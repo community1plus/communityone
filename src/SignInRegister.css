@@ -1,0 +1,140 @@
+* {
+  box-sizing: border-box;
+}
+
+body, html, #root {
+  height: 100%;
+  margin: 0;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.floating-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: white; /* optional light overlay */
+  z-index: 1000;
+}
+.logo {
+  position: absolute;
+  top: 20px;
+  left: 40px;
+  font-family: Arial, sans-serif;
+  font-size: 60px;
+  color: red;
+  font-weight: bold;
+  z-index: 1100;
+}
+
+.container {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+.container {
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+  padding: 1rem;
+}
+
+h1 {
+  color: red;
+  font-size: 3rem;
+  margin-bottom: 2rem;
+}
+
+.btn {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 25px;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  background-color: white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.btn:hover {
+  background-color: #f0f0f0;
+}
+
+.btn img {
+  height: 24px;
+  margin-right: 12px;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 20px 0;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #ccc;
+}
+
+.divider span {
+  margin: 0 10px;
+  color: #888;
+}
+
+input[type="email"] {
+  width: 100%;
+  padding: 12px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.signup-btn {
+  width: 100%;
+  padding: 12px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 25px;
+  background-color: red;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.signup-btn:hover {
+  background-color: darkred;
+}
+
+footer {
+  margin-top: 2rem;
+  font-size: 0.9rem;
+  color: #aaa;
+}
+
+/* Facebook button */
+.btn-facebook {
+  justify-content: center; /* center the icon + text */
+}
+
+/* All other buttons align text with Facebook's text */
+.btn:not(.btn-facebook) {
+  padding-left: 52px; /* aligns text with Facebook button text */
+}

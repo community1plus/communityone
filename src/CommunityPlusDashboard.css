@@ -1,0 +1,130 @@
+/* =========================
+   PAGE / DASHBOARD LAYOUT
+   ========================= */
+
+.dashboard-container {
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Main area below header */
+.main {
+  display: flex;
+  flex-direction: row;
+  height: calc(100vh - 104px);
+  margin-top: 104px; /* just under header */
+  width: 100%;
+  overflow: hidden;
+}
+
+/* =========================
+   HEADER NAV
+   ========================= */
+
+.links {
+  display: flex;
+  gap: 1rem;
+  padding: 0.5rem 1rem;
+  background: #fafafa;
+}
+
+/* =========================
+   SIDEBAR
+   ========================= */
+
+.sidebar {
+  width: 240px;
+  min-width: 240px;
+  background: #f4f4f4;
+  border-right: 1px solid #ddd;
+  overflow-y: auto;
+}
+
+/* =========================
+   MAIN CONTENT AREA
+   ========================= */
+
+.content-area {
+  flex: 1;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+
+/* =========================
+   MAP VIEW (DEFAULT)
+   ========================= */
+
+.map-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Map container */
+.map-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+#map {
+  background: repeating-linear-gradient(
+    45deg,
+    #ddd,
+    #ddd 10px,
+    #eee 10px,
+    #eee 20px
+  );
+}
+
+/* =========================
+   FEED / DYNAMIC CONTENT
+   ========================= */
+
+.feed-column {
+  flex: 1;
+  display: flex;
+  background-color: rgb(230, 224, 224);
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;      /* content scrolls here */
+  overflow-x: hidden;
+}
+
+/* =========================
+   SEARCH + MAP HELPERS
+   ========================= */
+
+.search-bar {
+  background: #fafafa;
+  z-index: 10;
+  margin: 0;
+  width: 100%;
+}
+
+/* Optional label over the map */
+.location-label {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.location-input {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+}

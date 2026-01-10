@@ -1,0 +1,45 @@
+/* Reset margins and ensure full height for everything */
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Set up your global font and text rendering */
+body {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+
+  background-color: #fff; /* default light background */
+  color: #242424;         /* default dark text */
+}
+
+/* Root app container */
+#root {
+  display: flex;
+  flex-direction: column; /* app layouts usually stack header/nav + main */
+  min-height: 100%;
+  overflow-x: hidden;     /* stop sideways scrollbars */
+  background-color: lightblue;            /* so children can layout easily */
+  justify-content: center;    /* center horizontally */
+  align-items: center;        /* center vertically */
+  font-family: Arial, sans-serif;
+}
+
+/* Optional: define CSS variables (custom props) on :root */
+:root {
+  --primary-color: #c00; /* example: COMMUNITY+ red */
+  --secondary-color: #242424;
+  --background-light: #fff;
+  --background-dark: #242424;
+  --text-light: #f9f9f9;
+  --text-dark: #242424;
+
+  color-scheme: light dark; /* helps browsers auto-adjust form controls */
+}

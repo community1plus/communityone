@@ -1,0 +1,105 @@
+.landing-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: Arial, sans-serif;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  justify-content: center; /* horizontal center */
+  align-items: center;     /* vertical center */
+  background-color: white;
+}
+
+.title-link {
+  text-decoration: none;
+}
+
+.title {
+  font-size: 60px;
+  color: red;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* Footer base */
+.footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px 40px;
+  background-color: #fff;
+  font-size: 14px;
+  color: #666;
+  border-top: 1px solid #e0e0e0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ✅ New: footer becomes two rows (search on top, content below) */
+.footer-column {
+  flex-direction: column;
+}
+
+/* ✅ Top row: search input */
+.footer-search-row {
+  display: flex;
+  justify-content: center; /* center the search input */
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: 12px;
+}
+
+/* Search sizing (top row) */
+.footer-search-row .search-input {
+  width: 420px;
+  max-width: 100%;
+}
+
+/* ✅ Bottom row: footer content */
+.footer-content-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.footer-left {
+  justify-content: flex-start;
+}
+
+.footer-center {
+  justify-content: center;
+}
+
+.footer-right {
+  justify-content: flex-end;
+}
+
+.footer-right a {
+  margin-left: 20px;
+  text-decoration: none;
+  color: #666;
+}
+
+.footer-right a:hover {
+  text-decoration: underline;
+}
+
+/* ChatGPT-style search input */
+.search-input {
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+}
+
+/* Focus state */
+.search-input:focus {
+  border-color: red;
+  box-shadow: 0 0 0 2px rgba(255, 0, 0, 0.15);
+}
