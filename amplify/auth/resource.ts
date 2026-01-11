@@ -15,8 +15,8 @@ export const auth = defineAuth({
         clientSecret: secret("GOOGLE_CLIENT_SECRET"),
       },
       facebook: {
-        clientId: secret("4245144389105101"),
-        clientSecret: secret("296ae4bffd3a52876cd81353afa47fcd"),
+        clientId: secret("FACEBOOK_APP_ID"),
+        clientSecret: secret("FACEBOOK_APP_SECRET"),
       },
 
       // ✅ MUST match your app URLs (dev + prod)
