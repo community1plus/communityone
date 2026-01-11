@@ -265,31 +265,38 @@ export default function CommunityPlusLandingPage() {
       </footer>
 
       {/* ============================
-          AUTH MODAL
+          AUTH MODAL (THEMED)
          ============================ */}
       {showAuth && (
         <div className="cpl-modalOverlay" role="dialog" aria-modal="true">
           <div className="cpl-modal">
             <div className="cpl-modalHeader">
-              <strong>Sign in to Community+</strong>
-              <button className="btn" type="button" onClick={() => setShowAuth(false)}>
+              <div className="cpl-modalTitle">Sign in to Community+</div>
+              <button
+                className="cpl-modalClose"
+                type="button"
+                onClick={() => setShowAuth(false)}
+              >
                 Close
               </button>
             </div>
 
             <div className="cpl-modalBody">
-              <Authenticator socialProviders={["google", "facebook"]}>
-                {({ user }) => {
-                  if (user) {
-                    // avoid setState during render loop
-                    setTimeout(() => {
-                      setShowAuth(false);
-                      navigate("/home", { replace: true });
-                    }, 0);
-                  }
-                  return null;
-                }}
-              </Authenticator>
+              {/* Scopes Amplify UI skin to this modal only */}
+              <div className="cpl-authTheme">
+                <Authenticator socialProviders={["google", "facebook"]}>
+                  {({ user }) => {
+                    if (user) {
+                      // avoid setState during render loop
+                      setTimeout(() => {
+                        setShowAuth(false);
+                        navigate("/home", { replace: true });
+                      }, 0);
+                    }
+                    return null;
+                  }}
+                </Authenticator>
+              </div>
             </div>
           </div>
         </div>

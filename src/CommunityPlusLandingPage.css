@@ -127,6 +127,96 @@
   border-radius: 18px;
 }
 
+/* =========================
+   Community+ Auth Modal
+   ========================= */
+
+.cpl-modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+
+  display: grid;
+  place-items: center;
+
+  padding: 18px;
+  background: rgba(20, 20, 20, 0.45);
+  backdrop-filter: blur(6px);
+}
+
+.cpl-modal {
+  width: min(980px, 92vw);       /* stop it being too wide */
+  max-height: 88vh;              /* keep it on screen */
+  overflow: hidden;              /* keep rounded corners clean */
+
+  border-radius: 22px;
+  border: 1px solid var(--line);
+  background: rgba(246, 243, 238, 0.96);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25);
+}
+
+.cpl-modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.cpl-modalTitle {
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: -0.02em;
+}
+
+.cpl-modalClose {
+  padding: 10px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.75);
+  cursor: pointer;
+}
+
+.cpl-modalBody {
+  padding: 18px;
+  overflow: auto;                /* scroll inside modal, not page */
+}
+
+/* Center the Amplify Auth UI inside the modal */
+.cpl-modalBody .amplify-authenticator {
+  display: flex;
+  justify-content: center;
+}
+
+/* Keep the inner Authenticator card a sensible width */
+.cpl-modalBody .amplify-card {
+  width: min(640px, 100%);
+  margin: 0 auto;
+
+  border-radius: 18px;
+  box-sizing: border-box;
+}
+
+/* Prevent any overflow that causes right-side cutoffs */
+.cpl-modalBody .amplify-authenticator,
+.cpl-modalBody .amplify-authenticator * {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Optional: soften the “double card” look inside your modal */
+.cpl-modalBody .amplify-card {
+  box-shadow: 0 10px 28px rgba(20, 20, 20, 0.10);
+}
+
+/* Optional: tighten the tabs bar spacing a bit */
+.cpl-modalBody .amplify-tabs__list {
+  justify-content: center;
+}
+
 
 a {
   color: inherit;
