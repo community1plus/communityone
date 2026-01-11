@@ -278,7 +278,7 @@ export default function CommunityPlusLandingPage() {
             </div>
 
             <div className="cpl-modalBody">
-              <Authenticator>
+              <Authenticator {["google", "facebook"]}>
                 {({ user }) => {
                   if (user) {
                     // avoid setState during render loop
