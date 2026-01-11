@@ -7,7 +7,7 @@ import { defineAuth, secret } from "@aws-amplify/backend";
 export const auth = defineAuth({
   loginWith: {
     email: true,
-
+    //
     // ✅ Add Google + Facebook social sign-in
     externalProviders: {
       google: {
