@@ -29,15 +29,16 @@ export default function CommunityPlusLandingPage() {
           </nav>
 
           <div className="actions">
-            <a className="btn" href="#">
+             {/* ✅ SIGN IN BUTTON */}
+            <button className="btn" onClick={() => setShowAuth(true)}>
               Sign in
-            </a>
-            <a className="btn primary" href="#">
+            </button>
+
+            <button className="btn primary" onClick={() => setShowAuth(true)}>
               <strong>Join</strong>
-            </a>
-            <div className="avatar" title="Profile" aria-label="Profile">
-              A
-            </div>
+            </button>
+
+            <div className="avatar">A</div>
           </div>
         </div>
       </header>
