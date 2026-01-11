@@ -4,7 +4,7 @@ import { getCurrentUser } from "aws-amplify/auth";
 import { Authenticator } from "@aws-amplify/ui-react";
 import CommunityPlusLandingPage from "./CommunityPlusLandingPage";
 import CommunityPlusDashboard from "./CommunityPlusDashboard";
-
+//
 /**
  * A small gate that:
  * - checks whether a user session exists
