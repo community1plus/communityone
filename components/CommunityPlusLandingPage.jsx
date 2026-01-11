@@ -1,5 +1,5 @@
 import React from "react";
-import "./src/CommunityPlusLandingPage.css";
+import "../src/CommunityPlusLandingPage.css";
 
 export default function CommunityPlusLandingPage() {
   return (
