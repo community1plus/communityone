@@ -18,7 +18,7 @@ export const auth = defineAuth({
         clientId: secret("FACEBOOK_APP_ID"),
         clientSecret: secret("FACEBOOK_APP_SECRET"),
       },
-
+      //
       // ✅ MUST match your app URLs (dev + prod)
       callbackUrls: [
         "http://localhost:5173/",
