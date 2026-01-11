@@ -321,6 +321,33 @@ a {
   margin-right: 4px;
 }
 
+/* Priority layout for pulse bar */
+.pulsebar {
+  display: flex;
+  gap: 8px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* Default pill behaviour */
+.pulsebar .pulse {
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ALERT should win space */
+.pulsebar .pulse-alert {
+  flex: 2 1 0;
+}
+
+/* EVENTS can collapse first */
+.pulsebar .pulse-events {
+  flex: 0.8 1 0;
+}
+
 
 /* ✅ FIX: allow grid columns to shrink so map doesn't overflow */
 .preview-inner {

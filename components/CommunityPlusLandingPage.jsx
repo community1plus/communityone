@@ -7,9 +7,7 @@ export default function CommunityPlusLandingPage() {
       <header className="topbar">
         <div className="wrap topbar-inner">
           <div className="brand">
-            <div className="logo">
-              COMMUNITY ONE
-            </div>
+            <div className="logo">COMMUNITY ONE</div>
 
             <div className="loc">
               <button className="pill" type="button" title="Change location">
@@ -88,14 +86,14 @@ export default function CommunityPlusLandingPage() {
 
             <aside className="preview" aria-label="App preview">
               <div className="pulsebar">
-                <span className="pulse">
+                <span className="pulse pulse-live">
                   <strong>LIVE</strong> <span className="sep">•</span> 2 gigs tonight
                 </span>
-                <span className="pulse">
+                <span className="pulse pulse-alert">
                   <strong>ALERT</strong> <span className="sep">•</span> 1 unverified
                   incident
                 </span>
-                <span className="pulse">
+                <span className="pulse pulse-events">
                   <strong>EVENTS</strong> <span className="sep">•</span> Weekend market
                 </span>
               </div>
