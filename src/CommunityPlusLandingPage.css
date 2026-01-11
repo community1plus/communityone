@@ -295,33 +295,32 @@ a {
 .pulsebar {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 12px 14px;
-  border-bottom: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.65);
-  color: var(--muted);
-  font-size: 12px;
-  white-space: nowrap;
-  overflow: hidden;
-}
-
-.pulsebar .pulse {
-  display: inline-flex;
-  align-items: center;
   gap: 8px;
-  padding: 7px 10px;
-  border-radius: 999px;
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.55);
+
+  white-space: nowrap;
+  overflow: hidden;        /* no scroll, no bleed */
 }
 
+/* Pills can shrink */
+.pulsebar .pulse {
+  flex: 1 1 0;             /* allow shrinking */
+  min-width: 0;            /* REQUIRED for text truncation */
+  max-width: 100%;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  padding: 6px 10px;       /* slightly tighter */
+  font-size: 11.5px;       /* subtle compression */
+}
+
+/* Prevent strong labels from forcing width */
 .pulsebar .pulse strong {
-  color: var(--ink);
+  flex-shrink: 0;
+  margin-right: 4px;
 }
 
-.pulsebar .sep {
-  opacity: 0.35;
-}
 
 /* ✅ FIX: allow grid columns to shrink so map doesn't overflow */
 .preview-inner {
