@@ -8,7 +8,7 @@ export default function CommunityPlusLandingPage() {
         <div className="wrap topbar-inner">
           <div className="brand">
             <div className="logo">
-              COMMUNITY<span>+</span>
+              COMMUNITY ONE
             </div>
 
             <div className="loc">
@@ -49,20 +49,20 @@ export default function CommunityPlusLandingPage() {
           <div className="hero-grid">
             <div className="headline">
               <h1 className="tagline">
-                Real people. <span className="accent">Real News.</span> Realtime
+                Real People. <span className="accent">Real News.</span> Real Time
               </h1>
 
               <p className="sub">
                 A map-first local feed that prioritises what’s happening <b>here</b>.
-                Short, time-bound posts. Clear labels.
+                Short, time-bound posts.
               </p>
 
               <div className="heroCtas">
                 <a className="btn primary" href="#">
-                  <strong>Explore your area</strong>
+                  <strong>Explore your local area</strong>
                 </a>
                 <a className="btn" href="#">
-                  See Global View
+                  Global View
                 </a>
                 <a
                   className="btn"
@@ -183,7 +183,7 @@ export default function CommunityPlusLandingPage() {
                 <div className="map">
                   <div className="pane-title">
                     <span>
-                      <b>Map</b> — St Kilda
+                      <b>Map</b> - St Kilda
                     </span>
                     <span className="mono">Now</span>
                   </div>
