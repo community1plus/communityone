@@ -1,7 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Authenticator } from "@aws-amplify/ui-react";
+import "@aws-amplify/ui-react/styles.css";
 import "../src/CommunityPlusLandingPage.css";
 
 export default function CommunityPlusLandingPage() {
+  const navigate = useNavigate();
+  const [showAuth, setShowAuth] = useState(false);
+
   return (
     <div className="cpl-root">
       <header className="topbar">
@@ -29,16 +35,22 @@ export default function CommunityPlusLandingPage() {
           </nav>
 
           <div className="actions">
-             {/* ✅ SIGN IN BUTTON */}
-            <button className="btn" onClick={() => setShowAuth(true)}>
+            {/* ✅ SIGN IN / JOIN BUTTONS */}
+            <button className="btn" type="button" onClick={() => setShowAuth(true)}>
               Sign in
             </button>
 
-            <button className="btn primary" onClick={() => setShowAuth(true)}>
+            <button
+              className="btn primary"
+              type="button"
+              onClick={() => setShowAuth(true)}
+            >
               <strong>Join</strong>
             </button>
 
-            <div className="avatar">A</div>
+            <div className="avatar" title="Profile" aria-label="Profile">
+              A
+            </div>
           </div>
         </div>
       </header>
@@ -251,6 +263,37 @@ export default function CommunityPlusLandingPage() {
           </div>
         </div>
       </footer>
+
+      {/* ============================
+          AUTH MODAL
+         ============================ */}
+      {showAuth && (
+        <div className="cpl-modalOverlay" role="dialog" aria-modal="true">
+          <div className="cpl-modal">
+            <div className="cpl-modalHeader">
+              <strong>Sign in to Community+</strong>
+              <button className="btn" type="button" onClick={() => setShowAuth(false)}>
+                Close
+              </button>
+            </div>
+
+            <div className="cpl-modalBody">
+              <Authenticator>
+                {({ user }) => {
+                  if (user) {
+                    // avoid setState during render loop
+                    setTimeout(() => {
+                      setShowAuth(false);
+                      navigate("/home", { replace: true });
+                    }, 0);
+                  }
+                  return null;
+                }}
+              </Authenticator>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
