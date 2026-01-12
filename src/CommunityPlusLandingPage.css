@@ -141,10 +141,15 @@ a {
 
 .cpl-authTagline {
   margin-top: 6px;
-  margin-bottom: 6px;
+  margin-bottom: 18px;  /* ✅ add this */
   font-size: 13px;
   opacity: 0.75;
-  line-height: 1.35;
+  line-height: 1.55;    /* ✅ slightly taller line-height */
+}
+
+/* Ensure the first auth button doesn't sit too close */
+.cpl-authTheme [data-amplify-authenticator] .amplify-button--fullwidth:first-of-type {
+  margin-top: 6px;
 }
 
 /* Scope Amplify overrides to the modal only */
