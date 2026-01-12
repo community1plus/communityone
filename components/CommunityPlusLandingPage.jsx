@@ -1,12 +1,67 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Authenticator } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 import "../src/CommunityPlusLandingPage.css";
 
+/**
+ * AuthGate
+ * - Renders Amplify Authenticator with a custom header
+ * - Calls onAuthed() once when a user is authenticated (guarded by parent)
+ */
+function AuthGate({ onAuthed }) {
+  return (
+    <Authenticator
+      socialProviders={["google", "facebook"]}
+      components={{
+        Header() {
+          return (
+            <div className="cpl-authHeader">
+              <div className="cpl-authBrand">Community+</div>
+              <div className="cpl-authTagline">
+                Local, real-time information for your community.
+              </div>
+            </div>
+          );
+        },
+      }}
+    >
+      {({ user }) => {
+        if (user) onAuthed();
+        return null;
+      }}
+    </Authenticator>
+  );
+}
+
 export default function CommunityPlusLandingPage() {
   const navigate = useNavigate();
   const [showAuth, setShowAuth] = useState(false);
+
+  // Prevent multiple navigations if Authenticator re-renders
+  const didNavigateRef = useRef(false);
+
+  const handleAuthed = () => {
+    if (didNavigateRef.current) return;
+    didNavigateRef.current = true;
+    setShowAuth(false);
+    navigate("/home", { replace: true });
+  };
+
+  // Reset the nav-guard each time the modal opens
+  useEffect(() => {
+    if (showAuth) didNavigateRef.current = false;
+  }, [showAuth]);
+
+  // Close on Escape
+  useEffect(() => {
+    if (!showAuth) return;
+    const onKeyDown = (e) => {
+      if (e.key === "Escape") setShowAuth(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [showAuth]);
 
   return (
     <div className="cpl-root">
@@ -35,7 +90,7 @@ export default function CommunityPlusLandingPage() {
           </nav>
 
           <div className="actions">
-            {/* ✅ SIGN IN / JOIN BUTTONS */}
+            {/* SIGN IN / JOIN */}
             <button className="btn" type="button" onClick={() => setShowAuth(true)}>
               Sign in
             </button>
@@ -265,13 +320,22 @@ export default function CommunityPlusLandingPage() {
       </footer>
 
       {/* ============================
-          AUTH MODAL (THEMED)
+          AUTH MODAL (TIGHTENED)
          ============================ */}
       {showAuth && (
-        <div className="cpl-modalOverlay" role="dialog" aria-modal="true">
+        <div
+          className="cpl-modalOverlay"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Authentication"
+          onMouseDown={(e) => {
+            // close on backdrop click only
+            if (e.target === e.currentTarget) setShowAuth(false);
+          }}
+        >
           <div className="cpl-modal">
             <div className="cpl-modalHeader">
-              <div className="cpl-modalTitle">Sign in to Community+</div>
+              <div className="cpl-modalTitle">Sign in</div>
               <button
                 className="cpl-modalClose"
                 type="button"
@@ -282,20 +346,9 @@ export default function CommunityPlusLandingPage() {
             </div>
 
             <div className="cpl-modalBody">
-              {/* Scopes Amplify UI skin to this modal only */}
+              {/* Scope Amplify UI skin to this modal only */}
               <div className="cpl-authTheme">
-                <Authenticator socialProviders={["google", "facebook"]}>
-                  {({ user }) => {
-                    if (user) {
-                      // avoid setState during render loop
-                      setTimeout(() => {
-                        setShowAuth(false);
-                        navigate("/home", { replace: true });
-                      }, 0);
-                    }
-                    return null;
-                  }}
-                </Authenticator>
+                <AuthGate onAuthed={handleAuthed} />
               </div>
             </div>
           </div>

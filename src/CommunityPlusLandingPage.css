@@ -17,6 +17,11 @@
   box-sizing: border-box;
 }
 
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
 .cpl-root {
   min-height: 100vh;
   margin: 0;
@@ -37,98 +42,18 @@
   letter-spacing: -0.01em;
 }
 
-/* Auth modal */
-.cpl-modalOverlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(20, 20, 20, 0.45);
-  backdrop-filter: blur(6px);
-  display: grid;
-  place-items: center;
-  z-index: 9999;
-}
-
-.cpl-modal {
-  width: min(480px, 100%);
-  background: #fff;
-  border-radius: 18px;
-  border: 1px solid var(--line);
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25);
-}
-
-.cpl-modalHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px;
-  border-bottom: 1px solid var(--line);
-}
-
-.cpl-modalBody {
-  padding: 16px;
-}
-
-/* ---------- Modal sizing + containment ---------- */
-.cpl-modalOverlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(20, 20, 20, 0.45);
-  backdrop-filter: blur(6px);
-  display: grid;
-  place-items: center;
-  padding: 18px;
-  z-index: 9999;
-}
-
-.cpl-modal {
-  width: min(920px, 92vw);       /* wider so tabs fit nicely */
-  max-height: 86vh;              /* prevent screen overflow */
-  overflow: hidden;              /* keeps rounded corners clean */
-  border-radius: 22px;
-  border: 1px solid var(--line);
-  background: rgba(246, 243, 238, 0.96);
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25);
-}
-
-.cpl-modalHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 14px 14px;
-  border-bottom: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.72);
-}
-
-.cpl-modalBody {
-  padding: 16px;
-  overflow: auto;               /* scroll inside modal if needed */
-}
-
-/* ---------- Amplify UI containment overrides ---------- */
-/* Make the Authenticator never exceed modal width */
-.cpl-modalBody .amplify-authenticator,
-.cpl-modalBody .amplify-authenticator *,
-.cpl-modalBody .amplify-tabs,
-.cpl-modalBody .amplify-card {
-  max-width: 100%;
-  box-sizing: border-box;
-}
-
-/* The actual auth "card" should fit the modal */
-.cpl-modalBody .amplify-card {
-  width: 100%;
+.wrap {
+  max-width: 1120px;
   margin: 0 auto;
-}
-
-/* Optional: slightly soften Amplify's card shadow inside your modal */
-.cpl-modalBody .amplify-card {
-  box-shadow: 0 10px 28px rgba(20, 20, 20, 0.10);
-  border-radius: 18px;
+  padding: 0 18px;
 }
 
 /* =========================
-   Community+ Auth Modal
+   Community+ Auth Modal (TIGHTENED)
+   - removes duplicated rules
+   - narrower modal
+   - hides Amplify tabs (Sign In/Create Account)
+   - tighter padding + calmer overlay
    ========================= */
 
 .cpl-modalOverlay {
@@ -139,20 +64,20 @@
   display: grid;
   place-items: center;
 
-  padding: 18px;
-  background: rgba(20, 20, 20, 0.45);
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.25);
   backdrop-filter: blur(6px);
 }
 
 .cpl-modal {
-  width: min(980px, 92vw);       /* stop it being too wide */
-  max-height: 88vh;              /* keep it on screen */
-  overflow: hidden;              /* keep rounded corners clean */
+  width: min(460px, 92vw);
+  max-height: 86vh;
+  overflow: hidden;
 
-  border-radius: 22px;
+  border-radius: 16px;
   border: 1px solid var(--line);
-  background: rgba(246, 243, 238, 0.96);
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25);
+  background: #fff;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.28);
 }
 
 .cpl-modalHeader {
@@ -162,74 +87,86 @@
   gap: 12px;
 
   padding: 14px 16px;
-  border-bottom: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.72);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.86);
 }
 
 .cpl-modalTitle {
-  font-weight: 700;
+  font-weight: 800;
   font-size: 16px;
   letter-spacing: -0.02em;
 }
 
 .cpl-modalClose {
-  padding: 10px 14px;
-  border-radius: 14px;
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.75);
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  background: #fff;
   cursor: pointer;
 }
 
 .cpl-modalBody {
-  padding: 18px;
-  overflow: auto;                /* scroll inside modal, not page */
+  padding: 14px 16px 18px;
+  overflow: auto; /* scroll inside modal if needed */
 }
 
-/* Center the Amplify Auth UI inside the modal */
-.cpl-modalBody .amplify-authenticator {
-  display: flex;
-  justify-content: center;
+/* Your Authenticator header (from JSX) */
+.cpl-authHeader {
+  text-align: center;
+  margin: 8px 0 14px;
 }
 
-/* Keep the inner Authenticator card a sensible width */
-.cpl-modalBody .amplify-card {
-  width: min(640px, 100%);
-  margin: 0 auto;
-
-  border-radius: 18px;
-  box-sizing: border-box;
+.cpl-authBrand {
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  font-size: 18px;
 }
 
-/* Prevent any overflow that causes right-side cutoffs */
-.cpl-modalBody .amplify-authenticator,
-.cpl-modalBody .amplify-authenticator * {
-  max-width: 100%;
-  box-sizing: border-box;
+.cpl-authTagline {
+  margin-top: 6px;
+  font-size: 13px;
+  opacity: 0.75;
+  line-height: 1.35;
 }
 
-/* Optional: soften the “double card” look inside your modal */
-.cpl-modalBody .amplify-card {
-  box-shadow: 0 10px 28px rgba(20, 20, 20, 0.10);
+/* Scope Amplify overrides to the modal only */
+.cpl-authTheme [data-amplify-authenticator] {
+  --amplify-components-authenticator-container-padding: 0;
+  --amplify-components-authenticator-router-box-shadow: none;
+  --amplify-components-authenticator-router-border-width: 0;
+  --amplify-components-authenticator-router-padding: 0;
+
+  --amplify-components-button-border-radius: 10px;
+  --amplify-components-fieldcontrol-border-radius: 10px;
 }
 
-/* Optional: tighten the tabs bar spacing a bit */
-.cpl-modalBody .amplify-tabs__list {
-  justify-content: center;
+/* Hide Sign In / Create Account tabs */
+.cpl-authTheme [data-amplify-authenticator] [role="tablist"] {
+  display: none !important;
 }
 
-
-a {
-  color: inherit;
-  text-decoration: none;
+/* Remove extra card chrome so it feels like part of your modal */
+.cpl-authTheme [data-amplify-authenticator] .amplify-card {
+  box-shadow: none !important;
+  border: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
 }
 
-.wrap {
-  max-width: 1120px;
-  margin: 0 auto;
-  padding: 0 18px;
+/* Tighten form layout */
+.cpl-authTheme [data-amplify-authenticator] form {
+  gap: 10px;
 }
 
-/* Top bar */
+/* Social buttons + primary button slightly tighter */
+.cpl-authTheme [data-amplify-authenticator] .amplify-button--fullwidth {
+  padding: 10px 12px;
+}
+
+/* =========================
+   Top bar
+   ========================= */
+
 .topbar {
   position: sticky;
   top: 0;
@@ -362,7 +299,10 @@ a {
   color: rgba(20, 20, 20, 0.7);
 }
 
-/* Hero */
+/* =========================
+   Hero
+   ========================= */
+
 .hero {
   padding: 54px 0 26px;
 }
@@ -461,7 +401,10 @@ a {
   font-size: 12px;
 }
 
-/* Preview panel (map + feed) */
+/* =========================
+   Preview panel (map + feed)
+   ========================= */
+
 .preview {
   border: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.7);
@@ -477,60 +420,27 @@ a {
   display: flex;
   align-items: center;
   gap: 8px;
-
-  white-space: nowrap;
-  overflow: hidden;        /* no scroll, no bleed */
-}
-
-/* Pills can shrink */
-.pulsebar .pulse {
-  flex: 1 1 0;             /* allow shrinking */
-  min-width: 0;            /* REQUIRED for text truncation */
-  max-width: 100%;
-
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-
-  padding: 6px 10px;       /* slightly tighter */
-  font-size: 11.5px;       /* subtle compression */
-}
-
-/* Prevent strong labels from forcing width */
-.pulsebar .pulse strong {
-  flex-shrink: 0;
-  margin-right: 4px;
-}
-
-/* Priority layout for pulse bar */
-.pulsebar {
-  display: flex;
-  gap: 8px;
   overflow: hidden;
   white-space: nowrap;
 }
 
-/* Default pill behaviour */
 .pulsebar .pulse {
   flex: 1 1 0;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  padding: 6px 10px;
+  font-size: 11.5px;
 }
 
-/* ALERT should win space */
 .pulsebar .pulse-alert {
   flex: 2 1 0;
 }
-
-/* EVENTS can collapse first */
 .pulsebar .pulse-events {
   flex: 0.8 1 0;
 }
 
-
-/* ✅ FIX: allow grid columns to shrink so map doesn't overflow */
 .preview-inner {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -538,7 +448,6 @@ a {
   min-height: 300px;
 }
 
-/* ✅ FIX: prevent overflow due to implicit min-width of children */
 .feed,
 .map {
   min-width: 0;
@@ -552,7 +461,7 @@ a {
 .map {
   padding: 14px;
   position: relative;
-  overflow: hidden; /* ✅ safety: keeps map content contained */
+  overflow: hidden;
 }
 
 .pane-title {
@@ -656,7 +565,6 @@ a {
   background: rgba(182, 58, 43, 0.1);
 }
 
-/* ✅ Restored + merged mapbox core styles (your paste was missing sizing/positioning/border) */
 .mapbox {
   width: 100%;
   max-width: 100%;
@@ -667,7 +575,7 @@ a {
   border-radius: 18px;
 
   position: relative;
-  overflow: hidden; /* ✅ ensures rounded corners contain everything */
+  overflow: hidden;
 
   background: radial-gradient(
       700px 300px at 30% 20%,
@@ -695,7 +603,6 @@ a {
   pointer-events: none;
 }
 
-/* ✅ Restored mappin positioning/sizing + your shape encoding */
 .mappin {
   position: absolute;
   width: 12px;
@@ -707,7 +614,7 @@ a {
 
 .mappin.teal {
   background: var(--accent-2);
-  border-radius: 6px; /* squares = info/events */
+  border-radius: 6px;
   box-shadow: 0 0 0 5px rgba(13, 91, 87, 0.14);
 }
 
@@ -723,7 +630,10 @@ a {
   color: var(--muted);
 }
 
-/* Lower section */
+/* =========================
+   Lower section
+   ========================= */
+
 .section {
   padding: 22px 0 58px;
 }
@@ -781,4 +691,3 @@ footer {
     "Courier New", monospace;
   opacity: 0.8;
 }
-
