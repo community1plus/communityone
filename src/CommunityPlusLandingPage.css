@@ -50,19 +50,19 @@ a {
 }
 
 /* =========================
-   Community+ Auth Modal
-   (CENTERED + CONTAINED + EVEN VERTICAL RHYTHM)
-   - centers header block properly
-   - removes dead space above social buttons
-   - ensures bottom links never clip
+   Community+ Auth Modal (CENTERED + CONTAINED + TIGHTER TOP SPACING)
+   - Reduces dead space above social buttons
+   - Keeps footer links inside modal (no clipping)
    ========================= */
 
 .cpl-modalOverlay {
   position: fixed;
   inset: 0;
   z-index: 9999;
+
   display: grid;
   place-items: center;
+
   padding: 24px;
   background: rgba(0, 0, 0, 0.25);
   backdrop-filter: blur(6px);
@@ -71,11 +71,13 @@ a {
 .cpl-modal {
   width: min(520px, 92vw);
   max-height: 86vh;
+
   border-radius: 18px;
   border: 1px solid var(--line);
   background: #fff;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.28);
-  overflow: hidden; /* rounded corners clean */
+
+  overflow: hidden; /* keep rounded corners clean */
 }
 
 .cpl-modalHeader {
@@ -102,11 +104,11 @@ a {
   cursor: pointer;
 }
 
-/* Body scrolls (not the page) + bottom breathing room */
+/* Body scrolls (not the page) + bottom breathing room so links don't clip */
 .cpl-modalBody {
   display: flex;
   justify-content: center;
-  padding: 14px 16px 40px; /* ✅ restore padding + bottom room */
+  /*padding: 16px 16px 40px; /* more bottom room; slightly tighter top */
   overflow: auto;
 }
 
@@ -117,36 +119,30 @@ a {
   margin: 0 auto;
 }
 
-/* Make sure nested Amplify wrappers can shrink */
+/* Make sure every nested Amplify wrapper can shrink */
 .cpl-authTheme,
 .cpl-authTheme * {
   box-sizing: border-box;
   max-width: 100%;
 }
 
-/* Header block: properly centered + balanced */
+/* Header (your JSX) */
 .cpl-authHeader {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   text-align: center;
-
-  padding: 8px 0 10px;
-  margin: 0;
+  margin: 0px 0 0px; /* tighter overall */
+  padding-bottom: 0px;
 }
 
 .cpl-authBrand {
-  margin: 0;
   font-weight: 900;
   letter-spacing: 0.02em;
   font-size: 18px;
-  line-height: 1.2;
-  color: var(--accent);
+  color: var(--accent)
 }
 
 .cpl-authTagline {
-  margin: 6px 0 8px; /* ✅ controlled gap before buttons */
+  margin-top: 0px;
+  margin-bottom: 0px; /* tighter space before buttons */
   font-size: 13px;
   opacity: 0.75;
   line-height: 1.45;
@@ -192,7 +188,7 @@ a {
   background: transparent !important;
 }
 
-/* Controlled spacing: consistent vertical rhythm */
+/* Controlled spacing: avoid oversized dead space at top */
 .cpl-authTheme [data-amplify-authenticator] form {
   display: flex;
   flex-direction: column;
