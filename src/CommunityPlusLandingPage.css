@@ -132,7 +132,6 @@ a {
   vertical-align: middle;
   margin: 0px 0 0px; /* tighter overall */
   padding-bottom: 0px;
-  vertical-align: middle;
 }
 
 .cpl-authBrand {
@@ -140,12 +139,14 @@ a {
   font-weight: 900;
   letter-spacing: 0.02em;
   font-size: 18px;
-  color: var(--accent)
+  color: var(--accent);
+  margin: 0px 0 0px; /* tighter overall */
+  padding-bottom: 0px;
 }
 
 .cpl-authTagline {
-  margin-top: 0px;
-  margin-bottom: 0px; /* tighter space before buttons */
+  margin: 0px 0 0px; /* tighter overall */
+  padding-bottom: 0px;
   font-size: 13px;
   opacity: 0.75;
   line-height: 1.45;
