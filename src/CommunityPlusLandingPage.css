@@ -128,7 +128,8 @@ a {
 /* Header (your JSX) */
 .cpl-authHeader {
   text-align: center;
-  /*margin: 6px 0 2px; /* tighter overall */
+  margin: 0px 0 0px; /* tighter overall */
+  padding-bottom: 0px;
 }
 
 .cpl-authBrand {
