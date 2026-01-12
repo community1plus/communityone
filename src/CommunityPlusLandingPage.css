@@ -49,11 +49,10 @@ a {
 }
 
 /* =========================
-   Community+ Auth Modal (TIGHTENED)
-   - removes duplicated rules
-   - narrower modal
-   - hides Amplify tabs (Sign In/Create Account)
-   - tighter padding + calmer overlay
+   Community+ Auth Modal (CENTERED + CONTAINED)
+   - Centers contents in modal
+   - Constrains Amplify Auth UI to a fixed column
+   - Prevents overflow/cutoff
    ========================= */
 
 .cpl-modalOverlay {
@@ -70,11 +69,11 @@ a {
 }
 
 .cpl-modal {
-  width: min(460px, 92vw);
+  width: min(520px, 92vw); /* slightly wider so nothing clips */
   max-height: 86vh;
   overflow: hidden;
 
-  border-radius: 16px;
+  border-radius: 18px;
   border: 1px solid var(--line);
   background: #fff;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.28);
@@ -105,9 +104,26 @@ a {
   cursor: pointer;
 }
 
+/* KEY: body becomes a centering container */
 .cpl-modalBody {
-  padding: 14px 16px 18px;
+  display: flex;
+  justify-content: center;
+  padding: 18px 16px 22px;
   overflow: auto; /* scroll inside modal if needed */
+}
+
+/* KEY: clamp the auth content to a single centered column */
+.cpl-authTheme {
+  width: 100%;
+  max-width: 420px; /* 400–460 is the sweet spot */
+  margin: 0 auto;
+}
+
+/* Make sure every nested Amplify wrapper can shrink */
+.cpl-authTheme,
+.cpl-authTheme * {
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 /* Your Authenticator header (from JSX) */
@@ -131,6 +147,8 @@ a {
 
 /* Scope Amplify overrides to the modal only */
 .cpl-authTheme [data-amplify-authenticator] {
+  width: 100%;
+
   --amplify-components-authenticator-container-padding: 0;
   --amplify-components-authenticator-router-box-shadow: none;
   --amplify-components-authenticator-router-border-width: 0;
@@ -138,6 +156,20 @@ a {
 
   --amplify-components-button-border-radius: 10px;
   --amplify-components-fieldcontrol-border-radius: 10px;
+}
+
+/* Remove any outer padding Amplify applies */
+.cpl-authTheme [data-amplify-authenticator] [data-amplify-container] {
+  padding: 0 !important;
+}
+
+/* Ensure router/card elements are 100% width and centered */
+.cpl-authTheme [data-amplify-authenticator] .amplify-authenticator__router,
+.cpl-authTheme [data-amplify-authenticator] .amplify-tabs,
+.cpl-authTheme [data-amplify-authenticator] .amplify-card {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 auto !important;
 }
 
 /* Hide Sign In / Create Account tabs */
@@ -158,8 +190,9 @@ a {
   gap: 10px;
 }
 
-/* Social buttons + primary button slightly tighter */
+/* Make sure full-width buttons truly respect the column */
 .cpl-authTheme [data-amplify-authenticator] .amplify-button--fullwidth {
+  width: 100% !important;
   padding: 10px 12px;
 }
 
