@@ -136,10 +136,11 @@ a {
   font-weight: 900;
   letter-spacing: 0.02em;
   font-size: 18px;
+  color: var(--accent)
 }
 
 .cpl-authTagline {
-  margin-top: 6px;
+  margin-top: 0px;
   margin-bottom: 8px; /* tighter space before buttons */
   font-size: 13px;
   opacity: 0.75;
