@@ -131,6 +131,7 @@ a {
   text-align: center;
   margin: 0px 0 0px; /* tighter overall */
   padding-bottom: 0px;
+  vertical-align: middle;
 }
 
 .cpl-authBrand {
