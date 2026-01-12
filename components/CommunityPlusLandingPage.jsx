@@ -91,7 +91,7 @@ export default function CommunityPlusLandingPage() {
 
           <div className="actions">
             {/* SIGN IN / JOIN */}
-            <button className="btn" type="button" onClick={() => setShowAuth(true)}>
+            <button className="btn signin" type="button" onClick={() => setShowAuth(true)}>
               Sign in
             </button>
 

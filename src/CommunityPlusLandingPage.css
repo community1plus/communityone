@@ -8,6 +8,7 @@
   --shadow: 0 10px 28px rgba(20, 20, 20, 0.08);
   --accent: #b63a2b; /* muted brick red */
   --accent-2: #0d5b57; /* deep teal (sparingly) */
+  --accent-facebook: rgb(24, 119, 242);
   --chip: rgba(182, 58, 43, 0.1);
   --ok: #1f7a3a;
   --warn: #b36a00;
@@ -49,19 +50,19 @@ a {
 }
 
 /* =========================
-   Community+ Auth Modal (CENTERED + CONTAINED + TIGHTER TOP SPACING)
-   - Reduces dead space above social buttons
-   - Keeps footer links inside modal (no clipping)
+   Community+ Auth Modal
+   (CENTERED + CONTAINED + EVEN VERTICAL RHYTHM)
+   - centers header block properly
+   - removes dead space above social buttons
+   - ensures bottom links never clip
    ========================= */
 
 .cpl-modalOverlay {
   position: fixed;
   inset: 0;
   z-index: 9999;
-
   display: grid;
   place-items: center;
-
   padding: 24px;
   background: rgba(0, 0, 0, 0.25);
   backdrop-filter: blur(6px);
@@ -70,13 +71,11 @@ a {
 .cpl-modal {
   width: min(520px, 92vw);
   max-height: 86vh;
-
   border-radius: 18px;
   border: 1px solid var(--line);
   background: #fff;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.28);
-
-  overflow: hidden; /* keep rounded corners clean */
+  overflow: hidden; /* rounded corners clean */
 }
 
 .cpl-modalHeader {
@@ -103,11 +102,11 @@ a {
   cursor: pointer;
 }
 
-/* Body scrolls (not the page) + bottom breathing room so links don't clip */
+/* Body scrolls (not the page) + bottom breathing room */
 .cpl-modalBody {
   display: flex;
   justify-content: center;
-  /*padding: 16px 16px 40px; /* more bottom room; slightly tighter top */
+  padding: 14px 16px 40px; /* ✅ restore padding + bottom room */
   overflow: auto;
 }
 
@@ -118,30 +117,36 @@ a {
   margin: 0 auto;
 }
 
-/* Make sure every nested Amplify wrapper can shrink */
+/* Make sure nested Amplify wrappers can shrink */
 .cpl-authTheme,
 .cpl-authTheme * {
   box-sizing: border-box;
   max-width: 100%;
 }
 
-/* Header (your JSX) */
+/* Header block: properly centered + balanced */
 .cpl-authHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
-  margin: 0px 0 0px; /* tighter overall */
-  padding-bottom: 0px;
+
+  padding: 8px 0 10px;
+  margin: 0;
 }
 
 .cpl-authBrand {
+  margin: 0;
   font-weight: 900;
   letter-spacing: 0.02em;
   font-size: 18px;
-  color: var(--accent)
+  line-height: 1.2;
+  color: var(--accent);
 }
 
 .cpl-authTagline {
-  margin-top: 0px;
-  margin-bottom: 0px; /* tighter space before buttons */
+  margin: 6px 0 8px; /* ✅ controlled gap before buttons */
   font-size: 13px;
   opacity: 0.75;
   line-height: 1.45;
@@ -187,7 +192,7 @@ a {
   background: transparent !important;
 }
 
-/* Controlled spacing: avoid oversized dead space at top */
+/* Controlled spacing: consistent vertical rhythm */
 .cpl-authTheme [data-amplify-authenticator] form {
   display: flex;
   flex-direction: column;
@@ -344,6 +349,17 @@ a {
     rgba(182, 58, 43, 0.14),
     rgba(182, 58, 43, 0.06)
   );
+}
+
+.btn.signin {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: linear-gradient(
+    180deg,
+    rgba(155, 44, 44, 0.12),
+    rgba(155, 44, 44, 0.04)
+  );
+  font-weight: 600;
 }
 
 .btn.primary strong {
