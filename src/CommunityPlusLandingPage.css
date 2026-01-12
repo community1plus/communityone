@@ -49,11 +49,9 @@ a {
 }
 
 /* =========================
-   Community+ Auth Modal (CENTERED + CONTAINED + EVEN SPACING)
-   - Centers contents in modal
-   - Constrains Amplify Auth UI to a fixed column
-   - Prevents overflow/cutoff
-   - Improves vertical rhythm + bottom breathing room
+   Community+ Auth Modal (CENTERED + CONTAINED + TIGHTER TOP SPACING)
+   - Reduces dead space above social buttons
+   - Keeps footer links inside modal (no clipping)
    ========================= */
 
 .cpl-modalOverlay {
@@ -72,12 +70,13 @@ a {
 .cpl-modal {
   width: min(520px, 92vw);
   max-height: 86vh;
-  overflow: hidden;
 
   border-radius: 18px;
   border: 1px solid var(--line);
   background: #fff;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.28);
+
+  overflow: hidden; /* keep rounded corners clean */
 }
 
 .cpl-modalHeader {
@@ -105,18 +104,18 @@ a {
   cursor: pointer;
 }
 
-/* KEY: body is a centering container + extra bottom padding */
+/* Body scrolls (not the page) + bottom breathing room so links don't clip */
 .cpl-modalBody {
   display: flex;
   justify-content: center;
-  padding: 18px 16px 32px; /* extra bottom breathing room */
+  padding: 16px 16px 40px; /* more bottom room; slightly tighter top */
   overflow: auto;
 }
 
-/* KEY: clamp the auth content to a single centered column */
+/* Clamp auth content to a centered column */
 .cpl-authTheme {
   width: 100%;
-  max-width: 420px; /* 400–460 sweet spot */
+  max-width: 420px;
   margin: 0 auto;
 }
 
@@ -127,10 +126,10 @@ a {
   max-width: 100%;
 }
 
-/* Your Authenticator header (from JSX) */
+/* Header (your JSX) */
 .cpl-authHeader {
   text-align: center;
-  margin: 6px 0 12px; /* slightly tighter + consistent */
+  margin: 6px 0 10px; /* tighter overall */
 }
 
 .cpl-authBrand {
@@ -141,15 +140,10 @@ a {
 
 .cpl-authTagline {
   margin-top: 6px;
-  margin-bottom: 18px;  /* ✅ add this */
+  margin-bottom: 8px; /* tighter space before buttons */
   font-size: 13px;
   opacity: 0.75;
-  line-height: 1.55;    /* ✅ slightly taller line-height */
-}
-
-/* Ensure the first auth button doesn't sit too close */
-.cpl-authTheme [data-amplify-authenticator] .amplify-button--fullwidth:first-of-type {
-  margin-top: 6px;
+  line-height: 1.45;
 }
 
 /* Scope Amplify overrides to the modal only */
@@ -184,7 +178,7 @@ a {
   display: none !important;
 }
 
-/* Remove extra card chrome so it feels like part of your modal */
+/* Remove extra card chrome */
 .cpl-authTheme [data-amplify-authenticator] .amplify-card {
   box-shadow: none !important;
   border: 0 !important;
@@ -192,35 +186,42 @@ a {
   background: transparent !important;
 }
 
-/* EVEN SPACING: create a consistent vertical rhythm */
+/* Controlled spacing: avoid oversized dead space at top */
 .cpl-authTheme [data-amplify-authenticator] form {
   display: flex;
   flex-direction: column;
-  gap: 14px; /* more even spacing */
+  gap: 10px;
+}
+
+/* Tighten social block if Amplify wraps it */
+.cpl-authTheme [data-amplify-authenticator] .amplify-social-buttons,
+.cpl-authTheme [data-amplify-authenticator] [data-amplify-social-buttons] {
+  margin-top: 6px !important;
+  margin-bottom: 8px !important;
 }
 
 /* Divider spacing (the "or" line) */
 .cpl-authTheme [data-amplify-authenticator] .amplify-divider {
-  margin: 10px 0 6px !important;
+  margin: 8px 0 6px !important;
 }
 
-/* Full-width buttons respect the column */
+/* Full-width buttons */
 .cpl-authTheme [data-amplify-authenticator] .amplify-button--fullwidth {
   width: 100% !important;
   padding: 10px 12px;
 }
 
-/* Give the "Forgot your password?" link some breathing room */
+/* Ensure the first provider button doesn't get extra top margin */
+.cpl-authTheme [data-amplify-authenticator] .amplify-button--fullwidth:first-of-type {
+  margin-top: 0 !important;
+}
+
+/* Give the "Forgot your password?" link space and keep it inside modal */
 .cpl-authTheme [data-amplify-authenticator] a[href*="forgot"],
 .cpl-authTheme [data-amplify-authenticator] a[href*="reset"] {
   display: inline-block;
-  margin-top: 8px;
-  padding-bottom: 6px;
-}
-
-/* Fallback: ensure last auth row never kisses the modal border */
-.cpl-authTheme [data-amplify-authenticator] > *:last-child {
-  padding-bottom: 10px;
+  margin-top: 10px;
+  padding-bottom: 14px;
 }
 
 /* =========================
