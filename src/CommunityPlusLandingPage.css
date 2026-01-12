@@ -49,10 +49,11 @@ a {
 }
 
 /* =========================
-   Community+ Auth Modal (CENTERED + CONTAINED)
+   Community+ Auth Modal (CENTERED + CONTAINED + EVEN SPACING)
    - Centers contents in modal
    - Constrains Amplify Auth UI to a fixed column
    - Prevents overflow/cutoff
+   - Improves vertical rhythm + bottom breathing room
    ========================= */
 
 .cpl-modalOverlay {
@@ -69,7 +70,7 @@ a {
 }
 
 .cpl-modal {
-  width: min(520px, 92vw); /* slightly wider so nothing clips */
+  width: min(520px, 92vw);
   max-height: 86vh;
   overflow: hidden;
 
@@ -104,18 +105,18 @@ a {
   cursor: pointer;
 }
 
-/* KEY: body becomes a centering container */
+/* KEY: body is a centering container + extra bottom padding */
 .cpl-modalBody {
   display: flex;
   justify-content: center;
-  padding: 18px 16px 22px;
-  overflow: auto; /* scroll inside modal if needed */
+  padding: 18px 16px 32px; /* extra bottom breathing room */
+  overflow: auto;
 }
 
 /* KEY: clamp the auth content to a single centered column */
 .cpl-authTheme {
   width: 100%;
-  max-width: 420px; /* 400–460 is the sweet spot */
+  max-width: 420px; /* 400–460 sweet spot */
   margin: 0 auto;
 }
 
@@ -129,7 +130,7 @@ a {
 /* Your Authenticator header (from JSX) */
 .cpl-authHeader {
   text-align: center;
-  margin: 8px 0 14px;
+  margin: 6px 0 12px; /* slightly tighter + consistent */
 }
 
 .cpl-authBrand {
@@ -185,15 +186,35 @@ a {
   background: transparent !important;
 }
 
-/* Tighten form layout */
+/* EVEN SPACING: create a consistent vertical rhythm */
 .cpl-authTheme [data-amplify-authenticator] form {
-  gap: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px; /* more even spacing */
 }
 
-/* Make sure full-width buttons truly respect the column */
+/* Divider spacing (the "or" line) */
+.cpl-authTheme [data-amplify-authenticator] .amplify-divider {
+  margin: 10px 0 6px !important;
+}
+
+/* Full-width buttons respect the column */
 .cpl-authTheme [data-amplify-authenticator] .amplify-button--fullwidth {
   width: 100% !important;
   padding: 10px 12px;
+}
+
+/* Give the "Forgot your password?" link some breathing room */
+.cpl-authTheme [data-amplify-authenticator] a[href*="forgot"],
+.cpl-authTheme [data-amplify-authenticator] a[href*="reset"] {
+  display: inline-block;
+  margin-top: 8px;
+  padding-bottom: 6px;
+}
+
+/* Fallback: ensure last auth row never kisses the modal border */
+.cpl-authTheme [data-amplify-authenticator] > *:last-child {
+  padding-bottom: 10px;
 }
 
 /* =========================

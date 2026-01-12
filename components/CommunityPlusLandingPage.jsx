@@ -17,7 +17,7 @@ function AuthGate({ onAuthed }) {
         Header() {
           return (
             <div className="cpl-authHeader">
-              <div className="cpl-authBrand">Community+</div>
+              <div className="cpl-authBrand">Community One</div>
               <div className="cpl-authTagline">
                 Local, real-time information for your community.
               </div>
@@ -312,7 +312,7 @@ export default function CommunityPlusLandingPage() {
 
       <footer>
         <div className="wrap foot">
-          <div>© Community+ — Local, time-bound, map-first.</div>
+          <div>© Community One — Local, time-bound, map-first.</div>
           <div className="mono">
             Theme: warm neutral + brick accent + deep teal (sparingly)
           </div>
