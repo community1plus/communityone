@@ -141,7 +141,7 @@ a {
 
 .cpl-authTagline {
   margin-top: 0px;
-  margin-bottom: 8px; /* tighter space before buttons */
+  margin-bottom: 0px; /* tighter space before buttons */
   font-size: 13px;
   opacity: 0.75;
   line-height: 1.45;
