@@ -84,7 +84,6 @@ a {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-
   padding: 14px 16px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   background: rgba(255, 255, 255, 0.86);
@@ -108,7 +107,7 @@ a {
 .cpl-modalBody {
   display: flex;
   justify-content: center;
-  padding: 16px 16px 40px; /* more bottom room; slightly tighter top */
+  /*padding: 16px 16px 40px; /* more bottom room; slightly tighter top */
   overflow: auto;
 }
 
@@ -255,6 +254,7 @@ a {
   letter-spacing: 0.08em;
   font-size: 14px;
   line-height: 1;
+  color: var(--accent);
   padding: 10px 12px;
   border: 1px solid var(--line);
   border-radius: 14px;
