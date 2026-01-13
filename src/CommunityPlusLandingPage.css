@@ -196,7 +196,7 @@ a {
 .cpl-authTheme [data-amplify-authenticator] form {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 0px;
 }
 
 /* Tighten social block if Amplify wraps it */
