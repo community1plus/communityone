@@ -344,7 +344,7 @@ export default function CommunityPlusLandingPage() {
                 Close
               </button>
             </div>
-
+            
             <div className="cpl-modalBody">
               {/* Scope Amplify UI skin to this modal only */}
               <div className="cpl-authTheme">
