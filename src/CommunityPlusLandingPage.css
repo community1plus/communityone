@@ -108,7 +108,7 @@ a {
 .cpl-modalBody {
   display: flex;
   justify-content: center;
-  padding:40px 40px; /* more bottom room; slightly tighter top */
+  padding:20px 20px; /* more bottom room; slightly tighter top */
   overflow: auto;
 }
 
