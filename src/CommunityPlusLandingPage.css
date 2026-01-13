@@ -108,7 +108,7 @@ a {
 .cpl-modalBody {
   display: flex;
   justify-content: center;
-  /*padding: 16px 16px 40px; /* more bottom room; slightly tighter top */
+  padding:40px 40px; /* more bottom room; slightly tighter top */
   overflow: auto;
 }
 
@@ -352,15 +352,29 @@ a {
 }
 
 .btn.signin {
-  border-color: var(--accent);
-  color: var(--accent);
+  border-color: var(--accent-facebook);
+  color: var(--accent-facebook);
   background: linear-gradient(
     180deg,
-    rgba(155, 44, 44, 0.12),
-    rgba(155, 44, 44, 0.04)
+    rgba(24, 119, 242, 0.14),
+    rgba(24, 119, 242, 0.05)
   );
   font-weight: 600;
 }
+
+.btn.signin:hover {
+  background: linear-gradient(
+    180deg,
+    rgba(24, 119, 242, 0.18),
+    rgba(24, 119, 242, 0.07)
+  );
+}
+
+.btn.signin:focus-visible {
+  outline: 3px solid rgba(24, 119, 242, 0.28);
+  outline-offset: 2px;
+}
+
 
 .btn.primary strong {
   color: var(--accent);
