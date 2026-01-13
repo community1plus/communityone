@@ -22,11 +22,11 @@ export const auth = defineAuth({
       // ✅ MUST match your app URLs (dev + prod)
       callbackUrls: [
         "http://localhost:5173/",
-        "https://community.one/",
+        "https://main.d331ohfcxghx8v.amplifyapp.com/"
       ],
       logoutUrls: [
         "http://localhost:5173/",
-        "https://community.one/",
+        "https://main.d331ohfcxghx8v.amplifyapp.com/"
       ],
     },
   },
