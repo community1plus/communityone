@@ -27,7 +27,12 @@ function AuthGate({ onAuthed }) {
       }}
     >
       {({ user }) => {
-        if (user) onAuthed();
+        // IMPORTANT: never call navigation inside render
+        // Use an effect to trigger once when user becomes available.
+        React.useEffect(() => {
+          if (user) onAuthed();
+        }, [user]);
+
         return null;
       }}
     </Authenticator>

@@ -2,11 +2,12 @@ import React, { useEffect, useState } from "react";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { getCurrentUser } from "aws-amplify/auth";
 import { Authenticator } from "@aws-amplify/ui-react";
+
 import CommunityPlusLandingPage from "./CommunityPlusLandingPage";
 import CommunityPlusDashboard from "./CommunityPlusDashboard";
-//
+
 /**
- * A small gate that:
+ * LandingGate
  * - checks whether a user session exists
  * - while checking, renders the Landing (or a minimal skeleton)
  * - if signed in, redirects to /home
@@ -34,15 +35,28 @@ function LandingGate() {
     };
   }, [navigate]);
 
-  // Optional: you can render a tiny loading state instead
   return <CommunityPlusLandingPage checkingAuth={checking} />;
 }
 
 /**
- * Protects a route by requiring auth.
- * If not signed in, bounce to /
+ * RequireAuth
+ * - If user is signed in, render children
+ * - If not, bounce to landing
  */
-function ProtectedHome() {
+function RequireAuth({ children }) {
+  return (
+    <Authenticator>
+      {({ user }) => (user ? children : <Navigate to="/" replace />)}
+    </Authenticator>
+  );
+}
+
+/**
+ * HomeRoute
+ * - authenticated route that renders the dashboard
+ * - passes user + signOut into the dashboard
+ */
+function HomeRoute() {
   return (
     <Authenticator>
       {({ user, signOut }) => {
@@ -55,13 +69,27 @@ function ProtectedHome() {
 
 export default function App() {
   return (
-    <Routes>
-      <Route path="/" element={<LandingGate />} />
-      <Route path="/home" element={<ProtectedHome />} />
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+    // Optional but recommended: provides Amplify UI auth state once at the top level
+    <Authenticator.Provider>
+      <Routes>
+        <Route path="/" element={<LandingGate />} />
+
+        {/* Option A: simplest (your current pattern, but safe) */}
+        <Route path="/home" element={<HomeRoute />} />
+
+        {/* Option B: if you later add more protected routes, use RequireAuth:
+            <Route
+              path="/home"
+              element={
+                <RequireAuth>
+                  <CommunityPlusDashboard />
+                </RequireAuth>
+              }
+            />
+        */}
+
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </Authenticator.Provider>
   );
 }
-
-              
-              
