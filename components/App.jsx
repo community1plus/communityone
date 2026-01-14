@@ -57,11 +57,24 @@ function RequireAuth({ children }) {
  * - passes user + signOut into the dashboard
  */
 function HomeRoute() {
+  const navigate = useNavigate();
+
   return (
     <Authenticator>
       {({ user, signOut }) => {
         if (!user) return <Navigate to="/" replace />;
-        return <CommunityPlusDashboard user={user} signOut={signOut} />;
+
+        const handleSignOut = async () => {
+          await signOut();
+          navigate("/", { replace: true });
+        };
+
+        return (
+          <CommunityPlusDashboard
+            user={user}
+            signOut={handleSignOut}
+          />
+        );
       }}
     </Authenticator>
   );

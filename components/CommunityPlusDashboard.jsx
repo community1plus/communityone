@@ -1,47 +1,70 @@
 import React, { useState, useEffect } from "react";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
+
 import CommunityPlusContentPage from "./CommunityPlusContentPage";
 import CommunityPlusHeader from "./CommunityPlusHeader";
 import CommunityPlusSideBar from "./CommunityPlusSideBar";
-import CommunityPlusFetchfbPosts from "./CommunityPlusFetchfbPosts";
 
-import "../src/CommunityPlusDashboard.css";
+import "./CommunityPlusDashboard.css";
 
 function CommunityPlusDashboard({ user, signOut }) {
-  const [coords, setCoords] = useState({ lat: -37.8136, lng: 144.9631 });
-  const [activeView, setActiveView] = useState("dashboard"); // default
+  const [coords, setCoords] = useState({ lat: -37.8136, lng: 144.9631 }); // Melbourne fallback
+  const [activeView, setActiveView] = useState("dashboard");
 
+  /* -------------------------------
+     Geolocation (browser → IP fallback)
+  -------------------------------- */
   useEffect(() => {
+    let cancelled = false;
+
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
-          setCoords({
-            lat: pos.coords.latitude,
-            lng: pos.coords.longitude,
-          });
+          if (!cancelled) {
+            setCoords({
+              lat: pos.coords.latitude,
+              lng: pos.coords.longitude,
+            });
+          }
         },
         () => {
           fetch("https://ipapi.co/json/")
             .then((res) => res.json())
             .then((data) => {
-              if (data.latitude && data.longitude) {
-                setCoords({ lat: data.latitude, lng: data.longitude });
+              if (!cancelled && data.latitude && data.longitude) {
+                setCoords({
+                  lat: data.latitude,
+                  lng: data.longitude,
+                });
               }
+            })
+            .catch(() => {
+              /* silent fallback */
             });
         }
       );
     }
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
+
+  /* -------------------------------
+     Debug logging (safe)
+  -------------------------------- */
+  useEffect(() => {
+    console.log("Active view:", activeView);
+  }, [activeView]);
 
   return (
     <div className="dashboard-container">
       {/* HEADER */}
       <CommunityPlusHeader
         user={user}
-        signOut={signOut}
+        signOut={signOut}          // ← this now redirects to landing
         setActiveView={setActiveView}
       />
-      {console.log("Active view:", activeView)}
 
       {/* BODY */}
       <main className="main">
@@ -53,7 +76,7 @@ function CommunityPlusDashboard({ user, signOut }) {
           {activeView === "dashboard" && (
             <div className="map-column">
               <LoadScript
-                googleMapsApiKey="AIzaSyCPG5QI1XTpFjgcTaDoY_rN5qxR3susJrc"
+                googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
                 libraries={["places"]}
               >
                 <GoogleMap
@@ -67,11 +90,9 @@ function CommunityPlusDashboard({ user, signOut }) {
             </div>
           )}
 
-          {activeView === "posts" && (
-            <CommunityPlusContentPage />
-          )}
+          {activeView === "posts" && <CommunityPlusContentPage />}
 
-          {/* Add more views later */}
+          {/* Future views */}
           {/* {activeView === "events" && <Events />} */}
         </div>
       </main>
