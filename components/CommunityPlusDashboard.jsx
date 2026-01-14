@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
-
 import CommunityPlusContentPage from "./CommunityPlusContentPage";
 import CommunityPlusHeader from "./CommunityPlusHeader";
 import CommunityPlusSideBar from "./CommunityPlusSideBar";
-
-import "./CommunityPlusDashboard.css";
+import "../src/CommunityPlusDashboard.css";
 
 function CommunityPlusDashboard({ user, signOut }) {
   const [coords, setCoords] = useState({ lat: -37.8136, lng: 144.9631 }); // Melbourne fallback
