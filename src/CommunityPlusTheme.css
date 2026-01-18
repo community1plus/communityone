@@ -1,0 +1,104 @@
+/* src/CommunityPlusTheme.css
+   Shared theme tokens + base components used across Landing + Dashboard
+*/
+
+:root{
+  /* Warm neutral + brick accent + deep teal (sparingly) */
+  --bg: #f6f4ef;
+  --surface: #ffffff;
+  --surface-2: #fbfaf7;
+  --text: #121212;
+  --muted: #5d5d5d;
+  --border: rgba(0,0,0,.10);
+
+  --brick: #b6402a;
+  --teal: #0f6b63;
+
+  --shadow: 0 10px 30px rgba(0,0,0,.08);
+  --shadow-soft: 0 6px 18px rgba(0,0,0,.06);
+
+  --radius: 16px;
+  --radius-lg: 22px;
+
+  --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+}
+
+/* Shared wrapper */
+.wrap{
+  width: min(1200px, calc(100% - 32px));
+  margin-inline: auto;
+}
+
+/* Shared UI bits */
+.btn{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  text-decoration: none;
+  box-shadow: var(--shadow-soft);
+  cursor: pointer;
+  transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+}
+.btn:hover{
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
+  border-color: rgba(0,0,0,.16);
+}
+.btn.primary{
+  background: var(--brick);
+  border-color: rgba(0,0,0,.10);
+  color: #fff;
+}
+.btn.primary:hover{
+  filter: brightness(1.03);
+}
+
+.pill{
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
+  cursor: pointer;
+}
+
+.card{
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-soft);
+}
+
+.pane-title{
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.mono{ font-family: var(--mono); }
+
+.section{
+  padding: 22px 0;
+}
+
+.divider{
+  height: 1px;
+  background: var(--border);
+}

@@ -1,130 +1,106 @@
-/* =========================
-   PAGE / DASHBOARD LAYOUT
-   ========================= */
+/* ==========================================================
+   COMMUNITY ONE — DASHBOARD (TOKENISED, GLOBAL THEME)
+   ========================================================== */
+
+/* ---------- Layout Root ---------- */
 
 .dashboard-container {
-  height: 100vh;
-  width: 100%;
+  min-height: 100vh;
+  background: var(--bg-app);
+  color: var(--text-primary);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
 }
 
-/* Main area below header */
+/* ---------- Header ---------- */
+
+.header {
+  height: 64px;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-default);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-6);
+  box-shadow: var(--shadow-xs);
+  z-index: 20;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.header-logo {
+  font-weight: 700;
+  font-size: var(--text-lg);
+  letter-spacing: 0.02em;
+}
+
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.header-nav a {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+}
+
+.header-nav a:hover {
+  background: var(--bg-muted);
+  color: var(--text-primary);
+}
+
+.header-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.header-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--bg-muted);
+  border: 1px solid var(--border-default);
+  display: grid;
+  place-items: center;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* ---------- Main Layout ---------- */
+
 .main {
-  display: flex;
-  flex-direction: row;
-  height: calc(100vh - 104px);
-  margin-top: 104px; /* just under header */
-  width: 100%;
-  overflow: hidden;
+  flex: 1;
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  min-height: 0;
 }
 
-/* =========================
-   HEADER NAV
-   ========================= */
-
-.links {
-  display: flex;
-  gap: 1rem;
-  padding: 0.5rem 1rem;
-  background: #fafafa;
-}
-
-/* =========================
-   SIDEBAR
-   ========================= */
+/* ---------- Sidebar ---------- */
 
 .sidebar {
-  width: 240px;
-  min-width: 240px;
-  background: #f4f4f4;
-  border-right: 1px solid #ddd;
-  overflow-y: auto;
-}
-
-/* =========================
-   MAIN CONTENT AREA
-   ========================= */
-
-.content-area {
-  flex: 1;
-  display: flex;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-}
-
-
-/* =========================
-   MAP VIEW (DEFAULT)
-   ========================= */
-
-.map-column {
-  flex: 1;
+  background: var(--bg-surface);
+  border-right: 1px solid var(--border-default);
+  padding: var(--space-4);
   display: flex;
   flex-direction: column;
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
+  gap: var(--space-2);
 }
 
-/* Map container */
-.map-container {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
+.sidebar-section {
+  margin-bottom: var(--space-4);
 }
 
-#map {
-  background: repeating-linear-gradient(
-    45deg,
-    #ddd,
-    #ddd 10px,
-    #eee 10px,
-    #eee 20px
-  );
-}
-
-/* =========================
-   FEED / DYNAMIC CONTENT
-   ========================= */
-
-.feed-column {
-  flex: 1;
-  display: flex;
-  background-color: rgb(230, 224, 224);
-  width: 100%;
-  height: 100%;
-  overflow-y: auto;      /* content scrolls here */
-  overflow-x: hidden;
-}
-
-/* =========================
-   SEARCH + MAP HELPERS
-   ========================= */
-
-.search-bar {
-  background: #fafafa;
-  z-index: 10;
-  margin: 0;
-  width: 100%;
-}
-
-/* Optional label over the map */
-.location-label {
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
-  background: rgba(255, 255, 255, 0.8);
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 14px;
-}
-
-.location-input {
-  padding: 8px 12px;
-  border: 1px solid #ccc;
-  border-radius: 20px;
-}
+.sidebar-title {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font
