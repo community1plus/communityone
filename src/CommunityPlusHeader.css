@@ -7,12 +7,11 @@
   width: 100%;
   top: 0;
   left: 0;
-  right: 0;
   background: #fff;
-  border-bottom: 0px solid #ddd;
+  border-bottom: 1px solid #ddd;
   z-index: 1000;
   display: flex;
-  flex-direction: column; /* two rows */
+  flex-direction: column;
   box-sizing: border-box;
 }
 
@@ -24,16 +23,16 @@
   display: flex;
   width: 100%;
   align-items: center;
-  justify-content: space-between; /* left / center / right */
-  padding: 6px 14px;
+  justify-content: space-between; 
+  padding: 10px 14px;
   gap: 12px;
 }
 
-/* NEW: LEFT SECTION */
+/* LEFT SECTION */
 .left-section {
   display: flex;
-  align-items: left;
-  flex-shrink: 0; /* ensure avatar never shrinks */
+  align-items: center;      /* FIXED */
+  flex-shrink: 0;
 }
 
 /* Avatar styling */
@@ -46,29 +45,29 @@
   font-weight: bold;
   font-size: 14px;
   display: flex;
-  align-items: left;
-  justify-content: left;
+  align-items: center;      /* FIXED */
+  justify-content: center;  /* FIXED */
   flex-shrink: 0;
 }
 
-/* NEW: CENTER SECTION */
+/* CENTER SECTION */
 .center-section {
-  flex: 1;                 /* expands fully */
+  flex: 1;
   display: flex;
-  justify-content: center; /* centers the search bar */
-  min-width: 0;            /* prevents overflow */
+  justify-content: center;
+  min-width: 0;
 }
 
 .search-wrapper {
   width: 100%;
-  max-width: 700px;        /* smooth limit */
+  max-width: 700px;
   min-width: 0;
 }
 
-/* NEW: RIGHT SECTION */
+/* RIGHT SECTION */
 .right-section {
   display: flex;
-  align-items: right;
+  align-items: center;      /* FIXED */
   flex-shrink: 0;
 }
 
@@ -82,7 +81,7 @@
 }
 
 /* =========================
-   GOOGLE-STYLE SEARCH (compact)
+   SEARCH BAR
    ========================= */
 
 .google-search {
@@ -95,37 +94,34 @@
   border-radius: 20px;
   box-shadow: 0 1px 6px rgba(0,0,0,0.1);
   padding: 0 10px;
-  box-sizing: border-box;
 }
 
 .google-search input {
   flex: 1;
-  width: 100%;
   border: none;
   outline: none;
+  background: transparent;
   font-size: 15px;
   padding: 0 6px;
-  background: transparent;
 }
 
 /* =========================
-   BOTTOM ROW: NAVIGATION (compact)
+   NAVIGATION ROW
    ========================= */
 
 .links {
   display: flex;
-  gap: 20px;
   justify-content: center;
-  padding: 6px 20px;
-  border-top: 0px solid #f0f0f0;
+  gap: 20px;
+  padding: 8px 20px;
   font-size: 13.5px;
+  background: #fff;        /* FIXED: keeps it inside header visually */
 }
 
 .links button,
 .links a {
   background: none;
   border: none;
-  text-decoration: none;
   color: #333;
   font-weight: 500;
   cursor: pointer;
