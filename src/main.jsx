@@ -5,7 +5,7 @@ import App from "../components/App.jsx";
 import outputs from "../amplify_outputs.json";
 import { Amplify } from "aws-amplify";
 Amplify.configure(outputs);
-import "./src/theme/theme.css";
+import "./theme/theme.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
