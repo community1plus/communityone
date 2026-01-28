@@ -1,292 +1,57 @@
-/* =====================================================
-   COMMUNITY ONE — DASHBOARD (Unified Theme + Layout Fix)
-   Fully upgraded + scroll-free + responsive
-===================================================== */
-
-/* GLOBAL HEIGHT CONSTANTS */
 :root {
-  --header-height: 72px;
-  --nav-height: 48px;
-  --sidebar-width: 230px;
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --surface-soft: #f1f5f9;
+  --border: #e5e7eb;
+
+  --text: #0f172a;
+  --text-muted: #64748b;
+
+  --brand: #c2410c;
+  --brand-soft: #fed7aa;
+  --accent: #0f766e;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.05);
+  --shadow-md: 0 6px 16px rgba(0,0,0,.06);
 }
 
-/* =====================================================
-   ROOT + BASE RESET
-===================================================== */
+.dashboard-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
 
-* {
+.main {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 220px;
+  background-color: #f9f9f9;
+  border-right: 1px solid #ddd;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
   box-sizing: border-box;
 }
 
-html, body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  overflow: hidden;           /* Remove global scrollbar */
-  background: var(--bg);
-  font-family: var(--font-ui);
-}
-
-/* =====================================================
-   HEADER ROW
-===================================================== */
-
-.header {
-  height: var(--header-height);
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  padding: 0 24px;
-  display: flex;
-  align-items: center;
-  position: fixed;
-  top: 0;
-  width: 100%;
-  z-index: 200;
-  box-shadow: var(--shadow-sm);
-}
-
-.header-top {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  gap: 24px;
-}
-
-.avatar {
-  width: 40px;
-  height: 40px;
-  background: var(--brand);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: 600;
-}
-
-.center-section {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-}
-
-.search-wrapper {
-  width: 100%;
-  max-width: 640px;
-}
-
-.geo {
-  white-space: nowrap;
-  color: var(--text-muted);
-  font-size: 14px;
-}
-
-/* =====================================================
-   NAVIGATION ROW
-===================================================== */
-
-.links {
-  position: fixed;
-  top: var(--header-height);
-  left: 0;
-  width: 100%;
-  height: var(--nav-height);
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 22px;
-  z-index: 150;
-}
-
-.links button {
-  font-size: 14px;
-  padding: 6px 10px;
-  border-radius: var(--radius-sm);
-  color: var(--text-muted);
-  transition: background .15s, color .15s;
-}
-
-.links button:hover {
-  background: var(--surface-soft);
-  color: var(--text);
-}
-
-/* =====================================================
-   MAIN LAYOUT
-===================================================== */
-
-.main {
-  display: flex;
-  width: 100%;
-  height: calc(100vh - var(--header-height) - var(--nav-height));
-  margin-top: calc(var(--header-height) + var(--nav-height));
-  overflow: hidden;
-}
-
-/* =====================================================
-   SIDEBAR (full height, no scrollbar visible)
-===================================================== */
-
-.sidebar {
-  position: fixed;
-  top: calc(var(--header-height) + var(--nav-height));
-  left: 0;
-  width: var(--sidebar-width);
-  height: calc(100vh - var(--header-height) - var(--nav-height));
-  background: var(--surface);
-  border-right: 1px solid var(--border);
-  padding: 20px 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  overflow-y: auto;
-  scrollbar-width: none;
-}
-
-.sidebar::-webkit-scrollbar {
-  display: none;
-}
-
-.sidebar-item {
-  padding: 10px 12px;
-  border-radius: var(--radius-md);
-  background: var(--surface);
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--text);
-  transition: background .15s;
-}
-
-.sidebar-item:hover {
-  background: var(--surface-soft);
-}
-
-.sidebar-item.logout {
-  color: var(--danger);
-  font-weight: 600;
-}
-
-.sidebar-divider {
-  border: none;
-  border-top: 1px solid var(--border);
-  margin: 12px 0;
-}
-
-/* =====================================================
-   CONTENT AREA GRID
-===================================================== */
-
 .content-area {
-  margin-left: var(--sidebar-width);
-  width: calc(100% - var(--sidebar-width));
-  height: 100%;
-  display: grid;
-  grid-template-columns: 370px 1fr;
-  overflow: hidden;
-}
-
-/* =====================================================
-   FEED COLUMN (internal scroll only)
-===================================================== */
-
-.feed-column {
-  background: var(--surface);
-  border-right: 1px solid var(--border);
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-.feed-header {
-  height: 56px;
-  padding: 0 16px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.feed-scroll {
   flex: 1;
-  overflow-y: auto;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  scrollbar-width: none;
-}
-
-.feed-scroll::-webkit-scrollbar {
-  display: none;
-}
-
-/* =====================================================
-   FEED CARDS (modern)
-===================================================== */
-
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 14px 16px;
-  box-shadow: var(--shadow-sm);
-  transition: box-shadow .15s, transform .15s;
-}
-
-.card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-}
-
-.card.ad {
-  background: linear-gradient(to bottom, var(--surface), #f0fdfa);
-  border-color: var(--brand-soft);
-}
-
-/* =====================================================
-   MAP COLUMN
-===================================================== */
-
-.map-column {
-  position: relative;
-  height: 100%;
-  background: var(--surface);
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  background: var(--bg);
+  overflow: hidden;
 }
 
 .map-container {
-  width: 100%;
-  height: 100%;
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-}
-
-/* =====================================================
-   RESPONSIVE
-===================================================== */
-
-@media (max-width: 1100px) {
-  .content-area {
-    grid-template-columns: 1fr;
-  }
-
-  .map-column {
-    display: none;
-  }
-}
-
-@media (max-width: 720px) {
-  .sidebar {
-    display: none;
-  }
-
-  .links {
-    display: none;
-  }
-
-  .content-area {
-    margin-left: 0;
-    width: 100%;
-  }
+  flex: 1;
+  border-radius: 0;
+  outline: none;
 }
