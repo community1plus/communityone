@@ -2,27 +2,41 @@ import React, { useState } from "react";
 
 export default function GoogleStyleSearch() {
   const [query, setQuery] = useState("");
+  const [focused, setFocused] = useState(false);
+
+  const suggestions = [
+    "Restaurants near me",
+    "Local events",
+    "Crime reports",
+    "Community posts",
+    "Lost & Found",
+    "Weather alerts"
+  ].filter((s) => s.toLowerCase().includes(query.toLowerCase()));
 
   return (
-    <div className="google-search">
-      <span className="icon search">🔍</span>
-
+    <div className={`gsearch ${focused ? "focused" : ""}`}>
       <input
-        type="text"
-        placeholder="Search..."
+        className="gsearch-input"
+        placeholder="Search community updates..."
         value={query}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setTimeout(() => setFocused(false), 120)}
         onChange={(e) => setQuery(e.target.value)}
       />
 
-      {/* Show ❌ only if input has text */}
-      {query && (
-        <span className="icon clear" onClick={() => setQuery("")}>
-          ❌
-        </span>
+      {focused && (
+        <div className="gsearch-dropdown">
+          {suggestions.length > 0 ? (
+            suggestions.map((s, idx) => (
+              <div key={idx} className="gsearch-suggestion">
+                {s}
+              </div>
+            ))
+          ) : (
+            <div className="gsearch-empty">No suggestions</div>
+          )}
+        </div>
       )}
-
-      <span className="icon mic">🎤</span>
-      <span className="icon lens">📷</span>
     </div>
   );
 }
