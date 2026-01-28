@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from "react";
-import GoogleStyleSearch from "./GoogleStyleSearch";
+import GoogleStyleSearch from "../GoogleStyleSearch";
+import "../src/components/Header/CommunityPlusHeader.css";
 
-
-export default function CommunityPlusHeader({ user, signOut, setActiveView }) {
+export default function CommunityPlusHeader({ setActiveView }) {
   const [location, setLocation] = useState("Locating...");
 
-  /* Location lookup */
   useEffect(() => {
-    if (!("geolocation" in navigator)) return;
-
     navigator.geolocation.getCurrentPosition(
       () => {
         fetch("https://ipapi.co/json/")
@@ -38,29 +35,23 @@ export default function CommunityPlusHeader({ user, signOut, setActiveView }) {
   }, []);
 
   return (
-    <header className="header">
-      <div className="header-top">
-
-        {/* LEFT: Avatar/Logo */}
-        <div className="left-section">
+    <>
+      {/* TOP HEADER */}
+      <header className="header">
+        <div className="header-top">
           <div className="avatar">C</div>
-        </div>
 
-        {/* CENTER: Search */}
-        <div className="center-section">
-          <div className="search-wrapper">
-            <GoogleStyleSearch />
+          <div className="center-section">
+            <div className="search-wrapper">
+              <GoogleStyleSearch />
+            </div>
           </div>
-        </div>
 
-        {/* RIGHT: Location */}
-        <div className="right-section">
           <div className="geo">{location}</div>
         </div>
+      </header>
 
-      </div>
-
-      {/* NAV ROW */}
+      {/* NAV BAR */}
       <nav className="links">
         <button onClick={() => setActiveView("dashboard")}>Home</button>
         <button onClick={() => setActiveView("posts")}>Posts</button>
@@ -70,6 +61,6 @@ export default function CommunityPlusHeader({ user, signOut, setActiveView }) {
         <button onClick={() => setActiveView("community")}>Community+</button>
         <button onClick={() => setActiveView("about")}>About</button>
       </nav>
-    </header>
+    </>
   );
 }

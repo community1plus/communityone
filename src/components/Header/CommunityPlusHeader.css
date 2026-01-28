@@ -1,46 +1,41 @@
 /* =====================================================
-   COMMUNITY ONE — HEADER (Unified Theme)
+   COMMUNITY ONE — HEADER
 ===================================================== */
 
-/* Container */
 .header {
-  position: sticky;
+  position: fixed;
   top: 0;
-  z-index: 900;
+  left: 0;
+  width: 100%;
+  height: var(--header-height);
   background: var(--surface);
   border-bottom: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}
-
-/* ---------- TOP SECTION ---------- */
-.header-top {
+  padding: 0 24px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  height: 72px;
-  padding: 0 24px;
-  background: var(--surface);
+  z-index: 900;
+  box-shadow: var(--shadow-sm);
 }
 
-/* Avatar */
-.left-section .avatar {
-  width: 42px;
-  height: 42px;
+.header-top {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
   background: var(--brand);
   color: white;
   border-radius: 50%;
   font-weight: 600;
-  font-size: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: var(--shadow-sm);
 }
 
-/* Center search bar */
 .center-section {
   flex: 1;
   display: flex;
@@ -52,34 +47,34 @@
   max-width: 640px;
 }
 
-/* Location text */
-.right-section {
-  display: flex;
-  align-items: center;
-}
-
 .geo {
-  color: var(--text-muted);
   font-size: 14px;
+  color: var(--text-muted);
   white-space: nowrap;
 }
 
-/* ---------- NAV LINKS UNDER HEADER ---------- */
+/* ---------- NAV BAR BELOW HEADER ---------- */
 .links {
-  display: flex;
-  justify-content: center;
-  gap: 24px;
-  padding: 10px 0;
-  border-top: 1px solid var(--border);
+  position: fixed;
+  top: var(--header-height);
+  left: 0;
+  width: 100%;
+  height: var(--nav-height);
   background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  z-index: 850;
 }
 
 .links button {
-  padding: 6px 12px;
   font-size: 14px;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
   color: var(--text-muted);
-  border-radius: var(--radius-md);
-  transition: 0.15s ease;
+  transition: background .15s, color .15s;
 }
 
 .links button:hover {

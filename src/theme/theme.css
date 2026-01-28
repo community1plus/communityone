@@ -1,0 +1,65 @@
+/* =====================================================
+   COMMUNITY ONE — GLOBAL THEME (Landing Page Style)
+===================================================== */
+
+/* ---------- GLOBAL TOKENS ---------- */
+:root {
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --surface-soft: #f1f5f9;
+  --surface-hover: #eef2f6;
+
+  --border: #e2e8f0;
+  --border-strong: #cbd5e1;
+
+  --text: #0f172a;
+  --text-muted: #64748b;
+
+  --brand: #0f766e;
+  --brand-soft: #ccfbf1;
+  --brand-strong: #115e59;
+
+  --danger: #dc2626;
+  --warning: #f59e0b;
+
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.05);
+  --shadow-md: 0 6px 16px rgba(0,0,0,.06);
+
+  --font-ui: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  /* Layout constants */
+  --header-height: 72px;
+  --nav-height: 48px;
+  --sidebar-width: 230px;
+}
+
+/* ---------- RESET ---------- */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+}
+
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.hidden { display: none !important; }
