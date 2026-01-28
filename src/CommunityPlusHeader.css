@@ -8,6 +8,7 @@
   left: 0;
   right: 0;
   background: #fff;
+  border-bottom: 0px solid #ddd;
   z-index: 1000;
   display: flex;
   flex-direction: column; /* two rows */
@@ -21,17 +22,19 @@
 .header-top {
   display: flex;
   align-items: center;
-  justify-content: space-between; /* pushes left / center / right */
+  justify-content: space-between; /* left / center / right */
   padding: 6px 14px;
   gap: 12px;
 }
 
-/* LEFT: Avatar only (clean separation) */
+/* NEW: LEFT SECTION */
 .left-section {
   display: flex;
   align-items: center;
+  flex-shrink: 0; /* ensure avatar never shrinks */
 }
 
+/* Avatar styling */
 .avatar {
   width: 36px;
   height: 36px;
@@ -46,21 +49,29 @@
   flex-shrink: 0;
 }
 
-/* CENTER: Search expands */
+/* NEW: CENTER SECTION */
 .center-section {
-  flex: 1;             /* EXPANDS middle */
+  flex: 1;                 /* expands fully */
   display: flex;
-  justify-content: center;
+  justify-content: center; /* centers the search bar */
+  min-width: 0;            /* prevents overflow */
 }
 
 .search-wrapper {
   width: 100%;
-  max-width: 700px;     /* contains the search input */
+  max-width: 700px;        /* smooth limit */
   min-width: 0;
 }
 
-/* RIGHT: Location */
-.right-section .geo {
+/* NEW: RIGHT SECTION */
+.right-section {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* Location text */
+.geo {
   font-size: 13px;
   font-weight: 500;
   color: #333;
@@ -69,7 +80,7 @@
 }
 
 /* =========================
-   GOOGLE-STYLE SEARCH FIELD
+   GOOGLE-STYLE SEARCH (compact)
    ========================= */
 
 .google-search {
@@ -87,6 +98,7 @@
 
 .google-search input {
   flex: 1;
+  width: 100%;
   border: none;
   outline: none;
   font-size: 15px;
@@ -95,13 +107,13 @@
 }
 
 /* =========================
-   NAVIGATION ROW (Bottom)
+   BOTTOM ROW: NAVIGATION (compact)
    ========================= */
 
 .links {
   display: flex;
-  justify-content: center;
   gap: 20px;
+  justify-content: center;
   padding: 6px 20px;
   border-top: 1px solid #f0f0f0;
   font-size: 13.5px;
