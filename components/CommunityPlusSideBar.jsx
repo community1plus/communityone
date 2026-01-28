@@ -1,8 +1,6 @@
 import React, { useState } from "react";
-import "../src/CommunityPlusSidebar.css";
 import { signOut } from "aws-amplify/auth";
 import CommunityPlusUploadForm from "./CommunityPlusUploadForm";
-
 export default function CommunityPlusSidebar({ setActiveView }) {
   const [showModal, setShowModal] = useState(false);
   const [activeTab, setActiveTab] = useState("upload");

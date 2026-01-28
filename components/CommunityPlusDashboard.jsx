@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
-
 import CommunityPlusHeader from "./CommunityPlusHeader";
 import CommunityPlusSideBar from "./CommunityPlusSideBar";
 import CommunityPlusContentPage from "./CommunityPlusContentPage";
-
-import "../src/CommunityPlusDashboard.css";
 
 function CommunityPlusDashboard({ user, signOut }) {
   const [coords, setCoords] = useState({
