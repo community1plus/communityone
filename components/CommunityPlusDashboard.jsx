@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
-
-import CommunityPlusHeader from "../CommunityPlusHeader";
-import CommunityPlusSidebar from "../CommunityPlusSidebar";
-import CommunityPlusContentPage from "../CommunityPlusContentPage";
+import CommunityPlusHeader from "./CommunityPlusHeader";
+import CommunityPlusSidebar from "./CommunityPlusSideBar";
+import CommunityPlusContentPage from "./CommunityPlusContentPage";
 
 export default function CommunityPlusDashboard({ user, signOut }) {
   const [coords, setCoords] = useState({
