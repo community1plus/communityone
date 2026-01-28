@@ -10,7 +10,7 @@ function CommunityPlusHeader({ setActiveView, user, signOut }) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
           const { latitude, longitude } = pos.coords;
-          setLocation(`Lat: ${latitude.toFixed(4)}, Lon: ${longitude.toFixed(4)}`);
+          setLocation(`${data.city}, ${data.region}`);
         },
         () => {
           fetch("https://ipapi.co/json/")
