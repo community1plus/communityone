@@ -5,10 +5,7 @@ import { Authenticator } from "@aws-amplify/ui-react";
 
 import CommunityPlusLandingPage from "./CommunityPlusLandingPage";
 import CommunityPlusDashboard from "./CommunityPlusDashboard";
-import "../src/theme.css";
-import "../src/CommunityPlusDashboard.css";
-import "../src/CommunityPlusHeader.css";
-import "../src/CommunityPlusSidebar.css";
+
 
 /**
  * LandingGate
