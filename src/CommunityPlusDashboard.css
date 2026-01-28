@@ -1,6 +1,6 @@
 /* =====================================================
-   COMMUNITY PLUS — DASHBOARD THEME (MERGED)
-   Applies global tokens + layout + feed + map + ads
+   COMMUNITY PLUS — FINAL MERGED DASHBOARD THEME
+   (Header + Sidebar + Layout + Feed + Map)
 ===================================================== */
 
 /* ---------- GLOBAL TOKENS ---------- */
@@ -13,10 +13,10 @@
   --text: #0f172a;
   --text-muted: #64748b;
 
-  --brand: #c2410c;        /* brick */
+  --brand: #c2410c;
   --brand-soft: #fed7aa;
 
-  --accent: #0f766e;       /* deep teal */
+  --accent: #0f766e;
   --accent-soft: #ccfbf1;
 
   --radius-sm: 6px;
@@ -26,18 +26,21 @@
   --shadow-sm: 0 1px 2px rgba(0,0,0,.05);
   --shadow-md: 0 6px 16px rgba(0,0,0,.06);
 
-  --font-ui: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-             Roboto, Inter, sans-serif;
+  --font-ui: system-ui, -apple-system, BlinkMacSystemFont,
+              "Segoe UI", Roboto, Inter, sans-serif;
+
+  --header-height: 64px;
+  --sidebar-width: 220px;
 }
 
-/* ---------- BASE RESET ---------- */
+/* ---------- RESET ---------- */
 * {
   box-sizing: border-box;
 }
 
 html, body {
-  height: 100%;
   margin: 0;
+  height: 100%;
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-ui);
@@ -49,34 +52,41 @@ a {
 }
 
 button {
-  font-family: inherit;
-  cursor: pointer;
   background: none;
   border: none;
+  cursor: pointer;
+  font-family: inherit;
 }
 
 /* =====================================================
-   LAYOUT SHELL
+   LAYOUT CONTAINER
 ===================================================== */
 
 .dashboard-container {
-  min-height: 100vh;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
 }
 
-/* ---------- HEADER ---------- */
+/* =====================================================
+   FIXED HEADER
+===================================================== */
+
 .header {
-  height: 64px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: var(--header-height);
+  width: 100%;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 24px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
+  z-index: 1000;
 }
 
 .header-left {
@@ -117,53 +127,24 @@ button {
   gap: 12px;
 }
 
-/* ---------- PILLS / BUTTONS ---------- */
-.pill {
-  padding: 6px 12px;
-  border-radius: 999px;
-  background: var(--surface-soft);
-  border: 1px solid var(--border);
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-muted);
-  transition: background .15s ease, color .15s ease, box-shadow .15s ease;
-}
-
-.pill:hover {
-  background: var(--surface);
-  color: var(--text);
-  box-shadow: var(--shadow-sm);
-}
-
-.pill.primary {
-  background: var(--brand);
-  color: white;
-  border-color: transparent;
-}
-
-.pill.primary:hover {
-  background: #9a3412;
-}
-
 /* =====================================================
-   MAIN BODY
+   FIXED SIDEBAR UNDER HEADER
 ===================================================== */
 
-.main {
-  flex: 1;
-  display: flex;
-  overflow: hidden;
-}
-
-/* ---------- SIDEBAR ---------- */
 .sidebar {
-  width: 220px;
+  position: fixed;
+  top: var(--header-height);
+  left: 0;
+  width: var(--sidebar-width);
+  height: calc(100vh - var(--header-height));
   background: var(--surface);
   border-right: 1px solid var(--border);
   padding: 16px 12px;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 20px;
+  z-index: 900;
 }
 
 .sidebar-section {
@@ -204,18 +185,24 @@ button {
 }
 
 /* =====================================================
-   CONTENT AREA
+   MAIN CONTENT AREA
 ===================================================== */
 
 .content-area {
-  flex: 1;
+  position: relative;
+  margin-top: var(--header-height);
+  margin-left: var(--sidebar-width);
+  height: calc(100vh - var(--header-height));
+  overflow-y: hidden;
+  background: var(--bg);
   display: grid;
   grid-template-columns: 360px 1fr;
-  background: var(--bg);
-  overflow: hidden;
 }
 
-/* ---------- FEED COLUMN ---------- */
+/* =====================================================
+   FEED COLUMN
+===================================================== */
+
 .feed-column {
   background: var(--surface);
   border-right: 1px solid var(--border);
@@ -224,7 +211,6 @@ button {
   overflow: hidden;
 }
 
-/* Feed header */
 .feed-header {
   height: 56px;
   padding: 0 16px;
@@ -232,7 +218,6 @@ button {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--surface);
 }
 
 .feed-title {
@@ -245,7 +230,6 @@ button {
   color: var(--text-muted);
 }
 
-/* Feed scroll area */
 .feed-scroll {
   flex: 1;
   overflow-y: auto;
@@ -255,7 +239,7 @@ button {
   gap: 12px;
 }
 
-/* ---------- FEED CARDS ---------- */
+/* Feed cards */
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -270,27 +254,14 @@ button {
   transform: translateY(-1px);
 }
 
-.cardMuted {
-  background: var(--surface-soft);
-  color: var(--text-muted);
-}
-
 .card .row {
   display: flex;
   gap: 12px;
-  align-items: flex-start;
-}
-
-.card .icon {
-  font-size: 18px;
-  line-height: 1;
-  margin-top: 2px;
 }
 
 .card .title {
   font-weight: 600;
   font-size: 14px;
-  margin-bottom: 4px;
 }
 
 .card .small {
@@ -301,7 +272,12 @@ button {
   flex-wrap: wrap;
 }
 
-/* ---------- SPONSORED POSTS ---------- */
+.cardMuted {
+  background: var(--surface-soft);
+  color: var(--text-muted);
+}
+
+/* Sponsored */
 .card.ad {
   border-color: var(--accent-soft);
   background: linear-gradient(180deg, #ffffff, #f0fdfa);
@@ -329,11 +305,10 @@ button {
 .map-column {
   display: flex;
   flex-direction: column;
-  background: var(--bg);
   overflow: hidden;
+  background: var(--bg);
 }
 
-/* Map header */
 .map-header {
   height: 56px;
   padding: 0 16px;
@@ -351,14 +326,11 @@ button {
   color: var(--text-muted);
 }
 
-/* Map container */
 .map-container {
   flex: 1;
-  border-radius: 0;
   outline: none;
 }
 
-/* Remove Google watermark overflow issues */
 .map-column > div {
   height: 100%;
 }
@@ -367,13 +339,13 @@ button {
    UTILITIES
 ===================================================== */
 
-.mono {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-               "Liberation Mono", "Courier New", monospace;
-}
-
 .hidden {
   display: none !important;
+}
+
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco,
+               Consolas, "Courier New", monospace;
 }
 
 /* =====================================================
@@ -384,7 +356,6 @@ button {
   .content-area {
     grid-template-columns: 1fr;
   }
-
   .map-column {
     display: none;
   }
@@ -394,7 +365,9 @@ button {
   .sidebar {
     display: none;
   }
-
+  .content-area {
+    margin-left: 0;
+  }
   .header-nav {
     display: none;
   }

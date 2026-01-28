@@ -6,19 +6,19 @@
   --sidebar-width: 220px;
   --header-height: 100px; /* adjust if header height changes */
 }
-
+/* Sidebar must be fixed under the header */
 .sidebar {
   position: fixed;
-  top: var(--header-height);                /* sits below header */
+  top: 64px; /* header height */
   left: 0;
-  width: var(--sidebar-width);
-  height: calc(100vh - var(--header-height)); /* full space minus header */
-  background-color: #f9f9f9;
-  border-right: 1px solid #ddd;
-  padding: 16px;
-  overflow-y: auto;                         /* scroll inside sidebar */
+  width: 220px;
+  height: calc(100vh - 64px);
+  overflow-y: auto;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 16px 12px;
   box-sizing: border-box;
-  z-index: 900;                             /* stays below header (1000) */
+  z-index: 99; /* under header (100) but above content */
 }
 
 /* ================
