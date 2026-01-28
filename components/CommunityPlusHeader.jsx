@@ -29,30 +29,40 @@ function CommunityPlusHeader({ setActiveView, user, signOut }) {
   }, []);
 
   return (
-    <header className="header">
-      {/* TOP ROW */}
-      <div className="header-top">
-        <div className="logo-container">
-          <div className="avatar">C</div>
-          <div className="search-wrapper">
-            <GoogleStyleSearch />
-          </div>
+  <header className="header">
+    {/* TOP ROW */}
+    <div className="header-top">
+
+      {/* LEFT: Logo/avatar */}
+      <div className="left-section">
+        <div className="avatar">C</div>
+      </div>
+
+      {/* CENTER: Search Bar */}
+      <div className="center-section">
+        <div className="search-wrapper">
+          <GoogleStyleSearch />
         </div>
+      </div>
+
+      {/* RIGHT: Location */}
+      <div className="right-section">
         <div className="geo">{location}</div>
       </div>
 
-      {/* BOTTOM ROW: Navigation */}
-      <nav className="links">
-        <button onClick={() => setActiveView("dashboard")}>Home</button>
-        <button onClick={() => setActiveView("posts")}>Posts</button>
-        <button onClick={() => setActiveView("events")}>Events</button>
-        <button onClick={() => setActiveView("incidents")}>Incidents</button>
-        <button onClick={() => setActiveView("search")}>Search</button>
-        <button onClick={() => setActiveView("community")}>Community+</button>
-        <button onClick={() => setActiveView("about")}>About</button>
-      </nav>
-    </header>
-  );
-}
+    </div>
+
+    {/* SECOND ROW: Navigation */}
+    <nav className="links">
+      <button onClick={() => setActiveView("dashboard")}>Home</button>
+      <button onClick={() => setActiveView("posts")}>Posts</button>
+      <button onClick={() => setActiveView("events")}>Events</button>
+      <button onClick={() => setActiveView("incidents")}>Incidents</button>
+      <button onClick={() => setActiveView("search")}>Search</button>
+      <button onClick={() => setActiveView("community")}>Community+</button>
+      <button onClick={() => setActiveView("about")}>About</button>
+    </nav>
+  </header>
+);
 
 export default CommunityPlusHeader;
