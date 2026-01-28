@@ -9,7 +9,7 @@ import "./theme/theme.css";
 import "./components/Dashboard/CommunityPlusDashboard.css";
 import "./components/Header/CommunityPlusHeader.css";
 import "./components/Sidebar/CommunityPlusSidebar.css";
-import "./components/MapToolbar/MapToolbarbar.css";
+import "./components/MapToolbar/MapToolbar.css";
 import "./components/GoogleStyleSearch/GoogleStyleSearch.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(

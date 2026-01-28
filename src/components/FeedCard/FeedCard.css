@@ -1,0 +1,60 @@
+.feed-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: transform .15s, box-shadow .15s;
+  cursor: pointer;
+}
+
+.feed-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.feed-card-media img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+.feed-card-body {
+  padding: 14px 16px;
+}
+
+.feed-card-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.feed-card-badge {
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+}
+
+.feed-card-time {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.feed-card-title {
+  margin: 4px 0 6px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.feed-card-text {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
