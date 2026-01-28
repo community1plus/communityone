@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import GoogleStyleSearch from "../GoogleStyleSearch";
+import GoogleStyleSearch from "./GoogleStyleSearch";
 
 export default function CommunityPlusHeader({ setActiveView }) {
   const [location, setLocation] = useState("Locating...");
