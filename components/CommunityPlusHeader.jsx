@@ -64,5 +64,5 @@ function CommunityPlusHeader({ setActiveView, user, signOut }) {
     </nav>
   </header>
 );
-
+}
 export default CommunityPlusHeader;
