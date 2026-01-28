@@ -51,7 +51,7 @@ function CommunityPlusHeader({ setActiveView, user, signOut }) {
       </div>
 
     </div>
-
+    <div>
     {/* SECOND ROW: Navigation */}
     <nav className="links">
       <button onClick={() => setActiveView("dashboard")}>Home</button>
@@ -62,6 +62,7 @@ function CommunityPlusHeader({ setActiveView, user, signOut }) {
       <button onClick={() => setActiveView("community")}>Community+</button>
       <button onClick={() => setActiveView("about")}>About</button>
     </nav>
+    </div>
   </header>
 );
 }
