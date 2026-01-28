@@ -4,6 +4,7 @@
 
 .header {
   position: fixed;
+  width: 100%;
   top: 0;
   left: 0;
   right: 0;
@@ -21,6 +22,7 @@
 
 .header-top {
   display: flex;
+  width: 100%;
   align-items: center;
   justify-content: space-between; /* left / center / right */
   padding: 6px 14px;
