@@ -1,3 +1,4 @@
+@import "./theme.css";
 :root {
   /* Subtle, “street + civic + tech” */
   --bg: #f6f3ee; /* warm off-white */

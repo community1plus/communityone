@@ -1,54 +1,50 @@
 import React, { useState } from "react";
 import "../src/CommunityPlusSidebar.css";
 import { signOut } from "aws-amplify/auth";
+import CommunityPlusUploadForm from "./CommunityPlusUploadForm";
 
-export default function CommunityPlusSidebar() {
+export default function CommunityPlusSidebar({ setActiveView }) {
   const [showModal, setShowModal] = useState(false);
   const [activeTab, setActiveTab] = useState("upload");
   const [uploadedFiles, setUploadedFiles] = useState([]);
-  const [uploadCategory, setUploadCategory] = useState("news");
 
-  const handleSignOut = async () => {
+  const handleLogout = async () => {
     try {
       await signOut();
       window.location.reload();
-    } catch (error) {
-      console.error("Error signing out: ", error);
+    } catch (err) {
+      console.error("Logout failed", err);
     }
   };
 
-  const openModal = (category) => {
-    setUploadCategory(category);
-    setActiveTab("upload");
-    setShowModal(true);
-  };
-
   return (
-    <div className="sidebar">
-      {/* Sidebar menu */}
+    <aside className="sidebar">
+
+      {/* MENU */}
       <ul className="sidebar-menu">
-        <li className="sidebar-item" onClick={() => openModal("news")}>
-          ➕ News
+        <li className="sidebar-item" onClick={() => setShowModal(true)}>
+          ➕ Add News
         </li>
-        <li className="sidebar-item" onClick={() => openModal("event")}>
-          📅 Event
+        <li className="sidebar-item" onClick={() => setActiveView("events")}>
+          📅 Add Event
         </li>
-        <li className="sidebar-item" onClick={() => openModal("opinion")}>
-          💬 Messaging
+        <li className="sidebar-item" onClick={() => setActiveView("posts")}>
+          💬 Opinion
         </li>
+
         <hr className="sidebar-divider" />
-        <li className="sidebar-item" onClick={handleSignOut}>
+
+        <li className="sidebar-item logout" onClick={handleLogout}>
           🚪 Logout
         </li>
       </ul>
 
-      {/* Modal */}
+      {/* MODAL */}
       {showModal && (
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
-          <div
-            className="modal-content"
-            onClick={(e) => e.stopPropagation()}
-          >
+
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+
             <button className="modal-close" onClick={() => setShowModal(false)}>
               ✖
             </button>
@@ -75,86 +71,68 @@ export default function CommunityPlusSidebar() {
               </span>
             </div>
 
-            {/* Tab content */}
+            {/* Tab body */}
             <div className="modal-body">
+
               {activeTab === "upload" && (
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    const formData = new FormData(e.target);
+                <div>
+                  <CommunityPlusUploadForm
+                    onSubmit={(formData) => {
+                      if (formData.files) {
+                        setUploadedFiles(Array.from(formData.files));
+                      }
+                      setActiveTab("preview");
+                    }}
+                  />
 
-                    // grab files for preview
-                    const files = formData.getAll("files");
-                    setUploadedFiles(files);
-
-                    console.log("Form Data:", Object.fromEntries(formData));
-                    setActiveTab("preview");
-                  }}
-                >
-                  <div className="form-field">
-                    <label htmlFor="title">Title</label>
-                    <input type="text" id="title" name="title" required />
-                  </div>
-
-                  <div className="form-field">
-                    <label htmlFor="blurb">Blurb</label>
-                    <textarea id="blurb" name="blurb" rows="3" required />
-                  </div>
-
-                  <div className="form-field">
-                    <label htmlFor="files">Upload File</label>
-                    <input type="file" id="files" name="files" multiple />
-                  </div>
-
-                  <button type="submit" className="submit-btn">
-                    Continue →
-                  </button>
-                </form>
-              )}
-
-              {activeTab === "preview" && (
-                <div className="preview-container">
-                  <h3>Preview ({uploadCategory})</h3>
-                  {uploadedFiles.length === 0 ? (
-                    <p>No files uploaded yet.</p>
-                  ) : (
+                  {uploadedFiles.length > 0 && (
                     <div className="preview-grid">
-                      {uploadedFiles.map((file, idx) => {
+                      {uploadedFiles.map((file, i) => {
                         const url = URL.createObjectURL(file);
                         return file.type.startsWith("image/") ? (
-                          <img
-                            key={idx}
-                            src={url}
-                            alt={file.name}
-                            className="preview-thumb"
-                          />
+                          <img key={i} src={url} alt={file.name} className="preview-thumb" />
                         ) : file.type.startsWith("video/") ? (
-                          <video
-                            key={idx}
-                            src={url}
-                            controls
-                            className="preview-thumb"
-                          />
+                          <video key={i} src={url} controls className="preview-thumb" />
                         ) : (
-                          <p key={idx}>{file.name}</p>
+                          <p key={i}>{file.name}</p>
                         );
                       })}
                     </div>
                   )}
-                  <button onClick={() => setActiveTab("submit")}>
-                    Continue to Submit →
-                  </button>
+                </div>
+              )}
+
+              {activeTab === "preview" && (
+                <div className="preview-container">
+                  <h3>Preview</h3>
+                  {uploadedFiles.length === 0 ? (
+                    <p>No files uploaded.</p>
+                  ) : (
+                    <div className="preview-grid">
+                      {uploadedFiles.map((file, i) => {
+                        const url = URL.createObjectURL(file);
+                        return file.type.startsWith("image/") ? (
+                          <img key={i} src={url} alt={file.name} className="preview-thumb" />
+                        ) : file.type.startsWith("video/") ? (
+                          <video key={i} src={url} controls className="preview-thumb" />
+                        ) : (
+                          <p key={i}>{file.name}</p>
+                        );
+                      })}
+                    </div>
+                  )}
+                  <button onClick={() => setActiveTab("submit")}>Continue →</button>
                 </div>
               )}
 
               {activeTab === "submit" && (
                 <div>
-                  <h3>Submit ({uploadCategory})</h3>
-                  <p>Final review and confirmation step.</p>
+                  <h3>Submit</h3>
+                  <p>Confirm your content before submitting.</p>
                   <button
                     className="submit-btn"
                     onClick={() => {
-                      console.log("Submitted successfully!");
+                      console.log("Submitted!");
                       setShowModal(false);
                       setUploadedFiles([]);
                     }}
@@ -163,10 +141,11 @@ export default function CommunityPlusSidebar() {
                   </button>
                 </div>
               )}
+
             </div>
           </div>
         </div>
       )}
-    </div>
+    </aside>
   );
 }

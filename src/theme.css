@@ -1,0 +1,103 @@
+/* =====================================================
+   COMMUNITY ONE — UNIFIED THEME SYSTEM
+   One palette. One visual language. Landing + Dashboard.
+===================================================== */
+
+/* -----------------------------------------------------
+   GLOBAL DESIGN TOKENS
+----------------------------------------------------- */
+
+:root {
+  /* ---------- Core Surfaces ---------- */
+  --bg: #F8FAFC;               /* warm grey-blue background */
+  --surface: #FFFFFF;          /* cards, panels */
+  --surface-soft: #F1F5F9;     /* muted container background */
+  --surface-fade: #F8FAFC;     /* subtle fade surfaces */
+
+  /* ---------- Borders ---------- */
+  --border: #E2E8F0;           /* soft border */
+  --border-strong: #CBD5E1;    /* strong dividers */
+
+  /* ---------- Text ---------- */
+  --text: #0F172A;             /* nearly-black slate */
+  --text-muted: #64748B;       /* mild slate */
+  --text-soft: #94A3B8;        /* gentle muted slate */
+
+  /* ---------------------------------------------------
+     BRAND + ACCENT SYSTEM
+     Based on Landing Page screenshot + Design Philosophy
+  ------------------------------------------------------ */
+
+  /* PRIMARY BRAND → Deep Teal */
+  --brand: #0F766E;            /* bold teal (headlines, highlights) */
+  --brand-hover: #0D5E57;
+  --brand-light: #CCFBF1;      /* soft teal tint for highlights */
+
+  /* SECONDARY ACCENT → Clay / Muted Red */
+  --accent: #C2410C;           /* brick/clay (warning, emphasis) */
+  --accent-hover: #9C3410;
+  --accent-soft: #FCE8E0;      /* pale clay tint for backgrounds */
+
+  /* ---------------------------------------------------
+     SEMANTIC COLORS (icons, states, indicators)
+  ------------------------------------------------------ */
+
+  --success: #15803D;          /* green (verified, distance icons) */
+  --success-soft: #DCFCE7;
+
+  --warning: #FACC15;          /* soft yellow alert */
+  --warning-soft: #FEF9C3;
+
+  --info: #0EA5E9;
+  --info-soft: #E0F2FE;
+
+  /* Sponsored tag */
+  --sponsored-tag: #34D399;    /* emerald */
+  --sponsored-soft: #D1FAE5;
+
+  /* ---------------------------------------------------
+     Typography System
+  ------------------------------------------------------ */
+
+  --font-ui: system-ui, -apple-system, BlinkMacSystemFont,
+             "Segoe UI", Roboto, Inter, sans-serif;
+
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 20px;
+  --font-size-xl: 28px;
+  --font-size-display: 40px;
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 600;
+  --font-weight-heavy: 800;
+
+  /* ---------------------------------------------------
+     Radii / Shadows / Spacing
+  ------------------------------------------------------ */
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-full: 999px;
+
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 4px 14px rgba(15, 23, 42, 0.06);
+  --shadow-lg: 0 8px 30px rgba(15, 23, 42, 0.08);
+
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 20px;
+  --spacing-xl: 32px;
+
+  /* ---------------------------------------------------
+     Layout Constants (shared across Dashboard)
+  ------------------------------------------------------ */
+
+  --header-height: 64px;
+  --sidebar-width: 220px;
+}

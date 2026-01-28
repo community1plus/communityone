@@ -1,54 +1,49 @@
 /* =====================================================
-   COMMUNITY PLUS — FINAL MERGED DASHBOARD THEME
-   (Header + Sidebar + Layout + Feed + Map)
+   COMMUNITY ONE — UNIFIED THEME (Landing Page Style)
+   Applies to Dashboard (Header, Sidebar, Feed, Map)
 ===================================================== */
 
-/* ---------- GLOBAL TOKENS ---------- */
+/* ---------- GLOBAL TOKENS (same as landing page) ---------- */
 :root {
-  --bg: #f8fafc;
-  --surface: #ffffff;
-  --surface-soft: #f1f5f9;
-  --border: #e5e7eb;
+  --bg: #f8fafc;                /* page background */
+  --surface: #ffffff;           /* cards & panels */
+  --surface-soft: #f1f5f9;      /* light-grey surfaces */
+  --surface-hover: #eef2f6;
 
-  --text: #0f172a;
-  --text-muted: #64748b;
+  --border: #e2e8f0;            /* soft grey border */
+  --border-strong: #cbd5e1;
 
-  --brand: #c2410c;
-  --brand-soft: #fed7aa;
+  --text: #0f172a;              /* deep slate */
+  --text-muted: #64748b;        /* light slate */
 
-  --accent: #0f766e;
-  --accent-soft: #ccfbf1;
+  --brand: #0f766e;             /* teal */
+  --brand-soft: #ccfbf1;
+  --brand-strong: #115e59;      /* darker teal */
+
+  --danger: #dc2626;
+  --warning: #f59e0b;
 
   --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
 
   --shadow-sm: 0 1px 2px rgba(0,0,0,.05);
   --shadow-md: 0 6px 16px rgba(0,0,0,.06);
 
-  --font-ui: system-ui, -apple-system, BlinkMacSystemFont,
-              "Segoe UI", Roboto, Inter, sans-serif;
-
-  --header-height: 64px;
-  --sidebar-width: 220px;
+  --font-ui: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-/* ---------- RESET ---------- */
+/* ---------- BASE RESET ---------- */
 * {
   box-sizing: border-box;
 }
 
 html, body {
-  margin: 0;
   height: 100%;
+  margin: 0;
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-ui);
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
 }
 
 button {
@@ -58,120 +53,122 @@ button {
   font-family: inherit;
 }
 
-/* =====================================================
-   LAYOUT CONTAINER
-===================================================== */
-
-.dashboard-container {
-  height: 100vh;
-  width: 100%;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
+a {
+  color: inherit;
+  text-decoration: none;
 }
 
 /* =====================================================
-   FIXED HEADER
+   HEADER — Restyled to match landing page
 ===================================================== */
-
 .header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: var(--header-height);
-  width: 100%;
+  height: 72px;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 24px;
-  z-index: 1000;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  box-shadow: var(--shadow-sm);
 }
 
-.header-left {
+.header-top {
   display: flex;
   align-items: center;
-  gap: 28px;
+  width: 100%;
+  gap: 24px;
 }
 
-.header-logo {
-  font-weight: 800;
-  letter-spacing: .04em;
-  color: var(--brand);
-  text-transform: uppercase;
-}
-
-.header-nav {
+/* Avatar circle */
+.avatar {
+  width: 40px;
+  height: 40px;
+  background: var(--brand);
+  color: white;
+  border-radius: 50%;
+  font-weight: 600;
   display: flex;
-  gap: 12px;
+  align-items: center;
+  justify-content: center;
 }
 
-.header-nav a {
-  padding: 7px 12px;
-  border-radius: var(--radius-sm);
+/* Search centered cleanly */
+.center-section {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.search-wrapper {
+  width: 100%;
+  max-width: 640px;
+}
+
+/* Location text */
+.geo {
+  white-space: nowrap;
   font-size: 14px;
-  font-weight: 500;
+  color: var(--text-muted);
+}
+
+/* Nav bar under header */
+.links {
+  display: flex;
+  justify-content: center;
+  gap: 22px;
+  padding: 10px 0;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+
+.links button {
+  font-size: 14px;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
   color: var(--text-muted);
   transition: background .15s ease, color .15s ease;
 }
 
-.header-nav a:hover {
+.links button:hover {
   background: var(--surface-soft);
   color: var(--text);
 }
 
-.header-actions {
+/* =====================================================
+   MAIN LAYOUT
+===================================================== */
+
+.main {
   display: flex;
-  align-items: center;
-  gap: 12px;
+  flex: 1;
+  overflow: hidden;
 }
 
 /* =====================================================
-   FIXED SIDEBAR UNDER HEADER
+   SIDEBAR — Landing Page Style
 ===================================================== */
 
 .sidebar {
-  position: fixed;
-  top: var(--header-height);
-  left: 0;
-  width: var(--sidebar-width);
-  height: calc(100vh - var(--header-height));
+  width: 230px;
   background: var(--surface);
   border-right: 1px solid var(--border);
-  padding: 16px 12px;
-  overflow-y: auto;
+  padding: 20px 14px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  z-index: 900;
-}
-
-.sidebar-section {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.sidebar-title {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: .08em;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  padding: 4px 10px;
+  gap: 10px;
+  box-shadow: var(--shadow-sm);
 }
 
 .sidebar-item {
-  padding: 9px 10px;
-  border-radius: var(--radius-sm);
-  font-size: 14px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  font-size: 15px;
   font-weight: 500;
   color: var(--text);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
   transition: background .15s ease, color .15s ease;
 }
 
@@ -179,24 +176,26 @@ button {
   background: var(--surface-soft);
 }
 
-.sidebar-item.active {
-  background: var(--accent-soft);
-  color: var(--accent);
+.sidebar-item.logout {
+  color: var(--danger);
+  font-weight: 600;
+}
+
+/* Divider */
+.sidebar-divider {
+  margin: 12px 0;
+  border: none;
+  border-top: 1px solid var(--border);
 }
 
 /* =====================================================
-   MAIN CONTENT AREA
+   CONTENT AREA GRID
 ===================================================== */
-
 .content-area {
-  position: relative;
-  margin-top: var(--header-height);
-  margin-left: var(--sidebar-width);
-  height: calc(100vh - var(--header-height));
-  overflow-y: hidden;
-  background: var(--bg);
+  flex: 1;
   display: grid;
-  grid-template-columns: 360px 1fr;
+  grid-template-columns: 370px 1fr; /* feed | map */
+  overflow: hidden;
 }
 
 /* =====================================================
@@ -208,43 +207,34 @@ button {
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
 }
 
 .feed-header {
   height: 56px;
-  padding: 0 16px;
-  border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: space-between;
-}
-
-.feed-title {
-  font-weight: 600;
+  padding: 0 16px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
   font-size: 15px;
-}
-
-.feed-radius {
-  font-size: 12px;
-  color: var(--text-muted);
 }
 
 .feed-scroll {
   flex: 1;
   overflow-y: auto;
-  padding: 12px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-/* Feed cards */
+/* Feed card */
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 12px 14px;
+  border-radius: var(--radius-lg);
+  padding: 16px;
   box-shadow: var(--shadow-sm);
   transition: box-shadow .15s ease, transform .15s ease;
 }
@@ -254,48 +244,26 @@ button {
   transform: translateY(-1px);
 }
 
-.card .row {
-  display: flex;
-  gap: 12px;
-}
-
-.card .title {
-  font-weight: 600;
-  font-size: 14px;
-}
-
-.card .small {
-  font-size: 12px;
-  color: var(--text-muted);
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
 .cardMuted {
   background: var(--surface-soft);
   color: var(--text-muted);
 }
 
-/* Sponsored */
-.card.ad {
-  border-color: var(--accent-soft);
-  background: linear-gradient(180deg, #ffffff, #f0fdfa);
-  position: relative;
+.card .title {
+  font-weight: 600;
+  font-size: 15px;
+  margin-bottom: 4px;
 }
 
-.card.ad::before {
-  content: "SP";
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: .06em;
-  padding: 3px 6px;
-  border-radius: 999px;
-  background: var(--accent-soft);
-  color: var(--accent);
+.card .small {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* Sponsored */
+.card.ad {
+  background: linear-gradient(to bottom, var(--surface), #f0fdfa);
+  border-color: var(--brand-soft);
 }
 
 /* =====================================================
@@ -303,49 +271,24 @@ button {
 ===================================================== */
 
 .map-column {
+  background: var(--surface);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  background: var(--bg);
+  border-left: 1px solid var(--border);
 }
 
 .map-header {
   height: 56px;
   padding: 0 16px;
   border-bottom: 1px solid var(--border);
-  background: var(--surface);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.map-sub {
-  font-size: 12px;
-  color: var(--text-muted);
 }
 
 .map-container {
   flex: 1;
-  outline: none;
-}
-
-.map-column > div {
   height: 100%;
-}
-
-/* =====================================================
-   UTILITIES
-===================================================== */
-
-.hidden {
-  display: none !important;
-}
-
-.mono {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco,
-               Consolas, "Courier New", monospace;
 }
 
 /* =====================================================
@@ -365,10 +308,7 @@ button {
   .sidebar {
     display: none;
   }
-  .content-area {
-    margin-left: 0;
-  }
-  .header-nav {
+  .links {
     display: none;
   }
 }
