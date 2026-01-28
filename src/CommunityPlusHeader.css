@@ -30,7 +30,7 @@
 /* NEW: LEFT SECTION */
 .left-section {
   display: flex;
-  align-items: center;
+  align-items: left;
   flex-shrink: 0; /* ensure avatar never shrinks */
 }
 
@@ -44,8 +44,8 @@
   font-weight: bold;
   font-size: 14px;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: left;
+  justify-content: left;
   flex-shrink: 0;
 }
 
@@ -66,7 +66,7 @@
 /* NEW: RIGHT SECTION */
 .right-section {
   display: flex;
-  align-items: center;
+  align-items: right;
   flex-shrink: 0;
 }
 
