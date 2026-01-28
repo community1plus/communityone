@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { signOut } from "aws-amplify/auth";
 import { useNavigate } from "react-router-dom";
-import CommunityPlusUploadForm from "./CommunityPlusUploadForm";
+import CommunityPlusUploadForm from "../CommunityPlusUploadForm";
+import "../Sidebar/CommunityPlusSidebar.css";
 
 export default function CommunityPlusSidebar({ setActiveView }) {
   const [showModal, setShowModal] = useState(false);
