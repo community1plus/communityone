@@ -1,5 +1,5 @@
 /* =========================
-   HEADER (two rows, fixed)
+   HEADER BASE
    ========================= */
 
 .header {
@@ -12,45 +12,48 @@
   z-index: 1000;
   display: flex;
   flex-direction: column;
-  box-sizing: border-box;
+  transition: box-shadow 0.25s ease, padding 0.25s ease;
+}
+
+/* Shadow when scrolling */
+.header-scrolled {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
 /* =========================
-   TOP ROW (Avatar — Search — Geo)
+   TOP ROW (Avatar — Search — Location)
    ========================= */
 
 .header-top {
   display: flex;
   width: 100%;
   align-items: center;
-  justify-content: space-between; 
-  padding: 10px 14px;
+  justify-content: space-between;
+  padding: 8px 14px;
   gap: 12px;
 }
 
-/* LEFT SECTION */
-.left-section {
+.left-section,
+.right-section {
   display: flex;
-  align-items: center;      /* FIXED */
+  align-items: center;
   flex-shrink: 0;
 }
 
-/* Avatar styling */
+/* Avatar */
 .avatar {
   width: 36px;
   height: 36px;
   background: #e3342f;
   color: #fff;
   border-radius: 50%;
-  font-weight: bold;
-  font-size: 14px;
   display: flex;
-  align-items: center;      /* FIXED */
-  justify-content: center;  /* FIXED */
-  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
 }
 
-/* CENTER SECTION */
+/* Center: Search */
 .center-section {
   flex: 1;
   display: flex;
@@ -60,74 +63,84 @@
 
 .search-wrapper {
   width: 100%;
-  max-width: 700px;
+  max-width: 650px;
   min-width: 0;
 }
 
-/* RIGHT SECTION */
-.right-section {
-  display: flex;
-  align-items: center;      /* FIXED */
-  flex-shrink: 0;
-}
-
-/* Location text */
+/* Right: Location */
 .geo {
   font-size: 13px;
   font-weight: 500;
-  color: #333;
   white-space: nowrap;
-  text-align: right;
 }
 
 /* =========================
-   SEARCH BAR
-   ========================= */
-
-.google-search {
-  width: 100%;
-  height: 38px;
-  display: flex;
-  align-items: center;
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 20px;
-  box-shadow: 0 1px 6px rgba(0,0,0,0.1);
-  padding: 0 10px;
-}
-
-.google-search input {
-  flex: 1;
-  border: none;
-  outline: none;
-  background: transparent;
-  font-size: 15px;
-  padding: 0 6px;
-}
-
-/* =========================
-   NAVIGATION ROW
+   NAVIGATION
    ========================= */
 
 .links {
   display: flex;
   justify-content: center;
-  gap: 20px;
+  gap: 22px;
   padding: 8px 20px;
-  font-size: 13.5px;
-  background: #fff;        /* FIXED: keeps it inside header visually */
+  background: #fff;
+  border-top: 1px solid #eee;
+  transition: max-height 0.3s ease;
 }
 
-.links button,
-.links a {
+.links button {
   background: none;
   border: none;
+  font-size: 14px;
   color: #333;
-  font-weight: 500;
   cursor: pointer;
 }
 
-.links button:hover,
-.links a:hover {
+.links button:hover {
   color: #e3342f;
+}
+
+/* =========================
+   MOBILE BEHAVIOR
+   ========================= */
+
+.hamburger {
+  font-size: 22px;
+  cursor: pointer;
+  padding: 4px 8px;
+  user-select: none;
+  display: none;
+}
+
+/* Hide location on mobile */
+.hide-mobile {
+  display: inline-block;
+}
+
+.show-mobile {
+  display: none;
+}
+
+/* Mobile styles */
+@media (max-width: 850px) {
+  .hide-mobile {
+    display: none;
+  }
+
+  .show-mobile {
+    display: block;
+  }
+
+  /* Collapse nav */
+  .links {
+    flex-direction: column;
+    max-height: 0;
+    overflow: hidden;
+    padding: 0 20px;
+  }
+
+  .links.open {
+    max-height: 300px; /* enough to show all */
+    padding: 12px 20px;
+  }
 }
