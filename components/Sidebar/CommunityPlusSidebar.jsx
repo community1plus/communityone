@@ -11,7 +11,7 @@ export default function CommunityPlusSidebar({ setActiveView }) {
     await signOut();
     navigate("/", { replace: true }); // Return to landing page
   };
-
+/**/ */
   return (
     <aside className="sidebar">
       <div
