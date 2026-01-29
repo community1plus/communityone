@@ -1,5 +1,5 @@
 import React from "react";
-import "./FeedCard.css";
+import "../../src/components/Feed/FeedCard.css";
 
 export default function FeedCard({ title, body, image, category, time }) {
   return (
