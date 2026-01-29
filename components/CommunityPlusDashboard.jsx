@@ -3,6 +3,7 @@ import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 import CommunityPlusHeader from "./CommunityPlusHeader";
 import CommunityPlusSidebar from "./CommunityPlusSideBar";
 import CommunityPlusContentPage from "./CommunityPlusContentPage";
+import "../src/components/Dashboard/CommunityPlusDashboard.css";
 
 export default function CommunityPlusDashboard({ user, signOut }) {
   const [coords, setCoords] = useState({
