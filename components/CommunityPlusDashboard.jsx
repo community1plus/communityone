@@ -1,53 +1,97 @@
 import React, { useState, useEffect } from "react";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
-import CommunityPlusHeader from "./CommunityPlusHeader";
-import CommunityPlusSidebar from "./CommunityPlusSideBar";
-import CommunityPlusContentPage from "./CommunityPlusContentPage";
-import "../src/components/Dashboard/CommunityPlusDashboard.css";
+
+import CommunityPlusHeader from "../Header/CommunityPlusHeader";
+import CommunityPlusSidebar from "../Sidebar/CommunityPlusSidebar";
+import CommunityPlusContentPage from "../Feed/CommunityPlusContentPage";
 
 export default function CommunityPlusDashboard({ user, signOut }) {
   const [coords, setCoords] = useState({
     lat: -37.8136,
-    lng: 144.9631,
+    lng: 144.9631
   });
 
   const [activeView, setActiveView] = useState("dashboard");
 
+  /* -------------------------------
+     Geolocation handler
+  -------------------------------- */
   useEffect(() => {
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setCoords({
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude,
-        });
-      },
-      () => {
-        fetch("https://ipapi.co/json/")
-          .then((res) => res.json())
-          .then((data) => {
-            if (data.latitude && data.longitude) {
-              setCoords({
-                lat: data.latitude,
-                lng: data.longitude,
-              });
-            }
-          })
-          .catch(() => {});
-      }
-    );
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setCoords({
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+          });
+        },
+        () => {
+          fetch("https://ipapi.co/json/")
+            .then((res) => res.json())
+            .then((data) => {
+              if (data.latitude && data.longitude) {
+                setCoords({
+                  lat: data.latitude,
+                  lng: data.longitude,
+                });
+              }
+            })
+            .catch(() => {});
+        }
+      );
+    }
   }, []);
+
+  /* -------------------------------
+     LOGOUT → Return to landing
+  -------------------------------- */
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      window.location.href = "/"; // go back to landing
+    } catch (err) {
+      console.error("Logout failed:", err);
+    }
+  };
 
   return (
     <div className="dashboard-container">
+      {/* HEADER */}
+      <CommunityPlusHeader
+        user={user}
+        setActiveView={setActiveView}
+        onLogout={handleLogout}
+      />
 
-      <CommunityPlusHeader setActiveView={setActiveView} />
-
+      {/* BODY */}
       <main className="main">
-        <CommunityPlusSidebar setActiveView={setActiveView} />
+        {/* SIDEBAR */}
+        <CommunityPlusSidebar setActiveView={setActiveView} onLogout={handleLogout} />
 
+        {/* CONTENT AREA */}
         <div className="content-area">
+
+          {/* FEED VIEW */}
+          {activeView !== "dashboard" && (
+            <div className="feed-column">
+              <div className="feed-header">
+                <span className="feed-title">{activeView}</span>
+              </div>
+
+              <div className="feed-scroll">
+                <CommunityPlusContentPage />
+              </div>
+            </div>
+          )}
+
+          {/* MAP VIEW */}
           {activeView === "dashboard" && (
             <div className="map-column">
+              <div className="map-header">
+                <span><b>Live around you</b></span>
+                <span className="map-sub">Location-based updates</span>
+              </div>
+
               <LoadScript
                 googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
                 libraries={["places"]}
@@ -62,8 +106,6 @@ export default function CommunityPlusDashboard({ user, signOut }) {
               </LoadScript>
             </div>
           )}
-
-          {activeView === "posts" && <CommunityPlusContentPage />}
         </div>
       </main>
     </div>

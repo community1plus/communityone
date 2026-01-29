@@ -1,134 +1,30 @@
 /* =====================================================
-   DASHBOARD (SAFE, SCOPED, LANDING-PROOF)
-   All styles are scoped under .dashboard-container
+   DASHBOARD WRAPPER (NO PAGE SCROLL)
 ===================================================== */
 
 .dashboard-container {
-  --bg: #f8fafc;
-  --surface: #ffffff;
-  --surface-soft: #f1f5f9;
-  --surface-hover: #eef2f6;
-
-  --border: #e2e8f0;
-  --border-strong: #cbd5e1;
-
-  --text: #0f172a;
-  --text-muted: #64748b;
-
-  --brand: #0f766e;
-  --brand-soft: #ccfbf1;
-  --brand-strong: #115e59;
-
-  --danger: #dc2626;
-  --warning: #f59e0b;
-
-  --radius-sm: 6px;
-  --radius-md: 12px;
-  --radius-lg: 18px;
-
-  --shadow-sm: 0 1px 2px rgba(0,0,0,.05);
-  --shadow-md: 0 6px 16px rgba(0,0,0,.08);
-}
-
-/* Layout container */
-.dashboard-container {
+  height: 100vh;
   display: flex;
   flex-direction: column;
-  height: 100vh;
   background: var(--bg);
+  overflow: hidden; /* prevents full-page scrolling */
+}
+
+/* =====================================================
+   MAIN LAYOUT SPLIT
+===================================================== */
+
+.main {
+  flex: 1;
+  display: flex;
   overflow: hidden;
 }
 
 /* =====================================================
-   HEADER (SCOPED)
+   SIDEBAR
 ===================================================== */
 
-.dashboard-container .header {
-  height: 72px;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 24px;
-  box-shadow: var(--shadow-sm);
-  position: sticky;
-  top: 0;
-  z-index: 50;
-}
-
-.dashboard-container .header-top {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  gap: 24px;
-}
-
-.dashboard-container .avatar {
-  width: 40px;
-  height: 40px;
-  background: var(--brand);
-  color: white;
-  border-radius: 50%;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.dashboard-container .center-section {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-}
-
-.dashboard-container .search-wrapper {
-  width: 100%;
-  max-width: 640px;
-}
-
-.dashboard-container .geo {
-  font-size: 14px;
-  color: var(--text-muted);
-  white-space: nowrap;
-}
-
-/* nav links under header */
-.dashboard-container .links {
-  height: 48px;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 22px;
-}
-
-.dashboard-container .links button {
-  padding: 6px 10px;
-  font-size: 14px;
-  border-radius: var(--radius-sm);
-  color: var(--text-muted);
-  transition: background .15s, color .15s;
-}
-
-.dashboard-container .links button:hover {
-  background: var(--surface-soft);
-  color: var(--text);
-}
-
-/* =====================================================
-   MAIN LAYOUT
-===================================================== */
-
-.dashboard-container .main {
-  display: flex;
-  flex: 1;
-  overflow: hidden;
-}
-
-/* SIDEBAR */
-.dashboard-container .sidebar {
+.sidebar {
   width: 230px;
   background: var(--surface);
   border-right: 1px solid var(--border);
@@ -137,42 +33,43 @@
   flex-direction: column;
   gap: 10px;
   box-shadow: var(--shadow-sm);
+  height: 100%;
+  overflow-y: auto;
 }
 
-.dashboard-container .sidebar-item {
+.sidebar-item {
   padding: 10px 12px;
   border-radius: var(--radius-md);
   background: var(--surface);
   font-size: 15px;
   font-weight: 500;
   color: var(--text);
-  transition: background .15s;
-  cursor: pointer;
+  transition: background .15s ease, color .15s ease;
 }
 
-.dashboard-container .sidebar-item:hover {
+.sidebar-item:hover {
   background: var(--surface-soft);
 }
 
-.dashboard-container .sidebar-item.logout {
+.sidebar-item.logout {
   color: var(--danger);
   font-weight: 600;
 }
 
-.dashboard-container .sidebar-divider {
+.sidebar-divider {
   margin: 12px 0;
   border: none;
   border-top: 1px solid var(--border);
 }
 
 /* =====================================================
-   CONTENT AREA GRID
+   CONTENT AREA GRID (FEED | MAP)
 ===================================================== */
 
-.dashboard-container .content-area {
+.content-area {
   flex: 1;
   display: grid;
-  grid-template-columns: 360px 1fr;
+  grid-template-columns: 370px 1fr;
   overflow: hidden;
 }
 
@@ -180,79 +77,45 @@
    FEED COLUMN
 ===================================================== */
 
-.dashboard-container .feed-column {
+.feed-column {
   background: var(--surface);
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
 }
 
-.dashboard-container .feed-header {
+.feed-header {
   height: 56px;
-  padding: 0 16px;
-  border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--border);
+  font-size: 15px;
 }
 
-.dashboard-container .feed-scroll {
+.feed-scroll {
   flex: 1;
   overflow-y: auto;
   padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
-}
-
-/* Feed card */
-.dashboard-container .card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 16px;
-  box-shadow: var(--shadow-sm);
-  transition: box-shadow .15s, transform .15s;
-}
-
-.dashboard-container .card:hover {
-  box-shadow: var(--shadow-md);
-  transform: translateY(-1px);
-}
-
-.dashboard-container .cardMuted {
-  background: var(--surface-soft);
-  color: var(--text-muted);
-}
-
-.dashboard-container .card .title {
-  font-weight: 600;
-  font-size: 15px;
-  margin-bottom: 4px;
-}
-
-.dashboard-container .card .small {
-  font-size: 13px;
-  color: var(--text-muted);
-}
-
-.dashboard-container .card.ad {
-  background: linear-gradient(to bottom, var(--surface), #f0fdfa);
-  border-color: var(--brand-soft);
+  gap: 12px;
 }
 
 /* =====================================================
    MAP COLUMN
 ===================================================== */
 
-.dashboard-container .map-column {
-  background: var(--surface);
+.map-column {
   display: flex;
   flex-direction: column;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  height: 100%;
+  overflow: hidden;
 }
 
-.dashboard-container .map-header {
+.map-header {
   height: 56px;
   padding: 0 16px;
   border-bottom: 1px solid var(--border);
@@ -261,9 +124,11 @@
   justify-content: space-between;
 }
 
-.dashboard-container .map-container {
+.map-container {
   flex: 1;
-  height: 100%;
+  width: 100%;
+  height: 100% !important; /* fix Google Maps height */
+  overflow: hidden;
 }
 
 /* =====================================================
@@ -271,19 +136,16 @@
 ===================================================== */
 
 @media (max-width: 1100px) {
-  .dashboard-container .content-area {
-    grid-template-columns: 1fr;
+  .content-area {
+    grid-template-columns: 1fr; /* hide feed */
   }
-  .dashboard-container .map-column {
+  .feed-column {
     display: none;
   }
 }
 
 @media (max-width: 720px) {
-  .dashboard-container .sidebar {
-    display: none;
-  }
-  .dashboard-container .links {
+  .sidebar {
     display: none;
   }
 }
