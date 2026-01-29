@@ -16,7 +16,7 @@ export default function CommunityPlusSidebar() {
       console.error("Error signing out: ", error);
     }
   };
-
+/**/ 
   return (
     <div className="sidebar">
       <ul className="sidebar-menu">
