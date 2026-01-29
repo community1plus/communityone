@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import GoogleStyleSearch from "./GoogleStyleSearch";
+import GoogleStyleSearch from "../Search/GoogleStyleSearch";
 import "../src/components/Header/CommunityPlusHeader.css";
 
 function CommunityPlusHeader({ setActiveView, user, signOut }) {

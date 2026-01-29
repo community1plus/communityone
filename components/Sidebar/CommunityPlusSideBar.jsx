@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { signOut } from "aws-amplify/auth";
-import CommunityPlusUploadForm from "./CommunityPlusUploadForm";
+import CommunityPlusUploadForm from "../CommunityPlusUploadForm";
 import "../src/components/Sidebar/CommunityPlusSidebar.css";
 
 export default function CommunityPlusSidebar() {
