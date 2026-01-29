@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Authenticator } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
-import "./src/components/CommunityPlusLandingPage/CommunityPlusLandingPage.css";
+import "../src/components/CommunityPlusLandingPage/CommunityPlusLandingPage.css";
 
 /**
  * AuthGate
