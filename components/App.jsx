@@ -13,6 +13,7 @@ import CommunityPlusDashboard from "./Dashboard/CommunityPlusDashboard";
  * - while checking, renders the Landing (or a minimal skeleton)
  * - if signed in, redirects to /home
  * 
+ * 
  */
 function LandingGate() {
   const navigate = useNavigate();
