@@ -13,7 +13,7 @@ export default function CommunityPlusDashboard({ user, signOut }) {
   });
 
   const [activeView, setActiveView] = useState("dashboard");
-  /**/
+  
   /* -------------------------------
      Geolocation handler
   -------------------------------- */
