@@ -1,4 +1,6 @@
 import React from "react";
+import "../src/components/MapToolbar/MapToolbar.css";
+
 
 export default function MapToolbar({ onZoomIn, onZoomOut, onRecenter, onRadius, onStyle }) {
   return (

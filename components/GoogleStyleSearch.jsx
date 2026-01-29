@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import "../src/components/GoogleStyleSearch/GoogleStyleSearch.css";
 
 export default function GoogleStyleSearch() {
   const [query, setQuery] = useState("");
