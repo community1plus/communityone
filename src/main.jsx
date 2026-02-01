@@ -2,11 +2,11 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "../components/App.jsx";
-import outputs from "./amplify_outputs.json";
+import outputs from "../amplify_outputs.json";
 import { Amplify } from "aws-amplify";
 Amplify.configure(outputs);
 import "./theme/theme.css";
-
+/**/
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
