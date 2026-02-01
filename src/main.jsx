@@ -6,7 +6,7 @@ import outputs from "./amplify_outputs.json";
 import { Amplify } from "aws-amplify";
 Amplify.configure(outputs);
 import "./theme/theme.css";
-/**/
+
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
