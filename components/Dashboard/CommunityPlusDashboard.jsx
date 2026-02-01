@@ -4,7 +4,7 @@ import CommunityPlusHeader from "../Header/CommunityPlusHeader";
 import CommunityPlusSidebar from "../Sidebar/CommunityPlusSidebar";
 import CommunityPlusContentPage from "../Feed/CommunityPlusContentPage";
 import "../../src/components/Dashboard/CommunityPlusDashboard.css";
-
+/**/
 export default function CommunityPlusDashboard({ user, signOut }) {
   const [coords, setCoords] = useState({
     lat: -37.8136,
