@@ -49,4 +49,14 @@ function CommunityPlusHeader({ setActiveView, user, signOut }) {
         <button onClick={() => setActiveView("dashboard")}>Home</button>
         <button onClick={() => setActiveView("posts")}>Posts</button>
         <button onClick={() => setActiveView("events")}>Events</button>
-        <button onClick={() => setActiveView("inc
+        <button onClick={() => setActiveView("incidents")}>Incidents</button>
+        <button onClick={() => setActiveView("search")}>Search</button>
+        <button onClick={() => setActiveView("community")}>Community+</button>
+        <button onClick={() => setActiveView("about")}>About</button>
+      </nav>
+
+    </header>
+  );
+}
+
+export default CommunityPlusHeader;
