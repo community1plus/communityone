@@ -13,92 +13,80 @@
   padding: 0 24px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   z-index: 900;
   box-shadow: var(--shadow-sm);
 }
 
-/* Top row inside header */
-.header-top {
-  width: 100%;
+/* Left: Avatar */
+.header-left {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 14px;
 }
 
-/* User avatar */
+/* Avatar circle */
 .avatar {
   width: 40px;
   height: 40px;
-  background: #0f766e; /* match avatar */
+  background: #0f766e;
   color: white;
   border-radius: 50%;
   font-weight: 600;
+  font-size: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* Center region for search */
-.center-section {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-}
-
-/* SEARCH BOX WRAPPER */
-.search-wrapper {
+/* Middle: CENTERED search */
+.header-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   width: 100%;
-  max-width: 640px;
-  position: relative;
-  display: flex;
-  align-items: center;
+  max-width: 480px;
 }
 
-/* Minimal Search Input */
+/* Search input styling */
+.search-wrapper {
+  position: relative;
+  width: 100%;
+}
+
 .search-input {
   width: 100%;
   padding: 10px 36px 10px 0;
-  font-size: 16px;
   background: transparent;
   border: none;
   border-bottom: 2px solid #0f766e33;
   outline: none;
+  font-size: 16px;
   color: var(--text);
-  transition: border-color .2s ease;
-}
-
-.search-input::placeholder {
-  color: var(--text-muted);
 }
 
 .search-input:focus {
-  border-bottom-color: #0f766e; /* avatar colour */
+  border-bottom-color: #0f766e;
 }
 
-/* Enter Arrow Icon */
 .search-enter {
   position: absolute;
   right: 0;
   bottom: 10px;
   font-size: 20px;
-  color: #0f766e; /* avatar colour */
+  color: #0f766e;
   cursor: pointer;
-  transition: opacity .2s ease;
 }
 
-.search-enter:hover {
-  opacity: .7;
-}
-
-/* Geolocation label (right side) */
-.geo {
+/* Right: Geo label */
+.header-right {
   font-size: 14px;
   color: var(--text-muted);
   white-space: nowrap;
 }
 
 /* =====================================================
-   NAV LINKS BELOW HEADER
+   NAV BAR
 ===================================================== */
 
 .links {
@@ -121,10 +109,4 @@
   padding: 6px 12px;
   border-radius: var(--radius-sm);
   color: var(--text-muted);
-  transition: background .15s, color .15s;
-}
-
-.links button:hover {
-  background: var(--surface-soft);
-  color: var(--text);
 }
