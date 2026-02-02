@@ -8,23 +8,22 @@ import "./CommunityPlusDashboard.css";
 export default function CommunityPlusDashboard({ user, signOut }) {
   const [coords, setCoords] = useState({
     lat: -37.8136,
-    lng: 144.9631
+    lng: 144.9631,
   });
 
   const [activeView, setActiveView] = useState("dashboard");
-  
+
   /* -------------------------------
      Geolocation handler
   -------------------------------- */
   useEffect(() => {
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
-        (pos) => {
+        (pos) =>
           setCoords({
             lat: pos.coords.latitude,
             lng: pos.coords.longitude,
-          });
-        },
+          }),
         () => {
           fetch("https://ipapi.co/json/")
             .then((res) => res.json())
@@ -48,7 +47,7 @@ export default function CommunityPlusDashboard({ user, signOut }) {
   const handleLogout = async () => {
     try {
       await signOut();
-      window.location.href = "/"; // go back to landing
+      window.location.href = "/";
     } catch (err) {
       console.error("Logout failed:", err);
     }
@@ -63,51 +62,14 @@ export default function CommunityPlusDashboard({ user, signOut }) {
         onLogout={handleLogout}
       />
 
-      {/* BODY */}
+      {/* MAIN AREA */}
       <main className="main">
-        {/* SIDEBAR */}
-        <CommunityPlusSidebar setActiveView={setActiveView} onLogout={handleLogout} />
+        {/* FIXED SIDEBAR */}
+        <CommunityPlusSidebar
+          setActiveView={setActiveView}
+          onLogout={handleLogout}
+        />
 
-        {/* CONTENT AREA */}
+        {/* CONTENT (FEED | MAP) */}
         <div className="content-area">
-
-          {/* FEED VIEW */}
-          {activeView !== "dashboard" && (
-            <div className="feed-column">
-              <div className="feed-header">
-                <span className="feed-title">{activeView}</span>
-              </div>
-
-              <div className="feed-scroll">
-                <CommunityPlusContentPage />
-              </div>
-            </div>
-          )}
-
-          {/* MAP VIEW */}
-          {activeView === "dashboard" && (
-            <div className="map-column">
-              <div className="map-header">
-                <span><b>Live around you</b></span>
-                <span className="map-sub">Location-based updates</span>
-              </div>
-
-              <LoadScript
-                googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
-                libraries={["places"]}
-              >
-                <GoogleMap
-                  center={coords}
-                  zoom={14}
-                  mapContainerClassName="map-container"
-                >
-                  <Marker position={coords} />
-                </GoogleMap>
-              </LoadScript>
-            </div>
-          )}
-        </div>
-      </main>
-    </div>
-  );
-}
+          {/* FEED ALWAYS VISIBLE*
