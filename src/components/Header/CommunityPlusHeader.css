@@ -17,6 +17,7 @@
   box-shadow: var(--shadow-sm);
 }
 
+/* Top row inside header */
 .header-top {
   width: 100%;
   display: flex;
@@ -24,10 +25,11 @@
   gap: 24px;
 }
 
+/* User avatar */
 .avatar {
   width: 40px;
   height: 40px;
-  background: var(--brand);
+  background: #0f766e; /* match avatar */
   color: white;
   border-radius: 50%;
   font-weight: 600;
@@ -36,24 +38,69 @@
   justify-content: center;
 }
 
+/* Center region for search */
 .center-section {
   flex: 1;
   display: flex;
   justify-content: center;
 }
 
+/* SEARCH BOX WRAPPER */
 .search-wrapper {
   width: 100%;
   max-width: 640px;
+  position: relative;
+  display: flex;
+  align-items: center;
 }
 
+/* Minimal Search Input */
+.search-input {
+  width: 100%;
+  padding: 10px 36px 10px 0;
+  font-size: 16px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid #0f766e33;
+  outline: none;
+  color: var(--text);
+  transition: border-color .2s ease;
+}
+
+.search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.search-input:focus {
+  border-bottom-color: #0f766e; /* avatar colour */
+}
+
+/* Enter Arrow Icon */
+.search-enter {
+  position: absolute;
+  right: 0;
+  bottom: 10px;
+  font-size: 20px;
+  color: #0f766e; /* avatar colour */
+  cursor: pointer;
+  transition: opacity .2s ease;
+}
+
+.search-enter:hover {
+  opacity: .7;
+}
+
+/* Geolocation label (right side) */
 .geo {
   font-size: 14px;
   color: var(--text-muted);
   white-space: nowrap;
 }
 
-/* ---------- NAV BAR BELOW HEADER ---------- */
+/* =====================================================
+   NAV LINKS BELOW HEADER
+===================================================== */
+
 .links {
   position: fixed;
   top: var(--header-height);

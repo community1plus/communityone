@@ -44,12 +44,11 @@ function CommunityPlusHeader({ setActiveView, user, signOut }) {
           <div className="avatar">C</div>
         </div>
 
-        {/* CENTER: Search */}
-        <div className="center-section">
-          <div className="search-wrapper">
-            <GoogleStyleSearch />
-          </div>
+        <div className="search-box">
+           <input type="text" className="search-input" placeholder="Search community updates..." />
+           <span className="search-enter">⤶</span>
         </div>
+
 
         {/* RIGHT: Geo */}
         <div className="right-section">
