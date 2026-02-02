@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 import CommunityPlusHeader from "../Header/CommunityPlusHeader";
 import CommunityPlusSidebar from "../Sidebar/CommunityPlusSidebar";
-import CommunityPlusContentPage from "./CommunityPlusContentPage";
+import CommunityPlusContentPage from "../FeedCard/CommunityPlusContentPage";
 import "./CommunityPlusDashboard.css";
 
 export default function CommunityPlusDashboard({ user, signOut }) {
