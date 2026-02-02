@@ -2,7 +2,7 @@
 import React from "react";
 import { signOut } from "aws-amplify/auth";
 import { useNavigate } from "react-router-dom";
-import "./components/Sidebar/CommunityPlusSidebar.css";
+import "./CommunityPlusSidebar.css";
 
 export default function CommunityPlusSidebar({ setActiveView }) {
   const navigate = useNavigate();
