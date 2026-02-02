@@ -1,48 +1,50 @@
 /* =====================================================
-   COMMUNITY ONE — HEADER (LANDING-PAGE THEME MATCH)
+   COMMUNITY ONE — HEADER (MATCH LANDING PAGE THEME)
 ===================================================== */
 
-/* --- HEADER CONTAINER --- */
 .header {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
 
-  background: var(--surface-soft); /* Warm white */
-  border-bottom: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.75); /* landing nav style */
+  backdrop-filter: blur(10px);
 
-  padding: 12px 24px 4px 24px;
+  border-bottom: 1px solid var(--line);
+  padding: 10px 24px 2px 24px;
 
   display: flex;
   flex-direction: column;
   gap: 4px;
-
   z-index: 900;
 }
 
-/* --- TOP ROW (AVATAR | SEARCH | GEO) --- */
+/* ------------------- TOP ROW ------------------- */
+
 .header-row {
   display: grid;
-  grid-template-columns: 48px 1fr auto; /* LEFT | CENTER | RIGHT */
+  grid-template-columns: 48px 1fr auto; 
   align-items: center;
 }
 
-/* --- AVATAR --- */
-.avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: var(--brand);  /* SAME TEAL AS LANDING */
-  color: white;
-  font-weight: 600;
+/* Avatar — landing page style */
+.header-left .avatar {
+  width: 38px;
+  height: 38px;
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: rgba(20, 20, 20, 0.06);
+
+  display: grid;
+  place-items: center;
+
+  font-weight: 700;
+  color: rgba(20, 20, 20, 0.7);
 }
 
-/* --- SEARCH WRAPPER --- */
+/* Center search */
 .header-center {
   display: flex;
   justify-content: center;
@@ -54,65 +56,65 @@
   max-width: 520px;
 }
 
-/* Input matches landing minimal style */
 .search-input {
   width: 100%;
   padding: 10px 36px 10px 0;
 
+  font-size: 15px;
   border: none;
-  border-bottom: 2px solid var(--border);
-  background: transparent;
-  font-size: 16px;
-  color: var(--text);
+  border-bottom: 2px solid var(--line);
 
+  background: transparent;
+  color: var(--ink);
   outline: none;
 }
 
 .search-input:focus {
-  border-bottom-color: var(--brand);
+  border-bottom-color: var(--accent-2);
 }
 
-/* Enter caret */
+/* caret "⤶" */
 .search-enter {
   position: absolute;
   right: 0;
   bottom: 8px;
-  font-size: 20px;
-  color: var(--brand);
-  cursor: pointer;
+  font-size: 18px;
+  color: var(--accent-2);
 }
 
-/* --- LOCATION --- */
+/* Location */
 .header-right {
   font-size: 14px;
-  color: var(--text-muted);
+  color: var(--muted);
   white-space: nowrap;
 }
 
-/* --- NAV LINKS ROW --- */
+/* ------------------- NAV BAR ------------------- */
+
 .links {
-  height: 36px;
+  height: 38px;
 
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 26px;
+  gap: 14px;
 
-  border-top: 1px solid var(--border);
-  padding-top: 6px;
+  border-top: 1px solid var(--line);
+  padding-top: 4px;
 }
 
 .links button {
   background: transparent;
   border: none;
-  font-size: 14px;
-  color: var(--text-muted);
-  cursor: pointer;
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 10px;
 
-  padding: 4px 8px;
-  transition: 0.2s;
+  color: var(--muted);
+  cursor: pointer;
 }
 
 .links button:hover {
-  color: var(--text);
+  background: rgba(255, 255, 255, 0.55);
+  color: var(--ink);
 }

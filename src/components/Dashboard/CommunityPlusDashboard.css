@@ -1,41 +1,48 @@
 /* =====================================================
-   COMMUNITY ONE — DASHBOARD (LANDING-PAGE THEME MATCH)
+   COMMUNITY ONE — DASHBOARD (MATCH LANDING PAGE)
 ===================================================== */
 
-/* --- ROOT CONTAINER --- */
+:root {
+  --sidebar-width: 220px;
+}
+
+/* Main layout background (same as landing) */
 .dashboard-container {
   height: 100vh;
+
+  background: radial-gradient(
+      1200px 600px at 20% -10%,
+      rgba(182, 58, 43, 0.1),
+      transparent 55%
+    ),
+    radial-gradient(
+      900px 500px at 95% 10%,
+      rgba(13, 91, 87, 0.1),
+      transparent 55%
+    ),
+    var(--bg);
+
   display: flex;
   flex-direction: column;
-
-  background: linear-gradient(
-    180deg,
-    var(--bg-gradient-top),
-    var(--bg-gradient-bottom)
-  );
-
   overflow: hidden;
 }
 
-/* Offset body for fixed header + nav */
+/* Push dashboard down below header + nav */
 .main {
   flex: 1;
   display: flex;
   overflow: hidden;
 
-  padding-top: calc(var(--header-height) + var(--nav-height));
+  padding-top: calc(64px + 38px); /* matches landing topbar + nav */
 }
 
-/* =====================================================
-   CONTENT AREA
-===================================================== */
-
+/* Content area */
 .content-area {
   flex: 1;
   display: flex;
-  gap: 24px;
+  gap: 18px;
 
-  padding: 24px;
+  padding: 18px;
   padding-left: calc(var(--sidebar-width) + 20px);
 }
 
@@ -45,18 +52,17 @@
 
 .sidebar {
   position: fixed;
-  top: calc(var(--header-height) + var(--nav-height));
+  top: calc(64px + 38px);
   left: 0;
 
   width: var(--sidebar-width);
-  height: calc(100vh - var(--header-height) - var(--nav-height));
+  height: calc(100vh - 64px - 38px);
 
-  background: var(--surface);
-  border-right: 1px solid var(--border);
-  padding: 20px 14px;
+  background: rgba(255, 255, 255, 0.7);
+  border-right: 1px solid var(--line);
+  backdrop-filter: blur(6px);
 
-  box-shadow: var(--shadow-sm);
-
+  padding: 18px;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -66,79 +72,80 @@
 
 .sidebar-item {
   padding: 10px 12px;
-  border-radius: var(--radius-md);
+  border-radius: 12px;
 
-  background: var(--surface);
-  color: var(--text);
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid var(--line);
 
-  transition: 0.15s;
+  color: var(--ink);
+  cursor: pointer;
+
+  transition: background 0.15s ease;
 }
 
 .sidebar-item:hover {
-  background: var(--surface-soft);
+  background: rgba(255, 255, 255, 0.75);
 }
 
 .sidebar-item.logout {
-  color: var(--accent-red);
+  color: var(--accent);
+  border-color: rgba(182, 58, 43, 0.35);
 }
 
 /* =====================================================
-   FEED COLUMN
+   FEED COLUMN — Matches landing preview feed
 ===================================================== */
 
 .feed-column {
-  width: 370px;
+  width: 360px;
   flex-shrink: 0;
-
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
 }
 
 .feed-header {
-  padding-bottom: 8px;
-  font-weight: 600;
+  font-weight: 700;
+  color: var(--muted);
+  margin-bottom: 8px;
 }
 
-/* Feed Card */
+/* feed card -> same as landing .card */
 .feed-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.62);
+  border-radius: 18px;
+  padding: 14px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow);
 
-  padding: 18px;
-  box-shadow: var(--shadow-sm);
-
-  transition: 0.15s;
+  transition: 0.2s ease;
 }
 
 .feed-card:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 10px 24px rgba(20, 20, 20, 0.08);
 }
 
 /* =====================================================
-   MAP COLUMN
+   MAP COLUMN — Landing `.mapbox` look
 ===================================================== */
 
 .map-column {
   flex: 1;
-
-  background: var(--surface);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
-
   display: flex;
   flex-direction: column;
+
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: var(--shadow);
+
   overflow: hidden;
 }
 
 .map-header {
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface-soft);
-  color: var(--text);
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--muted);
+  border-bottom: 1px solid var(--line);
 }
 
 .map-container {
@@ -163,6 +170,6 @@
   }
 
   .content-area {
-    padding-left: 24px;
+    padding-left: 18px;
   }
 }
