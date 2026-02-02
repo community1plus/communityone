@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import GoogleStyleSearch from "../Search/GoogleStyleSearch";
-import "../../src/components/Header/CommunityPlusHeader.css";
+import "../src/components/Header/CommunityPlusHeader.css";
 
 function CommunityPlusHeader({ setActiveView, user, signOut }) {
   const [location, setLocation] = useState("Fetching location...");
