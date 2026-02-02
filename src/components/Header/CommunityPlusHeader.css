@@ -1,123 +1,111 @@
 /* =====================================================
-   COMMUNITY ONE — HEADER (CENTERED SEARCH FIX)
+   COMMUNITY ONE — HEADER (MATCH LANDING PAGE THEME)
 ===================================================== */
 
+/* Soft warm background like landing page */
 .header {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-
-  /* reduce header height */
-  height: 62px;
-
-  background: var(--surface);
-  border-bottom: none;
-  padding: 0 20px;
+  background: #F5F4F1; /* Landing page background tone */
 
   display: grid;
-  grid-template-columns: 48px 1fr auto; /* Avatar | Center | Geo */
+  grid-template-columns: 48px 1fr auto;
   align-items: center;
+
+  padding: 8px 24px; 
+  height: 62px; /* reduced height to match landing page */
+
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+  box-shadow: none; /* Landing header is flatter */
 
   z-index: 900;
-  box-shadow: var(--shadow-sm);
 }
 
-/* LEFT — Avatar */
-.header-left {
-  display: flex;
-  align-items: center;
-}
-
+/* Avatar now matches COMMUNITY ONE brand chip */
 .avatar {
   width: 40px;
   height: 40px;
-  background: #0f766e;
+  background: #C0392B; /* BRAND RED */
   color: white;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 600;
+  font-size: 18px;
 }
 
-/* CENTER — Search centered perfectly */
+/* --- Search Input --- */
 .header-center {
   display: flex;
   justify-content: center;
 }
 
-/* Force search bar to stay centered */
 .search-wrapper {
   position: relative;
   width: 100%;
-  max-width: 520px;
-  margin: 0 auto; /* <-- forces perfect centering */
+  max-width: 480px;
 }
 
-/* Search input line style */
 .search-input {
   width: 100%;
-  padding: 10px 36px 10px 0;
+  padding: 8px 36px 8px 0;
   border: none;
-  border-bottom: 2px solid #0f766e33;
-  font-size: 16px;
+  border-bottom: 2px solid rgba(192, 57, 43, 0.25); /* soft brand tone */
   background: transparent;
+  font-size: 16px;
   outline: none;
 }
 
 .search-input:focus {
-  border-bottom-color: #0f766e;
+  border-bottom-color: #C0392B;
 }
 
-/* Enter symbol */
 .search-enter {
   position: absolute;
   right: 0;
-  bottom: 10px;
+  bottom: 6px;
   font-size: 20px;
-  color: #0f766e;
+  color: #C0392B;
   cursor: pointer;
 }
 
-/* RIGHT — Geo */
+/* --- Geo Tag --- */
 .header-right {
   font-size: 14px;
-  color: var(--text-muted);
+  color: #876; /* landing page “secondary text” tone */
   white-space: nowrap;
 }
 
-/* =====================================================
-   NAV BAR (TIGHTER SPACING)
-===================================================== */
-
+/* --- Nav Row --- */
 .links {
   position: fixed;
-  top: 62px; /* reduced from larger value */
+  top: 62px; /* matches header height */
   left: 0;
   width: 100%;
-  height: 44px; /* tighter nav height */
-
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
+  height: 42px;
+  background: #F5F4F1;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
 
   display: flex;
-  align-items: center;
   justify-content: center;
-  gap: 26px;  /* reduce spacing */
-
-  z-index: 850;
+  align-items: center;
+  gap: 24px;
 }
 
 .links button {
+  background: none;
+  border: none;
   font-size: 14px;
-  padding: 4px 8px; /* reduced vertical padding */
-  color: var(--text-muted);
-  border-radius: var(--radius-sm);
-  transition: 0.15s;
+  padding: 6px 10px;
+  color: #444;
+  border-radius: 8px;
+  transition: background .15s, color .15s;
 }
 
 .links button:hover {
-  background: var(--surface-soft);
-  color: var(--text);
+  background: rgba(192, 57, 43, 0.1); /* soft brand highlight */
+  color: #C0392B;
 }
