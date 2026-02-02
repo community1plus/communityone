@@ -1,5 +1,5 @@
 /* =====================================================
-   COMMUNITY ONE — HEADER
+   COMMUNITY ONE — HEADER (FIXED + CLEAN)
 ===================================================== */
 
 .header {
@@ -9,66 +9,65 @@
   width: 100%;
   height: var(--header-height);
   background: var(--surface);
-  border-bottom: 1px solid var(--border);
+  /* REMOVE BOTTOM BORDER (requested) */
+  border-bottom: none;
   padding: 0 24px;
-  display: flex;
+
+  display: grid;
+  grid-template-columns: auto 1fr auto; /* LEFT | CENTER | RIGHT */
   align-items: center;
-  justify-content: space-between;
+
   z-index: 900;
   box-shadow: var(--shadow-sm);
 }
 
-/* Left: Avatar */
+/* LEFT — avatar */
 .header-left {
   display: flex;
   align-items: center;
-  gap: 14px;
 }
 
-/* Avatar circle */
 .avatar {
   width: 40px;
   height: 40px;
   background: #0f766e;
   color: white;
   border-radius: 50%;
-  font-weight: 600;
-  font-size: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-weight: 600;
 }
 
-/* Middle: CENTERED search */
+/* CENTER — perfectly centered search */
 .header-center {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  max-width: 480px;
+  display: flex;
+  justify-content: center;
 }
 
-/* Search input styling */
+/* Search wrapper */
 .search-wrapper {
   position: relative;
   width: 100%;
+  max-width: 500px;
 }
 
+/* Minimal search input */
 .search-input {
   width: 100%;
   padding: 10px 36px 10px 0;
-  background: transparent;
   border: none;
   border-bottom: 2px solid #0f766e33;
-  outline: none;
   font-size: 16px;
-  color: var(--text);
+  background: transparent;
+  outline: none;
 }
 
 .search-input:focus {
   border-bottom-color: #0f766e;
 }
 
+/* Enter icon (⤶) */
 .search-enter {
   position: absolute;
   right: 0;
@@ -78,35 +77,9 @@
   cursor: pointer;
 }
 
-/* Right: Geo label */
+/* RIGHT — geo label */
 .header-right {
   font-size: 14px;
   color: var(--text-muted);
   white-space: nowrap;
-}
-
-/* =====================================================
-   NAV BAR
-===================================================== */
-
-.links {
-  position: fixed;
-  top: var(--header-height);
-  left: 0;
-  width: 100%;
-  height: var(--nav-height);
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 22px;
-  z-index: 850;
-}
-
-.links button {
-  font-size: 14px;
-  padding: 6px 12px;
-  border-radius: var(--radius-sm);
-  color: var(--text-muted);
 }

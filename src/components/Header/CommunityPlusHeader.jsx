@@ -1,73 +1,52 @@
 import React, { useState, useEffect } from "react";
-import GoogleStyleSearch from "../GoogleStyleSearch/GoogleStyleSearch";
 import "./CommunityPlusHeader.css";
 
 function CommunityPlusHeader({ setActiveView, user, signOut }) {
   const [location, setLocation] = useState("Fetching location...");
 
   useEffect(() => {
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        () => {
-          fetch("https://ipapi.co/json/")
-            .then((res) => res.json())
-            .then((data) => {
-              if (data.city && data.region) {
-                setLocation(`${data.city}, ${data.region}`);
-              } else {
-                setLocation("Location unavailable");
-              }
-            })
-            .catch(() => setLocation("Location unavailable"));
-        },
-        () => {
-          fetch("https://ipapi.co/json/")
-            .then((res) => res.json())
-            .then((data) => {
-              if (data.city && data.region) {
-                setLocation(`${data.city}, ${data.region}`);
-              } else {
-                setLocation("Location unavailable");
-              }
-            })
-            .catch(() => setLocation("Location unavailable"));
+    fetch("https://ipapi.co/json/")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.city && data.region) {
+          setLocation(`${data.city}, ${data.region}`);
+        } else {
+          setLocation("Location unavailable");
         }
-      );
-    }
+      })
+      .catch(() => setLocation("Location unavailable"));
   }, []);
 
   return (
     <header className="header">
-      <div className="header-top">
-        {/* LEFT: Avatar */}
-        <div className="left-section">
-          <div className="avatar">C</div>
-        </div>
 
-        <div className="search-box">
-           <input type="text" className="search-input" placeholder="Search community updates..." />
-           <span className="search-enter">⤶</span>
-        </div>
-
-
-        {/* RIGHT: Geo */}
-        <div className="right-section">
-          <div className="geo">{location}</div>
+      {/* LEFT — Avatar */}
+      <div className="header-left">
+        <div className="avatar">
+          {user?.username?.[0]?.toUpperCase() ?? "C"}
         </div>
       </div>
 
-      {/* NAV ROW */}
+      {/* CENTER — Search */}
+      <div className="header-center">
+        <div className="search-wrapper">
+          <input
+            type="text"
+            className="search-input"
+            placeholder="Search community updates..."
+          />
+          <span className="search-enter">⤶</span>
+        </div>
+      </div>
+
+      {/* RIGHT — Location */}
+      <div className="header-right">
+        {location}
+      </div>
+
+      {/* NAV BAR (full width below header row) */}
       <nav className="links">
         <button onClick={() => setActiveView("dashboard")}>Home</button>
         <button onClick={() => setActiveView("posts")}>Posts</button>
         <button onClick={() => setActiveView("events")}>Events</button>
-        <button onClick={() => setActiveView("incidents")}>Incidents</button>
-        <button onClick={() => setActiveView("search")}>Search</button>
-        <button onClick={() => setActiveView("community")}>Community+</button>
-        <button onClick={() => setActiveView("about")}>About</button>
-      </nav>
-    </header>
-  );
-}
-
-export default CommunityPlusHeader;
+        <button onClick={() => setActiveView("inc
