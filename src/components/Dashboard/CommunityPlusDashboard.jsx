@@ -81,7 +81,7 @@ export default function CommunityPlusDashboard({ user, signOut }) {
             </div>
 
             <div className="feed-scroll">
-              <FeedCaerd />
+              <FeedCard />
             </div>
           </div>
 
