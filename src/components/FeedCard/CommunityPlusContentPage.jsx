@@ -8,12 +8,8 @@ export default function CommunityPlusContentPage() {
       <div className="posts-grid">
         {/* Row 1 */}
         <div className="post-card">Post 1</div>
-        <div className="post-card">Post 2</div>
-        <div className="post-card">Post 3</div>
-        <div className="post-card">Post 4</div>
-        <div className="post-card ad-card">Ad</div>
-
         
+               
       </div>
     </div>
   );
