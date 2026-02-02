@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 import CommunityPlusHeader from "../Header/CommunityPlusHeader";
 import CommunityPlusSidebar from "../Sidebar/CommunityPlusSidebar";
-import CommunityPlusContentPage from "../FeedCard/CommunityPlusContentPage";
+import FeedCard from "../FeedCard/FeedCard";
 import "./CommunityPlusDashboard.css";
 
 export default function CommunityPlusDashboard({ user, signOut }) {
@@ -81,7 +81,7 @@ export default function CommunityPlusDashboard({ user, signOut }) {
             </div>
 
             <div className="feed-scroll">
-              <CommunityPlusContentPage />
+              <FeedCaerd />
             </div>
           </div>
 
