@@ -72,4 +72,43 @@ export default function CommunityPlusDashboard({ user, signOut }) {
 
         {/* CONTENT (FEED | MAP) */}
         <div className="content-area">
-          {/* FEED ALWAYS VISIBLE*
+          {/* FEED ALWAYS VISIBLE */}
+          <div className="feed-column">
+            <div className="feed-header">
+              <span className="feed-title">
+                {activeView === "dashboard" ? "Here" : activeView}
+              </span>
+            </div>
+
+            <div className="feed-scroll">
+              <CommunityPlusContentPage />
+            </div>
+          </div>
+
+          {/* MAP ONLY VISIBLE IN DASHBOARD */}
+          {activeView === "dashboard" && (
+            <div className="map-column">
+              <div className="map-header">
+                <span><b>Live around you</b></span>
+                <span className="map-sub">Location-based updates</span>
+              </div>
+
+              <LoadScript
+                googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
+                libraries={["places"]}
+              >
+                <GoogleMap
+                  center={coords}
+                  zoom={14}
+                  mapContainerClassName="map-container"
+                >
+                  <Marker position={coords} />
+                </GoogleMap>
+              </LoadScript>
+            </div>
+          )}
+        </div>
+      </main>
+    </div>
+  );
+}
