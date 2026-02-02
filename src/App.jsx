@@ -3,8 +3,8 @@ import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { getCurrentUser } from "aws-amplify/auth";
 import { Authenticator } from "@aws-amplify/ui-react";
 
-import CommunityPlusLandingPage from "./CommunityPlusLandingPage/CommunityPlusLandingPage";
-import CommunityPlusDashboard from "./Dashboard/CommunityPlusDashboard";
+import CommunityPlusLandingPage from "../src/components/CommunityPlusLandingPage/CommunityPlusLandingPage";
+import CommunityPlusDashboard from "./components/Dashboard/CommunityPlusDashboard";
 
 
 /**
