@@ -1,5 +1,5 @@
 /* =====================================================
-   COMMUNITY ONE — HEADER (FIXED + CLEAN)
+   COMMUNITY ONE — HEADER (CENTERED SEARCH FIX)
 ===================================================== */
 
 .header {
@@ -7,20 +7,23 @@
   top: 0;
   left: 0;
   width: 100%;
-  height: var(--header-height);
+
+  /* reduce header height */
+  height: 62px;
+
   background: var(--surface);
-  border-bottom: none; /* no bottom border */
-  padding: 0 24px;
+  border-bottom: none;
+  padding: 0 20px;
 
   display: grid;
-  grid-template-columns: auto 1fr auto; /* LEFT | CENTER | RIGHT */
+  grid-template-columns: 48px 1fr auto; /* Avatar | Center | Geo */
   align-items: center;
 
   z-index: 900;
   box-shadow: var(--shadow-sm);
 }
 
-/* LEFT — avatar */
+/* LEFT — Avatar */
 .header-left {
   display: flex;
   align-items: center;
@@ -38,20 +41,21 @@
   font-weight: 600;
 }
 
-/* CENTER — perfectly centered search */
+/* CENTER — Search centered perfectly */
 .header-center {
   display: flex;
   justify-content: center;
 }
 
-/* Search wrapper */
+/* Force search bar to stay centered */
 .search-wrapper {
   position: relative;
   width: 100%;
-  max-width: 500px;
+  max-width: 520px;
+  margin: 0 auto; /* <-- forces perfect centering */
 }
 
-/* Minimal search input */
+/* Search input line style */
 .search-input {
   width: 100%;
   padding: 10px 36px 10px 0;
@@ -66,7 +70,7 @@
   border-bottom-color: #0f766e;
 }
 
-/* Enter icon (⤶) */
+/* Enter symbol */
 .search-enter {
   position: absolute;
   right: 0;
@@ -76,15 +80,7 @@
   cursor: pointer;
 }
 
-.header-row {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  height: 100%;
-}
-
-
-/* RIGHT — geo label */
+/* RIGHT — Geo */
 .header-right {
   font-size: 14px;
   color: var(--text-muted);
@@ -92,32 +88,33 @@
 }
 
 /* =====================================================
-   NAV LINKS (FIX 1 — CENTERED)
+   NAV BAR (TIGHTER SPACING)
 ===================================================== */
 
 .links {
   position: fixed;
-  top: var(--header-height);
+  top: 62px; /* reduced from larger value */
   left: 0;
   width: 100%;
-  height: var(--nav-height);
+  height: 44px; /* tighter nav height */
+
   background: var(--surface);
   border-bottom: 1px solid var(--border);
 
   display: flex;
-  justify-content: center; /* FIX 1 — center the nav */
   align-items: center;
-  gap: 30px;
+  justify-content: center;
+  gap: 26px;  /* reduce spacing */
 
   z-index: 850;
 }
 
 .links button {
   font-size: 14px;
-  padding: 6px 12px;
-  border-radius: var(--radius-sm);
+  padding: 4px 8px; /* reduced vertical padding */
   color: var(--text-muted);
-  transition: background .15s, color .15s;
+  border-radius: var(--radius-sm);
+  transition: 0.15s;
 }
 
 .links button:hover {
