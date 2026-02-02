@@ -1,50 +1,57 @@
-/* =============== SIDEBAR =============== */
+/* =====================================================
+   SIDEBAR — LANDING PAGE STYLE
+===================================================== */
 
 :root {
   --sidebar-width: 230px;
-  --header-height: 70px;
-  --nav-height: 56px;
+  --header-height: 64px;
+  --nav-height: 38px;
 }
 
 .sidebar {
   position: fixed;
-  top: calc(var(--header-height));
+  top: calc(var(--header-height) + var(--nav-height));
   left: 0;
+
   width: var(--sidebar-width);
-  height: calc(100vh - var(--header-height));
-  background: var(--surface);
-  border-right: 1px solid var(--border);
-  padding: 20px 14px;
+  height: calc(100vh - var(--header-height) - var(--nav-height));
+
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(8px);
+  border-right: 1px solid var(--line);
+
+  padding: 18px 14px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  overflow-y: auto;
+  gap: 12px;
+
   box-shadow: var(--shadow-sm);
-  z-index: 20; /* keeps sidebar above map */
+  overflow-y: auto;
 }
 
 .sidebar-item {
   padding: 10px 12px;
   border-radius: var(--radius-md);
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--text);
-  background: var(--surface);
-  transition: background .15s;
+
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid var(--line);
+
+  color: var(--ink);
   cursor: pointer;
+  transition: background 0.15s ease;
 }
 
 .sidebar-item:hover {
-  background: var(--surface-soft);
+  background: rgba(255, 255, 255, 0.75);
 }
 
 .sidebar-item.logout {
-  color: var(--danger);
-  font-weight: 600;
+  color: var(--accent);
+  border-color: rgba(182, 58, 43, 0.35);
 }
 
 .sidebar-divider {
   border: none;
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--line);
   margin: 12px 0;
 }

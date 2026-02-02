@@ -1,0 +1,30 @@
+:root {
+  /* Inherit landing page theme */
+  --bg: #f6f3ee;
+  --panel: #ffffff;
+  --ink: #141414;
+  --muted: #5a5a5a;
+  --line: rgba(20, 20, 20, 0.12);
+  --accent: #b63a2b;
+  --accent-2: #0d5b57;
+
+  /* Mapped dashboard tokens */
+  --surface: var(--panel);
+  --surface-soft: rgba(255, 255, 255, 0.55);
+
+  --text: var(--ink);
+  --text-muted: var(--muted);
+
+  --border: var(--line);
+  --danger: var(--accent);
+
+  --brand: var(--accent);
+  --brand-strong: var(--accent);
+  --brand-soft: rgba(182, 58, 43, 0.1);
+
+  --radius-md: 14px;
+  --radius-lg: 20px;
+
+  --shadow-sm: 0 6px 18px rgba(20, 20, 20, 0.06);
+  --shadow-md: 0 10px 28px rgba(20, 20, 20, 0.08);
+}
