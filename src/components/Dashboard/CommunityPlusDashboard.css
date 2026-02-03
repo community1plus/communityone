@@ -133,6 +133,12 @@
   opacity: 1;
 }
 
+.map-loading {
+  padding: 20px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
 
 /* =====================================================
    RESPONSIVE

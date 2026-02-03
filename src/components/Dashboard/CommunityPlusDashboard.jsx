@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { GoogleMap, Marker } from "@react-google-maps/api";
+import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
+
 import CommunityPlusHeader from "../Header/CommunityPlusHeader";
 import CommunityPlusSidebar from "../Sidebar/CommunityPlusSidebar";
 import FeedCard from "../FeedCard/FeedCard";
-import "./CommunityPlusDashboard.css";
 import PostComposer from "../Sidebar/Post/PostComposer";
+
+import "./CommunityPlusDashboard.css";
 
 export default function CommunityPlusDashboard({ user, signOut }) {
   const [coords, setCoords] = useState({
@@ -12,9 +14,19 @@ export default function CommunityPlusDashboard({ user, signOut }) {
     lng: 144.9631,
   });
 
-  const [mapLoaded, setMapLoaded] = useState(false);
   const [activeView, setActiveView] = useState("dashboard");
 
+  /* ---------------------------------------------
+     LOAD GOOGLE MAPS (fixes "google is not defined")
+  ---------------------------------------------- */
+  const { isLoaded } = useJsApiLoader({
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+    libraries: ["places"],
+  });
+
+  /* ---------------------------------------------
+     GEOLOCATION HANDLER
+  ---------------------------------------------- */
   useEffect(() => {
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
@@ -33,12 +45,16 @@ export default function CommunityPlusDashboard({ user, signOut }) {
                   lng: data.longitude,
                 });
               }
-            });
+            })
+            .catch(() => {});
         }
       );
     }
   }, []);
 
+  /* ---------------------------------------------
+     LOGOUT HANDLER
+  ---------------------------------------------- */
   const handleLogout = async () => {
     try {
       await signOut();
@@ -50,39 +66,59 @@ export default function CommunityPlusDashboard({ user, signOut }) {
 
   return (
     <div className="dashboard-container">
-      <CommunityPlusHeader user={user} setActiveView={setActiveView} onLogout={handleLogout} />
+
+      {/* HEADER */}
+      <CommunityPlusHeader
+        user={user}
+        setActiveView={setActiveView}
+        onLogout={handleLogout}
+      />
 
       <main className="main">
-        <CommunityPlusSidebar setActiveView={setActiveView} onLogout={handleLogout} />
 
+        {/* SIDEBAR */}
+        <CommunityPlusSidebar
+          setActiveView={setActiveView}
+          onLogout={handleLogout}
+        />
+
+        {/* MAIN CONTENT AREA */}
         <div className="content-area">
 
+          {/* FEED COLUMN (always visible except mobile) */}
           <div className="feed-column">
             <div className="feed-header">
               <span className="feed-title">LIVE FEED</span>
             </div>
+
             <div className="feed-scroll">
+              <FeedCard />
               <FeedCard />
             </div>
           </div>
-       
+
           {/* POST COMPOSER MODE */}
           {activeView === "post" && (
-              <PostComposer />
-         )}
+            <PostComposer />
+          )}
 
+          {/* DASHBOARD MAP VIEW */}
           {activeView === "dashboard" && (
             <div className="map-column">
-              <GoogleMap
-                center={coords}
-                zoom={14}
-                onLoad={() => setMapLoaded(true)}
-                mapContainerClassName={`map-container ${mapLoaded ? "loaded" : ""}`}
-              >
-                <Marker position={coords} />
-              </GoogleMap>
+              {!isLoaded ? (
+                <div className="map-loading">Loading map…</div>
+              ) : (
+                <GoogleMap
+                  center={coords}
+                  zoom={14}
+                  mapContainerClassName="map-container loaded"
+                >
+                  <Marker position={coords} />
+                </GoogleMap>
+              )}
             </div>
           )}
+
         </div>
       </main>
     </div>
