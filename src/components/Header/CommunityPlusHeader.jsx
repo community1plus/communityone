@@ -38,7 +38,7 @@ function CommunityPlusHeader({ setActiveView, user, signOut }) {
             <input
               type="text"
               className="search-input"
-              placeholder="Search community updates..."
+              placeholder="Search"
             />
             <span className="search-enter">⤶</span>
           </div>

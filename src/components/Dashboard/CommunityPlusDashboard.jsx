@@ -76,7 +76,9 @@ export default function CommunityPlusDashboard({ user, signOut }) {
           <div className="feed-column">
             <div className="feed-header">
               <span className="feed-title">
-                {activeView === "dashboard" ? "Here" : activeView}
+               
+               { /* activeView === "dashboard" ? "Here" : activeView */} 
+               
               </span>
             </div>
 
@@ -88,11 +90,7 @@ export default function CommunityPlusDashboard({ user, signOut }) {
           {/* MAP ONLY VISIBLE IN DASHBOARD */}
           {activeView === "dashboard" && (
             <div className="map-column">
-              <div className="map-header">
-                <span><b>Live around you</b></span>
-                <span className="map-sub">Location-based updates</span>
-              </div>
-
+             
               <LoadScript
                 googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
                 libraries={["places"]}

@@ -7,7 +7,7 @@ export default function FeedCard() {
     <div className="posts-page">
       <div className="posts-grid">
         {/* Row 1 */}
-        <div className="post-card">Feed</div>                 
+        <div className="post-card">Live Feed</div>                 
       </div>
     </div>
   );
