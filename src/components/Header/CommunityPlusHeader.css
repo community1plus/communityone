@@ -7,7 +7,6 @@
   top: 0;
   left: 0;
   width: 100%;
-  background: rgba(255, 255, 255, 0.75);
   background: rgba(246, 243, 238, 0.72);
   backdrop-filter: blur(10px);
   border-bottom: none;
@@ -26,25 +25,22 @@
   display: grid;
   grid-template-columns: 48px 1fr auto;
   align-items: center;
+  border-bottom: none;
 }
 
 /* Avatar — landing style */
 .header-left .avatar {
   width: 40px;
   height: 40px;
-
   border-radius: 50%;                 /* perfect circle */
   background: var(--accent);          /* brick-red brand background */
   border: 1px solid var(--accent);    /* seamless border */
-
   color: #ffffff;                     /* white initial */
   font-weight: var(--fw-bold);
   font-size: var(--fs-lg);
   letter-spacing: 0.5px;
-
   display: grid;
   place-items: center;
-
   box-shadow: 0 0 0 4px rgba(182, 58, 43, 0.25); /* soft warm glow */
 }
 

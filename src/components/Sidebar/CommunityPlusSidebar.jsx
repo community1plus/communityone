@@ -18,21 +18,28 @@ export default function CommunityPlusSidebar({ setActiveView }) {
         className="sidebar-item"
         onClick={() => setActiveView("news")}
       >
-        ➕ Add News
+        ➕ Post
       </div>
 
       <div
         className="sidebar-item"
         onClick={() => setActiveView("event")}
       >
-        📅 Add Event
+        ➕ Event
       </div>
 
       <div
         className="sidebar-item"
-        onClick={() => setActiveView("opinion")}
+        onClick={() => setActiveView("incident")}
       >
-        💬 Opinion
+        ➕ Incident
+      </div>
+
+      <div
+        className="sidebar-item"
+        onClick={() => setActiveView("beacon")}
+      >
+        ➕ Beacon
       </div>
 
       <hr className="sidebar-divider" />
