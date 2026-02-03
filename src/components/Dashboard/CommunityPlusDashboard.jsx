@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
+import { GoogleMap, Marker } from "@react-google-maps/api";
 import CommunityPlusHeader from "../Header/CommunityPlusHeader";
 import CommunityPlusSidebar from "../Sidebar/CommunityPlusSidebar";
 import FeedCard from "../FeedCard/FeedCard";
@@ -11,11 +11,9 @@ export default function CommunityPlusDashboard({ user, signOut }) {
     lng: 144.9631,
   });
 
+  const [mapLoaded, setMapLoaded] = useState(false);
   const [activeView, setActiveView] = useState("dashboard");
 
-  /* -------------------------------
-     Geolocation handler
-  -------------------------------- */
   useEffect(() => {
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
@@ -34,16 +32,12 @@ export default function CommunityPlusDashboard({ user, signOut }) {
                   lng: data.longitude,
                 });
               }
-            })
-            .catch(() => {});
+            });
         }
       );
     }
   }, []);
 
-  /* -------------------------------
-     LOGOUT → Return to landing
-  -------------------------------- */
   const handleLogout = async () => {
     try {
       await signOut();
@@ -55,54 +49,32 @@ export default function CommunityPlusDashboard({ user, signOut }) {
 
   return (
     <div className="dashboard-container">
-      {/* HEADER */}
-      <CommunityPlusHeader
-        user={user}
-        setActiveView={setActiveView}
-        onLogout={handleLogout}
-      />
+      <CommunityPlusHeader user={user} setActiveView={setActiveView} onLogout={handleLogout} />
 
-      {/* MAIN AREA */}
       <main className="main">
-        {/* FIXED SIDEBAR */}
-        <CommunityPlusSidebar
-          setActiveView={setActiveView}
-          onLogout={handleLogout}
-        />
+        <CommunityPlusSidebar setActiveView={setActiveView} onLogout={handleLogout} />
 
-        {/* CONTENT (FEED | MAP) */}
         <div className="content-area">
-          {/* FEED ALWAYS VISIBLE */}
+
           <div className="feed-column">
             <div className="feed-header">
-              <span className="feed-title">
-               
-               { /* activeView === "dashboard" ? "Here" : activeView */} 
-               
-              </span>
+              <span className="feed-title">LIVE FEED</span>
             </div>
-
             <div className="feed-scroll">
               <FeedCard />
             </div>
           </div>
 
-          {/* MAP ONLY VISIBLE IN DASHBOARD */}
           {activeView === "dashboard" && (
             <div className="map-column">
-             
-              <LoadScript
-                googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
-                libraries={["places"]}
+              <GoogleMap
+                center={coords}
+                zoom={14}
+                onLoad={() => setMapLoaded(true)}
+                mapContainerClassName={`map-container ${mapLoaded ? "loaded" : ""}`}
               >
-                <GoogleMap
-                  center={coords}
-                  zoom={14}
-                  mapContainerClassName="map-container"
-                >
-                  <Marker position={coords} />
-                </GoogleMap>
-              </LoadScript>
+                <Marker position={coords} />
+              </GoogleMap>
             </div>
           )}
         </div>

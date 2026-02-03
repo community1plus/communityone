@@ -6,7 +6,7 @@
 /* ---------- PAGE BACKGROUND (exact landing match) ---------- */
 
 .dashboard-container {
-  height: 100vh;
+  min-height: 100vh;
 
   background: radial-gradient(
       1200px 600px at 20% -10%,
@@ -23,8 +23,8 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  overflow-y: auto;
 }
+
 
 /* ---------- CONTENT BELOW HEADER + NAV ---------- */
 
@@ -32,9 +32,8 @@
   flex: 1;
   display: flex;
   overflow: hidden;
-  overflow-y: visible !important;
-  overflow-x: hidden;
-  /* Your header-height = 64px, nav-height = 38px */
+
+  /* sits below header (64px) + nav (38px) */
   padding-top: calc(var(--header-height) + var(--nav-height));
 }
 
@@ -43,9 +42,13 @@
   display: flex;
   gap: 18px;
   padding: 18px;
+
+  /* space for fixed sidebar */
+  padding-left: calc(var(--sidebar-width) + 20px);
+
   overflow: visible !important;
-  padding-left: calc(var(--sidebar-width) + 20px); /* space for fixed sidebar */
 }
+
 
 /* =====================================================
    FEED COLUMN — Landing Page Card System
@@ -63,21 +66,23 @@
 
 .feed-header {
   font-size: 14px;
+  font-weight: 700;
   color: var(--muted);
   margin-bottom: 10px;
-  font-weight: 600;
 }
 
-/* Landing-page card style */
+
+/* ---------- Feed Card (exact landing style) ---------- */
+
 .feed-card {
   border: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.62);
 
-  border-radius: var(--radius-lg); /* 18px to match landing */
+  border-radius: 20px; /* Landing uses softer roundness */
   padding: 14px;
   margin-bottom: 14px;
 
-  box-shadow: var(--shadow-sm); /* landing uses soft shadow */
+  box-shadow: var(--shadow-sm);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -85,6 +90,7 @@
   transform: translateY(-3px);
   box-shadow: var(--shadow-md);
 }
+
 
 /* =====================================================
    MAP COLUMN — EXACT LANDING .mapbox SYSTEM
@@ -104,7 +110,6 @@
   overflow: hidden;
 }
 
-/* header above the map */
 .map-header {
   padding: 12px 16px;
   font-size: 12px;
@@ -112,12 +117,22 @@
   border-bottom: 1px solid var(--line);
 }
 
-/* Map frame */
+
+/* Smooth-loading map container */
 .map-container {
-  flex: 1;
   width: 100%;
   height: 100%;
+  min-height: 420px;
+
+  background: #f4f1ee; /* warm placeholder matching landing */
+  opacity: 0;
+  transition: opacity 0.35s ease;
 }
+
+.map-container.loaded {
+  opacity: 1;
+}
+
 
 /* =====================================================
    RESPONSIVE
@@ -125,7 +140,7 @@
 
 @media (max-width: 1100px) {
   .feed-column {
-    display: none;
+    display: none; /* Hide feed on mid screens */
   }
 }
 
@@ -134,6 +149,6 @@
     display: none;
   }
   .content-area {
-    padding-left: 18px;
+    padding-left: 18px; /* Use full width */
   }
 }
