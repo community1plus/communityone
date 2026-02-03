@@ -1,9 +1,11 @@
 /* =====================================================
-   COMMUNITY ONE — GLOBAL THEME (Landing Page Style)
+   COMMUNITY ONE — GLOBAL THEME
+   (Landing Page + Dashboard + Header Unified System)
 ===================================================== */
 
 /* ---------- GLOBAL TOKENS ---------- */
 :root {
+  /* BRAND COLORS */
   --brand: #0A7F72;               /* Avatar teal */
   --brand-strong: #0A7F72;
   --brand-soft: #E0F2F0;
@@ -11,29 +13,59 @@
   --accent-red: #C8483C;
   --accent-red-soft: #F6E9E6;
 
+  /* BACKGROUND */
   --bg-gradient-top: #FDF9F7;
   --bg-gradient-bottom: #F4ECE8;
+  --bg: #F6F3EE; /* landing page warm off-white */
 
+  /* SURFACES */
   --surface: #FFFFFF;
   --surface-soft: #FCF9F8;
 
+  /* BORDERS */
   --border: #E5DAD3;
   --border-strong: #D9C9C0;
 
+  /* TEXT */
   --text: #2C2C2C;
   --text-muted: #6F6A67;
+  --text-accent: #C8483C;
 
+  /* RADII */
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 18px;
 
+  /* SHADOWS */
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
   --shadow-md: 0 4px 12px rgba(0,0,0,0.12);
 
+  /* LAYOUT */
   --header-height: 70px;
   --nav-height: 36px;
-
   --sidebar-width: 230px;
+
+  /* ---------- TYPOGRAPHY TOKENS ---------- */
+  --font-ui: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  --font-body: var(--font-ui);
+  --font-display: var(--font-ui);
+
+  /* FONT SIZES (Unified Scale) */
+  --fs-xs: 12px;
+  --fs-sm: 13px;
+  --fs-md: 14px;
+  --fs-lg: 15px;
+  --fs-xl: 18px;
+
+  /* HEADER-SPECIFIC */
+  --header-title-size: var(--fs-lg);
+  --header-text-size: var(--fs-md);
+  --header-nav-size: var(--fs-sm);
+
+  /* WEIGHTS */
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-bold: 700;
 }
 
 
@@ -47,7 +79,9 @@ html, body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font-family: var(--font-ui);
+  font-family: var(--font-body);
+  font-size: var(--fs-md);
+  letter-spacing: -0.01em;
 }
 
 button {
@@ -62,4 +96,6 @@ a {
   text-decoration: none;
 }
 
-.hidden { display: none !important; }
+.hidden { 
+  display: none !important; 
+}

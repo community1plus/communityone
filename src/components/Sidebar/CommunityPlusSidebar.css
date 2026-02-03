@@ -1,12 +1,12 @@
 /* =====================================================
-   SIDEBAR — LANDING PAGE STYLE
+   SIDEBAR — COMMUNITY ONE (Matches Landing Page)
 ===================================================== */
 
-:root {
-  --sidebar-width: 230px;
-  --header-height: 64px;
-  --nav-height: 38px;
-}
+/* These come from theme.css — do NOT redeclare here:
+   --sidebar-width
+   --header-height
+   --nav-height
+*/
 
 .sidebar {
   position: fixed;
@@ -16,40 +16,48 @@
   width: var(--sidebar-width);
   height: calc(100vh - var(--header-height) - var(--nav-height));
 
-  background: rgba(255, 255, 255, 0.65);
-  backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.65);      /* same as landing topbar */
+  backdrop-filter: blur(10px);
   border-right: 1px solid var(--line);
 
-  padding: 18px 14px;
+  padding: 18px 16px;
   display: flex;
   flex-direction: column;
   gap: 12px;
 
-  box-shadow: var(--shadow-sm);
   overflow-y: auto;
+  box-shadow: var(--shadow-sm);
+  z-index: 40;
 }
 
+/* Sidebar buttons */
 .sidebar-item {
-  padding: 10px 12px;
+  padding: 10px 14px;
   border-radius: var(--radius-md);
 
   background: rgba(255, 255, 255, 0.55);
   border: 1px solid var(--line);
 
+  font-size: 14px;
+  font-weight: 500;
   color: var(--ink);
+
   cursor: pointer;
-  transition: background 0.15s ease;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
 .sidebar-item:hover {
   background: rgba(255, 255, 255, 0.75);
 }
 
+/* Logout item */
 .sidebar-item.logout {
-  color: var(--accent);
-  border-color: rgba(182, 58, 43, 0.35);
+  color: var(--accent-red);
+  border-color: rgba(200, 72, 60, 0.35);
+  font-weight: 600;
 }
 
+/* Divider line */
 .sidebar-divider {
   border: none;
   border-top: 1px solid var(--line);
