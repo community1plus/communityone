@@ -1,24 +1,22 @@
-export default function FeedCard({ items = [] }) {
+export default function FeedCard({ title, summary, image }) {
   return (
-    <div className="feed-column">
+    <div className="feed-card">
 
-      <div className="feed-header">LIVE FEED</div>
-
-      {items.map((item, idx) => (
-        <div className="feed-card" key={idx}>
-          <div className="feed-card-title">{item.title}</div>
-
-          <div className="feed-card-meta">
-            <span className="meta-dot-teal"></span>
-            {item.distance}m • {item.location}
-          </div>
-
-          <div className="feed-card-meta">
-            <span className="meta-dot-red"></span>
-            {item.timeAgo}
-          </div>
+      {image && (
+        <div className="feed-card-media">
+          <img src={image} alt="uploaded" />
         </div>
-      ))}
+      )}
+
+      <div className="feed-card-body">
+        <div className="feed-card-header">
+          <span className="feed-card-badge">POST</span>
+          <span className="feed-card-time">Just now</span>
+        </div>
+
+        <h3 className="feed-card-title">{title}</h3>
+        <p className="feed-card-text">{summary}</p>
+      </div>
 
     </div>
   );

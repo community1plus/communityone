@@ -14,9 +14,10 @@ export default function CommunityPlusSidebar({ setActiveView }) {
 /**/ 
   return (
     <aside className="sidebar">
+      
       <div
         className="sidebar-item"
-        onClick={() => setActiveView("news")}
+        onClick={() => setActiveView("post")}
       >
         ➕ Post
       </div>

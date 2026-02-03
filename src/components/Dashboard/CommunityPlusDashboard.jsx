@@ -4,6 +4,7 @@ import CommunityPlusHeader from "../Header/CommunityPlusHeader";
 import CommunityPlusSidebar from "../Sidebar/CommunityPlusSidebar";
 import FeedCard from "../FeedCard/FeedCard";
 import "./CommunityPlusDashboard.css";
+import PostComposer from "../Sidebar/Post/PostComposer";
 
 export default function CommunityPlusDashboard({ user, signOut }) {
   const [coords, setCoords] = useState({
@@ -64,6 +65,11 @@ export default function CommunityPlusDashboard({ user, signOut }) {
               <FeedCard />
             </div>
           </div>
+       
+          {/* POST COMPOSER MODE */}
+          {activeView === "post" && (
+              <PostComposer />
+         )}
 
           {activeView === "dashboard" && (
             <div className="map-column">
