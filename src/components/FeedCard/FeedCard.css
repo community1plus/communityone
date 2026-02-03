@@ -1,121 +1,49 @@
 /* =====================================================
-   FEED COLUMN WRAPPER (Landing Page Panel Style)
+   FEED COLUMN — FIXED TO MATCH LANDING PAGE
 ===================================================== */
 
 .feed-column {
   width: 360px;
   flex-shrink: 0;
 
-  background: #ffffff;
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 22px;
-
   box-shadow: var(--shadow-sm);
 
-  padding: 20px;
+  padding: 20px 22px;
+
   display: flex;
   flex-direction: column;
   gap: 14px;
 
-  height: calc(100vh - 140px);
-  overflow-y: auto;
+  /* IMPORTANT — remove scrollbars and allow parent to scroll instead */
+  overflow: visible !important;
 }
 
-/* Smooth fades — optional */
-.feed-column::before,
+/* FEED HEADER */
+.feed-header {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+/* GRADIENT FADE (TO MATCH LANDING PAGE) */
 .feed-column::after {
   content: "";
-  position: sticky;
+  position: absolute;
+  bottom: 0;
   left: 0;
   right: 0;
-  height: 38px;
+  height: 90px;
+
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,0.85) 40%,
+    rgba(255,255,255,1) 100%
+  );
+
   pointer-events: none;
-}
-
-.feed-column::before {
-  top: 0;
-  background: linear-gradient(
-    to bottom,
-    rgba(255, 255, 255, 1),
-    rgba(255, 255, 255, 0)
-  );
-}
-
-.feed-column::after {
-  bottom: 0;
-  background: linear-gradient(
-    to bottom,
-    rgba(255, 255, 255, 0),
-    rgba(255, 255, 255, 1)
-  );
-}
-
-/* =====================================================
-   FEED HEADER (Landing typography)
-===================================================== */
-
-.feed-header {
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  color: var(--ink);
-
-  padding-bottom: 4px;
-  margin-bottom: 10px;
-}
-
-/* =====================================================
-   FEED CARD — clean white rounded version
-===================================================== */
-
-.feed-card {
-  background: #ffffff;                       /* Pure white */
-  border: 1px solid var(--border);
-  border-radius: 16px;                       /* Rounded */
-  padding: 16px;
-
-  box-shadow: var(--shadow-sm);
-  transition: transform .15s ease, box-shadow .15s ease;
-
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.feed-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-}
-
-/* Title */
-.feed-card-title {
-  margin: 0;
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--ink);
-}
-
-/* Badge / Subtext rows */
-.feed-card-meta {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
-  color: var(--muted);
-}
-
-/* Icon bullet (teal) */
-.meta-dot-teal {
-  width: 10px;
-  height: 10px;
-  background: var(--accent-2);
-  border-radius: 999px;
-}
-
-/* Icon bullet (red) */
-.meta-dot-red {
-  width: 10px;
-  height: 10px;
-  background: var(--accent-red);
-  border-radius: 999px;
 }

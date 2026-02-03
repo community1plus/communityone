@@ -108,7 +108,7 @@
   gap: 14px;
 
   padding-top: 4px;
-  border-top: 1px solid var(--border);
+  border-top: none;
 }
 
 .links button {
