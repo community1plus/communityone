@@ -1,75 +1,124 @@
-.post-composer {
+/* =====================================================
+   POST COMPOSER — LANDING PAGE THEME
+===================================================== */
+
+.composer-wrapper {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 18px;
+  gap: 22px;
   width: 100%;
-}
+  padding: 20px;
 
-.post-form,
-.post-preview {
-  background: rgba(255, 255, 255, 0.62);
+  background: rgba(255, 255, 255, 0.65);
   border: 1px solid var(--line);
-  border-radius: 20px;
-  padding: 18px;
-  box-shadow: var(--shadow-sm);
+  border-radius: 22px;
+  box-shadow: var(--shadow);
 }
 
-.post-form h2,
-.post-preview h2 {
-  margin-top: 0;
-  margin-bottom: 14px;
-  font-size: 16px;
+/* LEFT — FORM AREA */
+.composer-left {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.composer-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
   color: var(--ink);
 }
 
-label {
+.composer-label {
   font-size: 13px;
   color: var(--muted);
 }
 
-.post-input,
-.post-textarea {
+.composer-input,
+.composer-textarea {
   width: 100%;
-  margin: 6px 0 14px;
-  padding: 10px;
-
-  border-radius: 10px;
   border: 1px solid var(--line);
-  background: #fff;
+  border-radius: 14px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.7);
   font-size: 14px;
 }
 
-.post-textarea {
-  height: 90px;
+.composer-textarea {
+  height: 120px;
   resize: none;
 }
 
-.post-preview-image {
-  display: block;
-  width: 100%;
-  height: 170px;
-  object-fit: cover;
+/* Icon Buttons */
+.icon-btn {
+  font-size: 22px;
+  padding: 10px 16px;
   border-radius: 14px;
-  margin-bottom: 14px;
-}
-
-.post-submit-btn {
-  padding: 12px 16px;
-  width: 100%;
-
-  background: var(--accent);
-  color: white;
-  border-radius: 12px;
-  font-weight: 700;
-  font-size: 14px;
   cursor: pointer;
+  transition: 0.15s ease;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.55);
 }
 
-.post-submit-btn:hover {
-  background: #a53126;
+.icon-btn:hover {
+  background: rgba(255, 255, 255, 0.75);
 }
 
-.empty-preview {
+.upload-btn {
+  color: var(--accent);
+}
+
+.preview-btn {
+  color: var(--accent-2);
+}
+
+.cancel-btn {
+  color: #b33;
+}
+
+.composer-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+/* RIGHT — PREVIEW AREA */
+.composer-right {
+  background: rgba(255, 255, 255, 0.55);
+  border-radius: 18px;
+  padding: 16px;
+  border: 1px solid var(--line);
+}
+
+.preview-title {
+  margin: 0 0 12px;
+  font-size: 14px;
   color: var(--muted);
-  font-size: 13px;
+}
+
+.preview-card {
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.62);
+  border-radius: 20px;
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.preview-img {
+  width: 100%;
+  border-radius: 14px;
+  margin-bottom: 12px;
+}
+
+.preview-card-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 6px;
+  color: var(--ink);
+}
+
+.preview-card-text {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.5;
 }

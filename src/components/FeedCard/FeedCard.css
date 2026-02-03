@@ -1,18 +1,17 @@
 /* =====================================================
-   FEED CARD — EXACT LANDING PAGE AESTHETIC
+   FEED CARD — EXACT LANDING PAGE STYLE
 ===================================================== */
 
 .feed-card {
   border: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.62);
+  border-radius: 20px; /* landing uses 16–22px radius → 20px perfect */
+  padding: 16px;
+  margin-bottom: 14px;
 
-  border-radius: 20px;
-  padding: 14px;
-
-  box-shadow: var(--shadow-sm);
-
-  cursor: pointer;
+  box-shadow: var(--shadow);  /* soft ambient shadow */
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
 }
 
 .feed-card:hover {
@@ -20,82 +19,96 @@
   box-shadow: var(--shadow-md);
 }
 
-/* =====================================================
-   CARD HEADER (badge + time)
-===================================================== */
-
-.feed-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
+/* -----------------------------------------------------
+   IMAGE (Landing style: full rounded with soft crop)
+----------------------------------------------------- */
+.feed-card-img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 16px;
+  margin-bottom: 12px;
 }
 
+/* -----------------------------------------------------
+   TITLE
+----------------------------------------------------- */
+.feed-card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0 0 6px;
+  letter-spacing: -0.01em;
+}
+
+/* -----------------------------------------------------
+   META TEXT / SUMMARY
+----------------------------------------------------- */
+.feed-card-text {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--muted);
+  margin: 0 0 10px;
+}
+
+/* -----------------------------------------------------
+   BADGES (similar to landing chip system)
+----------------------------------------------------- */
 .feed-card-badge {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  gap: 6px;
 
   padding: 6px 10px;
-  border-radius: 14px;
+  border-radius: 999px;
 
   background: rgba(255, 255, 255, 0.55);
   border: 1px solid var(--line);
 
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--ink);
+  font-size: 11.5px;
+  color: var(--muted);
+  margin-bottom: 10px;
 }
 
+/* Optional inner dot (like landing) */
+.feed-card-badge-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: var(--chip);
+  display: grid;
+  place-items: center;
+  color: var(--accent);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+/* -----------------------------------------------------
+   TIME LABEL
+----------------------------------------------------- */
 .feed-card-time {
   font-size: 12px;
   color: var(--muted);
+  margin-top: 6px;
 }
 
-/* =====================================================
-   TITLE + TEXT
-===================================================== */
+/* -----------------------------------------------------
+   LANDING PAGE FADE GRADIENT (optional)
+----------------------------------------------------- */
+.feed-card::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 30px;
 
-.feed-card-title {
-  font-size: 14px;
-  font-weight: 700;
-  margin: 6px 0 6px;
-  color: var(--ink);
-  letter-spacing: -0.01em;
-}
+  border-radius: 0 0 20px 20px;
+  pointer-events: none;
 
-.feed-card-text {
-  font-size: 12.5px;
-  color: var(--muted);
-  line-height: 1.55;
-  margin: 0;
-}
-
-/* =====================================================
-   OPTIONAL THUMBNAIL
-   Matches landing panel card image shape
-===================================================== */
-
-.feed-card-media img {
-  width: 100%;
-  height: 160px;
-  object-fit: cover;
-
-  border-radius: 14px;
-  margin-bottom: 12px;
-
-  border: 1px solid var(--line);
-}
-
-/* =====================================================
-   FEED COLUMN SPACING
-===================================================== */
-
-.feed-column {
-  overflow: visible !important;
-}
-
-.feed-scroll {
-  overflow: visible !important;
-  padding-right: 4px; /* breathable spacing */
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0),
+    rgba(255, 255, 255, 0.85)
+  );
+  opacity: 0.9;
 }

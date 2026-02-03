@@ -1,94 +1,88 @@
+// PostComposer.jsx
 import React, { useState } from "react";
-import FeedCard from "../../FeedCard/FeedCard";
 import "./PostComposer.css";
 
 export default function PostComposer() {
   const [title, setTitle] = useState("");
   const [summary, setSummary] = useState("");
-  const [file, setFile] = useState(null);
-  const [posts, setPosts] = useState([]);
+  const [image, setImage] = useState(null);
+  const [previewMode, setPreviewMode] = useState(false);
 
-  const handleFileUpload = (e) => {
-    const uploaded = e.target.files[0];
-    if (uploaded) {
-      const preview = URL.createObjectURL(uploaded);
-      setFile(preview);
-    }
+  const handleUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) setImage(URL.createObjectURL(file));
   };
 
-  const handleSubmit = () => {
-    if (!title.trim() || !summary.trim()) return;
-
-    const newPost = {
-      id: Date.now(),
-      title,
-      summary,
-      image: file
-    };
-
-    setPosts([newPost, ...posts]);
-
-    // Clear fields
+  const resetForm = () => {
     setTitle("");
     setSummary("");
-    setFile(null);
+    setImage(null);
+    setPreviewMode(false);
   };
 
   return (
-    <div className="post-composer">
+    <div className="composer-wrapper">
+      {/* LEFT SIDE — FORM */}
+      <div className="composer-left">
+        <h2 className="composer-title">Create a Post</h2>
 
-      {/* LEFT COLUMN — FORM */}
-      <div className="post-form">
-        <h2>Create Post</h2>
-
-        <label>Title</label>
+        <label className="composer-label">Title</label>
         <input
-          className="post-input"
+          className="composer-input"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
+          placeholder="Enter a short headline..."
         />
 
-        <label>Summary</label>
+        <label className="composer-label">Summary</label>
         <textarea
-          className="post-textarea"
+          className="composer-textarea"
           value={summary}
           onChange={(e) => setSummary(e.target.value)}
+          placeholder="Write a brief description..."
         />
 
-        <label>Upload Image</label>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleFileUpload}
-        />
+        {/* ACTION BUTTONS */}
+        <div className="composer-actions">
 
-        {file && (
-          <img src={file} className="post-preview-image" alt="preview"/>
-        )}
+          {/* Upload Button */}
+          <label className="icon-btn upload-btn">
+            ⧉
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleUpload}
+              hidden
+            />
+          </label>
 
-        <button className="post-submit-btn" onClick={handleSubmit}>
-          Submit Post
-        </button>
+          {/* Preview Button */}
+          <button
+            className="icon-btn preview-btn"
+            onClick={() => setPreviewMode(true)}
+          >
+            ◉
+          </button>
+
+          {/* Cancel Button */}
+          <button className="icon-btn cancel-btn" onClick={resetForm}>
+            ×
+          </button>
+        </div>
       </div>
 
-      {/* RIGHT COLUMN — LIVE PREVIEW */}
-      <div className="post-preview">
-        <h2>Preview</h2>
+      {/* RIGHT SIDE — PREVIEW */}
+      <div className="composer-right">
+        <h3 className="preview-title">Live Preview</h3>
 
-        {posts.length === 0 && (
-          <p className="empty-preview">No posts yet...</p>
+        {previewMode && (
+          <div className="preview-card">
+            {image && <img src={image} alt="preview" className="preview-img" />}
+            <h4 className="preview-card-title">{title || "Untitled Post"}</h4>
+            <p className="preview-card-text">{summary || "No summary added yet."}</p>
+          </div>
         )}
-
-        {posts.map((p) => (
-          <FeedCard
-            key={p.id}
-            title={p.title}
-            summary={p.summary}
-            image={p.image}
-          />
-        ))}
       </div>
-
     </div>
   );
 }
