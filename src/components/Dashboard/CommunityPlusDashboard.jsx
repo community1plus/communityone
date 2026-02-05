@@ -3,7 +3,6 @@ import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 
 import CommunityPlusHeader from "../Header/CommunityPlusHeader";
 import CommunityPlusSidebar from "../Sidebar/CommunityPlusSidebar";
-import FeedCard from "../FeedCard/FeedCard";
 import PostComposer from "../Sidebar/Post/PostComposer";
 
 import "./CommunityPlusDashboard.css";
@@ -17,7 +16,7 @@ export default function CommunityPlusDashboard({ user, signOut }) {
   const [activeView, setActiveView] = useState("dashboard");
 
   /* ---------------------------------------------
-     LOAD GOOGLE MAPS (fixes "google is not defined")
+     LOAD GOOGLE MAPS
   ---------------------------------------------- */
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
@@ -54,73 +53,4 @@ export default function CommunityPlusDashboard({ user, signOut }) {
 
   /* ---------------------------------------------
      LOGOUT HANDLER
-  ---------------------------------------------- */
-  const handleLogout = async () => {
-    try {
-      await signOut();
-      window.location.href = "/";
-    } catch (err) {
-      console.error("Logout failed:", err);
-    }
-  };
-
-  return (
-    <div className="dashboard-container">
-
-      {/* HEADER */}
-      <CommunityPlusHeader
-        user={user}
-        setActiveView={setActiveView}
-        onLogout={handleLogout}
-      />
-
-      <main className="main">
-
-        {/* SIDEBAR */}
-        <CommunityPlusSidebar
-          setActiveView={setActiveView}
-          onLogout={handleLogout}
-        />
-
-        {/* MAIN CONTENT AREA */}
-        <div className="content-area">
-
-          {/* FEED COLUMN (always visible except mobile) */}
-          <div className="feed-column">
-            <div className="feed-header">
-              <span className="feed-title">LIVE FEED</span>
-            </div>
-
-            <div className="feed-scroll">
-              <FeedCard />
-              <FeedCard />
-            </div>
-          </div>
-
-          {/* POST COMPOSER MODE */}
-          {activeView === "post" && (
-            <PostComposer />
-          )}
-
-          {/* DASHBOARD MAP VIEW */}
-          {activeView === "dashboard" && (
-            <div className="map-column">
-              {!isLoaded ? (
-                <div className="map-loading">Loading map…</div>
-              ) : (
-                <GoogleMap
-                  center={coords}
-                  zoom={14}
-                  mapContainerClassName="map-container loaded"
-                >
-                  <Marker position={coords} />
-                </GoogleMap>
-              )}
-            </div>
-          )}
-
-        </div>
-      </main>
-    </div>
-  );
-}
+  --------------------------------------
