@@ -1,28 +1,13 @@
-/* =====================================================
-   FEED CARD — Landing Page Style (2-Column Layout)
-===================================================== */
-
-/* ---- FEED GRID (2 columns) ---- */
-.feed-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;   /* Two equal columns */
-  gap: 18px;                        /* Spacing between cards */
-  width: 100%;
-}
-
-/* ---- FEED CARD ---- */
 .feed-card {
-  position: relative;
-
   border: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.62);
+
   border-radius: 20px;
+  padding: 14px;
 
-  padding: 16px;
   box-shadow: var(--shadow-sm);
-
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  cursor: pointer;
+  overflow: hidden;
 }
 
 .feed-card:hover {
@@ -30,89 +15,54 @@
   box-shadow: var(--shadow-md);
 }
 
-/* ---- IMAGE ---- */
-.feed-card-img {
-  width: 100%;
-  height: 160px;
-  object-fit: cover;
-
-  border-radius: 16px;
-  margin-bottom: 12px;
-}
-
-/* ---- TITLE ---- */
-.feed-card-title {
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--ink);
-  margin: 0 0 6px;
-  letter-spacing: -0.01em;
-}
-
-/* ---- DESCRIPTION ---- */
-.feed-card-text {
-  font-size: 13px;
-  color: var(--muted);
-  line-height: 1.55;
-  margin: 0 0 12px;
-}
-
-/* ---- BADGE ---- */
-.feed-card-badge {
-  display: inline-flex;
+/* Header */
+.feed-card-header {
+  display: flex;
   align-items: center;
-  gap: 6px;
-
-  padding: 6px 10px;
-  border-radius: 999px;
-
-  background: rgba(255, 255, 255, 0.55);
-  border: 1px solid var(--line);
-
-  font-size: 11.5px;
-  color: var(--muted);
-
   margin-bottom: 10px;
 }
 
-.feed-card-badge-dot {
-  width: 14px;
-  height: 14px;
-  border-radius: 6px;
+.feed-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 10px;
 
-  background: var(--chip);
   border: 1px solid var(--line);
-
-  font-size: 10px;
-  font-weight: 800;
-  color: var(--accent);
-
-  display: grid;
-  place-items: center;
+  background: #fff;
+  box-shadow: var(--shadow-xs);
 }
 
-/* ---- TIME ---- */
-.feed-card-time {
+.feed-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.feed-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.feed-time {
   font-size: 12px;
   color: var(--muted);
+  margin-top: 2px;
 }
 
-/* ---- LANDING-LIKE GRADIENT ---- */
-.feed-card::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
+/* Text */
+.feed-text {
+  font-size: 14px;
+  color: var(--ink);
+  line-height: 1.5;
+  margin: 8px 0 12px;
+}
 
-  height: 36px;
-  border-radius: 0 0 20px 20px;
-
-  background: linear-gradient(
-    to bottom,
-    rgba(255, 255, 255, 0),
-    rgba(255, 255, 255, 0.9)
-  );
-
-  pointer-events: none;
+/* Optional Image Preview */
+.feed-image {
+  width: 100%;
+  border-radius: 14px;
+  box-shadow: var(--shadow-sm);
+  margin-top: 6px;
 }

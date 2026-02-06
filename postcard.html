@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Polaroid Postcards Mockup</title>
+
+<style>
+/* =====================================================
+   POLAROID POSTCARD GRID — POSTS PAGE MOCKUP
+===================================================== */
+
+.postcard-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 26px;
+
+  width: 100%;
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 30px;
+}
+
+/* Base Polaroid Card */
+.postcard {
+  background: #ffffff;
+  border-radius: 6px;
+
+  padding: 12px 12px 22px;
+  border: 1px solid #e6e6e6;
+
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+  transform: rotate(-1.5deg);
+  transition: 0.25s ease;
+}
+
+.postcard:hover {
+  transform: rotate(0deg) scale(1.03);
+  box-shadow: 0 10px 28px rgba(0,0,0,0.16);
+}
+
+/* Polaroid Image */
+.postcard-img {
+  width: 100%;
+  border-radius: 4px;
+  display: block;
+  margin-bottom: 14px;
+}
+
+/* Caption */
+.postcard-caption {
+  text-align: center;
+  font-size: 15px;
+  font-weight: 600;
+  color: #444;
+}
+
+/* Adjust variation of tilts for realism */
+.postcard:nth-child(2) { transform: rotate(0.8deg); }
+.postcard:nth-child(3) { transform: rotate(-2deg); }
+.postcard:nth-child(4) { transform: rotate(1.4deg); }
+.postcard:nth-child(5) { transform: rotate(-0.7deg); }
+
+/* Ad Slot (bottom-right) */
+.ad-card {
+  background: #fffdf4;
+  border: 1px dashed #c7b47a;
+  transform: rotate(1.8deg);
+}
+
+.ad-label {
+  text-align: center;
+  font-size: 12px;
+  color: #b6932e;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+</style>
+
+</head>
+<body>
+
+<div class="postcard-grid">
+
+  <!-- ROW 1 -->
+  <div class="postcard">
+    <img src="https://via.placeholder.com/300x200" class="postcard-img" />
+    <div class="postcard-caption">Post Title One</div>
+  </div>
+
+  <div class="postcard">
+    <img src="https://via.placeholder.com/300x200" class="postcard-img" />
+    <div class="postcard-caption">Post Title Two</div>
+  </div>
+
+  <div class="postcard">
+    <img src="https://via.placeholder.com/300x200" class="postcard-img" />
+    <div class="postcard-caption">Post Title Three</div>
+  </div>
+
+  <!-- ROW 2 -->
+  <div class="postcard">
+    <img src="https://via.placeholder.com/300x200" class="postcard-img" />
+    <div class="postcard-caption">Post Title Four</div>
+  </div>
+
+  <div class="postcard">
+    <img src="https://via.placeholder.com/300x200" class="postcard-img" />
+    <div class="postcard-caption">Post Title Five</div>
+  </div>
+
+  <!-- AD SLOT -->
+  <div class="postcard ad-card">
+    <div class="ad-label">Advertisement</div>
+    <img src="https://via.placeholder.com/300x200?text=Your+Ad+Here" class="postcard-img" />
+  </div>
+
+</div>
+
+</body>
+</html>
