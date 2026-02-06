@@ -87,7 +87,7 @@ export default function CommunityPlusDashboard({ user, signOut }) {
           {/* FEED COLUMN (two FeedCards) */}
           <div className="feed-column">
             <div className="feed-header">
-              <span className="feed-title">LIVE FEED</span>
+              
             </div>
 
             <div className="feed-stack">
