@@ -3,6 +3,7 @@ import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 
 import CommunityPlusHeader from "../Header/CommunityPlusHeader";
 import CommunityPlusSidebar from "../Sidebar/CommunityPlusSidebar";
+import FeedCard from "../FeedCard/FeedCard";
 import PostComposer from "../Sidebar/Post/PostComposer";
 
 import "./CommunityPlusDashboard.css";
@@ -80,28 +81,41 @@ export default function CommunityPlusDashboard({ user, signOut }) {
           onLogout={handleLogout}
         />
 
-        {/* MAIN CONTENT AREA (no feed column) */}
+        {/* 2-COLUMN LAYOUT: FEED • MAIN */}
         <div className="content-area">
 
-          {/* POST COMPOSER */}
-          {activeView === "post" && <PostComposer />}
-
-          {/* DASHBOARD MAP VIEW */}
-          {activeView === "dashboard" && (
-            <div className="map-column">
-              {!isLoaded ? (
-                <div className="map-loading">Loading map…</div>
-              ) : (
-                <GoogleMap
-                  center={coords}
-                  zoom={14}
-                  mapContainerClassName="map-container loaded"
-                >
-                  <Marker position={coords} />
-                </GoogleMap>
-              )}
+          {/* FEED COLUMN (two FeedCards) */}
+          <div className="feed-column">
+            <div className="feed-header">
+              <span className="feed-title">LIVE FEED</span>
             </div>
-          )}
+
+            <div className="feed-stack">
+              <FeedCard />
+              <FeedCard />
+            </div>
+          </div>
+
+          {/* RIGHT PANEL */}
+          <div className="main-panel">
+            {activeView === "post" && <PostComposer />}
+
+            {activeView === "dashboard" && (
+              <div className="map-column">
+                {!isLoaded ? (
+                  <div className="map-loading">Loading map…</div>
+                ) : (
+                  <GoogleMap
+                    center={coords}
+                    zoom={14}
+                    mapContainerClassName="map-container loaded"
+                  >
+                    <Marker position={coords} />
+                  </GoogleMap>
+                )}
+              </div>
+            )}
+          </div>
 
         </div>
       </main>

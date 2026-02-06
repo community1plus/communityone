@@ -1,4 +1,3 @@
-// PostComposer.jsx
 import React, { useState } from "react";
 import "./PostComposer.css";
 
@@ -22,6 +21,7 @@ export default function PostComposer() {
 
   return (
     <div className="composer-wrapper">
+      
       {/* LEFT SIDE — FORM */}
       <div className="composer-left">
         <h2 className="composer-title">Create a Post</h2>
@@ -77,9 +77,30 @@ export default function PostComposer() {
 
         {previewMode && (
           <div className="preview-card">
-            {image && <img src={image} alt="preview" className="preview-img" />}
-            <h4 className="preview-card-title">{title || "Untitled Post"}</h4>
-            <p className="preview-card-text">{summary || "No summary added yet."}</p>
+
+            {/* ⭐ FIRST THUMBNAIL — STATIC LOGO */}
+            <img
+              src="/logo/logo.png"
+              alt="logo-preview"
+              className="preview-img primary-logo"
+            />
+
+            {/* User-uploaded image — appears AFTER logo */}
+            {image && (
+              <img
+                src={image}
+                alt="preview"
+                className="preview-img"
+              />
+            )}
+
+            <h4 className="preview-card-title">
+              {title || "Untitled Post"}
+            </h4>
+
+            <p className="preview-card-text">
+              {summary || "No summary added yet."}
+            </p>
           </div>
         )}
       </div>
