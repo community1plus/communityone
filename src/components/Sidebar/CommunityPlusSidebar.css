@@ -1,12 +1,6 @@
 /* =====================================================
-   SIDEBAR — COMMUNITY ONE (Matches Landing Page)
+   SIDEBAR — COMMUNITY ONE (Landing Page Theme)
 ===================================================== */
-
-/* These come from theme.css — do NOT redeclare here:
-   --sidebar-width
-   --header-height
-   --nav-height
-*/
 
 .sidebar {
   position: fixed;
@@ -16,50 +10,73 @@
   width: var(--sidebar-width);
   height: calc(100vh - var(--header-height) - var(--nav-height));
 
-  background: rgba(255, 255, 255, 0.65);      /* same as landing topbar */
-  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+
   border-right: 1px solid var(--line);
 
-  padding: 18px 16px;
+  padding: 20px 16px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 
   overflow-y: auto;
-  box-shadow: var(--shadow-sm);
+
+  border-radius: 0 20px 20px 0;             /* matches the landing-page card curvature */
+  box-shadow: var(--shadow-sm);             /* consistent with maps + feed */
   z-index: 40;
+  transition: 0.25s ease;
 }
 
-/* Sidebar buttons */
+/* Sidebar Buttons (polished + landing theme) */
 .sidebar-item {
-  padding: 10px 14px;
-  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  border-radius: 16px;
 
   background: rgba(255, 255, 255, 0.55);
   border: 1px solid var(--line);
 
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--ink);
 
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition: 0.2s ease;
+  box-shadow: var(--shadow-xs);
 }
 
 .sidebar-item:hover {
   background: rgba(255, 255, 255, 0.75);
+  box-shadow: var(--shadow-sm);             /* lift effect, like FeedCard */
+  transform: translateY(-2px);
 }
 
-/* Logout item */
+/* Active state (optional, matches Landing Page tabs) */
+.sidebar-item.active {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: var(--accent);
+  box-shadow: var(--shadow);
+  transform: translateY(-2px);
+}
+
+/* Logout Button */
 .sidebar-item.logout {
   color: var(--accent-red);
   border-color: rgba(200, 72, 60, 0.35);
+  background: rgba(255, 240, 240, 0.55);
   font-weight: 600;
 }
 
-/* Divider line */
+.sidebar-item.logout:hover {
+  background: rgba(255, 230, 230, 0.75);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Elegant Divider */
 .sidebar-divider {
   border: none;
   border-top: 1px solid var(--line);
-  margin: 12px 0;
+  margin: 10px 0 6px;
+  opacity: 0.6;
 }
