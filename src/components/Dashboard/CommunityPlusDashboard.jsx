@@ -16,17 +16,11 @@ export default function CommunityPlusDashboard({ user, signOut }) {
 
   const [activeView, setActiveView] = useState("dashboard");
 
-  /* ---------------------------------------------
-     LOAD GOOGLE MAPS
-  ---------------------------------------------- */
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
     libraries: ["places"],
   });
 
-  /* ---------------------------------------------
-     GEOLOCATION HANDLER
-  ---------------------------------------------- */
   useEffect(() => {
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
@@ -52,9 +46,6 @@ export default function CommunityPlusDashboard({ user, signOut }) {
     }
   }, []);
 
-  /* ---------------------------------------------
-     LOGOUT HANDLER
-  ---------------------------------------------- */
   const handleLogout = async () => {
     try {
       await signOut();
@@ -66,7 +57,6 @@ export default function CommunityPlusDashboard({ user, signOut }) {
 
   return (
     <div className="dashboard-container">
-      {/* HEADER */}
       <CommunityPlusHeader
         user={user}
         setActiveView={setActiveView}
@@ -75,20 +65,16 @@ export default function CommunityPlusDashboard({ user, signOut }) {
 
       <main className="main">
 
-        {/* SIDEBAR */}
         <CommunityPlusSidebar
           setActiveView={setActiveView}
           onLogout={handleLogout}
         />
 
-        {/* 2-COLUMN LAYOUT: FEED • MAIN */}
         <div className="content-area">
 
-          {/* FEED COLUMN (two FeedCards) */}
+          {/* LEFT FEED COLUMN */}
           <div className="feed-column">
-            <div className="feed-header">
-              
-            </div>
+            <div className="feed-header"></div>
 
             <div className="feed-stack">
               <FeedCard />
@@ -96,26 +82,24 @@ export default function CommunityPlusDashboard({ user, signOut }) {
             </div>
           </div>
 
-          {/* RIGHT PANEL */}
-          <div className="main-panel">
-            {activeView === "post" && <PostComposer />}
+          {/* RIGHT COLUMN */}
+          {activeView === "post" && <PostComposer />}
 
-            {activeView === "dashboard" && (
-              <div className="map-column">
-                {!isLoaded ? (
-                  <div className="map-loading">Loading map…</div>
-                ) : (
-                  <GoogleMap
-                    center={coords}
-                    zoom={14}
-                    mapContainerClassName="map-container loaded"
-                  >
-                    <Marker position={coords} />
-                  </GoogleMap>
-                )}
-              </div>
-            )}
-          </div>
+          {activeView === "dashboard" && (
+            <div className="map-column">
+              {!isLoaded ? (
+                <div className="map-loading">Loading map…</div>
+              ) : (
+                <GoogleMap
+                  center={coords}
+                  zoom={14}
+                  mapContainerClassName="map-container loaded"
+                >
+                  <Marker position={coords} />
+                </GoogleMap>
+              )}
+            </div>
+          )}
 
         </div>
       </main>

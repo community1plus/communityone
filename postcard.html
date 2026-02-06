@@ -4,23 +4,30 @@
 <meta charset="UTF-8" />
 <title>Polaroid Postcards Mockup</title>
 
+<!-- GOOGLE FONT — Permanent Marker -->
+<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet">
+
 <style>
 /* =====================================================
-   POLAROID POSTCARD GRID — POSTS PAGE MOCKUP
+   POLAROID POSTCARD GRID — HANDWRITTEN + OXIDE RED
+   Warm Noir + Oxide Red Theme
+   Equal 3×2 Layout
 ===================================================== */
 
 .postcard-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);     /* 3×2 equal height */
   gap: 26px;
 
   width: 100%;
   max-width: 1200px;
+  height: 78vh;                           /* total grid height */
   margin: 40px auto;
   padding: 30px;
 }
 
-/* Base Polaroid Card */
+/* Polaroid Card */
 .postcard {
   background: #ffffff;
   border-radius: 6px;
@@ -31,6 +38,10 @@
   box-shadow: 0 6px 18px rgba(0,0,0,0.12);
   transform: rotate(-1.5deg);
   transition: 0.25s ease;
+
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .postcard:hover {
@@ -38,29 +49,43 @@
   box-shadow: 0 10px 28px rgba(0,0,0,0.16);
 }
 
-/* Polaroid Image */
+/* Image fills postcard space */
 .postcard-img {
   width: 100%;
+  height: 100%;
+  object-fit: cover;
   border-radius: 4px;
-  display: block;
+
+  flex: 1;                     /* fill vertical space */
   margin-bottom: 14px;
 }
 
-/* Caption */
+/* ✍️ Handwritten Caption Strip — OXIDE RED */
 .postcard-caption {
   text-align: center;
-  font-size: 15px;
-  font-weight: 600;
-  color: #444;
+  font-size: 18px;
+  font-weight: 400;
+
+  background: #8A2E2E;         /* OXIDE RED */
+  color: #FAF7F2;             /* warm off-white */
+
+  padding: 10px 0;
+  border-radius: 4px;
+  margin-top: -2px;
+
+  box-shadow: 0 2px 4px rgba(0,0,0,0.25);
+
+  font-family: "Permanent Marker", sans-serif;  /* handwritten look */
+  letter-spacing: 1px;
 }
 
-/* Adjust variation of tilts for realism */
+/* Randomized tilt for realism */
 .postcard:nth-child(2) { transform: rotate(0.8deg); }
 .postcard:nth-child(3) { transform: rotate(-2deg); }
 .postcard:nth-child(4) { transform: rotate(1.4deg); }
 .postcard:nth-child(5) { transform: rotate(-0.7deg); }
 
-/* Ad Slot (bottom-right) */
+/* Ad Slot */
 .ad-card {
   background: #fffdf4;
   border: 1px dashed #c7b47a;
@@ -114,6 +139,7 @@
   <div class="postcard ad-card">
     <div class="ad-label">Advertisement</div>
     <img src="https://via.placeholder.com/300x200?text=Your+Ad+Here" class="postcard-img" />
+    <div class="postcard-caption">Sponsored</div>
   </div>
 
 </div>
