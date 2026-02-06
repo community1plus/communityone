@@ -53,4 +53,58 @@ export default function CommunityPlusDashboard({ user, signOut }) {
 
   /* ---------------------------------------------
      LOGOUT HANDLER
-  --------------------------------------
+  ---------------------------------------------- */
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      window.location.href = "/";
+    } catch (err) {
+      console.error("Logout failed:", err);
+    }
+  };
+
+  return (
+    <div className="dashboard-container">
+      {/* HEADER */}
+      <CommunityPlusHeader
+        user={user}
+        setActiveView={setActiveView}
+        onLogout={handleLogout}
+      />
+
+      <main className="main">
+
+        {/* SIDEBAR */}
+        <CommunityPlusSidebar
+          setActiveView={setActiveView}
+          onLogout={handleLogout}
+        />
+
+        {/* MAIN CONTENT AREA (no feed column) */}
+        <div className="content-area">
+
+          {/* POST COMPOSER */}
+          {activeView === "post" && <PostComposer />}
+
+          {/* DASHBOARD MAP VIEW */}
+          {activeView === "dashboard" && (
+            <div className="map-column">
+              {!isLoaded ? (
+                <div className="map-loading">Loading map…</div>
+              ) : (
+                <GoogleMap
+                  center={coords}
+                  zoom={14}
+                  mapContainerClassName="map-container loaded"
+                >
+                  <Marker position={coords} />
+                </GoogleMap>
+              )}
+            </div>
+          )}
+
+        </div>
+      </main>
+    </div>
+  );
+}
