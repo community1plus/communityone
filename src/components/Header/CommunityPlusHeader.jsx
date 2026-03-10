@@ -107,6 +107,7 @@ function CommunityPlusHeader({ setActiveView, user, signOut }) {
         <button onClick={() => setActiveView("community")}>Community+</button>
         <button onClick={() => setActiveView("about")}>About</button>
         <button onClick={() => setActiveView("yellowpages")}>Yellow Pages</button>
+        <button onClick={() => setActiveView("merch")}>Merch</button>
       </nav>
 
     </header>

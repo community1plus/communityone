@@ -45,12 +45,12 @@
   display: grid;
   grid-template-columns: 360px 1fr;
   gap: 20px;
-
   height: calc(100vh - var(--header-height) - var(--nav-height));
-
+  flex: 1;
+  display: flex;
+  padding: 24px;
   padding: 20px;
   padding-left: calc(var(--sidebar-width) + 20px);
-
   overflow: hidden;
 }
 
