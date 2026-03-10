@@ -13,7 +13,7 @@ export default function FeedCard({
 
       {/* Header Row */}
       <div className="feed-card-header">
-        <img src={avatar} alt="avatar" className="feed-avatar" />
+        {/* <img src={avatar} alt="avatar" className="feed-avatar" /> */}
 
         <div className="feed-meta">
           <span className="feed-name">{name}</span>
