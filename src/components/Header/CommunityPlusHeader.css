@@ -108,6 +108,9 @@
 }
 
 /* Avatar */
+.avatar-wrapper {
+  position: relative;
+}
 
 .header-right .avatar {
   width: 42px;
@@ -133,12 +136,14 @@
 
 /* ------------------- DROPDOWN ------------------- */
 
+/* ------------------- DROPDOWN ------------------- */
+
 .dropdown-menu {
   position: absolute;
-  top: 70px;
-  left: 0;
+  top: 56px;
+  right: 0;                     /* anchor to avatar */
 
-  width: 190px;
+  width: 180px;
 
   background: rgba(246, 243, 238, 0.95);
   backdrop-filter: blur(10px);
@@ -149,7 +154,6 @@
   box-shadow: 0 10px 25px rgba(0,0,0,0.15);
 
   overflow: hidden;
-
   z-index: 1000;
 }
 

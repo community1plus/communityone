@@ -31,30 +31,12 @@ function CommunityPlusHeader({ setActiveView, user, signOut }) {
       <div className="header-row">
 
         {/* LEFT — Logo */}
-        <div className="header-left logo-container" onClick={toggleMenu}>
+        <div className="header-left logo-container">
           <img
             src="/logo/logo.png"
             alt="Community One"
             className="logo"
           />
-
-          {showMenu && (
-            <div className="dropdown-menu">
-              <div
-                className="menu-item"
-                onClick={() => setActiveView("profile")}
-              >
-                Profile Settings
-              </div>
-
-              <div
-                className="menu-item"
-                onClick={signOut}
-              >
-                Logout
-              </div>
-            </div>
-          )}
         </div>
 
         {/* CENTER — Search */}
@@ -71,11 +53,42 @@ function CommunityPlusHeader({ setActiveView, user, signOut }) {
 
         {/* RIGHT — Avatar + Location */}
         <div className="header-right">
-          
+
           <span className="location-text">{location}</span>
 
-          <div className="avatar">
-            {user?.username?.[0]?.toUpperCase() ?? "C"}
+          <div className="avatar-wrapper">
+
+            <div
+              className="avatar"
+              onClick={toggleMenu}
+            >
+              {user?.username?.[0]?.toUpperCase() ?? "C"}
+            </div>
+
+            {showMenu && (
+              <div className="dropdown-menu">
+                <div
+                  className="menu-item"
+                  onClick={() => {
+                    setActiveView("profile");
+                    setShowMenu(false);
+                  }}
+                >
+                  Profile Settings
+                </div>
+
+                <div
+                  className="menu-item"
+                  onClick={() => {
+                    signOut();
+                    setShowMenu(false);
+                  }}
+                >
+                  Logout
+                </div>
+              </div>
+            )}
+
           </div>
 
         </div>
