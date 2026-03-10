@@ -64,7 +64,6 @@ export default function CommunityPlusDashboard({ user, signOut }) {
       />
 
       <main className="main">
-
         <CommunityPlusSidebar
           setActiveView={setActiveView}
           onLogout={handleLogout}
@@ -72,33 +71,38 @@ export default function CommunityPlusDashboard({ user, signOut }) {
 
         <div className="content-area">
 
-          {/* LEFT FEED COLUMN */}
-          <div className="feed-column">
-            <div className="feed-header"></div>
-
-            <div className="feed-stack">
-              <FeedCard />
-              <FeedCard />
+          {/* POST VIEW (REPLACES DASHBOARD CONTENT) */}
+          {activeView === "post" ? (
+            <div className="composer-view">
+              <PostComposer setActiveView={setActiveView} />
             </div>
-          </div>
+          ) : (
+            <>
+              {/* LEFT FEED COLUMN */}
+              <div className="feed-column">
+                <div className="feed-header"></div>
 
-          {/* RIGHT COLUMN */}
-          {activeView === "post" && <PostComposer />}
+                <div className="feed-stack">
+                  <FeedCard />
+                  <FeedCard />
+                </div>
+              </div>
 
-          {activeView === "dashboard" && (
-            <div className="map-column">
-              {!isLoaded ? (
-                <div className="map-loading">Loading map…</div>
-              ) : (
-                <GoogleMap
-                  center={coords}
-                  zoom={14}
-                  mapContainerClassName="map-container loaded"
-                >
-                  <Marker position={coords} />
-                </GoogleMap>
-              )}
-            </div>
+              {/* RIGHT MAP COLUMN */}
+              <div className="map-column">
+                {!isLoaded ? (
+                  <div className="map-loading">Loading map…</div>
+                ) : (
+                  <GoogleMap
+                    center={coords}
+                    zoom={14}
+                    mapContainerClassName="map-container loaded"
+                  >
+                    <Marker position={coords} />
+                  </GoogleMap>
+                )}
+              </div>
+            </>
           )}
 
         </div>
