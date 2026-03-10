@@ -23,25 +23,23 @@
 
 .header-row {
   display: grid;
-  grid-template-columns: 48px 1fr auto;
+  grid-template-columns: auto 1fr auto; /* UPDATED */
   align-items: center;
   border-bottom: none;
 }
 
-/* Avatar — landing style */
-.header-left .avatar {
-  width: 40px;
+/* ------------------- LOGO ------------------- */
+
+.logo-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.logo {
   height: 40px;
-  border-radius: 50%;                 /* perfect circle */
-  background: var(--accent);          /* brick-red brand background */
-  border: 1px solid var(--accent);    /* seamless border */
-  color: #ffffff;                     /* white initial */
-  font-weight: var(--fw-bold);
-  font-size: var(--fs-lg);
-  letter-spacing: 0.5px;
-  display: grid;
-  place-items: center;
-  box-shadow: 0 0 0 4px rgba(182, 58, 43, 0.25); /* soft warm glow */
+  object-fit: contain;
 }
 
 /* ------------------- SEARCH ------------------- */
@@ -81,6 +79,7 @@
 }
 
 /* caret */
+
 .search-enter {
   position: absolute;
   right: 0;
@@ -89,12 +88,69 @@
   color: var(--brand);
 }
 
-/* ------------------- LOCATION ------------------- */
+/* ------------------- RIGHT SIDE ------------------- */
 
 .header-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
   font-size: var(--header-text-size);
   color: var(--text-muted);
   white-space: nowrap;
+}
+
+/* Avatar — landing style */
+
+.header-right .avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  color: #ffffff;
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-lg);
+  letter-spacing: 0.5px;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 0 0 4px rgba(182, 58, 43, 0.25);
+}
+
+/* ------------------- DROPDOWN ------------------- */
+
+.dropdown-menu {
+  position: absolute;
+  top: 48px;
+  left: 0;
+
+  width: 180px;
+
+  background: rgba(246, 243, 238, 0.95);
+  backdrop-filter: blur(10px);
+
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+
+  overflow: hidden;
+  z-index: 1000;
+}
+
+.menu-item {
+  padding: 10px 14px;
+
+  font-family: var(--font-ui);
+  font-size: var(--header-text-size);
+
+  color: var(--text);
+  cursor: pointer;
+
+  transition: background 0.18s ease;
+}
+
+.menu-item:hover {
+  background: var(--surface-soft);
 }
 
 /* ------------------- NAV BAR ------------------- */

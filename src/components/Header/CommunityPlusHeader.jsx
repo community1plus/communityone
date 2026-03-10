@@ -3,6 +3,7 @@ import "./CommunityPlusHeader.css";
 
 function CommunityPlusHeader({ setActiveView, user, signOut }) {
   const [location, setLocation] = useState("Fetching location...");
+  const [showMenu, setShowMenu] = useState(false);
 
   useEffect(() => {
     fetch("https://ipapi.co/json/")
@@ -17,6 +18,10 @@ function CommunityPlusHeader({ setActiveView, user, signOut }) {
       .catch(() => setLocation("Location unavailable"));
   }, []);
 
+  const toggleMenu = () => {
+    setShowMenu(!showMenu);
+  };
+
   return (
     <header className="header">
 
@@ -25,11 +30,31 @@ function CommunityPlusHeader({ setActiveView, user, signOut }) {
       ====================== */}
       <div className="header-row">
 
-        {/* LEFT — Avatar */}
-        <div className="header-left">
-          <div className="avatar">
-            {user?.username?.[0]?.toUpperCase() ?? "C"}
-          </div>
+        {/* LEFT — Logo */}
+        <div className="header-left logo-container" onClick={toggleMenu}>
+          <img
+            src="/logo/logo.png"
+            alt="Community One"
+            className="logo"
+          />
+
+          {showMenu && (
+            <div className="dropdown-menu">
+              <div
+                className="menu-item"
+                onClick={() => setActiveView("profile")}
+              >
+                Profile Settings
+              </div>
+
+              <div
+                className="menu-item"
+                onClick={signOut}
+              >
+                Logout
+              </div>
+            </div>
+          )}
         </div>
 
         {/* CENTER — Search */}
@@ -44,9 +69,15 @@ function CommunityPlusHeader({ setActiveView, user, signOut }) {
           </div>
         </div>
 
-        {/* RIGHT — Location */}
+        {/* RIGHT — Avatar + Location */}
         <div className="header-right">
-          {location}
+          
+          <span className="location-text">{location}</span>
+
+          <div className="avatar">
+            {user?.username?.[0]?.toUpperCase() ?? "C"}
+          </div>
+
         </div>
 
       </div>
@@ -62,6 +93,7 @@ function CommunityPlusHeader({ setActiveView, user, signOut }) {
         <button onClick={() => setActiveView("search")}>Search</button>
         <button onClick={() => setActiveView("community")}>Community+</button>
         <button onClick={() => setActiveView("about")}>About</button>
+        <button onClick={() => setActiveView("yellowpages")}>Yellow Pages</button>
       </nav>
 
     </header>
