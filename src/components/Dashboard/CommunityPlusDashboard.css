@@ -7,33 +7,18 @@
 
 .dashboard-container {
   height: 100vh;
-  background: radial-gradient(
-      1200px 600px at 20% -10%,
-      rgba(182, 58, 43, 0.1),
-      transparent 55%
-    ),
-    radial-gradient(
-      900px 500px at 95% 10%,
-      rgba(13, 91, 87, 0.1),
-      transparent 55%
-    ),
-    var(--bg);
-
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  display: grid;
+  grid-template-rows: auto 1fr;
 }
+
 
 
 /* ---------- CONTENT BELOW HEADER + NAV ---------- */
 
 .main {
-  flex: 1;
-  display: flex;
-  overflow: hidden;
+  display: grid;
+  grid-template-columns: 240px 1fr;
   height: 100%;
-  width: 100%;
-  padding-top: calc(var(--header-height) + var(--nav-height));
 }
 
 /*
@@ -42,10 +27,11 @@
   Map expands + fills height.
 */
 .content-area {
-  flex: 1;
-  display: flex;
-  height: 100%;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 32px;
   padding: 24px;
+  height: 100%;
 }
 
 

@@ -28,7 +28,7 @@
 .composer-left {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 20px;
 }
 
 .composer-title {
