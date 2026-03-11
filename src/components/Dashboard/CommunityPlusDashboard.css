@@ -6,9 +6,7 @@
 /* ---------- PAGE BACKGROUND (exact landing match) ---------- */
 
 .dashboard-container {
-  min-height: 100vh;
   height: 100vh;
-
   background: radial-gradient(
       1200px 600px at 20% -10%,
       rgba(182, 58, 43, 0.1),
@@ -43,16 +41,10 @@
   Map expands + fills height.
 */
 .content-area {
-  display: grid;
-  grid-template-columns: 360px 1fr;
-  gap: 20px;
-  height: 100%;
   flex: 1;
   display: flex;
+  height: 100%;
   padding: 24px;
-  padding: 20px;
-  padding-left: calc(var(--sidebar-width) + 20px);
-  overflow: hidden;
 }
 
 
