@@ -62,8 +62,8 @@ export default function CommunityPlusDashboard({ user, signOut }) {
         user={user}
         setActiveView={setActiveView}
         onLogout={handleLogout}
+        coords={coords}
       />
-
       <main className="main">
         <CommunityPlusSidebar
           setActiveView={setActiveView}

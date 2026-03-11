@@ -1,31 +1,34 @@
 import React, { useState, useEffect } from "react";
 import "./CommunityPlusHeader.css";
 
-function CommunityPlusHeader({ setActiveView, user, signOut }) {
+function CommunityPlusHeader({ setActiveView, user, signOut, coords }) {
 
   const [location, setLocation] = useState("Locating...");
   const [showMenu, setShowMenu] = useState(false);
 
   useEffect(() => {
 
-    const getSuburb = async (lat, lng) => {
+    if (!coords) return;
+
+    const cachedLocation = localStorage.getItem("userLocation");
+
+    // Use cached suburb if available
+    if (cachedLocation) {
+      setLocation(cachedLocation);
+      return;
+    }
+
+    const getSuburb = async () => {
 
       try {
 
         const res = await fetch(
-          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`
+          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${coords.lat},${coords.lng}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`
         );
 
         const data = await res.json();
 
-        console.log("Geocode result:", data);
-
-        if (!data.results || data.results.length === 0) {
-          setLocation("Location unavailable");
-          return;
-        }
-
-        const components = data.results[0].address_components;
+        const components = data.results[0]?.address_components || [];
 
         const suburb = components.find(c =>
           c.types.includes("locality") ||
@@ -39,9 +42,18 @@ function CommunityPlusHeader({ setActiveView, user, signOut }) {
         );
 
         if (suburb && state) {
-          setLocation(`${suburb.long_name}, ${state.short_name}`);
+
+          const locationString = `${suburb.long_name}, ${state.short_name}`;
+
+          setLocation(locationString);
+
+          // Save to cache
+          localStorage.setItem("userLocation", locationString);
+
         } else {
+
           setLocation("Location unavailable");
+
         }
 
       } catch (err) {
@@ -53,35 +65,9 @@ function CommunityPlusHeader({ setActiveView, user, signOut }) {
 
     };
 
-    if ("geolocation" in navigator) {
+    getSuburb();
 
-      navigator.geolocation.getCurrentPosition(
-
-        (pos) => {
-
-          const lat = pos.coords.latitude;
-          const lng = pos.coords.longitude;
-
-          getSuburb(lat, lng);
-
-        },
-
-        (err) => {
-
-          console.error("Geolocation error:", err);
-          setLocation("Location unavailable");
-
-        }
-
-      );
-
-    } else {
-
-      setLocation("Location unavailable");
-
-    }
-
-  }, []);
+  }, [coords]);
 
   const toggleMenu = () => {
     setShowMenu(!showMenu);
@@ -90,13 +76,7 @@ function CommunityPlusHeader({ setActiveView, user, signOut }) {
   return (
     <header className="header">
 
-      {/* ======================
-          TOP ROW
-      ====================== */}
-
       <div className="header-row">
-
-        {/* LEFT — Logo */}
 
         <div className="header-left logo-container">
           <img
@@ -106,25 +86,16 @@ function CommunityPlusHeader({ setActiveView, user, signOut }) {
           />
         </div>
 
-        {/* CENTER — Search */}
-
         <div className="header-center">
-
           <div className="search-wrapper">
-
             <input
               type="text"
               className="search-input"
               placeholder="Search"
             />
-
             <span className="search-enter">⤶</span>
-
           </div>
-
         </div>
-
-        {/* RIGHT — Avatar + Location */}
 
         <div className="header-right">
 
@@ -140,7 +111,6 @@ function CommunityPlusHeader({ setActiveView, user, signOut }) {
             </div>
 
             {showMenu && (
-
               <div className="dropdown-menu">
 
                 <div
@@ -164,7 +134,6 @@ function CommunityPlusHeader({ setActiveView, user, signOut }) {
                 </div>
 
               </div>
-
             )}
 
           </div>
@@ -173,12 +142,7 @@ function CommunityPlusHeader({ setActiveView, user, signOut }) {
 
       </div>
 
-      {/* ======================
-          NAV ROW
-      ====================== */}
-
       <nav className="links">
-
         <button onClick={() => setActiveView("dashboard")}>Home</button>
         <button onClick={() => setActiveView("posts")}>Posts</button>
         <button onClick={() => setActiveView("events")}>Events</button>
@@ -188,12 +152,10 @@ function CommunityPlusHeader({ setActiveView, user, signOut }) {
         <button onClick={() => setActiveView("about")}>About</button>
         <button onClick={() => setActiveView("yellowpages")}>Yellow Pages</button>
         <button onClick={() => setActiveView("merch")}>Merch</button>
-
       </nav>
 
     </header>
   );
-
 }
 
 export default CommunityPlusHeader;
