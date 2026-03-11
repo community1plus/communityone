@@ -29,9 +29,10 @@
 .content-area {
   display: grid;
   grid-template-columns: 1.4fr 1fr;
-  gap: 32px;
+  gap: 28px;
   padding: 24px;
   height: 100%;
+  padding: 24px 24px 24px 16px;
 }
 
 

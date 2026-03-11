@@ -2,12 +2,8 @@
    POST COMPOSER — LANDING PAGE THEME
 ===================================================== */
 
+
 .post-composer {
-  flex: 1;
-  display: grid;
-  grid-template-columns: 1.3fr 1fr;
-  gap: 28px;
-  height: 100%;
   width: 100%;
 }
 
