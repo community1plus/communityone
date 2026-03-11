@@ -5,6 +5,7 @@ import CommunityPlusHeader from "../Header/CommunityPlusHeader";
 import CommunityPlusSidebar from "../Sidebar/CommunityPlusSidebar";
 import FeedCard from "../FeedCard/FeedCard";
 import PostComposer from "../Sidebar/Post/PostComposer";
+import CommunityPlusYellowPages from "../YellowPages/CommunityPlusYellowPages";
 
 import "./CommunityPlusDashboard.css";
 
@@ -71,12 +72,20 @@ export default function CommunityPlusDashboard({ user, signOut }) {
 
         <div className="content-area">
 
-          {/* POST VIEW (REPLACES DASHBOARD CONTENT) */}
-          {activeView === "post" ? (
+          {/* POST VIEW */}
+          {activeView === "post" && (
             <div className="composer-view">
               <PostComposer setActiveView={setActiveView} />
             </div>
-          ) : (
+          )}
+
+          {/* YELLOW PAGES VIEW */}
+          {activeView === "yellowpages" && (
+            <CommunityPlusYellowPages coords={coords} />
+          )}
+
+          {/* DEFAULT DASHBOARD VIEW */}
+          {activeView === "dashboard" && (
             <>
               {/* LEFT FEED COLUMN */}
               <div className="feed-column">
