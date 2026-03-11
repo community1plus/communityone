@@ -13,12 +13,14 @@
 
 
 
+
 /* ---------- CONTENT BELOW HEADER + NAV ---------- */
 
 .main {
   display: grid;
   grid-template-columns: 240px 1fr;
   height: 100%;
+  overflow: hidden;
 }
 
 /*
