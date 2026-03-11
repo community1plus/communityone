@@ -1,45 +1,53 @@
-import React, { useState, useEffect } from "react";
-import "./CommunityPlusYellowPages.css";
+import React, { useEffect, useState, useRef } from "react";
 
 export default function CommunityPlusYellowPages({ coords }) {
 
   const [businesses, setBusinesses] = useState([]);
+  const mapRef = useRef(null);
 
   useEffect(() => {
 
-    if (!coords) return;
+    if (!coords || !window.google) return;
 
-    const fetchBusinesses = async () => {
+    const map = new window.google.maps.Map(document.createElement("div"));
 
-      const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json
-      ?location=${coords.lat},${coords.lng}
-      &radius=2000
-      &type=restaurant
-      &key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`;
+    const service = new window.google.maps.places.PlacesService(map);
 
-      try {
-        const res = await fetch(url);
-        const data = await res.json();
-
-        setBusinesses(data.results || []);
-
-      } catch (err) {
-        console.error("Places API error:", err);
-      }
-
+    const request = {
+      location: new window.google.maps.LatLng(coords.lat, coords.lng),
+      radius: 2000,
+      type: "restaurant"
     };
 
-    fetchBusinesses();
+    service.nearbySearch(request, (results, status) => {
+
+      if (status === window.google.maps.places.PlacesServiceStatus.OK) {
+        setBusinesses(results);
+      } else {
+        console.error("Places API error:", status);
+      }
+
+    });
 
   }, [coords]);
 
   return (
-    <div className="yellowpages">
+    <div style={{ padding: "24px" }}>
 
       <h2>Local Businesses</h2>
 
+      {businesses.length === 0 && (
+        <p>Loading businesses...</p>
+      )}
+
       {businesses.map((biz) => (
-        <div key={biz.place_id} className="business-card">
+        <div key={biz.place_id} style={{
+          background: "#fff",
+          padding: "16px",
+          borderRadius: "12px",
+          marginBottom: "12px",
+          border: "1px solid #eee"
+        }}>
 
           <h3>{biz.name}</h3>
 
@@ -52,4 +60,5 @@ export default function CommunityPlusYellowPages({ coords }) {
 
     </div>
   );
+
 }
