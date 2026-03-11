@@ -30,11 +30,9 @@
 */
 .content-area {
   display: grid;
-  grid-template-columns: 1.4fr 1fr;
+  grid-template-columns: 520px 1fr;
   gap: 28px;
   padding: 24px;
-  height: 100%;
-  padding: 24px 24px 24px 16px;
 }
 
 
@@ -45,10 +43,9 @@
 .feed-column {
   width: 360px;
   flex-shrink: 0;
-
+  max-width: 520px;
   display: flex;
   flex-direction: column;
-
   height: 100%;
   overflow: hidden;
 }
@@ -102,14 +99,13 @@
 .map-column {
   display: flex;
   flex-direction: column;
-
   background: rgba(255, 255, 255, 0.65);
   border: 1px solid var(--line);
   border-radius: 22px;
   box-shadow: var(--shadow);
-
   height: 100%;
   overflow: hidden;
+  width: 100%;
 }
 
 /* Remove header gap or extra bars if not used */
