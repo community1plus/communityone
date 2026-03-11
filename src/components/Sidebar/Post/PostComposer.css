@@ -4,7 +4,11 @@
 
 
 .post-composer {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 32px;
   width: 100%;
+  height: 100%;
 }
 
 .composer-wrapper {
@@ -25,6 +29,8 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+  width: 100%;
+  height: 100%;
 }
 
 .composer-title {
@@ -92,6 +98,7 @@
 ===================================================== */
 
 .composer-right {
+  width: 100%;
   height: 100%;
 }
 

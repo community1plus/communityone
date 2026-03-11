@@ -2,20 +2,58 @@ import React, { useState, useEffect } from "react";
 import "./CommunityPlusHeader.css";
 
 function CommunityPlusHeader({ setActiveView, user, signOut }) {
-  const [location, setLocation] = useState("Fetching location...");
+  const [location, setLocation] = useState("Locating...");
   const [showMenu, setShowMenu] = useState(false);
 
   useEffect(() => {
-    fetch("https://ipapi.co/json/")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.city && data.region) {
-          setLocation(`${data.city}, ${data.region}`);
+
+    const getSuburb = async (lat, lng) => {
+      try {
+        const res = await fetch(
+          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`
+        );
+
+        const data = await res.json();
+
+        const components = data.results[0]?.address_components || [];
+
+        const suburb = components.find(c =>
+          c.types.includes("locality")
+        );
+
+        const state = components.find(c =>
+          c.types.includes("administrative_area_level_1")
+        );
+
+        if (suburb && state) {
+          setLocation(`${suburb.long_name}, ${state.short_name}`);
         } else {
           setLocation("Location unavailable");
         }
-      })
-      .catch(() => setLocation("Location unavailable"));
+
+      } catch {
+        setLocation("Location unavailable");
+      }
+    };
+
+    if ("geolocation" in navigator) {
+
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+
+          getSuburb(lat, lng);
+        },
+        () => {
+          setLocation("Location unavailable");
+        }
+      );
+
+    } else {
+      setLocation("Location unavailable");
+    }
+
   }, []);
 
   const toggleMenu = () => {
@@ -67,6 +105,7 @@ function CommunityPlusHeader({ setActiveView, user, signOut }) {
 
             {showMenu && (
               <div className="dropdown-menu">
+
                 <div
                   className="menu-item"
                   onClick={() => {
@@ -86,6 +125,7 @@ function CommunityPlusHeader({ setActiveView, user, signOut }) {
                 >
                   Logout
                 </div>
+
               </div>
             )}
 
