@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import "./CommunityPlusYellowPages.css";
 
 export default function CommunityPlusYellowPages({ coords }) {
 

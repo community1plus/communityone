@@ -1,0 +1,12 @@
+.yellowpages {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.business-card {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid #e8e6e2;
+}
