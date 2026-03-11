@@ -64,10 +64,20 @@ export default function PostComposer() {
             ◉
           </button>
 
-          {/* Cancel Button */}
-          <button className="icon-btn cancel-btn" onClick={resetForm}>
-            ×
+          <button className="icon-btn reset-btn" onClick={resetForm}>
+            ↺
           </button>
+
+          {/* Cancel Button */}
+          <button
+            className="icon-btn cancel-btn"
+            onClick={() => {
+            resetForm();
+            setActiveView("dashboard");
+            }}
+        >
+          ×
+         </button>
         </div>
       </div>
 

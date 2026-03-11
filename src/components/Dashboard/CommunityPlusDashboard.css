@@ -7,6 +7,7 @@
 
 .dashboard-container {
   min-height: 100vh;
+  height: 100vh;
 
   background: radial-gradient(
       1200px 600px at 20% -10%,
@@ -45,7 +46,7 @@
   display: grid;
   grid-template-columns: 360px 1fr;
   gap: 20px;
-  height: calc(100vh - var(--header-height) - var(--nav-height));
+  height: 100%;
   flex: 1;
   display: flex;
   padding: 24px;
@@ -82,7 +83,6 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
-
   flex: 1;
   overflow: hidden;
 }
