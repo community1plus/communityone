@@ -96,10 +96,7 @@
 ===================================================== */
 
 .composer-right {
-  background: rgba(255, 255, 255, 0.55);
-  border-radius: 18px;
-  padding: 16px;
-  border: 1px solid var(--line);
+  height: 100%;
 }
 
 .preview-title {
