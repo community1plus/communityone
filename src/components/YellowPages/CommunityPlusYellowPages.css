@@ -14,19 +14,35 @@
 ===================================================== */
 
 .business-list {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: auto auto 1fr 1fr;
   gap: 16px;
-  overflow-y: auto;
-  padding-right: 8px;
+  height: 100%;
+  overflow: hidden;
 }
 
-/* CATEGORY FILTERS */
+/* HEADER */
+
+.business-list h2 {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* BUSINESS COUNT */
+
+.business-count {
+  margin-left: 8px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+/* =====================================================
+   CATEGORY FILTERS
+===================================================== */
 
 .business-filters {
   display: flex;
   gap: 10px;
-  margin-bottom: 12px;
   flex-wrap: wrap;
 }
 
@@ -53,7 +69,14 @@
   border-radius: 12px;
   padding: 16px;
   border: 1px solid #e8e6e2;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  height: 100%;
   cursor: pointer;
+
   transition: transform .15s ease, box-shadow .15s ease;
 }
 

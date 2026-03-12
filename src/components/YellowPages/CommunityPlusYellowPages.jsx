@@ -17,6 +17,9 @@ export default function CommunityPlusYellowPages({ coords }) {
 
     if (!coords || !window.google) return;
 
+    // keep map centered on user location when coords change
+    setMapCenter(coords);
+
     const map = new window.google.maps.Map(document.createElement("div"));
 
     const service = new window.google.maps.places.PlacesService(map);
@@ -55,7 +58,12 @@ export default function CommunityPlusYellowPages({ coords }) {
 
       <div className="business-list">
 
-        <h2>Local Businesses</h2>
+        <h2>
+          Local Businesses
+          <span className="business-count">
+            {businesses.length}
+          </span>
+        </h2>
 
         {/* CATEGORY FILTERS */}
 
