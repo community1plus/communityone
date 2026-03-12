@@ -128,10 +128,10 @@ export default function CommunityPlusYellowPages({ coords }) {
         ) : (
 
           <GoogleMap
-            mapContainerStyle={mapContainerStyle}
             center={mapCenter}
             zoom={14}
-          >
+            mapContainerClassName="map-container loaded"
+        >
 
             {businesses.map(biz => (
               <Marker

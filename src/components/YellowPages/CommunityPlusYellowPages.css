@@ -115,6 +115,15 @@
   min-height: 400px;
 }
 
+.map-container {
+  width: 100%;
+  height: 100%;
+  border-radius: 18px;
+}
+
+.map-container.loaded {
+  opacity: 1;
+}
 /* =====================================================
    RESPONSIVE
 ===================================================== */
