@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { GoogleMap, Marker } from "@react-google-maps/api";
+import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 import "./CommunityPlusYellowPages.css";
 
 export default function CommunityPlusYellowPages({ coords }) {
@@ -8,6 +8,11 @@ export default function CommunityPlusYellowPages({ coords }) {
   const [mapCenter, setMapCenter] = useState(coords);
   const [category, setCategory] = useState("restaurant");
 
+  const { isLoaded } = useJsApiLoader({
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+    libraries: ["places"]
+  });
+
   const mapContainerStyle = {
     width: "100%",
     height: "100%"
@@ -15,9 +20,8 @@ export default function CommunityPlusYellowPages({ coords }) {
 
   useEffect(() => {
 
-    if (!coords || !window.google) return;
+    if (!coords || !isLoaded) return;
 
-    // keep map centered on user location when coords change
     setMapCenter(coords);
 
     const map = new window.google.maps.Map(document.createElement("div"));
@@ -49,7 +53,7 @@ export default function CommunityPlusYellowPages({ coords }) {
 
     });
 
-  }, [coords, category]);
+  }, [coords, category, isLoaded]);
 
   return (
     <div className="yellowpages-layout">
@@ -64,8 +68,6 @@ export default function CommunityPlusYellowPages({ coords }) {
             {businesses.length}
           </span>
         </h2>
-
-        {/* CATEGORY FILTERS */}
 
         <div className="business-filters">
 
@@ -86,8 +88,6 @@ export default function CommunityPlusYellowPages({ coords }) {
           </button>
 
         </div>
-
-        {/* BUSINESS CARDS */}
 
         {businesses.map(biz => (
 
@@ -121,23 +121,31 @@ export default function CommunityPlusYellowPages({ coords }) {
 
       <div className="business-map">
 
-        <GoogleMap
-          mapContainerStyle={mapContainerStyle}
-          center={mapCenter}
-          zoom={14}
-        >
+        {!isLoaded ? (
+          <div className="map-loading">
+            Loading map...
+          </div>
+        ) : (
 
-          {businesses.map(biz => (
-            <Marker
-              key={biz.id}
-              position={{
-                lat: biz.lat,
-                lng: biz.lng
-              }}
-            />
-          ))}
+          <GoogleMap
+            mapContainerStyle={mapContainerStyle}
+            center={mapCenter}
+            zoom={14}
+          >
 
-        </GoogleMap>
+            {businesses.map(biz => (
+              <Marker
+                key={biz.id}
+                position={{
+                  lat: biz.lat,
+                  lng: biz.lng
+                }}
+              />
+            ))}
+
+          </GoogleMap>
+
+        )}
 
       </div>
 
