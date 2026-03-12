@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { GoogleMap, Marker } from "@react-google-maps/api";
-import "./CommunityPlusYellowpages.css";
+import "./CommunityPlusYellowPages.css";
 
 export default function CommunityPlusYellowPages({ coords }) {
 
