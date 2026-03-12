@@ -28,6 +28,8 @@ function CommunityPlusHeader({ setActiveView, user, signOut, coords }) {
 
         const data = await res.json();
 
+        console.log("GEOCODE RESPONSE:", data);
+
         const components = data.results[0]?.address_components || [];
 
         const suburb = components.find(c =>
