@@ -1,9 +1,17 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
+import { GoogleMap, Marker } from "@react-google-maps/api";
+import "./CommunityPlusYellowpages.css";
 
 export default function CommunityPlusYellowPages({ coords }) {
 
   const [businesses, setBusinesses] = useState([]);
-  const mapRef = useRef(null);
+  const [mapCenter, setMapCenter] = useState(coords);
+  const [category, setCategory] = useState("restaurant");
+
+  const mapContainerStyle = {
+    width: "100%",
+    height: "100%"
+  };
 
   useEffect(() => {
 
@@ -15,50 +23,116 @@ export default function CommunityPlusYellowPages({ coords }) {
 
     const request = {
       location: new window.google.maps.LatLng(coords.lat, coords.lng),
-      radius: 2000,
-      type: "restaurant"
+      rankBy: window.google.maps.places.RankBy.DISTANCE,
+      type: category
     };
 
     service.nearbySearch(request, (results, status) => {
 
       if (status === window.google.maps.places.PlacesServiceStatus.OK) {
-        setBusinesses(results);
-      } else {
-        console.error("Places API error:", status);
+
+        const places = results.slice(0, 20).map(place => ({
+          id: place.place_id,
+          name: place.name,
+          address: place.vicinity,
+          rating: place.rating,
+          lat: place.geometry.location.lat(),
+          lng: place.geometry.location.lng()
+        }));
+
+        setBusinesses(places);
+
       }
 
     });
 
-  }, [coords]);
+  }, [coords, category]);
 
   return (
-    <div style={{ padding: "24px" }}>
+    <div className="yellowpages-layout">
 
-      <h2>Local Businesses</h2>
+      {/* LEFT SIDE — BUSINESS LIST */}
 
-      {businesses.length === 0 && (
-        <p>Loading businesses...</p>
-      )}
+      <div className="business-list">
 
-      {businesses.map((biz) => (
-        <div key={biz.place_id} style={{
-          background: "#fff",
-          padding: "16px",
-          borderRadius: "12px",
-          marginBottom: "12px",
-          border: "1px solid #eee"
-        }}>
+        <h2>Local Businesses</h2>
 
-          <h3>{biz.name}</h3>
+        {/* CATEGORY FILTERS */}
 
-          <p>{biz.vicinity}</p>
+        <div className="business-filters">
 
-          <p>⭐ {biz.rating ?? "No rating"}</p>
+          <button onClick={() => setCategory("restaurant")}>
+            Restaurants
+          </button>
+
+          <button onClick={() => setCategory("cafe")}>
+            Cafes
+          </button>
+
+          <button onClick={() => setCategory("bar")}>
+            Bars
+          </button>
+
+          <button onClick={() => setCategory("store")}>
+            Shops
+          </button>
 
         </div>
-      ))}
+
+        {/* BUSINESS CARDS */}
+
+        {businesses.map(biz => (
+
+          <div
+            key={biz.id}
+            className="business-card"
+            onClick={() =>
+              setMapCenter({ lat: biz.lat, lng: biz.lng })
+            }
+          >
+
+            <h3>{biz.name}</h3>
+
+            <p className="business-address">
+              📍 {biz.address}
+            </p>
+
+            {biz.rating && (
+              <p className="business-rating">
+                ⭐ {biz.rating}
+              </p>
+            )}
+
+          </div>
+
+        ))}
+
+      </div>
+
+      {/* RIGHT SIDE — MAP */}
+
+      <div className="business-map">
+
+        <GoogleMap
+          mapContainerStyle={mapContainerStyle}
+          center={mapCenter}
+          zoom={14}
+        >
+
+          {businesses.map(biz => (
+            <Marker
+              key={biz.id}
+              position={{
+                lat: biz.lat,
+                lng: biz.lng
+              }}
+            />
+          ))}
+
+        </GoogleMap>
+
+      </div>
 
     </div>
   );
-
 }

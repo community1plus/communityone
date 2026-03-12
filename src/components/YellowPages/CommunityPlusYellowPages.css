@@ -1,12 +1,105 @@
-.yellowpages {
+/* =====================================================
+   YELLOW PAGES LAYOUT
+===================================================== */
+
+.yellowpages-layout {
+  display: grid;
+  grid-template-columns: 420px 1fr;
+  gap: 24px;
+  height: 100%;
+}
+
+/* =====================================================
+   BUSINESS LIST
+===================================================== */
+
+.business-list {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  overflow-y: auto;
+  padding-right: 8px;
 }
+
+/* CATEGORY FILTERS */
+
+.business-filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.business-filters button {
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  background: white;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all .15s ease;
+}
+
+.business-filters button:hover {
+  background: #f3f2ef;
+}
+
+/* =====================================================
+   BUSINESS CARDS
+===================================================== */
 
 .business-card {
   background: white;
   border-radius: 12px;
   padding: 16px;
   border: 1px solid #e8e6e2;
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.business-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0,0,0,.06);
+}
+
+.business-card h3 {
+  font-size: 16px;
+  margin-bottom: 6px;
+}
+
+.business-address {
+  font-size: 13px;
+  color: #6f6d68;
+}
+
+.business-rating {
+  margin-top: 6px;
+  font-size: 14px;
+}
+
+/* =====================================================
+   MAP PANEL
+===================================================== */
+
+.business-map {
+  background: rgba(255,255,255,.6);
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 1100px) {
+
+  .yellowpages-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .business-map {
+    height: 420px;
+  }
+
 }
