@@ -139,10 +139,6 @@
     grid-template-columns: 1fr;
   }
 
-  .business-map {
-    height: 420px;
-  }
-
 }
 
 .business-header {
