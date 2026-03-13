@@ -21,12 +21,12 @@
 /* 2 column layout: Feed + Map */
 
 .content-area {
-  flex: 1;
   display: grid;
   grid-template-columns: 420px 1fr;
   gap: 24px;
   padding: 24px;
   height: 100%;
+  min-height: 0;
 }
 
 /* =====================================================

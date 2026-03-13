@@ -7,7 +7,8 @@
   grid-template-columns: 420px 1fr;
   gap: 24px;
   width: 100%;
-  height: calc(100vh - 140px);
+  height: 100%;
+  min-height: 0;
 }
 
 /* =====================================================
@@ -107,13 +108,14 @@
 ===================================================== */
 
 .business-map {
-  background: rgba(255,255,255,.6);
-  border-radius: 18px;
-  border: 1px solid var(--line);
-  overflow: hidden;
   display: flex;
+  flex-direction: column;
+  background: rgba(255,255,255,.65);
+  border-radius: 22px;
+  border: 1px solid var(--line);
   height: 100%;
-  width: 100%;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .map-container {
