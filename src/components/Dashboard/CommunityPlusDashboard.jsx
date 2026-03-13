@@ -6,7 +6,7 @@ import CommunityPlusSidebar from "../Sidebar/CommunityPlusSidebar";
 import FeedCard from "../FeedCard/FeedCard";
 import PostComposer from "../Sidebar/Post/PostComposer";
 import CommunityPlusYellowPages from "../YellowPages/CommunityPlusYellowPages";
-import CommunityPlusProfile from "../Profile/CommunityPlusProfile";
+import CommunityPlusUserProfile from "../CommunityPlusUserProfile/CommunityPlusUserProfile";
 
 import "./CommunityPlusDashboard.css";
 
