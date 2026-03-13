@@ -81,13 +81,14 @@ export default function CommunityPlusDashboard({ user, signOut }) {
 
           {/* YELLOW PAGES VIEW */}
           {activeView === "yellowpages" && (
+            
             <CommunityPlusYellowPages
               coords={coords}
               isLoaded={isLoaded}
               
             />
           )}
-          console.log("YellowPages loaded", coords, isLoaded);
+          
           {/* DEFAULT DASHBOARD VIEW */}
           {activeView === "dashboard" && (
             <>
