@@ -6,8 +6,8 @@
   display: grid;
   grid-template-columns: 420px 1fr;
   gap: 24px;
-  height: 100%;
   width: 100%;
+  height: calc(100vh - 160px);
 }
 
 /* =====================================================
@@ -112,7 +112,6 @@
   border: 1px solid var(--line);
   overflow: hidden;
   height: 100%;
-  width: 100%;
   min-height: 400px;
 }
 

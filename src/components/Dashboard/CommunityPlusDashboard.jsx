@@ -84,8 +84,10 @@ export default function CommunityPlusDashboard({ user, signOut }) {
             <CommunityPlusYellowPages
               coords={coords}
               isLoaded={isLoaded}
+              
             />
           )}
+          console.log("YellowPages loaded", coords, isLoaded);
           {/* DEFAULT DASHBOARD VIEW */}
           {activeView === "dashboard" && (
             <>
