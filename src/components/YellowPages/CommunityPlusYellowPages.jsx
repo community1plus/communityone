@@ -1,19 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
+import { GoogleMap, Marker } from "@react-google-maps/api";
 import "./CommunityPlusYellowPages.css";
 
-export default function CommunityPlusYellowPages({ coords }) {
+export default function CommunityPlusYellowPages({ coords, isLoaded }) {
 
   const [businesses, setBusinesses] = useState([]);
   const [mapCenter, setMapCenter] = useState(coords);
   const [category, setCategory] = useState("restaurant");
 
-  const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
-    libraries: ["places"]
-  });
-
-  const mapContainerStyle = {
+ const mapContainerStyle = {
     width: "100%",
     height: "100%"
   };
@@ -23,8 +18,6 @@ export default function CommunityPlusYellowPages({ coords }) {
     if (!coords || !isLoaded) return;
 
     setMapCenter(coords);
-
-    const map = new window.google.maps.Map(document.createElement("div"));
 
     const service = new window.google.maps.places.PlacesService(map);
 
@@ -128,6 +121,7 @@ export default function CommunityPlusYellowPages({ coords }) {
         ) : (
 
           <GoogleMap
+            onLoad={(map) => setMapInstance(map)}
             center={mapCenter}
             zoom={14}
             mapContainerClassName="map-container loaded"
