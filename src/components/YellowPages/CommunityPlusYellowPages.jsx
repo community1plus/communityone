@@ -9,7 +9,6 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
   const [category, setCategory] = useState("restaurant");
   const [mapInstance, setMapInstance] = useState(null);
   const [visibleIndex, setVisibleIndex] = useState(0);
-
   const visibleBusinesses = businesses.slice(visibleIndex, visibleIndex + 2);
 
   const scrollDown = () => {
