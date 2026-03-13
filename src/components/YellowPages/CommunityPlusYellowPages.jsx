@@ -150,7 +150,6 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
       {/* RIGHT SIDE — MAP */}
 
       <div className="business-map">
-        <h1>Business Map</h1>
         {!isLoaded ? (
           <div className="map-loading">
             Loading map...
