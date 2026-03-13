@@ -6,10 +6,12 @@ import CommunityPlusSidebar from "../Sidebar/CommunityPlusSidebar";
 import FeedCard from "../FeedCard/FeedCard";
 import PostComposer from "../Sidebar/Post/PostComposer";
 import CommunityPlusYellowPages from "../YellowPages/CommunityPlusYellowPages";
+import CommunityPlusProfile from "../Profile/CommunityPlusProfile";
 
 import "./CommunityPlusDashboard.css";
 
 export default function CommunityPlusDashboard({ user, signOut }) {
+
   const [coords, setCoords] = useState({
     lat: -37.8136,
     lng: 144.9631,
@@ -23,13 +25,17 @@ export default function CommunityPlusDashboard({ user, signOut }) {
   });
 
   useEffect(() => {
+
     if ("geolocation" in navigator) {
+
       navigator.geolocation.getCurrentPosition(
+
         (pos) =>
           setCoords({
             lat: pos.coords.latitude,
             lng: pos.coords.longitude,
           }),
+
         () => {
           fetch("https://ipapi.co/json/")
             .then((res) => res.json())
@@ -43,28 +49,123 @@ export default function CommunityPlusDashboard({ user, signOut }) {
             })
             .catch(() => {});
         }
+
       );
+
     }
+
   }, []);
 
+
   const handleLogout = async () => {
+
     try {
+
       await signOut();
       window.location.href = "/";
+
     } catch (err) {
+
       console.error("Logout failed:", err);
+
     }
+
   };
 
+
+  /* ===============================
+     VIEW SWITCHER
+  =============================== */
+
+  const renderView = () => {
+
+    switch (activeView) {
+
+      case "profile":
+        return (
+          <CommunityPlusProfile user={user} />
+        );
+
+      case "post":
+        return (
+          <div className="composer-view">
+            <PostComposer setActiveView={setActiveView} />
+          </div>
+        );
+
+      case "yellowpages":
+        return (
+          <CommunityPlusYellowPages
+            coords={coords}
+            isLoaded={isLoaded}
+          />
+        );
+
+      case "dashboard":
+      default:
+        return (
+          <>
+            {/* LEFT FEED COLUMN */}
+
+            <div className="feed-column">
+
+              <div className="feed-header"></div>
+
+              <div className="feed-stack">
+                <FeedCard />
+                <FeedCard />
+              </div>
+
+            </div>
+
+
+            {/* RIGHT MAP COLUMN */}
+
+            <div className="map-column">
+
+              {!isLoaded ? (
+
+                <div className="map-loading">
+                  Loading map…
+                </div>
+
+              ) : (
+
+                <GoogleMap
+                  center={coords}
+                  zoom={14}
+                  mapContainerClassName="map-container loaded"
+                >
+
+                  <Marker position={coords} />
+
+                </GoogleMap>
+
+              )}
+
+            </div>
+
+          </>
+        );
+
+    }
+
+  };
+
+
   return (
+
     <div className="dashboard-container">
+
       <CommunityPlusHeader
         user={user}
         setActiveView={setActiveView}
         onLogout={handleLogout}
         coords={coords}
       />
+
       <main className="main">
+
         <CommunityPlusSidebar
           setActiveView={setActiveView}
           onLogout={handleLogout}
@@ -72,55 +173,14 @@ export default function CommunityPlusDashboard({ user, signOut }) {
 
         <div className="content-area">
 
-          {/* POST VIEW */}
-          {activeView === "post" && (
-            <div className="composer-view">
-              <PostComposer setActiveView={setActiveView} />
-            </div>
-          )}
-
-          {/* YELLOW PAGES VIEW */}
-          {activeView === "yellowpages" && (
-            
-            <CommunityPlusYellowPages
-              coords={coords}
-              isLoaded={isLoaded}
-              
-            />
-          )}
-          
-          {/* DEFAULT DASHBOARD VIEW */}
-          {activeView === "dashboard" && (
-            <>
-              {/* LEFT FEED COLUMN */}
-              <div className="feed-column">
-                <div className="feed-header"></div>
-
-                <div className="feed-stack">
-                  <FeedCard />
-                  <FeedCard />
-                </div>
-              </div>
-
-              {/* RIGHT MAP COLUMN */}
-              <div className="map-column">
-                {!isLoaded ? (
-                  <div className="map-loading">Loading map…</div>
-                ) : (
-                  <GoogleMap
-                    center={coords}
-                    zoom={14}
-                    mapContainerClassName="map-container loaded"
-                  >
-                    <Marker position={coords} />
-                  </GoogleMap>
-                )}
-              </div>
-            </>
-          )}
+          {renderView()}
 
         </div>
+
       </main>
+
     </div>
+
   );
+
 }

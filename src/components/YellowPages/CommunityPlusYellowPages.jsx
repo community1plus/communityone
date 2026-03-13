@@ -10,8 +10,6 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
   const [mapInstance, setMapInstance] = useState(null);
   const [visibleIndex, setVisibleIndex] = useState(0);
 
-  const visibleBusinesses = businesses.slice(visibleIndex, visibleIndex + 2);
-
   const scrollDown = () => {
     if (visibleIndex + 2 < businesses.length) {
       setVisibleIndex((prev) => prev + 2);
@@ -117,35 +115,44 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
         </div>
 
 
-        {/* BUSINESS CARDS */}
+        {/* BUSINESS CARDS WITH SLIDE ANIMATION */}
 
         <div className="business-cards">
 
-          {visibleBusinesses.map((biz) => (
+          <div
+            className="business-cards-track"
+            style={{
+              transform: `translateY(-${visibleIndex * 50}%)`
+            }}
+          >
 
-            <div
-              key={biz.id}
-              className="business-card"
-              onClick={() =>
-                setMapCenter({ lat: biz.lat, lng: biz.lng })
-              }
-            >
+            {businesses.map((biz) => (
 
-              <h3>{biz.name}</h3>
+              <div
+                key={biz.id}
+                className="business-card"
+                onClick={() =>
+                  setMapCenter({ lat: biz.lat, lng: biz.lng })
+                }
+              >
 
-              <p className="business-address">
-                📍 {biz.address}
-              </p>
+                <h3>{biz.name}</h3>
 
-              {biz.rating && (
-                <p className="business-rating">
-                  ⭐ {biz.rating}
+                <p className="business-address">
+                  📍 {biz.address}
                 </p>
-              )}
 
-            </div>
+                {biz.rating && (
+                  <p className="business-rating">
+                    ⭐ {biz.rating}
+                  </p>
+                )}
 
-          ))}
+              </div>
+
+            ))}
+
+          </div>
 
         </div>
 

@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./CommunityPlusHeader.css";
 
-function CommunityPlusHeader({ setActiveView, user, signOut, coords }) {
+function CommunityPlusHeader({ setActiveView, user, onLogout, coords }) {
 
   const [location, setLocation] = useState("Locating...");
   const [showMenu, setShowMenu] = useState(false);
+
+  const menuRef = useRef(null);
 
   useEffect(() => {
 
@@ -12,7 +14,6 @@ function CommunityPlusHeader({ setActiveView, user, signOut, coords }) {
 
     const cachedLocation = localStorage.getItem("userLocation");
 
-    // Use cached suburb if available
     if (cachedLocation) {
       setLocation(cachedLocation);
       return;
@@ -27,8 +28,6 @@ function CommunityPlusHeader({ setActiveView, user, signOut, coords }) {
         );
 
         const data = await res.json();
-
-        console.log("GEOCODE RESPONSE:", data);
 
         const components = data.results[0]?.address_components || [];
 
@@ -49,7 +48,6 @@ function CommunityPlusHeader({ setActiveView, user, signOut, coords }) {
 
           setLocation(locationString);
 
-          // Save to cache
           localStorage.setItem("userLocation", locationString);
 
         } else {
@@ -70,6 +68,26 @@ function CommunityPlusHeader({ setActiveView, user, signOut, coords }) {
     getSuburb();
 
   }, [coords]);
+
+  /* ---------- CLICK OUTSIDE DROPDOWN ---------- */
+
+  useEffect(() => {
+
+    const handleClickOutside = (event) => {
+
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setShowMenu(false);
+      }
+
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+
+  }, []);
 
   const toggleMenu = () => {
     setShowMenu(!showMenu);
@@ -103,7 +121,9 @@ function CommunityPlusHeader({ setActiveView, user, signOut, coords }) {
 
           <span className="location-text">{location}</span>
 
-          <div className="avatar-wrapper">
+          {/* ---------- AVATAR + DROPDOWN ---------- */}
+
+          <div className="avatar-wrapper" ref={menuRef}>
 
             <div
               className="avatar"
@@ -113,6 +133,7 @@ function CommunityPlusHeader({ setActiveView, user, signOut, coords }) {
             </div>
 
             {showMenu && (
+
               <div className="dropdown-menu">
 
                 <div
@@ -128,7 +149,7 @@ function CommunityPlusHeader({ setActiveView, user, signOut, coords }) {
                 <div
                   className="menu-item"
                   onClick={() => {
-                    signOut();
+                    onLogout();
                     setShowMenu(false);
                   }}
                 >
@@ -136,6 +157,7 @@ function CommunityPlusHeader({ setActiveView, user, signOut, coords }) {
                 </div>
 
               </div>
+
             )}
 
           </div>
