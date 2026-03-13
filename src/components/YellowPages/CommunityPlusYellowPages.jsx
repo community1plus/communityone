@@ -9,17 +9,18 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
   const [category, setCategory] = useState("restaurant");
   const [mapInstance, setMapInstance] = useState(null);
   const [visibleIndex, setVisibleIndex] = useState(0);
+
   const visibleBusinesses = businesses.slice(visibleIndex, visibleIndex + 2);
 
   const scrollDown = () => {
     if (visibleIndex + 2 < businesses.length) {
-      setVisibleIndex(visibleIndex + 2);
+      setVisibleIndex((prev) => prev + 2);
     }
   };
 
   const scrollUp = () => {
     if (visibleIndex - 2 >= 0) {
-      setVisibleIndex(visibleIndex - 2);
+      setVisibleIndex((prev) => prev - 2);
     }
   };
 
@@ -28,7 +29,7 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
     if (!coords || !isLoaded || !mapInstance) return;
 
     setMapCenter(coords);
-    setVisibleIndex(0); // reset view when category/location changes
+    setVisibleIndex(0);
 
     const service = new window.google.maps.places.PlacesService(mapInstance);
 
@@ -60,14 +61,12 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
   }, [coords, category, isLoaded, mapInstance]);
 
   return (
-    <div className="yellowpages-layout">
-
-      {/* LEFT SIDE — BUSINESS LIST */}
+    <>
+      {/* LEFT PANEL — BUSINESS LIST */}
 
       <div className="business-list">
 
         <h2 className="business-header">
-
           Local Businesses
           <span className="business-count">
             {businesses.length}
@@ -92,8 +91,8 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
             </button>
 
           </span>
-
         </h2>
+
 
         {/* CATEGORY FILTERS */}
 
@@ -117,39 +116,46 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
 
         </div>
 
+
         {/* BUSINESS CARDS */}
 
-        {visibleBusinesses.map(biz => (
+        <div className="business-cards">
 
-          <div
-            key={biz.id}
-            className="business-card"
-            onClick={() =>
-              setMapCenter({ lat: biz.lat, lng: biz.lng })
-            }
-          >
+          {visibleBusinesses.map((biz) => (
 
-            <h3>{biz.name}</h3>
+            <div
+              key={biz.id}
+              className="business-card"
+              onClick={() =>
+                setMapCenter({ lat: biz.lat, lng: biz.lng })
+              }
+            >
 
-            <p className="business-address">
-              📍 {biz.address}
-            </p>
+              <h3>{biz.name}</h3>
 
-            {biz.rating && (
-              <p className="business-rating">
-                ⭐ {biz.rating}
+              <p className="business-address">
+                📍 {biz.address}
               </p>
-            )}
 
-          </div>
+              {biz.rating && (
+                <p className="business-rating">
+                  ⭐ {biz.rating}
+                </p>
+              )}
 
-        ))}
+            </div>
+
+          ))}
+
+        </div>
 
       </div>
 
-      {/* RIGHT SIDE — MAP */}
+
+      {/* RIGHT PANEL — MAP */}
 
       <div className="map-column">
+
         {!isLoaded ? (
           <div className="map-loading">
             Loading map...
@@ -163,7 +169,8 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
             mapContainerClassName="map-container loaded"
           >
 
-            {businesses.map(biz => (
+            {businesses.map((biz) => (
+
               <Marker
                 key={biz.id}
                 position={{
@@ -171,6 +178,7 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
                   lng: biz.lng
                 }}
               />
+
             ))}
 
           </GoogleMap>
@@ -178,7 +186,6 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
         )}
 
       </div>
-
-    </div>
+    </>
   );
 }
