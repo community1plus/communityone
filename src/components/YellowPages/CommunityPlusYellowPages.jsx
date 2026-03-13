@@ -7,19 +7,31 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
   const [businesses, setBusinesses] = useState([]);
   const [mapCenter, setMapCenter] = useState(coords);
   const [category, setCategory] = useState("restaurant");
+  const [mapInstance, setMapInstance] = useState(null);
+  const [visibleIndex, setVisibleIndex] = useState(0);
 
- const mapContainerStyle = {
-    width: "100%",
-    height: "100%"
+  const visibleBusinesses = businesses.slice(visibleIndex, visibleIndex + 2);
+
+  const scrollDown = () => {
+    if (visibleIndex + 2 < businesses.length) {
+      setVisibleIndex(visibleIndex + 2);
+    }
+  };
+
+  const scrollUp = () => {
+    if (visibleIndex - 2 >= 0) {
+      setVisibleIndex(visibleIndex - 2);
+    }
   };
 
   useEffect(() => {
 
-    if (!coords || !isLoaded) return;
+    if (!coords || !isLoaded || !mapInstance) return;
 
     setMapCenter(coords);
+    setVisibleIndex(0); // reset view when category/location changes
 
-    const service = new window.google.maps.places.PlacesService(map);
+    const service = new window.google.maps.places.PlacesService(mapInstance);
 
     const request = {
       location: new window.google.maps.LatLng(coords.lat, coords.lng),
@@ -46,7 +58,7 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
 
     });
 
-  }, [coords, category, isLoaded]);
+  }, [coords, category, isLoaded, mapInstance]);
 
   return (
     <div className="yellowpages-layout">
@@ -55,12 +67,36 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
 
       <div className="business-list">
 
-        <h2>
+        <h2 className="business-header">
+
           Local Businesses
           <span className="business-count">
             {businesses.length}
           </span>
+
+          <span className="business-arrows">
+
+            <button
+              className="arrow-up"
+              onClick={scrollUp}
+              disabled={visibleIndex === 0}
+            >
+              ▲
+            </button>
+
+            <button
+              className="arrow-down"
+              onClick={scrollDown}
+              disabled={visibleIndex + 2 >= businesses.length}
+            >
+              ▼
+            </button>
+
+          </span>
+
         </h2>
+
+        {/* CATEGORY FILTERS */}
 
         <div className="business-filters">
 
@@ -82,7 +118,9 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
 
         </div>
 
-        {businesses.map(biz => (
+        {/* BUSINESS CARDS */}
+
+        {visibleBusinesses.map(biz => (
 
           <div
             key={biz.id}
@@ -125,7 +163,7 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
             center={mapCenter}
             zoom={14}
             mapContainerClassName="map-container loaded"
-        >
+          >
 
             {businesses.map(biz => (
               <Marker
