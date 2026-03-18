@@ -8,11 +8,12 @@ const [files, setFiles] = useState([]);
 const [previewMode, setPreviewMode] = useState(false);
 const [dragActive, setDragActive] = useState(false);
 
-// 🔥 COMPRESS IMAGE
+// COMPRESS IMAGE
 const compressImage = (file) => {
 return new Promise((resolve) => {
 const img = new Image();
 const reader = new FileReader();
+
 
   reader.onload = (e) => {
     img.src = e.target.result;
@@ -37,12 +38,14 @@ const reader = new FileReader();
 
   reader.readAsDataURL(file);
 });
+
 };
 
 const processFiles = async (selectedFiles) => {
 const compressed = await Promise.all(
 selectedFiles.map((file) => compressImage(file))
 );
+
 
 const mappedFiles = compressed.map((file) => ({
   file,
@@ -53,7 +56,7 @@ const mappedFiles = compressed.map((file) => ({
 
 setFiles((prev) => [...prev, ...mappedFiles]);
 
-// 🔥 simulate upload progress
+// simulate upload progress
 mappedFiles.forEach((f) => {
   const interval = setInterval(() => {
     setFiles((prev) =>
@@ -69,6 +72,7 @@ mappedFiles.forEach((f) => {
 });
 
 setPreviewMode(true);
+
 
 };
 
@@ -90,7 +94,7 @@ return prev.filter((f) => f.id !== id);
 });
 };
 
-// 🔥 DRAG REORDER
+// DRAG REORDER
 const handleDragStart = (e, index) => {
 e.dataTransfer.setData("index", index);
 };
@@ -99,6 +103,7 @@ const handleDropReorder = (e, index) => {
 const from = e.dataTransfer.getData("index");
 if (from === null) return;
 
+
 setFiles((prev) => {
   const updated = [...prev];
   const [moved] = updated.splice(from, 1);
@@ -106,15 +111,23 @@ setFiles((prev) => {
   return updated;
 });
 
+
+};
+
+const resetForm = () => {
+files.forEach((f) => URL.revokeObjectURL(f.url));
+setFiles([]);
+setTitle("");
+setSummary("");
+setPreviewMode(false);
 };
 
 return ( <div className="post-composer"> <div className="composer-wrapper">
 
-
     {/* LEFT */}
     <div className="composer-left">
 
-      <h2>Create a Post</h2>
+      <h2 className="composer-title">Create a Post</h2>
 
       <input
         className="composer-input"
@@ -143,11 +156,41 @@ return ( <div className="post-composer"> <div className="composer-wrapper">
         Drag & drop images or click upload
       </div>
 
+      {/* ACTION BUTTONS (RESTORED) */}
       <div className="composer-actions">
-        <label className="icon-btn">
+
+        <label className="icon-btn upload-btn tooltip" data-tooltip="Add files">
           ⧉
           <input type="file" multiple onChange={handleUpload} hidden />
         </label>
+
+        <button
+          className="icon-btn preview-btn tooltip"
+          data-tooltip="Preview post"
+          onClick={() => setPreviewMode(true)}
+        >
+          ◉
+        </button>
+
+        <button
+          className="icon-btn reset-btn tooltip"
+          data-tooltip="Reset form"
+          onClick={resetForm}
+        >
+          ↺
+        </button>
+
+        <button
+          className="icon-btn cancel-btn tooltip"
+          data-tooltip="Cancel"
+          onClick={() => {
+            resetForm();
+            setActiveView("dashboard");
+          }}
+        >
+          ×
+        </button>
+
       </div>
 
     </div>
@@ -157,39 +200,57 @@ return ( <div className="post-composer"> <div className="composer-wrapper">
 
       <div className="preview-scroll">
 
-        <div className="preview-grid">
+        {/* EMPTY STATE WITH ANIMATION */}
+        {files.length === 0 ? (
+          <div className="empty-preview">
 
-          {files.map((f, index) => (
-            <div
-              key={f.id}
-              draggable
-              onDragStart={(e) => handleDragStart(e, index)}
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={(e) => handleDropReorder(e, index)}
-              className="preview-grid-item"
-            >
-              <img src={f.url} className="preview-grid-img" />
+            <img
+              src="/logo.png"
+              alt="logo"
+              className="empty-logo"
+            />
 
-              {/* PROGRESS BAR */}
-              {f.progress < 100 && (
-                <div className="progress-bar">
-                  <div
-                    className="progress-fill"
-                    style={{ width: `${f.progress}%` }}
-                  />
-                </div>
-              )}
+            <p className="empty-text">
+              Upload images to preview your post
+            </p>
 
-              <button
-                className="delete-overlay"
-                onClick={() => handleDelete(f.id)}
+          </div>
+        ) : (
+
+          <div className="preview-grid">
+
+            {files.map((f, index) => (
+              <div
+                key={f.id}
+                draggable
+                onDragStart={(e) => handleDragStart(e, index)}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => handleDropReorder(e, index)}
+                className="preview-grid-item"
               >
-                ×
-              </button>
-            </div>
-          ))}
+                <img src={f.url} className="preview-grid-img" />
 
-        </div>
+                {f.progress < 100 && (
+                  <div className="progress-bar">
+                    <div
+                      className="progress-fill"
+                      style={{ width: `${f.progress}%` }}
+                    />
+                  </div>
+                )}
+
+                <button
+                  className="delete-overlay"
+                  onClick={() => handleDelete(f.id)}
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+
+          </div>
+
+        )}
 
       </div>
 
@@ -197,5 +258,6 @@ return ( <div className="post-composer"> <div className="composer-wrapper">
 
   </div>
 </div>
+
 );
 }

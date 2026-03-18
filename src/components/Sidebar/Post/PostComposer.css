@@ -1,5 +1,5 @@
 /* =====================================================
-POST COMPOSER — PREMIUM UI (MODERN + RESPONSIVE)
+POST COMPOSER — PREMIUM UI (WITH AMBIENT EMPTY STATE)
 ===================================================== */
 
 .post-composer {
@@ -12,17 +12,18 @@ flex: 1;
 min-width: 0;
 }
 
-/* FIXED GRID */
+/* GRID */
 .composer-wrapper {
 display: grid;
 grid-template-columns: 1.4fr 1fr;
 gap: 24px;
 width: 100%;
-align-items: start;
+
+align-items: stretch;
 }
 
 /* =====================================================
-LEFT — FORM AREA
+LEFT PANEL
 ===================================================== */
 
 .composer-left {
@@ -30,6 +31,8 @@ display: flex;
 flex-direction: column;
 gap: 18px;
 padding: 20px;
+
+height: 100%;
 
 background: rgba(255, 255, 255, 0.65);
 border: 1px solid var(--line);
@@ -42,19 +45,139 @@ box-shadow:
 inset 0 1px 0 rgba(255,255,255,0.5);
 }
 
-.composer-title {
-margin: 0 0 4px;
-font-size: 20px;
-font-weight: 700;
-color: var(--ink);
+/* =====================================================
+RIGHT PANEL
+===================================================== */
+
+.composer-right {
+display: flex;
+flex-direction: column;
+gap: 12px;
+padding: 16px;
+
+height: 100%;
+
+background: #f9f7f4;
+border-radius: 18px;
+
+min-height: 0;
+
+box-shadow:
+0 10px 30px rgba(0,0,0,0.05),
+inset 0 1px 0 rgba(255,255,255,0.5);
+
+position: relative;
+overflow: hidden;
 }
 
-.composer-label {
+/* =====================================================
+SCROLL AREA
+===================================================== */
+
+.preview-scroll {
+display: flex;
+flex-direction: column;
+gap: 12px;
+
+flex: 1;
+justify-content: center;
+
+overflow-y: auto;
+padding-right: 6px;
+padding-bottom: 6px;
+
+min-height: 0;
+}
+
+/* =====================================================
+✨ PREMIUM EMPTY STATE
+===================================================== */
+
+.empty-preview {
+position: relative;
+
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+
+height: 100%;
+gap: 14px;
+text-align: center;
+z-index: 2;
+}
+
+/* 🌈 SOFT GRADIENT GLOW BACKGROUND */
+.empty-preview::before {
+content: "";
+position: absolute;
+width: 240px;
+height: 240px;
+
+background: radial-gradient(
+circle,
+rgba(214,75,58,0.18),
+rgba(214,75,58,0.05),
+transparent 70%
+);
+
+filter: blur(30px);
+border-radius: 50%;
+
+animation: glowPulse 4s ease-in-out infinite;
+z-index: -1;
+}
+
+/* LOGO */
+.empty-logo {
+width: 82px;
+opacity: 0.85;
+
+animation: floatLogo 3.2s ease-in-out infinite;
+}
+
+/* TEXT */
+.empty-text {
 font-size: 13px;
 color: var(--muted);
+letter-spacing: 0.2px;
 }
 
-/* INPUTS */
+/* =====================================================
+ANIMATIONS
+===================================================== */
+
+@keyframes floatLogo {
+0% {
+transform: translateY(0px) scale(1);
+}
+50% {
+transform: translateY(-10px) scale(1.03);
+}
+100% {
+transform: translateY(0px) scale(1);
+}
+}
+
+@keyframes glowPulse {
+0% {
+transform: scale(0.9);
+opacity: 0.5;
+}
+50% {
+transform: scale(1.15);
+opacity: 0.9;
+}
+100% {
+transform: scale(0.9);
+opacity: 0.5;
+}
+}
+
+/* =====================================================
+INPUTS
+===================================================== */
+
 .composer-input,
 .composer-textarea {
 width: 100%;
@@ -80,7 +203,7 @@ resize: none;
 }
 
 /* =====================================================
-DRAG & DROP ZONE
+DROP ZONE
 ===================================================== */
 
 .drop-zone {
@@ -90,6 +213,7 @@ padding: 18px;
 text-align: center;
 font-size: 13px;
 color: var(--muted);
+
 transition: all 0.2s ease;
 }
 
@@ -99,7 +223,7 @@ background: rgba(214,75,58,0.05);
 }
 
 /* =====================================================
-ICON BUTTONS
+BUTTONS
 ===================================================== */
 
 .icon-btn {
@@ -139,92 +263,7 @@ margin-top: 14px;
 }
 
 /* =====================================================
-RIGHT — PREVIEW AREA
-===================================================== */
-
-.composer-right {
-display: flex;
-flex-direction: column;
-gap: 12px;
-padding: 16px;
-
-background: #f9f7f4;
-border-radius: 18px;
-
-min-height: 0;
-
-box-shadow:
-0 10px 30px rgba(0,0,0,0.05),
-inset 0 1px 0 rgba(255,255,255,0.5);
-}
-
-.preview-title {
-margin: 0;
-font-size: 13px;
-color: var(--muted);
-}
-
-/* SCROLL */
-.preview-scroll {
-display: flex;
-flex-direction: column;
-gap: 12px;
-
-overflow-y: auto;
-padding-right: 6px;
-padding-bottom: 6px;
-
-min-height: 0;
-}
-
-.preview-scroll::-webkit-scrollbar {
-width: 6px;
-}
-.preview-scroll::-webkit-scrollbar-thumb {
-background: rgba(0,0,0,0.15);
-border-radius: 6px;
-}
-
-/* =====================================================
-FILE LIST
-===================================================== */
-
-.file-list {
-display: flex;
-flex-direction: column;
-gap: 10px;
-}
-
-.file-row {
-display: flex;
-justify-content: space-between;
-align-items: center;
-
-padding: 10px 12px;
-border-radius: 10px;
-
-background: rgba(255,255,255,0.8);
-border: 1px solid var(--line);
-
-transition: all 0.15s ease;
-}
-
-.file-row:hover {
-transform: translateY(-1px);
-box-shadow: 0 8px 16px rgba(0,0,0,0.06);
-}
-
-.file-name {
-font-size: 13px;
-color: var(--ink);
-max-width: 70%;
-overflow: hidden;
-text-overflow: ellipsis;
-white-space: nowrap;
-}
-
-/* =====================================================
-GRID PREVIEW (NEW)
+GRID PREVIEW
 ===================================================== */
 
 .preview-grid {
@@ -245,7 +284,7 @@ object-fit: cover;
 border-radius: 10px;
 }
 
-/* DELETE OVERLAY */
+/* DELETE */
 .delete-overlay {
 position: absolute;
 top: 6px;
@@ -258,7 +297,7 @@ padding: 2px 6px;
 cursor: pointer;
 }
 
-/* PROGRESS BAR */
+/* PROGRESS */
 .progress-bar {
 position: absolute;
 bottom: 4px;
@@ -274,32 +313,6 @@ overflow: hidden;
 height: 100%;
 background: var(--accent);
 transition: width 0.2s ease;
-}
-
-/* =====================================================
-PREVIEW CARD
-===================================================== */
-
-.preview-card {
-border: 1px solid var(--line);
-background: rgba(255, 255, 255, 0.75);
-border-radius: 18px;
-padding: 14px;
-
-display: flex;
-flex-direction: column;
-gap: 10px;
-}
-
-/* =====================================================
-EMPTY STATE
-===================================================== */
-
-.empty-state {
-color: var(--muted);
-font-size: 13px;
-text-align: center;
-padding: 40px 0;
 }
 
 /* =====================================================
@@ -325,24 +338,5 @@ border-radius: 16px;
 
 .composer-actions {
 justify-content: space-between;
-}
-
-.file-name {
-max-width: 55%;
-}
-}
-
-/* =====================================================
-ANIMATIONS
-===================================================== */
-
-@keyframes fadeIn {
-from {
-opacity: 0;
-transform: translateY(6px);
-}
-to {
-opacity: 1;
-transform: translateY(0);
 }
 }
