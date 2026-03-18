@@ -205,7 +205,7 @@ return ( <div className="post-composer"> <div className="composer-wrapper">
           <div className="empty-preview">
 
             <img
-              src="/logo.png"
+              src="/public/logo.png"
               alt="logo"
               className="empty-logo"
             />
