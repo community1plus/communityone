@@ -1,8 +1,40 @@
+/* =====================================================
+TOKENS — DESIGN SYSTEM (v2 CLEAN)
+===================================================== */
+
 :root {
 
-/* ========================
-SPACING (8pt system)
-======================== */
+/* =====================================================
+TYPOGRAPHY TOKENS
+===================================================== */
+
+--font-sans: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+
+--fw-regular: 400;
+--fw-medium: 500;
+--fw-semibold: 600;
+--fw-bold: 700;
+
+--text-xs: 12px;
+--text-sm: 13px;
+--text-md: 14px;
+--text-lg: 16px;
+--text-xl: 18px;
+--text-2xl: 20px;
+--text-3xl: 24px;
+
+--lh-tight: 1.2;
+--lh-normal: 1.4;
+--lh-relaxed: 1.6;
+
+--tracking-tight: -0.01em;
+--tracking-normal: 0;
+--tracking-wide: 0.02em;
+
+/* =====================================================
+SPACING (8pt SYSTEM)
+===================================================== */
+
 --space-1: 8px;
 --space-2: 12px;
 --space-3: 16px;
@@ -10,31 +42,11 @@ SPACING (8pt system)
 --space-5: 24px;
 --space-6: 32px;
 
-/* ========================
-RADIUS
-======================== */
---radius-sm: 10px;
---radius-md: 14px;
---radius-lg: 18px;
---radius-xl: 22px;
+/* =====================================================
+LAYOUT
+===================================================== */
 
-/* ========================
-SHADOWS
-======================== */
---shadow-sm: 0 4px 12px rgba(0,0,0,0.05);
---shadow-md: 0 10px 30px rgba(0,0,0,0.08);
---shadow-lg: 0 20px 50px rgba(0,0,0,0.12);
-
-/* ========================
-COLORS (use your theme)
-======================== */
---bg-glass: rgba(255,255,255,0.65);
---bg-soft: #f9f7f4;
-
-/* ========================
-MOTION
-======================== */
---ease: cubic-bezier(0.22, 1, 0.36, 1);
---transition-fast: 0.18s var(--ease);
---transition-med: 0.28s var(--ease);
+--layout-gap: var(--space-5);
+--layout-pad: var(--space-5);
+--layout-max-width: 1200px;
 }

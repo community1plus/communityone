@@ -1,101 +1,213 @@
 /* =====================================================
-   COMMUNITY ONE — GLOBAL THEME
-   (Landing Page + Dashboard + Header Unified System)
+COMMUNITY ONE — GLOBAL THEME (v2 ELITE SYSTEM)
 ===================================================== */
 
-/* ---------- GLOBAL TOKENS ---------- */
+/* =====================================================
+TOKENS (UNIFIED + NORMALISED)
+===================================================== */
+
 :root {
-  /* BRAND COLORS */
-  --brand: #0A7F72;               /* Avatar teal */
-  --brand-strong: #0A7F72;
-  --brand-soft: #E0F2F0;
 
-  --accent-red: #C8483C;
-  --accent-red-soft: #F6E9E6;
+/* ================= BRAND ================= */
 
-  /* BACKGROUND */
-  --bg-gradient-top: #FDF9F7;
-  --bg-gradient-bottom: #F4ECE8;
-  --bg: #F6F3EE; /* landing page warm off-white */
+--brand: #0A7F72;
+--brand-strong: #0A7F72;
+--brand-soft: #E0F2F0;
 
-  /* SURFACES */
-  --surface: #FFFFFF;
-  --surface-soft: #FCF9F8;
+--accent: #C8483C;
+--accent-red: #C8483C;
+--accent-red-soft: #F6E9E6;
 
-  /* BORDERS */
-  --border: #E5DAD3;
-  --border-strong: #D9C9C0;
+/* ================= BACKGROUND ================= */
 
-  /* TEXT */
-  --text: #2C2C2C;
-  --text-muted: #6F6A67;
-  --text-accent: #C8483C;
+--bg-gradient-top: #FDF9F7;
+--bg-gradient-bottom: #F4ECE8;
+--bg: #F6F3EE;
 
-  /* RADII */
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 18px;
+/* ================= SURFACES ================= */
 
-  /* SHADOWS */
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.12);
+--surface: #FFFFFF;
+--surface-soft: #FCF9F8;
+--surface-elevated: rgba(255,255,255,0.75);
 
-  /* LAYOUT */
-  --header-height: 70px;
-  --nav-height: 36px;
-  --sidebar-width: 230px;
+/* ================= BORDERS ================= */
 
-  /* ---------- TYPOGRAPHY TOKENS ---------- */
-  --font-ui: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-  --font-body: var(--font-ui);
-  --font-display: var(--font-ui);
+--line: #E5DAD3;            /* 🔥 unified */
+--line-strong: #D9C9C0;
 
-  /* FONT SIZES (Unified Scale) */
-  --fs-xs: 12px;
-  --fs-sm: 13px;
-  --fs-md: 14px;
-  --fs-lg: 15px;
-  --fs-xl: 18px;
+/* ================= TEXT ================= */
 
-  /* HEADER-SPECIFIC */
-  --header-title-size: var(--fs-lg);
-  --header-text-size: var(--fs-md);
-  --header-nav-size: var(--fs-sm);
+--ink: #2C2C2C;             /* 🔥 primary text */
+--muted: #6F6A67;
+--text-accent: #C8483C;
 
-  /* WEIGHTS */
-  --fw-regular: 400;
-  --fw-medium: 500;
-  --fw-bold: 700;
+/* ================= RADII ================= */
+
+--radius-sm: 6px;
+--radius-md: 10px;
+--radius-lg: 18px;
+
+/* ================= SHADOWS ================= */
+
+--shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+--shadow-md: 0 4px 12px rgba(0,0,0,0.12);
+--shadow-lg: 0 10px 30px rgba(0,0,0,0.08);
+
+/* ================= TRANSITIONS ================= */
+
+--transition-fast: 0.15s ease;
+--transition-base: 0.25s ease;
+
+/* ================= LAYOUT ================= */
+
+--header-height: 70px;
+--nav-height: 36px;
+--sidebar-width: 240px;
+
+/* =====================================================
+TYPOGRAPHY SYSTEM (MERGED)
+===================================================== */
+
+--font-sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+
+--fw-regular: 400;
+--fw-medium: 500;
+--fw-semibold: 600;
+--fw-bold: 700;
+
+--text-xs: 12px;
+--text-sm: 13px;
+--text-md: 14px;
+--text-lg: 16px;
+--text-xl: 18px;
+--text-2xl: 20px;
+--text-3xl: 24px;
+
+--lh-tight: 1.2;
+--lh-normal: 1.4;
+--lh-relaxed: 1.6;
+
+--tracking-tight: -0.01em;
 }
 
+/* =====================================================
+RESET (CLEAN + MODERN)
+===================================================== */
 
-/* ---------- RESET ---------- */
-* {
-  box-sizing: border-box;
+*,
+*::before,
+*::after {
+box-sizing: border-box;
 }
 
 html, body {
-  height: 100%;
-  margin: 0;
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--font-body);
-  font-size: var(--fs-md);
-  letter-spacing: -0.01em;
+height: 100%;
+margin: 0;
+
+background: var(--bg);
+color: var(--ink);
+
+font-family: var(--font-sans);
+font-size: var(--text-md);
+line-height: var(--lh-normal);
+letter-spacing: var(--tracking-tight);
+
+-webkit-font-smoothing: antialiased;
 }
 
+/* remove default margins */
+h1, h2, h3, h4, p {
+margin: 0;
+}
+
+/* =====================================================
+BASE ELEMENTS
+===================================================== */
+
 button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-family: inherit;
+background: none;
+border: none;
+cursor: pointer;
+font-family: inherit;
 }
 
 a {
-  color: inherit;
-  text-decoration: none;
+color: inherit;
+text-decoration: none;
 }
 
-.hidden { 
-  display: none !important; 
+.hidden {
+display: none !important;
+}
+
+/* =====================================================
+TYPOGRAPHY CLASSES (SYSTEM)
+===================================================== */
+
+.h1 {
+font-size: var(--text-3xl);
+font-weight: var(--fw-bold);
+}
+
+.h2 {
+font-size: var(--text-2xl);
+font-weight: var(--fw-semibold);
+}
+
+.h3 {
+font-size: var(--text-xl);
+font-weight: var(--fw-semibold);
+}
+
+.h4 {
+font-size: var(--text-lg);
+font-weight: var(--fw-medium);
+}
+
+.text-body {
+font-size: var(--text-md);
+line-height: var(--lh-relaxed);
+}
+
+.text-label {
+font-size: var(--text-sm);
+font-weight: var(--fw-medium);
+color: var(--muted);
+}
+
+.text-meta {
+font-size: var(--text-xs);
+color: var(--muted);
+}
+
+/* =====================================================
+SURFACE SYSTEM (NEW 🔥)
+===================================================== */
+
+.surface {
+background: var(--surface);
+border: 1px solid var(--line);
+border-radius: var(--radius-lg);
+box-shadow: var(--shadow-sm);
+}
+
+.surface-soft {
+background: var(--surface-soft);
+}
+
+.surface-elevated {
+background: var(--surface-elevated);
+box-shadow: var(--shadow-lg);
+}
+
+/* =====================================================
+UTILITY
+===================================================== */
+
+.flex {
+display: flex;
+}
+
+.grid {
+display: grid;
 }
