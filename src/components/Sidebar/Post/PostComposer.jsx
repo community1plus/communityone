@@ -208,7 +208,7 @@ return ( <div className="post-composer"> <div className="composer-wrapper">
             </p>  
 
             <img
-              src="\public\logo\logo.png"
+              src="/logo/logo.png"
               alt="logo"
               className="empty-logo"
             />
