@@ -1,13 +1,13 @@
 /* =====================================================
-POST COMPOSER — PREMIUM UI (WITH AMBIENT EMPTY STATE)
+POST COMPOSER — ELITE SYSTEM (PANEL + CONSISTENT SPACING)
+===================================================== */
+
+/* =====================================================
+BASE
 ===================================================== */
 
 .post-composer {
 width: 100%;
-max-width: 1200px;
-margin: 0 auto;
-padding: 20px;
-
 flex: 1;
 min-width: 0;
 }
@@ -16,23 +16,29 @@ min-width: 0;
 .composer-wrapper {
 display: grid;
 grid-template-columns: 1.4fr 1fr;
-gap: 24px;
+gap: var(--layout-gap);
 width: 100%;
+
+max-width: 1100px;       /* 🔥 prevents over-stretch */
+margin: 0 auto;          /* 🔥 perfect centering */
 
 align-items: stretch;
 }
 
-.composer-view {
-  grid-column: 1 / -1;
+/* =====================================================
+🧱 PANEL SYSTEM (REUSABLE)
+===================================================== */
 
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
+.panel {
+background: rgba(255, 255, 255, 0.65);
+border: 1px solid var(--line);
+border-radius: 22px;
 
-  padding: var(--layout-pad);
+backdrop-filter: blur(10px);
 
-  width: 100%;
-  height: 100%;
+box-shadow:
+0 10px 30px rgba(0,0,0,0.05),
+inset 0 1px 0 rgba(255,255,255,0.5);
 }
 
 /* =====================================================
@@ -42,15 +48,15 @@ LEFT PANEL
 .composer-left {
 display: flex;
 flex-direction: column;
-gap: 18px;
-padding: 20px;
+gap: var(--space-3);
+padding: var(--space-4);
 
 height: 100%;
 
+/* panel styles */
 background: rgba(255, 255, 255, 0.65);
 border: 1px solid var(--line);
 border-radius: 22px;
-
 backdrop-filter: blur(10px);
 
 box-shadow:
@@ -65,8 +71,8 @@ RIGHT PANEL
 .composer-right {
 display: flex;
 flex-direction: column;
-gap: 12px;
-padding: 16px;
+gap: var(--space-2);
+padding: var(--space-3);
 
 height: 100%;
 
@@ -90,7 +96,7 @@ SCROLL AREA
 .preview-scroll {
 display: flex;
 flex-direction: column;
-gap: 12px;
+gap: var(--space-2);
 
 flex: 1;
 justify-content: center;
@@ -115,12 +121,11 @@ align-items: center;
 justify-content: center;
 
 height: 100%;
-gap: 14px;
+gap: var(--space-2);
 text-align: center;
 z-index: 2;
 }
 
-/* 🌈 SOFT GRADIENT GLOW BACKGROUND */
 .empty-preview::before {
 content: "";
 position: absolute;
@@ -141,7 +146,6 @@ animation: glowPulse 4s ease-in-out infinite;
 z-index: -1;
 }
 
-/* LOGO */
 .empty-logo {
 width: 82px;
 opacity: 0.85;
@@ -149,7 +153,6 @@ opacity: 0.85;
 animation: floatLogo 3.2s ease-in-out infinite;
 }
 
-/* TEXT */
 .empty-text {
 font-size: 13px;
 color: var(--muted);
@@ -161,30 +164,15 @@ ANIMATIONS
 ===================================================== */
 
 @keyframes floatLogo {
-0% {
-transform: translateY(0px) scale(1);
-}
-50% {
-transform: translateY(-10px) scale(1.03);
-}
-100% {
-transform: translateY(0px) scale(1);
-}
+0% { transform: translateY(0px) scale(1); }
+50% { transform: translateY(-10px) scale(1.03); }
+100% { transform: translateY(0px) scale(1); }
 }
 
 @keyframes glowPulse {
-0% {
-transform: scale(0.9);
-opacity: 0.5;
-}
-50% {
-transform: scale(1.15);
-opacity: 0.9;
-}
-100% {
-transform: scale(0.9);
-opacity: 0.5;
-}
+0% { transform: scale(0.9); opacity: 0.5; }
+50% { transform: scale(1.15); opacity: 0.9; }
+100% { transform: scale(0.9); opacity: 0.5; }
 }
 
 /* =====================================================
@@ -196,7 +184,7 @@ INPUTS
 width: 100%;
 border: 1px solid var(--line);
 border-radius: 14px;
-padding: 12px 14px;
+padding: var(--space-3);
 background: rgba(255, 255, 255, 0.7);
 font-size: 14px;
 
@@ -222,7 +210,7 @@ DROP ZONE
 .drop-zone {
 border: 2px dashed var(--line);
 border-radius: 14px;
-padding: 18px;
+padding: var(--space-4);
 text-align: center;
 font-size: 13px;
 color: var(--muted);
@@ -271,8 +259,8 @@ transform: scale(0.95);
 
 .composer-actions {
 display: flex;
-gap: 10px;
-margin-top: 14px;
+gap: var(--space-2);
+margin-top: var(--space-3);
 }
 
 /* =====================================================
@@ -282,7 +270,7 @@ GRID PREVIEW
 .preview-grid {
 display: grid;
 grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-gap: 8px;
+gap: var(--space-1);
 }
 
 .preview-grid-item {
@@ -345,7 +333,7 @@ order: -1;
 @media (max-width: 640px) {
 .composer-left,
 .composer-right {
-padding: 14px;
+padding: var(--space-3);
 border-radius: 16px;
 }
 
