@@ -12,13 +12,12 @@ flex: 1;
 min-width: 0;
 }
 
-/* FIXED GRID (NO MORE display: contents) */
+/* FIXED GRID */
 .composer-wrapper {
 display: grid;
 grid-template-columns: 1.4fr 1fr;
 gap: 24px;
 width: 100%;
-
 align-items: start;
 }
 
@@ -30,7 +29,6 @@ LEFT — FORM AREA
 display: flex;
 flex-direction: column;
 gap: 18px;
-
 padding: 20px;
 
 background: rgba(255, 255, 255, 0.65);
@@ -62,7 +60,7 @@ color: var(--muted);
 width: 100%;
 border: 1px solid var(--line);
 border-radius: 14px;
-padding: 12px 14px; /* improved spacing */
+padding: 12px 14px;
 background: rgba(255, 255, 255, 0.7);
 font-size: 14px;
 
@@ -79,6 +77,25 @@ box-shadow: 0 0 0 3px rgba(214,75,58,0.12);
 .composer-textarea {
 height: 120px;
 resize: none;
+}
+
+/* =====================================================
+DRAG & DROP ZONE
+===================================================== */
+
+.drop-zone {
+border: 2px dashed var(--line);
+border-radius: 14px;
+padding: 18px;
+text-align: center;
+font-size: 13px;
+color: var(--muted);
+transition: all 0.2s ease;
+}
+
+.drop-zone.active {
+border-color: var(--accent);
+background: rgba(214,75,58,0.05);
 }
 
 /* =====================================================
@@ -118,7 +135,7 @@ transform: scale(0.95);
 .composer-actions {
 display: flex;
 gap: 10px;
-margin-top: 14px; /* improved spacing */
+margin-top: 14px;
 }
 
 /* =====================================================
@@ -129,7 +146,6 @@ RIGHT — PREVIEW AREA
 display: flex;
 flex-direction: column;
 gap: 12px;
-
 padding: 16px;
 
 background: #f9f7f4;
@@ -148,7 +164,7 @@ font-size: 13px;
 color: var(--muted);
 }
 
-/* SCROLL AREA */
+/* SCROLL */
 .preview-scroll {
 display: flex;
 flex-direction: column;
@@ -156,12 +172,11 @@ gap: 12px;
 
 overflow-y: auto;
 padding-right: 6px;
-padding-bottom: 6px; /* prevents cutoff */
+padding-bottom: 6px;
 
 min-height: 0;
 }
 
-/* scrollbar */
 .preview-scroll::-webkit-scrollbar {
 width: 6px;
 }
@@ -208,24 +223,57 @@ text-overflow: ellipsis;
 white-space: nowrap;
 }
 
-.file-actions {
-display: flex;
-gap: 6px;
+/* =====================================================
+GRID PREVIEW (NEW)
+===================================================== */
+
+.preview-grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+gap: 8px;
 }
 
-.file-btn {
+.preview-grid-item {
+position: relative;
+cursor: grab;
+}
+
+.preview-grid-img {
+width: 100%;
+height: 90px;
+object-fit: cover;
+border-radius: 10px;
+}
+
+/* DELETE OVERLAY */
+.delete-overlay {
+position: absolute;
+top: 6px;
+right: 6px;
+background: rgba(0,0,0,0.6);
+color: white;
 border: none;
-background: white;
-border-radius: 8px;
-padding: 5px 7px;
+border-radius: 6px;
+padding: 2px 6px;
 cursor: pointer;
 }
 
-.file-btn:hover { transform: scale(1.05); }
-.file-btn.preview:hover { background: #e6f7fa; }
-.file-btn.delete:hover {
-background: #ffe9e6;
-color: #c23b2e;
+/* PROGRESS BAR */
+.progress-bar {
+position: absolute;
+bottom: 4px;
+left: 4px;
+right: 4px;
+height: 4px;
+background: rgba(0,0,0,0.1);
+border-radius: 4px;
+overflow: hidden;
+}
+
+.progress-fill {
+height: 100%;
+background: var(--accent);
+transition: width 0.2s ease;
 }
 
 /* =====================================================
@@ -243,32 +291,6 @@ flex-direction: column;
 gap: 10px;
 }
 
-.preview-img,
-.primary-logo {
-width: 100%;
-border-radius: 12px;
-background: rgba(255,255,255,0.55);
-box-shadow: var(--shadow-sm);
-}
-
-.preview-img:hover,
-.primary-logo:hover {
-transform: scale(1.01);
-}
-
-.preview-card-title {
-font-size: 15px;
-font-weight: 700;
-margin: 0;
-color: var(--ink);
-}
-
-.preview-card-text {
-font-size: 13px;
-color: var(--muted);
-line-height: 1.5;
-}
-
 /* =====================================================
 EMPTY STATE
 ===================================================== */
@@ -281,10 +303,9 @@ padding: 40px 0;
 }
 
 /* =====================================================
-RESPONSIVE DESIGN
+RESPONSIVE
 ===================================================== */
 
-/* Tablet */
 @media (max-width: 1024px) {
 .composer-wrapper {
 grid-template-columns: 1fr;
@@ -295,7 +316,6 @@ order: -1;
 }
 }
 
-/* Mobile */
 @media (max-width: 640px) {
 .composer-left,
 .composer-right {
