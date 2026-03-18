@@ -159,7 +159,7 @@ return ( <div className="post-composer"> <div className="composer-wrapper">
       {/* ACTION BUTTONS (RESTORED) */}
       <div className="composer-actions">
 
-        <label className="icon-btn upload-btn tooltip" data-tooltip="Add files">
+        <label className="btn icon-btn">
           ⧉
           <input type="file" multiple onChange={handleUpload} hidden />
         </label>
