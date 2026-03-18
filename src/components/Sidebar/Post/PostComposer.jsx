@@ -206,9 +206,9 @@ return ( <div className="post-composer"> <div className="composer-wrapper">
             <p className="empty-text">
               Upload images to preview your post
             </p>  
-            
+
             <img
-              src="/public/logo/logo.png"
+              src="\public\logo\logo.png"
               alt="logo"
               className="empty-logo"
             />
