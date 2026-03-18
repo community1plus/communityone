@@ -1,5 +1,5 @@
 /* =====================================================
-SIDEBAR — COMMUNITY ONE (SYSTEM v2)
+SIDEBAR — COMMUNITY ONE (SYSTEM v3 — ALIGNED)
 ===================================================== */
 
 .sidebar {
@@ -10,10 +10,12 @@ display: flex;
 flex-direction: column;
 gap: var(--space-2);
 
-padding: var(--layout-pad);
+/* 🔥 FIXED: remove top padding drift */
+padding-left: var(--layout-pad);
 padding-right: var(--space-3);
+padding-top: 0;
 
-align-self: start; /* 🔥 aligns with content */
+align-self: start;
 }
 
 /* =====================================================
@@ -57,7 +59,6 @@ box-shadow: var(--shadow);
 VARIANTS
 ===================================================== */
 
-/* logout */
 .sidebar-item.logout {
 color: var(--accent-red);
 border-color: rgba(200, 72, 60, 0.35);

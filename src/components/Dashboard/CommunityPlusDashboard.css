@@ -1,5 +1,5 @@
 /* =====================================================
-COMMUNITY ONE — DASHBOARD (ELITE LAYOUT SYSTEM v2)
+COMMUNITY ONE — DASHBOARD (ELITE LAYOUT SYSTEM v3)
 ===================================================== */
 
 /* =====================================================
@@ -39,7 +39,9 @@ display: grid;
 grid-template-rows: auto 1fr;
 }
 
-/* ---------- MAIN GRID ---------- */
+/* =====================================================
+MAIN GRID (🔥 NOW OWNS ALL VERTICAL SPACING)
+===================================================== */
 
 .main {
 display: grid;
@@ -48,11 +50,14 @@ grid-template-columns: 240px 1fr;
 height: 100%;
 overflow: hidden;
 
-align-items: stretch; /* 🔥 FIXED */
+align-items: stretch;
+
+/* 🔥 CRITICAL FIX */
+padding-top: var(--layout-pad);
 }
 
 /* =====================================================
-SIDEBAR (ALIGNED + SYSTEMISED)
+SIDEBAR (ALIGNED)
 ===================================================== */
 
 .sidebar {
@@ -60,10 +65,12 @@ display: flex;
 flex-direction: column;
 gap: var(--space-3);
 
-padding: var(--layout-pad);
+/* 🔥 REMOVE vertical offset */
+padding-left: var(--layout-pad);
 padding-right: var(--space-3);
+padding-top: 0;
 
-align-self: start; /* 🔥 ensures perfect top alignment */
+align-self: start;
 }
 
 /* =====================================================
@@ -76,17 +83,16 @@ grid-template-columns: 420px 1fr;
 
 gap: var(--layout-gap);
 
-padding: var(--layout-pad);
-padding-left: 0; /* sidebar owns left spacing */
+/* 🔥 FIXED — no top padding */
+padding: 0 var(--layout-pad) var(--layout-pad) 0;
 
 height: 100%;
 min-height: 0;
 box-sizing: border-box;
 
-align-items: start; /* 🔥 column alignment */
+align-items: start;
 }
 
-/* ensure both columns snap to same baseline */
 .content-area > * {
 align-self: start;
 }
@@ -128,7 +134,9 @@ min-height: 0;
 overflow: hidden;
 }
 
-/* ---------- FEED CARD ---------- */
+/* =====================================================
+FEED CARD
+===================================================== */
 
 .feed-card {
 border: 1px solid var(--line);
@@ -191,7 +199,7 @@ color: var(--text-muted);
 }
 
 /* =====================================================
-COMPOSER VIEW (CENTERED + CONSISTENT)
+COMPOSER VIEW
 ===================================================== */
 
 .composer-view {
