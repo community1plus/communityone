@@ -206,7 +206,5 @@ return ( <div className="post-composer"> {/* ✅ FIXED WRAPPER */}
 
   </div>
 </div>
-```
-
 );
 }
