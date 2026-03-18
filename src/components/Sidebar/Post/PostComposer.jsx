@@ -2,193 +2,207 @@ import React, { useState } from "react";
 import "./PostComposer.css";
 
 export default function PostComposer({ setActiveView }) {
-  const [title, setTitle] = useState("");
-  const [summary, setSummary] = useState("");
-  const [files, setFiles] = useState([]);
-  const [previewMode, setPreviewMode] = useState(false);
+const [title, setTitle] = useState("");
+const [summary, setSummary] = useState("");
+const [files, setFiles] = useState([]);
+const [previewMode, setPreviewMode] = useState(false);
 
-  // HANDLE MULTIPLE FILES
-  const handleUpload = (e) => {
-    const selectedFiles = Array.from(e.target.files);
+// HANDLE MULTIPLE FILES
+const handleUpload = (e) => {
+const selectedFiles = Array.from(e.target.files);
 
-    const mappedFiles = selectedFiles.map((file) => ({
-      file,
-      url: URL.createObjectURL(file),
-      id: crypto.randomUUID(),
-    }));
+```
+const mappedFiles = selectedFiles.map((file) => ({
+  file,
+  url: URL.createObjectURL(file),
+  id: crypto.randomUUID(),
+}));
 
-    // prevent duplicate filenames
-    setFiles((prev) => {
-      const existing = new Set(prev.map((f) => f.file.name));
-      const filtered = mappedFiles.filter(
-        (f) => !existing.has(f.file.name)
-      );
-      return [...prev, ...filtered];
-    });
-  };
+// prevent duplicate filenames
+setFiles((prev) => {
+  const existing = new Set(prev.map((f) => f.file.name));
+  const filtered = mappedFiles.filter(
+    (f) => !existing.has(f.file.name)
+  );
+  return [...prev, ...filtered];
+});
+```
 
-  // DELETE FILE
-  const handleDelete = (id) => {
-    setFiles((prev) => prev.filter((f) => f.id !== id));
-  };
+};
 
-  const resetForm = () => {
-    setTitle("");
-    setSummary("");
-    setFiles([]);
-    setPreviewMode(false);
-  };
+// DELETE FILE
+const handleDelete = (id) => {
+setFiles((prev) => prev.filter((f) => f.id !== id));
+};
 
-  return (
-    <div className="composer-wrapper">
-      
-      {/* LEFT SIDE */}
-      <div className="composer-left">
-        <h2 className="composer-title">Create a Post</h2>
+const resetForm = () => {
+setTitle("");
+setSummary("");
+setFiles([]);
+setPreviewMode(false);
+};
 
-        <label className="composer-label">Title</label>
+return ( <div className="composer-wrapper">
+
+```
+  {/* LEFT SIDE */}
+  <div className="composer-left">
+    <h2 className="composer-title">Create a Post</h2>
+
+    <label className="composer-label">Title</label>
+    <input
+      className="composer-input"
+      value={title}
+      onChange={(e) => setTitle(e.target.value)}
+      placeholder="Enter a short headline..."
+    />
+
+    <label className="composer-label">Summary</label>
+    <textarea
+      className="composer-textarea"
+      value={summary}
+      onChange={(e) => setSummary(e.target.value)}
+      placeholder="Write a brief description..."
+    />
+
+    {/* ACTION BUTTONS */}
+    <div className="composer-actions">
+
+      {/* Upload */}
+      <label
+        className="icon-btn upload-btn tooltip"
+        data-tooltip="Add files"
+      >
+        ⧉
         <input
-          className="composer-input"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Enter a short headline..."
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={handleUpload}
+          hidden
         />
+      </label>
 
-        <label className="composer-label">Summary</label>
-        <textarea
-          className="composer-textarea"
-          value={summary}
-          onChange={(e) => setSummary(e.target.value)}
-          placeholder="Write a brief description..."
-        />
+      {/* Preview */}
+      <button
+        className="icon-btn preview-btn tooltip"
+        data-tooltip="Preview post"
+        onClick={() => setPreviewMode(true)}
+      >
+        ◉
+      </button>
 
-        {/* ACTION BUTTONS */}
-        <div className="composer-actions">
+      {/* Reset */}
+      <button
+        className="icon-btn reset-btn tooltip"
+        data-tooltip="Reset form"
+        onClick={resetForm}
+      >
+        ↺
+      </button>
 
-          {/* Upload */}
-          <label
-            className="icon-btn upload-btn tooltip"
-            data-tooltip="Add files"
-          >
-            ⧉
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={handleUpload}
-              hidden
-            />
-          </label>
+      {/* Cancel */}
+      <button
+        className="icon-btn cancel-btn tooltip"
+        data-tooltip="Cancel"
+        onClick={() => {
+          resetForm();
+          setActiveView("dashboard");
+        }}
+      >
+        ×
+      </button>
+    </div>
+  </div>
 
-          {/* Preview */}
-          <button
-            className="icon-btn preview-btn tooltip"
-            data-tooltip="Preview post"
-            onClick={() => setPreviewMode(true)}
-          >
-            ◉
-          </button>
+  {/* RIGHT SIDE */}
+  <div className="composer-right">
+    <h3 className="preview-title">
+      {previewMode ? "Live Preview" : "Uploaded Files"}
+    </h3>
 
-          {/* Reset */}
-          <button
-            className="icon-btn reset-btn tooltip"
-            data-tooltip="Reset form"
-            onClick={resetForm}
-          >
-            ↺
-          </button>
+    <div className="preview-scroll">
 
-          {/* Cancel */}
-          <button
-            className="icon-btn cancel-btn tooltip"
-            data-tooltip="Cancel"
-            onClick={() => {
-              resetForm();
-              setActiveView("dashboard");
-            }}
-          >
-            ×
-          </button>
+      {/* EMPTY STATE */}
+      {!previewMode && files.length === 0 && (
+        <div className="empty-state">
+          No files uploaded yet
         </div>
-      </div>
+      )}
 
-      {/* RIGHT SIDE */}
-      <div className="composer-right">
-        <h3 className="preview-title">
-          {files.length > 0 && !previewMode
-            ? "Uploaded Files"
-            : "Live Preview"}
-        </h3>
+      {/* FILE LIST */}
+      {!previewMode && files.length > 0 && (
+        <div className="file-list">
+          {files.map((f) => (
+            <div key={f.id} className="file-row">
 
-        {/* FILE LIST */}
-        {files.length > 0 && !previewMode && (
-          <div className="file-list">
-            {files.map((f) => (
-              <div key={f.id} className="file-row">
+              <span className="file-name">
+                {f.file.name}
+              </span>
 
-                {/* FILE NAME */}
-                <span className="file-name">
-                  {f.file.name}
-                </span>
+              <div className="file-actions">
 
-                {/* ACTIONS */}
-                <div className="file-actions">
+                <button
+                  className="file-btn preview tooltip"
+                  data-tooltip="Preview file"
+                  onClick={() => window.open(f.url, "_blank")}
+                >
+                  👁
+                </button>
 
-                  {/* PREVIEW */}
-                  <button
-                    className="file-btn preview tooltip"
-                    data-tooltip="Preview file"
-                    onClick={() => window.open(f.url, "_blank")}
-                  >
-                    👁
-                  </button>
+                <button
+                  className="file-btn delete tooltip"
+                  data-tooltip="Remove file"
+                  onClick={() => handleDelete(f.id)}
+                >
+                  ×
+                </button>
 
-                  {/* DELETE */}
-                  <button
-                    className="file-btn delete tooltip"
-                    data-tooltip="Remove file"
-                    onClick={() => handleDelete(f.id)}
-                  >
-                    ×
-                  </button>
-
-                </div>
               </div>
-            ))}
-          </div>
-        )}
+            </div>
+          ))}
+        </div>
+      )}
 
-        {/* PREVIEW MODE */}
-        {previewMode && (
-          <div className="preview-card">
+      {/* PREVIEW MODE */}
+      {previewMode && (
+        <div className="preview-card">
 
-            {/* LOGO */}
-            <img
-              src="/logo/logo.png"
-              alt="logo-preview"
-              className="preview-img primary-logo"
-            />
+          <img
+            src="/logo/logo.png"
+            alt="logo-preview"
+            className="preview-img primary-logo"
+          />
 
-            {/* IMAGES */}
-            {files.map((f) => (
+          {files.length > 0 ? (
+            files.map((f) => (
               <img
                 key={f.id}
                 src={f.url}
                 alt="preview"
                 className="preview-img"
               />
-            ))}
+            ))
+          ) : (
+            <div className="empty-state">
+              No images to preview
+            </div>
+          )}
 
-            <h4 className="preview-card-title">
-              {title || "Untitled Post"}
-            </h4>
+          <h4 className="preview-card-title">
+            {title || "Untitled Post"}
+          </h4>
 
-            <p className="preview-card-text">
-              {summary || "No summary added yet."}
-            </p>
-          </div>
-        )}
-      </div>
+          <p className="preview-card-text">
+            {summary || "No summary added yet."}
+          </p>
+        </div>
+      )}
+
     </div>
-  );
+  </div>
+</div>
+```
+
+);
 }

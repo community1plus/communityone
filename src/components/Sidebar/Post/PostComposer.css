@@ -1,345 +1,397 @@
 /* =====================================================
-   POST COMPOSER — PREMIUM UI
+POST COMPOSER — PREMIUM UI
 ===================================================== */
 
 .post-composer {
-  display: grid;
-  grid-template-columns: 1.4fr 1fr;
-  gap: 32px;
-  width: 100%;
-  height: 100%;
-  min-width: 0;
+display: grid;
+grid-template-columns: 1.4fr 1fr;
+gap: 32px;
+width: 100%;
+height: 100%;
+min-width: 0;
 }
 
 .composer-wrapper {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 22px;
-  width: 100%;
-  padding: 20px;
-  height: 100%;
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 22px;
+width: 100%;
+padding: 20px;
+height: 100%;
 
-  background: rgba(255, 255, 255, 0.65);
-  border: 1px solid var(--line);
-  border-radius: 22px;
+align-items: stretch; /* ✅ NEW */
 
-  backdrop-filter: blur(10px);
+background: rgba(255, 255, 255, 0.65);
+border: 1px solid var(--line);
+border-radius: 22px;
 
-  box-shadow:
-    0 10px 30px rgba(0,0,0,0.05),
-    inset 0 1px 0 rgba(255,255,255,0.5);
+backdrop-filter: blur(10px);
+
+box-shadow:
+0 10px 30px rgba(0,0,0,0.05),
+inset 0 1px 0 rgba(255,255,255,0.5);
 }
 
 /* LEFT — FORM AREA */
 .composer-left {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  width: 100%;
-  height: 100%;
+display: flex;
+flex-direction: column;
+gap: 20px;
+width: 100%;
+height: 100%;
 }
 
 .composer-title {
-  margin: 0;
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--ink);
+margin: 0;
+font-size: 20px;
+font-weight: 700;
+color: var(--ink);
 }
 
 .composer-label {
-  font-size: 13px;
-  color: var(--muted);
+font-size: 13px;
+color: var(--muted);
 }
 
 /* INPUTS */
 .composer-input,
 .composer-textarea {
-  width: 100%;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 10px 12px;
-  background: rgba(255, 255, 255, 0.7);
-  font-size: 14px;
+width: 100%;
+border: 1px solid var(--line);
+border-radius: 14px;
+padding: 10px 12px;
+background: rgba(255, 255, 255, 0.7);
+font-size: 14px;
 
-  transition: all 0.18s ease;
+transition: all 0.18s ease;
 }
 
 .composer-input:focus,
 .composer-textarea:focus {
-  outline: none;
-  border-color: var(--accent);
+outline: none;
+border-color: var(--accent);
 
-  box-shadow:
-    0 0 0 3px rgba(214,75,58,0.12);
+box-shadow:
+0 0 0 3px rgba(214,75,58,0.12);
 }
 
 .composer-textarea {
-  height: 120px;
-  resize: none;
+height: 120px;
+resize: none;
 }
 
 /* =====================================================
-   ICON BUTTONS — PREMIUM INTERACTION
+ICON BUTTONS — PREMIUM INTERACTION
 ===================================================== */
 
 .icon-btn {
-  font-size: 20px;
-  padding: 10px 14px;
-  border-radius: 14px;
-  cursor: pointer;
+font-size: 20px;
+padding: 10px 14px;
+border-radius: 14px;
+cursor: pointer;
 
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.6);
+border: 1px solid var(--line);
+background: rgba(255, 255, 255, 0.6);
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+display: flex;
+align-items: center;
+justify-content: center;
 
-  transition: all 0.18s ease;
+transition: all 0.18s ease;
 }
 
 /* hover lift */
 .icon-btn:hover {
-  transform: translateY(-2px);
-  background: rgba(255, 255, 255, 0.85);
+transform: translateY(-2px);
+background: rgba(255, 255, 255, 0.85);
 
-  box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+box-shadow: 0 8px 18px rgba(0,0,0,0.08);
 }
 
 /* click feedback */
 .icon-btn:active {
-  transform: scale(0.95);
+transform: scale(0.95);
 }
 
 .upload-btn {
-  color: var(--accent);
+color: var(--accent);
 }
 
 .preview-btn {
-  color: var(--accent-2);
+color: var(--accent-2);
 }
 
 .cancel-btn {
-  color: #c23b2e;
+color: #c23b2e;
 }
 
 .composer-actions {
-  display: flex;
-  gap: 12px;
-  margin-top: 8px;
+display: flex;
+gap: 12px;
+margin-top: 8px;
 }
 
 /* =====================================================
-   FILE LIST — PREMIUM ATTACHMENTS UI
+FILE LIST — PREMIUM ATTACHMENTS UI
 ===================================================== */
 
 .file-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+display: flex;
+flex-direction: column;
+gap: 10px;
 }
 
 .file-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+display: flex;
+justify-content: space-between;
+align-items: center;
 
-  padding: 12px 14px;
-  border-radius: 12px;
+padding: 12px 14px;
+border-radius: 12px;
 
-  background: rgba(255,255,255,0.75);
-  border: 1px solid var(--line);
+background: rgba(255,255,255,0.75);
+border: 1px solid var(--line);
 
-  transition: all 0.15s ease;
+transition: all 0.15s ease;
 
-  animation: fadeIn 0.25s ease;
+animation: fadeIn 0.25s ease;
 }
 
 .file-row:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.06);
+transform: translateY(-1px);
+box-shadow: 0 10px 20px rgba(0,0,0,0.06);
 }
 
 .file-name {
-  font-size: 14px;
-  color: var(--ink);
-  max-width: 70%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+font-size: 14px;
+color: var(--ink);
+max-width: 70%;
+overflow: hidden;
+text-overflow: ellipsis;
+white-space: nowrap;
 }
 
 .file-actions {
-  display: flex;
-  gap: 8px;
+display: flex;
+gap: 8px;
 }
 
 .file-btn {
-  border: none;
-  background: white;
-  border-radius: 8px;
-  padding: 6px 8px;
-  cursor: pointer;
+border: none;
+background: white;
+border-radius: 8px;
+padding: 6px 8px;
+cursor: pointer;
 
-  transition: all 0.15s ease;
+transition: all 0.15s ease;
 }
 
 .file-btn:hover {
-  transform: scale(1.05);
+transform: scale(1.05);
 }
 
 .file-btn.preview:hover {
-  background: #e6f7fa;
+background: #e6f7fa;
 }
 
 .file-btn.delete:hover {
-  background: #ffe9e6;
-  color: #c23b2e;
+background: #ffe9e6;
+color: #c23b2e;
 }
 
 /* =====================================================
-   TOOLTIP — GLASS STYLE
+TOOLTIP — GLASS STYLE
 ===================================================== */
 
 .tooltip {
-  position: relative;
+position: relative;
 }
 
 .tooltip::after {
-  content: attr(data-tooltip);
-  position: absolute;
+content: attr(data-tooltip);
+position: absolute;
 
-  bottom: 125%;
-  left: 50%;
-  transform: translateX(-50%) scale(0.9);
+bottom: 125%;
+left: 50%;
+transform: translateX(-50%) scale(0.9);
 
-  background: rgba(20,20,20,0.92);
-  backdrop-filter: blur(8px);
+background: rgba(20,20,20,0.92);
+backdrop-filter: blur(8px);
 
-  color: #fff;
-  font-size: 12px;
-  padding: 6px 10px;
-  border-radius: 6px;
+color: #fff;
+font-size: 12px;
+padding: 6px 10px;
+border-radius: 6px;
 
-  white-space: nowrap;
+white-space: nowrap;
 
-  opacity: 0;
-  pointer-events: none;
-  transition: all 0.2s ease;
+opacity: 0;
+pointer-events: none;
+transition: all 0.2s ease;
 }
 
 .tooltip::before {
-  content: "";
-  position: absolute;
+content: "";
+position: absolute;
 
-  bottom: 115%;
-  left: 50%;
-  transform: translateX(-50%);
+bottom: 115%;
+left: 50%;
+transform: translateX(-50%);
 
-  border: 6px solid transparent;
-  border-top-color: rgba(20,20,20,0.92);
+border: 6px solid transparent;
+border-top-color: rgba(20,20,20,0.92);
 
-  opacity: 0;
-  transition: all 0.2s ease;
+opacity: 0;
+transition: all 0.2s ease;
 }
 
 .tooltip:hover::after,
 .tooltip:hover::before {
-  opacity: 1;
-  transform: translateX(-50%) scale(1);
+opacity: 1;
+transform: translateX(-50%) scale(1);
 }
 
 /* =====================================================
-   RIGHT — PREVIEW AREA
+RIGHT — PREVIEW AREA (IMPROVED)
 ===================================================== */
 
 .composer-right {
-  width: 100%;
-  height: 100%;
+display: flex;
+flex-direction: column;
+gap: 12px;
 
-  background: #f9f7f4;
-  border-radius: 18px;
+width: 100%;
+height: 100%;
+min-height: 0; /* ✅ critical */
 
-  box-shadow:
-    0 10px 30px rgba(0,0,0,0.05),
-    inset 0 1px 0 rgba(255,255,255,0.5);
+padding: 16px;
+
+background: #f9f7f4;
+border-radius: 18px;
+
+box-shadow:
+0 10px 30px rgba(0,0,0,0.05),
+inset 0 1px 0 rgba(255,255,255,0.5);
+}
+
+/* scroll container */
+.preview-scroll {
+display: flex;
+flex-direction: column;
+gap: 12px;
+
+overflow-y: auto;
+padding-right: 6px;
+
+min-height: 0;
+}
+
+/* clean scrollbar */
+.preview-scroll::-webkit-scrollbar {
+width: 6px;
+}
+
+.preview-scroll::-webkit-scrollbar-thumb {
+background: rgba(0,0,0,0.15);
+border-radius: 6px;
 }
 
 .preview-title {
-  margin: 0 0 12px;
-  font-size: 14px;
-  color: var(--muted);
+margin: 0;
+font-size: 13px;
+color: var(--muted);
+padding-left: 2px;
 }
 
 .preview-card {
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.7);
-  border-radius: 20px;
-  padding: 16px;
+border: 1px solid var(--line);
+background: rgba(255, 255, 255, 0.75);
+border-radius: 20px;
+padding: 14px;
 
-  box-shadow: var(--shadow-sm);
+box-shadow: var(--shadow-sm);
+
+display: flex;
+flex-direction: column;
+gap: 10px;
+}
+
+/* empty state */
+.composer-right:empty::after {
+content: "Preview will appear here";
+color: var(--muted);
+font-size: 13px;
+text-align: center;
+margin: auto;
 }
 
 /* LOGO */
 .primary-logo {
-  width: 100%;
-  border-radius: 14px;
-  margin-bottom: 12px;
+width: 100%;
+border-radius: 14px;
+margin-bottom: 12px;
 
-  background: rgba(255, 255, 255, 0.55);
-  padding: 12px;
+background: rgba(255, 255, 255, 0.55);
+padding: 12px;
 
-  box-shadow: var(--shadow-sm);
+box-shadow: var(--shadow-sm);
 
-  opacity: 0.92;
-  transition: all 0.2s ease;
+opacity: 0.92;
+transition: all 0.2s ease;
 }
 
 .primary-logo:hover {
-  opacity: 1;
-  transform: scale(1.01);
+opacity: 1;
+transform: scale(1.01);
 }
 
 /* IMAGES */
 .preview-img {
-  width: 100%;
-  border-radius: 14px;
-  margin-bottom: 12px;
+width: 100%;
+border-radius: 14px;
+margin-bottom: 12px;
 
-  background: rgba(255, 255, 255, 0.55);
-  box-shadow: var(--shadow-sm);
+background: rgba(255, 255, 255, 0.55);
+box-shadow: var(--shadow-sm);
 
-  transition: transform 0.2s ease;
+transition: transform 0.2s ease;
 }
 
 .preview-img:hover {
-  transform: scale(1.01);
+transform: scale(1.01);
 }
 
 .preview-card-title {
-  font-size: 16px;
-  font-weight: 700;
-  margin: 0 0 6px;
-  color: var(--ink);
+font-size: 16px;
+font-weight: 700;
+margin: 0 0 6px;
+color: var(--ink);
 }
 
 .preview-card-text {
-  font-size: 14px;
-  color: var(--muted);
-  line-height: 1.5;
+font-size: 14px;
+color: var(--muted);
+line-height: 1.5;
 }
 
 /* =====================================================
-   ANIMATIONS
+ANIMATIONS
 ===================================================== */
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+from {
+opacity: 0;
+transform: translateY(6px);
+}
+to {
+opacity: 1;
+transform: translateY(0);
+}
+}
+
+.empty-state {
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+  padding: 40px 0;
 }
