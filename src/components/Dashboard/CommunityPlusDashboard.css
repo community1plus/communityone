@@ -229,6 +229,7 @@ padding: var(--layout-pad);
 
 .sidebar {
 display: none;
+  margin-top: calc(var(--layout-pad) + 2px);
 }
 
 .container {
