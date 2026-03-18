@@ -46,14 +46,11 @@ MAIN GRID (🔥 NOW OWNS ALL VERTICAL SPACING)
 .main {
 display: grid;
 grid-template-columns: 240px 1fr;
-
 height: 100%;
 overflow: hidden;
-
 align-items: stretch;
-
-/* 🔥 CRITICAL FIX */
-padding-top: var(--layout-pad);
+height: 100%;
+padding-top: var(--content-top-offset); /* 🔥 MASTER CONTROL */
 }
 
 /* =====================================================
@@ -80,21 +77,13 @@ CONTENT AREA
 .content-area {
 display: grid;
 grid-template-columns: 420px 1fr;
-
 gap: var(--layout-gap);
-
 /* 🔥 FIXED — no top padding */
 padding: 0 var(--layout-pad) var(--layout-pad) 0;
-
 height: 100%;
 min-height: 0;
 box-sizing: border-box;
-
 align-items: start;
-}
-
-.content-area > * {
-align-self: start;
 }
 
 /* =====================================================
@@ -204,13 +193,10 @@ COMPOSER VIEW
 
 .composer-view {
 grid-column: 1 / -1;
-
+padding: 0 var(--layout-pad) var(--layout-pad);
 display: flex;
 justify-content: center;
 align-items: flex-start;
-
-padding: var(--layout-pad);
-
 width: 100%;
 height: 100%;
 box-sizing: border-box;
@@ -229,7 +215,7 @@ padding: var(--layout-pad);
 
 .sidebar {
 display: none;
-  margin-top: calc(var(--layout-pad) + 2px);
+padding: 0 var(--space-3) 0 var(--layout-pad);
 }
 
 .container {
