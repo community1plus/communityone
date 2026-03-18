@@ -203,16 +203,17 @@ return ( <div className="post-composer"> <div className="composer-wrapper">
         {/* EMPTY STATE WITH ANIMATION */}
         {files.length === 0 ? (
           <div className="empty-preview">
-
+            <p className="empty-text">
+              Upload images to preview your post
+            </p>  
+            
             <img
-              src="/public/logo.png"
+              src="/public/logo/logo.png"
               alt="logo"
               className="empty-logo"
             />
 
-            <p className="empty-text">
-              Upload images to preview your post
-            </p>
+            
 
           </div>
         ) : (
