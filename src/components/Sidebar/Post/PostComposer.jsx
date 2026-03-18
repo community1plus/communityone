@@ -17,7 +17,14 @@ export default function PostComposer({ setActiveView }) {
       id: crypto.randomUUID(),
     }));
 
-    setFiles((prev) => [...prev, ...mappedFiles]);
+    // prevent duplicate filenames
+    setFiles((prev) => {
+      const existing = new Set(prev.map((f) => f.file.name));
+      const filtered = mappedFiles.filter(
+        (f) => !existing.has(f.file.name)
+      );
+      return [...prev, ...filtered];
+    });
   };
 
   // DELETE FILE
@@ -35,7 +42,7 @@ export default function PostComposer({ setActiveView }) {
   return (
     <div className="composer-wrapper">
       
-      {/* LEFT SIDE — FORM */}
+      {/* LEFT SIDE */}
       <div className="composer-left">
         <h2 className="composer-title">Create a Post</h2>
 
@@ -58,10 +65,10 @@ export default function PostComposer({ setActiveView }) {
         {/* ACTION BUTTONS */}
         <div className="composer-actions">
 
-          {/* Upload Button */}
+          {/* Upload */}
           <label
-            className="icon-btn upload-btn"
-            title="Add files"
+            className="icon-btn upload-btn tooltip"
+            data-tooltip="Add files"
           >
             ⧉
             <input
@@ -73,10 +80,10 @@ export default function PostComposer({ setActiveView }) {
             />
           </label>
 
-          {/* Preview Button */}
+          {/* Preview */}
           <button
-            className="icon-btn preview-btn"
-            title="Preview post"
+            className="icon-btn preview-btn tooltip"
+            data-tooltip="Preview post"
             onClick={() => setPreviewMode(true)}
           >
             ◉
@@ -84,8 +91,8 @@ export default function PostComposer({ setActiveView }) {
 
           {/* Reset */}
           <button
-            className="icon-btn reset-btn"
-            title="Reset form"
+            className="icon-btn reset-btn tooltip"
+            data-tooltip="Reset form"
             onClick={resetForm}
           >
             ↺
@@ -93,8 +100,8 @@ export default function PostComposer({ setActiveView }) {
 
           {/* Cancel */}
           <button
-            className="icon-btn cancel-btn"
-            title="Cancel and go back"
+            className="icon-btn cancel-btn tooltip"
+            data-tooltip="Cancel"
             onClick={() => {
               resetForm();
               setActiveView("dashboard");
@@ -108,30 +115,44 @@ export default function PostComposer({ setActiveView }) {
       {/* RIGHT SIDE */}
       <div className="composer-right">
         <h3 className="preview-title">
-          {files.length > 0 ? "Uploaded Files" : "Live Preview"}
+          {files.length > 0 && !previewMode
+            ? "Uploaded Files"
+            : "Live Preview"}
         </h3>
 
-        {/* FILE LIST MODE */}
-        {files.length > 0 && (
+        {/* FILE LIST */}
+        {files.length > 0 && !previewMode && (
           <div className="file-list">
             {files.map((f) => (
-              <div key={f.id} className="file-item">
-                
-                {/* IMAGE PREVIEW */}
-                <img
-                  src={f.url}
-                  alt="upload"
-                  className="file-preview"
-                />
+              <div key={f.id} className="file-row">
 
-                {/* DELETE BUTTON */}
-                <button
-                  className="file-delete"
-                  title="Remove file"
-                  onClick={() => handleDelete(f.id)}
-                >
-                  ×
-                </button>
+                {/* FILE NAME */}
+                <span className="file-name">
+                  {f.file.name}
+                </span>
+
+                {/* ACTIONS */}
+                <div className="file-actions">
+
+                  {/* PREVIEW */}
+                  <button
+                    className="file-btn preview tooltip"
+                    data-tooltip="Preview file"
+                    onClick={() => window.open(f.url, "_blank")}
+                  >
+                    👁
+                  </button>
+
+                  {/* DELETE */}
+                  <button
+                    className="file-btn delete tooltip"
+                    data-tooltip="Remove file"
+                    onClick={() => handleDelete(f.id)}
+                  >
+                    ×
+                  </button>
+
+                </div>
               </div>
             ))}
           </div>
@@ -141,14 +162,14 @@ export default function PostComposer({ setActiveView }) {
         {previewMode && (
           <div className="preview-card">
 
-            {/* STATIC LOGO */}
+            {/* LOGO */}
             <img
               src="/logo/logo.png"
               alt="logo-preview"
               className="preview-img primary-logo"
             />
 
-            {/* ALL UPLOADED IMAGES */}
+            {/* IMAGES */}
             {files.map((f) => (
               <img
                 key={f.id}
