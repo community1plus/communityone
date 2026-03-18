@@ -3,20 +3,23 @@ POST COMPOSER — PREMIUM UI (MODERN + RESPONSIVE)
 ===================================================== */
 
 .post-composer {
-  display: grid;
-  grid-template-columns: 1.4fr 1fr;
-  gap: 24px;
-  width: 100%;
-  max-width: 1200px;   /* ✅ KEY FIX */
-  margin: 0 auto;      /* ✅ centers layout */
-  padding: 20px;       /* ✅ prevents edge hugging */
-  align-items: start; /* prevents vertical stretching weirdness */
-  min-width: 0;
+width: 100%;
+max-width: 1200px;
+margin: 0 auto;
+padding: 20px;
+
+flex: 1;
+min-width: 0;
 }
 
-/* REMOVE DOUBLE GRID CONFLICT */
+/* FIXED GRID (NO MORE display: contents) */
 .composer-wrapper {
-display: contents;
+display: grid;
+grid-template-columns: 1.4fr 1fr;
+gap: 24px;
+width: 100%;
+
+align-items: start;
 }
 
 /* =====================================================
@@ -59,7 +62,7 @@ color: var(--muted);
 width: 100%;
 border: 1px solid var(--line);
 border-radius: 14px;
-padding: 10px 12px;
+padding: 12px 14px; /* improved spacing */
 background: rgba(255, 255, 255, 0.7);
 font-size: 14px;
 
@@ -70,7 +73,6 @@ transition: all 0.18s ease;
 .composer-textarea:focus {
 outline: none;
 border-color: var(--accent);
-
 box-shadow: 0 0 0 3px rgba(214,75,58,0.12);
 }
 
@@ -116,7 +118,7 @@ transform: scale(0.95);
 .composer-actions {
 display: flex;
 gap: 10px;
-margin-top: 10px;
+margin-top: 14px; /* improved spacing */
 }
 
 /* =====================================================
@@ -154,6 +156,7 @@ gap: 12px;
 
 overflow-y: auto;
 padding-right: 6px;
+padding-bottom: 6px; /* prevents cutoff */
 
 min-height: 0;
 }
@@ -283,12 +286,12 @@ RESPONSIVE DESIGN
 
 /* Tablet */
 @media (max-width: 1024px) {
-.post-composer {
+.composer-wrapper {
 grid-template-columns: 1fr;
 }
 
 .composer-right {
-order: -1; /* preview on top */
+order: -1;
 }
 }
 
