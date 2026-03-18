@@ -202,7 +202,6 @@ return ( <div className="composer-wrapper">
     </div>
   </div>
 </div>
-```
 
 );
 }
