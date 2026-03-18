@@ -9,6 +9,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;   /* THIS creates vertical spacing */
+  padding: var(--layout-pad) 0 0 var(--layout-pad);
 }
 
 /* Sidebar Buttons (polished + landing theme) */

@@ -2,6 +2,21 @@
    COMMUNITY ONE — DASHBOARD
    Fully aligned with Landing Page Theme
 ===================================================== */
+/* =====================================================
+LAYOUT SYSTEM — GLOBAL TOKENS
+===================================================== */
+
+:root {
+  --layout-gap: 24px;
+  --layout-pad: 24px;
+  --layout-max-width: 1200px;
+}
+
+.feed-column,
+.map-column,
+.composer-wrapper {
+  align-items: start;
+}
 
 .dashboard-container {
   height: 100vh;
@@ -16,6 +31,7 @@
   grid-template-columns: 240px 1fr;
   height: 100%;
   overflow: hidden;
+  align-items: start;
 }
 
 /* 2 column layout: Feed + Map */
@@ -23,8 +39,9 @@
 .content-area {
   display: grid;
   grid-template-columns: 420px 1fr;
-  gap: 24px;
-  padding: 24px;
+  gap: var(--layout-gap);
+  padding: var(--layout-pad);
+  padding-left: 0; /* 🔥 sidebar handles left spacing */
   height: 100%;
   min-height: 0;
 }
@@ -129,12 +146,12 @@
 
   .content-area {
     grid-template-columns: 1fr;
+    padding: var(--layout-pad);
   }
 
-  .feed-column {
+  .sidebar {
     display: none;
   }
-
 }
 
 @media (max-width: 720px) {
