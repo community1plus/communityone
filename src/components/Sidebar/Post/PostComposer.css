@@ -1,5 +1,5 @@
 /* =====================================================
-POST COMPOSER — ELITE SYSTEM v3 (UNIFIED PANELS)
+POST COMPOSER — ELITE SYSTEM v3 (ALIGNED + FIXED)
 ===================================================== */
 
 /* =====================================================
@@ -12,7 +12,10 @@ flex: 1;
 min-width: 0;
 }
 
-/* GRID */
+/* =====================================================
+GRID (FIXED ALIGNMENT)
+===================================================== */
+
 .composer-wrapper {
 display: grid;
 grid-template-columns: 1.4fr 1fr;
@@ -22,11 +25,11 @@ width: 100%;
 max-width: 1100px;
 margin: 0 auto;
 
-align-items: stretch;
+align-items: start; /* 🔥 FIXED (was stretch) */
 }
 
 /* =====================================================
-🧱 PANEL SYSTEM (GLOBAL REUSE)
+🧱 PANEL SYSTEM
 ===================================================== */
 
 .panel {
@@ -49,11 +52,10 @@ LEFT PANEL
 display: flex;
 flex-direction: column;
 gap: var(--space-3);
-padding: var(--space-4);
 
+padding: var(--space-4); /* 🔥 unified padding */
 height: 100%;
 
-/* apply panel manually */
 background: rgba(255, 255, 255, 0.65);
 border: 1px solid var(--line);
 border-radius: 22px;
@@ -63,6 +65,14 @@ box-shadow:
 inset 0 1px 0 rgba(255,255,255,0.5);
 }
 
+/* remove default heading offset */
+.composer-left h1,
+.composer-left h2,
+.composer-left h3,
+.composer-left h4 {
+margin: 0;
+}
+
 /* =====================================================
 RIGHT PANEL
 ===================================================== */
@@ -70,9 +80,9 @@ RIGHT PANEL
 .composer-right {
 display: flex;
 flex-direction: column;
-gap: var(--space-2);
-padding: var(--space-3);
+gap: var(--space-3); /* 🔥 match left */
 
+padding: var(--space-4); /* 🔥 unified padding */
 height: 100%;
 
 background: #f9f7f4;
@@ -89,7 +99,7 @@ overflow: hidden;
 }
 
 /* =====================================================
-SCROLL AREA
+SCROLL AREA (FIXED ALIGNMENT)
 ===================================================== */
 
 .preview-scroll {
@@ -98,7 +108,7 @@ flex-direction: column;
 gap: var(--space-2);
 
 flex: 1;
-justify-content: center;
+justify-content: flex-start; /* 🔥 FIXED (was center) */
 
 overflow-y: auto;
 padding-right: 6px;
@@ -108,7 +118,7 @@ min-height: 0;
 }
 
 /* =====================================================
-✨ EMPTY STATE (PREMIUM)
+✨ EMPTY STATE
 ===================================================== */
 
 .empty-preview {
@@ -205,7 +215,7 @@ background: rgba(214,75,58,0.05);
 }
 
 /* =====================================================
-BUTTONS (DEDUPED)
+BUTTONS
 ===================================================== */
 
 .icon-btn {
