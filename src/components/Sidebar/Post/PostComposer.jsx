@@ -14,7 +14,6 @@ return new Promise((resolve) => {
 const img = new Image();
 const reader = new FileReader();
 
-```
   reader.onload = (e) => {
     img.src = e.target.result;
   };
@@ -38,8 +37,6 @@ const reader = new FileReader();
 
   reader.readAsDataURL(file);
 });
-```
-
 };
 
 const processFiles = async (selectedFiles) => {
@@ -47,7 +44,6 @@ const compressed = await Promise.all(
 selectedFiles.map((file) => compressImage(file))
 );
 
-```
 const mappedFiles = compressed.map((file) => ({
   file,
   url: URL.createObjectURL(file),
@@ -73,7 +69,6 @@ mappedFiles.forEach((f) => {
 });
 
 setPreviewMode(true);
-```
 
 };
 
@@ -104,20 +99,18 @@ const handleDropReorder = (e, index) => {
 const from = e.dataTransfer.getData("index");
 if (from === null) return;
 
-```
 setFiles((prev) => {
   const updated = [...prev];
   const [moved] = updated.splice(from, 1);
   updated.splice(index, 0, moved);
   return updated;
 });
-```
 
 };
 
 return ( <div className="post-composer"> <div className="composer-wrapper">
 
-```
+
     {/* LEFT */}
     <div className="composer-left">
 
