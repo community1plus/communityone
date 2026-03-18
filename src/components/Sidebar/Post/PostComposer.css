@@ -3,12 +3,15 @@ POST COMPOSER — PREMIUM UI (MODERN + RESPONSIVE)
 ===================================================== */
 
 .post-composer {
-display: grid;
-grid-template-columns: 1.4fr 1fr;
-gap: 24px;
-width: 100%;
-height: 100%;
-min-width: 0;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 24px;
+  width: 100%;
+  max-width: 1200px;   /* ✅ KEY FIX */
+  margin: 0 auto;      /* ✅ centers layout */
+  padding: 20px;       /* ✅ prevents edge hugging */
+  align-items: start; /* prevents vertical stretching weirdness */
+  min-width: 0;
 }
 
 /* REMOVE DOUBLE GRID CONFLICT */
