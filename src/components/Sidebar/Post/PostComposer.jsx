@@ -8,56 +8,67 @@ const [files, setFiles] = useState([]);
 const [previewMode, setPreviewMode] = useState(false);
 const [dragActive, setDragActive] = useState(false);
 
-// COMPRESS IMAGE
+/* =====================================================
+IMAGE COMPRESSION
+===================================================== */
+
 const compressImage = (file) => {
 return new Promise((resolve) => {
-const img = new Image();
-const reader = new FileReader();
+if (!file.type.startsWith("image/")) return resolve(file);
 
+```
+  const img = new Image();
+  const reader = new FileReader();
 
-  reader.onload = (e) => {
-    img.src = e.target.result;
-  };
+  reader.onload = (e) => (img.src = e.target.result);
 
   img.onload = () => {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
 
     const maxWidth = 1200;
-    const scale = maxWidth / img.width;
+    const scale = Math.min(maxWidth / img.width, 1);
 
-    canvas.width = maxWidth;
+    canvas.width = img.width * scale;
     canvas.height = img.height * scale;
 
     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
     canvas.toBlob((blob) => {
       resolve(new File([blob], file.name, { type: "image/jpeg" }));
-    }, "image/jpeg", 0.7);
+    }, "image/jpeg", 0.75);
   };
 
   reader.readAsDataURL(file);
 });
+```
 
 };
 
+/* =====================================================
+FILE PROCESSING
+===================================================== */
+
 const processFiles = async (selectedFiles) => {
+if (!selectedFiles?.length) return;
+
+```
 const compressed = await Promise.all(
-selectedFiles.map((file) => compressImage(file))
+  selectedFiles.map((file) => compressImage(file))
 );
 
-
-const mappedFiles = compressed.map((file) => ({
+const mapped = compressed.map((file) => ({
   file,
   url: URL.createObjectURL(file),
   id: crypto.randomUUID(),
   progress: 0,
 }));
 
-setFiles((prev) => [...prev, ...mappedFiles]);
+setFiles((prev) => [...prev, ...mapped]);
+setPreviewMode(true);
 
-// simulate upload progress
-mappedFiles.forEach((f) => {
+// simulate upload
+mapped.forEach((f) => {
   const interval = setInterval(() => {
     setFiles((prev) =>
       prev.map((p) =>
@@ -70,11 +81,13 @@ mappedFiles.forEach((f) => {
 
   setTimeout(() => clearInterval(interval), 1200);
 });
-
-setPreviewMode(true);
-
+```
 
 };
+
+/* =====================================================
+EVENTS
+===================================================== */
 
 const handleUpload = (e) => {
 processFiles(Array.from(e.target.files));
@@ -94,7 +107,6 @@ return prev.filter((f) => f.id !== id);
 });
 };
 
-// DRAG REORDER
 const handleDragStart = (e, index) => {
 e.dataTransfer.setData("index", index);
 };
@@ -103,14 +115,14 @@ const handleDropReorder = (e, index) => {
 const from = e.dataTransfer.getData("index");
 if (from === null) return;
 
-
+```
 setFiles((prev) => {
   const updated = [...prev];
   const [moved] = updated.splice(from, 1);
   updated.splice(index, 0, moved);
   return updated;
 });
-
+```
 
 };
 
@@ -122,8 +134,13 @@ setSummary("");
 setPreviewMode(false);
 };
 
+/* =====================================================
+UI
+===================================================== */
+
 return ( <div className="post-composer"> <div className="composer-wrapper">
 
+```
     {/* LEFT */}
     <div className="composer-left">
 
@@ -143,8 +160,8 @@ return ( <div className="post-composer"> <div className="composer-wrapper">
         placeholder="Write something..."
       />
 
-      {/* DROP ZONE */}
-      <div
+      {/* 🔥 PREMIUM DROP ZONE */}
+      <label
         className={`drop-zone ${dragActive ? "active" : ""}`}
         onDragOver={(e) => {
           e.preventDefault();
@@ -153,10 +170,24 @@ return ( <div className="post-composer"> <div className="composer-wrapper">
         onDragLeave={() => setDragActive(false)}
         onDrop={handleDrop}
       >
-        Drag & drop images or click upload
-      </div>
+        <div className="drop-zone-inner">
+          <span className="drop-title">
+            Drag & drop images
+          </span>
+          <span className="drop-sub">
+            or click to upload
+          </span>
+        </div>
 
-      {/* ACTION BUTTONS (RESTORED) */}
+        <input
+          type="file"
+          multiple
+          onChange={handleUpload}
+          hidden
+        />
+      </label>
+
+      {/* ACTIONS */}
       <div className="composer-actions">
 
         <label className="btn icon-btn">
@@ -165,24 +196,21 @@ return ( <div className="post-composer"> <div className="composer-wrapper">
         </label>
 
         <button
-          className="icon-btn preview-btn tooltip"
-          data-tooltip="Preview post"
+          className="icon-btn preview-btn"
           onClick={() => setPreviewMode(true)}
         >
           ◉
         </button>
 
         <button
-          className="icon-btn reset-btn tooltip"
-          data-tooltip="Reset form"
+          className="icon-btn reset-btn"
           onClick={resetForm}
         >
           ↺
         </button>
 
         <button
-          className="icon-btn cancel-btn tooltip"
-          data-tooltip="Cancel"
+          className="icon-btn cancel-btn"
           onClick={() => {
             resetForm();
             setActiveView("dashboard");
@@ -200,25 +228,23 @@ return ( <div className="post-composer"> <div className="composer-wrapper">
 
       <div className="preview-scroll">
 
-        {/* EMPTY STATE WITH ANIMATION */}
         {files.length === 0 ? (
-          <div className="empty-preview">
+
+          <div className="empty-preview fade-in">
             <p className="empty-text">
               Upload images to preview your post
-            </p>  
+            </p>
 
             <img
               src="/logo/logo.png"
               alt="logo"
               className="empty-logo"
             />
-
-            
-
           </div>
+
         ) : (
 
-          <div className="preview-grid">
+          <div className="preview-grid fade-in">
 
             {files.map((f, index) => (
               <div
@@ -259,6 +285,7 @@ return ( <div className="post-composer"> <div className="composer-wrapper">
 
   </div>
 </div>
+```
 
 );
 }

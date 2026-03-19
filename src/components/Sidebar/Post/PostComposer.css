@@ -1,5 +1,5 @@
 /* =====================================================
-POST COMPOSER — ELITE SYSTEM v3 (ALIGNED + FIXED)
+POST COMPOSER — ELITE SYSTEM v4 (FINAL POLISH)
 ===================================================== */
 
 /* =====================================================
@@ -10,6 +10,8 @@ BASE
 width: 100%;
 flex: 1;
 min-width: 0;
+display: flex;
+height: 100%;
 }
 
 /* =====================================================
@@ -25,7 +27,8 @@ width: 100%;
 max-width: 1100px;
 margin: 0 auto;
 
-align-items: start; /* 🔥 FIXED (was stretch) */
+height: 100%;
+align-items: start;
 }
 
 /* =====================================================
@@ -53,19 +56,20 @@ display: flex;
 flex-direction: column;
 gap: var(--space-3);
 
-padding: var(--space-4); /* 🔥 unified padding */
+padding: var(--space-4);
 height: 100%;
 
 background: rgba(255, 255, 255, 0.65);
 border: 1px solid var(--line);
 border-radius: 22px;
+
 backdrop-filter: blur(10px);
+
 box-shadow:
 0 10px 30px rgba(0,0,0,0.05),
 inset 0 1px 0 rgba(255,255,255,0.5);
 }
 
-/* remove default heading offset */
 .composer-left h1,
 .composer-left h2,
 .composer-left h3,
@@ -80,9 +84,9 @@ RIGHT PANEL
 .composer-right {
 display: flex;
 flex-direction: column;
-gap: var(--space-3); /* 🔥 match left */
+gap: var(--space-3);
 
-padding: var(--space-4); /* 🔥 unified padding */
+padding: var(--space-4);
 height: 100%;
 
 background: #f9f7f4;
@@ -99,7 +103,7 @@ overflow: hidden;
 }
 
 /* =====================================================
-SCROLL AREA (FIXED ALIGNMENT)
+SCROLL AREA
 ===================================================== */
 
 .preview-scroll {
@@ -108,7 +112,7 @@ flex-direction: column;
 gap: var(--space-2);
 
 flex: 1;
-justify-content: flex-start; /* 🔥 FIXED (was center) */
+justify-content: flex-start;
 
 overflow-y: auto;
 padding-right: 6px;
@@ -162,7 +166,7 @@ animation: floatLogo 3.2s ease-in-out infinite;
 }
 
 .empty-text {
-font-size: 13px;
+font-size: var(--text-sm);
 color: var(--muted);
 }
 
@@ -177,9 +181,11 @@ border: 1px solid var(--line);
 border-radius: 14px;
 padding: var(--space-3);
 background: rgba(255, 255, 255, 0.7);
-font-size: 14px;
+font-size: var(--text-md);
 
-transition: all 0.18s ease;
+transition:
+border-color var(--dur-fast),
+box-shadow var(--dur-fast);
 }
 
 .composer-input:focus,
@@ -195,23 +201,49 @@ resize: none;
 }
 
 /* =====================================================
-DROP ZONE
+🔥 DROP ZONE (PREMIUM)
 ===================================================== */
 
 .drop-zone {
+position: relative;
+overflow: hidden;
+
 border: 2px dashed var(--line);
 border-radius: 14px;
 padding: var(--space-4);
+
 text-align: center;
-font-size: 13px;
+font-size: var(--text-sm);
 color: var(--muted);
 
-transition: all 0.2s ease;
+transition:
+transform var(--dur-fast) var(--ease-out),
+box-shadow var(--dur-fast),
+border-color var(--dur-fast);
 }
 
 .drop-zone.active {
+transform: scale(1.02);
 border-color: var(--accent);
-background: rgba(214,75,58,0.05);
+
+box-shadow:
+0 0 0 3px rgba(200,72,60,0.12),
+0 8px 24px rgba(0,0,0,0.08);
+}
+
+.drop-zone.active::after {
+content: "";
+position: absolute;
+inset: 0;
+
+background: radial-gradient(
+circle,
+rgba(200,72,60,0.15),
+transparent 70%
+);
+
+animation: dropGlow 1.6s infinite;
+pointer-events: none;
 }
 
 /* =====================================================
@@ -231,17 +263,18 @@ display: flex;
 align-items: center;
 justify-content: center;
 
-transition: all 0.18s ease;
+transition:
+transform var(--dur-fast) var(--ease-bounce),
+box-shadow var(--dur-fast);
 }
 
 .icon-btn:hover {
-transform: translateY(-2px);
-background: rgba(255, 255, 255, 0.85);
-box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+transform: translateY(-2px) scale(1.05);
+box-shadow: var(--shadow-sm);
 }
 
 .icon-btn:active {
-transform: scale(0.95);
+transform: scale(0.92);
 }
 
 .upload-btn { color: var(--accent); }
@@ -267,6 +300,20 @@ gap: var(--space-1);
 .preview-grid-item {
 position: relative;
 cursor: grab;
+
+transition:
+transform var(--dur-base) var(--ease-out),
+box-shadow var(--dur-base);
+}
+
+/* NEW upload animation */
+.preview-grid-item.new {
+animation: imageIn 0.4s var(--ease-bounce);
+}
+
+.preview-grid-item:hover {
+transform: scale(1.04);
+box-shadow: var(--shadow-md);
 }
 
 .preview-grid-img {
@@ -281,12 +328,24 @@ border-radius: 10px;
 position: absolute;
 top: 6px;
 right: 6px;
+
 background: rgba(0,0,0,0.6);
 color: white;
+
 border: none;
 border-radius: 6px;
 padding: 2px 6px;
+
 cursor: pointer;
+
+transition:
+transform var(--dur-fast),
+background var(--dur-fast);
+}
+
+.delete-overlay:hover {
+transform: scale(1.15);
+background: rgba(200,72,60,0.9);
 }
 
 /* PROGRESS */
@@ -295,6 +354,7 @@ position: absolute;
 bottom: 4px;
 left: 4px;
 right: 4px;
+
 height: 4px;
 background: rgba(0,0,0,0.1);
 border-radius: 4px;
@@ -347,4 +407,24 @@ ANIMATIONS
 0% { transform: scale(0.9); opacity: 0.5; }
 50% { transform: scale(1.15); opacity: 0.9; }
 100% { transform: scale(0.9); opacity: 0.5; }
+}
+
+@keyframes dropGlow {
+0% { opacity: 0.4; transform: scale(0.9); }
+50% { opacity: 0.9; transform: scale(1.05); }
+100% { opacity: 0.4; transform: scale(0.9); }
+}
+
+@keyframes imageIn {
+0% {
+opacity: 0;
+transform: scale(0.85);
+}
+60% {
+opacity: 1;
+transform: scale(1.05);
+}
+100% {
+transform: scale(1);
+}
 }

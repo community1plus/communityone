@@ -1,106 +1,65 @@
 /* =====================================================
-COMMUNITY ONE — GLOBAL THEME (v2 ELITE SYSTEM)
+COMMUNITY ONE — GLOBAL THEME (v3 FINAL SYSTEM)
+Theme + Motion + Skeleton
 ===================================================== */
 
 /* =====================================================
-TOKENS (UNIFIED + NORMALISED)
+GLOBAL TOKENS
 ===================================================== */
 
 :root {
-
-/* ================= BRAND ================= */
-
+/* BRAND */
 --brand: #0A7F72;
---brand-strong: #0A7F72;
 --brand-soft: #E0F2F0;
 
 --accent: #C8483C;
 --accent-red: #C8483C;
 --accent-red-soft: #F6E9E6;
 
-/* ================= BACKGROUND ================= */
-
---bg-gradient-top: #FDF9F7;
---bg-gradient-bottom: #F4ECE8;
+/* BACKGROUND */
 --bg: #F6F3EE;
 
-/* ================= SURFACES ================= */
-
+/* SURFACE */
 --surface: #FFFFFF;
 --surface-soft: #FCF9F8;
---surface-elevated: rgba(255,255,255,0.75);
 
-/* ================= BORDERS ================= */
+/* BORDERS */
+--line: #E5DAD3;
 
---line: #E5DAD3;            /* 🔥 unified */
---line-strong: #D9C9C0;
-
-/* ================= TEXT ================= */
-
---ink: #2C2C2C;             /* 🔥 primary text */
+/* TEXT */
+--ink: #2C2C2C;
 --muted: #6F6A67;
---text-accent: #C8483C;
 
-/* ================= RADII ================= */
-
+/* RADII */
 --radius-sm: 6px;
 --radius-md: 10px;
 --radius-lg: 18px;
 
-/* ================= SHADOWS ================= */
+/* SHADOWS (OPTIMISED) */
+--shadow-sm: 0 2px 6px rgba(0,0,0,0.06);
+--shadow-md: 0 6px 18px rgba(0,0,0,0.12);
+--shadow-lg: 0 12px 28px rgba(0,0,0,0.16);
 
---shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
---shadow-md: 0 4px 12px rgba(0,0,0,0.12);
---shadow-lg: 0 10px 30px rgba(0,0,0,0.08);
+/* MOTION */
+--ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+--ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+--ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
 
-/* ================= TRANSITIONS ================= */
-
---transition-fast: 0.15s ease;
---transition-base: 0.25s ease;
-
-/* ================= LAYOUT ================= */
-
---header-height: 70px;
---nav-height: 36px;
---sidebar-width: 240px;
-
-/* =====================================================
-TYPOGRAPHY SYSTEM (MERGED)
-===================================================== */
-
---font-sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-
---fw-regular: 400;
---fw-medium: 500;
---fw-semibold: 600;
---fw-bold: 700;
-
---text-xs: 12px;
---text-sm: 13px;
---text-md: 14px;
---text-lg: 16px;
---text-xl: 18px;
---text-2xl: 20px;
---text-3xl: 24px;
-
---lh-tight: 1.2;
---lh-normal: 1.4;
---lh-relaxed: 1.6;
-
---tracking-tight: -0.01em;
+--dur-fast: 120ms;
+--dur-base: 180ms;
+--dur-slow: 260ms;
 }
 
 /* =====================================================
-RESET (CLEAN + MODERN)
+RESET
 ===================================================== */
 
-*,
-*::before,
-*::after {
-box-sizing: border-box;
-}
+* {
+  box-sizing: border-box;
+  }
 
-html, body {
+html,
+body {
 height: 100%;
 margin: 0;
 
@@ -109,20 +68,10 @@ color: var(--ink);
 
 font-family: var(--font-sans);
 font-size: var(--text-md);
-line-height: var(--lh-normal);
 letter-spacing: var(--tracking-tight);
 
 -webkit-font-smoothing: antialiased;
 }
-
-/* remove default margins */
-h1, h2, h3, h4, p {
-margin: 0;
-}
-
-/* =====================================================
-BASE ELEMENTS
-===================================================== */
 
 button {
 background: none;
@@ -141,73 +90,185 @@ display: none !important;
 }
 
 /* =====================================================
-TYPOGRAPHY CLASSES (SYSTEM)
+INTERACTION BASE
 ===================================================== */
 
-.h1 {
-font-size: var(--text-3xl);
-font-weight: var(--fw-bold);
-}
-
-.h2 {
-font-size: var(--text-2xl);
-font-weight: var(--fw-semibold);
-}
-
-.h3 {
-font-size: var(--text-xl);
-font-weight: var(--fw-semibold);
-}
-
-.h4 {
-font-size: var(--text-lg);
-font-weight: var(--fw-medium);
-}
-
-.text-body {
-font-size: var(--text-md);
-line-height: var(--lh-relaxed);
-}
-
-.text-label {
-font-size: var(--text-sm);
-font-weight: var(--fw-medium);
-color: var(--muted);
-}
-
-.text-meta {
-font-size: var(--text-xs);
-color: var(--muted);
+.interactive {
+transition:
+transform var(--dur-base) var(--ease-out),
+box-shadow var(--dur-base) var(--ease-out),
+background var(--dur-fast) var(--ease-out);
 }
 
 /* =====================================================
-SURFACE SYSTEM (NEW 🔥)
+BUTTONS
 ===================================================== */
 
-.surface {
-background: var(--surface);
-border: 1px solid var(--line);
-border-radius: var(--radius-lg);
-box-shadow: var(--shadow-sm);
+.icon-btn {
+display: inline-flex;
+align-items: center;
+justify-content: center;
+
+transition:
+transform var(--dur-fast) var(--ease-bounce),
+box-shadow var(--dur-fast) var(--ease-out),
+background var(--dur-fast) var(--ease-out);
 }
 
-.surface-soft {
-background: var(--surface-soft);
+.icon-btn:hover {
+transform: translateY(-2px) scale(1.02);
 }
 
-.surface-elevated {
-background: var(--surface-elevated);
+.icon-btn:active {
+transform: scale(0.94);
+}
+
+/* =====================================================
+CARDS / PANELS
+===================================================== */
+
+.feed-card,
+.panel {
+transition:
+transform var(--dur-base) var(--ease-out),
+box-shadow var(--dur-base) var(--ease-out);
+}
+
+.feed-card:hover {
+transform: translateY(-4px);
 box-shadow: var(--shadow-lg);
 }
 
 /* =====================================================
-UTILITY
+SIDEBAR
 ===================================================== */
 
-.flex {
-display: flex;
+.sidebar-item {
+transition:
+transform var(--dur-fast) var(--ease-bounce),
+box-shadow var(--dur-fast) var(--ease-out),
+background var(--dur-fast) var(--ease-out);
 }
 
-.grid {
-display: grid;
+.sidebar-item:hover {
+transform: translateY(-2px) scale(1.01);
+}
+
+/* =====================================================
+INPUTS
+===================================================== */
+
+.composer-input,
+.composer-textarea {
+transition:
+border-color var(--dur-fast) var(--ease-out),
+box-shadow var(--dur-fast) var(--ease-out);
+}
+
+/* =====================================================
+IMAGES
+===================================================== */
+
+.preview-grid-img {
+transition:
+transform var(--dur-base) var(--ease-out);
+}
+
+.preview-grid-item:hover .preview-grid-img {
+transform: scale(1.03);
+}
+
+/* =====================================================
+EMPTY STATE
+===================================================== */
+
+.empty-logo {
+animation: floatLogo 3.5s var(--ease-in-out) infinite;
+}
+
+/* =====================================================
+SKELETON SYSTEM (NEW)
+===================================================== */
+
+.skeleton {
+position: relative;
+overflow: hidden;
+background: #eee7e2;
+border-radius: 8px;
+}
+
+.skeleton::after {
+content: "";
+position: absolute;
+inset: 0;
+
+background: linear-gradient(
+90deg,
+transparent,
+rgba(255,255,255,0.6),
+transparent
+);
+
+transform: translateX(-100%);
+animation: shimmer 1.4s infinite;
+}
+
+@keyframes shimmer {
+100% {
+transform: translateX(100%);
+}
+}
+
+/* variants */
+.skeleton-text {
+height: 10px;
+border-radius: 6px;
+}
+
+.skeleton-title {
+height: 14px;
+width: 60%;
+border-radius: 6px;
+}
+
+.skeleton-avatar {
+width: 38px;
+height: 38px;
+border-radius: 50%;
+}
+
+.skeleton-image {
+width: 100%;
+height: 180px;
+border-radius: 14px;
+}
+
+/* spacing */
+.skeleton-gap-sm { margin-bottom: var(--space-1); }
+.skeleton-gap-md { margin-bottom: var(--space-2); }
+.skeleton-gap-lg { margin-bottom: var(--space-3); }
+
+/* =====================================================
+ANIMATIONS
+===================================================== */
+
+.fade-in {
+animation: fadeIn 0.4s var(--ease-out);
+}
+
+@keyframes fadeIn {
+from {
+opacity: 0;
+transform: translateY(6px);
+}
+to {
+opacity: 1;
+transform: translateY(0);
+}
+}
+
+@keyframes floatLogo {
+0% { transform: translateY(0px); }
+50% { transform: translateY(-10px); }
+100% { transform: translateY(0px); }
 }
