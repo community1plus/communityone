@@ -1,68 +1,118 @@
+/* =====================================================
+FEED CARD — FIXED ALIGNMENT + SYSTEM CONSISTENCY
+===================================================== */
+
+.feed-column {
+width: 100%;
+max-width: 420px;
+
+display: flex;
+flex-direction: column;
+
+align-self: start;        /* 🔥 FIX: aligns with map + sidebar */
+overflow: visible;        /* 🔥 FIX: removes clipping offset */
+}
+
+/* =====================================================
+STACK (FIXED)
+===================================================== */
+
+.feed-stack {
+display: flex;
+flex-direction: column;
+gap: var(--space-3);
+
+flex: none;               /* 🔥 FIX: prevents vertical drift */
+overflow: visible;
+}
+
+/* ensure first card starts flush */
+.feed-stack > *:first-child {
+margin-top: 0;
+}
+
+/* =====================================================
+CARD
+===================================================== */
+
 .feed-card {
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.62);
+border: 1px solid var(--line);
+background: rgba(255, 255, 255, 0.62);
 
-  border-radius: 20px;
-  padding: 14px;
+border-radius: 20px;
+padding: var(--space-3);  /* 🔥 system spacing */
 
-  box-shadow: var(--shadow-sm);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  overflow: hidden;
+box-shadow: var(--shadow-sm);
+transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+overflow: hidden;
+margin-top: 0;            /* 🔥 safety */
 }
 
 .feed-card:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-md);
+transform: translateY(-3px);
+box-shadow: var(--shadow-md);
 }
 
-/* Header */
+/* =====================================================
+HEADER
+===================================================== */
+
 .feed-card-header {
-  display: flex;
-  align-items: center;
-  margin-bottom: 10px;
+display: flex;
+align-items: center;
+margin-bottom: var(--space-2);
 }
 
 .feed-avatar {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-right: 10px;
+width: 38px;
+height: 38px;
+border-radius: 50%;
+object-fit: cover;
 
-  border: 1px solid var(--line);
-  background: #fff;
-  box-shadow: var(--shadow-xs);
+margin-right: var(--space-2);
+
+border: 1px solid var(--line);
+background: #fff;
+box-shadow: var(--shadow-sm);
 }
 
 .feed-meta {
-  display: flex;
-  flex-direction: column;
+display: flex;
+flex-direction: column;
 }
 
 .feed-name {
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--ink);
+font-size: var(--text-lg);
+font-weight: var(--fw-bold);
+color: var(--ink);
 }
 
 .feed-time {
-  font-size: 12px;
-  color: var(--muted);
-  margin-top: 2px;
+font-size: var(--text-xs);
+color: var(--muted);
+margin-top: 2px;
 }
 
-/* Text */
+/* =====================================================
+TEXT
+===================================================== */
+
 .feed-text {
-  font-size: 14px;
-  color: var(--ink);
-  line-height: 1.5;
-  margin: 8px 0 12px;
+font-size: var(--text-md);
+color: var(--ink);
+line-height: var(--lh-relaxed);
+
+margin: var(--space-2) 0 var(--space-3);
 }
 
-/* Optional Image Preview */
+/* =====================================================
+IMAGE
+===================================================== */
+
 .feed-image {
-  width: 100%;
-  border-radius: 14px;
-  box-shadow: var(--shadow-sm);
-  margin-top: 6px;
+width: 100%;
+border-radius: 14px;
+box-shadow: var(--shadow-sm);
+margin-top: var(--space-2);
 }
