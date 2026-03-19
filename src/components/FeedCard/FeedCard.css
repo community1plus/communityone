@@ -1,5 +1,5 @@
 /* =====================================================
-FEED CARD — FIXED ALIGNMENT + SYSTEM CONSISTENCY
+FEED COLUMN — FINAL (STRUCTURAL + OPTICAL ALIGNMENT)
 ===================================================== */
 
 .feed-column {
@@ -9,12 +9,14 @@ max-width: 420px;
 display: flex;
 flex-direction: column;
 
-align-self: start;        /* 🔥 FIX: aligns with map + sidebar */
-overflow: visible;        /* 🔥 FIX: removes clipping offset */
+align-self: start;
+overflow: visible;
+
+transform: translateY(-2px); /* 🔥 optical alignment */
 }
 
 /* =====================================================
-STACK (FIXED)
+STACK
 ===================================================== */
 
 .feed-stack {
@@ -22,11 +24,10 @@ display: flex;
 flex-direction: column;
 gap: var(--space-3);
 
-flex: none;               /* 🔥 FIX: prevents vertical drift */
+flex: none;
 overflow: visible;
 }
 
-/* ensure first card starts flush */
 .feed-stack > *:first-child {
 margin-top: 0;
 }
@@ -40,13 +41,18 @@ border: 1px solid var(--line);
 background: rgba(255, 255, 255, 0.62);
 
 border-radius: 20px;
-padding: var(--space-3);  /* 🔥 system spacing */
+padding: var(--space-3);
 
 box-shadow: var(--shadow-sm);
 transition: transform 0.2s ease, box-shadow 0.2s ease;
 
 overflow: hidden;
-margin-top: 0;            /* 🔥 safety */
+margin-top: 0;
+}
+
+/* subtle optical tightening */
+.feed-card:first-child {
+margin-top: -1px; /* 🔥 fine-tune */
 }
 
 .feed-card:hover {
@@ -115,4 +121,12 @@ width: 100%;
 border-radius: 14px;
 box-shadow: var(--shadow-sm);
 margin-top: var(--space-2);
+}
+
+/* =====================================================
+MAP COLUMN (OPTICAL BALANCE)
+===================================================== */
+
+.map-column {
+transform: translateY(-1px); /* 🔥 subtle counter-balance */
 }
