@@ -7,6 +7,7 @@ const [summary, setSummary] = useState("");
 const [files, setFiles] = useState([]);
 const [previewMode, setPreviewMode] = useState(false);
 const [dragActive, setDragActive] = useState(false);
+const [category, setCategory] = useState("Post");
 
 /* =====================================================
 IMAGE COMPRESSION
@@ -64,7 +65,6 @@ const mapped = compressed.map((file) => ({
 setFiles((prev) => [...prev, ...mapped]);
 setPreviewMode(true);
 
-// simulate upload
 mapped.forEach((f) => {
   const interval = setInterval(() => {
     setFiles((prev) =>
@@ -139,6 +139,19 @@ return ( <div className="post-composer"> <div className="composer-wrapper">
 
       <h2 className="composer-title">Create a Post</h2>
 
+      {/* CATEGORY */}
+      <div className="category-row">
+        {["Post", "Event", "Incident", "Beacon"].map((cat) => (
+          <button
+            key={cat}
+            className={`category-chip ${category === cat ? "active" : ""}`}
+            onClick={() => setCategory(cat)}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
+
       <input
         className="composer-input"
         value={title}
@@ -153,7 +166,7 @@ return ( <div className="post-composer"> <div className="composer-wrapper">
         placeholder="Write something..."
       />
 
-      {/* 🔥 PREMIUM DROP ZONE */}
+      {/* DROP ZONE */}
       <label
         className={`drop-zone ${dragActive ? "active" : ""}`}
         onDragOver={(e) => {
@@ -164,46 +177,58 @@ return ( <div className="post-composer"> <div className="composer-wrapper">
         onDrop={handleDrop}
       >
         <div className="drop-zone-inner">
-          <span className="drop-title">
-            Drag & drop images
-          </span>
-          <span className="drop-sub">
-            or click to upload
-          </span>
+          <span className="drop-title">Drag & drop images</span>
+          <span className="drop-sub">or click to upload</span>
         </div>
 
-        <input
-          type="file"
-          multiple
-          onChange={handleUpload}
-          hidden
-        />
+        <input type="file" multiple onChange={handleUpload} hidden />
       </label>
 
       {/* ACTIONS */}
       <div className="composer-actions">
 
-        <label className="btn icon-btn">
+        <label className="icon-btn tooltip" data-tip="Upload files">
           ⧉
           <input type="file" multiple onChange={handleUpload} hidden />
         </label>
 
         <button
-          className="icon-btn preview-btn"
+          className="icon-btn tooltip"
+          data-tip="Preview post"
           onClick={() => setPreviewMode(true)}
         >
           ◉
         </button>
 
         <button
-          className="icon-btn reset-btn"
+          className="icon-btn tooltip"
+          data-tip="View metadata"
+          onClick={() => console.log(files)}
+        >
+          ⓘ
+        </button>
+
+        <button
+          className="icon-btn tooltip"
+          data-tip="Help"
+          onClick={() =>
+            alert("Tip: Drag images, reorder them, preview before posting.")
+          }
+        >
+          ?
+        </button>
+
+        <button
+          className="icon-btn tooltip"
+          data-tip="Reset form"
           onClick={resetForm}
         >
           ↺
         </button>
 
         <button
-          className="icon-btn cancel-btn"
+          className="icon-btn cancel-btn tooltip"
+          data-tip="Cancel"
           onClick={() => {
             resetForm();
             setActiveView("dashboard");
