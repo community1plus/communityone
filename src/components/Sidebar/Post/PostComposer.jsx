@@ -16,7 +16,6 @@ const compressImage = (file) => {
 return new Promise((resolve) => {
 if (!file.type.startsWith("image/")) return resolve(file);
 
-```
   const img = new Image();
   const reader = new FileReader();
 
@@ -41,7 +40,6 @@ if (!file.type.startsWith("image/")) return resolve(file);
 
   reader.readAsDataURL(file);
 });
-```
 
 };
 
@@ -52,7 +50,6 @@ FILE PROCESSING
 const processFiles = async (selectedFiles) => {
 if (!selectedFiles?.length) return;
 
-```
 const compressed = await Promise.all(
   selectedFiles.map((file) => compressImage(file))
 );
@@ -81,7 +78,6 @@ mapped.forEach((f) => {
 
   setTimeout(() => clearInterval(interval), 1200);
 });
-```
 
 };
 
@@ -115,14 +111,12 @@ const handleDropReorder = (e, index) => {
 const from = e.dataTransfer.getData("index");
 if (from === null) return;
 
-```
 setFiles((prev) => {
   const updated = [...prev];
   const [moved] = updated.splice(from, 1);
   updated.splice(index, 0, moved);
   return updated;
 });
-```
 
 };
 
@@ -140,7 +134,6 @@ UI
 
 return ( <div className="post-composer"> <div className="composer-wrapper">
 
-```
     {/* LEFT */}
     <div className="composer-left">
 
@@ -285,7 +278,6 @@ return ( <div className="post-composer"> <div className="composer-wrapper">
 
   </div>
 </div>
-```
 
 );
 }
