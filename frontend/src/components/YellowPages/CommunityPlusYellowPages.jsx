@@ -22,41 +22,22 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
     }
   };
 
+  // ✅ UPDATED: Fetch from YOUR backend instead of Google Places
   useEffect(() => {
 
-    if (!coords || !isLoaded || !mapInstance) return;
+    if (!coords) return;
 
     setMapCenter(coords);
     setVisibleIndex(0);
 
-    const service = new window.google.maps.places.PlacesService(mapInstance);
+    fetch(`http://localhost:5000/api/businesses?lat=${coords.lat}&lng=${coords.lng}&category=${category}`)
+      .then(res => res.json())
+      .then(data => {
+        setBusinesses(data);
+      })
+      .catch(err => console.error("API error:", err));
 
-    const request = {
-      location: new window.google.maps.LatLng(coords.lat, coords.lng),
-      rankBy: window.google.maps.places.RankBy.DISTANCE,
-      type: category
-    };
-
-    service.nearbySearch(request, (results, status) => {
-
-      if (status === window.google.maps.places.PlacesServiceStatus.OK) {
-
-        const places = results.slice(0, 20).map(place => ({
-          id: place.place_id,
-          name: place.name,
-          address: place.vicinity,
-          rating: place.rating,
-          lat: place.geometry.location.lat(),
-          lng: place.geometry.location.lng()
-        }));
-
-        setBusinesses(places);
-
-      }
-
-    });
-
-  }, [coords, category, isLoaded, mapInstance]);
+  }, [coords, category]);
 
   return (
     <>
@@ -91,7 +72,6 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
           </span>
         </h2>
 
-
         {/* CATEGORY FILTERS */}
 
         <div className="business-filters">
@@ -114,8 +94,7 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
 
         </div>
 
-
-        {/* BUSINESS CARDS WITH SLIDE ANIMATION */}
+        {/* BUSINESS CARDS */}
 
         <div className="business-cards">
 
@@ -157,7 +136,6 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
         </div>
 
       </div>
-
 
       {/* RIGHT PANEL — MAP */}
 
