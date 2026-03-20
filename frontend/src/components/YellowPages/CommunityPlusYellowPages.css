@@ -107,6 +107,7 @@
   transition: transform 0.35s ease;
 }
 
+
 /* =====================================================
    BUSINESS CARDS
 ===================================================== */
@@ -147,6 +148,21 @@
 .business-rating {
   margin-top: 6px;
   font-size: 14px;
+}
+
+
+/* =====================================================
+   MAP COLUMN (🔥 NEW — CRITICAL FIX)
+===================================================== */
+
+.map-column {
+  display: flex;
+  flex-direction: column;
+
+  flex: 1;
+
+  height: 100%;
+  min-height: 500px; /* ensures map is visible */
 }
 
 
