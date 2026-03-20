@@ -4,6 +4,7 @@ import "./CommunityPlusYellowPages.css";
 
 export default function CommunityPlusYellowPages({ coords, isLoaded }) {
 
+  const API = import.meta.env.VITE_API_URL;  
   const [businesses, setBusinesses] = useState([]);
   const [mapCenter, setMapCenter] = useState(
     coords || { lat: -37.8136, lng: 144.9631 } // fallback
@@ -46,7 +47,7 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
     setLoading(true);
     setError(null);
 
-    fetch(`http://localhost:5000/api/businesses?lat=${coords.lat}&lng=${coords.lng}&category=${category}`)
+    fetch(`${API}/api/businesses?lat=${coords.lat}&lng=${coords.lng}&category=${category}`)
       .then(res => res.json())
       .then(data => {
         console.log("📦 BACKEND DATA:", data);
