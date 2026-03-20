@@ -1,20 +1,33 @@
 import express from "express";
 import cors from "cors";
-import businessesRoutes from "./routes/businesses.js";
 
 const app = express();
-
 app.use(cors());
-app.use(express.json());
 
-// Health check
+const PORT = process.env.PORT || 5000;
+
 app.get("/api/health", (req, res) => {
   res.json({ status: "OK" });
 });
 
-// ✅ Businesses API
-app.use("/api/businesses", businessesRoutes);
+app.get("/api/businesses", (req, res) => {
+  const { lat, lng, category } = req.query;
 
-app.listen(5000, () => {
-  console.log("Server running on port 5000");
+  console.log("Incoming query:", { lat, lng, category });
+
+  res.json([
+    {
+      id: 1,
+      name: "Melbourne Cafe",
+      address: "123 Collins St",
+      lat: -37.8136,
+      lng: 144.9631,
+      category: "cafe",
+      rating: 4.5
+    }
+  ]);
+});
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
