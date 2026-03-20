@@ -5,10 +5,15 @@ import "./CommunityPlusYellowPages.css";
 export default function CommunityPlusYellowPages({ coords, isLoaded }) {
 
   const [businesses, setBusinesses] = useState([]);
-  const [mapCenter, setMapCenter] = useState(coords);
+  const [mapCenter, setMapCenter] = useState(
+    coords || { lat: -37.8136, lng: 144.9631 } // fallback (Melbourne)
+  );
   const [category, setCategory] = useState("restaurant");
-  const [mapInstance, setMapInstance] = useState(null);
   const [visibleIndex, setVisibleIndex] = useState(0);
+
+  // optional but useful
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const scrollDown = () => {
     if (visibleIndex + 2 < businesses.length) {
@@ -22,22 +27,31 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
     }
   };
 
-  // ✅ UPDATED: Fetch from YOUR backend instead of Google Places
+  // ✅ FIXED: Proper guard + clean fetch
   useEffect(() => {
 
-    if (!coords) return;
+    if (!coords?.lat || !coords?.lng) return;
+
+    console.log("Fetching with:", coords, category);
 
     setMapCenter(coords);
     setVisibleIndex(0);
+    setLoading(true);
+    setError(null);
 
     fetch(`http://localhost:5000/api/businesses?lat=${coords.lat}&lng=${coords.lng}&category=${category}`)
       .then(res => res.json())
       .then(data => {
+        console.log("BACKEND DATA:", data);
         setBusinesses(data);
       })
-      .catch(err => console.error("API error:", err));
+      .catch(err => {
+        console.error("API error:", err);
+        setError("Failed to load businesses");
+      })
+      .finally(() => setLoading(false));
 
-  }, [coords, category]);
+  }, [coords?.lat, coords?.lng, category]);
 
   return (
     <>
@@ -71,6 +85,11 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
 
           </span>
         </h2>
+
+        {/* ✅ Loading / Error States */}
+
+        {loading && <div className="loading">Loading businesses...</div>}
+        {error && <div className="error">{error}</div>}
 
         {/* CATEGORY FILTERS */}
 
@@ -148,7 +167,6 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
         ) : (
 
           <GoogleMap
-            onLoad={(map) => setMapInstance(map)}
             center={mapCenter}
             zoom={14}
             mapContainerClassName="map-container loaded"
