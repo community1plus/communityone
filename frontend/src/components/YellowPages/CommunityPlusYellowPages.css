@@ -1,4 +1,18 @@
 /* =====================================================
+   MAIN LAYOUT (🔥 CRITICAL)
+===================================================== */
+
+.yellowpages-layout {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 20px;
+
+  height: 100%;
+  min-height: 600px;
+}
+
+
+/* =====================================================
    BUSINESS LIST
 ===================================================== */
 
@@ -12,6 +26,8 @@
 
   min-width: 0;
   min-height: 0;
+
+  overflow: hidden; /* 🔥 keeps layout clean */
 }
 
 
@@ -97,7 +113,7 @@
 
 .business-cards {
   position: relative;
-  overflow: hidden;
+  overflow-y: auto; /* 🔥 scrollable list */
   height: 100%;
 }
 
@@ -152,7 +168,7 @@
 
 
 /* =====================================================
-   MAP COLUMN (🔥 NEW — CRITICAL FIX)
+   MAP COLUMN
 ===================================================== */
 
 .map-column {
@@ -162,7 +178,7 @@
   flex: 1;
 
   height: 100%;
-  min-height: 500px; /* ensures map is visible */
+  min-height: 500px;
 }
 
 
@@ -196,6 +212,10 @@
 ===================================================== */
 
 @media (max-width: 1100px) {
+
+  .yellowpages-layout {
+    grid-template-columns: 1fr;
+  }
 
   .business-list {
     grid-column: 1 / -1;
