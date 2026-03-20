@@ -1,35 +1,20 @@
 version: 1
 
 frontend:
-  env:
-    variables:
-      NODE_VERSION: 20   # Force Node 20 for Vite
   phases:
     preBuild:
       commands:
-        - npm ci
+        - cd frontend
+        - npm install
     build:
       commands:
-        - npm run build    # Vite → dist
+        - npm run build
+
   artifacts:
-    baseDirectory: dist
+    baseDirectory: frontend/dist
     files:
       - '**/*'
-  cache:
-    paths:
-      - node_modules/**/*
 
-backend:
-  env:
-    variables:
-      NODE_VERSION: 20     # Ensure backend builds with Node 20
-  phases:
-    preBuild:
-      commands:
-        - npm ci
-    build:
-      commands:
-        - npm run build    # tsc compiles Lambda code
   cache:
     paths:
-      - node_modules/**/*
+      - frontend/node_modules/**/*
