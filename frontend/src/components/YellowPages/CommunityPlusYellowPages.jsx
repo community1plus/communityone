@@ -6,12 +6,11 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
 
   const [businesses, setBusinesses] = useState([]);
   const [mapCenter, setMapCenter] = useState(
-    coords || { lat: -37.8136, lng: 144.9631 } // fallback (Melbourne)
+    coords || { lat: -37.8136, lng: 144.9631 } // fallback
   );
   const [category, setCategory] = useState("restaurant");
   const [visibleIndex, setVisibleIndex] = useState(0);
 
-  // optional but useful
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -27,12 +26,20 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
     }
   };
 
-  // ✅ FIXED: Proper guard + clean fetch
+  // ✅ FIXED useEffect
   useEffect(() => {
 
-    if (!coords?.lat || !coords?.lng) return;
+    // 🚨 STRICT GUARD (prevents undefined API calls)
+    if (
+      !coords ||
+      typeof coords.lat !== "number" ||
+      typeof coords.lng !== "number"
+    ) {
+      console.log("⛔ Skipping fetch — invalid coords:", coords);
+      return;
+    }
 
-    console.log("Fetching with:", coords, category);
+    console.log("✅ Fetching with:", coords, category);
 
     setMapCenter(coords);
     setVisibleIndex(0);
@@ -42,11 +49,11 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
     fetch(`http://localhost:5000/api/businesses?lat=${coords.lat}&lng=${coords.lng}&category=${category}`)
       .then(res => res.json())
       .then(data => {
-        console.log("BACKEND DATA:", data);
+        console.log("📦 BACKEND DATA:", data);
         setBusinesses(data);
       })
       .catch(err => {
-        console.error("API error:", err);
+        console.error("❌ API error:", err);
         setError("Failed to load businesses");
       })
       .finally(() => setLoading(false));
@@ -86,7 +93,7 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
           </span>
         </h2>
 
-        {/* ✅ Loading / Error States */}
+        {/* ✅ Loading + Error */}
 
         {loading && <div className="loading">Loading businesses...</div>}
         {error && <div className="error">{error}</div>}
