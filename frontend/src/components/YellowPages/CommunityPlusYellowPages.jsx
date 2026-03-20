@@ -28,8 +28,10 @@ export default function CommunityPlusYellowPages({ coords }) {
 
   const mapRef = useRef(null);
   const debounceRef = useRef(null);
+  const lastBoundsRef = useRef(null);
 
-  // 🔥 FETCH USING BOUNDS
+  /* ================= FETCH ================= */
+
   const fetchBusinesses = (bounds) => {
     if (!bounds) return;
 
@@ -53,26 +55,56 @@ export default function CommunityPlusYellowPages({ coords }) {
       .finally(() => setLoading(false));
   };
 
-  // 🔥 HANDLE MAP MOVE (debounced)
+  /* ================= MAP IDLE ================= */
+
   const handleMapIdle = () => {
     if (!mapRef.current) return;
 
     const bounds = mapRef.current.getBounds();
     if (!bounds) return;
 
+    const ne = bounds.getNorthEast();
+    const sw = bounds.getSouthWest();
+
+    const newBounds = {
+      north: ne.lat(),
+      south: sw.lat(),
+      east: ne.lng(),
+      west: sw.lng()
+    };
+
+    // 🔥 prevent jitter loop
+    if (lastBoundsRef.current) {
+      const prev = lastBoundsRef.current;
+
+      const moved =
+        Math.abs(prev.north - newBounds.north) > 0.01 ||
+        Math.abs(prev.south - newBounds.south) > 0.01 ||
+        Math.abs(prev.east - newBounds.east) > 0.01 ||
+        Math.abs(prev.west - newBounds.west) > 0.01;
+
+      if (!moved) return;
+    }
+
+    lastBoundsRef.current = newBounds;
+
     clearTimeout(debounceRef.current);
 
     debounceRef.current = setTimeout(() => {
       fetchBusinesses(bounds);
-    }, 300); // debounce
+    }, 300);
   };
 
-  // 🔥 INITIAL CENTER
+  /* ================= INITIAL CENTER ================= */
+
   useEffect(() => {
     const lat = coords?.lat ?? fallback.lat;
     const lng = coords?.lng ?? fallback.lng;
+
     setMapCenter({ lat, lng });
   }, [coords]);
+
+  /* ================= UI ================= */
 
   return (
 
@@ -105,6 +137,13 @@ export default function CommunityPlusYellowPages({ coords }) {
               className={`business-card ${selectedId === biz.id ? "active" : ""}`}
               onClick={() => {
                 setSelectedId(biz.id);
+
+                // 🔥 smooth center (fix)
+                if (mapRef.current) {
+                  mapRef.current.panTo({ lat: biz.lat, lng: biz.lng });
+                  mapRef.current.setZoom(15);
+                }
+
                 setMapCenter({ lat: biz.lat, lng: biz.lng });
               }}
             >
@@ -146,7 +185,7 @@ export default function CommunityPlusYellowPages({ coords }) {
             mapContainerClassName="map-container loaded"
           >
 
-            {/* 🔥 CLUSTERING (critical for 10k scale) */}
+            {/* 🔥 CLUSTERING */}
             <MarkerClusterer>
               {(clusterer) =>
                 businesses.map((biz) => (
@@ -156,6 +195,12 @@ export default function CommunityPlusYellowPages({ coords }) {
                     clusterer={clusterer}
                     onClick={() => {
                       setSelectedId(biz.id);
+
+                      if (mapRef.current) {
+                        mapRef.current.panTo({ lat: biz.lat, lng: biz.lng });
+                        mapRef.current.setZoom(15);
+                      }
+
                       setMapCenter({ lat: biz.lat, lng: biz.lng });
                     }}
                   />
