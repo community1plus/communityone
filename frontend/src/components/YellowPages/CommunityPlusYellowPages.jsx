@@ -1,12 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { GoogleMap, Marker } from "@react-google-maps/api";
+import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 import "./CommunityPlusYellowPages.css";
 
-export default function CommunityPlusYellowPages({ coords, isLoaded }) {
+export default function CommunityPlusYellowPages({ coords }) {
 
   const API = import.meta.env.VITE_API_URL;
+  const MAP_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
   const fallback = { lat: -37.8136, lng: 144.9631 };
+
+  // ✅ LOAD GOOGLE MAPS HERE (fixes Amplify issue)
+  const { isLoaded, loadError } = useJsApiLoader({
+    googleMapsApiKey: MAP_KEY
+  });
 
   const [businesses, setBusinesses] = useState([]);
   const [mapCenter, setMapCenter] = useState(coords || fallback);
@@ -28,13 +34,14 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
     }
   };
 
-  // ✅ FIXED FETCH (no more blocking)
+  // ✅ FETCH BUSINESSES (resilient)
   useEffect(() => {
 
     const lat = coords?.lat ?? fallback.lat;
     const lng = coords?.lng ?? fallback.lng;
 
     console.log("✅ Fetching with:", lat, lng, category);
+    console.log("🗺 MAP KEY:", MAP_KEY);
 
     setMapCenter({ lat, lng });
     setVisibleIndex(0);
@@ -53,7 +60,7 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
       })
       .finally(() => setLoading(false));
 
-  }, [coords, category]); // 🔥 simplified dependency
+  }, [coords, category]);
 
   return (
 
@@ -90,12 +97,8 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
           </span>
         </h2>
 
-        {/* Loading / Error */}
-
         {loading && <div className="loading">Loading businesses...</div>}
         {error && <div className="error">{error}</div>}
-
-        {/* Filters */}
 
         <div className="business-filters">
 
@@ -116,8 +119,6 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
           </button>
 
         </div>
-
-        {/* Cards */}
 
         <div className="business-cards">
 
@@ -164,7 +165,11 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
 
       <div className="map-column">
 
-        {!isLoaded ? (
+        {loadError ? (
+          <div className="map-loading">
+            ❌ Map failed to load
+          </div>
+        ) : !isLoaded ? (
           <div className="map-loading">
             Loading map...
           </div>
