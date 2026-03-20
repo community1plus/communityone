@@ -1,111 +1,121 @@
-import React, { useEffect, useState } from "react";
-import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
-import { getCurrentUser } from "aws-amplify/auth";
-import { Authenticator } from "@aws-amplify/ui-react";
+import { useState } from 'react'
+import reactLogo from './assets/react.svg'
+import viteLogo from './assets/vite.svg'
+import heroImg from './assets/hero.png'
+import './App.css'
 
-import CommunityPlusLandingPage from "../src/components/CommunityPlusLandingPage/CommunityPlusLandingPage";
-import CommunityPlusDashboard from "./components/Dashboard/CommunityPlusDashboard";
-
-
-/**
- * LandingGate
- * - checks whether a user session exists
- * - while checking, renders the Landing (or a minimal skeleton)
- * - if signed in, redirects to /home
- * 
- * 
- */
-function LandingGate() {
-  const navigate = useNavigate();
-  const [checking, setChecking] = useState(true);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    (async () => {
-      try {
-        await getCurrentUser(); // succeeds if there's a valid session
-        if (!cancelled) navigate("/home", { replace: true });
-      } catch {
-        // no session, stay on landing
-      } finally {
-        if (!cancelled) setChecking(false);
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [navigate]);
-
-  return <CommunityPlusLandingPage checkingAuth={checking} />;
-}
-
-/**
- * RequireAuth
- * - If user is signed in, render children
- * - If not, bounce to landing
- */
-function RequireAuth({ children }) {
-  return (
-    <Authenticator>
-      {({ user }) => (user ? children : <Navigate to="/" replace />)}
-    </Authenticator>
-  );
-}
-
-/**
- * HomeRoute
- * - authenticated route that renders the dashboard
- * - passes user + signOut into the dashboard
- */
-function HomeRoute() {
-  const navigate = useNavigate();
+function App() {
+  const [count, setCount] = useState(0)
 
   return (
-    <Authenticator>
-      {({ user, signOut }) => {
-        if (!user) return <Navigate to="/" replace />;
+    <>
+      <section id="center">
+        <div className="hero">
+          <img src={heroImg} className="base" width="170" height="179" alt="" />
+          <img src={reactLogo} className="framework" alt="React logo" />
+          <img src={viteLogo} className="vite" alt="Vite logo" />
+        </div>
+        <div>
+          <h1>Get started</h1>
+          <p>
+            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
+          </p>
+        </div>
+        <button
+          className="counter"
+          onClick={() => setCount((count) => count + 1)}
+        >
+          Count is {count}
+        </button>
+      </section>
 
-        const handleSignOut = async () => {
-          await signOut();
-          navigate("/", { replace: true });
-        };
+      <div className="ticks"></div>
 
-        return (
-          <CommunityPlusDashboard
-            user={user}
-            signOut={handleSignOut}
-          />
-        );
-      }}
-    </Authenticator>
-  );
+      <section id="next-steps">
+        <div id="docs">
+          <svg className="icon" role="presentation" aria-hidden="true">
+            <use href="/icons.svg#documentation-icon"></use>
+          </svg>
+          <h2>Documentation</h2>
+          <p>Your questions, answered</p>
+          <ul>
+            <li>
+              <a href="https://vite.dev/" target="_blank">
+                <img className="logo" src={viteLogo} alt="" />
+                Explore Vite
+              </a>
+            </li>
+            <li>
+              <a href="https://react.dev/" target="_blank">
+                <img className="button-icon" src={reactLogo} alt="" />
+                Learn more
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div id="social">
+          <svg className="icon" role="presentation" aria-hidden="true">
+            <use href="/icons.svg#social-icon"></use>
+          </svg>
+          <h2>Connect with us</h2>
+          <p>Join the Vite community</p>
+          <ul>
+            <li>
+              <a href="https://github.com/vitejs/vite" target="_blank">
+                <svg
+                  className="button-icon"
+                  role="presentation"
+                  aria-hidden="true"
+                >
+                  <use href="/icons.svg#github-icon"></use>
+                </svg>
+                GitHub
+              </a>
+            </li>
+            <li>
+              <a href="https://chat.vite.dev/" target="_blank">
+                <svg
+                  className="button-icon"
+                  role="presentation"
+                  aria-hidden="true"
+                >
+                  <use href="/icons.svg#discord-icon"></use>
+                </svg>
+                Discord
+              </a>
+            </li>
+            <li>
+              <a href="https://x.com/vite_js" target="_blank">
+                <svg
+                  className="button-icon"
+                  role="presentation"
+                  aria-hidden="true"
+                >
+                  <use href="/icons.svg#x-icon"></use>
+                </svg>
+                X.com
+              </a>
+            </li>
+            <li>
+              <a href="https://bsky.app/profile/vite.dev" target="_blank">
+                <svg
+                  className="button-icon"
+                  role="presentation"
+                  aria-hidden="true"
+                >
+                  <use href="/icons.svg#bluesky-icon"></use>
+                </svg>
+                Bluesky
+              </a>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <div className="ticks"></div>
+      <section id="spacer"></section>
+    </>
+  )
 }
 
-export default function App() {
-  return (
-    // Optional but recommended: provides Amplify UI auth state once at the top level
-    <Authenticator.Provider>
-      <Routes>
-        <Route path="/" element={<LandingGate />} />
-
-        {/* Option A: simplest (your current pattern, but safe) */}
-        <Route path="/home" element={<HomeRoute />} />
-
-        {/* Option B: if you later add more protected routes, use RequireAuth:
-            <Route
-              path="/home"
-              element={
-                <RequireAuth>
-                  <CommunityPlusDashboard />
-                </RequireAuth>
-              }
-            />
-        */}
-
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </Authenticator.Provider>
-  );
-}
+export default App
