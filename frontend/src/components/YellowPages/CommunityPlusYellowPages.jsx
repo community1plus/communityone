@@ -1,14 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { GoogleMap, Marker } from "@react-google-maps/api";
+import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 import "./CommunityPlusYellowPages.css";
 
-export default function CommunityPlusYellowPages({ coords, isLoaded }) {
+export default function CommunityPlusYellowPages({ coords }) {
 
-  const API = import.meta.env.VITE_API_URL;  
+  const API = import.meta.env.VITE_API_URL;
+
+  // ✅ Load Google Maps properly
+  const { isLoaded } = useJsApiLoader({
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY
+  });
+
+  const defaultCoords = { lat: -37.8136, lng: 144.9631 };
+  const safeCoords = coords && coords.lat && coords.lng ? coords : defaultCoords;
+
   const [businesses, setBusinesses] = useState([]);
-  const [mapCenter, setMapCenter] = useState(
-    coords || { lat: -37.8136, lng: 144.9631 } // fallback
-  );
+  const [mapCenter, setMapCenter] = useState(safeCoords);
   const [category, setCategory] = useState("restaurant");
   const [visibleIndex, setVisibleIndex] = useState(0);
 
@@ -27,54 +34,41 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
     }
   };
 
-  // ✅ FIXED useEffect
+  // ✅ FIXED FETCH (no more blocking)
   useEffect(() => {
+    console.log("📡 Fetching with:", safeCoords, category);
 
-    // 🚨 STRICT GUARD (prevents undefined API calls)
-    if (
-      !coords ||
-      typeof coords.lat !== "number" ||
-      typeof coords.lng !== "number"
-    ) {
-      console.log("⛔ Skipping fetch — invalid coords:", coords);
-      return;
-    }
-
-    console.log("✅ Fetching with:", coords, category);
-
-    setMapCenter(coords);
+    setMapCenter(safeCoords);
     setVisibleIndex(0);
     setLoading(true);
     setError(null);
 
-    fetch(`${API}/api/businesses?lat=${coords.lat}&lng=${coords.lng}&category=${category}`)
-      .then(res => res.json())
-      .then(data => {
+    fetch(
+      `${API}/api/businesses?lat=${safeCoords.lat}&lng=${safeCoords.lng}&category=${category}`
+    )
+      .then((res) => res.json())
+      .then((data) => {
         console.log("📦 BACKEND DATA:", data);
         setBusinesses(data);
       })
-      .catch(err => {
+      .catch((err) => {
         console.error("❌ API error:", err);
         setError("Failed to load businesses");
       })
       .finally(() => setLoading(false));
 
-  }, [coords?.lat, coords?.lng, category]);
+  }, [safeCoords.lat, safeCoords.lng, category]);
 
   return (
     <>
-      {/* LEFT PANEL — BUSINESS LIST */}
-
+      {/* LEFT PANEL */}
       <div className="business-list">
 
         <h2 className="business-header">
           Local Businesses
-          <span className="business-count">
-            {businesses.length}
-          </span>
+          <span className="business-count">{businesses.length}</span>
 
           <span className="business-arrows">
-
             <button
               className="arrow-up"
               onClick={scrollUp}
@@ -90,50 +84,27 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
             >
               ▼
             </button>
-
           </span>
         </h2>
-
-        {/* ✅ Loading + Error */}
 
         {loading && <div className="loading">Loading businesses...</div>}
         {error && <div className="error">{error}</div>}
 
-        {/* CATEGORY FILTERS */}
-
+        {/* FILTERS */}
         <div className="business-filters">
-
-          <button onClick={() => setCategory("restaurant")}>
-            Restaurants
-          </button>
-
-          <button onClick={() => setCategory("cafe")}>
-            Cafes
-          </button>
-
-          <button onClick={() => setCategory("bar")}>
-            Bars
-          </button>
-
-          <button onClick={() => setCategory("store")}>
-            Shops
-          </button>
-
+          <button onClick={() => setCategory("restaurant")}>Restaurants</button>
+          <button onClick={() => setCategory("cafe")}>Cafes</button>
+          <button onClick={() => setCategory("bar")}>Bars</button>
+          <button onClick={() => setCategory("store")}>Shops</button>
         </div>
 
-        {/* BUSINESS CARDS */}
-
+        {/* CARDS */}
         <div className="business-cards">
-
           <div
             className="business-cards-track"
-            style={{
-              transform: `translateY(-${visibleIndex * 50}%)`
-            }}
+            style={{ transform: `translateY(-${visibleIndex * 50}%)` }}
           >
-
             {businesses.map((biz) => (
-
               <div
                 key={biz.id}
                 className="business-card"
@@ -141,59 +112,36 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
                   setMapCenter({ lat: biz.lat, lng: biz.lng })
                 }
               >
-
                 <h3>{biz.name}</h3>
-
-                <p className="business-address">
-                  📍 {biz.address}
-                </p>
-
+                <p className="business-address">📍 {biz.address}</p>
                 {biz.rating && (
-                  <p className="business-rating">
-                    ⭐ {biz.rating}
-                  </p>
+                  <p className="business-rating">⭐ {biz.rating}</p>
                 )}
-
               </div>
-
             ))}
-
           </div>
-
         </div>
 
       </div>
 
       {/* RIGHT PANEL — MAP */}
-
       <div className="map-column">
 
         {!isLoaded ? (
-          <div className="map-loading">
-            Loading map...
-          </div>
+          <div className="map-loading">Loading map...</div>
         ) : (
-
           <GoogleMap
             center={mapCenter}
             zoom={14}
             mapContainerClassName="map-container loaded"
           >
-
             {businesses.map((biz) => (
-
               <Marker
                 key={biz.id}
-                position={{
-                  lat: biz.lat,
-                  lng: biz.lng
-                }}
+                position={{ lat: biz.lat, lng: biz.lng }}
               />
-
             ))}
-
           </GoogleMap>
-
         )}
 
       </div>
