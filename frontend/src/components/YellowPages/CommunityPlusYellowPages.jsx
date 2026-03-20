@@ -1,5 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
-import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
+import {
+  GoogleMap,
+  Marker,
+  MarkerClusterer,
+  useJsApiLoader
+} from "@react-google-maps/api";
 import "./CommunityPlusYellowPages.css";
 
 export default function CommunityPlusYellowPages({ coords }) {
@@ -22,38 +27,52 @@ export default function CommunityPlusYellowPages({ coords }) {
   const [error, setError] = useState(null);
 
   const mapRef = useRef(null);
+  const debounceRef = useRef(null);
 
-  // FETCH
-  useEffect(() => {
+  // 🔥 FETCH USING BOUNDS
+  const fetchBusinesses = (bounds) => {
+    if (!bounds) return;
 
-    const lat = coords?.lat ?? fallback.lat;
-    const lng = coords?.lng ?? fallback.lng;
+    const ne = bounds.getNorthEast();
+    const sw = bounds.getSouthWest();
 
-    setMapCenter({ lat, lng });
+    const north = ne.lat();
+    const south = sw.lat();
+    const east = ne.lng();
+    const west = sw.lng();
+
     setLoading(true);
     setError(null);
 
-    fetch(`${API}/api/businesses?lat=${lat}&lng=${lng}&category=${category}`)
+    fetch(`${API}/api/businesses?north=${north}&south=${south}&east=${east}&west=${west}&category=${category}`)
       .then(res => res.json())
       .then(data => {
-
-        const safeData = Array.isArray(data) ? data : [];
-        setBusinesses(safeData);
-
-        // 🔥 Fit bounds
-        if (safeData.length && mapRef.current && window.google) {
-          const bounds = new window.google.maps.LatLngBounds();
-          safeData.forEach(biz => {
-            bounds.extend({ lat: biz.lat, lng: biz.lng });
-          });
-          mapRef.current.fitBounds(bounds);
-        }
-
+        setBusinesses(Array.isArray(data) ? data : []);
       })
       .catch(() => setError("Failed to load businesses"))
       .finally(() => setLoading(false));
+  };
 
-  }, [coords, category]);
+  // 🔥 HANDLE MAP MOVE (debounced)
+  const handleMapIdle = () => {
+    if (!mapRef.current) return;
+
+    const bounds = mapRef.current.getBounds();
+    if (!bounds) return;
+
+    clearTimeout(debounceRef.current);
+
+    debounceRef.current = setTimeout(() => {
+      fetchBusinesses(bounds);
+    }, 300); // debounce
+  };
+
+  // 🔥 INITIAL CENTER
+  useEffect(() => {
+    const lat = coords?.lat ?? fallback.lat;
+    const lng = coords?.lng ?? fallback.lng;
+    setMapCenter({ lat, lng });
+  }, [coords]);
 
   return (
 
@@ -123,21 +142,26 @@ export default function CommunityPlusYellowPages({ coords }) {
             center={mapCenter}
             zoom={14}
             onLoad={(map) => (mapRef.current = map)}
+            onIdle={handleMapIdle}
             mapContainerClassName="map-container loaded"
           >
 
-            {businesses.map((biz) => (
-
-              <Marker
-                key={biz.id}
-                position={{ lat: biz.lat, lng: biz.lng }}
-                onClick={() => {
-                  setSelectedId(biz.id);
-                  setMapCenter({ lat: biz.lat, lng: biz.lng });
-                }}
-              />
-
-            ))}
+            {/* 🔥 CLUSTERING (critical for 10k scale) */}
+            <MarkerClusterer>
+              {(clusterer) =>
+                businesses.map((biz) => (
+                  <Marker
+                    key={biz.id}
+                    position={{ lat: biz.lat, lng: biz.lng }}
+                    clusterer={clusterer}
+                    onClick={() => {
+                      setSelectedId(biz.id);
+                      setMapCenter({ lat: biz.lat, lng: biz.lng });
+                    }}
+                  />
+                ))
+              }
+            </MarkerClusterer>
 
           </GoogleMap>
 
