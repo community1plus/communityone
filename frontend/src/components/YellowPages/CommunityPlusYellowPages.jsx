@@ -6,10 +6,10 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
 
   const API = import.meta.env.VITE_API_URL;
 
+  const fallback = { lat: -37.8136, lng: 144.9631 };
+
   const [businesses, setBusinesses] = useState([]);
-  const [mapCenter, setMapCenter] = useState(
-    coords || { lat: -37.8136, lng: 144.9631 }
-  );
+  const [mapCenter, setMapCenter] = useState(coords || fallback);
   const [category, setCategory] = useState("restaurant");
   const [visibleIndex, setVisibleIndex] = useState(0);
 
@@ -28,30 +28,24 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
     }
   };
 
-  // FETCH BUSINESSES
+  // ✅ FIXED FETCH (no more blocking)
   useEffect(() => {
 
-    if (
-      !coords ||
-      typeof coords.lat !== "number" ||
-      typeof coords.lng !== "number"
-    ) {
-      console.log("⛔ Skipping fetch — invalid coords:", coords);
-      return;
-    }
+    const lat = coords?.lat ?? fallback.lat;
+    const lng = coords?.lng ?? fallback.lng;
 
-    console.log("✅ Fetching with:", coords, category);
+    console.log("✅ Fetching with:", lat, lng, category);
 
-    setMapCenter(coords);
+    setMapCenter({ lat, lng });
     setVisibleIndex(0);
     setLoading(true);
     setError(null);
 
-    fetch(`${API}/api/businesses?lat=${coords.lat}&lng=${coords.lng}&category=${category}`)
+    fetch(`${API}/api/businesses?lat=${lat}&lng=${lng}&category=${category}`)
       .then(res => res.json())
       .then(data => {
         console.log("📦 BACKEND DATA:", data);
-        setBusinesses(data);
+        setBusinesses(Array.isArray(data) ? data : []);
       })
       .catch(err => {
         console.error("❌ API error:", err);
@@ -59,7 +53,7 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
       })
       .finally(() => setLoading(false));
 
-  }, [coords?.lat, coords?.lng, category]);
+  }, [coords, category]); // 🔥 simplified dependency
 
   return (
 
@@ -174,7 +168,7 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
           <div className="map-loading">
             Loading map...
           </div>
-        ) : (
+        ) : mapCenter ? (
 
           <GoogleMap
             center={mapCenter}
@@ -196,6 +190,8 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
 
           </GoogleMap>
 
+        ) : (
+          <div className="map-loading">No location available</div>
         )}
 
       </div>
