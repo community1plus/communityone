@@ -1,6 +1,6 @@
 import { Routes, Route } from "react-router-dom";
-import CommunityPlusLandingPage from "./components/CommunityPlusLandingPage";
-import CommunityPlusYellowPages from "./components/CommunityPlusYellowPages";
+import CommunityPlusLandingPage from "./components/CommunityPlusLandingPage/CommunityPlusLandingPage";
+import CommunityPlusYellowPages from "./components/CommunityPlusYellowPages/CommunityPlusYellowPages";
 
 export default function App() {
   return (
