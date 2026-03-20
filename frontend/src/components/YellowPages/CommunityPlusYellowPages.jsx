@@ -31,6 +31,7 @@ export default function CommunityPlusYellowPages({ coords }) {
   const mapRef = useRef(null);
   const debounceRef = useRef(null);
   const lastBoundsRef = useRef(null);
+  const cardRefs = useRef({}); // 🔥 for scroll sync
 
   /* ================= FETCH ================= */
 
@@ -75,7 +76,7 @@ export default function CommunityPlusYellowPages({ coords }) {
       west: sw.lng()
     };
 
-    // prevent jitter loop
+    // 🔥 prevent jitter loop
     if (lastBoundsRef.current) {
       const prev = lastBoundsRef.current;
 
@@ -106,18 +107,25 @@ export default function CommunityPlusYellowPages({ coords }) {
     setMapCenter({ lat, lng });
   }, [coords]);
 
-  /* ================= CLICK HANDLER ================= */
+  /* ================= SELECT BUSINESS ================= */
 
   const handleSelectBusiness = (biz) => {
     setSelectedId(biz.id);
     setSelectedBusiness(biz);
 
+    // 🔥 pan + zoom
     if (mapRef.current) {
       mapRef.current.panTo({ lat: biz.lat, lng: biz.lng });
       mapRef.current.setZoom(15);
     }
 
     setMapCenter({ lat: biz.lat, lng: biz.lng });
+
+    // 🔥 scroll card into view
+    cardRefs.current[biz.id]?.scrollIntoView({
+      behavior: "smooth",
+      block: "center"
+    });
   };
 
   /* ================= UI ================= */
@@ -150,6 +158,7 @@ export default function CommunityPlusYellowPages({ coords }) {
 
             <div
               key={biz.id}
+              ref={(el) => (cardRefs.current[biz.id] = el)}
               className={`business-card ${selectedId === biz.id ? "active" : ""}`}
               onClick={() => handleSelectBusiness(biz)}
             >
@@ -191,6 +200,7 @@ export default function CommunityPlusYellowPages({ coords }) {
             mapContainerClassName="map-container loaded"
           >
 
+            {/* 🔥 CLUSTERING + ACTIVE MARKER */}
             <MarkerClusterer>
               {(clusterer) =>
                 businesses.map((biz) => (
@@ -198,6 +208,11 @@ export default function CommunityPlusYellowPages({ coords }) {
                     key={biz.id}
                     position={{ lat: biz.lat, lng: biz.lng }}
                     clusterer={clusterer}
+                    icon={
+                      selectedId === biz.id
+                        ? "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
+                        : "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+                    }
                     onClick={() => handleSelectBusiness(biz)}
                   />
                 ))
