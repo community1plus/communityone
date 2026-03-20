@@ -21,7 +21,9 @@ export default function CommunityPlusYellowPages({ coords }) {
   const [businesses, setBusinesses] = useState([]);
   const [mapCenter, setMapCenter] = useState(coords || fallback);
   const [category, setCategory] = useState("restaurant");
+
   const [selectedId, setSelectedId] = useState(null);
+  const [selectedBusiness, setSelectedBusiness] = useState(null);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -73,7 +75,7 @@ export default function CommunityPlusYellowPages({ coords }) {
       west: sw.lng()
     };
 
-    // 🔥 prevent jitter loop
+    // prevent jitter loop
     if (lastBoundsRef.current) {
       const prev = lastBoundsRef.current;
 
@@ -103,6 +105,20 @@ export default function CommunityPlusYellowPages({ coords }) {
 
     setMapCenter({ lat, lng });
   }, [coords]);
+
+  /* ================= CLICK HANDLER ================= */
+
+  const handleSelectBusiness = (biz) => {
+    setSelectedId(biz.id);
+    setSelectedBusiness(biz);
+
+    if (mapRef.current) {
+      mapRef.current.panTo({ lat: biz.lat, lng: biz.lng });
+      mapRef.current.setZoom(15);
+    }
+
+    setMapCenter({ lat: biz.lat, lng: biz.lng });
+  };
 
   /* ================= UI ================= */
 
@@ -135,17 +151,7 @@ export default function CommunityPlusYellowPages({ coords }) {
             <div
               key={biz.id}
               className={`business-card ${selectedId === biz.id ? "active" : ""}`}
-              onClick={() => {
-                setSelectedId(biz.id);
-
-                // 🔥 smooth center (fix)
-                if (mapRef.current) {
-                  mapRef.current.panTo({ lat: biz.lat, lng: biz.lng });
-                  mapRef.current.setZoom(15);
-                }
-
-                setMapCenter({ lat: biz.lat, lng: biz.lng });
-              }}
+              onClick={() => handleSelectBusiness(biz)}
             >
 
               <h3>{biz.name}</h3>
@@ -185,7 +191,6 @@ export default function CommunityPlusYellowPages({ coords }) {
             mapContainerClassName="map-container loaded"
           >
 
-            {/* 🔥 CLUSTERING */}
             <MarkerClusterer>
               {(clusterer) =>
                 businesses.map((biz) => (
@@ -193,16 +198,7 @@ export default function CommunityPlusYellowPages({ coords }) {
                     key={biz.id}
                     position={{ lat: biz.lat, lng: biz.lng }}
                     clusterer={clusterer}
-                    onClick={() => {
-                      setSelectedId(biz.id);
-
-                      if (mapRef.current) {
-                        mapRef.current.panTo({ lat: biz.lat, lng: biz.lng });
-                        mapRef.current.setZoom(15);
-                      }
-
-                      setMapCenter({ lat: biz.lat, lng: biz.lng });
-                    }}
+                    onClick={() => handleSelectBusiness(biz)}
                   />
                 ))
               }
@@ -213,6 +209,38 @@ export default function CommunityPlusYellowPages({ coords }) {
         )}
 
       </div>
+
+      {/* 🔥 DETAIL PANEL */}
+      {selectedBusiness && (
+        <div className="business-detail">
+
+          <div className="detail-header">
+            <h2>{selectedBusiness.name}</h2>
+            <button onClick={() => setSelectedBusiness(null)}>✕</button>
+          </div>
+
+          <div className="detail-body">
+
+            <p className="detail-address">
+              📍 {selectedBusiness.address}
+            </p>
+
+            {selectedBusiness.rating && (
+              <p className="detail-rating">
+                ⭐ {selectedBusiness.rating}
+              </p>
+            )}
+
+            <div className="detail-actions">
+              <button>Directions</button>
+              <button>Save</button>
+              <button>Share</button>
+            </div>
+
+          </div>
+
+        </div>
+      )}
 
     </div>
   );
