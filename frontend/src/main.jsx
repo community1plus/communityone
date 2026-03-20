@@ -5,7 +5,6 @@ import "./index.css";
 import { Amplify } from "aws-amplify";
 import App from "./App.jsx";
 
-Amplify.configure(outputs);
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter>
