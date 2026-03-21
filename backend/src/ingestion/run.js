@@ -1,18 +1,25 @@
 import "dotenv/config";
-import { fetchOSMBusinesses } from "./osmIngest.js";
-import { fetchGooglePlaces } from "./googleIngest.js";
+import { ingestGoogle, ingestOSM } from "../services/ingest.js";
+
+const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
 async function run() {
+  console.log("🚀 Starting ingestion...\n");
 
   const lat = -37.8136;
   const lng = 144.9631;
 
-  const osm = await fetchOSMBusinesses(lat, lng);
-  const google = await fetchGooglePlaces(lat, lng);
+  try {
+    await Promise.all([
+      ingestGoogle({ lat, lng }),
+      ingestOSM({ lat, lng })
+    ]);
 
-  const combined = [...osm, ...google];
+    console.log("\n🎉 Ingestion complete");
 
-  console.log("✅ Ingestion complete:", combined.length);
+  } catch (err) {
+    console.error("❌ Ingestion failed:", err.message);
+  }
 }
 
 run();
