@@ -1,7 +1,6 @@
 import "dotenv/config";
 import { fetchOSMBusinesses } from "./osmIngest.js";
 import { fetchGooglePlaces } from "./googleIngest.js";
-import { saveBusinesses } from "./saveBusinesses.js";
 
 async function run() {
 
@@ -12,8 +11,6 @@ async function run() {
   const google = await fetchGooglePlaces(lat, lng);
 
   const combined = [...osm, ...google];
-
-  await saveBusinesses(combined);
 
   console.log("✅ Ingestion complete:", combined.length);
 }
