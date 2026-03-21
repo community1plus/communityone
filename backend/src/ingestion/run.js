@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { fetchOSMBusinesses } from "./osmIngest.js";
 import { fetchGooglePlaces } from "./googleIngest.js";
 import { saveBusinesses } from "./saveBusinesses.js";

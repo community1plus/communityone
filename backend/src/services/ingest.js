@@ -55,7 +55,7 @@ export async function ingestOSM({ lat, lng }) {
   const query = `
     [out:json];
     (
-      node(around:2000,${lat},${lng})["amenity"];
+      node(around:800,${lat},${lng})["amenity"];
     );
     out;
   `;
