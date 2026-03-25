@@ -26,20 +26,6 @@ const pool = new Pool({
 const GOOGLE_KEY = process.env.GOOGLE_PLACES_API_KEY;
 
 /* =====================================================
-   TEMP FALLBACK DATA
-===================================================== */
-
-const businesses = Array.from({ length: 1000 }).map((_, i) => ({
-  id: i + 1,
-  name: `Business ${i + 1}`,
-  category: ["restaurant", "cafe", "bar", "store"][i % 4],
-  address: "Melbourne VIC",
-  lat: -37.8136 + (Math.random() - 0.5) * 0.1,
-  lng: 144.9631 + (Math.random() - 0.5) * 0.1,
-  rating: (Math.random() * 5).toFixed(1)
-}));
-
-/* =====================================================
    HEALTH CHECK
 ===================================================== */
 
@@ -47,13 +33,38 @@ app.get("/api/health", async (req, res) => {
   try {
     await pool.query("SELECT 1");
     res.json({ status: "OK", db: "connected" });
-  } catch {
+  } catch (err) {
+    console.error("❌ health error:", err.message);
     res.json({ status: "OK", db: "fallback" });
   }
 });
 
 /* =====================================================
-   BUSINESSES (MAP VIEW)
+   DEBUG ENDPOINTS
+===================================================== */
+
+app.get("/api/debug-count", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT COUNT(*) FROM businesses");
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error("❌ debug-count error:", err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get("/api/debug-db", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT current_database()");
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error("❌ debug-db error:", err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/* =====================================================
+   BUSINESSES (MAP VIEW) ✅ FIXED
 ===================================================== */
 
 app.get("/api/businesses", async (req, res) => {
@@ -77,7 +88,10 @@ app.get("/api/businesses", async (req, res) => {
              ST_Y(location::geometry) AS lat,
              ST_X(location::geometry) AS lng
       FROM businesses
-      WHERE location && ST_MakeEnvelope($1, $2, $3, $4, 4326)
+      WHERE ST_Intersects(
+        location::geometry,
+        ST_MakeEnvelope($1, $2, $3, $4, 4326)
+      )
     `;
 
     if (category) {
@@ -88,15 +102,19 @@ app.get("/api/businesses", async (req, res) => {
     query += ` LIMIT ${limit}`;
 
     const result = await pool.query(query, values);
+
+    console.log("📦 businesses rows:", result.rows.length);
+
     return res.json(result.rows);
 
-  } catch {
-    return res.json([]);
+  } catch (err) {
+    console.error("❌ businesses error:", err.message);
+    return res.status(500).json({ error: err.message });
   }
 });
 
 /* =====================================================
-   🔍 SEARCH (FULL TEXT + GEO)
+   SEARCH (UNCHANGED BUT LOGGING ADDED)
 ===================================================== */
 
 app.get("/api/search", async (req, res) => {
@@ -140,16 +158,19 @@ app.get("/api/search", async (req, res) => {
     `;
 
     const result = await pool.query(query, values);
+
+    console.log("🔎 search rows:", result.rows.length);
+
     res.json(result.rows);
 
   } catch (err) {
     console.error("❌ search error:", err.message);
-    res.json([]);
+    res.status(500).json({ error: err.message });
   }
 });
 
 /* =====================================================
-   ⚡ AUTOCOMPLETE (FAST PREFIX SEARCH)
+   AUTOCOMPLETE
 ===================================================== */
 
 app.get("/api/autocomplete", async (req, res) => {
@@ -174,12 +195,12 @@ app.get("/api/autocomplete", async (req, res) => {
 
   } catch (err) {
     console.error("❌ autocomplete error:", err.message);
-    res.json([]);
+    res.status(500).json({ error: err.message });
   }
 });
 
 /* =====================================================
-   UPSERT (DEDUP CORE)
+   UPSERT (UNCHANGED)
 ===================================================== */
 
 async function upsertBusiness(biz) {
@@ -215,6 +236,84 @@ async function upsertBusiness(biz) {
 }
 
 /* =====================================================
+   INGEST (UNCHANGED)
+===================================================== */
+
+async function ingestGoogle({ lat, lng }) {
+  if (!GOOGLE_KEY) return;
+
+  try {
+    const res = await axios.get(
+      "https://maps.googleapis.com/maps/api/place/nearbysearch/json",
+      {
+        params: {
+          location: `${lat},${lng}`,
+          radius: 2000,
+          key: GOOGLE_KEY
+        }
+      }
+    );
+
+    for (const place of res.data.results) {
+      await upsertBusiness({
+        name: place.name,
+        category: place.types?.[0] || "other",
+        address: place.vicinity,
+        rating: place.rating || null,
+        lat: place.geometry.location.lat,
+        lng: place.geometry.location.lng,
+        source: "google",
+        external_id: place.place_id
+      });
+    }
+
+    console.log(`✅ Google ingest: ${res.data.results.length}`);
+
+  } catch (err) {
+    console.error("❌ Google ingest error:", err.message);
+  }
+}
+
+async function ingestOSM({ lat, lng }) {
+  try {
+    const query = `
+      [out:json];
+      (
+        node["amenity"](around:2000,${lat},${lng});
+        node["shop"](around:2000,${lat},${lng});
+      );
+      out;
+    `;
+
+    const res = await axios.post(
+      "https://overpass-api.de/api/interpreter",
+      query,
+      { headers: { "Content-Type": "text/plain" } }
+    );
+
+    for (const el of res.data.elements) {
+      const tags = el.tags || {};
+
+      await upsertBusiness({
+        name: tags.name || "Unknown",
+        category: tags.amenity || tags.shop || "other",
+        address: tags["addr:full"] || "",
+        rating: null,
+        lat: el.lat,
+        lng: el.lon,
+        source: "osm",
+        external_id: el.id.toString()
+      });
+    }
+
+    console.log(`✅ OSM ingest: ${res.data.elements.length}`);
+
+  } catch (err) {
+    console.error("❌ OSM ingest error:", err.message);
+  }
+}
+
+/* =====================================================
    INGEST ENDPOINT
 ===================================================== */
 
@@ -228,7 +327,8 @@ app.get("/api/ingest", async (req, res) => {
 
     res.json({ status: "ingestion complete" });
 
-  } catch {
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "ingestion failed" });
   }
 });
