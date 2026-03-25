@@ -1,6 +1,6 @@
 import "dotenv/config";
-import { ingestGoogle } from "./googleIngest.js";
-import { ingestOSM } from "./osmIngest.js";
+import { ingestGoogle } from "./ingest.js";
+import { ingestOSM } from "./ingest.js";
 import { generateGrid } from "./grid.js";
 
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
