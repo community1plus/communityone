@@ -1,34 +1,88 @@
 import axios from "axios";
-import { pool } from "../db.js";
+import { pool } from "../db/db.js";
 
 /* =====================================================
    CONFIG
 ===================================================== */
 
 const GOOGLE_KEY = process.env.GOOGLE_PLACES_API_KEY;
+const BATCH_SIZE = 100; // 🔥 now safe to increase
+
+const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
 /* =====================================================
-   GOOGLE PLACES INGEST
+   🔥 BULK UPSERT (CORE ENGINE)
+===================================================== */
+
+async function bulkUpsertBusinesses(businesses) {
+  if (!businesses.length) return;
+
+  const values = [];
+  const placeholders = [];
+
+  businesses.forEach((biz, i) => {
+    const idx = i * 8;
+
+    placeholders.push(`
+      ($${idx + 1}, $${idx + 2}, $${idx + 3}, $${idx + 4},
+       $${idx + 5}, $${idx + 6},
+       ST_SetSRID(ST_MakePoint($${idx + 6}, $${idx + 5}), 4326),
+       $${idx + 7}, $${idx + 8})
+    `);
+
+    values.push(
+      biz.name,
+      biz.category,
+      biz.address,
+      biz.rating,
+      biz.lat,
+      biz.lng,
+      biz.source,
+      biz.external_id
+    );
+  });
+
+  const query = `
+    INSERT INTO businesses
+    (name, category, address, rating, lat, lng, location, source, external_id)
+    VALUES ${placeholders.join(",")}
+    ON CONFLICT (source, external_id)
+    DO UPDATE SET
+      name = EXCLUDED.name,
+      rating = EXCLUDED.rating,
+      updated_at = NOW()
+  `;
+
+  try {
+    await pool.query(query, values);
+  } catch (err) {
+    console.error("❌ bulk upsert error:", err.message);
+  }
+}
+
+/* =====================================================
+   GOOGLE PLACES INGEST (🔥 BULK)
 ===================================================== */
 
 export async function ingestGoogle({ lat, lng, radius = 2000, type = "restaurant" }) {
 
   const url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json";
 
-  const res = await axios.get(url, {
-    params: {
-      location: `${lat},${lng}`,
-      radius,
-      type,
-      key: GOOGLE_KEY
-    }
-  });
+  try {
+    const res = await axios.get(url, {
+      params: {
+        location: `${lat},${lng}`,
+        radius,
+        type,
+        key: GOOGLE_KEY
+      }
+    });
 
-  const places = res.data.results;
+    const places = res.data.results || [];
 
-  for (const p of places) {
+    console.log(`📍 Google fetched: ${places.length}`);
 
-    const biz = {
+    const businesses = places.map((p) => ({
       name: p.name,
       category: type,
       address: p.vicinity,
@@ -37,40 +91,50 @@ export async function ingestGoogle({ lat, lng, radius = 2000, type = "restaurant
       lng: p.geometry.location.lng,
       source: "google",
       external_id: p.place_id
-    };
+    }));
 
-    await upsertBusiness(biz);
+    // 🔥 BULK INSERT IN CHUNKS
+    for (let i = 0; i < businesses.length; i += BATCH_SIZE) {
+      const chunk = businesses.slice(i, i + BATCH_SIZE);
+      await bulkUpsertBusinesses(chunk);
+    }
+
+    console.log(`✅ Google ingested: ${businesses.length}`);
+
+  } catch (err) {
+    console.error("❌ Google ingest failed:", err.message);
   }
-
-  console.log(`✅ Google ingested: ${places.length}`);
 }
 
-
 /* =====================================================
-   OSM (OVERPASS) INGEST
+   OSM INGEST (🔥 BULK + SAFE)
 ===================================================== */
 
 export async function ingestOSM({ lat, lng }) {
 
   const query = `
-    [out:json];
+    [out:json][timeout:25];
     (
-      node(around:800,${lat},${lng})["amenity"];
+      node["amenity"](around:800,${lat},${lng});
     );
     out;
   `;
 
-  const res = await axios.post(
-    "https://overpass-api.de/api/interpreter",
-    query,
-    { headers: { "Content-Type": "text/plain" } }
-  );
+  try {
+    const res = await axios.post(
+      "https://overpass-api.de/api/interpreter",
+      query,
+      {
+        headers: { "Content-Type": "text/plain" },
+        timeout: 30000
+      }
+    );
 
-  const nodes = res.data.elements;
+    const nodes = res.data.elements || [];
 
-  for (const n of nodes) {
+    console.log(`🌍 OSM fetched: ${nodes.length}`);
 
-    const biz = {
+    const businesses = nodes.map((n) => ({
       name: n.tags?.name || "Unknown",
       category: n.tags?.amenity || "other",
       address: "OSM location",
@@ -79,48 +143,17 @@ export async function ingestOSM({ lat, lng }) {
       lng: n.lon,
       source: "osm",
       external_id: `osm_${n.id}`
-    };
+    }));
 
-    await upsertBusiness(biz);
-  }
+    // 🔥 BULK INSERT IN CHUNKS
+    for (let i = 0; i < businesses.length; i += BATCH_SIZE) {
+      const chunk = businesses.slice(i, i + BATCH_SIZE);
+      await bulkUpsertBusinesses(chunk);
+    }
 
-  console.log(`✅ OSM ingested: ${nodes.length}`);
-}
+    console.log(`✅ OSM ingested: ${businesses.length}`);
 
-
-/* =====================================================
-   UPSERT (DEDUPLICATION CORE)
-===================================================== */
-
-async function upsertBusiness(biz) {
-
-  try {
-    await pool.query(
-      `
-      INSERT INTO businesses
-      (name, category, address, rating, lat, lng, location, source, external_id)
-      VALUES ($1,$2,$3,$4,$5,$6,
-        ST_SetSRID(ST_MakePoint($6,$5),4326),
-        $7,$8
-      )
-      ON CONFLICT (source, external_id)
-      DO UPDATE SET
-        name = EXCLUDED.name,
-        rating = EXCLUDED.rating,
-        updated_at = NOW()
-      `,
-      [
-        biz.name,
-        biz.category,
-        biz.address,
-        biz.rating,
-        biz.lat,
-        biz.lng,
-        biz.source,
-        biz.external_id
-      ]
-    );
   } catch (err) {
-    console.error("❌ upsert error:", err.message);
+    console.log("⚠️ OSM failed, skipping:", err.response?.status || err.message);
   }
 }
