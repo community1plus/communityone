@@ -11,7 +11,7 @@ app.use(cors());
 const PORT = process.env.PORT || 5000;
 
 /* =====================================================
-   DATABASE CONNECTION
+   DATABASE
 ===================================================== */
 
 const pool = new Pool({
@@ -26,7 +26,7 @@ const pool = new Pool({
 const GOOGLE_KEY = process.env.GOOGLE_PLACES_API_KEY;
 
 /* =====================================================
-   HEALTH CHECK
+   HEALTH
 ===================================================== */
 
 app.get("/api/health", async (req, res) => {
@@ -34,56 +34,38 @@ app.get("/api/health", async (req, res) => {
     await pool.query("SELECT 1");
     res.json({ status: "OK", db: "connected" });
   } catch (err) {
-    console.error("❌ health error:", err.message);
+    console.error(err);
     res.json({ status: "OK", db: "fallback" });
   }
 });
 
 /* =====================================================
-   DEBUG ENDPOINTS
+   DEBUG
 ===================================================== */
 
 app.get("/api/debug-count", async (req, res) => {
-  try {
-    const result = await pool.query("SELECT COUNT(*) FROM businesses");
-    res.json(result.rows[0]);
-  } catch (err) {
-    console.error("❌ debug-count error:", err.message);
-    res.status(500).json({ error: err.message });
-  }
-});
-
-app.get("/api/debug-db", async (req, res) => {
-  try {
-    const result = await pool.query("SELECT current_database()");
-    res.json(result.rows[0]);
-  } catch (err) {
-    console.error("❌ debug-db error:", err.message);
-    res.status(500).json({ error: err.message });
-  }
+  const r = await pool.query("SELECT COUNT(*) FROM businesses");
+  res.json(r.rows[0]);
 });
 
 /* =====================================================
-   BUSINESSES (MAP VIEW) ✅ FIXED
+   MAP (FIXED GEO)
 ===================================================== */
 
 app.get("/api/businesses", async (req, res) => {
-  let { north, south, east, west, category, limit = 50 } = req.query;
-
-  north = parseFloat(north);
-  south = parseFloat(south);
-  east = parseFloat(east);
-  west = parseFloat(west);
-  limit = Math.min(parseInt(limit) || 50, 200);
-
-  if ([north, south, east, west].some(v => isNaN(v))) {
-    return res.json([]);
-  }
-
   try {
-    const values = [west, south, east, north];
+    const north = parseFloat(req.query.north);
+    const south = parseFloat(req.query.south);
+    const east = parseFloat(req.query.east);
+    const west = parseFloat(req.query.west);
+    const limit = Math.min(parseInt(req.query.limit) || 50, 200);
 
-    let query = `
+    if ([north, south, east, west].some(isNaN)) {
+      return res.json([]);
+    }
+
+    const result = await pool.query(
+      `
       SELECT id, name, address, rating,
              ST_Y(location::geometry) AS lat,
              ST_X(location::geometry) AS lng
@@ -92,116 +74,85 @@ app.get("/api/businesses", async (req, res) => {
         location::geometry,
         ST_MakeEnvelope($1, $2, $3, $4, 4326)
       )
-    `;
-
-    if (category) {
-      values.push(category);
-      query += ` AND category = $${values.length}`;
-    }
-
-    query += ` LIMIT ${limit}`;
-
-    const result = await pool.query(query, values);
-
-    console.log("📦 businesses rows:", result.rows.length);
-
-    return res.json(result.rows);
-
-  } catch (err) {
-    console.error("❌ businesses error:", err.message);
-    return res.status(500).json({ error: err.message });
-  }
-});
-
-/* =====================================================
-   SEARCH (FIXED + SMART FALLBACK)
-===================================================== */
-
-app.get("/api/search", async (req, res) => {
-  const { q, lat, lng, radius = 2000, category, limit = 50 } = req.query;
-
-  if (!q || q.length < 2) return res.json([]);
-
-  try {
-    // 🔍 detect if search_vector exists
-    const columnCheck = await pool.query(`
-      SELECT column_name
-      FROM information_schema.columns
-      WHERE table_name = 'businesses'
-      AND column_name = 'search_vector'
-    `);
-
-    const hasSearchVector = columnCheck.rows.length > 0;
-
-    let values = [];
-    let query = "";
-
-    if (hasSearchVector) {
-      // ✅ full-text
-      values = [q];
-
-      query = `
-        SELECT id, name, address, rating,
-               ST_Y(location::geometry) AS lat,
-               ST_X(location::geometry) AS lng,
-               ts_rank(search_vector, plainto_tsquery($1)) AS rank
-        FROM businesses
-        WHERE search_vector @@ plainto_tsquery($1)
-      `;
-
-    } else {
-      // ✅ fallback
-      values = [`%${q}%`];
-
-      query = `
-        SELECT id, name, address, rating,
-               ST_Y(location::geometry) AS lat,
-               ST_X(location::geometry) AS lng,
-               0 AS rank
-        FROM businesses
-        WHERE name ILIKE $1
-      `;
-    }
-
-    let idx = values.length + 1;
-
-    // 📍 GEO filter
-    if (lat && lng) {
-      query += `
-        AND ST_DWithin(
-          location::geography,
-          ST_SetSRID(ST_MakePoint($${idx},$${idx + 1}),4326)::geography,
-          $${idx + 2}
-        )
-      `;
-      values.push(lng, lat, radius);
-      idx += 3;
-    }
-
-    // 📂 category
-    if (category) {
-      query += ` AND category = $${idx}`;
-      values.push(category);
-      idx++;
-    }
-
-    query += `
-      ORDER BY rank DESC NULLS LAST, rating DESC NULLS LAST
-      LIMIT ${Math.min(parseInt(limit) || 50, 100)}
-    `;
-
-    const result = await pool.query(query, values);
-
-    console.log(
-      `🔎 search (${hasSearchVector ? "FTS" : "ILIKE"}) →`,
-      result.rows.length
+      LIMIT $5
+      `,
+      [west, south, east, north, limit]
     );
 
     res.json(result.rows);
 
   } catch (err) {
-    console.error("❌ search error FULL:", err);
-    res.status(500).json({ error: err.message || "search failed" });
+    console.error("❌ businesses:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/* =====================================================
+   🔍 CLEAN SEARCH (STABLE VERSION)
+===================================================== */
+
+app.get("/api/search", async (req, res) => {
+  try {
+    const q = req.query.q;
+    const lat = parseFloat(req.query.lat);
+    const lng = parseFloat(req.query.lng);
+    const radius = parseInt(req.query.radius) || 2000;
+    const limit = Math.min(parseInt(req.query.limit) || 50, 100);
+
+    if (!q || q.length < 2) return res.json([]);
+
+    const hasGeo = !isNaN(lat) && !isNaN(lng);
+
+    let query = `
+      SELECT
+        id,
+        name,
+        address,
+        rating,
+        ST_Y(location::geometry) AS lat,
+        ST_X(location::geometry) AS lng
+        ${hasGeo ? `,
+        ST_Distance(
+          location,
+          ST_SetSRID(ST_MakePoint($2,$3),4326)::geography
+        ) AS distance` : ``}
+      FROM businesses
+      WHERE name ILIKE $1
+    `;
+
+    const values = [`%${q}%`];
+
+    if (hasGeo) {
+      values.push(lng, lat, radius);
+
+      query += `
+        AND ST_DWithin(
+          location,
+          ST_SetSRID(ST_MakePoint($2,$3),4326)::geography,
+          $4
+        )
+      `;
+    }
+
+    query += `
+      ORDER BY
+        ${hasGeo ? "distance ASC," : ""}
+        rating DESC NULLS LAST
+      LIMIT ${limit}
+    `;
+
+    const result = await pool.query(query, values);
+
+    console.log("🔎 search rows:", result.rows.length);
+
+    res.json(result.rows);
+
+  } catch (err) {
+    console.error("❌ SEARCH ERROR:", err);
+    res.status(500).json({
+      error: err.message,
+      detail: err.detail
+    });
   }
 });
 
@@ -210,11 +161,10 @@ app.get("/api/search", async (req, res) => {
 ===================================================== */
 
 app.get("/api/autocomplete", async (req, res) => {
-  const { q, limit = 10 } = req.query;
-
-  if (!q || q.length < 2) return res.json([]);
-
   try {
+    const q = req.query.q;
+    if (!q || q.length < 2) return res.json([]);
+
     const result = await pool.query(
       `
       SELECT name
@@ -222,21 +172,21 @@ app.get("/api/autocomplete", async (req, res) => {
       WHERE name ILIKE $1
       GROUP BY name
       ORDER BY COUNT(*) DESC
-      LIMIT $2
+      LIMIT 10
       `,
-      [`${q}%`, limit]
+      [`${q}%`]
     );
 
     res.json(result.rows.map(r => r.name));
 
   } catch (err) {
-    console.error("❌ autocomplete error:", err.message);
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.json([]);
   }
 });
 
 /* =====================================================
-   UPSERT (DEDUP CORE)
+   UPSERT
 ===================================================== */
 
 async function upsertBusiness(biz) {
@@ -267,7 +217,7 @@ async function upsertBusiness(biz) {
       ]
     );
   } catch (err) {
-    console.error("❌ upsert error:", err.message);
+    console.error("❌ upsert:", err.message);
   }
 }
 
@@ -278,36 +228,31 @@ async function upsertBusiness(biz) {
 async function ingestGoogle({ lat, lng }) {
   if (!GOOGLE_KEY) return;
 
-  try {
-    const res = await axios.get(
-      "https://maps.googleapis.com/maps/api/place/nearbysearch/json",
-      {
-        params: {
-          location: `${lat},${lng}`,
-          radius: 2000,
-          key: GOOGLE_KEY
-        }
+  const res = await axios.get(
+    "https://maps.googleapis.com/maps/api/place/nearbysearch/json",
+    {
+      params: {
+        location: `${lat},${lng}`,
+        radius: 2000,
+        key: GOOGLE_KEY
       }
-    );
-
-    for (const place of res.data.results) {
-      await upsertBusiness({
-        name: place.name,
-        category: place.types?.[0] || "other",
-        address: place.vicinity,
-        rating: place.rating || null,
-        lat: place.geometry.location.lat,
-        lng: place.geometry.location.lng,
-        source: "google",
-        external_id: place.place_id
-      });
     }
+  );
 
-    console.log(`✅ Google ingest: ${res.data.results.length}`);
-
-  } catch (err) {
-    console.error("❌ Google ingest error:", err.message);
+  for (const p of res.data.results) {
+    await upsertBusiness({
+      name: p.name,
+      category: p.types?.[0],
+      address: p.vicinity,
+      rating: p.rating,
+      lat: p.geometry.location.lat,
+      lng: p.geometry.location.lng,
+      source: "google",
+      external_id: p.place_id
+    });
   }
+
+  console.log("✅ Google:", res.data.results.length);
 }
 
 /* =====================================================
@@ -315,68 +260,57 @@ async function ingestGoogle({ lat, lng }) {
 ===================================================== */
 
 async function ingestOSM({ lat, lng }) {
-  try {
-    const query = `
-      [out:json];
-      (
-        node["amenity"](around:2000,${lat},${lng});
-        node["shop"](around:2000,${lat},${lng});
-      );
-      out;
-    `;
-
-    const res = await axios.post(
-      "https://overpass-api.de/api/interpreter",
-      query,
-      { headers: { "Content-Type": "text/plain" } }
+  const query = `
+    [out:json];
+    (
+      node["amenity"](around:2000,${lat},${lng});
+      node["shop"](around:2000,${lat},${lng});
     );
+    out;
+  `;
 
-    for (const el of res.data.elements) {
-      const tags = el.tags || {};
+  const res = await axios.post(
+    "https://overpass-api.de/api/interpreter",
+    query,
+    { headers: { "Content-Type": "text/plain" } }
+  );
 
-      await upsertBusiness({
-        name: tags.name || "Unknown",
-        category: tags.amenity || tags.shop || "other",
-        address: tags["addr:full"] || "",
-        rating: null,
-        lat: el.lat,
-        lng: el.lon,
-        source: "osm",
-        external_id: el.id.toString()
-      });
-    }
+  for (const el of res.data.elements) {
+    const t = el.tags || {};
 
-    console.log(`✅ OSM ingest: ${res.data.elements.length}`);
-
-  } catch (err) {
-    console.error("❌ OSM ingest error:", err.message);
+    await upsertBusiness({
+      name: t.name || "Unknown",
+      category: t.amenity || t.shop,
+      address: t["addr:full"] || "",
+      rating: null,
+      lat: el.lat,
+      lng: el.lon,
+      source: "osm",
+      external_id: el.id.toString()
+    });
   }
+
+  console.log("✅ OSM:", res.data.elements.length);
 }
 
 /* =====================================================
-   INGEST ENDPOINT
+   INGEST
 ===================================================== */
 
 app.get("/api/ingest", async (req, res) => {
   const lat = parseFloat(req.query.lat) || -37.8136;
   const lng = parseFloat(req.query.lng) || 144.9631;
 
-  try {
-    await ingestGoogle({ lat, lng });
-    await ingestOSM({ lat, lng });
+  await ingestGoogle({ lat, lng });
+  await ingestOSM({ lat, lng });
 
-    res.json({ status: "ingestion complete" });
-
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "ingestion failed" });
-  }
+  res.json({ status: "done" });
 });
 
 /* =====================================================
-   START SERVER
+   START
 ===================================================== */
 
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`🚀 running on ${PORT}`);
 });
