@@ -26,7 +26,7 @@ const pool = new Pool({
 const GOOGLE_KEY = process.env.GOOGLE_PLACES_API_KEY;
 
 /* =====================================================
-   TEMP FALLBACK DATA (kept for safety)
+   TEMP FALLBACK DATA
 ===================================================== */
 
 const businesses = Array.from({ length: 1000 }).map((_, i) => ({
@@ -53,7 +53,7 @@ app.get("/api/health", async (req, res) => {
 });
 
 /* =====================================================
-   BUSINESSES ENDPOINT (DB + FALLBACK)
+   BUSINESSES (MAP VIEW)
 ===================================================== */
 
 app.get("/api/businesses", async (req, res) => {
@@ -66,7 +66,6 @@ app.get("/api/businesses", async (req, res) => {
   limit = Math.min(parseInt(limit) || 50, 200);
 
   if ([north, south, east, west].some(v => isNaN(v))) {
-    console.log("⛔ Invalid bounds:", req.query);
     return res.json([]);
   }
 
@@ -89,21 +88,93 @@ app.get("/api/businesses", async (req, res) => {
     query += ` LIMIT ${limit}`;
 
     const result = await pool.query(query, values);
-
     return res.json(result.rows);
 
-  } catch (err) {
-    console.error("❌ DB error, using fallback:", err.message);
+  } catch {
+    return res.json([]);
+  }
+});
 
-    let results = businesses.filter(b =>
-      b.lat <= north &&
-      b.lat >= south &&
-      b.lng <= east &&
-      b.lng >= west &&
-      (!category || b.category === category)
+/* =====================================================
+   🔍 SEARCH (FULL TEXT + GEO)
+===================================================== */
+
+app.get("/api/search", async (req, res) => {
+  const { q, lat, lng, radius = 2000, category, limit = 50 } = req.query;
+
+  if (!q || q.length < 2) return res.json([]);
+
+  try {
+    const values = [q];
+    let idx = 1;
+
+    let query = `
+      SELECT id, name, address, rating,
+             ST_Y(location::geometry) AS lat,
+             ST_X(location::geometry) AS lng,
+             ts_rank(search_vector, plainto_tsquery($1)) AS rank
+      FROM businesses
+      WHERE search_vector @@ plainto_tsquery($1)
+    `;
+
+    if (lat && lng) {
+      query += `
+        AND ST_DWithin(
+          location::geography,
+          ST_SetSRID(ST_MakePoint($2,$3),4326)::geography,
+          $4
+        )
+      `;
+      values.push(lng, lat, radius);
+      idx = 4;
+    }
+
+    if (category) {
+      query += ` AND category = $${idx + 1}`;
+      values.push(category);
+    }
+
+    query += `
+      ORDER BY rank DESC, rating DESC
+      LIMIT ${Math.min(parseInt(limit) || 50, 100)}
+    `;
+
+    const result = await pool.query(query, values);
+    res.json(result.rows);
+
+  } catch (err) {
+    console.error("❌ search error:", err.message);
+    res.json([]);
+  }
+});
+
+/* =====================================================
+   ⚡ AUTOCOMPLETE (FAST PREFIX SEARCH)
+===================================================== */
+
+app.get("/api/autocomplete", async (req, res) => {
+  const { q, limit = 10 } = req.query;
+
+  if (!q || q.length < 2) return res.json([]);
+
+  try {
+    const result = await pool.query(
+      `
+      SELECT name
+      FROM businesses
+      WHERE name ILIKE $1
+      GROUP BY name
+      ORDER BY COUNT(*) DESC
+      LIMIT $2
+      `,
+      [`${q}%`, limit]
     );
 
-    return res.json(results.slice(0, limit));
+    res.json(result.rows.map(r => r.name));
+
+  } catch (err) {
+    console.error("❌ autocomplete error:", err.message);
+    res.json([]);
   }
 });
 
@@ -144,76 +215,6 @@ async function upsertBusiness(biz) {
 }
 
 /* =====================================================
-   GOOGLE INGEST
-===================================================== */
-
-async function ingestGoogle({ lat, lng, radius = 2000, type = "restaurant" }) {
-
-  const res = await axios.get(
-    "https://maps.googleapis.com/maps/api/place/nearbysearch/json",
-    {
-      params: {
-        location: `${lat},${lng}`,
-        radius,
-        type,
-        key: GOOGLE_KEY
-      }
-    }
-  );
-
-  for (const p of res.data.results) {
-    await upsertBusiness({
-      name: p.name,
-      category: type,
-      address: p.vicinity,
-      rating: p.rating || 0,
-      lat: p.geometry.location.lat,
-      lng: p.geometry.location.lng,
-      source: "google",
-      external_id: p.place_id
-    });
-  }
-
-  console.log(`✅ Google ingested: ${res.data.results.length}`);
-}
-
-/* =====================================================
-   OSM INGEST
-===================================================== */
-
-async function ingestOSM({ lat, lng }) {
-
-  const query = `
-    [out:json];
-    (
-      node(around:2000,${lat},${lng})["amenity"];
-    );
-    out;
-  `;
-
-  const res = await axios.post(
-    "https://overpass-api.de/api/interpreter",
-    query,
-    { headers: { "Content-Type": "text/plain" } }
-  );
-
-  for (const n of res.data.elements) {
-    await upsertBusiness({
-      name: n.tags?.name || "Unknown",
-      category: n.tags?.amenity || "other",
-      address: "OSM location",
-      rating: 0,
-      lat: n.lat,
-      lng: n.lon,
-      source: "osm",
-      external_id: `osm_${n.id}`
-    });
-  }
-
-  console.log(`✅ OSM ingested: ${res.data.elements.length}`);
-}
-
-/* =====================================================
    INGEST ENDPOINT
 ===================================================== */
 
@@ -222,13 +223,12 @@ app.get("/api/ingest", async (req, res) => {
   const lng = parseFloat(req.query.lng) || 144.9631;
 
   try {
-    await ingestGoogle({ lat, lng, type: "restaurant" });
+    await ingestGoogle({ lat, lng });
     await ingestOSM({ lat, lng });
 
     res.json({ status: "ingestion complete" });
 
-  } catch (err) {
-    console.error(err);
+  } catch {
     res.status(500).json({ error: "ingestion failed" });
   }
 });
