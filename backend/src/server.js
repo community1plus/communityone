@@ -114,7 +114,7 @@ app.get("/api/businesses", async (req, res) => {
 });
 
 /* =====================================================
-   SEARCH (UNCHANGED BUT LOGGING ADDED)
+   SEARCH (FIXED + SMART FALLBACK)
 ===================================================== */
 
 app.get("/api/search", async (req, res) => {
@@ -123,49 +123,85 @@ app.get("/api/search", async (req, res) => {
   if (!q || q.length < 2) return res.json([]);
 
   try {
-    const values = [q];
-    let idx = 1;
+    // 🔍 detect if search_vector exists
+    const columnCheck = await pool.query(`
+      SELECT column_name
+      FROM information_schema.columns
+      WHERE table_name = 'businesses'
+      AND column_name = 'search_vector'
+    `);
 
-    let query = `
-      SELECT id, name, address, rating,
-             ST_Y(location::geometry) AS lat,
-             ST_X(location::geometry) AS lng,
-             ts_rank(search_vector, plainto_tsquery($1)) AS rank
-      FROM businesses
-      WHERE search_vector @@ plainto_tsquery($1)
-    `;
+    const hasSearchVector = columnCheck.rows.length > 0;
 
+    let values = [];
+    let query = "";
+
+    if (hasSearchVector) {
+      // ✅ full-text
+      values = [q];
+
+      query = `
+        SELECT id, name, address, rating,
+               ST_Y(location::geometry) AS lat,
+               ST_X(location::geometry) AS lng,
+               ts_rank(search_vector, plainto_tsquery($1)) AS rank
+        FROM businesses
+        WHERE search_vector @@ plainto_tsquery($1)
+      `;
+
+    } else {
+      // ✅ fallback
+      values = [`%${q}%`];
+
+      query = `
+        SELECT id, name, address, rating,
+               ST_Y(location::geometry) AS lat,
+               ST_X(location::geometry) AS lng,
+               0 AS rank
+        FROM businesses
+        WHERE name ILIKE $1
+      `;
+    }
+
+    let idx = values.length + 1;
+
+    // 📍 GEO filter
     if (lat && lng) {
       query += `
         AND ST_DWithin(
           location::geography,
-          ST_SetSRID(ST_MakePoint($2,$3),4326)::geography,
-          $4
+          ST_SetSRID(ST_MakePoint($${idx},$${idx + 1}),4326)::geography,
+          $${idx + 2}
         )
       `;
       values.push(lng, lat, radius);
-      idx = 4;
+      idx += 3;
     }
 
+    // 📂 category
     if (category) {
-      query += ` AND category = $${idx + 1}`;
+      query += ` AND category = $${idx}`;
       values.push(category);
+      idx++;
     }
 
     query += `
-      ORDER BY rank DESC, rating DESC
+      ORDER BY rank DESC NULLS LAST, rating DESC NULLS LAST
       LIMIT ${Math.min(parseInt(limit) || 50, 100)}
     `;
 
     const result = await pool.query(query, values);
 
-    console.log("🔎 search rows:", result.rows.length);
+    console.log(
+      `🔎 search (${hasSearchVector ? "FTS" : "ILIKE"}) →`,
+      result.rows.length
+    );
 
     res.json(result.rows);
 
   } catch (err) {
-    console.error("❌ search error:", err.message);
-    res.status(500).json({ error: err.message });
+    console.error("❌ search error FULL:", err);
+    res.status(500).json({ error: err.message || "search failed" });
   }
 });
 
@@ -200,7 +236,7 @@ app.get("/api/autocomplete", async (req, res) => {
 });
 
 /* =====================================================
-   UPSERT (UNCHANGED)
+   UPSERT (DEDUP CORE)
 ===================================================== */
 
 async function upsertBusiness(biz) {
@@ -236,7 +272,7 @@ async function upsertBusiness(biz) {
 }
 
 /* =====================================================
-   INGEST (UNCHANGED)
+   GOOGLE INGEST
 ===================================================== */
 
 async function ingestGoogle({ lat, lng }) {
@@ -273,6 +309,10 @@ async function ingestGoogle({ lat, lng }) {
     console.error("❌ Google ingest error:", err.message);
   }
 }
+
+/* =====================================================
+   OSM INGEST
+===================================================== */
 
 async function ingestOSM({ lat, lng }) {
   try {
