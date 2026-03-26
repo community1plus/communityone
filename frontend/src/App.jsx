@@ -2,11 +2,12 @@ import { Routes, Route } from "react-router-dom";
 import CommunityPlusLandingPage from "./components/CommunityPlusLandingPage/CommunityPlusLandingPage";
 import CommunityPlusYellowPages from "./components/YellowPages/CommunityPlusYellowPages";
 import { Amplify } from "aws-amplify";
-import { awsconfig } from "./aws-exports.js";
+import config from "./amplify_outputs.json";
+
+Amplify.configure(config);;
 import { useAuthenticator } from "@aws-amplify/ui-react";
 
 const { user } = useAuthenticator();
-Amplify.configure(awsconfig);
 
 export default function App() {
   return (
