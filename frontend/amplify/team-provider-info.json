@@ -10,6 +10,11 @@
       "StackName": "amplify-communityone-main-fd725",
       "StackId": "arn:aws:cloudformation:ap-southeast-2:784434437133:stack/amplify-communityone-main-fd725/c61166c0-240d-11f1-83c8-02f070526b03",
       "AmplifyAppId": "d1ss8rtrtimogr"
+    },
+    "categories": {
+      "auth": {
+        "communityoneaba83683": {}
+      }
     }
   }
 }
