@@ -1,7 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import CommunityPlusLandingPage from "./components/CommunityPlusLandingPage/CommunityPlusLandingPage";
 import CommunityPlusYellowPages from "./components/YellowPages/CommunityPlusYellowPages";
-import { Amplify } from "aws-amplify";
+import { Amplify } from "./aws-amplify";
 import config from "./amplify_outputs.json" assert { type: "json" };
 
 Amplify.configure(config);;
