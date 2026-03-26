@@ -1,14 +1,19 @@
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
-import "./index.css";
-import { Amplify } from "aws-amplify";
+import React from "react";
+import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
 
-createRoot(document.getElementById("root")).render(
-  <StrictMode>
-    <BrowserRouter>
+import { Amplify } from "aws-amplify";
+import config from "./amplify-config.js";
+
+import { Authenticator } from "@aws-amplify/ui-react";
+import "@aws-amplify/ui-react/styles.css";
+
+Amplify.configure(config);
+
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
+    <Authenticator.Provider>
       <App />
-    </BrowserRouter>
-  </StrictMode>
+    </Authenticator.Provider>
+  </React.StrictMode>
 );

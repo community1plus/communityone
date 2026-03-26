@@ -11,7 +11,7 @@ export default function CommunityPlusLandingPage() {
   const didNavigateRef = useRef(false);
 
   const handleAuthed = () => {
-  if (didNavigateRef.current) return;
+    if (didNavigateRef.current) return;
     didNavigateRef.current = true;
     setShowAuth(false);
     navigate("/home", { replace: true });
@@ -103,7 +103,7 @@ export default function CommunityPlusLandingPage() {
         </div>
       </footer>
 
-      {/* AUTH MODAL (DISABLED VERSION) */}
+      {/* AUTH MODAL */}
       {showAuth && (
         <div
           className="cpl-modalOverlay"
@@ -119,12 +119,18 @@ export default function CommunityPlusLandingPage() {
 
             <div className="cpl-modalBody">
               <Authenticator>
-                {({ user, signOut }) => {
-                  handleAuthed(); // navigate once signed in
+                {({ user }) => {
+                  // ✅ SAFE: only trigger once when user exists
+                  useEffect(() => {
+                    if (user) {
+                      handleAuthed();
+                    }
+                  }, [user]);
+
                   return null;
                 }}
               </Authenticator>
-          </div>
+            </div>
           </div>
         </div>
       )}
