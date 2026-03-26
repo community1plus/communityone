@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./CommunityPlusLandingPage.css";
+import { Authenticator } from "@aws-amplify/ui-react";
+import "@aws-amplify/ui-react/styles.css";
 
 export default function CommunityPlusLandingPage() {
   const navigate = useNavigate();
@@ -9,7 +11,7 @@ export default function CommunityPlusLandingPage() {
   const didNavigateRef = useRef(false);
 
   const handleAuthed = () => {
-    if (didNavigateRef.current) return;
+  if (didNavigateRef.current) return;
     didNavigateRef.current = true;
     setShowAuth(false);
     navigate("/home", { replace: true });
@@ -116,10 +118,13 @@ export default function CommunityPlusLandingPage() {
             </div>
 
             <div className="cpl-modalBody">
-              <div style={{ padding: "20px", textAlign: "center" }}>
-                🚧 Auth temporarily disabled
-              </div>
-            </div>
+              <Authenticator>
+                {({ user, signOut }) => {
+                  handleAuthed(); // navigate once signed in
+                  return null;
+                }}
+              </Authenticator>
+          </div>
           </div>
         </div>
       )}
