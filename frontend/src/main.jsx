@@ -6,7 +6,10 @@ import App from "./App.jsx";
 import { Amplify } from "aws-amplify";
 import outputs from "./amplify_outputs.json";
 
-// ✅ Ensure OAuth + Auth works correctly
+// ✅ ADD THIS
+import { AuthProvider } from "./context/AuthContext";
+
+// ✅ Amplify config (your version is fine)
 Amplify.configure({
   ...outputs,
   Auth: {
@@ -22,7 +25,10 @@ Amplify.configure({
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
-      <App />
+      {/* 🔥 CRITICAL FIX */}
+      <AuthProvider>
+        <App />
+      </AuthProvider>
     </BrowserRouter>
   </React.StrictMode>
 );
