@@ -43,12 +43,12 @@
       ],
       "domain": "communityone-auth.auth.ap-southeast-2.amazoncognito.com"
     },
-    "unauthenticated_identities_enabled": true
+    "unauthenticated_identities_enabled": false
   },
   "data": {
     "url": "https://6rwq6jgc35bqdp7xrurv6lu3dm.appsync-api.ap-southeast-2.amazonaws.com/graphql",
     "aws_region": "ap-southeast-2",
-    "default_authorization_type": "AWS_IAM",
+    "default_authorization_type": "AMAZON_COGNITO_USER_POOLS",
     "authorization_types": [
       "AMAZON_COGNITO_USER_POOLS"
     ],
