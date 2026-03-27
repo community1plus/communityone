@@ -30,7 +30,7 @@
       ],
       "redirect_sign_in_uri": [
         "http://localhost:5173/",
-        "main.d1ss8rtrtimogr.amplifyapp.com/"
+        "https://main.d1ss8rtrtimogr.amplifyapp.com/"
       ],
       "redirect_sign_out_uri": [
         "http://localhost:5173/",
