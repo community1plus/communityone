@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./CommunityPlusLandingPage.css";
 
-import { signInWithRedirect, getCurrentUser } from "aws-amplify/auth";
+import { getCurrentUser } from "aws-amplify/auth";
 import { Authenticator } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 
@@ -14,11 +14,14 @@ export default function CommunityPlusLandingPage() {
   const handleAuthed = () => {
     if (didNavigateRef.current) return;
     didNavigateRef.current = true;
+
+    document.body.classList.remove("modal-open");
     setShowAuth(false);
+
     navigate("/home", { replace: true });
   };
 
-  // ✅ Check if already logged in
+  // ✅ check session
   useEffect(() => {
     const checkUser = async () => {
       try {
@@ -28,6 +31,15 @@ export default function CommunityPlusLandingPage() {
     };
     checkUser();
   }, []);
+
+  // ✅ lock background scroll when modal open
+  useEffect(() => {
+    if (showAuth) {
+      document.body.classList.add("modal-open");
+    } else {
+      document.body.classList.remove("modal-open");
+    }
+  }, [showAuth]);
 
   return (
     <div className="cpl-root">
@@ -60,6 +72,7 @@ export default function CommunityPlusLandingPage() {
           <div className="cpl-modal">
             <div className="cpl-modalHeader">
               <div className="cpl-modalTitle">Sign in</div>
+
               <button
                 className="cpl-modalClose"
                 onClick={() => setShowAuth(false)}
@@ -70,41 +83,8 @@ export default function CommunityPlusLandingPage() {
 
             <div className="cpl-modalBody">
               <div className="cpl-authTheme">
-                
-                {/* 🔥 SOCIAL LOGIN */}
-                <button
-                  className="btn social"
-                  style={{ width: "100%", marginBottom: "10px" }}
-                  onClick={() =>
-                    signInWithRedirect({ provider: "Google" })
-                  }
-                >
-                  Continue with Google
-                </button>
 
-                <button
-                  className="btn social"
-                  style={{ width: "100%", marginBottom: "12px" }}
-                  onClick={() =>
-                    signInWithRedirect({ provider: "Facebook" })
-                  }
-                >
-                  Continue with Facebook
-                </button>
-
-                {/* Divider */}
-                <div
-                  style={{
-                    margin: "12px 0",
-                    textAlign: "center",
-                    fontSize: "12px",
-                    color: "var(--muted)",
-                  }}
-                >
-                  — or —
-                </div>
-
-                {/* 🔥 EMAIL / PASSWORD (Amplify UI) */}
+                {/* 🚀 FULL COGNITO UI */}
                 <Authenticator>
                   {({ user }) => {
                     useEffect(() => {

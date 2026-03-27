@@ -38,6 +38,7 @@ a {
     var(--bg);
 }
 
+/* 🔥 CRITICAL: ensure app stays visible */
 #root {
   position: relative;
   z-index: 1;
@@ -50,7 +51,7 @@ a {
 }
 
 /* =========================
-   MODAL (FIXED + PREMIUM)
+   MODAL (FINAL FIXED)
    ========================= */
 
 .cpl-modalOverlay {
@@ -62,13 +63,16 @@ a {
   place-items: center;
   padding: 24px;
 
-  background: rgba(0, 0, 0, 0.35);
-  backdrop-filter: blur(8px);
+  /* 🔥 FIX: lighter so page shows */
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(6px);
 }
 
 .cpl-modal {
   width: min(520px, 92vw);
-  max-height: 86vh;
+
+  /* ❌ REMOVE scroll constraint */
+  max-height: unset;
 
   border-radius: 18px;
   border: 1px solid var(--line);
@@ -103,9 +107,11 @@ a {
 }
 
 .cpl-modalBody {
-  flex: 1;
   padding: 20px;
-  overflow-y: auto;
+
+  /* 🔥 KEY FIX: no scrollbar */
+  overflow: hidden;
+
   display: flex;
   justify-content: center;
 }
@@ -172,6 +178,14 @@ a {
 /* divider */
 .cpl-authTheme .amplify-divider {
   opacity: 0.6;
+}
+
+/* =========================
+   BODY SCROLL LOCK
+   ========================= */
+
+body.modal-open {
+  overflow: hidden;
 }
 
 /* =========================
