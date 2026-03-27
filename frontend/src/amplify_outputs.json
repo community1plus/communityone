@@ -44,7 +44,7 @@
         "profile",
         "aws.cognito.signin.user.admin"
       ],
-      "domain": "https://communityone-auth.auth.ap-southeast-2.amazoncognito.com"
+      "domain": "communityone-auth.auth.ap-southeast-2.amazoncognito.com"
     },
     "unauthenticated_identities_enabled": true
   },
