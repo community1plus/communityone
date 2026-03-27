@@ -38,11 +38,9 @@
       ],
       "response_type": "code",
       "scopes": [
-        "phone",
         "email",
         "openid",
-        "profile",
-        "aws.cognito.signin.user.admin"
+        "profile"
       ],
       "domain": "communityone-auth.auth.ap-southeast-2.amazoncognito.com"
     },
