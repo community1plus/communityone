@@ -2,16 +2,20 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./CommunityPlusLandingPage.css";
 
-import { getCurrentUser, fetchAuthSession } from "aws-amplify/auth";
+import { useAuth } from "../../context/AuthContext";
 import { Authenticator } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 
 export default function CommunityPlusLandingPage() {
   const navigate = useNavigate();
-  const [showAuth, setShowAuth] = useState(false);
-  const [checkingAuth, setCheckingAuth] = useState(true);
+  const { user, loading } = useAuth();
 
+  const [showAuth, setShowAuth] = useState(false);
   const didNavigateRef = useRef(false);
+
+  /* ===============================
+     🔥 REDIRECT WHEN AUTHED
+  =============================== */
 
   const handleAuthed = () => {
     if (didNavigateRef.current) return;
@@ -23,33 +27,14 @@ export default function CommunityPlusLandingPage() {
     navigate("/home", { replace: true });
   };
 
-  /* ===============================
-     🔥 COMPLETE OAUTH FLOW (FIX)
-  =============================== */
-
   useEffect(() => {
-    const completeAuth = async () => {
-      try {
-        // ✅ CRITICAL: completes Google/Facebook OAuth redirect
-        await fetchAuthSession();
-
-        const user = await getCurrentUser();
-
-        if (user) {
-          handleAuthed();
-        }
-      } catch {
-        // not signed in yet
-      }
-
-      setCheckingAuth(false);
-    };
-
-    completeAuth();
-  }, []);
+    if (!loading && user) {
+      handleAuthed();
+    }
+  }, [user, loading]);
 
   /* ===============================
-     🧠 MODAL BODY SCROLL LOCK
+     🧠 MODAL SCROLL LOCK
   =============================== */
 
   useEffect(() => {
@@ -61,10 +46,10 @@ export default function CommunityPlusLandingPage() {
   }, [showAuth]);
 
   /* ===============================
-     ⛔ PREVENT FLASH BEFORE AUTH CHECK
+     ⛔ PREVENT FLASH
   =============================== */
 
-  if (checkingAuth) return null;
+  if (loading) return null;
 
   return (
     <div className="cpl-root">
@@ -111,16 +96,8 @@ export default function CommunityPlusLandingPage() {
 
             <div className="cpl-modalBody">
               <div className="cpl-authTheme">
-                {/* 🔥 FULL COGNITO UI (Google + Facebook + Email) */}
-                <Authenticator>
-                  {({ user }) => {
-                    useEffect(() => {
-                      if (user) handleAuthed();
-                    }, [user]);
-
-                    return null;
-                  }}
-                </Authenticator>
+                {/* ✅ SAFE: no hooks inside render props */}
+                <Authenticator />
               </div>
             </div>
           </div>
