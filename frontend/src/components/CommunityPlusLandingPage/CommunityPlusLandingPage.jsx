@@ -23,14 +23,20 @@ export default function CommunityPlusLandingPage() {
 
   // ✅ check session
   useEffect(() => {
-    const checkUser = async () => {
-      try {
-        const user = await getCurrentUser();
-        if (user) handleAuthed();
-      } catch {}
-    };
-    checkUser();
-  }, []);
+  const checkUser = async () => {
+    try {
+      const user = await getCurrentUser();
+
+      if (user) {
+        handleAuthed();
+      }
+    } catch {
+      // not signed in
+    }
+  };
+
+  checkUser();
+}, []);
 
   // ✅ lock background scroll when modal open
   useEffect(() => {

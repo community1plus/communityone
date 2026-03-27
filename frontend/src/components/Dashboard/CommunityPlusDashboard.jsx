@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
+import { getCurrentUser, signOut } from "aws-amplify/auth";
+import { useNavigate } from "react-router-dom";
 
 import CommunityPlusHeader from "../Header/CommunityPlusHeader";
 import CommunityPlusSidebar from "../Sidebar/CommunityPlusSidebar";
@@ -10,7 +12,11 @@ import CommunityPlusUserProfile from "../CommunityPlusUserProfile/CommunityPlusU
 
 import "./CommunityPlusDashboard.css";
 
-export default function CommunityPlusDashboard({ user, signOut }) {
+export default function CommunityPlusDashboard() {
+  const navigate = useNavigate();
+
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const [coords, setCoords] = useState({
     lat: -37.8136,
@@ -19,23 +25,41 @@ export default function CommunityPlusDashboard({ user, signOut }) {
 
   const [activeView, setActiveView] = useState("dashboard");
 
+  /* ===============================
+     🔐 AUTH GUARD (CRITICAL)
+  =============================== */
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const currentUser = await getCurrentUser();
+        setUser(currentUser);
+        setLoading(false);
+      } catch {
+        navigate("/");
+      }
+    };
+
+    checkAuth();
+  }, []);
+
+  /* ===============================
+     📍 GEOLOCATION
+  =============================== */
+
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
     libraries: ["places"],
   });
 
   useEffect(() => {
-
     if ("geolocation" in navigator) {
-
       navigator.geolocation.getCurrentPosition(
-
         (pos) =>
           setCoords({
             lat: pos.coords.latitude,
             lng: pos.coords.longitude,
           }),
-
         () => {
           fetch("https://ipapi.co/json/")
             .then((res) => res.json())
@@ -49,42 +73,31 @@ export default function CommunityPlusDashboard({ user, signOut }) {
             })
             .catch(() => {});
         }
-
       );
-
     }
-
   }, []);
 
+  /* ===============================
+     🔓 LOGOUT (FIXED)
+  =============================== */
 
   const handleLogout = async () => {
-
     try {
-
       await signOut();
-      window.location.href = "/";
-
+      navigate("/");
     } catch (err) {
-
       console.error("Logout failed:", err);
-
     }
-
   };
-
 
   /* ===============================
      VIEW SWITCHER
   =============================== */
 
   const renderView = () => {
-
     switch (activeView) {
-
       case "profile":
-        return (
-          <CommunityPlusProfile user={user} />
-        );
+        return <CommunityPlusUserProfile user={user} />;
 
       case "post":
         return (
@@ -105,58 +118,49 @@ export default function CommunityPlusDashboard({ user, signOut }) {
       default:
         return (
           <>
-            {/* LEFT FEED COLUMN */}
-
+            {/* LEFT FEED */}
             <div className="feed-column">
-
               <div className="feed-header"></div>
 
               <div className="feed-stack">
                 <FeedCard />
                 <FeedCard />
               </div>
-
             </div>
 
-
-            {/* RIGHT MAP COLUMN */}
-
+            {/* RIGHT MAP */}
             <div className="map-column">
-
               {!isLoaded ? (
-
-                <div className="map-loading">
-                  Loading map…
-                </div>
-
+                <div className="map-loading">Loading map…</div>
               ) : (
-
                 <GoogleMap
                   center={coords}
                   zoom={14}
                   mapContainerClassName="map-container loaded"
                 >
-
                   <Marker position={coords} />
-
                 </GoogleMap>
-
               )}
-
             </div>
-
           </>
         );
-
     }
-
   };
 
+  /* ===============================
+     LOADING STATE
+  =============================== */
+
+  if (loading) {
+    return <div style={{ padding: 20 }}>Loading...</div>;
+  }
+
+  /* ===============================
+     MAIN RENDER
+  =============================== */
 
   return (
-
     <div className="dashboard-container">
-
       <CommunityPlusHeader
         user={user}
         setActiveView={setActiveView}
@@ -165,22 +169,13 @@ export default function CommunityPlusDashboard({ user, signOut }) {
       />
 
       <main className="main">
-
         <CommunityPlusSidebar
           setActiveView={setActiveView}
           onLogout={handleLogout}
         />
 
-        <div className="content-area">
-
-          {renderView()}
-
-        </div>
-
+        <div className="content-area">{renderView()}</div>
       </main>
-
     </div>
-
   );
-
 }
