@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./CommunityPlusLandingPage.css";
 
-import { useAuth } from "../../AuthContext";
+import { useAuth } from "../../context/AuthContext";
 import { Authenticator } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 
