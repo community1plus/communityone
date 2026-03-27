@@ -20,7 +20,7 @@ export default function CommunityPlusLandingPage() {
   const openCognitoPopup = (provider) => {
     const domain =
       "https://communityone-auth.auth.ap-southeast-2.amazoncognito.com";
-    const clientId = "4h373ct5h2blpsm5ls1p9j8loc";
+    const clientId = "1h8emkpkl4eenlrtlo72394enb";
     const redirectUri = encodeURIComponent(window.location.origin + "/");
 
     const url = `${domain}/oauth2/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&identity_provider=${provider}`;
