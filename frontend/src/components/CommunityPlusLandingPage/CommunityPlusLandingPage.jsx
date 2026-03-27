@@ -1,11 +1,13 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./CommunityPlusLandingPage.css";
-import { signInWithRedirect, getCurrentUser } from "aws-amplify/auth";
+import { getCurrentUser } from "aws-amplify/auth";
 
 export default function CommunityPlusLandingPage() {
   const navigate = useNavigate();
   const didNavigateRef = useRef(false);
+  const popupRef = useRef(null);
+  const [loading, setLoading] = useState(false);
 
   // ✅ Redirect once authenticated
   const handleAuthed = () => {
@@ -14,15 +16,67 @@ export default function CommunityPlusLandingPage() {
     navigate("/home", { replace: true });
   };
 
-  // ✅ Check if user already logged in
+  // ✅ Popup login handler
+  const openCognitoPopup = (provider) => {
+    const domain =
+      "https://communityone-auth.auth.ap-southeast-2.amazoncognito.com";
+    const clientId = "4h373ct5h2blpsm5ls1p9j8loc";
+    const redirectUri = encodeURIComponent(window.location.origin + "/");
+
+    const url = `${domain}/oauth2/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&identity_provider=${provider}`;
+
+    const width = 500;
+    const height = 600;
+    const left = window.screenX + (window.innerWidth - width) / 2;
+    const top = window.screenY + (window.innerHeight - height) / 2;
+
+    const popup = window.open(
+      url,
+      "cognitoLogin",
+      `width=${width},height=${height},top=${top},left=${left}`
+    );
+
+    // 🚨 fallback if popup blocked
+    if (!popup) {
+      window.location.href = url;
+      return;
+    }
+
+    popupRef.current = popup;
+    setLoading(true);
+  };
+
+  // ✅ Detect login + close popup
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      try {
+        const user = await getCurrentUser();
+
+        if (user) {
+          setLoading(false);
+
+          // close popup if open
+          if (popupRef.current && !popupRef.current.closed) {
+            popupRef.current.close();
+          }
+
+          handleAuthed();
+        }
+      } catch {
+        // not logged in yet
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // ✅ Initial session check
   useEffect(() => {
     const checkUser = async () => {
       try {
         const user = await getCurrentUser();
         if (user) handleAuthed();
-      } catch {
-        // not signed in
-      }
+      } catch {}
     };
 
     checkUser();
@@ -53,23 +107,24 @@ export default function CommunityPlusLandingPage() {
           </nav>
 
           <div className="actions">
-            {/* ✅ Explicit providers (FIXES YOUR ERROR) */}
+            {/* 🔥 Facebook */}
             <button
               className="btn signin"
-              onClick={() =>
-                signInWithRedirect({ provider: "Facebook" })
-              }
+              onClick={() => openCognitoPopup("Facebook")}
+              disabled={loading}
             >
-              Sign in with Facebook
+              {loading ? "Signing in..." : "Sign in with Facebook"}
             </button>
 
+            {/* 🔥 Google */}
             <button
               className="btn primary"
-              onClick={() =>
-                signInWithRedirect({ provider: "Google" })
-              }
+              onClick={() => openCognitoPopup("Google")}
+              disabled={loading}
             >
-              <strong>Sign in with Google</strong>
+              <strong>
+                {loading ? "Signing in..." : "Sign in with Google"}
+              </strong>
             </button>
 
             <div className="avatar">A</div>
