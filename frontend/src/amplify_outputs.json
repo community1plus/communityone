@@ -39,8 +39,7 @@
       "response_type": "code",
       "scopes": [
         "email",
-        "openid",
-        "profile"
+        "openid"
       ],
       "domain": "communityone-auth.auth.ap-southeast-2.amazoncognito.com"
     },
