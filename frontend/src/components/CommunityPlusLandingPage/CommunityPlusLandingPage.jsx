@@ -2,13 +2,15 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./CommunityPlusLandingPage.css";
 
-import { getCurrentUser } from "aws-amplify/auth";
+import { getCurrentUser, fetchAuthSession } from "aws-amplify/auth";
 import { Authenticator } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 
 export default function CommunityPlusLandingPage() {
   const navigate = useNavigate();
   const [showAuth, setShowAuth] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+
   const didNavigateRef = useRef(false);
 
   const handleAuthed = () => {
@@ -21,24 +23,35 @@ export default function CommunityPlusLandingPage() {
     navigate("/home", { replace: true });
   };
 
-  // ✅ check session
+  /* ===============================
+     🔥 COMPLETE OAUTH FLOW (FIX)
+  =============================== */
+
   useEffect(() => {
-  const checkUser = async () => {
-    try {
-      const user = await getCurrentUser();
+    const completeAuth = async () => {
+      try {
+        // ✅ CRITICAL: completes Google/Facebook OAuth redirect
+        await fetchAuthSession();
 
-      if (user) {
-        handleAuthed();
+        const user = await getCurrentUser();
+
+        if (user) {
+          handleAuthed();
+        }
+      } catch {
+        // not signed in yet
       }
-    } catch {
-      // not signed in
-    }
-  };
 
-  checkUser();
-}, []);
+      setCheckingAuth(false);
+    };
 
-  // ✅ lock background scroll when modal open
+    completeAuth();
+  }, []);
+
+  /* ===============================
+     🧠 MODAL BODY SCROLL LOCK
+  =============================== */
+
   useEffect(() => {
     if (showAuth) {
       document.body.classList.add("modal-open");
@@ -46,6 +59,12 @@ export default function CommunityPlusLandingPage() {
       document.body.classList.remove("modal-open");
     }
   }, [showAuth]);
+
+  /* ===============================
+     ⛔ PREVENT FLASH BEFORE AUTH CHECK
+  =============================== */
+
+  if (checkingAuth) return null;
 
   return (
     <div className="cpl-root">
@@ -67,7 +86,10 @@ export default function CommunityPlusLandingPage() {
         </div>
       </header>
 
-      {/* ✅ AUTH MODAL */}
+      {/* ===============================
+          AUTH MODAL
+      =============================== */}
+
       {showAuth && (
         <div
           className="cpl-modalOverlay"
@@ -89,8 +111,7 @@ export default function CommunityPlusLandingPage() {
 
             <div className="cpl-modalBody">
               <div className="cpl-authTheme">
-
-                {/* 🚀 FULL COGNITO UI */}
+                {/* 🔥 FULL COGNITO UI (Google + Facebook + Email) */}
                 <Authenticator>
                   {({ user }) => {
                     useEffect(() => {
@@ -100,7 +121,6 @@ export default function CommunityPlusLandingPage() {
                     return null;
                   }}
                 </Authenticator>
-
               </div>
             </div>
           </div>
