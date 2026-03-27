@@ -1,34 +1,32 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "./CommunityPlusLandingPage.css";
-import { Authenticator } from "@aws-amplify/ui-react";
-import "@aws-amplify/ui-react/styles.css";
+import { signInWithRedirect, getCurrentUser } from "aws-amplify/auth";
 
 export default function CommunityPlusLandingPage() {
   const navigate = useNavigate();
-  const [showAuth, setShowAuth] = useState(false);
-
   const didNavigateRef = useRef(false);
 
+  // ✅ Redirect once authenticated
   const handleAuthed = () => {
     if (didNavigateRef.current) return;
     didNavigateRef.current = true;
-    setShowAuth(false);
     navigate("/home", { replace: true });
   };
 
+  // ✅ Check if user already logged in (important)
   useEffect(() => {
-    if (showAuth) didNavigateRef.current = false;
-  }, [showAuth]);
-
-  useEffect(() => {
-    if (!showAuth) return;
-    const onKeyDown = (e) => {
-      if (e.key === "Escape") setShowAuth(false);
+    const checkUser = async () => {
+      try {
+        const user = await getCurrentUser();
+        if (user) handleAuthed();
+      } catch {
+        // not signed in → ignore
+      }
     };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [showAuth]);
+
+    checkUser();
+  }, []);
 
   return (
     <div className="cpl-root">
@@ -55,11 +53,18 @@ export default function CommunityPlusLandingPage() {
           </nav>
 
           <div className="actions">
-            <button className="btn signin" onClick={() => setShowAuth(true)}>
+            {/* ✅ Redirect-based auth */}
+            <button
+              className="btn signin"
+              onClick={() => signInWithRedirect()}
+            >
               Sign in
             </button>
 
-            <button className="btn primary" onClick={() => setShowAuth(true)}>
+            <button
+              className="btn primary"
+              onClick={() => signInWithRedirect()}
+            >
               <strong>Join</strong>
             </button>
 
@@ -102,38 +107,6 @@ export default function CommunityPlusLandingPage() {
           <div>© Community One</div>
         </div>
       </footer>
-
-      {/* AUTH MODAL */}
-      {showAuth && (
-        <div
-          className="cpl-modalOverlay"
-          onMouseDown={(e) => {
-            if (e.target === e.currentTarget) setShowAuth(false);
-          }}
-        >
-          <div className="cpl-modal">
-            <div className="cpl-modalHeader">
-              <div className="cpl-modalTitle">Sign in</div>
-              <button onClick={() => setShowAuth(false)}>Close</button>
-            </div>
-
-            <div className="cpl-modalBody">
-              <Authenticator>
-                {({ user }) => {
-                  // ✅ SAFE: only trigger once when user exists
-                  useEffect(() => {
-                    if (user) {
-                      handleAuthed();
-                    }
-                  }, [user]);
-
-                  return null;
-                }}
-              </Authenticator>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
