@@ -14,14 +14,14 @@ export default function CommunityPlusLandingPage() {
     navigate("/home", { replace: true });
   };
 
-  // ✅ Check if user already logged in (important)
+  // ✅ Check if user already logged in
   useEffect(() => {
     const checkUser = async () => {
       try {
         const user = await getCurrentUser();
         if (user) handleAuthed();
       } catch {
-        // not signed in → ignore
+        // not signed in
       }
     };
 
@@ -53,19 +53,23 @@ export default function CommunityPlusLandingPage() {
           </nav>
 
           <div className="actions">
-            {/* ✅ Redirect-based auth */}
+            {/* ✅ Explicit providers (FIXES YOUR ERROR) */}
             <button
               className="btn signin"
-              onClick={() => signInWithRedirect()}
+              onClick={() =>
+                signInWithRedirect({ provider: "Facebook" })
+              }
             >
-              Sign in
+              Sign in with Facebook
             </button>
 
             <button
               className="btn primary"
-              onClick={() => signInWithRedirect()}
+              onClick={() =>
+                signInWithRedirect({ provider: "Google" })
+              }
             >
-              <strong>Join</strong>
+              <strong>Sign in with Google</strong>
             </button>
 
             <div className="avatar">A</div>
