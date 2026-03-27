@@ -60,45 +60,62 @@ export default function CommunityPlusLandingPage() {
           <div className="cpl-modal">
             <div className="cpl-modalHeader">
               <div className="cpl-modalTitle">Sign in</div>
-              <button onClick={() => setShowAuth(false)}>Close</button>
+              <button
+                className="cpl-modalClose"
+                onClick={() => setShowAuth(false)}
+              >
+                Close
+              </button>
             </div>
 
             <div className="cpl-modalBody">
-              
-              {/* 🔥 SOCIAL BUTTONS */}
-              <button
-                className="btn social"
-                onClick={() =>
-                  signInWithRedirect({ provider: "Google" })
-                }
-              >
-                Continue with Google
-              </button>
+              <div className="cpl-authTheme">
+                
+                {/* 🔥 SOCIAL LOGIN */}
+                <button
+                  className="btn social"
+                  style={{ width: "100%", marginBottom: "10px" }}
+                  onClick={() =>
+                    signInWithRedirect({ provider: "Google" })
+                  }
+                >
+                  Continue with Google
+                </button>
 
-              <button
-                className="btn social"
-                onClick={() =>
-                  signInWithRedirect({ provider: "Facebook" })
-                }
-              >
-                Continue with Facebook
-              </button>
+                <button
+                  className="btn social"
+                  style={{ width: "100%", marginBottom: "12px" }}
+                  onClick={() =>
+                    signInWithRedirect({ provider: "Facebook" })
+                  }
+                >
+                  Continue with Facebook
+                </button>
 
-              <div style={{ margin: "20px 0", textAlign: "center" }}>
-                — or —
+                {/* Divider */}
+                <div
+                  style={{
+                    margin: "12px 0",
+                    textAlign: "center",
+                    fontSize: "12px",
+                    color: "var(--muted)",
+                  }}
+                >
+                  — or —
+                </div>
+
+                {/* 🔥 EMAIL / PASSWORD (Amplify UI) */}
+                <Authenticator>
+                  {({ user }) => {
+                    useEffect(() => {
+                      if (user) handleAuthed();
+                    }, [user]);
+
+                    return null;
+                  }}
+                </Authenticator>
+
               </div>
-
-              {/* 🔥 EMAIL LOGIN (Cognito UI inside modal) */}
-              <Authenticator>
-                {({ user }) => {
-                  useEffect(() => {
-                    if (user) handleAuthed();
-                  }, [user]);
-
-                  return null;
-                }}
-              </Authenticator>
-
             </div>
           </div>
         </div>
