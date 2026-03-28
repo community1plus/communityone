@@ -123,7 +123,7 @@ export default function CommunityPlusLandingPage() {
                 onClick={() => {
                   setAuthLoading(true);
                   setShowAuth(false);
-                  signInWithRedirect();
+                  signInWithRedirect({ provider: "COGNITO" });
                 }}
               >
                 Continue with Email
