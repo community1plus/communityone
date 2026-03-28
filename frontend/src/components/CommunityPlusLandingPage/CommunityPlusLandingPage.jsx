@@ -2,9 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./CommunityPlusLandingPage.css";
 
+import { signInWithRedirect } from "aws-amplify/auth";
 import { useAuth } from "../../context/AuthContext";
-import { Authenticator } from "@aws-amplify/ui-react";
-import "@aws-amplify/ui-react/styles.css";
 
 export default function CommunityPlusLandingPage() {
   const navigate = useNavigate();
@@ -12,10 +11,6 @@ export default function CommunityPlusLandingPage() {
 
   const [showAuth, setShowAuth] = useState(false);
   const didNavigateRef = useRef(false);
-
-  /* ===============================
-     🔥 REDIRECT WHEN AUTHED
-  =============================== */
 
   const handleAuthed = () => {
     if (didNavigateRef.current) return;
@@ -27,6 +22,10 @@ export default function CommunityPlusLandingPage() {
     navigate("/home", { replace: true });
   };
 
+  /* ===============================
+     AUTO REDIRECT AFTER LOGIN
+  =============================== */
+
   useEffect(() => {
     if (!loading && user) {
       handleAuthed();
@@ -34,7 +33,7 @@ export default function CommunityPlusLandingPage() {
   }, [user, loading]);
 
   /* ===============================
-     🧠 MODAL SCROLL LOCK
+     MODAL SCROLL LOCK
   =============================== */
 
   useEffect(() => {
@@ -45,19 +44,13 @@ export default function CommunityPlusLandingPage() {
     }
   }, [showAuth]);
 
-  /* ===============================
-     ⛔ PREVENT FLASH
-  =============================== */
-
   if (loading) return null;
 
   return (
     <div className="cpl-root">
       <header className="topbar">
         <div className="wrap topbar-inner">
-          <div className="brand">
-            <div className="logo">COMMUNITY ONE</div>
-          </div>
+          <div className="logo">COMMUNITY ONE</div>
 
           <div className="actions">
             <button className="btn signin" onClick={() => setShowAuth(true)}>
@@ -65,14 +58,14 @@ export default function CommunityPlusLandingPage() {
             </button>
 
             <button className="btn primary" onClick={() => setShowAuth(true)}>
-              <strong>Join</strong>
+              Join
             </button>
           </div>
         </div>
       </header>
 
       {/* ===============================
-          AUTH MODAL
+          CUSTOM AUTH MODAL
       =============================== */}
 
       {showAuth && (
@@ -84,21 +77,42 @@ export default function CommunityPlusLandingPage() {
         >
           <div className="cpl-modal">
             <div className="cpl-modalHeader">
-              <div className="cpl-modalTitle">Sign in</div>
-
-              <button
-                className="cpl-modalClose"
-                onClick={() => setShowAuth(false)}
-              >
-                Close
-              </button>
+              <div>Sign in</div>
+              <button onClick={() => setShowAuth(false)}>Close</button>
             </div>
 
             <div className="cpl-modalBody">
-              <div className="cpl-authTheme">
-                {/* ✅ SAFE: no hooks inside render props */}
-                <Authenticator />
-              </div>
+
+              {/* 🔥 GOOGLE */}
+              <button
+                className="btn social google"
+                onClick={() =>
+                  signInWithRedirect({ provider: "Google" })
+                }
+              >
+                Continue with Google
+              </button>
+
+              {/* 🔥 FACEBOOK */}
+              <button
+                className="btn social facebook"
+                onClick={() =>
+                  signInWithRedirect({ provider: "Facebook" })
+                }
+              >
+                Continue with Facebook
+              </button>
+
+              <div className="divider">— or —</div>
+
+              {/* 🔥 EMAIL LOGIN (redirect) */}
+              <button
+                className="btn email"
+                onClick={() => signInWithRedirect()}
+              >
+                Continue with Email
+              </button>
+
             </div>
           </div>
         </div>
