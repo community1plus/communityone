@@ -12,11 +12,7 @@ export default function App() {
   =============================== */
 
   if (loading) {
-    return (
-      <div className="auth-loading-overlay">
-        <div className="auth-loading-box">Loading session…</div>
-      </div>
-    );
+    return null;
   }
 
   return (
