@@ -42,8 +42,7 @@ LOGO
 display: flex;
 align-items: center;
 cursor: pointer;
-
-grid-row: span 2;
+gap: 12px;grid-row: span 2;
 }
 
 .logo {
@@ -51,6 +50,12 @@ height: 64px; /* 🔥 reduced from 72px */
 object-fit: contain;
 }
 
+.location-text.left {
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 500;
+  white-space: nowrap;
+}
 /* =====================================================
 SEARCH
 ===================================================== */

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./CommunityPlusHeader.css";
+import { fetchUserAttributes } from "aws-amplify/auth";
 
 function CommunityPlusHeader({ setActiveView, user, onLogout, coords }) {
 
@@ -14,7 +15,7 @@ function CommunityPlusHeader({ setActiveView, user, onLogout, coords }) {
 
   const getUserName = () => {
     // Cognito typically stores this:
-    const first = user?.signInDetails?.loginId?.split("@")[0] || user?.username;
+    const first = user?.signInDetails?.loginId?.split("@")[0] || user?.username || "User";
 
     // fallback clean format
     return first || "User";
@@ -117,7 +118,17 @@ function CommunityPlusHeader({ setActiveView, user, onLogout, coords }) {
 
         {/* LEFT */}
         <div className="header-left logo-container">
-          <img src="/logo/logo.png" alt="Community One" className="logo" />
+
+          <img
+            src="/logo/logo.png"
+            alt="Community One"
+            className="logo"
+          />
+
+          <span className="location-text left">
+            {location || "—"}
+          </span>
+
         </div>
 
         {/* CENTER */}
@@ -135,9 +146,7 @@ function CommunityPlusHeader({ setActiveView, user, onLogout, coords }) {
         {/* RIGHT */}
         <div className="header-right">
 
-          <span className="location-text">
-            {location || "—"}
-          </span>
+          
 
           {/* USER INFO + AVATAR */}
           <div className="user-block" ref={menuRef}>
