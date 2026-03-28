@@ -5,6 +5,20 @@ import { signInWithRedirect } from "aws-amplify/auth";
 import { Authenticator } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 
+/* ===============================
+🔥 SAFE AUTH LISTENER (FIX)
+=============================== */
+
+function AuthListener({ user, onAuth }) {
+useEffect(() => {
+if (user) {
+onAuth(user);
+}
+}, [user, onAuth]);
+
+return null;
+}
+
 export default function CommunityPlusLandingPage() {
 const [showAuth, setShowAuth] = useState(false);
 const [authLoading, setAuthLoading] = useState(false);
@@ -83,7 +97,7 @@ return ( <div className="cpl-root"> <header className="topbar"> <div className="
   </main>
 
   {/* ===============================
-      AUTH MODAL (STABLE)
+      AUTH MODAL
   =============================== */}
 
   {showAuth && (
@@ -96,6 +110,7 @@ return ( <div className="cpl-root"> <header className="topbar"> <div className="
       <div className="cpl-modal">
         <div className="cpl-modalHeader">
           <div className="cpl-modalTitle">COMMUNITY ONE</div>
+
           <button
             className="cpl-closeBtn"
             onClick={() => setShowAuth(false)}
@@ -140,21 +155,16 @@ return ( <div className="cpl-root"> <header className="topbar"> <div className="
           {/* RIGHT: EMAIL */}
           <div className="auth-right">
             <div className="auth-inline">
+
               <Authenticator
                 initialState="signIn"
                 socialProviders={[]} // ✅ prevents duplicate buttons
               >
-                {({ user }) => {
-                  // 🔥 SAFE: move side effect OUT of render
-                  useEffect(() => {
-                    if (user) {
-                      setAuthedUser(user);
-                    }
-                  }, [user]);
-
-                  return null;
-                }}
+                {({ user }) => (
+                  <AuthListener user={user} onAuth={setAuthedUser} />
+                )}
               </Authenticator>
+
             </div>
           </div>
 
