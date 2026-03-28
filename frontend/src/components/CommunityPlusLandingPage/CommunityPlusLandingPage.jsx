@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./CommunityPlusLandingPage.css";
 
 import { signInWithRedirect } from "aws-amplify/auth";
@@ -8,6 +8,8 @@ import "@aws-amplify/ui-react/styles.css";
 export default function CommunityPlusLandingPage() {
   const [showAuth, setShowAuth] = useState(false);
   const [authLoading, setAuthLoading] = useState(false);
+
+  const didNavigateRef = useRef(false);
 
   /* ===============================
      MODAL SCROLL LOCK
@@ -26,7 +28,10 @@ export default function CommunityPlusLandingPage() {
   =============================== */
 
   const handleAuthed = () => {
-    window.location.href = "/home"; // keep simple + reliable
+    if (didNavigateRef.current) return;
+    didNavigateRef.current = true;
+
+    window.location.href = "/home";
   };
 
   return (
@@ -75,7 +80,7 @@ export default function CommunityPlusLandingPage() {
       </main>
 
       {/* ===============================
-          AUTH MODAL (PREMIUM)
+          AUTH MODAL
       =============================== */}
 
       {showAuth && (
@@ -91,51 +96,49 @@ export default function CommunityPlusLandingPage() {
               <button onClick={() => setShowAuth(false)}>Close</button>
             </div>
 
-            <div className="cpl-modalBody">
+            <div className="cpl-modalBody auth-grid">
 
-              <div className="auth-sub">
-                Sign in to your local community
-              </div>
+              {/* LEFT: SOCIAL */}
+              <div className="auth-left">
+                <div className="auth-sub">
+                  Sign in to your local community
+                </div>
 
-              {/* 🔥 SOCIAL LOGIN */}
-              <button
-                className="auth-btn google"
-                onClick={() => {
-                  setAuthLoading(true);
-                  setShowAuth(false);
-                  signInWithRedirect({ provider: "Google" });
-                }}
-              >
-                <span className="icon">G</span>
-                Continue with Google
-              </button>
-
-              <button
-                className="auth-btn facebook"
-                onClick={() => {
-                  setAuthLoading(true);
-                  setShowAuth(false);
-                  signInWithRedirect({ provider: "Facebook" });
-                }}
-              >
-                <span className="icon">f</span>
-                Continue with Facebook
-              </button>
-
-              <div className="auth-divider">
-                <span>or</span>
-              </div>
-
-              {/* 🔥 EMAIL LOGIN (INLINE — NO REDIRECT) */}
-              <div className="auth-inline">
-                <Authenticator initialState="signIn">
-                  {({ user }) => {
-                    if (user) {
-                      handleAuthed();
-                    }
-                    return null;
+                <button
+                  className="auth-btn google"
+                  onClick={() => {
+                    setAuthLoading(true);
+                    setShowAuth(false);
+                    signInWithRedirect({ provider: "Google" });
                   }}
-                </Authenticator>
+                >
+                  <span className="icon">G</span>
+                  Continue with Google
+                </button>
+
+                <button
+                  className="auth-btn facebook"
+                  onClick={() => {
+                    setAuthLoading(true);
+                    setShowAuth(false);
+                    signInWithRedirect({ provider: "Facebook" });
+                  }}
+                >
+                  <span className="icon">f</span>
+                  Continue with Facebook
+                </button>
+              </div>
+
+              {/* RIGHT: EMAIL */}
+              <div className="auth-right">
+                <div className="auth-inline">
+                  <Authenticator initialState="signIn">
+                    {({ user }) => {
+                      if (user) handleAuthed();
+                      return null;
+                    }}
+                  </Authenticator>
+                </div>
               </div>
 
             </div>

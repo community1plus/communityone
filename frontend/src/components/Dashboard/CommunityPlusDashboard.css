@@ -233,3 +233,115 @@ display: none;
 padding: var(--space-3);
 }
 }
+
+/* =====================================================
+ELITE POLISH LAYER (NON-BREAKING ENHANCEMENTS)
+===================================================== */
+
+/* ---------------------------------
+SHADOW SYSTEM (CONSISTENT DEPTH)
+--------------------------------- */
+
+:root {
+  --shadow-sm: 0 6px 18px rgba(20, 20, 20, 0.06);
+  --shadow-md: 0 12px 28px rgba(20, 20, 20, 0.1);
+  --shadow-lg: 0 18px 48px rgba(20, 20, 20, 0.14);
+}
+
+/* ---------------------------------
+GLOBAL MOTION SYSTEM
+--------------------------------- */
+
+* {
+  transition:
+    background 0.2s ease,
+    border 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+/* ---------------------------------
+DASHBOARD BACKGROUND DEPTH
+--------------------------------- */
+
+.dashboard-container {
+  background:
+    radial-gradient(900px 400px at 20% 0%, rgba(182, 58, 43, 0.05), transparent 60%),
+    radial-gradient(700px 400px at 90% 10%, rgba(13, 91, 87, 0.05), transparent 60%);
+}
+
+/* ---------------------------------
+SIDEBAR REFINEMENT
+--------------------------------- */
+
+.sidebar {
+  opacity: 0.95;
+}
+
+/* ---------------------------------
+CONTENT AREA SMOOTHNESS
+--------------------------------- */
+
+.content-area {
+  animation: fadeInUp 0.3s ease;
+}
+
+/* ---------------------------------
+FEED CARD (UPGRADED)
+--------------------------------- */
+
+.feed-card {
+  backdrop-filter: blur(6px);
+}
+
+.feed-card:hover {
+  transform: translateY(-4px) scale(1.01);
+}
+
+/* ---------------------------------
+MAP COLUMN (PREMIUM GLASS)
+--------------------------------- */
+
+.map-column {
+  backdrop-filter: blur(8px);
+}
+
+/* ---------------------------------
+MAP LOADING STATE
+--------------------------------- */
+
+.map-loading {
+  font-size: 13px;
+  opacity: 0.6;
+}
+
+/* ---------------------------------
+COMPOSER VIEW (CENTER BALANCE)
+--------------------------------- */
+
+.composer-view {
+  animation: fadeInUp 0.25s ease;
+}
+
+/* ---------------------------------
+SCROLL BEHAVIOR (SMOOTH)
+--------------------------------- */
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* ---------------------------------
+ANIMATIONS
+--------------------------------- */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
