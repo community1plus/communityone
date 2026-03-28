@@ -30,6 +30,11 @@ export default function CommunityPlusDashboard() {
   =============================== */
 
   useEffect(() => {
+  console.log("USER:", user);
+  console.log("LOADING:", loading);
+}, [user, loading]);
+   
+  useEffect(() => {
     const checkAuth = async () => {
       try {
         const currentUser = await getCurrentUser();
