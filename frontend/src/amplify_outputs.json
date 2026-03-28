@@ -24,6 +24,7 @@
     },
     "oauth": {
       "identity_providers": [
+        "COGNITO",
         "GOOGLE",
         "FACEBOOK"
       ],
