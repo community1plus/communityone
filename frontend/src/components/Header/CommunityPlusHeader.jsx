@@ -19,7 +19,7 @@ return user?.displayName || "User";
 const getInitials = () => {
 const name = getUserName();
 
-```
+
 const parts = name.split(/[.\s@]/).filter(Boolean);
 
 if (parts.length >= 2) {
@@ -27,7 +27,7 @@ if (parts.length >= 2) {
 }
 
 return name.slice(0, 2).toUpperCase();
-```
+
 
 };
 
@@ -38,7 +38,7 @@ LOCATION RESOLUTION (IMPROVED)
 useEffect(() => {
 if (!coords?.lat || !coords?.lng) return;
 
-```
+
 const cached = JSON.parse(localStorage.getItem("userLocation"));
 
 // 🔥 30 min cache expiry
@@ -94,7 +94,7 @@ const getSuburb = async () => {
 };
 
 getSuburb();
-```
+
 
 }, [coords]);
 
@@ -109,10 +109,10 @@ setShowMenu(false);
 }
 };
 
-```
+
 document.addEventListener("mousedown", handleClickOutside);
 return () => document.removeEventListener("mousedown", handleClickOutside);
-```
+
 
 }, []);
 
@@ -124,7 +124,7 @@ RENDER
 
 return ( <header className="header">
 
-```
+
   <div className="header-row">
 
     {/* LEFT */}
@@ -215,7 +215,7 @@ return ( <header className="header">
   </nav>
 
 </header>
-```
+
 
 );
 }
