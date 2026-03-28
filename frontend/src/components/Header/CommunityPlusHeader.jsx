@@ -1,210 +1,223 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./CommunityPlusHeader.css";
-import { fetchUserAttributes } from "aws-amplify/auth";
 
 function CommunityPlusHeader({ setActiveView, user, onLogout, coords }) {
 
-  const [location, setLocation] = useState("Locating...");
-  const [showMenu, setShowMenu] = useState(false);
+const [location, setLocation] = useState("Locating...");
+const [showMenu, setShowMenu] = useState(false);
 
-  const menuRef = useRef(null);
+const menuRef = useRef(null);
 
-  /* ===============================
-     USER DISPLAY HELPERS
-  =============================== */
+/* ===============================
+USER DISPLAY HELPERS (FIXED)
+=============================== */
 
-  const getUserName = () => {
-    // Cognito typically stores this:
-    const first = user?.signInDetails?.loginId?.split("@")[0] || user?.username || "User";
+const getUserName = () => {
+return user?.displayName || "User";
+};
 
-    // fallback clean format
-    return first || "User";
-  };
+const getInitials = () => {
+const name = getUserName();
 
-  const getInitials = () => {
-    const name = getUserName();
+```
+const parts = name.split(/[.\s@]/).filter(Boolean);
 
-    // support "first.last"
-    const parts = name.split(/[.\s]/);
+if (parts.length >= 2) {
+  return (parts[0][0] + parts[1][0]).toUpperCase();
+}
 
-    if (parts.length >= 2) {
-      return (parts[0][0] + parts[1][0]).toUpperCase();
-    }
+return name.slice(0, 2).toUpperCase();
+```
 
-    return name.slice(0, 2).toUpperCase();
-  };
+};
 
-  /* ===============================
-     LOCATION RESOLUTION (FIXED)
-  =============================== */
+/* ===============================
+LOCATION RESOLUTION (IMPROVED)
+=============================== */
 
-  useEffect(() => {
-    if (!coords?.lat || !coords?.lng) return;
+useEffect(() => {
+if (!coords?.lat || !coords?.lng) return;
 
-    const cached = localStorage.getItem("userLocation");
+```
+const cached = JSON.parse(localStorage.getItem("userLocation"));
 
-    if (cached) {
-      setLocation(cached);
+// 🔥 30 min cache expiry
+if (cached && Date.now() - cached.timestamp < 1000 * 60 * 30) {
+  setLocation(cached.value);
+  return;
+}
+
+const getSuburb = async () => {
+  try {
+    const res = await fetch(
+      `https://maps.googleapis.com/maps/api/geocode/json?latlng=${coords.lat},${coords.lng}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`
+    );
+
+    const data = await res.json();
+
+    if (!data.results?.length) {
+      setLocation("Location unavailable");
       return;
     }
 
-    const getSuburb = async () => {
-      try {
-        const res = await fetch(
-          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${coords.lat},${coords.lng}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`
-        );
+    const components = data.results[0].address_components;
 
-        const data = await res.json();
+    const suburb = components.find(c =>
+      c.types.includes("locality") ||
+      c.types.includes("sublocality") ||
+      c.types.includes("sublocality_level_1")
+    );
 
-        if (!data.results?.length) {
-          setLocation("Location unavailable");
-          return;
-        }
+    const state = components.find(c =>
+      c.types.includes("administrative_area_level_1")
+    );
 
-        const components = data.results[0].address_components;
+    if (suburb && state) {
+      const loc = `${suburb.long_name}, ${state.short_name}`;
 
-        const suburb = components.find(c =>
-          c.types.includes("locality") ||
-          c.types.includes("sublocality") ||
-          c.types.includes("sublocality_level_1")
-        );
+      setLocation(loc);
 
-        const state = components.find(c =>
-          c.types.includes("administrative_area_level_1")
-        );
+      // 🔥 store with expiry
+      localStorage.setItem("userLocation", JSON.stringify({
+        value: loc,
+        timestamp: Date.now()
+      }));
 
-        if (suburb && state) {
-          const loc = `${suburb.long_name}, ${state.short_name}`;
-          setLocation(loc);
-          localStorage.setItem("userLocation", loc);
-        } else {
-          setLocation("Location unavailable");
-        }
+    } else {
+      setLocation("Location unavailable");
+    }
 
-      } catch (err) {
-        console.error("Geocode error:", err);
-        setLocation("Location unavailable");
-      }
-    };
+  } catch (err) {
+    console.error("Geocode error:", err);
+    setLocation("Location unavailable");
+  }
+};
 
-    getSuburb();
-  }, [coords]);
+getSuburb();
+```
 
-  /* ===============================
-     CLICK OUTSIDE
-  =============================== */
+}, [coords]);
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setShowMenu(false);
-      }
-    };
+/* ===============================
+CLICK OUTSIDE
+=============================== */
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+useEffect(() => {
+const handleClickOutside = (event) => {
+if (menuRef.current && !menuRef.current.contains(event.target)) {
+setShowMenu(false);
+}
+};
 
-  const toggleMenu = () => setShowMenu(prev => !prev);
+```
+document.addEventListener("mousedown", handleClickOutside);
+return () => document.removeEventListener("mousedown", handleClickOutside);
+```
 
-  /* ===============================
-     RENDER
-  =============================== */
+}, []);
 
-  return (
-    <header className="header">
+const toggleMenu = () => setShowMenu(prev => !prev);
 
-      <div className="header-row">
+/* ===============================
+RENDER
+=============================== */
 
-        {/* LEFT */}
-        <div className="header-left logo-container">
+return ( <header className="header">
 
-          <img
-            src="/logo/logo.png"
-            alt="Community One"
-            className="logo"
-          />
+```
+  <div className="header-row">
 
-          <span className="location-text left">
-            {location || "—"}
-          </span>
+    {/* LEFT */}
+    <div className="header-left logo-container">
 
+      <img
+        src="/logo/logo.png"
+        alt="Community One"
+        className="logo"
+      />
+
+      <span className="location-text left">
+        {location === "Locating..." ? "Locating…" : location}
+      </span>
+
+    </div>
+
+    {/* CENTER */}
+    <div className="header-center">
+      <div className="search-wrapper">
+        <input
+          type="text"
+          className="search-input"
+          placeholder="Search"
+        />
+        <span className="search-enter">⤶</span>
+      </div>
+    </div>
+
+    {/* RIGHT */}
+    <div className="header-right">
+
+      <div className="user-block" ref={menuRef}>
+
+        <span
+          className="username"
+          title={user?.attributes?.email}
+        >
+          {getUserName()}
+        </span>
+
+        <div className="avatar" onClick={toggleMenu}>
+          {getInitials()}
         </div>
 
-        {/* CENTER */}
-        <div className="header-center">
-          <div className="search-wrapper">
-            <input
-              type="text"
-              className="search-input"
-              placeholder="Search"
-            />
-            <span className="search-enter">⤶</span>
-          </div>
-        </div>
+        {showMenu && (
+          <div className="dropdown-menu">
 
-        {/* RIGHT */}
-        <div className="header-right">
-
-          
-
-          {/* USER INFO + AVATAR */}
-          <div className="user-block" ref={menuRef}>
-
-            <span className="username">
-              {getUserName()}
-            </span>
-
-            <div className="avatar" onClick={toggleMenu}>
-              {getInitials()}
+            <div
+              className="menu-item"
+              onClick={() => {
+                setActiveView("profile");
+                setShowMenu(false);
+              }}
+            >
+              Profile Settings
             </div>
 
-            {showMenu && (
-              <div className="dropdown-menu">
-
-                <div
-                  className="menu-item"
-                  onClick={() => {
-                    setActiveView("profile");
-                    setShowMenu(false);
-                  }}
-                >
-                  Profile Settings
-                </div>
-
-                <div
-                  className="menu-item"
-                  onClick={() => {
-                    onLogout();
-                    setShowMenu(false);
-                  }}
-                >
-                  Logout
-                </div>
-
-              </div>
-            )}
+            <div
+              className="menu-item"
+              onClick={() => {
+                onLogout();
+                setShowMenu(false);
+              }}
+            >
+              Logout
+            </div>
 
           </div>
-
-        </div>
+        )}
 
       </div>
 
-      <nav className="links">
-        <button onClick={() => setActiveView("dashboard")}>Home</button>
-        <button onClick={() => setActiveView("posts")}>Posts</button>
-        <button onClick={() => setActiveView("events")}>Events</button>
-        <button onClick={() => setActiveView("incidents")}>Incidents</button>
-        <button onClick={() => setActiveView("search")}>Search</button>
-        <button onClick={() => setActiveView("community")}>Community+</button>
-        <button onClick={() => setActiveView("about")}>About</button>
-        <button onClick={() => setActiveView("yellowpages")}>Yellow Pages</button>
-        <button onClick={() => setActiveView("merch")}>Merch</button>
-      </nav>
+    </div>
 
-    </header>
-  );
+  </div>
+
+  <nav className="links">
+    <button onClick={() => setActiveView("dashboard")}>Home</button>
+    <button onClick={() => setActiveView("posts")}>Posts</button>
+    <button onClick={() => setActiveView("events")}>Events</button>
+    <button onClick={() => setActiveView("incidents")}>Incidents</button>
+    <button onClick={() => setActiveView("search")}>Search</button>
+    <button onClick={() => setActiveView("community")}>Community+</button>
+    <button onClick={() => setActiveView("about")}>About</button>
+    <button onClick={() => setActiveView("yellowpages")}>Yellow Pages</button>
+    <button onClick={() => setActiveView("merch")}>Merch</button>
+  </nav>
+
+</header>
+```
+
+);
 }
 
 export default CommunityPlusHeader;
