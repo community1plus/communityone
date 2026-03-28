@@ -295,6 +295,14 @@ a {
   font-weight: 600;
 }
 
+.auth-right .amplify-authenticator {
+  width: 100%;
+}
+
+.auth-right .amplify-flex {
+  gap: 10px !important;
+}
+
 /* =========================
    BODY SCROLL LOCK
    ========================= */

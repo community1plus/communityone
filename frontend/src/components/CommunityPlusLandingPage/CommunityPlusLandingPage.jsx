@@ -132,12 +132,15 @@ export default function CommunityPlusLandingPage() {
               {/* RIGHT: EMAIL */}
               <div className="auth-right">
                 <div className="auth-inline">
-                  <Authenticator initialState="signIn">
-                    {({ user }) => {
-                      if (user) handleAuthed();
-                      return null;
-                    }}
-                  </Authenticator>
+                  <Authenticator
+  initialState="signIn"
+  socialProviders={[]}   // 🔥 THIS IS THE FIX
+>
+  {({ user }) => {
+    if (user) handleAuthed();
+    return null;
+  }}
+</Authenticator>
                 </div>
               </div>
 
