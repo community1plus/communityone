@@ -26,13 +26,13 @@ attributes?.email?.split("@")[0] ||                   // email prefix
 currentUser?.username ||                              // cognito fallback
 "User";
 
-```
+
 return {
   ...currentUser,
   attributes,
   displayName
 };
-```
+
 
 };
 
@@ -45,7 +45,7 @@ try {
 // ensure tokens ready (critical after OAuth redirect)
 await fetchAuthSession();
 
-```
+
   const currentUser = await getCurrentUser();
 
   // 🔥 NEW: fetch attributes
@@ -60,7 +60,7 @@ await fetchAuthSession();
 } finally {
   setLoading(false);
 }
-```
+
 
 };
 
@@ -80,7 +80,7 @@ useEffect(() => {
 const unsubscribe = Hub.listen("auth", ({ payload }) => {
 const { event } = payload;
 
-```
+
   if (event === "signedIn") {
     loadUser(); // 🔥 handles OAuth redirect return
   }
@@ -91,7 +91,7 @@ const { event } = payload;
 });
 
 return unsubscribe;
-```
+
 
 }, []);
 
