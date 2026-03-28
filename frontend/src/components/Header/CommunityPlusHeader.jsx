@@ -8,34 +8,64 @@ function CommunityPlusHeader({ setActiveView, user, onLogout, coords }) {
 
   const menuRef = useRef(null);
 
+  /* ===============================
+     USER DISPLAY HELPERS
+  =============================== */
+
+  const getUserName = () => {
+    // Cognito typically stores this:
+    const first = user?.signInDetails?.loginId?.split("@")[0] || user?.username;
+
+    // fallback clean format
+    return first || "User";
+  };
+
+  const getInitials = () => {
+    const name = getUserName();
+
+    // support "first.last"
+    const parts = name.split(/[.\s]/);
+
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+
+    return name.slice(0, 2).toUpperCase();
+  };
+
+  /* ===============================
+     LOCATION RESOLUTION (FIXED)
+  =============================== */
+
   useEffect(() => {
+    if (!coords?.lat || !coords?.lng) return;
 
-    if (!coords) return;
+    const cached = localStorage.getItem("userLocation");
 
-    const cachedLocation = localStorage.getItem("userLocation");
-
-    if (cachedLocation) {
-      setLocation(cachedLocation);
+    if (cached) {
+      setLocation(cached);
       return;
     }
 
     const getSuburb = async () => {
-
       try {
-
         const res = await fetch(
           `https://maps.googleapis.com/maps/api/geocode/json?latlng=${coords.lat},${coords.lng}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`
         );
 
         const data = await res.json();
 
-        const components = data.results[0]?.address_components || [];
+        if (!data.results?.length) {
+          setLocation("Location unavailable");
+          return;
+        }
+
+        const components = data.results[0].address_components;
 
         const suburb = components.find(c =>
           c.types.includes("locality") ||
           c.types.includes("sublocality") ||
-          c.types.includes("sublocality_level_1") ||
-          c.types.includes("postal_town")
+          c.types.includes("sublocality_level_1")
         );
 
         const state = components.find(c =>
@@ -43,69 +73,54 @@ function CommunityPlusHeader({ setActiveView, user, onLogout, coords }) {
         );
 
         if (suburb && state) {
-
-          const locationString = `${suburb.long_name}, ${state.short_name}`;
-
-          setLocation(locationString);
-
-          localStorage.setItem("userLocation", locationString);
-
+          const loc = `${suburb.long_name}, ${state.short_name}`;
+          setLocation(loc);
+          localStorage.setItem("userLocation", loc);
         } else {
-
           setLocation("Location unavailable");
-
         }
 
       } catch (err) {
-
         console.error("Geocode error:", err);
         setLocation("Location unavailable");
-
       }
-
     };
 
     getSuburb();
-
   }, [coords]);
 
-  /* ---------- CLICK OUTSIDE DROPDOWN ---------- */
+  /* ===============================
+     CLICK OUTSIDE
+  =============================== */
 
   useEffect(() => {
-
     const handleClickOutside = (event) => {
-
       if (menuRef.current && !menuRef.current.contains(event.target)) {
         setShowMenu(false);
       }
-
     };
 
     document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const toggleMenu = () => {
-    setShowMenu(!showMenu);
-  };
+  const toggleMenu = () => setShowMenu(prev => !prev);
+
+  /* ===============================
+     RENDER
+  =============================== */
 
   return (
     <header className="header">
 
       <div className="header-row">
 
+        {/* LEFT */}
         <div className="header-left logo-container">
-          <img
-            src="/logo/logo.png"
-            alt="Community One"
-            className="logo"
-          />
+          <img src="/logo/logo.png" alt="Community One" className="logo" />
         </div>
 
+        {/* CENTER */}
         <div className="header-center">
           <div className="search-wrapper">
             <input
@@ -117,23 +132,25 @@ function CommunityPlusHeader({ setActiveView, user, onLogout, coords }) {
           </div>
         </div>
 
+        {/* RIGHT */}
         <div className="header-right">
 
-          <span className="location-text">{location}</span>
+          <span className="location-text">
+            {location || "—"}
+          </span>
 
-          {/* ---------- AVATAR + DROPDOWN ---------- */}
+          {/* USER INFO + AVATAR */}
+          <div className="user-block" ref={menuRef}>
 
-          <div className="avatar-wrapper" ref={menuRef}>
+            <span className="username">
+              {getUserName()}
+            </span>
 
-            <div
-              className="avatar"
-              onClick={toggleMenu}
-            >
-              {user?.username?.[0]?.toUpperCase() ?? "C"}
+            <div className="avatar" onClick={toggleMenu}>
+              {getInitials()}
             </div>
 
             {showMenu && (
-
               <div className="dropdown-menu">
 
                 <div
@@ -157,7 +174,6 @@ function CommunityPlusHeader({ setActiveView, user, onLogout, coords }) {
                 </div>
 
               </div>
-
             )}
 
           </div>
