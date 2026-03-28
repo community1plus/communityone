@@ -10,6 +10,8 @@ export default function CommunityPlusLandingPage() {
   const { user, loading } = useAuth();
 
   const [showAuth, setShowAuth] = useState(false);
+  const [authLoading, setAuthLoading] = useState(false);
+
   const didNavigateRef = useRef(false);
 
   const handleAuthed = () => {
@@ -77,43 +79,68 @@ export default function CommunityPlusLandingPage() {
         >
           <div className="cpl-modal">
             <div className="cpl-modalHeader">
-              <div>Sign in</div>
+              <div className="cpl-modalTitle">Welcome back</div>
               <button onClick={() => setShowAuth(false)}>Close</button>
             </div>
 
             <div className="cpl-modalBody">
 
+              <div className="auth-sub">
+                Sign in to your local community
+              </div>
+
               {/* 🔥 GOOGLE */}
               <button
-                className="btn social google"
-                onClick={() =>
-                  signInWithRedirect({ provider: "Google" })
-                }
+                className="auth-btn google"
+                onClick={() => {
+                  setAuthLoading(true);
+                  setShowAuth(false);
+                  signInWithRedirect({ provider: "Google" });
+                }}
               >
+                <span className="icon">G</span>
                 Continue with Google
               </button>
 
               {/* 🔥 FACEBOOK */}
               <button
-                className="btn social facebook"
-                onClick={() =>
-                  signInWithRedirect({ provider: "Facebook" })
-                }
+                className="auth-btn facebook"
+                onClick={() => {
+                  setAuthLoading(true);
+                  setShowAuth(false);
+                  signInWithRedirect({ provider: "Facebook" });
+                }}
               >
+                <span className="icon">f</span>
                 Continue with Facebook
               </button>
 
-              <div className="divider">— or —</div>
+              <div className="auth-divider">
+                <span>or</span>
+              </div>
 
-              {/* 🔥 EMAIL LOGIN (redirect) */}
+              {/* 🔥 EMAIL LOGIN */}
               <button
-                className="btn email"
-                onClick={() => signInWithRedirect()}
+                className="auth-btn email"
+                onClick={() => {
+                  setAuthLoading(true);
+                  setShowAuth(false);
+                  signInWithRedirect();
+                }}
               >
                 Continue with Email
               </button>
 
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* 🔥 OPTIONAL: GLOBAL LOADING STATE */}
+      {authLoading && (
+        <div className="auth-loading-overlay">
+          <div className="auth-loading-box">
+            Signing you in…
           </div>
         </div>
       )}
