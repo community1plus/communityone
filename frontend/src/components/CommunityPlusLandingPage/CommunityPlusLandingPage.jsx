@@ -93,7 +93,7 @@ export default function CommunityPlusLandingPage() {
           <div className="cpl-modal">
             <div className="cpl-modalHeader">
               <div className="cpl-modalTitle">COMMUNITY ONE</div>
-              <button onClick={() => setShowAuth(false)}>Close</button>
+              <button onClick={() => setShowAuth(false)}>X</button>
             </div>
 
             <div className="cpl-modalBody auth-grid">
