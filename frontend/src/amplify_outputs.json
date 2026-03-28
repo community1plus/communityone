@@ -3,7 +3,6 @@
     "user_pool_id": "ap-southeast-2_2TGqghCuO",
     "aws_region": "ap-southeast-2",
     "user_pool_client_id": "1h8emkpkl4eenlrtlo72394enb",
-    "identity_pool_id": "ap-southeast-2:1fa01c90-64f1-4a48-a9f6-43597a00596b",
     "mfa_methods": [],
     "standard_required_attributes": [
       "email"
