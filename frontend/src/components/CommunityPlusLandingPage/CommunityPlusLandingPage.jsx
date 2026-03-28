@@ -1,38 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 import "./CommunityPlusLandingPage.css";
 
 import { signInWithRedirect } from "aws-amplify/auth";
-import { useAuth } from "../../context/AuthContext";
 
 export default function CommunityPlusLandingPage() {
-  const navigate = useNavigate();
-  const { user, loading } = useAuth();
-
   const [showAuth, setShowAuth] = useState(false);
   const [authLoading, setAuthLoading] = useState(false);
-
-  const didNavigateRef = useRef(false);
-
-  const handleAuthed = () => {
-    if (didNavigateRef.current) return;
-    didNavigateRef.current = true;
-
-    document.body.classList.remove("modal-open");
-    setShowAuth(false);
-
-    navigate("/home", { replace: true });
-  };
-
-  /* ===============================
-     AUTO REDIRECT AFTER LOGIN
-  =============================== */
-
-  useEffect(() => {
-    if (!loading && user) {
-      handleAuthed();
-    }
-  }, [user, loading]);
 
   /* ===============================
      MODAL SCROLL LOCK
@@ -45,8 +18,6 @@ export default function CommunityPlusLandingPage() {
       document.body.classList.remove("modal-open");
     }
   }, [showAuth]);
-
-  if (loading) return null;
 
   return (
     <div className="cpl-root">
@@ -67,7 +38,34 @@ export default function CommunityPlusLandingPage() {
       </header>
 
       {/* ===============================
-          CUSTOM AUTH MODAL
+          HERO (restore your page content)
+      =============================== */}
+
+      <main className="wrap">
+        <section className="hero">
+          <div className="hero-grid">
+            <div className="headline">
+              <h1 className="tagline">
+                Real People. <span className="accent">Real News.</span> Real Time
+              </h1>
+
+              <p className="sub">
+                A map-first local feed that prioritises what’s happening <b>here</b>.
+              </p>
+
+              <button
+                className="btn primary"
+                onClick={() => setShowAuth(true)}
+              >
+                Explore your local area
+              </button>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      {/* ===============================
+          AUTH MODAL
       =============================== */}
 
       {showAuth && (
@@ -89,7 +87,7 @@ export default function CommunityPlusLandingPage() {
                 Sign in to your local community
               </div>
 
-              {/* 🔥 GOOGLE */}
+              {/* GOOGLE */}
               <button
                 className="auth-btn google"
                 onClick={() => {
@@ -102,7 +100,7 @@ export default function CommunityPlusLandingPage() {
                 Continue with Google
               </button>
 
-              {/* 🔥 FACEBOOK */}
+              {/* FACEBOOK */}
               <button
                 className="auth-btn facebook"
                 onClick={() => {
@@ -119,7 +117,7 @@ export default function CommunityPlusLandingPage() {
                 <span>or</span>
               </div>
 
-              {/* 🔥 EMAIL LOGIN */}
+              {/* EMAIL */}
               <button
                 className="auth-btn email"
                 onClick={() => {
@@ -136,7 +134,7 @@ export default function CommunityPlusLandingPage() {
         </div>
       )}
 
-      {/* 🔥 OPTIONAL: GLOBAL LOADING STATE */}
+      {/* LOADING OVERLAY */}
       {authLoading && (
         <div className="auth-loading-overlay">
           <div className="auth-loading-box">
