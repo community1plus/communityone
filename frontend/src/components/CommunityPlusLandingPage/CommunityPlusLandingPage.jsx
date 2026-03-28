@@ -92,7 +92,7 @@ export default function CommunityPlusLandingPage() {
         >
           <div className="cpl-modal">
             <div className="cpl-modalHeader">
-              <div className="cpl-modalTitle">Welcome back</div>
+              <div className="cpl-modalTitle">COMMUNITY ONE</div>
               <button onClick={() => setShowAuth(false)}>Close</button>
             </div>
 
@@ -113,7 +113,7 @@ export default function CommunityPlusLandingPage() {
                   }}
                 >
                   <span className="icon">G</span>
-                  Continue with Google
+                  Google
                 </button>
 
                 <button
@@ -125,7 +125,7 @@ export default function CommunityPlusLandingPage() {
                   }}
                 >
                   <span className="icon">f</span>
-                  Continue with Facebook
+                  Facebook
                 </button>
               </div>
 
