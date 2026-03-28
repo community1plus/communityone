@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import "./CommunityPlusLandingPage.css";
 
 import { signInWithRedirect } from "aws-amplify/auth";
+import { Authenticator } from "@aws-amplify/ui-react";
+import "@aws-amplify/ui-react/styles.css";
 
 export default function CommunityPlusLandingPage() {
   const [showAuth, setShowAuth] = useState(false);
@@ -18,6 +20,14 @@ export default function CommunityPlusLandingPage() {
       document.body.classList.remove("modal-open");
     }
   }, [showAuth]);
+
+  /* ===============================
+     HANDLE LOGIN COMPLETE
+  =============================== */
+
+  const handleAuthed = () => {
+    window.location.href = "/home"; // keep simple + reliable
+  };
 
   return (
     <div className="cpl-root">
@@ -38,7 +48,7 @@ export default function CommunityPlusLandingPage() {
       </header>
 
       {/* ===============================
-          HERO (restore your page content)
+          HERO
       =============================== */}
 
       <main className="wrap">
@@ -65,7 +75,7 @@ export default function CommunityPlusLandingPage() {
       </main>
 
       {/* ===============================
-          AUTH MODAL
+          AUTH MODAL (PREMIUM)
       =============================== */}
 
       {showAuth && (
@@ -87,7 +97,7 @@ export default function CommunityPlusLandingPage() {
                 Sign in to your local community
               </div>
 
-              {/* GOOGLE */}
+              {/* 🔥 SOCIAL LOGIN */}
               <button
                 className="auth-btn google"
                 onClick={() => {
@@ -100,7 +110,6 @@ export default function CommunityPlusLandingPage() {
                 Continue with Google
               </button>
 
-              {/* FACEBOOK */}
               <button
                 className="auth-btn facebook"
                 onClick={() => {
@@ -117,24 +126,27 @@ export default function CommunityPlusLandingPage() {
                 <span>or</span>
               </div>
 
-              {/* EMAIL */}
-              <button
-                className="auth-btn email"
-                onClick={() => {
-                  setAuthLoading(true);
-                  setShowAuth(false);
-                  signInWithRedirect();
-                }}
-              >
-                Continue with Email
-              </button>
+              {/* 🔥 EMAIL LOGIN (INLINE — NO REDIRECT) */}
+              <div className="auth-inline">
+                <Authenticator initialState="signIn">
+                  {({ user }) => {
+                    if (user) {
+                      handleAuthed();
+                    }
+                    return null;
+                  }}
+                </Authenticator>
+              </div>
 
             </div>
           </div>
         </div>
       )}
 
-      {/* LOADING OVERLAY */}
+      {/* ===============================
+          LOADING OVERLAY
+      =============================== */}
+
       {authLoading && (
         <div className="auth-loading-overlay">
           <div className="auth-loading-box">

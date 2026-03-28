@@ -195,6 +195,56 @@ a {
    AMPLIFY EMAIL FORM
    ========================= */
 
+/* =========================
+   INLINE AUTH (NEW MERGE)
+   ========================= */
+
+.auth-inline {
+  width: 100%;
+  margin-top: 10px;
+}
+
+/* kill Amplify default layout spacing */
+.auth-inline .amplify-card {
+  box-shadow: none !important;
+  border: none !important;
+  padding: 0 !important;
+  background: transparent !important;
+}
+
+/* hide tab switcher (Sign in / Sign up) */
+.auth-inline [role="tablist"] {
+  display: none !important;
+}
+
+/* input fields */
+.auth-inline .amplify-field-group__control {
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 13px;
+}
+
+/* primary button = your brand */
+.auth-inline .amplify-button--primary {
+  background: linear-gradient(
+    180deg,
+    rgba(182, 58, 43, 0.9),
+    rgba(182, 58, 43, 0.75)
+  );
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.auth-inline .amplify-button--primary:hover {
+  filter: brightness(1.05);
+}
+
+/* spacing fix */
+.auth-inline .amplify-field {
+  margin-bottom: 10px;
+}
+
 .cpl-authTheme {
   width: 100%;
   max-width: 420px;
