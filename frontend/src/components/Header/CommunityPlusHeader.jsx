@@ -2,23 +2,34 @@ import React, { useState, useEffect, useRef } from "react";
 import "./CommunityPlusHeader.css";
 
 function CommunityPlusHeader({ setActiveView, user, onLogout, coords }) {
-
 const [location, setLocation] = useState("Locating...");
 const [showMenu, setShowMenu] = useState(false);
 
 const menuRef = useRef(null);
 
 /* ===============================
-USER DISPLAY HELPERS (FIXED)
+🔥 SAFE USER HELPERS
 =============================== */
 
 const getUserName = () => {
-return user?.displayName || "User";
+if (!user) return "";
+
+
+return (
+  user?.attributes?.email ||
+  user?.username ||
+  user?.signInDetails?.loginId ||
+  "User"
+);
+
+
 };
 
 const getInitials = () => {
 const name = getUserName();
 
+
+if (!name) return "";
 
 const parts = name.split(/[.\s@]/).filter(Boolean);
 
@@ -32,19 +43,26 @@ return name.slice(0, 2).toUpperCase();
 };
 
 /* ===============================
-LOCATION RESOLUTION (IMPROVED)
+📍 LOCATION (SAFE + CACHED)
 =============================== */
 
 useEffect(() => {
 if (!coords?.lat || !coords?.lng) return;
 
 
-const cached = JSON.parse(localStorage.getItem("userLocation"));
+try {
+  const cached = JSON.parse(localStorage.getItem("userLocation"));
 
-// 🔥 30 min cache expiry
-if (cached && Date.now() - cached.timestamp < 1000 * 60 * 30) {
-  setLocation(cached.value);
-  return;
+  if (
+    cached &&
+    cached.timestamp &&
+    Date.now() - cached.timestamp < 1000 * 60 * 30
+  ) {
+    setLocation(cached.value);
+    return;
+  }
+} catch {
+  // corrupted cache → ignore
 }
 
 const getSuburb = async () => {
@@ -62,13 +80,13 @@ const getSuburb = async () => {
 
     const components = data.results[0].address_components;
 
-    const suburb = components.find(c =>
-      c.types.includes("locality") ||
-      c.types.includes("sublocality") ||
-      c.types.includes("sublocality_level_1")
+    const suburb = components.find((c) =>
+      ["locality", "sublocality", "sublocality_level_1"].some((t) =>
+        c.types.includes(t)
+      )
     );
 
-    const state = components.find(c =>
+    const state = components.find((c) =>
       c.types.includes("administrative_area_level_1")
     );
 
@@ -77,16 +95,16 @@ const getSuburb = async () => {
 
       setLocation(loc);
 
-      // 🔥 store with expiry
-      localStorage.setItem("userLocation", JSON.stringify({
-        value: loc,
-        timestamp: Date.now()
-      }));
-
+      localStorage.setItem(
+        "userLocation",
+        JSON.stringify({
+          value: loc,
+          timestamp: Date.now(),
+        })
+      );
     } else {
       setLocation("Location unavailable");
     }
-
   } catch (err) {
     console.error("Geocode error:", err);
     setLocation("Location unavailable");
@@ -111,25 +129,27 @@ setShowMenu(false);
 
 
 document.addEventListener("mousedown", handleClickOutside);
-return () => document.removeEventListener("mousedown", handleClickOutside);
+return () =>
+  document.removeEventListener("mousedown", handleClickOutside);
 
 
 }, []);
 
-const toggleMenu = () => setShowMenu(prev => !prev);
+const toggleMenu = () => setShowMenu((prev) => !prev);
 
 /* ===============================
-RENDER
+🔥 SAFE RENDER GUARD
 =============================== */
 
-return ( <header className="header">
+const isAuthed = !!user;
+const username = getUserName();
+const initials = getInitials();
 
+return ( <header className="header"> <div className="header-row">
 
-  <div className="header-row">
 
     {/* LEFT */}
     <div className="header-left logo-container">
-
       <img
         src="/logo/logo.png"
         alt="Community One"
@@ -139,7 +159,6 @@ return ( <header className="header">
       <span className="location-text left">
         {location === "Locating..." ? "Locating…" : location}
       </span>
-
     </div>
 
     {/* CENTER */}
@@ -156,48 +175,48 @@ return ( <header className="header">
 
     {/* RIGHT */}
     <div className="header-right">
+      {isAuthed && (
+        <div className="user-block" ref={menuRef}>
 
-      <div className="user-block" ref={menuRef}>
+          <span
+            className="username"
+            title={user?.attributes?.email || ""}
+          >
+            {username}
+          </span>
 
-        <span
-          className="username"
-          title={user?.attributes?.email}
-        >
-          {getUserName()}
-        </span>
-
-        <div className="avatar" onClick={toggleMenu}>
-          {getInitials()}
-        </div>
-
-        {showMenu && (
-          <div className="dropdown-menu">
-
-            <div
-              className="menu-item"
-              onClick={() => {
-                setActiveView("profile");
-                setShowMenu(false);
-              }}
-            >
-              Profile Settings
-            </div>
-
-            <div
-              className="menu-item"
-              onClick={() => {
-                onLogout();
-                setShowMenu(false);
-              }}
-            >
-              Logout
-            </div>
-
+          <div className="avatar" onClick={toggleMenu}>
+            {initials}
           </div>
-        )}
 
-      </div>
+          {showMenu && (
+            <div className="dropdown-menu">
 
+              <div
+                className="menu-item"
+                onClick={() => {
+                  setActiveView("profile");
+                  setShowMenu(false);
+                }}
+              >
+                Profile Settings
+              </div>
+
+              <div
+                className="menu-item"
+                onClick={() => {
+                  onLogout?.();
+                  setShowMenu(false);
+                }}
+              >
+                Logout
+              </div>
+
+            </div>
+          )}
+
+        </div>
+      )}
     </div>
 
   </div>
@@ -213,7 +232,6 @@ return ( <header className="header">
     <button onClick={() => setActiveView("yellowpages")}>Yellow Pages</button>
     <button onClick={() => setActiveView("merch")}>Merch</button>
   </nav>
-
 </header>
 
 
