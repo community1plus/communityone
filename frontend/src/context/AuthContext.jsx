@@ -1,33 +1,67 @@
-import { Routes, Route, Navigate } from "react-router-dom";
-import { useAuth } from "./context/AuthContext";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import {
+getCurrentUser,
+fetchAuthSession,
+signOut,
+} from "aws-amplify/auth";
+import { Hub } from "aws-amplify/utils";
 
-import CommunityPlusLandingPage from "./components/CommunityPlusLandingPage/CommunityPlusLandingPage";
-import CommunityPlusDashboard from "./components/Dashboard/CommunityPlusDashboard";
+const AuthContext = createContext();
 
-export default function App() {
-const { user, loading } = useAuth();
+export function AuthProvider({ children }) {
+const [user, setUser] = useState(null);
+const [loading, setLoading] = useState(true);
 
-if (loading) return null; // 🔥 prevents flicker + race condition
+/* ===============================
+LOAD USER (CRITICAL)
+=============================== */
 
-return ( <Routes>
-{/* PUBLIC */}
-<Route
-path="/"
-element={
-user ? <Navigate to="/home" replace /> : <CommunityPlusLandingPage />
+const loadUser = async () => {
+try {
+await fetchAuthSession(); // 🔥 ensures OAuth completes
+const currentUser = await getCurrentUser();
+setUser(currentUser);
+} catch {
+setUser(null);
+} finally {
+setLoading(false);
 }
-/>
+};
+
+/* INITIAL LOAD */
+useEffect(() => {
+loadUser();
+}, []);
+
+/* LISTEN FOR OAUTH RETURN */
+useEffect(() => {
+const unsubscribe = Hub.listen("auth", ({ payload }) => {
+if (payload.event === "signedIn") {
+loadUser();
+}
 
 
-  {/* PROTECTED */}
-  <Route
-    path="/home"
-    element={
-      user ? <CommunityPlusDashboard /> : <Navigate to="/" replace />
-    }
-  />
-</Routes>
+  if (payload.event === "signedOut") {
+    setUser(null);
+  }
+});
+
+return unsubscribe;
 
 
+}, []);
+
+/* LOGOUT */
+const logout = async () => {
+await signOut();
+setUser(null);
+};
+
+return (
+<AuthContext.Provider value={{ user, loading, logout }}>
+{children}
+</AuthContext.Provider>
 );
 }
+
+export const useAuth = () => useContext(AuthContext);
