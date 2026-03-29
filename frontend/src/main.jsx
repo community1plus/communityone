@@ -12,10 +12,10 @@ Amplify.configure(outputs);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    
+    <AuthProvider>
       <BrowserRouter>
-        <AuthProvider><App /> </AuthProvider>     
+        <App />      
       </BrowserRouter>
- 
+    </AuthProvider>
   </React.StrictMode>
 );

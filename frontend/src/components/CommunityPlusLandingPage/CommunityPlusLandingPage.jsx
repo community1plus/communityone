@@ -44,8 +44,8 @@ return ( <div className="cpl-root"> <header className="topbar"> <div className="
 
 
       <div className="actions">
-        <button onClick={() => setShowAuth(true)}>Sign in</button>
-        <button onClick={() => setShowAuth(true)}>Join</button>
+        <button className="btn signin" onClick={() => setShowAuth(true)}>Sign in</button>
+        <button className="btn primary" onClick={() => setShowAuth(true)}>Join</button>
       </div>
     </div>
   </header>
@@ -53,10 +53,9 @@ return ( <div className="cpl-root"> <header className="topbar"> <div className="
   <main className="wrap">
     <section className="hero">
       <h1>Real People. Real News. Real Time</h1>
-
-      <button onClick={() => setShowAuth(true)}>
+      
         Explore your local area
-      </button>
+      
     </section>
   </main>
 
