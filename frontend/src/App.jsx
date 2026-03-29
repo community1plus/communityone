@@ -5,33 +5,29 @@ import CommunityPlusLandingPage from "./components/CommunityPlusLandingPage/Comm
 import CommunityPlusDashboard from "./components/Dashboard/CommunityPlusDashboard";
 
 export default function App() {
-  const { user, loading } = useAuth();
+const { user, loading } = useAuth();
 
-  /* ===============================
-     🔥 AUTH GATE (CRITICAL FIX)
-  =============================== */
+if (loading) return null; // 🔥 prevents flicker + race condition
 
-  if (loading) {
-    return null;
-  }
+return ( <Routes>
+{/* PUBLIC */}
+<Route
+path="/"
+element={
+user ? <Navigate to="/home" replace /> : <CommunityPlusLandingPage />
+}
+/>
 
-  return (
-    <Routes>
-      {/* LANDING */}
-      <Route
-        path="/"
-        element={
-          user ? <Navigate to="/home" replace /> : <CommunityPlusLandingPage />
-        }
-      />
 
-      {/* DASHBOARD (PROTECTED) */}
-      <Route
-        path="/home"
-        element={
-          user ? <CommunityPlusDashboard /> : <Navigate to="/" replace />
-        }
-      />
-    </Routes>
-  );
+  {/* PROTECTED */}
+  <Route
+    path="/home"
+    element={
+      user ? <CommunityPlusDashboard /> : <Navigate to="/" replace />
+    }
+  />
+</Routes>
+
+
+);
 }
