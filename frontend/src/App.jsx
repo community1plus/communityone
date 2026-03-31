@@ -3,6 +3,7 @@ import { useAuth } from "./context/AuthContext";
 import CommunityPlusLandingPage from "./pages/CommunityPlusLandingPage/CommunityPlusLandingPage";
 import CommunityPlusDashboard from "./pages/Dashboard/CommunityPlusDashboard";
 import AuthGate from "./pages/AuthGate";
+import { apiFetch } from "../services/api";
 import Onboarding from "./pages/Onboarding";
 
 export default function App() {

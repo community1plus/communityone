@@ -1,12 +1,13 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { apiFetch } from "../services/api";
 
 export default function AuthGate() {
   const navigate = useNavigate();
 
   useEffect(() => {
     async function checkUser() {
-      const res = await apifetch("/users/me");
+      const res = await apiFetch("/users/me");
       const data = await res.json();
 
       if (!data.hasProfile) {
