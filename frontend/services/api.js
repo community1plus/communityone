@@ -4,6 +4,7 @@ const API_BASE =
 
 export async function apiFetch(path, options = {}) {
   const url = `${API_BASE}${path}`;
+  
 
   try {
     const res = await fetch(url, {
@@ -11,8 +12,11 @@ export async function apiFetch(path, options = {}) {
         "Content-Type": "application/json"
       },
       ...options
-    });
 
+      
+    });
+    const url = `${API_BASE}${path}`;
+    console.log("API CALL:", url);  
     // 🔥 Catch non-JSON responses (your current crash)
     const contentType = res.headers.get("content-type");
 
