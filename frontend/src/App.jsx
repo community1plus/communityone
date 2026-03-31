@@ -3,7 +3,7 @@ import { useAuth } from "./context/AuthContext";
 import CommunityPlusLandingPage from "./pages/CommunityPlusLandingPage/CommunityPlusLandingPage";
 import CommunityPlusDashboard from "./pages/Dashboard/CommunityPlusDashboard";
 import AuthGate from "./pages/AuthGate";
-import Onboarding from "./pages/Onboarding";
+import Onboarding from "./pages/Onboarding/CommunityPlusOnboarding";
 
 export default function App() {
   const { user, loading } = useAuth();

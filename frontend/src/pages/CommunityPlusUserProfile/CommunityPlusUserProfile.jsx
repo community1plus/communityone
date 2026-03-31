@@ -1,36 +1,36 @@
-import React, { useEffect, useState } from "react";
-import "./CommunityPlusUserProfile.css";
-export default function CommunityPlusProfile({ user }) {
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { apiFetch } from "../../services/api";
+
+export default function CommunityPlusUserProfile({ mode = "edit" }) {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     username: "",
-    email: "",
-    phone: "",
-    streetNumber: "",
-    streetName: "",
-    suburb: "",
-    state: "",
-    postcode: "",
-    country: "Australia",
+    display_name: "",
     userType: "PERSONAL"
   });
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(mode === "edit");
   const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
 
-  // 🔥 Load profile on mount
+  // 🔥 Load profile ONLY in edit mode
   useEffect(() => {
+    if (mode !== "edit") return;
+
     async function loadProfile() {
       try {
-        const res = await fetch("/api/users/me");
-        const data = await res.json();
+        const data = await apiFetch("/api/users/me");
 
         if (data.profile) {
-          setFormData((prev) => ({
-            ...prev,
-            ...data.profile
-          }));
+          setFormData({
+            username: data.profile.username || "",
+            display_name: data.profile.display_name || "",
+            userType: data.profile.userType || "PERSONAL"
+          });
         }
+
       } catch (err) {
         console.error("Failed to load profile", err);
       } finally {
@@ -39,141 +39,98 @@ export default function CommunityPlusProfile({ user }) {
     }
 
     loadProfile();
-  }, []);
+  }, [mode]);
 
   const handleChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
+    setFormData({
+      ...formData,
       [e.target.name]: e.target.value
-    }));
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!formData.username || !formData.display_name) {
+      setError("Please fill in all fields");
+      return;
+    }
+
     setSaving(true);
-    setMessage("");
+    setError("");
 
     try {
-      await fetch("/api/users/update", {
+      const endpoint =
+        mode === "onboarding"
+          ? "/api/users/profile/create"
+          : "/api/users/update";
+
+      await apiFetch(endpoint, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
         body: JSON.stringify(formData)
       });
 
-      setMessage("✅ Profile saved successfully");
+      // 🔥 Navigation logic
+      if (mode === "onboarding") {
+        navigate("/home", { replace: true });
+      }
+
     } catch (err) {
-      console.error(err);
-      setMessage("❌ Failed to save profile");
+      console.error("Profile save failed", err);
+      setError("Failed to save profile");
     } finally {
       setSaving(false);
     }
   };
 
-  if (loading) return <div className="profile-loading">Loading profile...</div>;
+  if (loading) return <div>Loading profile...</div>;
 
   return (
     <div className="profile-container">
 
-      <h2>Profile Settings</h2>
+      <h2>
+        {mode === "onboarding"
+          ? "Create your profile"
+          : "Profile Settings"}
+      </h2>
 
-      <form className="profile-form" onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit}>
 
-        {/* USERNAME */}
-        <div className="form-group">
-          <label>Username</label>
-          <input
-            name="username"
-            value={formData.username}
-            disabled
-          />
-        </div>
+        <input
+          name="username"
+          placeholder="Username"
+          value={formData.username}
+          onChange={handleChange}
+        />
 
-        {/* CONTACT */}
-        <h3>Contact</h3>
+        <input
+          name="display_name"
+          placeholder="Display Name"
+          value={formData.display_name}
+          onChange={handleChange}
+        />
 
-        <div className="form-group">
-          <label>Email</label>
-          <input
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-          />
-        </div>
+        <select
+          name="userType"
+          value={formData.userType}
+          onChange={handleChange}
+        >
+          <option value="PERSONAL">Personal</option>
+          <option value="BUSINESS">Business</option>
+          <option value="MIXED">Mixed</option>
+          <option value="COMMUNITY_SERVICE">Community Service</option>
+          <option value="GOVERNMENT">Government</option>
+        </select>
 
-        <div className="form-group">
-          <label>Phone</label>
-          <input
-            name="phone"
-            value={formData.phone}
-            onChange={handleChange}
-          />
-        </div>
-
-        {/* ADDRESS */}
-        <h3>Address</h3>
-
-        <div className="address-grid">
-          <input
-            name="streetNumber"
-            placeholder="Street No."
-            value={formData.streetNumber}
-            onChange={handleChange}
-          />
-
-          <input
-            name="streetName"
-            placeholder="Street Name"
-            value={formData.streetName}
-            onChange={handleChange}
-          />
-
-          <input
-            name="suburb"
-            placeholder="Suburb"
-            value={formData.suburb}
-            onChange={handleChange}
-          />
-
-          <input
-            name="state"
-            placeholder="State"
-            value={formData.state}
-            onChange={handleChange}
-          />
-
-          <input
-            name="postcode"
-            placeholder="Postcode"
-            value={formData.postcode}
-            onChange={handleChange}
-          />
-        </div>
-
-        {/* USER TYPE */}
-        <h3>Profile Type</h3>
-
-        <div className="form-group">
-          <select
-            name="userType"
-            value={formData.userType}
-            onChange={handleChange}
-          >
-            <option value="PERSONAL">Personal</option>
-            <option value="BUSINESS">Business</option>
-            <option value="MIXED">Mixed</option>
-            <option value="COMMUNITY_SERVICE">Community Service</option>
-            <option value="GOVERNMENT">Government</option>
-          </select>
-        </div>
-
-        {/* ACTION */}
-        <button className="profile-btn" type="submit" disabled={saving}>
-          {saving ? "Saving..." : "Save Profile"}
+        <button type="submit" disabled={saving}>
+          {saving
+            ? "Saving..."
+            : mode === "onboarding"
+            ? "Create Profile"
+            : "Save Changes"}
         </button>
 
-        {message && <p className="profile-message">{message}</p>}
+        {error && <p className="error">{error}</p>}
 
       </form>
     </div>

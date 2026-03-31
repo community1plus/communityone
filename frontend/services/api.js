@@ -5,14 +5,12 @@ const API_BASE =
 export async function apiFetch(path, options = {}) {
   const url = `${API_BASE}${path}`;
   
-
   try {
     const res = await fetch(url, {
       headers: {
         "Content-Type": "application/json"
       },
       ...options
-
       
     });
     const url = `${API_BASE}${path}`;
