@@ -14,7 +14,7 @@ export async function getMe(req, res) {
     });
 
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error" });
+    console.error("🔥 getMe FULL ERROR:", err); // 👈 ADD THIS
+    res.status(500).json({ error: err.message }); // 👈 CHANGE THIS
   }
 }
