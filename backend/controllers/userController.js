@@ -1,4 +1,5 @@
 import { getOrCreateUserWithProfile } from "../services/userService.js";
+import { pool } from "../db/index.js";
 
 export async function getMe(req, res) {
   const { sub, email } = req.user;
