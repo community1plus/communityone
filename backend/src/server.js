@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import pkg from "pg";
 import axios from "axios";
-import userRoutes from "./routes/userRoutes.js";
+import userRoutes from "../routes/userRoutes.js";
 import dotenv from "dotenv";
 dotenv.config();
 
