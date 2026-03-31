@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { apiFetch } from "../services/api";
-
+import { apiFetch } from "../../services/api";
 export default function AuthGate() {
   const navigate = useNavigate();
 
