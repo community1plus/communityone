@@ -18,8 +18,6 @@ export default function AuthGate() {
 
       } catch (err) {
         console.error("AuthGate error:", err);
-
-        // 🔥 fallback: send to landing if something breaks
         navigate("/", { replace: true });
       }
     }
