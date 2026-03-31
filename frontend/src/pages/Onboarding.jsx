@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { apiFetch } from "../..api/services/api";
+import { apiFetch } from "../../services/api";
 
 export default function Onboarding() {
   const [username, setUsername] = useState("");
