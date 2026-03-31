@@ -1,23 +1,31 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiFetch } from "../../services/api";
+
 export default function AuthGate() {
   const navigate = useNavigate();
 
   useEffect(() => {
     async function checkUser() {
-      const res = await apiFetch("/users/me");
-      const data = await res.json();
+      try {
+        const data = await apiFetch("/api/users/me");
 
-      if (!data.hasProfile) {
-        navigate("/onboarding");
-      } else {
-        navigate("/dashboard");
+        if (!data.hasProfile) {
+          navigate("/onboarding", { replace: true });
+        } else {
+          navigate("/home", { replace: true });
+        }
+
+      } catch (err) {
+        console.error("AuthGate error:", err);
+
+        // 🔥 fallback: send to landing if something breaks
+        navigate("/", { replace: true });
       }
     }
 
     checkUser();
-  }, []);
+  }, [navigate]);
 
   return <div>Loading...</div>;
 }
