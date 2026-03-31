@@ -1,33 +1,36 @@
 const API_BASE =
   import.meta.env.VITE_API_URL ||
-  "http://localhost:5000";
+  "http://localhost:5000"; // fallback for local dev
 
 export async function apiFetch(path, options = {}) {
   const url = `${API_BASE}${path}`;
+  
 
   try {
-    const response = await fetch(url, {
+    const res = await fetch(url, {
       headers: {
         "Content-Type": "application/json"
       },
       ...options
+
+      
     });
+    const url = `${API_BASE}${path}`;
+    console.log("API CALL:", url);  
+    // 🔥 Catch non-JSON responses (your current crash)
+    const contentType = res.headers.get("content-type");
 
-    const text = await response.text();
+    if (!res.ok) {
+      throw new Error(`API error: ${res.status}`);
+    }
 
-    let data;
-    try {
-      data = JSON.parse(text);
-    } catch {
-      console.error("❌ Non-JSON response:", text);
+    if (!contentType || !contentType.includes("application/json")) {
+      const text = await res.text();
+      console.error("⚠️ Non-JSON response:", text);
       throw new Error("Invalid JSON response");
     }
 
-    if (!response.ok) {
-      throw new Error(data?.error || `API error ${response.status}`);
-    }
-
-    return data;
+    return res.json();
 
   } catch (err) {
     console.error("❌ API FETCH ERROR:", err);
