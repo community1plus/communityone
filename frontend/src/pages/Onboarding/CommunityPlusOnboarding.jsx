@@ -1,4 +1,4 @@
-import CommunityPlusUserProfile from "../pages/CommunityPlusUserProfile/CommunityPlusUserProfile";
+import CommunityPlusUserProfile from "../CommunityPlusUserProfile/CommunityPlusUserProfile";
 
 export default function Onboarding() {
   return <CommunityPlusUserProfile mode="onboarding" />;
