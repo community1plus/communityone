@@ -2,10 +2,8 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 import CommunityPlusLandingPage from "./pages/CommunityPlusLandingPage/CommunityPlusLandingPage";
 import CommunityPlusDashboard from "./pages/Dashboard/CommunityPlusDashboard";
-
-// NEW
-import AuthGate from "./pages/AuthGate";
-import Onboarding from "./pages/Onboarding";
+import AuthGate from "../pages/AuthGate";
+import Onboarding from "../pages/Onboarding";
 
 export default function App() {
   const { user, loading } = useAuth();
