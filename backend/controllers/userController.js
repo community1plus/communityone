@@ -15,6 +15,7 @@ export async function getMe(req, res) {
   } catch (err) {
     console.error("🔥 getMe FULL ERROR:", req.user + err); // 👈 ADD THIS
     console.error ("👤 req.user:", req.user);
+    
     res.status(500).json({ error: err.message }); // 👈 CHANGE THIS
   }
 }
