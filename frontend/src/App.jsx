@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
-import CommunityPlusLandingPage from "../pages/CommunityPlusLandingPage/CommunityPlusLandingPage";
-import CommunityPlusDashboard from "../pages/Dashboard/CommunityPlusDashboard";
+import CommunityPlusLandingPage from "./pages CommunityPlusLandingPage/CommunityPlusLandingPage";
+import CommunityPlusDashboard from "./pages/Dashboard/CommunityPlusDashboard";
 
 // NEW
 import AuthGate from "./pages/AuthGate";
