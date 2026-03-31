@@ -6,7 +6,7 @@ export default function AuthGate() {
 
   useEffect(() => {
     async function checkUser() {
-      const res = await fetch("/api/me");
+      const res = await apifetch("/users/me");
       const data = await res.json();
 
       if (!data.hasProfile) {
