@@ -1,33 +1,64 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
+import CommunityPlusLandingPage from "../pages/CommunityPlusLandingPage/CommunityPlusLandingPage";
+import CommunityPlusDashboard from "../pages/Dashboard/CommunityPlusDashboard";
 
-import CommunityPlusLandingPage from "./components/CommunityPlusLandingPage/CommunityPlusLandingPage";
-import CommunityPlusDashboard from "./components/Dashboard/CommunityPlusDashboard";
+// NEW
+import AuthGate from "./pages/AuthGate";
+import Onboarding from "./pages/Onboarding";
 
 export default function App() {
-const { user, loading } = useAuth();
+  const { user, loading } = useAuth();
 
-if (loading) return null; // 🔥 prevents flicker + race condition
+  // 🔥 Prevents flicker + race conditions
+  if (loading) return null;
 
-return ( <Routes>
-{/* PUBLIC */}
-<Route
-path="/"
-element={
-user ? <Navigate to="/home" replace /> : <CommunityPlusLandingPage />
-}
-/>
+  return (
+    <Routes>
+      {/* =========================
+          PUBLIC (Landing)
+      ========================= */}
+      <Route
+        path="/"
+        element={
+          user ? <Navigate to="/auth" replace /> : <CommunityPlusLandingPage />
+        }
+      />
 
+      {/* =========================
+          AUTH GATE (Profile Check)
+      ========================= */}
+      <Route
+        path="/auth"
+        element={
+          user ? <AuthGate /> : <Navigate to="/" replace />
+        }
+      />
 
-  {/* PROTECTED */}
-  <Route
-    path="/home"
-    element={
-      user ? <CommunityPlusDashboard /> : <Navigate to="/" replace />
-    }
-  />
-</Routes>
+      {/* =========================
+          ONBOARDING
+      ========================= */}
+      <Route
+        path="/onboarding"
+        element={
+          user ? <Onboarding /> : <Navigate to="/" replace />
+        }
+      />
 
+      {/* =========================
+          PROTECTED DASHBOARD
+      ========================= */}
+      <Route
+        path="/home"
+        element={
+          user ? <CommunityPlusDashboard /> : <Navigate to="/" replace />
+        }
+      />
 
-);
+      {/* =========================
+          FALLBACK (optional)
+      ========================= */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
 }
