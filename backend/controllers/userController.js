@@ -1,5 +1,4 @@
 import { getOrCreateUserWithProfile } from "../services/userService.js";
-import { pool } from "../db/index.js";
 
 export async function getMe(req, res) {
   const { sub, email } = req.user;
@@ -15,6 +14,7 @@ export async function getMe(req, res) {
 
   } catch (err) {
     console.error("🔥 getMe FULL ERROR:", err); // 👈 ADD THIS
+    console.log("👤 req.user:", req.user);
     res.status(500).json({ error: err.message }); // 👈 CHANGE THIS
   }
 }
