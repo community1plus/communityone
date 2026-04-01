@@ -30,16 +30,24 @@ app.use(express.json());
 const PORT = process.env.PORT || 5000;
 
 /* =====================================================
-   DEBUG ENV
+   🔍 DEBUG ENV (ENHANCED)
 ===================================================== */
-console.log("🔐 DATABASE_URL:", process.env.DATABASE_URL ? "LOADED ✅" : "MISSING ❌");
+const dbUrl = process.env.DATABASE_URL;
+
+if (!dbUrl) {
+  console.error("❌ DATABASE_URL is MISSING — app will fail");
+} else {
+  // show only safe part (no password)
+  const safeUrl = dbUrl.replace(/\/\/.*:.*@/, "//****:****@");
+  console.log("🔐 DATABASE_URL:", safeUrl);
+}
 
 /* =====================================================
    DATABASE
 ===================================================== */
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: dbUrl,
   ssl:
     process.env.NODE_ENV === "production"
       ? { rejectUnauthorized: false }
@@ -47,11 +55,19 @@ const pool = new Pool({
   connectionTimeoutMillis: 5000
 });
 
-pool.query("SELECT current_database(), inet_server_addr()")
-  .then(res => console.log("🌍 BACKEND DB:", res.rows))
-  .catch(err => console.error(err));
 /* =====================================================
-   🔥 DB CONNECTION TEST (CRITICAL)
+   🔥 DB LOCATION DEBUG (CRITICAL)
+===================================================== */
+pool.query("SELECT current_database(), inet_server_addr()")
+  .then((res) => {
+    console.log("🌍 BACKEND DB:", res.rows);
+  })
+  .catch((err) => {
+    console.error("❌ DB LOCATION ERROR:", err);
+  });
+
+/* =====================================================
+   🔥 DB CONNECTION TEST
 ===================================================== */
 (async () => {
   try {
@@ -87,7 +103,7 @@ app.get("/api/health", async (req, res) => {
 });
 
 /* =====================================================
-   🔥 BASIC TEST ROUTE (VERY IMPORTANT)
+   🔥 BASIC TEST ROUTE
 ===================================================== */
 app.get("/api/test", (req, res) => {
   res.json({ ok: true });
