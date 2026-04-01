@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 import { getCurrentUser, signOut } from "aws-amplify/auth";
 import { useNavigate } from "react-router-dom";
-
 import CommunityPlusHeader from "../../components/Layout/Header/CommunityPlusHeader";
 import CommunityPlusSidebar from "../../components/Layout/Sidebar/CommunityPlusSidebar";
 import FeedCard from "../../components/FeedCard/FeedCard";
@@ -47,6 +46,12 @@ export default function CommunityPlusDashboard() {
 
     checkAuth();
   }, []);
+  useEffect(() => {
+     if (activeView === "yellowpages") {
+        console.log("📍 Yellow Pages loaded");
+      }
+  }, [activeView]);
+
 
   /* ===============================
      📍 GEOLOCATION
