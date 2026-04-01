@@ -19,6 +19,7 @@ export async function getMe(req, res) {
     ).trim(); // 🔥 CRITICAL FIX
 
     const email =
+      rawUser.email ||
       rawUser.signInDetails?.loginId ||
       rawUser.attributes?.email ||
       null;
