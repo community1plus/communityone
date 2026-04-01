@@ -1,22 +1,36 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { apiFetch } from "../../services/api";
 import { useAuth } from "../context/AuthContext";
+import { apiFetch } from "../services/api";
 
 export default function AuthGate() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+
+  // 🔥 Prevent double execution (React strict mode + rerenders)
+  const hasRun = useRef(false);
 
   useEffect(() => {
-    async function checkUser() {
-      // 🔥 Extra safety: no session → exit
-      if (!user) {
-        navigate("/", { replace: true });
-        return;
-      }
+    // 🚫 Wait until auth fully resolves
+    if (loading) return;
 
+    // 🚫 No session → go back to landing
+    if (!user) {
+      navigate("/", { replace: true });
+      return;
+    }
+
+    // 🚫 Prevent duplicate calls
+    if (hasRun.current) return;
+    hasRun.current = true;
+
+    async function resolveUser() {
       try {
+        console.log("🔍 AuthGate: checking user");
+
         const data = await apiFetch("/api/users/me");
+
+        console.log("✅ AuthGate response:", data);
 
         if (!data.hasProfile) {
           navigate("/onboarding", { replace: true });
@@ -25,13 +39,15 @@ export default function AuthGate() {
         }
 
       } catch (err) {
-        console.error("AuthGate error:", err);
+        console.error("❌ AuthGate error:", err);
+
+        // fallback → reset flow
         navigate("/", { replace: true });
       }
     }
 
-    checkUser();
-  }, [user, navigate]);
+    resolveUser();
+  }, [user, loading, navigate]);
 
   return <div>Loading...</div>;
 }

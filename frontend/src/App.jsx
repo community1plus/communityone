@@ -19,7 +19,7 @@ export default function App() {
       <Route
         path="/"
         element={
-          user ? <Navigate to="/auth" replace /> : <CommunityPlusLandingPage />
+          user && !loading ? <Navigate to="/auth" replace /> : <CommunityPlusLandingPage />
         }
       />
 
