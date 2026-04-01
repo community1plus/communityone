@@ -10,13 +10,21 @@ export async function getMe(req, res) {
     /* =========================
        🧠 NORMALISE USER
     ========================= */
-    const sub = req.user?.userId || req.user?.sub;
+    const rawUser = req.user || {};
+
+    const sub = (
+      rawUser.userId ||
+      rawUser.sub ||
+      ""
+    ).trim(); // 🔥 CRITICAL FIX
+
     const email =
-      req.user?.signInDetails?.loginId ||
-      req.user?.attributes?.email ||
+      rawUser.signInDetails?.loginId ||
+      rawUser.attributes?.email ||
       null;
 
     if (!sub) {
+      console.error("❌ INVALID USER OBJECT:", rawUser);
       throw new Error("Missing user identifier (sub/userId)");
     }
 
@@ -25,8 +33,9 @@ export async function getMe(req, res) {
     /* =========================
        🔥 SERVICE CALL
     ========================= */
-    const { user, profile } =
-      await getOrCreateUserWithProfile(sub, email);
+    const result = await getOrCreateUserWithProfile(sub, email);
+
+    const { user, profile, debug } = result;
 
     /* =========================
        ✅ RESPONSE
@@ -34,7 +43,10 @@ export async function getMe(req, res) {
     return res.json({
       user,
       profile,
-      hasProfile: !!profile && profile.is_completed
+      hasProfile: !!profile && profile.is_completed,
+
+      // 🔥 TEMP DEBUG (REMOVE IN PROD)
+      debug
     });
 
   } catch (err) {
