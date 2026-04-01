@@ -7,8 +7,8 @@ export default function AuthGate() {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
 
-  // 🔥 Prevent double execution (React strict mode + rerenders)
-  const hasRun = useRef(false);
+  // 🔥 Track last processed user (better than boolean)
+  const lastUserRef = useRef(null);
 
   useEffect(() => {
     // 🚫 Wait until auth fully resolves
@@ -20,15 +20,16 @@ export default function AuthGate() {
       return;
     }
 
-    // 🚫 Prevent duplicate calls
-    if (hasRun.current) return;
-    hasRun.current = true;
+    // 🚫 Prevent duplicate calls for SAME user
+    if (lastUserRef.current === user.userId) return;
+    lastUserRef.current = user.userId;
 
     async function resolveUser() {
       try {
         console.log("🔍 AuthGate: checking user");
 
-        const data = await apiFetch("/api/users/me");
+        // ✅ FIXED PATH
+        const data = await apiFetch("/users/me");
 
         console.log("✅ AuthGate response:", data);
 
@@ -41,12 +42,15 @@ export default function AuthGate() {
       } catch (err) {
         console.error("❌ AuthGate error:", err);
 
-        // fallback → reset flow
+        // 🔁 Allow retry if something failed
+        lastUserRef.current = null;
+
         navigate("/", { replace: true });
       }
     }
 
     resolveUser();
+
   }, [user, loading, navigate]);
 
   return <div>Loading...</div>;
