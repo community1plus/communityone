@@ -47,6 +47,9 @@ const pool = new Pool({
   connectionTimeoutMillis: 5000
 });
 
+pool.query("SELECT current_database(), inet_server_addr()")
+  .then(res => console.log("🌍 BACKEND DB:", res.rows))
+  .catch(err => console.error(err));
 /* =====================================================
    🔥 DB CONNECTION TEST (CRITICAL)
 ===================================================== */
