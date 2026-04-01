@@ -1,6 +1,8 @@
 import { pool } from "../db/index.js";
 
 export async function getOrCreateUserWithProfile(sub, email) {
+  const client = await pool.connect();
+
   try {
     /* =========================
        🧠 VALIDATION
@@ -9,27 +11,33 @@ export async function getOrCreateUserWithProfile(sub, email) {
       throw new Error("Missing cognito_sub");
     }
 
-    console.log("➡️ userService start:", { sub, email });
+    console.log("➡️ userService INPUT:", { sub, email });
 
     /* =========================
-       🔥 1. GET OR CREATE USER
+       🔒 USE TRANSACTION (IMPORTANT)
     ========================= */
+    await client.query("BEGIN");
 
-    let user;
-
-    // Try fetch existing user
-    const userResult = await pool.query(
-      "SELECT * FROM users WHERE cognito_sub = $1",
+    /* =========================
+       🔍 1. GET USER
+    ========================= */
+    console.log("🧪 SELECT user...");
+    const userResult = await client.query(
+      "SELECT * FROM users WHERE cognito_sub = $1 LIMIT 1",
       [sub]
     );
 
-    user = userResult.rows[0];
+    let user = userResult.rows[0];
 
-    // Create if not exists
+    console.log("📦 SELECT result:", user);
+
+    /* =========================
+       🔥 2. CREATE USER IF NOT EXISTS
+    ========================= */
     if (!user) {
-      console.log("👤 Creating new user:", sub);
+      console.log("👤 INSERT user...");
 
-      const insertResult = await pool.query(
+      const insertResult = await client.query(
         `
         INSERT INTO users (cognito_sub, email)
         VALUES ($1, $2)
@@ -41,42 +49,57 @@ export async function getOrCreateUserWithProfile(sub, email) {
       );
 
       user = insertResult.rows[0];
+
+      console.log("📦 INSERT result:", user);
     }
 
-    if (!user) {
-      throw new Error("Failed to create or fetch user");
+    if (!user || !user.id) {
+      throw new Error("User creation failed (no id returned)");
     }
-
-    console.log("✅ user resolved:", user.id);
 
     /* =========================
-       🔍 2. GET PROFILE
+       🔍 3. GET PROFILE
     ========================= */
+    console.log("🧪 SELECT profile...");
 
-    let profile = null;
-
-    const profileResult = await pool.query(
+    const profileResult = await client.query(
       "SELECT * FROM user_profiles WHERE user_id = $1 LIMIT 1",
       [user.id]
     );
 
-    if (profileResult.rows.length > 0) {
-      profile = profileResult.rows[0];
-    }
+    const profile =
+      profileResult.rows.length > 0
+        ? profileResult.rows[0]
+        : null;
 
     console.log("📄 profile:", profile ? "FOUND" : "NONE");
 
     /* =========================
-       📦 3. RETURN
+       ✅ COMMIT
     ========================= */
+    await client.query("COMMIT");
 
+    /* =========================
+       📦 RETURN
+    ========================= */
     return {
       user,
       profile
     };
 
   } catch (err) {
-    console.error("🔥 userService FULL ERROR:", err);
+    await client.query("ROLLBACK");
+
+    console.error("🔥 userService FULL ERROR:", {
+      message: err.message,
+      stack: err.stack,
+      code: err.code,
+      detail: err.detail
+    });
+
     throw err;
+
+  } finally {
+    client.release();
   }
 }
