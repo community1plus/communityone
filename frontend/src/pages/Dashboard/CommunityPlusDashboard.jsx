@@ -1,18 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 import { getCurrentUser, signOut } from "aws-amplify/auth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+
 import CommunityPlusHeader from "../../components/Layout/Header/CommunityPlusHeader";
 import CommunityPlusSidebar from "../../components/Layout/Sidebar/CommunityPlusSidebar";
 import FeedCard from "../../components/FeedCard/FeedCard";
 import PostComposer from "../../components/Layout/Sidebar/Post/PostComposer";
 import CommunityPlusYellowPages from "../YellowPages/CommunityPlusYellowPages";
 import CommunityPlusUserProfile from "../CommunityPlusUserProfile/CommunityPlusUserProfile";
+import Onboarding from "../Onboarding/CommunityPlusOnboarding"; // 🔥 NEW
 
 import "./CommunityPlusDashboard.css";
 
 export default function CommunityPlusDashboard() {
   const navigate = useNavigate();
+  const location = useLocation(); // 🔥 NEW
 
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -22,17 +25,20 @@ export default function CommunityPlusDashboard() {
     lng: 144.9631,
   });
 
-  const [activeView, setActiveView] = useState("dashboard");
+  // 🔥 CRITICAL: supports AuthGate view injection
+  const [activeView, setActiveView] = useState(
+    location.state?.view || "dashboard"
+  );
 
   /* ===============================
-     🔐 AUTH GUARD (CRITICAL)
+     🔐 AUTH GUARD
   =============================== */
 
   useEffect(() => {
-  console.log("USER:", user);
-  console.log("LOADING:", loading);
-}, [user, loading]);
-   
+    console.log("USER:", user);
+    console.log("LOADING:", loading);
+  }, [user, loading]);
+
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -46,12 +52,16 @@ export default function CommunityPlusDashboard() {
 
     checkAuth();
   }, []);
-  useEffect(() => {
-     if (activeView === "yellowpages") {
-        console.log("📍 Yellow Pages loaded");
-      }
-  }, [activeView]);
 
+  /* ===============================
+     📍 VIEW DEBUG (YELLOW PAGES)
+  =============================== */
+
+  useEffect(() => {
+    if (activeView === "yellowpages") {
+      console.log("📍 Yellow Pages loaded");
+    }
+  }, [activeView]);
 
   /* ===============================
      📍 GEOLOCATION
@@ -88,7 +98,7 @@ export default function CommunityPlusDashboard() {
   }, []);
 
   /* ===============================
-     🔓 LOGOUT (FIXED)
+     🔓 LOGOUT
   =============================== */
 
   const handleLogout = async () => {
@@ -106,6 +116,10 @@ export default function CommunityPlusDashboard() {
 
   const renderView = () => {
     switch (activeView) {
+      // 🔥 NEW — ONBOARDING INSIDE DASHBOARD
+      case "onboarding":
+        return <Onboarding setActiveView={setActiveView} />;
+
       case "profile":
         return <CommunityPlusUserProfile user={user} />;
 
