@@ -5,16 +5,22 @@ export async function getOrCreateUserWithProfile(sub, email) {
 
   try {
     /* =========================
-       🧠 VALIDATION
+       🧠 SANITISE + VALIDATION
     ========================= */
+    const rawSub = sub;
+
+    sub = (sub || "").trim(); // 🔥 CRITICAL FIX
+
+    console.log("➡️ userService INPUT:", { rawSub, sub, email });
+    console.log("🚨 SUB TYPE:", typeof sub);
+    console.log("🚨 SUB LENGTH:", sub.length);
+
     if (!sub) {
       throw new Error("Missing cognito_sub");
     }
 
-    console.log("➡️ userService INPUT:", { sub, email });
-
     /* =========================
-       🔒 USE TRANSACTION (IMPORTANT)
+       🔒 USE TRANSACTION
     ========================= */
     await client.query("BEGIN");
 
@@ -56,6 +62,8 @@ export async function getOrCreateUserWithProfile(sub, email) {
     if (!user || !user.id) {
       throw new Error("User creation failed (no id returned)");
     }
+
+    console.log("✅ FINAL USER ID:", user.id);
 
     /* =========================
        🔍 3. GET PROFILE
