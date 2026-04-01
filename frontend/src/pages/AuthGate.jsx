@@ -7,20 +7,20 @@ export default function AuthGate() {
   const navigate = useNavigate();
   const { user, loading } = useAuth();
 
-  // 🔥 Track last processed user (better than boolean)
+  // 🔥 Track last processed user (prevents duplicate calls)
   const lastUserRef = useRef(null);
 
   useEffect(() => {
-    // 🚫 Wait until auth fully resolves
+    // 🚫 Wait until auth resolves
     if (loading) return;
 
-    // 🚫 No session → go back to landing
+    // 🚫 No session → landing
     if (!user) {
       navigate("/", { replace: true });
       return;
     }
 
-    // 🚫 Prevent duplicate calls for SAME user
+    // 🚫 Prevent duplicate calls for same user
     if (lastUserRef.current === user.userId) return;
     lastUserRef.current = user.userId;
 
@@ -28,13 +28,16 @@ export default function AuthGate() {
       try {
         console.log("🔍 AuthGate: checking user");
 
-        // ✅ FIXED PATH
         const data = await apiFetch("/users/me");
 
         console.log("✅ AuthGate response:", data);
 
+        // 🔥 KEY CHANGE — route INTO dashboard with view state
         if (!data.hasProfile) {
-          navigate("/onboarding", { replace: true });
+          navigate("/home", {
+            replace: true,
+            state: { view: "onboarding" }
+          });
         } else {
           navigate("/home", { replace: true });
         }
@@ -42,7 +45,7 @@ export default function AuthGate() {
       } catch (err) {
         console.error("❌ AuthGate error:", err);
 
-        // 🔁 Allow retry if something failed
+        // 🔁 allow retry if failure
         lastUserRef.current = null;
 
         navigate("/", { replace: true });
