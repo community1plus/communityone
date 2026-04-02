@@ -1,17 +1,27 @@
 /* =====================================================
-   CONTAINER
+   CONTAINER (UPDATED: FULL HEIGHT, NO SCROLL)
 ===================================================== */
 
 .profile-container {
   max-width: 560px;
-  margin: 40px auto;
+
+  width: 100%;
+  height: 100%;                 /* 🔥 fill parent */
+
+  margin: 0 auto;               /* 🔥 remove vertical margin */
   padding: 32px;
+  padding-bottom: 60px;         /* 🔥 internal bottom spacing */
+
+  display: flex;                /* 🔥 flex layout */
+  flex-direction: column;
 
   background: #fff;
   border-radius: 18px;
   border: 1px solid #e8e6e2;
 
   box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+
+  overflow: hidden;             /* 🔥 no scroll */
 }
 
 
@@ -27,13 +37,15 @@
 
 
 /* =====================================================
-   FORM LAYOUT
+   FORM LAYOUT (UPDATED)
 ===================================================== */
 
 .profile-container form {
   display: flex;
   flex-direction: column;
   gap: 18px;
+
+  flex: 1;                      /* 🔥 take remaining height */
 }
 
 
@@ -144,11 +156,11 @@
 
 
 /* =====================================================
-   BUTTONS
+   BUTTONS (UPDATED)
 ===================================================== */
 
 .profile-container button {
-  margin-top: 8px;
+  margin-top: auto;            /* 🔥 pushes button to bottom */
   padding: 12px;
 
   border: none;
@@ -210,7 +222,6 @@
 
 @media (max-width: 600px) {
   .profile-container {
-    margin: 20px;
     padding: 20px;
   }
 }
