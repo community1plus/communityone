@@ -1,50 +1,82 @@
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { apiFetch } from "../../services/api";
+import { fetchAuthSession } from "aws-amplify/auth";
 
 export default function AuthGate() {
   const navigate = useNavigate();
   const { user, loading, setAppUser } = useAuth();
 
-  // 🔥 Prevent duplicate calls per session
   const lastUserRef = useRef(null);
 
   useEffect(() => {
-    // 🚫 Wait for auth to resolve
     if (loading) return;
 
-    // 🚫 No session → landing
     if (!user) {
       navigate("/", { replace: true });
       return;
     }
 
-    // 🔥 Use stable identifier
     const userKey = user?.userId || user?.username;
 
-    // 🚫 Prevent duplicate calls
     if (lastUserRef.current === userKey) return;
     lastUserRef.current = userKey;
 
     async function resolveUser() {
       try {
         console.log("🔍 AuthGate: checking user");
+
         const API_BASE = import.meta.env.VITE_API_BASE;
-        const data = await apiFetch(`${API_BASE}/users/me`);
+
+        /* ===============================
+           🔐 GET AUTH TOKEN
+        =============================== */
+
+        const session = await fetchAuthSession();
+        const token = session.tokens?.idToken?.toString();
+
+        if (!token) {
+          throw new Error("No auth token available");
+        }
+
+        /* ===============================
+           🌐 CALL BACKEND
+        =============================== */
+
+        const res = await fetch(`${API_BASE}/users/me`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`, // 🔥 CRITICAL
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!res.ok) {
+          throw new Error(`API error: ${res.status}`);
+        }
+
+        const data = await res.json(); // 🔥 CRITICAL FIX
 
         console.log("✅ AuthGate response:", data);
 
-        // 🔥 STORE BACKEND USER (CRITICAL FIX)
-        if (data?.user) {
-          setAppUser(data.user);
+        /* ===============================
+           🧠 STORE USER
+        =============================== */
+
+        if (!data || !data.user) {
+          throw new Error("Invalid user response");
         }
 
-        // 🔥 ROUTING LOGIC
-        if (!data?.hasProfile) {
+        setAppUser(data.user);
+
+        /* ===============================
+           🚦 ROUTING
+        =============================== */
+
+        if (!data.hasProfile) {
           navigate("/home", {
             replace: true,
-            state: { view: "onboarding" }
+            state: { view: "onboarding" },
           });
         } else {
           navigate("/home", { replace: true });
@@ -53,7 +85,6 @@ export default function AuthGate() {
       } catch (err) {
         console.error("❌ AuthGate error:", err);
 
-        // 🔁 allow retry
         lastUserRef.current = null;
 
         navigate("/", { replace: true });
