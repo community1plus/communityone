@@ -1,11 +1,22 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./CommunityPlusHeader.css";
+import { useLocationContext } from "../../context/LocationContext"; // ✅ NEW
 
-function CommunityPlusHeader({ setActiveView, user, onLogout, coords }) {
-  const [location, setLocation] = useState("Locating...");
+function CommunityPlusHeader({ setActiveView, user, onLogout }) {
   const [showMenu, setShowMenu] = useState(false);
 
   const menuRef = useRef(null);
+
+  /* ===============================
+  📍 LOCATION CONTEXT (NEW SYSTEM)
+  =============================== */
+
+  const {
+    viewLocation,
+    homeLocation,
+    enableLiveLocation,
+    setViewLocation
+  } = useLocationContext();
 
   /* ===============================
   👤 USERNAME (HARDENED)
@@ -14,12 +25,10 @@ function CommunityPlusHeader({ setActiveView, user, onLogout, coords }) {
   const getUserName = () => {
     if (!user) return "Member";
 
-    // ✅ 1. Real name (best)
     if (user?.attributes?.name && !/^\d+$/.test(user.attributes.name)) {
       return user.attributes.name;
     }
 
-    // ✅ 2. Email
     const email =
       user?.attributes?.email ||
       user?.signInDetails?.loginId;
@@ -28,101 +37,16 @@ function CommunityPlusHeader({ setActiveView, user, onLogout, coords }) {
       return email.split("@")[0];
     }
 
-    // ❌ 3. BLOCK numeric IDs completely
-    const raw = user?.username || "";
-
-    if (!raw || /^\d+$/.test(raw)) {
-      return "Member";
-    }
-
-    // ✅ 4. Clean provider strings
-    return raw.replace(/^facebook_|^google_/, "");
+    return "Member"; // 🔥 hard stop (no numeric leak)
   };
 
   const getInitials = () => {
     const name = getUserName();
-
     const clean = name.replace(/[^a-zA-Z]/g, "");
 
     if (!clean) return "ME";
-
-    if (clean.length === 1) return clean.toUpperCase();
-
     return clean.slice(0, 2).toUpperCase();
   };
-
-  /* ===============================
-  📍 LOCATION (FORCED RESOLUTION)
-  =============================== */
-
-  useEffect(() => {
-    let mounted = true;
-
-    const resolveLocation = async () => {
-      // ✅ STEP 1: ALWAYS get IP location first (fast + reliable)
-      try {
-        const res = await fetch("https://ipapi.co/json/");
-        const data = await res.json();
-
-        if (mounted && data.city && data.region_code) {
-          setLocation(`${data.city}, ${data.region_code}`);
-        }
-      } catch {
-        if (mounted) setLocation("Location unavailable");
-      }
-
-      // ✅ STEP 2: Upgrade to precise GPS location if available
-      if (coords?.lat && coords?.lng) {
-        try {
-          const res = await fetch(
-            `https://maps.googleapis.com/maps/api/geocode/json?latlng=${coords.lat},${coords.lng}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`
-          );
-
-          const data = await res.json();
-          const best = data.results?.[0];
-
-          if (!best) return;
-
-          const components = best.address_components || [];
-
-          const suburb =
-            components.find(c => c.types.includes("sublocality_level_1")) ||
-            components.find(c => c.types.includes("neighborhood")) ||
-            components.find(c => c.types.includes("postal_town"));
-
-          const city = components.find(c =>
-            c.types.includes("locality")
-          );
-
-          const state = components.find(c =>
-            c.types.includes("administrative_area_level_1")
-          );
-
-          const postcode = components.find(c =>
-            c.types.includes("postal_code")
-          );
-
-          let loc = "";
-
-          if (suburb && state) {
-            loc = `${suburb.long_name}, ${state.short_name} ${postcode?.long_name || ""}`;
-          } else if (city && state) {
-            loc = `${city.long_name}, ${state.short_name}`;
-          }
-
-          if (mounted && loc) {
-            setLocation(loc.trim());
-          }
-        } catch {}
-      }
-    };
-
-    resolveLocation();
-
-    return () => {
-      mounted = false;
-    };
-  }, [coords]);
 
   /* ===============================
   CLICK OUTSIDE
@@ -156,15 +80,34 @@ function CommunityPlusHeader({ setActiveView, user, onLogout, coords }) {
 
         {/* LEFT */}
         <div className="header-left logo-container">
+
           <img
             src="/logo/logo.png"
             alt="Community One"
             className="logo"
           />
 
-          <span className="location-text left">
-            {location}
-          </span>
+          {/* 🔥 LOCATION SWITCHER */}
+          <div className="location-switcher">
+
+            <span className="location-text left">
+              📍 {viewLocation?.label || "Locating..."}
+            </span>
+
+            <div className="location-dropdown">
+
+              <button onClick={() => setViewLocation(homeLocation)}>
+                🏠 Home
+              </button>
+
+              <button onClick={enableLiveLocation}>
+                📡 Near Me
+              </button>
+
+            </div>
+
+          </div>
+
         </div>
 
         {/* CENTER */}

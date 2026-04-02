@@ -3,29 +3,27 @@ import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 import { getCurrentUser, signOut } from "aws-amplify/auth";
 import { useNavigate, useLocation } from "react-router-dom";
 
+import { useLocationContext } from "../../context/LocationContext"; // ✅ NEW
+
 import CommunityPlusHeader from "../../components/Layout/Header/CommunityPlusHeader";
 import CommunityPlusSidebar from "../../components/Layout/Sidebar/CommunityPlusSidebar";
 import FeedCard from "../../components/FeedCard/FeedCard";
 import PostComposer from "../../components/Layout/Sidebar/Post/PostComposer";
 import CommunityPlusYellowPages from "../YellowPages/CommunityPlusYellowPages";
 import CommunityPlusUserProfile from "../CommunityPlusUserProfile/CommunityPlusUserProfile";
-import Onboarding from "../Onboarding/CommunityPlusOnboarding"; // 🔥 NEW
+import Onboarding from "../Onboarding/CommunityPlusOnboarding";
 
 import "./CommunityPlusDashboard.css";
 
 export default function CommunityPlusDashboard() {
   const navigate = useNavigate();
-  const location = useLocation(); // 🔥 NEW
+  const location = useLocation();
+
+  const { viewLocation } = useLocationContext(); // 🔥 NEW
 
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const [coords, setCoords] = useState({
-    lat: -37.8136,
-    lng: 144.9631,
-  });
-
-  // 🔥 CRITICAL: supports AuthGate view injection
   const [activeView, setActiveView] = useState(
     location.state?.view || "dashboard"
   );
@@ -33,11 +31,6 @@ export default function CommunityPlusDashboard() {
   /* ===============================
      🔐 AUTH GUARD
   =============================== */
-
-  useEffect(() => {
-    console.log("USER:", user);
-    console.log("LOADING:", loading);
-  }, [user, loading]);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -54,43 +47,13 @@ export default function CommunityPlusDashboard() {
   }, []);
 
   /* ===============================
-     📍 VIEW DEBUG (YELLOW PAGES)
-  =============================== */
-
-  
-  /* ===============================
-     📍 GEOLOCATION
+     🗺 GOOGLE MAP LOADER
   =============================== */
 
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
     libraries: ["places"],
   });
-
-  useEffect(() => {
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) =>
-          setCoords({
-            lat: pos.coords.latitude,
-            lng: pos.coords.longitude,
-          }),
-        () => {
-          fetch("https://ipapi.co/json/")
-            .then((res) => res.json())
-            .then((data) => {
-              if (data.latitude && data.longitude) {
-                setCoords({
-                  lat: data.latitude,
-                  lng: data.longitude,
-                });
-              }
-            })
-            .catch(() => {});
-        }
-      );
-    }
-  }, []);
 
   /* ===============================
      🔓 LOGOUT
@@ -106,12 +69,21 @@ export default function CommunityPlusDashboard() {
   };
 
   /* ===============================
+     📍 LOCATION (SINGLE SOURCE)
+  =============================== */
+
+  const mapCenter =
+    viewLocation?.lat && viewLocation?.lng
+      ? { lat: viewLocation.lat, lng: viewLocation.lng }
+      : { lat: -37.8136, lng: 144.9631 }; // fallback (Melbourne)
+
+  /* ===============================
      VIEW SWITCHER
   =============================== */
 
   const renderView = () => {
     switch (activeView) {
-      // 🔥 NEW — ONBOARDING INSIDE DASHBOARD
+
       case "onboarding":
         return <Onboarding setActiveView={setActiveView} />;
 
@@ -126,10 +98,9 @@ export default function CommunityPlusDashboard() {
         );
 
       case "yellowpages":
-        console.log("YELLOW PAGES VIEW ACTIVE");
         return (
           <CommunityPlusYellowPages
-            coords={coords}
+            coords={mapCenter} // 🔥 now uses viewLocation
             isLoaded={isLoaded}
           />
         );
@@ -154,11 +125,11 @@ export default function CommunityPlusDashboard() {
                 <div className="map-loading">Loading map…</div>
               ) : (
                 <GoogleMap
-                  center={coords}
+                  center={mapCenter} // 🔥 SINGLE SOURCE
                   zoom={14}
                   mapContainerClassName="map-container loaded"
                 >
-                  <Marker position={coords} />
+                  <Marker position={mapCenter} />
                 </GoogleMap>
               )}
             </div>
@@ -181,14 +152,15 @@ export default function CommunityPlusDashboard() {
 
   return (
     <div className="dashboard-container">
+
       <CommunityPlusHeader
         user={user}
         setActiveView={setActiveView}
         onLogout={handleLogout}
-        coords={coords}
       />
 
       <main className="main">
+
         <CommunityPlusSidebar
           setActiveView={setActiveView}
           onLogout={handleLogout}
@@ -196,11 +168,12 @@ export default function CommunityPlusDashboard() {
 
         <div
           className={`content-area ${
-          activeView === "yellowpages" ? "full-width" : ""
-      }`}
->
-  {renderView()}
-</div>
+            activeView === "yellowpages" ? "full-width" : ""
+          }`}
+        >
+          {renderView()}
+        </div>
+
       </main>
     </div>
   );

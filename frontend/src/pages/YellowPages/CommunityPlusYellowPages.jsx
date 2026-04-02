@@ -12,9 +12,7 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
   const fallback = { lat: -37.8136, lng: 144.9631 };
 
   const [businesses, setBusinesses] = useState([]);
-  const [mapCenter, setMapCenter] = useState(
-    coords?.lat ? coords : fallback
-  );
+  const [mapCenter, setMapCenter] = useState(fallback);
   const [category, setCategory] = useState("restaurant");
 
   const [selectedId, setSelectedId] = useState(null);
@@ -28,9 +26,27 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
   const lastBoundsRef = useRef(null);
   const cardRefs = useRef({});
 
-  /* ================= FETCH ================= */
+  /* ===============================
+     📍 SYNC WITH LOCATION CONTEXT
+  =============================== */
 
-  const fetchBusinesses = (bounds) => {
+  useEffect(() => {
+    if (coords?.lat && coords?.lng) {
+      setMapCenter({ lat: coords.lat, lng: coords.lng });
+
+      // 🔥 force fetch when location changes
+      if (mapRef.current) {
+        const bounds = mapRef.current.getBounds();
+        if (bounds) fetchBusinesses(bounds);
+      }
+    }
+  }, [coords]);
+
+  /* ===============================
+     🔍 FETCH BUSINESSES
+  =============================== */
+
+  const fetchBusinesses = async (bounds) => {
     if (!bounds) return;
 
     const ne = bounds.getNorthEast();
@@ -41,21 +57,30 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
     const east = ne.lng();
     const west = sw.lng();
 
-    setLoading(true);
-    setError(null);
+    try {
+      setLoading(true);
+      setError(null);
 
-    fetch(
-      `${API}/api/businesses?north=${north}&south=${south}&east=${east}&west=${west}&category=${category}`
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        setBusinesses(Array.isArray(data) ? data : []);
-      })
-      .catch(() => setError("Failed to load businesses"))
-      .finally(() => setLoading(false));
+      const res = await fetch(
+        `${API}/api/businesses?north=${north}&south=${south}&east=${east}&west=${west}&category=${category}`
+      );
+
+      if (!res.ok) throw new Error("API error");
+
+      const data = await res.json();
+
+      setBusinesses(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("Business fetch error:", err);
+      setError("Failed to load businesses");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  /* ================= MAP IDLE ================= */
+  /* ===============================
+     🗺 MAP IDLE (SMART FETCH)
+  =============================== */
 
   const handleMapIdle = () => {
     if (!mapRef.current) return;
@@ -94,24 +119,20 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
     }, 300);
   };
 
-  /* ================= INITIAL CENTER ================= */
+  /* ===============================
+     🔄 INITIAL LOAD FIX
+  =============================== */
 
   useEffect(() => {
-    const lat = coords?.lat ?? fallback.lat;
-    const lng = coords?.lng ?? fallback.lng;
-    setMapCenter({ lat, lng });
-  }, [coords]);
-
-  /* ================= FETCH ON LOAD ================= */
-
-  useEffect(() => {
-    if (mapRef.current) {
+    if (isLoaded && mapRef.current) {
       const bounds = mapRef.current.getBounds();
       if (bounds) fetchBusinesses(bounds);
     }
   }, [isLoaded]);
 
-  /* ================= REFETCH ON CATEGORY ================= */
+  /* ===============================
+     🔄 CATEGORY CHANGE
+  =============================== */
 
   useEffect(() => {
     if (mapRef.current) {
@@ -120,7 +141,9 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
     }
   }, [category]);
 
-  /* ================= SELECT BUSINESS ================= */
+  /* ===============================
+     📌 SELECT BUSINESS
+  =============================== */
 
   const handleSelectBusiness = (biz) => {
     setSelectedId(biz.id);
@@ -139,7 +162,9 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
     });
   };
 
-  /* ================= UI ================= */
+  /* ===============================
+     UI
+  =============================== */
 
   return (
     <div style={{ width: "100%", height: "100%" }}>
@@ -174,7 +199,6 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
                 onClick={() => handleSelectBusiness(biz)}
               >
                 <h3>{biz.name}</h3>
-
                 <p className="business-address">📍 {biz.address}</p>
 
                 {biz.rating && (
@@ -245,6 +269,7 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
             </div>
           </div>
         )}
+
       </div>
     </div>
   );
