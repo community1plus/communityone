@@ -9,6 +9,7 @@
   width: 100%;
   min-height: calc(100vh - 140px); /* 🔥 KEY FIX */
   position: relative;
+   background: red;
 }
 
 
@@ -131,9 +132,8 @@
 
 .map-column {
   display: flex;
-  height: 100%;
   min-height: 500px;
-  position: relative;
+  height: 100%;
 }
 
 .map-container {
@@ -163,6 +163,12 @@
   box-shadow: 0 12px 30px rgba(0,0,0,0.15);
   z-index: 1000;
 
+  display: flex;
+  flex-direction: column;
+}
+
+.content-area {
+  height: 100%;
   display: flex;
   flex-direction: column;
 }
@@ -227,6 +233,7 @@
 
   .yellowpages-layout {
     grid-template-columns: 1fr;
+   
   }
 
   .business-detail {
