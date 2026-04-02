@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiFetch } from "../../../services/api";
+import "./CommunityPlusUserProfile.css";
 
 export default function CommunityPlusUserProfile({ mode = "edit" }) {
   const navigate = useNavigate();
