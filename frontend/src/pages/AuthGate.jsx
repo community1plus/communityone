@@ -31,7 +31,7 @@ export default function AuthGate() {
       try {
         console.log("🔍 AuthGate: checking user");
 
-        const data = await apiFetch("/users/me");
+        const data = await apiFetch("/api/users/me");
 
         console.log("✅ AuthGate response:", data);
 
