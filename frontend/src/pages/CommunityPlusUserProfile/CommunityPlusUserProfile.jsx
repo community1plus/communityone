@@ -1,10 +1,22 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiFetch } from "../../../services/api";
+import { Autocomplete } from "@react-google-maps/api";
+import { useLocationContext } from "../../../context/LocationContext";
+
 import "./CommunityPlusUserProfile.css";
 
 export default function CommunityPlusUserProfile({ mode = "edit" }) {
   const navigate = useNavigate();
+  const autoRef = useRef(null);
+
+  const {
+    homeLocation,
+    liveLocation,
+    viewLocation,
+    setHome,
+    enableLiveLocation
+  } = useLocationContext();
 
   const [formData, setFormData] = useState({
     username: "",
@@ -16,7 +28,10 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
-  // 🔥 Load profile ONLY in edit mode
+  /* ===============================
+     LOAD PROFILE
+  =============================== */
+
   useEffect(() => {
     if (mode !== "edit") return;
 
@@ -31,7 +46,6 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
             userType: data.profile.userType || "PERSONAL"
           });
         }
-
       } catch (err) {
         console.error("Failed to load profile", err);
       } finally {
@@ -41,6 +55,10 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
 
     loadProfile();
   }, [mode]);
+
+  /* ===============================
+     FORM HANDLING
+  =============================== */
 
   const handleChange = (e) => {
     setFormData({
@@ -71,7 +89,6 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
         body: JSON.stringify(formData)
       });
 
-      // 🔥 Navigation logic
       if (mode === "onboarding") {
         navigate("/home", { replace: true });
       }
@@ -82,6 +99,38 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
     } finally {
       setSaving(false);
     }
+  };
+
+  /* ===============================
+     LOCATION PICKER
+  =============================== */
+
+  const onPlaceChanged = () => {
+    const place = autoRef.current.getPlace();
+    if (!place.geometry) return;
+
+    const components = place.address_components;
+
+    const suburb =
+      components.find(c => c.types.includes("locality")) ||
+      components.find(c => c.types.includes("sublocality_level_1"));
+
+    const state = components.find(c =>
+      c.types.includes("administrative_area_level_1")
+    );
+
+    const postcode = components.find(c =>
+      c.types.includes("postal_code")
+    );
+
+    const loc = {
+      label: `${suburb?.long_name}, ${state?.short_name} ${postcode?.long_name || ""}`,
+      lat: place.geometry.location.lat(),
+      lng: place.geometry.location.lng(),
+      type: "home"
+    };
+
+    setHome(loc);
   };
 
   if (loading) return <div>Loading profile...</div>;
@@ -97,32 +146,83 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
 
       <form onSubmit={handleSubmit}>
 
-        <input
-          name="username"
-          placeholder="Username"
-          value={formData.username}
-          onChange={handleChange}
-        />
+        {/* USERNAME */}
+        <div className="form-group">
+          <label>Username</label>
+          <input
+            name="username"
+            value={formData.username}
+            onChange={handleChange}
+          />
+        </div>
 
-        <input
-          name="display_name"
-          placeholder="Display Name"
-          value={formData.display_name}
-          onChange={handleChange}
-        />
+        {/* DISPLAY NAME */}
+        <div className="form-group">
+          <label>Display Name</label>
+          <input
+            name="display_name"
+            value={formData.display_name}
+            onChange={handleChange}
+          />
+        </div>
 
-        <select
-          name="userType"
-          value={formData.userType}
-          onChange={handleChange}
-        >
-          <option value="PERSONAL">Personal</option>
-          <option value="BUSINESS">Business</option>
-          <option value="MIXED">Mixed</option>
-          <option value="COMMUNITY_SERVICE">Community Service</option>
-          <option value="GOVERNMENT">Government</option>
-        </select>
+        {/* USER TYPE */}
+        <div className="form-group">
+          <label>User Type</label>
+          <select
+            name="userType"
+            value={formData.userType}
+            onChange={handleChange}
+          >
+            <option value="PERSONAL">Personal</option>
+            <option value="BUSINESS">Business</option>
+            <option value="MIXED">Mixed</option>
+            <option value="COMMUNITY_SERVICE">Community Service</option>
+            <option value="GOVERNMENT">Government</option>
+          </select>
+        </div>
 
+        {/* 🔥 LOCATION SECTION */}
+        <div className="location-section">
+
+          <label>Home Location</label>
+
+          <Autocomplete
+            onLoad={(auto) => (autoRef.current = auto)}
+            onPlaceChanged={onPlaceChanged}
+          >
+            <input
+              placeholder="Search your suburb..."
+              className="location-input"
+            />
+          </Autocomplete>
+
+          {/* CURRENT LOCATION */}
+          <div className="location-row">
+            <span>📍 Home:</span>
+            <strong>{homeLocation?.label || "Not set"}</strong>
+          </div>
+
+          <div className="location-row">
+            <span>📡 Current:</span>
+            <strong>{liveLocation?.label || "Not active"}</strong>
+            <button
+              type="button"
+              onClick={enableLiveLocation}
+              className="ghost-btn"
+            >
+              Use GPS
+            </button>
+          </div>
+
+          <div className="location-row">
+            <span>🧭 Nearby:</span>
+            <strong>{viewLocation?.label || "—"}</strong>
+          </div>
+
+        </div>
+
+        {/* SUBMIT */}
         <button type="submit" disabled={saving}>
           {saving
             ? "Saving..."
