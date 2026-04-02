@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./CommunityPlusHeader.css";
 import { useLocationContext } from "../../../context/LocationContext";
+import { useAuth } from "../../../context/AuthContext"; // 🔥 NEW
 
 function CommunityPlusHeader({ setActiveView, user, onLogout }) {
   const [showMenu, setShowMenu] = useState(false);
@@ -13,38 +14,44 @@ function CommunityPlusHeader({ setActiveView, user, onLogout }) {
     setViewLocation
   } = useLocationContext();
 
+  // 🔥 GLOBAL USER (BACKEND)
+  const { appUser } = useAuth();
+
+  // 🔥 SOURCE OF TRUTH
+  const effectiveUser = appUser || user;
+
   /* ===============================
-  👤 USERNAME (FINAL FIX)
+  👤 USERNAME (FINAL)
   =============================== */
 
   const getUserName = () => {
-    if (!user) return "Member";
+    if (!effectiveUser) return "Member";
 
-    // 🔥 1. BACKEND USER (BEST SOURCE)
-    if (user?.email) {
-      return user.email.split("@")[0];
+    // ✅ 1. Backend user (BEST)
+    if (effectiveUser?.email) {
+      return effectiveUser.email.split("@")[0];
     }
 
-    // 🔥 2. Amplify login (fallback)
-    if (user?.signInDetails?.loginId) {
-      const login = user.signInDetails.loginId;
+    // ✅ 2. Amplify login
+    if (effectiveUser?.signInDetails?.loginId) {
+      const login = effectiveUser.signInDetails.loginId;
       if (login.includes("@")) return login.split("@")[0];
       return login;
     }
 
-    // 🔥 3. Cognito attributes
-    if (user?.attributes?.email) {
-      return user.attributes.email.split("@")[0];
+    // ✅ 3. Cognito attributes
+    if (effectiveUser?.attributes?.email) {
+      return effectiveUser.attributes.email.split("@")[0];
     }
 
-    // 🔥 4. Facebook usernames (clean)
-    if (user?.username?.startsWith("facebook_")) {
+    // ✅ 4. Facebook usernames (clean)
+    if (effectiveUser?.username?.startsWith("facebook_")) {
       return "User";
     }
 
-    // 🔥 5. Safe fallback
-    if (user?.username && !/^\d+$/.test(user.username)) {
-      return user.username;
+    // ✅ 5. Safe fallback
+    if (effectiveUser?.username && !/^\d+$/.test(effectiveUser.username)) {
+      return effectiveUser.username;
     }
 
     return "Member";
@@ -86,7 +93,7 @@ function CommunityPlusHeader({ setActiveView, user, onLogout }) {
 
   const toggleMenu = () => setShowMenu((prev) => !prev);
 
-  const isAuthed = !!user;
+  const isAuthed = !!effectiveUser;
   const username = getUserName();
   const initials = getInitials();
 
@@ -145,7 +152,7 @@ function CommunityPlusHeader({ setActiveView, user, onLogout }) {
 
               <span
                 className="username"
-                title={user?.email || ""}
+                title={effectiveUser?.email || ""}
               >
                 {username}
               </span>
