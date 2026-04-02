@@ -34,10 +34,10 @@ export default function CommunityPlusDashboard() {
   =============================== */
 
   const { isLoaded } = useJsApiLoader({
+    id: "google-map-script", // 🔥 REQUIRED FIX
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
-    libraries: LIBRARIES, // 🔥 FIXED
+    libraries: LIBRARIES,
   });
-
   /* ===============================
      🔓 LOGOUT
   =============================== */
