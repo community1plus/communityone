@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
-import { getCurrentUser, signOut } from "aws-amplify/auth";
+import { signOut } from "aws-amplify/auth";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useLocationContext } from "../../context/LocationContext"; // ✅ NEW
+import { useLocationContext } from "../../context/LocationContext";
+import { useAuth } from "../../context/AuthContext";
+
 import CommunityPlusHeader from "../../components/Layout/Header/CommunityPlusHeader";
 import CommunityPlusSidebar from "../../components/Layout/Sidebar/CommunityPlusSidebar";
 import FeedCard from "../../components/FeedCard/FeedCard";
@@ -10,42 +12,22 @@ import PostComposer from "../../components/Layout/Sidebar/Post/PostComposer";
 import CommunityPlusYellowPages from "../YellowPages/CommunityPlusYellowPages";
 import CommunityPlusUserProfile from "../CommunityPlusUserProfile/CommunityPlusUserProfile";
 import Onboarding from "../Onboarding/CommunityPlusOnboarding";
-import { useAuth } from "../../context/AuthContext";
+
 import "./CommunityPlusDashboard.css";
+
+/* 🔥 FIX: prevent LoadScript reload */
+const LIBRARIES = ["places"];
 
 export default function CommunityPlusDashboard() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { viewLocation } = useLocationContext(); // 🔥 NEW
-
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-
+  const { viewLocation } = useLocationContext();
+  const { appUser, loading } = useAuth(); // 🔥 SINGLE SOURCE OF TRUTH
 
   const [activeView, setActiveView] = useState(
     location.state?.view || "dashboard"
   );
-
- const { appUser } = useAuth();
-
-  /* ===============================
-     🔐 AUTH GUARD
-  =============================== */
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const currentUser = await getCurrentUser();
-        setUser(currentUser);
-        setLoading(false);
-      } catch {
-        navigate("/");
-      }
-    };
-
-    checkAuth();
-  }, []);
 
   /* ===============================
      🗺 GOOGLE MAP LOADER
@@ -53,7 +35,7 @@ export default function CommunityPlusDashboard() {
 
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
-    libraries: ["places"],
+    libraries: LIBRARIES, // 🔥 FIXED
   });
 
   /* ===============================
@@ -76,7 +58,15 @@ export default function CommunityPlusDashboard() {
   const mapCenter =
     viewLocation?.lat && viewLocation?.lng
       ? { lat: viewLocation.lat, lng: viewLocation.lng }
-      : { lat: -37.8136, lng: 144.9631 }; // fallback (Melbourne)
+      : { lat: -37.8136, lng: 144.9631 };
+
+  /* ===============================
+     BLOCK UNTIL USER READY
+  =============================== */
+
+  if (loading || !appUser) {
+    return <div style={{ padding: 20 }}>Loading user...</div>;
+  }
 
   /* ===============================
      VIEW SWITCHER
@@ -89,7 +79,7 @@ export default function CommunityPlusDashboard() {
         return <Onboarding setActiveView={setActiveView} />;
 
       case "profile":
-        return <CommunityPlusUserProfile user={user} />;
+        return <CommunityPlusUserProfile />; // 🔥 FIXED
 
       case "post":
         return (
@@ -101,7 +91,7 @@ export default function CommunityPlusDashboard() {
       case "yellowpages":
         return (
           <CommunityPlusYellowPages
-            coords={mapCenter} // 🔥 now uses viewLocation
+            coords={mapCenter}
             isLoaded={isLoaded}
           />
         );
@@ -126,7 +116,7 @@ export default function CommunityPlusDashboard() {
                 <div className="map-loading">Loading map…</div>
               ) : (
                 <GoogleMap
-                  center={mapCenter} // 🔥 SINGLE SOURCE
+                  center={mapCenter}
                   zoom={14}
                   mapContainerClassName="map-container loaded"
                 >
@@ -140,20 +130,13 @@ export default function CommunityPlusDashboard() {
   };
 
   /* ===============================
-     LOADING STATE
-  =============================== */
-
-  if (loading) {
-    return <div style={{ padding: 20 }}>Loading...</div>;
-  }
-
-  /* ===============================
      MAIN RENDER
   =============================== */
 
   return (
     <div className="dashboard-container">
 
+      {/* 🔥 HEADER NOW GETS CORRECT USER */}
       <CommunityPlusHeader
         user={appUser}
         setActiveView={setActiveView}
