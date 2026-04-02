@@ -9,7 +9,6 @@
   width: 100%;
   min-height: calc(100vh - 140px); /* 🔥 KEY FIX */
   position: relative;
-   background: red;
 }
 
 
