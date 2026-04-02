@@ -1,9 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
-import {
-  GoogleMap,
-  Marker,
-  MarkerClusterer
-} from "@react-google-maps/api";
+import React, { useEffect, useRef, useState, useMemo } from "react";
+import { GoogleMap, Marker } from "@react-google-maps/api";
 import "./CommunityPlusYellowPages.css";
 
 export default function CommunityPlusYellowPages({ coords, isLoaded }) {
@@ -27,14 +23,19 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
   const cardRefs = useRef({});
 
   /* ===============================
-     📍 SYNC WITH LOCATION CONTEXT
+     🛑 HARD GUARD (FIXES YOUR ERROR)
   =============================== */
+  if (!isLoaded || !window.google) {
+    return <div className="map-loading">Loading map...</div>;
+  }
 
+  /* ===============================
+     📍 SYNC LOCATION
+  =============================== */
   useEffect(() => {
     if (coords?.lat && coords?.lng) {
       setMapCenter({ lat: coords.lat, lng: coords.lng });
 
-      // 🔥 force fetch when location changes
       if (mapRef.current) {
         const bounds = mapRef.current.getBounds();
         if (bounds) fetchBusinesses(bounds);
@@ -43,35 +44,29 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
   }, [coords]);
 
   /* ===============================
-     🔍 FETCH BUSINESSES
+     🔍 FETCH
   =============================== */
-
   const fetchBusinesses = async (bounds) => {
     if (!bounds) return;
 
     const ne = bounds.getNorthEast();
     const sw = bounds.getSouthWest();
 
-    const north = ne.lat();
-    const south = sw.lat();
-    const east = ne.lng();
-    const west = sw.lng();
-
     try {
       setLoading(true);
       setError(null);
 
       const res = await fetch(
-        `${API}/api/businesses?north=${north}&south=${south}&east=${east}&west=${west}&category=${category}`
+        `${API}/api/businesses?north=${ne.lat()}&south=${sw.lat()}&east=${ne.lng()}&west=${sw.lng()}&category=${category}`
       );
 
       if (!res.ok) throw new Error("API error");
 
       const data = await res.json();
-
       setBusinesses(Array.isArray(data) ? data : []);
+
     } catch (err) {
-      console.error("Business fetch error:", err);
+      console.error(err);
       setError("Failed to load businesses");
     } finally {
       setLoading(false);
@@ -79,9 +74,8 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
   };
 
   /* ===============================
-     🗺 MAP IDLE (SMART FETCH)
+     🧠 SMART FETCH (DEBOUNCED)
   =============================== */
-
   const handleMapIdle = () => {
     if (!mapRef.current) return;
 
@@ -120,20 +114,18 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
   };
 
   /* ===============================
-     🔄 INITIAL LOAD FIX
+     🔄 INITIAL LOAD
   =============================== */
-
   useEffect(() => {
-    if (isLoaded && mapRef.current) {
+    if (mapRef.current) {
       const bounds = mapRef.current.getBounds();
       if (bounds) fetchBusinesses(bounds);
     }
-  }, [isLoaded]);
+  }, []);
 
   /* ===============================
      🔄 CATEGORY CHANGE
   =============================== */
-
   useEffect(() => {
     if (mapRef.current) {
       const bounds = mapRef.current.getBounds();
@@ -144,15 +136,12 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
   /* ===============================
      📌 SELECT BUSINESS
   =============================== */
-
   const handleSelectBusiness = (biz) => {
     setSelectedId(biz.id);
     setSelectedBusiness(biz);
 
-    if (mapRef.current) {
-      mapRef.current.panTo({ lat: biz.lat, lng: biz.lng });
-      mapRef.current.setZoom(15);
-    }
+    mapRef.current?.panTo({ lat: biz.lat, lng: biz.lng });
+    mapRef.current?.setZoom(15);
 
     setMapCenter({ lat: biz.lat, lng: biz.lng });
 
@@ -163,114 +152,97 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
   };
 
   /* ===============================
+     ⚡ PERFORMANCE BOOST
+     Memoized markers
+  =============================== */
+  const markers = useMemo(() => {
+    return businesses.map((biz) => (
+      <Marker
+        key={biz.id}
+        position={{ lat: biz.lat, lng: biz.lng }}
+        icon={
+          selectedId === biz.id
+            ? "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
+            : "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+        }
+        onClick={() => handleSelectBusiness(biz)}
+      />
+    ));
+  }, [businesses, selectedId]);
+
+  /* ===============================
      UI
   =============================== */
-
   return (
-    <div style={{ width: "100%", height: "100%" }}>
-      <div className="yellowpages-layout">
+    <div className="yellowpages-layout">
 
-        {/* LEFT PANEL */}
-        <div className="business-list">
+      {/* LEFT PANEL */}
+      <div className="business-list">
 
-          <h2 className="business-header">
-            Local Businesses
-            <span className="business-count">{businesses.length}</span>
-          </h2>
+        <h2 className="business-header">
+          Local Businesses
+          <span className="business-count">{businesses.length}</span>
+        </h2>
 
-          {loading && <div className="loading">Loading businesses...</div>}
-          {error && <div className="error">{error}</div>}
+        {loading && <div className="loading">Loading businesses...</div>}
+        {error && <div className="error">{error}</div>}
 
-          <div className="business-filters">
-            <button onClick={() => setCategory("restaurant")}>Restaurants</button>
-            <button onClick={() => setCategory("cafe")}>Cafes</button>
-            <button onClick={() => setCategory("bar")}>Bars</button>
-            <button onClick={() => setCategory("store")}>Shops</button>
-          </div>
-
-          <div className="business-cards">
-            {businesses.map((biz) => (
-              <div
-                key={biz.id}
-                ref={(el) => (cardRefs.current[biz.id] = el)}
-                className={`business-card ${
-                  selectedId === biz.id ? "active" : ""
-                }`}
-                onClick={() => handleSelectBusiness(biz)}
-              >
-                <h3>{biz.name}</h3>
-                <p className="business-address">📍 {biz.address}</p>
-
-                {biz.rating && (
-                  <p className="business-rating">⭐ {biz.rating}</p>
-                )}
-              </div>
-            ))}
-          </div>
+        <div className="business-filters">
+          <button onClick={() => setCategory("restaurant")}>Restaurants</button>
+          <button onClick={() => setCategory("cafe")}>Cafes</button>
+          <button onClick={() => setCategory("bar")}>Bars</button>
+          <button onClick={() => setCategory("store")}>Shops</button>
         </div>
 
-        {/* RIGHT PANEL */}
-        <div className="map-column">
-          {!isLoaded ? (
-            <div className="map-loading">Loading map...</div>
-          ) : (
-            <GoogleMap
-              center={mapCenter}
-              zoom={14}
-              onLoad={(map) => (mapRef.current = map)}
-              onIdle={handleMapIdle}
-              mapContainerClassName="map-container loaded"
+        <div className="business-cards">
+          {businesses.map((biz) => (
+            <div
+              key={biz.id}
+              ref={(el) => (cardRefs.current[biz.id] = el)}
+              className={`business-card ${selectedId === biz.id ? "active" : ""}`}
+              onClick={() => handleSelectBusiness(biz)}
             >
-              <MarkerClusterer>
-                {(clusterer) =>
-                  businesses.map((biz) => (
-                    <Marker
-                      key={biz.id}
-                      position={{ lat: biz.lat, lng: biz.lng }}
-                      clusterer={clusterer}
-                      icon={
-                        selectedId === biz.id
-                          ? "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
-                          : "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
-                      }
-                      onClick={() => handleSelectBusiness(biz)}
-                    />
-                  ))
-                }
-              </MarkerClusterer>
-            </GoogleMap>
-          )}
-        </div>
-
-        {/* DETAIL PANEL */}
-        {selectedBusiness && (
-          <div className="business-detail">
-            <div className="detail-header">
-              <h2>{selectedBusiness.name}</h2>
-              <button onClick={() => setSelectedBusiness(null)}>✕</button>
+              <h3>{biz.name}</h3>
+              <p>📍 {biz.address}</p>
+              {biz.rating && <p>⭐ {biz.rating}</p>}
             </div>
+          ))}
+        </div>
+      </div>
 
-            <div className="detail-body">
-              <p className="detail-address">
-                📍 {selectedBusiness.address}
-              </p>
+      {/* MAP */}
+      <div className="map-column">
+        <GoogleMap
+          center={mapCenter}
+          zoom={14}
+          onLoad={(map) => (mapRef.current = map)}
+          onIdle={handleMapIdle}
+          mapContainerClassName="map-container loaded"
+        >
+          {markers}
+        </GoogleMap>
+      </div>
 
-              {selectedBusiness.rating && (
-                <p className="detail-rating">
-                  ⭐ {selectedBusiness.rating}
-                </p>
-              )}
+      {/* DETAIL PANEL */}
+      {selectedBusiness && (
+        <div className="business-detail">
+          <div className="detail-header">
+            <h2>{selectedBusiness.name}</h2>
+            <button onClick={() => setSelectedBusiness(null)}>✕</button>
+          </div>
 
-              <div className="detail-actions">
-                <button>Directions</button>
-                <button>Save</button>
-                <button>Share</button>
-              </div>
+          <div className="detail-body">
+            <p>📍 {selectedBusiness.address}</p>
+            {selectedBusiness.rating && <p>⭐ {selectedBusiness.rating}</p>}
+
+            <div className="detail-actions">
+              <button>Directions</button>
+              <button>Save</button>
+              <button>Share</button>
             </div>
           </div>
-        )}
-
-      </div>
+        </div>
+      )}
     </div>
   );
 }
