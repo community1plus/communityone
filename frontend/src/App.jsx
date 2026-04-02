@@ -4,6 +4,7 @@ import CommunityPlusLandingPage from "./pages/CommunityPlusLandingPage/Community
 import CommunityPlusDashboard from "./pages/Dashboard/CommunityPlusDashboard";
 import AuthGate from "./pages/AuthGate";
 import Onboarding from "./pages/Onboarding/CommunityPlusOnboarding";
+import YellowPages from "./pages/YellowPages/YellowPages";
 
 export default function App() {
   const { user, loading } = useAuth();
@@ -52,6 +53,13 @@ export default function App() {
           user ? <CommunityPlusDashboard /> : <Navigate to="/" replace />
         }
       />
+
+      <Route
+        path="/yellowpages"
+        element={
+          user ? <YellowPages /> : <Navigate to="/" replace />
+      }
+/>
 
       {/* =========================
           FALLBACK (optional)
