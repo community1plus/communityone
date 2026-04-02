@@ -57,12 +57,7 @@ export default function CommunityPlusDashboard() {
      📍 VIEW DEBUG (YELLOW PAGES)
   =============================== */
 
-  useEffect(() => {
-    if (activeView === "yellowpages") {
-      console.log("📍 Yellow Pages loaded");
-    }
-  }, [activeView]);
-
+  
   /* ===============================
      📍 GEOLOCATION
   =============================== */
@@ -131,6 +126,7 @@ export default function CommunityPlusDashboard() {
         );
 
       case "yellowpages":
+        console.log("YELLOW PAGES VIEW ACTIVE");
         return (
           <CommunityPlusYellowPages
             coords={coords}
