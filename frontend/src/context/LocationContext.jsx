@@ -47,17 +47,8 @@ export function LocationProvider({ children }) {
   =============================== */
 
   useEffect(() => {
-    const initLocation = async () => {
-      // ✅ 1. LOAD SAVED LOCATION (BEST)
-      const saved = localStorage.getItem("homeLocation");
-
-      if (saved) {
-        const loc = JSON.parse(saved);
-        setHomeLocation(loc);
-        setViewLocation(loc);
-      }
-
-      // ✅ 2. TRY HIGH-ACCURACY GPS (SILENT)
+    
+          // ✅ 2. TRY HIGH-ACCURACY GPS (SILENT)
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           async (pos) => {
@@ -87,6 +78,18 @@ export function LocationProvider({ children }) {
           }
         );
       }
+
+    const initLocation = async () => {
+      // ✅ 1. LOAD SAVED LOCATION (BEST)
+      const saved = localStorage.getItem("homeLocation");
+
+      if (saved) {
+        const loc = JSON.parse(saved);
+        setHomeLocation(loc);
+        setViewLocation(loc);
+      }
+
+
 
       // ✅ 3. FALLBACK TO IP (ONLY IF NOTHING ELSE)
       if (!saved) {
