@@ -8,18 +8,18 @@ function CommunityPlusHeader({ setActiveView, user, onLogout, coords }) {
   const menuRef = useRef(null);
 
   /* ===============================
-  👤 USER HELPERS (FINAL)
+  👤 USERNAME (HARDENED)
   =============================== */
 
   const getUserName = () => {
-    if (!user) return "";
+    if (!user) return "Member";
 
-    // ✅ Real name (best)
-    if (user?.attributes?.name) {
+    // ✅ 1. Real name (best)
+    if (user?.attributes?.name && !/^\d+$/.test(user.attributes.name)) {
       return user.attributes.name;
     }
 
-    // ✅ Email fallback
+    // ✅ 2. Email
     const email =
       user?.attributes?.email ||
       user?.signInDetails?.loginId;
@@ -28,50 +28,50 @@ function CommunityPlusHeader({ setActiveView, user, onLogout, coords }) {
       return email.split("@")[0];
     }
 
-    // ❌ BLOCK numeric IDs (Facebook)
-    if (user?.username && !/^\d+$/.test(user.username)) {
-      return user.username.replace(/^facebook_|^google_/, "");
+    // ❌ 3. BLOCK numeric IDs completely
+    const raw = user?.username || "";
+
+    if (!raw || /^\d+$/.test(raw)) {
+      return "Member";
     }
 
-    return "Member";
+    // ✅ 4. Clean provider strings
+    return raw.replace(/^facebook_|^google_/, "");
   };
 
   const getInitials = () => {
     const name = getUserName();
-    if (!name) return "";
 
-    const parts = name
-      .replace(/[^a-zA-Z\s]/g, " ")
-      .split(" ")
-      .filter(Boolean);
+    const clean = name.replace(/[^a-zA-Z]/g, "");
 
-    if (parts.length >= 2) {
-      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-    }
+    if (!clean) return "ME";
 
-    return name.slice(0, 2).toUpperCase();
+    if (clean.length === 1) return clean.toUpperCase();
+
+    return clean.slice(0, 2).toUpperCase();
   };
 
   /* ===============================
-  📍 LOCATION (SUBURB + POSTCODE)
+  📍 LOCATION (FORCED RESOLUTION)
   =============================== */
 
   useEffect(() => {
-    const getLocation = async () => {
-      // ✅ 1. Cache
-      try {
-        const cached = JSON.parse(localStorage.getItem("userLocation"));
-        if (
-          cached &&
-          cached.timestamp &&
-          Date.now() - cached.timestamp < 1000 * 60 * 30
-        ) {
-          setLocation(cached.value);
-          return;
-        }
-      } catch {}
+    let mounted = true;
 
-      // ✅ 2. GPS reverse geocode
+    const resolveLocation = async () => {
+      // ✅ STEP 1: ALWAYS get IP location first (fast + reliable)
+      try {
+        const res = await fetch("https://ipapi.co/json/");
+        const data = await res.json();
+
+        if (mounted && data.city && data.region_code) {
+          setLocation(`${data.city}, ${data.region_code}`);
+        }
+      } catch {
+        if (mounted) setLocation("Location unavailable");
+      }
+
+      // ✅ STEP 2: Upgrade to precise GPS location if available
       if (coords?.lat && coords?.lng) {
         try {
           const res = await fetch(
@@ -79,10 +79,11 @@ function CommunityPlusHeader({ setActiveView, user, onLogout, coords }) {
           );
 
           const data = await res.json();
-          const results = data.results || [];
-          const best = results[0];
+          const best = data.results?.[0];
 
-          const components = best?.address_components || [];
+          if (!best) return;
+
+          const components = best.address_components || [];
 
           const suburb =
             components.find(c => c.types.includes("sublocality_level_1")) ||
@@ -101,7 +102,7 @@ function CommunityPlusHeader({ setActiveView, user, onLogout, coords }) {
             c.types.includes("postal_code")
           );
 
-          let loc = "Location unavailable";
+          let loc = "";
 
           if (suburb && state) {
             loc = `${suburb.long_name}, ${state.short_name} ${postcode?.long_name || ""}`;
@@ -109,38 +110,18 @@ function CommunityPlusHeader({ setActiveView, user, onLogout, coords }) {
             loc = `${city.long_name}, ${state.short_name}`;
           }
 
-          loc = loc.trim();
-
-          setLocation(loc);
-
-          localStorage.setItem(
-            "userLocation",
-            JSON.stringify({
-              value: loc,
-              timestamp: Date.now(),
-            })
-          );
-
-          return;
+          if (mounted && loc) {
+            setLocation(loc.trim());
+          }
         } catch {}
-      }
-
-      // ✅ 3. IP fallback (production safe)
-      try {
-        const res = await fetch("https://ipapi.co/json/");
-        const data = await res.json();
-
-        if (data.city && data.region_code) {
-          setLocation(`${data.city}, ${data.region_code}`);
-        } else {
-          setLocation("Location unavailable");
-        }
-      } catch {
-        setLocation("Location unavailable");
       }
     };
 
-    getLocation();
+    resolveLocation();
+
+    return () => {
+      mounted = false;
+    };
   }, [coords]);
 
   /* ===============================
