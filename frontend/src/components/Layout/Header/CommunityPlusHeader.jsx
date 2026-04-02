@@ -1,15 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./CommunityPlusHeader.css";
-import { useLocationContext } from "../../../context/LocationContext"; // ✅ NEW
+import { useLocationContext } from "../../../context/LocationContext";
 
 function CommunityPlusHeader({ setActiveView, user, onLogout }) {
   const [showMenu, setShowMenu] = useState(false);
-
   const menuRef = useRef(null);
-
-  /* ===============================
-  📍 LOCATION CONTEXT (NEW SYSTEM)
-  =============================== */
 
   const {
     viewLocation,
@@ -19,33 +14,51 @@ function CommunityPlusHeader({ setActiveView, user, onLogout }) {
   } = useLocationContext();
 
   /* ===============================
-  👤 USERNAME (HARDENED)
+  👤 USERNAME (FIXED)
   =============================== */
 
   const getUserName = () => {
     if (!user) return "Member";
 
+    // 🔍 Debug once if needed
+    // console.log("USER OBJECT:", user);
+
+    // ✅ 1. Amplify v6 (BEST SOURCE)
+    const emailFromSignIn = user?.signInDetails?.loginId;
+    if (emailFromSignIn && emailFromSignIn.includes("@")) {
+      return emailFromSignIn.split("@")[0];
+    }
+
+    // ✅ 2. Cognito attributes
+    if (user?.attributes?.email) {
+      return user.attributes.email.split("@")[0];
+    }
+
+    // ✅ 3. Display name (if exists)
     if (user?.attributes?.name && !/^\d+$/.test(user.attributes.name)) {
       return user.attributes.name;
     }
 
-    const email =
-      user?.attributes?.email ||
-      user?.signInDetails?.loginId;
-
-    if (email && email.includes("@")) {
-      return email.split("@")[0];
+    // ✅ 4. Username fallback (avoid numeric junk)
+    if (user?.username && !/^\d+$/.test(user.username)) {
+      return user.username;
     }
 
-    return "Member"; // 🔥 hard stop (no numeric leak)
+    return "Member";
   };
 
   const getInitials = () => {
     const name = getUserName();
-    const clean = name.replace(/[^a-zA-Z]/g, "");
 
-    if (!clean) return "ME";
-    return clean.slice(0, 2).toUpperCase();
+    const parts = name.split(/[\s._-]+/).filter(Boolean);
+
+    if (parts.length === 1) {
+      return parts[0].slice(0, 2).toUpperCase();
+    }
+
+    return (
+      (parts[0][0] || "") + (parts[1]?.[0] || "")
+    ).toUpperCase();
   };
 
   /* ===============================
@@ -66,13 +79,13 @@ function CommunityPlusHeader({ setActiveView, user, onLogout }) {
 
   const toggleMenu = () => setShowMenu((prev) => !prev);
 
-  /* ===============================
-  RENDER
-  =============================== */
-
   const isAuthed = !!user;
   const username = getUserName();
   const initials = getInitials();
+
+  /* ===============================
+  RENDER
+  =============================== */
 
   return (
     <header className="header">
@@ -87,7 +100,6 @@ function CommunityPlusHeader({ setActiveView, user, onLogout }) {
             className="logo"
           />
 
-          {/* 🔥 LOCATION SWITCHER */}
           <div className="location-switcher">
 
             <span className="location-text left">
@@ -129,7 +141,11 @@ function CommunityPlusHeader({ setActiveView, user, onLogout }) {
 
               <span
                 className="username"
-                title={user?.attributes?.email || ""}
+                title={
+                  user?.attributes?.email ||
+                  user?.signInDetails?.loginId ||
+                  ""
+                }
               >
                 {username}
               </span>
