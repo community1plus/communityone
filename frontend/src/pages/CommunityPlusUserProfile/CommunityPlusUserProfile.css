@@ -6,6 +6,47 @@
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.05);
 }
+.profile-container {
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.profile-container form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px; /* controls vertical spacing */
+}
+
+.profile-container input,
+.profile-container select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.profile-container button {
+  margin-top: 10px;
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  background: #111;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.profile-container button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error {
+  color: red;
+  font-size: 13px;
+}
 
 .profile-container h2 {
   margin-bottom: 20px;
