@@ -27,7 +27,7 @@ export default function AuthGate() {
         console.log("🔍 AuthGate: checking user");
 
         const API_BASE = import.meta.env.VITE_API_BASE;
-
+        console.log("API_BASE:", import.meta.env.VITE_API_BASE);
         /* ===============================
            🔐 GET AUTH TOKEN
         =============================== */
