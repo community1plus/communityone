@@ -2,9 +2,7 @@ import React, { useState, useEffect } from "react";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 import { getCurrentUser, signOut } from "aws-amplify/auth";
 import { useNavigate, useLocation } from "react-router-dom";
-
 import { useLocationContext } from "../../context/LocationContext"; // ✅ NEW
-
 import CommunityPlusHeader from "../../components/Layout/Header/CommunityPlusHeader";
 import CommunityPlusSidebar from "../../components/Layout/Sidebar/CommunityPlusSidebar";
 import FeedCard from "../../components/FeedCard/FeedCard";
@@ -12,7 +10,6 @@ import PostComposer from "../../components/Layout/Sidebar/Post/PostComposer";
 import CommunityPlusYellowPages from "../YellowPages/CommunityPlusYellowPages";
 import CommunityPlusUserProfile from "../CommunityPlusUserProfile/CommunityPlusUserProfile";
 import Onboarding from "../Onboarding/CommunityPlusOnboarding";
-
 import "./CommunityPlusDashboard.css";
 
 export default function CommunityPlusDashboard() {
@@ -24,9 +21,12 @@ export default function CommunityPlusDashboard() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+
   const [activeView, setActiveView] = useState(
     location.state?.view || "dashboard"
   );
+
+ const { appUser } = useAuth();
 
   /* ===============================
      🔐 AUTH GUARD
@@ -154,7 +154,7 @@ export default function CommunityPlusDashboard() {
     <div className="dashboard-container">
 
       <CommunityPlusHeader
-        user={user}
+        user={appUser}
         setActiveView={setActiveView}
         onLogout={handleLogout}
       />

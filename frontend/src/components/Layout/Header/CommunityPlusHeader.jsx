@@ -14,32 +14,35 @@ function CommunityPlusHeader({ setActiveView, user, onLogout }) {
   } = useLocationContext();
 
   /* ===============================
-  👤 USERNAME (FIXED)
+  👤 USERNAME (FINAL FIX)
   =============================== */
 
   const getUserName = () => {
     if (!user) return "Member";
 
-    // 🔍 Debug once if needed
-    // console.log("USER OBJECT:", user);
-
-    // ✅ 1. Amplify v6 (BEST SOURCE)
-    const emailFromSignIn = user?.signInDetails?.loginId;
-    if (emailFromSignIn && emailFromSignIn.includes("@")) {
-      return emailFromSignIn.split("@")[0];
+    // 🔥 1. BACKEND USER (BEST SOURCE)
+    if (user?.email) {
+      return user.email.split("@")[0];
     }
 
-    // ✅ 2. Cognito attributes
+    // 🔥 2. Amplify login (fallback)
+    if (user?.signInDetails?.loginId) {
+      const login = user.signInDetails.loginId;
+      if (login.includes("@")) return login.split("@")[0];
+      return login;
+    }
+
+    // 🔥 3. Cognito attributes
     if (user?.attributes?.email) {
       return user.attributes.email.split("@")[0];
     }
 
-    // ✅ 3. Display name (if exists)
-    if (user?.attributes?.name && !/^\d+$/.test(user.attributes.name)) {
-      return user.attributes.name;
+    // 🔥 4. Facebook usernames (clean)
+    if (user?.username?.startsWith("facebook_")) {
+      return "User";
     }
 
-    // ✅ 4. Username fallback (avoid numeric junk)
+    // 🔥 5. Safe fallback
     if (user?.username && !/^\d+$/.test(user.username)) {
       return user.username;
     }
@@ -49,6 +52,10 @@ function CommunityPlusHeader({ setActiveView, user, onLogout }) {
 
   const getInitials = () => {
     const name = getUserName();
+
+    if (!name || name === "User" || name === "Member") {
+      return "ME";
+    }
 
     const parts = name.split(/[\s._-]+/).filter(Boolean);
 
@@ -100,14 +107,13 @@ function CommunityPlusHeader({ setActiveView, user, onLogout }) {
             className="logo"
           />
 
+          {/* LOCATION */}
           <div className="location-switcher">
-
             <span className="location-text left">
               📍 {viewLocation?.label || "Locating..."}
             </span>
 
             <div className="location-dropdown">
-
               <button onClick={() => setViewLocation(homeLocation)}>
                 🏠 Home
               </button>
@@ -115,9 +121,7 @@ function CommunityPlusHeader({ setActiveView, user, onLogout }) {
               <button onClick={enableLiveLocation}>
                 📡 Near Me
               </button>
-
             </div>
-
           </div>
 
         </div>
@@ -141,11 +145,7 @@ function CommunityPlusHeader({ setActiveView, user, onLogout }) {
 
               <span
                 className="username"
-                title={
-                  user?.attributes?.email ||
-                  user?.signInDetails?.loginId ||
-                  ""
-                }
+                title={user?.email || ""}
               >
                 {username}
               </span>
@@ -186,6 +186,7 @@ function CommunityPlusHeader({ setActiveView, user, onLogout }) {
 
       </div>
 
+      {/* NAV */}
       <nav className="links">
         <button onClick={() => setActiveView("dashboard")}>Home</button>
         <button onClick={() => setActiveView("posts")}>Posts</button>

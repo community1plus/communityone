@@ -5,13 +5,13 @@ import { apiFetch } from "../../services/api";
 
 export default function AuthGate() {
   const navigate = useNavigate();
-  const { user, loading } = useAuth();
+  const { user, loading, setAppUser } = useAuth();
 
-  // 🔥 Track last processed user (prevents duplicate calls)
+  // 🔥 Prevent duplicate calls per session
   const lastUserRef = useRef(null);
 
   useEffect(() => {
-    // 🚫 Wait until auth resolves
+    // 🚫 Wait for auth to resolve
     if (loading) return;
 
     // 🚫 No session → landing
@@ -20,9 +20,12 @@ export default function AuthGate() {
       return;
     }
 
-    // 🚫 Prevent duplicate calls for same user
-    if (lastUserRef.current === user.userId) return;
-    lastUserRef.current = user.userId;
+    // 🔥 Use stable identifier
+    const userKey = user?.userId || user?.username;
+
+    // 🚫 Prevent duplicate calls
+    if (lastUserRef.current === userKey) return;
+    lastUserRef.current = userKey;
 
     async function resolveUser() {
       try {
@@ -32,8 +35,13 @@ export default function AuthGate() {
 
         console.log("✅ AuthGate response:", data);
 
-        // 🔥 KEY CHANGE — route INTO dashboard with view state
-        if (!data.hasProfile) {
+        // 🔥 STORE BACKEND USER (CRITICAL FIX)
+        if (data?.user) {
+          setAppUser(data.user);
+        }
+
+        // 🔥 ROUTING LOGIC
+        if (!data?.hasProfile) {
           navigate("/home", {
             replace: true,
             state: { view: "onboarding" }
@@ -45,7 +53,7 @@ export default function AuthGate() {
       } catch (err) {
         console.error("❌ AuthGate error:", err);
 
-        // 🔁 allow retry if failure
+        // 🔁 allow retry
         lastUserRef.current = null;
 
         navigate("/", { replace: true });
@@ -54,7 +62,7 @@ export default function AuthGate() {
 
     resolveUser();
 
-  }, [user, loading, navigate]);
+  }, [user, loading, navigate, setAppUser]);
 
   return <div>Loading...</div>;
 }
