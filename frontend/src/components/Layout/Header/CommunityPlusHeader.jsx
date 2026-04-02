@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./CommunityPlusHeader.css";
-import { useLocationContext } from "../../context/LocationContext"; // ✅ NEW
+import { useLocationContext } from "../../../context/LocationContext"; // ✅ NEW
 
 function CommunityPlusHeader({ setActiveView, user, onLogout }) {
   const [showMenu, setShowMenu] = useState(false);
