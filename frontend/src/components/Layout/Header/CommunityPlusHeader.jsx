@@ -8,22 +8,32 @@ function CommunityPlusHeader({ setActiveView, user, onLogout, coords }) {
   const menuRef = useRef(null);
 
   /* ===============================
-  🔥 USER HELPERS (FIXED)
+  🔥 USER HELPERS (FINAL)
   =============================== */
 
   const getUserName = () => {
     if (!user) return "";
 
-    const email =
-      user?.attributes?.email ||
-      user?.signInDetails?.loginId ||
-      "";
-
-    if (email.includes("@")) {
-      return email.split("@")[0]; // ✅ email prefix
+    // ✅ Best: real name (Facebook / Google)
+    if (user?.attributes?.name) {
+      return user.attributes.name;
     }
 
-    return email || "User";
+    // ✅ Email fallback
+    const email =
+      user?.attributes?.email ||
+      user?.signInDetails?.loginId;
+
+    if (email && email.includes("@")) {
+      return email.split("@")[0];
+    }
+
+    // ✅ Provider fallback (clean IDs)
+    if (user?.username) {
+      return user.username.replace(/^facebook_|^google_/, "");
+    }
+
+    return "User";
   };
 
   const getInitials = () => {
@@ -31,24 +41,24 @@ function CommunityPlusHeader({ setActiveView, user, onLogout, coords }) {
     if (!name) return "";
 
     const parts = name
-      .replace(/[^a-zA-Z]/g, " ")
+      .replace(/[^a-zA-Z\s]/g, " ")
       .split(" ")
       .filter(Boolean);
 
     if (parts.length >= 2) {
-      return (parts[0][0] + parts[1][0]).toUpperCase();
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
     }
 
     return name.slice(0, 2).toUpperCase();
   };
 
   /* ===============================
-  📍 LOCATION (PRODUCTION SAFE)
+  📍 LOCATION (SUBURB + POSTCODE)
   =============================== */
 
   useEffect(() => {
     const getLocation = async () => {
-      // ✅ 1. Try cache first
+      // ✅ 1. Cache
       try {
         const cached = JSON.parse(localStorage.getItem("userLocation"));
         if (
@@ -61,7 +71,7 @@ function CommunityPlusHeader({ setActiveView, user, onLogout, coords }) {
         }
       } catch {}
 
-      // ✅ 2. Try GPS reverse geocode
+      // ✅ 2. GPS reverse geocode
       if (coords?.lat && coords?.lng) {
         try {
           const res = await fetch(
@@ -69,21 +79,23 @@ function CommunityPlusHeader({ setActiveView, user, onLogout, coords }) {
           );
 
           const data = await res.json();
-
           const components = data.results?.[0]?.address_components || [];
 
-          const suburb = components.find((c) =>
-            ["locality", "sublocality", "sublocality_level_1"].some((t) =>
-              c.types.includes(t)
-            )
-          );
+          const suburb =
+            components.find(c => c.types.includes("sublocality_level_1")) ||
+            components.find(c => c.types.includes("postal_town")) ||
+            components.find(c => c.types.includes("locality"));
 
-          const state = components.find((c) =>
+          const state = components.find(c =>
             c.types.includes("administrative_area_level_1")
           );
 
+          const postcode = components.find(c =>
+            c.types.includes("postal_code")
+          );
+
           if (suburb && state) {
-            const loc = `${suburb.long_name}, ${state.short_name}`;
+            const loc = `${suburb.long_name}, ${state.short_name} ${postcode?.long_name || ""}`.trim();
 
             setLocation(loc);
 
@@ -100,7 +112,7 @@ function CommunityPlusHeader({ setActiveView, user, onLogout, coords }) {
         } catch {}
       }
 
-      // ✅ 3. Fallback to IP location (works in production)
+      // ✅ 3. IP fallback (production safe)
       try {
         const res = await fetch("https://ipapi.co/json/");
         const data = await res.json();
