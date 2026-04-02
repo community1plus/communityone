@@ -8,13 +8,13 @@ function CommunityPlusHeader({ setActiveView, user, onLogout, coords }) {
   const menuRef = useRef(null);
 
   /* ===============================
-  🔥 USER HELPERS (FINAL)
+  👤 USER HELPERS (FINAL)
   =============================== */
 
   const getUserName = () => {
     if (!user) return "";
 
-    // ✅ Best: real name (Facebook / Google)
+    // ✅ Real name (best)
     if (user?.attributes?.name) {
       return user.attributes.name;
     }
@@ -28,12 +28,12 @@ function CommunityPlusHeader({ setActiveView, user, onLogout, coords }) {
       return email.split("@")[0];
     }
 
-    // ✅ Provider fallback (clean IDs)
-    if (user?.username) {
+    // ❌ BLOCK numeric IDs (Facebook)
+    if (user?.username && !/^\d+$/.test(user.username)) {
       return user.username.replace(/^facebook_|^google_/, "");
     }
 
-    return "User";
+    return "Member";
   };
 
   const getInitials = () => {
@@ -79,12 +79,19 @@ function CommunityPlusHeader({ setActiveView, user, onLogout, coords }) {
           );
 
           const data = await res.json();
-          const components = data.results?.[0]?.address_components || [];
+          const results = data.results || [];
+          const best = results[0];
+
+          const components = best?.address_components || [];
 
           const suburb =
             components.find(c => c.types.includes("sublocality_level_1")) ||
-            components.find(c => c.types.includes("postal_town")) ||
-            components.find(c => c.types.includes("locality"));
+            components.find(c => c.types.includes("neighborhood")) ||
+            components.find(c => c.types.includes("postal_town"));
+
+          const city = components.find(c =>
+            c.types.includes("locality")
+          );
 
           const state = components.find(c =>
             c.types.includes("administrative_area_level_1")
@@ -94,21 +101,27 @@ function CommunityPlusHeader({ setActiveView, user, onLogout, coords }) {
             c.types.includes("postal_code")
           );
 
+          let loc = "Location unavailable";
+
           if (suburb && state) {
-            const loc = `${suburb.long_name}, ${state.short_name} ${postcode?.long_name || ""}`.trim();
-
-            setLocation(loc);
-
-            localStorage.setItem(
-              "userLocation",
-              JSON.stringify({
-                value: loc,
-                timestamp: Date.now(),
-              })
-            );
-
-            return;
+            loc = `${suburb.long_name}, ${state.short_name} ${postcode?.long_name || ""}`;
+          } else if (city && state) {
+            loc = `${city.long_name}, ${state.short_name}`;
           }
+
+          loc = loc.trim();
+
+          setLocation(loc);
+
+          localStorage.setItem(
+            "userLocation",
+            JSON.stringify({
+              value: loc,
+              timestamp: Date.now(),
+            })
+          );
+
+          return;
         } catch {}
       }
 
