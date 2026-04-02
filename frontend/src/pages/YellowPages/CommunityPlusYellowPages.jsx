@@ -2,24 +2,19 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   GoogleMap,
   Marker,
-  MarkerClusterer,
-  useJsApiLoader
+  MarkerClusterer
 } from "@react-google-maps/api";
 import "./CommunityPlusYellowPages.css";
 
-export default function CommunityPlusYellowPages({ coords }) {
-
+export default function CommunityPlusYellowPages({ coords, isLoaded }) {
   const API = import.meta.env.VITE_API_URL;
-  const MAP_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
   const fallback = { lat: -37.8136, lng: 144.9631 };
 
-  const { isLoaded, loadError } = useJsApiLoader({
-    googleMapsApiKey: MAP_KEY
-  });
-
   const [businesses, setBusinesses] = useState([]);
-  const [mapCenter, setMapCenter] = useState(coords || fallback);
+  const [mapCenter, setMapCenter] = useState(
+    coords?.lat ? coords : fallback
+  );
   const [category, setCategory] = useState("restaurant");
 
   const [selectedId, setSelectedId] = useState(null);
@@ -31,7 +26,7 @@ export default function CommunityPlusYellowPages({ coords }) {
   const mapRef = useRef(null);
   const debounceRef = useRef(null);
   const lastBoundsRef = useRef(null);
-  const cardRefs = useRef({}); // 🔥 for scroll sync
+  const cardRefs = useRef({});
 
   /* ================= FETCH ================= */
 
@@ -49,9 +44,11 @@ export default function CommunityPlusYellowPages({ coords }) {
     setLoading(true);
     setError(null);
 
-    fetch(`${API}/api/businesses?north=${north}&south=${south}&east=${east}&west=${west}&category=${category}`)
-      .then(res => res.json())
-      .then(data => {
+    fetch(
+      `${API}/api/businesses?north=${north}&south=${south}&east=${east}&west=${west}&category=${category}`
+    )
+      .then((res) => res.json())
+      .then((data) => {
         setBusinesses(Array.isArray(data) ? data : []);
       })
       .catch(() => setError("Failed to load businesses"))
@@ -76,7 +73,6 @@ export default function CommunityPlusYellowPages({ coords }) {
       west: sw.lng()
     };
 
-    // 🔥 prevent jitter loop
     if (lastBoundsRef.current) {
       const prev = lastBoundsRef.current;
 
@@ -103,9 +99,26 @@ export default function CommunityPlusYellowPages({ coords }) {
   useEffect(() => {
     const lat = coords?.lat ?? fallback.lat;
     const lng = coords?.lng ?? fallback.lng;
-
     setMapCenter({ lat, lng });
   }, [coords]);
+
+  /* ================= FETCH ON LOAD ================= */
+
+  useEffect(() => {
+    if (mapRef.current) {
+      const bounds = mapRef.current.getBounds();
+      if (bounds) fetchBusinesses(bounds);
+    }
+  }, [isLoaded]);
+
+  /* ================= REFETCH ON CATEGORY ================= */
+
+  useEffect(() => {
+    if (mapRef.current) {
+      const bounds = mapRef.current.getBounds();
+      if (bounds) fetchBusinesses(bounds);
+    }
+  }, [category]);
 
   /* ================= SELECT BUSINESS ================= */
 
@@ -113,7 +126,6 @@ export default function CommunityPlusYellowPages({ coords }) {
     setSelectedId(biz.id);
     setSelectedBusiness(biz);
 
-    // 🔥 pan + zoom
     if (mapRef.current) {
       mapRef.current.panTo({ lat: biz.lat, lng: biz.lng });
       mapRef.current.setZoom(15);
@@ -121,7 +133,6 @@ export default function CommunityPlusYellowPages({ coords }) {
 
     setMapCenter({ lat: biz.lat, lng: biz.lng });
 
-    // 🔥 scroll card into view
     cardRefs.current[biz.id]?.scrollIntoView({
       behavior: "smooth",
       block: "center"
@@ -131,132 +142,110 @@ export default function CommunityPlusYellowPages({ coords }) {
   /* ================= UI ================= */
 
   return (
+    <div style={{ width: "100%", height: "100%" }}>
+      <div className="yellowpages-layout">
 
-    <div className="yellowpages-layout">
+        {/* LEFT PANEL */}
+        <div className="business-list">
 
-      {/* LEFT PANEL */}
-      <div className="business-list">
+          <h2 className="business-header">
+            Local Businesses
+            <span className="business-count">{businesses.length}</span>
+          </h2>
 
-        <h2 className="business-header">
-          Local Businesses
-          <span className="business-count">{businesses.length}</span>
-        </h2>
+          {loading && <div className="loading">Loading businesses...</div>}
+          {error && <div className="error">{error}</div>}
 
-        {loading && <div className="loading">Loading businesses...</div>}
-        {error && <div className="error">{error}</div>}
+          <div className="business-filters">
+            <button onClick={() => setCategory("restaurant")}>Restaurants</button>
+            <button onClick={() => setCategory("cafe")}>Cafes</button>
+            <button onClick={() => setCategory("bar")}>Bars</button>
+            <button onClick={() => setCategory("store")}>Shops</button>
+          </div>
 
-        <div className="business-filters">
-          <button onClick={() => setCategory("restaurant")}>Restaurants</button>
-          <button onClick={() => setCategory("cafe")}>Cafes</button>
-          <button onClick={() => setCategory("bar")}>Bars</button>
-          <button onClick={() => setCategory("store")}>Shops</button>
+          <div className="business-cards">
+            {businesses.map((biz) => (
+              <div
+                key={biz.id}
+                ref={(el) => (cardRefs.current[biz.id] = el)}
+                className={`business-card ${
+                  selectedId === biz.id ? "active" : ""
+                }`}
+                onClick={() => handleSelectBusiness(biz)}
+              >
+                <h3>{biz.name}</h3>
+
+                <p className="business-address">📍 {biz.address}</p>
+
+                {biz.rating && (
+                  <p className="business-rating">⭐ {biz.rating}</p>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
 
-        <div className="business-cards">
-
-          {businesses.map((biz) => (
-
-            <div
-              key={biz.id}
-              ref={(el) => (cardRefs.current[biz.id] = el)}
-              className={`business-card ${selectedId === biz.id ? "active" : ""}`}
-              onClick={() => handleSelectBusiness(biz)}
+        {/* RIGHT PANEL */}
+        <div className="map-column">
+          {!isLoaded ? (
+            <div className="map-loading">Loading map...</div>
+          ) : (
+            <GoogleMap
+              center={mapCenter}
+              zoom={14}
+              onLoad={(map) => (mapRef.current = map)}
+              onIdle={handleMapIdle}
+              mapContainerClassName="map-container loaded"
             >
+              <MarkerClusterer>
+                {(clusterer) =>
+                  businesses.map((biz) => (
+                    <Marker
+                      key={biz.id}
+                      position={{ lat: biz.lat, lng: biz.lng }}
+                      clusterer={clusterer}
+                      icon={
+                        selectedId === biz.id
+                          ? "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
+                          : "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+                      }
+                      onClick={() => handleSelectBusiness(biz)}
+                    />
+                  ))
+                }
+              </MarkerClusterer>
+            </GoogleMap>
+          )}
+        </div>
 
-              <h3>{biz.name}</h3>
+        {/* DETAIL PANEL */}
+        {selectedBusiness && (
+          <div className="business-detail">
+            <div className="detail-header">
+              <h2>{selectedBusiness.name}</h2>
+              <button onClick={() => setSelectedBusiness(null)}>✕</button>
+            </div>
 
-              <p className="business-address">
-                📍 {biz.address}
+            <div className="detail-body">
+              <p className="detail-address">
+                📍 {selectedBusiness.address}
               </p>
 
-              {biz.rating && (
-                <p className="business-rating">
-                  ⭐ {biz.rating}
+              {selectedBusiness.rating && (
+                <p className="detail-rating">
+                  ⭐ {selectedBusiness.rating}
                 </p>
               )}
 
+              <div className="detail-actions">
+                <button>Directions</button>
+                <button>Save</button>
+                <button>Share</button>
+              </div>
             </div>
-
-          ))}
-
-        </div>
-
-      </div>
-
-      {/* RIGHT PANEL */}
-      <div className="map-column">
-
-        {loadError ? (
-          <div className="map-loading">Map failed to load</div>
-        ) : !isLoaded ? (
-          <div className="map-loading">Loading map...</div>
-        ) : (
-
-          <GoogleMap
-            center={mapCenter}
-            zoom={14}
-            onLoad={(map) => (mapRef.current = map)}
-            onIdle={handleMapIdle}
-            mapContainerClassName="map-container loaded"
-          >
-
-            {/* 🔥 CLUSTERING + ACTIVE MARKER */}
-            <MarkerClusterer>
-              {(clusterer) =>
-                businesses.map((biz) => (
-                  <Marker
-                    key={biz.id}
-                    position={{ lat: biz.lat, lng: biz.lng }}
-                    clusterer={clusterer}
-                    icon={
-                      selectedId === biz.id
-                        ? "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
-                        : "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
-                    }
-                    onClick={() => handleSelectBusiness(biz)}
-                  />
-                ))
-              }
-            </MarkerClusterer>
-
-          </GoogleMap>
-
+          </div>
         )}
-
       </div>
-
-      {/* 🔥 DETAIL PANEL */}
-      {selectedBusiness && (
-        <div className="business-detail">
-
-          <div className="detail-header">
-            <h2>{selectedBusiness.name}</h2>
-            <button onClick={() => setSelectedBusiness(null)}>✕</button>
-          </div>
-
-          <div className="detail-body">
-
-            <p className="detail-address">
-              📍 {selectedBusiness.address}
-            </p>
-
-            {selectedBusiness.rating && (
-              <p className="detail-rating">
-                ⭐ {selectedBusiness.rating}
-              </p>
-            )}
-
-            <div className="detail-actions">
-              <button>Directions</button>
-              <button>Save</button>
-              <button>Share</button>
-            </div>
-
-          </div>
-
-        </div>
-      )}
-
     </div>
   );
 }
