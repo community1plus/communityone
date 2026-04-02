@@ -194,7 +194,13 @@ export default function CommunityPlusDashboard() {
           onLogout={handleLogout}
         />
 
-        <div className="content-area">{renderView()}</div>
+        <div
+          className={`content-area ${
+          activeView === "yellowpages" ? "full-width" : ""
+      }`}
+>
+  {renderView()}
+</div>
       </main>
     </div>
   );
