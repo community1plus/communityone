@@ -30,7 +30,7 @@ export default function AuthGate() {
     async function resolveUser() {
       try {
         console.log("🔍 AuthGate: checking user");
-        const API_BASE = import.meta.env.VITE_API_URL;
+        const API_BASE = import.meta.env.VITE_API_BASE;
         const data = await apiFetch(`${API_BASE}/users/me`);
 
         console.log("✅ AuthGate response:", data);
