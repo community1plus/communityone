@@ -10,6 +10,7 @@ import PostComposer from "../../components/Layout/Sidebar/Post/PostComposer";
 import CommunityPlusYellowPages from "../YellowPages/CommunityPlusYellowPages";
 import CommunityPlusUserProfile from "../CommunityPlusUserProfile/CommunityPlusUserProfile";
 import Onboarding from "../Onboarding/CommunityPlusOnboarding";
+import { useAuth } from "../../context/AuthContext";
 import "./CommunityPlusDashboard.css";
 
 export default function CommunityPlusDashboard() {
