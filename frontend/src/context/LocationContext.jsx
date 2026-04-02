@@ -43,72 +43,37 @@ export function LocationProvider({ children }) {
   };
 
   /* ===============================
-  📍 INITIALISE LOCATION (SMART)
+  📍 INITIALISE LOCATION (SAFE)
   =============================== */
 
   useEffect(() => {
-    
-          // ✅ 2. TRY HIGH-ACCURACY GPS (SILENT)
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          async (pos) => {
-            const lat = pos.coords.latitude;
-            const lng = pos.coords.longitude;
-
-            const label = await reverseGeocode(lat, lng);
-
-            const loc = {
-              label,
-              lat,
-              lng,
-              accuracy: pos.coords.accuracy,
-              type: "live"
-            };
-
-            setLiveLocation(loc);
-
-            // 🔥 only override if no saved location
-            setViewLocation(prev => prev || loc);
-          },
-          () => {},
-          {
-            enableHighAccuracy: true,
-            timeout: 8000,
-            maximumAge: 60000
-          }
-        );
-      }
-
     const initLocation = async () => {
-      // ✅ 1. LOAD SAVED LOCATION (BEST)
+      // ✅ 1. LOAD SAVED LOCATION (PRIMARY)
       const saved = localStorage.getItem("homeLocation");
 
       if (saved) {
         const loc = JSON.parse(saved);
         setHomeLocation(loc);
         setViewLocation(loc);
+        return;
       }
 
+      // ✅ 2. IP FALLBACK (NO GPS HERE → avoids browser warning)
+      try {
+        const res = await fetch("https://ipapi.co/json/");
+        const data = await res.json();
 
+        const loc = {
+          label: `${data.city}, ${data.region_code}`,
+          lat: data.latitude,
+          lng: data.longitude,
+          type: "home"
+        };
 
-      // ✅ 3. FALLBACK TO IP (ONLY IF NOTHING ELSE)
-      if (!saved) {
-        try {
-          const res = await fetch("https://ipapi.co/json/");
-          const data = await res.json();
-
-          const loc = {
-            label: `${data.city}, ${data.region_code}`,
-            lat: data.latitude,
-            lng: data.longitude,
-            type: "home"
-          };
-
-          setHomeLocation(loc);
-          setViewLocation(prev => prev || loc);
-        } catch {
-          console.error("IP location failed");
-        }
+        setHomeLocation(loc);
+        setViewLocation(loc);
+      } catch {
+        console.error("IP location failed");
       }
     };
 
@@ -116,7 +81,7 @@ export function LocationProvider({ children }) {
   }, []);
 
   /* ===============================
-  📡 MANUAL GPS (USER CLICK)
+  📡 MANUAL GPS (USER CLICK ONLY)
   =============================== */
 
   const enableLiveLocation = () => {
@@ -171,7 +136,7 @@ export function LocationProvider({ children }) {
         viewLocation,
         setViewLocation,
         enableLiveLocation,
-        setHome // 🔥 important for suburb picker
+        setHome
       }}
     >
       {children}
