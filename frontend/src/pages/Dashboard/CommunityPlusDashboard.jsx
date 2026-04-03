@@ -139,9 +139,11 @@ export default function CommunityPlusDashboard({ isLoaded }) {
 
         <div
           className={`content-area ${
-            activeView === "yellowpages" ? "full-width" : ""
+            ["yellowpages", "profile", "onboarding"].includes(activeView)
+            ? "full-width"
+            : ""
           }`}
-        >
+      >
           {renderView()}
         </div>
 
