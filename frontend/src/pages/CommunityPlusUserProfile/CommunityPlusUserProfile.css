@@ -2,23 +2,19 @@
    CONTAINER (FIT TO CONTENT PANE)
 ===================================================== */
 
-.profile-container {
+.profile-layout {
+  display: grid;
+
+  /* 🔥 TRUE FULL WIDTH */
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
+
+  gap: 32px;
+
   width: 100%;
-  max-width: 100%;
+  max-width: 100%;   /* 🔥 REMOVE LIMIT */
+  margin: 0;         /* 🔥 NO CENTERING */
 
-  height: auto;
-  margin: 0;
-  padding: 24px;
-
-  display: flex;
-  flex-direction: column;
-
-  background: transparent;
-  border: none;
-  border-radius: 0;
-  box-shadow: none;
-
-  overflow: visible;
+  align-items: start;
 }
 
 
