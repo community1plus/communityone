@@ -1,12 +1,23 @@
-export async function mockAuth(req, res, next) {
-  // Simulated logged-in user
-  req.user = {
-    sub: "test-sub-123",
-    email: "test@example.com",
+import jwt from "jsonwebtoken";
 
-    // IMPORTANT: match your system
-    profile_id: "test-profile-id"
-  };
+export const verifyToken = (req, res, next) => {
+  const token = req.headers.authorization?.split(" ")[1];
 
-  next();
-}
+  if (!token) {
+    return res.status(401).json({ error: "No token" });
+  }
+
+  try {
+    const decoded = jwt.decode(token); // or verify with Cognito
+
+    req.user = {
+      userId: decoded.sub,
+      email: decoded.email,
+      name: decoded.name
+    };
+
+    next();
+  } catch (err) {
+    return res.status(401).json({ error: "Invalid token" });
+  }
+};
