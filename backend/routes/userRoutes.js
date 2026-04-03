@@ -54,6 +54,7 @@ const verifyToken = (req, res, next) => {
     {
       issuer: ISSUER,
       algorithms: ["RS256"],
+      audience: process.env.COGNITO_CLIENT_ID, // 🔥 REQUIRED
     },
     (err, decoded) => {
       if (err) {
