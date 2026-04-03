@@ -40,12 +40,22 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
         const data = await apiFetch("/api/users/me");
 
         if (data.profile) {
-          setFormData({
-            username: data.profile.username || "",
-            display_name: data.profile.display_name || "",
-            userType: data.profile.userType || "PERSONAL"
-          });
-        }
+  setFormData({
+    username: data.profile.username || "",
+    display_name: data.profile.display_name || "",
+    userType: data.profile.userType || "PERSONAL"
+  });
+} else {
+  // 🔥 FALLBACK TO AUTH DATA
+  setFormData({
+    username: appUser?.username || "",
+    display_name:
+      appUser?.attributes?.name ||
+      appUser?.attributes?.email?.split("@")[0] ||
+      "",
+    userType: "PERSONAL"
+  });
+}
       } catch (err) {
         console.error("Failed to load profile", err);
       } finally {
