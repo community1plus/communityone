@@ -4,8 +4,6 @@ const API_BASE =
 
 import { fetchAuthSession } from "aws-amplify/auth";
 
-const API_BASE = "https://communityone-backend.onrender.com/api";
-
 export async function apiFetch(path, options = {}) {
   let token = null;
 
