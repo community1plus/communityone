@@ -2,16 +2,23 @@
    CONTAINER (FIT TO CONTENT PANE)
 ===================================================== */
 
-.profile-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
-  gap: 24px;
-
+.profile-container {
   width: 100%;
-  max-width: 900px;      /* 🔥 KEY FIX */
-  margin: 0 auto;        /* 🔥 CENTER IT */
+  max-width: 100%;
 
-  align-items: start;
+  height: auto;
+  margin: 0;
+  padding: 24px;
+
+  display: flex;
+  flex-direction: column;
+
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+
+  overflow: visible;
 }
 
 
@@ -27,7 +34,7 @@
 
 
 /* =====================================================
-   TWO COLUMN LAYOUT (FIXED)
+   🔥 CENTERED TWO-COLUMN LAYOUT
 ===================================================== */
 
 .profile-layout {
@@ -36,7 +43,8 @@
   gap: 24px;
 
   width: 100%;
-  max-width: 100%;
+  max-width: 1000px;   /* 🔥 KEY FIX */
+  margin: 0 auto;      /* 🔥 CENTER */
 
   align-items: start;
 }
@@ -51,14 +59,12 @@
   min-width: 0;
 
   background: #fff;
-  padding: 24px;
+  padding: 28px; /* 🔥 improved spacing */
   border-radius: 16px;
   border: 1px solid #eee;
 
   display: flex;
   flex-direction: column;
-
-  height: auto;
 }
 
 
@@ -71,9 +77,7 @@
   flex-direction: column;
   gap: 18px;
 
-  flex: unset;
   overflow: visible;
-  height: auto;
 }
 
 
@@ -115,8 +119,6 @@
 .profile-container input::placeholder {
   color: #aaa;
 }
-
-/* FOCUS */
 
 .profile-container input:focus,
 .profile-container select:focus {
@@ -187,8 +189,6 @@
 
   display: flex;
   flex-direction: column;
-
-  height: auto;
 }
 
 
