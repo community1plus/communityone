@@ -1,6 +1,18 @@
 /* =====================================================
    CONTAINER (FIT TO CONTENT PANE)
 ===================================================== */
+.main {
+  display: flex;
+  width: 100%;
+}
+
+.content-area {
+  flex: 1;
+  width: 100%;
+  max-width: 100%;
+
+  padding: 24px 32px;
+}
 
 .profile-layout {
   display: grid;
