@@ -33,7 +33,7 @@ export default function AuthGate() {
         =============================== */
 
         const session = await fetchAuthSession();
-        const token = session.tokens?.idToken?.toString();
+        const token =  session.tokens?.idToken?.toString() || session.tokens?.accessToken?.toString();
 
         if (!token) {
           throw new Error("No auth token available");
