@@ -33,7 +33,7 @@ export default function AuthGate() {
         =============================== */
 
         const session = await fetchAuthSession();
-        const token =  token = session.tokens?.accessToken?.toString(); // 🔥 FORCE ACCESS TOKEN
+        const token = session.tokens?.accessToken?.toString(); // 🔥 FORCE ACCESS TOKEN
         if (!token) {
           throw new Error("No auth token available");
         }
@@ -45,7 +45,7 @@ export default function AuthGate() {
         const res = await fetch(`${API_BASE}/users/me`, {
           method: "GET",
           headers: {
-            Authorization: `Bearer ${token}`, // 🔥 CRITICAL
+            "Authorization": `Bearer ${token}`, // 🔥 CRITICAL
             "Content-Type": "application/json",
           },
         });
