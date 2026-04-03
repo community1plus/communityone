@@ -84,6 +84,9 @@ export default function CommunityPlusDashboard({ isLoaded }) {
           />
         );
 
+      case "communityplus":
+        return <CommunityPlusHub />;
+
       case "dashboard":
       default:
         return (

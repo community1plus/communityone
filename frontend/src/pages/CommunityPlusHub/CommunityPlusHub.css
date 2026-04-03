@@ -1,0 +1,59 @@
+.communityplus-container {
+  width: 100%;
+  padding: 24px 32px;
+}
+
+.communityplus-container h2 {
+  font-size: 22px;
+  margin-bottom: 20px;
+}
+
+/* GRID */
+
+.cp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+/* CARD */
+
+.cp-card {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 16px;
+
+  overflow: hidden;
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+.cp-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+}
+
+/* IMAGE */
+
+.cp-image {
+  height: 140px;
+  background-size: cover;
+  background-position: center;
+}
+
+/* CONTENT */
+
+.cp-content {
+  padding: 14px;
+}
+
+.cp-content h3 {
+  font-size: 15px;
+  margin-bottom: 6px;
+}
+
+.cp-content p {
+  font-size: 13px;
+  color: #666;
+}
