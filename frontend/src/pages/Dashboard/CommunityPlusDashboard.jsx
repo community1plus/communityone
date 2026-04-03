@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
+import { GoogleMap, Marker } from "@react-google-maps/api";
 import { signOut } from "aws-amplify/auth";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useLocationContext } from "../../context/LocationContext";
@@ -15,29 +15,17 @@ import Onboarding from "../Onboarding/CommunityPlusOnboarding";
 
 import "./CommunityPlusDashboard.css";
 
-/* 🔥 FIX: prevent LoadScript reload */
-const LIBRARIES = ["places"];
-
-export default function CommunityPlusDashboard() {
+export default function CommunityPlusDashboard({ isLoaded }) {
   const navigate = useNavigate();
   const location = useLocation();
 
   const { viewLocation } = useLocationContext();
-  const { appUser, loading } = useAuth(); // 🔥 SINGLE SOURCE OF TRUTH
+  const { appUser, loading } = useAuth();
 
   const [activeView, setActiveView] = useState(
     location.state?.view || "dashboard"
   );
 
-  /* ===============================
-     🗺 GOOGLE MAP LOADER
-  =============================== */
-
-  const { isLoaded } = useJsApiLoader({
-    id: "google-map-script", // 🔥 REQUIRED FIX
-    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
-    libraries: LIBRARIES,
-  });
   /* ===============================
      🔓 LOGOUT
   =============================== */
@@ -52,7 +40,7 @@ export default function CommunityPlusDashboard() {
   };
 
   /* ===============================
-     📍 LOCATION (SINGLE SOURCE)
+     📍 LOCATION
   =============================== */
 
   const mapCenter =
@@ -79,7 +67,7 @@ export default function CommunityPlusDashboard() {
         return <Onboarding setActiveView={setActiveView} />;
 
       case "profile":
-        return <CommunityPlusUserProfile />; // 🔥 FIXED
+        return <CommunityPlusUserProfile />;
 
       case "post":
         return (
@@ -112,7 +100,7 @@ export default function CommunityPlusDashboard() {
 
             {/* RIGHT MAP */}
             <div className="map-column">
-              {!isLoaded ? (
+              {!isLoaded || !window.google ? (
                 <div className="map-loading">Loading map…</div>
               ) : (
                 <GoogleMap
@@ -136,7 +124,6 @@ export default function CommunityPlusDashboard() {
   return (
     <div className="dashboard-container">
 
-      {/* 🔥 HEADER NOW GETS CORRECT USER */}
       <CommunityPlusHeader
         user={appUser}
         setActiveView={setActiveView}
