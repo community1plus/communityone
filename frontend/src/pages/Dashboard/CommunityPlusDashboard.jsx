@@ -12,8 +12,10 @@ import PostComposer from "../../components/Layout/Sidebar/Post/PostComposer";
 import CommunityPlusYellowPages from "../YellowPages/CommunityPlusYellowPages";
 import CommunityPlusUserProfile from "../CommunityPlusUserProfile/CommunityPlusUserProfile";
 import Onboarding from "../Onboarding/CommunityPlusOnboarding";
+import CommunityPlusHub from "../CommunityPlusHub/CommunityPlusHub";
 
 import "./CommunityPlusDashboard.css";
+import CommunityPlusHub from "../CommunityPlusHub/CommunityPlusHub";
 
 export default function CommunityPlusDashboard({ isLoaded }) {
   const navigate = useNavigate();
