@@ -8,7 +8,8 @@ export async function apiFetch(path, options = {}) {
   try {
     const response = await fetch(url, {
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
       },
       ...options
     });
