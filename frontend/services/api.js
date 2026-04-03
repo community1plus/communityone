@@ -10,15 +10,15 @@ export async function apiFetch(path, options = {}) {
   =============================== */
   try {
     const session = await fetchAuthSession();
-
+    console.log("SESSION:", session); // 🔍 debug
     // Prefer ID token, fallback to access token
-    token =
-      session.tokens?.idToken?.toString() ||
-      session.tokens?.accessToken?.toString();
+    token = session.tokens?.accessToken?.toString();
 
   } catch (err) {
     console.warn("⚠️ No auth session available:", err);
   }
+
+  console.log("TOKEN:", token); // 🔍 debug
 
   /* ===============================
      🚀 MAKE REQUEST
