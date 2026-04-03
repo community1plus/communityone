@@ -49,30 +49,31 @@ const verifyToken = (req, res, next) => {
   const token = authHeader.split(" ")[1];
 
   jwt.verify(
-    token,
-    getKey,
-    {
-      issuer: ISSUER,
-      algorithms: ["RS256"],
-      audience: process.env.COGNITO_CLIENT_ID, // 🔥 REQUIRED
-    },
-    (err, decoded) => {
-      if (err) {
-        console.error("JWT verification failed:", err);
-        return res.status(401).json({ error: "Invalid token" });
-      }
-
-      // 🔥 Attach REAL user from Cognito
-      req.user = {
-        userId: decoded.sub,
-        email: decoded.email,
-        name: decoded.name || decoded["cognito:username"],
-        username: decoded["cognito:username"],
-      };
-
-      next();
+  token,
+  getKey,
+  {
+    issuer: ISSUER,
+    algorithms: ["RS256"],
+    audience: process.env.COGNITO_CLIENT_ID,
+  },
+  (err, decoded) => {
+    if (err) {
+      console.error("❌ JWT ERROR:", err); // 🔥 ADD THIS
+      return res.status(401).json({ error: "Invalid token" });
     }
-  );
+
+    console.log("✅ DECODED:", decoded); // 🔥 ADD THIS
+
+    req.user = {
+      userId: decoded.sub,
+      email: decoded.email,
+      name: decoded.name,
+      username: decoded["cognito:username"],
+    };
+
+    next();
+  }
+);
 };
 
 /* ===============================
