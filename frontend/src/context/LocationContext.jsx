@@ -18,7 +18,7 @@ const parseAddress = (components = []) => {
 const get = (type) =>
 components.find((c) => c.types.includes(type));
 
-```
+
 return {
   country: get("country")?.long_name,
   state: get("administrative_area_level_1")?.short_name,
@@ -30,7 +30,7 @@ return {
   street: get("route")?.long_name,
   streetNumber: get("street_number")?.long_name,
 };
-```
+
 
 };
 
@@ -44,7 +44,7 @@ const res = await fetch(
 `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${GOOGLE_KEY}`
 );
 
-```
+
   const data = await res.json();
   const components = data.results?.[0]?.address_components || [];
 
@@ -65,7 +65,7 @@ const res = await fetch(
 } catch {
   return { label: "Near you" };
 }
-```
+
 
 };
 
@@ -89,7 +89,7 @@ return 0;
 const resolveBestLocation = (home, live) => {
 if (!home && !live) return null;
 
-```
+
 if (home && live) {
   return confidenceScore(live.type) > confidenceScore(home.type)
     ? live
@@ -97,7 +97,7 @@ if (home && live) {
 }
 
 return live || home;
-```
+
 
 };
 
@@ -110,7 +110,7 @@ const initLocation = async () => {
 // ✅ 1. SAVED HOME
 const saved = localStorage.getItem("homeLocation");
 
-```
+
   if (saved) {
     const loc = JSON.parse(saved);
     setHomeLocation(loc);
@@ -139,7 +139,7 @@ const saved = localStorage.getItem("homeLocation");
 };
 
 initLocation();
-```
+
 
 }, []);
 
@@ -150,7 +150,7 @@ initLocation();
 const enableLiveLocation = () => {
 if (!navigator.geolocation) return;
 
-```
+
 navigator.geolocation.getCurrentPosition(
   async (pos) => {
     const lat = pos.coords.latitude;
@@ -198,14 +198,12 @@ type: "home",
 confidence: confidenceScore("home"),
 };
 
-```
 setHomeLocation(enriched);
 
 const best = resolveBestLocation(enriched, liveLocation);
 setViewLocation(best);
 
 localStorage.setItem("homeLocation", JSON.stringify(enriched));
-```
 
 };
 
