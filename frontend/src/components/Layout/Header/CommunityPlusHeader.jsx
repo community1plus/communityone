@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import "./CommunityPlusHeader.css";
 import { useLocationContext } from "../../../context/LocationContext";
 import { useAuth } from "../../../context/AuthContext";
@@ -20,28 +20,19 @@ function CommunityPlusHeader({ setActiveView, user, onLogout }) {
   const effectiveUser = appUser || user;
 
   /* ===============================
-     USER LOGIC
+     🧠 USER LOGIC (CLEANED)
   =============================== */
 
-  const getUserName = () => {
+  const username = useMemo(() => {
     if (!effectiveUser) return "Member";
 
-    if (effectiveUser?.email) {
-      return effectiveUser.email.split("@")[0];
-    }
+    const email =
+      effectiveUser?.email ||
+      effectiveUser?.attributes?.email ||
+      effectiveUser?.signInDetails?.loginId;
 
-    if (effectiveUser?.signInDetails?.loginId) {
-      const login = effectiveUser.signInDetails.loginId;
-      if (login.includes("@")) return login.split("@")[0];
-      return login;
-    }
-
-    if (effectiveUser?.attributes?.email) {
-      return effectiveUser.attributes.email.split("@")[0];
-    }
-
-    if (effectiveUser?.username?.startsWith("facebook_")) {
-      return "User";
+    if (email && email.includes("@")) {
+      return email.split("@")[0];
     }
 
     if (effectiveUser?.username && !/^\d+$/.test(effectiveUser.username)) {
@@ -49,25 +40,55 @@ function CommunityPlusHeader({ setActiveView, user, onLogout }) {
     }
 
     return "Member";
+  }, [effectiveUser]);
+
+  const initials = useMemo(() => {
+    if (!username) return "ME";
+
+    const parts = username.split(/[\s._-]+/).filter(Boolean);
+
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+
+    return ((parts[0][0] || "") + (parts[1]?.[0] || "")).toUpperCase();
+  }, [username]);
+
+  /* ===============================
+     📍 LOCATION FORMATTER
+  =============================== */
+
+  const formatLocationLabel = (loc) => {
+    if (!loc) return "Locating...";
+
+    const stateMap = {
+      Victoria: "VIC",
+      "New South Wales": "NSW",
+      Queensland: "QLD",
+      "South Australia": "SA",
+      Tasmania: "TAS",
+      "Western Australia": "WA",
+      "Northern Territory": "NT",
+      ACT: "ACT"
+    };
+
+    const stateShort = stateMap[loc.state] || loc.state;
+
+    return `${loc.suburb || loc.city || ""}, ${stateShort || ""} ${loc.postcode || ""}`.trim();
   };
 
-  const getInitials = () => {
-    const name = getUserName();
+  /* ===============================
+     🎯 ACCURACY INTELLIGENCE
+  =============================== */
 
-    if (!name || name === "User" || name === "Member") {
-      return "ME";
-    }
+  const accuracyMeta = useMemo(() => {
+    const acc = viewLocation?.accuracy;
+    if (!acc) return null;
 
-    const parts = name.split(/[\s._-]+/).filter(Boolean);
+    if (acc <= 50) return { label: "Exact", class: "exact" };
+    if (acc <= 200) return { label: "Precise", class: "precise" };
+    if (acc <= 1000) return { label: "Approx", class: "approx" };
 
-    if (parts.length === 1) {
-      return parts[0].slice(0, 2).toUpperCase();
-    }
-
-    return (
-      (parts[0][0] || "") + (parts[1]?.[0] || "")
-    ).toUpperCase();
-  };
+    return { label: "Rough", class: "rough" };
+  }, [viewLocation]);
 
   /* ===============================
      CLICK OUTSIDE
@@ -87,31 +108,35 @@ function CommunityPlusHeader({ setActiveView, user, onLogout }) {
 
   const toggleMenu = () => setShowMenu((prev) => !prev);
 
-  const isAuthed = !!effectiveUser;
-  const username = getUserName();
-  const initials = getInitials();
-
   /* ===============================
-     LOCATION ACTIONS
+     📡 LOCATION ACTIONS (UPGRADED)
   =============================== */
 
   const handleHomeClick = async () => {
+    if (locating) return;
     setLocating(true);
 
-    // Refresh if missing OR low accuracy
-    if (!homeLocation || homeLocation?.accuracy > 1000) {
-      await enableHomeLocation();
-    } else {
-      setViewLocation(homeLocation);
+    try {
+      // Refresh only if stale or missing
+      if (!homeLocation || homeLocation?.accuracy > 500) {
+        await enableHomeLocation();
+      } else {
+        setViewLocation(homeLocation);
+      }
+    } finally {
+      setLocating(false);
     }
-
-    setTimeout(() => setLocating(false), 1500);
   };
 
-  const handleLiveClick = () => {
+  const handleLiveClick = async () => {
+    if (locating) return;
     setLocating(true);
-    enableLiveLocation();
-    setTimeout(() => setLocating(false), 2000);
+
+    try {
+      await enableLiveLocation();
+    } finally {
+      setLocating(false);
+    }
   };
 
   /* ===============================
@@ -133,21 +158,32 @@ function CommunityPlusHeader({ setActiveView, user, onLogout }) {
 
           {/* LOCATION */}
           <div className="location-switcher">
-            <span className="location-text left">
-              📍 {locating
-                ? "Locating..."
-                : viewLocation?.label || "Locating..."}
-            </span>
 
-            {/* 🔥 OPTIONAL ACCURACY DISPLAY */}
-            {viewLocation?.accuracy && !locating && (
-              <span className="location-accuracy">
-                ±{Math.round(viewLocation.accuracy)}m
+            <div className="location-display">
+
+              <span className="location-text">
+                📍 {locating
+                  ? "Locating..."
+                  : formatLocationLabel(viewLocation)}
               </span>
-            )}
+
+              {!locating && viewLocation?.accuracy && (
+                <>
+                  <span className="location-accuracy">
+                    ±{Math.round(viewLocation.accuracy)}m
+                  </span>
+
+                  {accuracyMeta && (
+                    <span className={`location-badge ${accuracyMeta.class}`}>
+                      {accuracyMeta.label}
+                    </span>
+                  )}
+                </>
+              )}
+
+            </div>
 
             <div className="location-dropdown">
-
               <button onClick={handleHomeClick}>
                 🏠 Home
               </button>
@@ -155,8 +191,8 @@ function CommunityPlusHeader({ setActiveView, user, onLogout }) {
               <button onClick={handleLiveClick}>
                 📡 Near Me
               </button>
-
             </div>
+
           </div>
 
         </div>
@@ -175,7 +211,7 @@ function CommunityPlusHeader({ setActiveView, user, onLogout }) {
 
         {/* RIGHT */}
         <div className="header-right">
-          {isAuthed && (
+          {effectiveUser && (
             <div className="user-block" ref={menuRef}>
 
               <span
