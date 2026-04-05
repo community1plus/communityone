@@ -4,254 +4,256 @@ const LocationContext = createContext();
 export const useLocationContext = () => useContext(LocationContext);
 
 export function LocationProvider({ children }) {
-const [homeLocation, setHomeLocation] = useState(null);
-const [liveLocation, setLiveLocation] = useState(null);
-const [ipLocation, setIpLocation] = useState(null);
-const [viewLocation, setViewLocation] = useState(null);
+  const [homeLocation, setHomeLocation] = useState(null);
+  const [liveLocation, setLiveLocation] = useState(null);
+  const [ipLocation, setIpLocation] = useState(null);
+  const [viewLocation, setViewLocation] = useState(null);
 
-const GOOGLE_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+  const GOOGLE_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
-/* ===============================
-🧠 PARSE GOOGLE ADDRESS
-=============================== */
+  /* ===============================
+     🧠 PARSE GOOGLE ADDRESS
+  =============================== */
 
-const parseAddress = (components = []) => {
-const get = (type) =>
-components.find((c) => c.types.includes(type));
+  const parseAddress = (components = []) => {
+    console.log("🧩 RAW ADDRESS COMPONENTS:", components);
 
+    const get = (type) =>
+      components.find((c) => c.types.includes(type));
 
-return {
-  country: get("country")?.long_name,
-  state: get("administrative_area_level_1")?.short_name,
-  city: get("locality")?.long_name,
-  suburb:
-    get("sublocality_level_1")?.long_name ||
-    get("locality")?.long_name,
-  postcode: get("postal_code")?.long_name,
-  street: get("route")?.long_name,
-  streetNumber: get("street_number")?.long_name,
-};
+    const parsed = {
+      country: get("country")?.long_name,
+      state: get("administrative_area_level_1")?.short_name,
+      city: get("locality")?.long_name,
+      suburb:
+        get("sublocality_level_1")?.long_name ||
+        get("locality")?.long_name,
+      postcode: get("postal_code")?.long_name,
+      street: get("route")?.long_name,
+      streetNumber: get("street_number")?.long_name,
+    };
 
+    console.log("🧠 PARSED ADDRESS:", parsed);
 
-};
-
-/* ===============================
-🌍 REVERSE GEOCODE
-=============================== */
-
-const reverseGeocode = async (lat, lng) => {
-try {
-const res = await fetch(
-`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${GOOGLE_KEY}`
-);
-
-
-  const data = await res.json();
-  const components = data.results?.[0]?.address_components || [];
-
-  const parsed = parseAddress(components);
-
-  const label = [
-    parsed.suburb,
-    parsed.state,
-    parsed.postcode,
-  ]
-    .filter(Boolean)
-    .join(", ");
-
-  return {
-    ...parsed,
-    label: label || "Near you",
+    return parsed;
   };
-} catch {
-  return { label: "Near you" };
-}
 
+  /* ===============================
+     🌍 REVERSE GEOCODE
+  =============================== */
 
-};
+  const reverseGeocode = async (lat, lng) => {
+    try {
+      const res = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${GOOGLE_KEY}`
+      );
 
-/* ===============================
-🔥 SPECIFICITY SCORING (CORE)
-=============================== */
+      const data = await res.json();
+      const components = data.results?.[0]?.address_components || [];
 
-const specificityScore = (loc) => {
-if (!loc) return 0;
+      const parsed = parseAddress(components);
 
+      const label = [
+        parsed.suburb,
+        parsed.state,
+        parsed.postcode,
+      ]
+        .filter(Boolean)
+        .join(", ");
 
-if (loc.streetNumber && loc.street) return 100;
-if (loc.street) return 90;
-if (loc.suburb || loc.postcode) return 80;
-if (loc.city) return 60;
-if (loc.state) return 40;
-if (loc.country) return 20;
+      const result = {
+        ...parsed,
+        label: label || "Near you",
+      };
 
-return 0;
+      console.log("🌍 REVERSE GEOCODE RESULT:", result);
 
+      return result;
+    } catch {
+      console.warn("Reverse geocode failed");
+      return { label: "Near you" };
+    }
+  };
 
-};
+  /* ===============================
+     🔥 SPECIFICITY SCORING
+  =============================== */
 
-/* ===============================
-🧠 RESOLVE BEST LOCATION
-=============================== */
+  const specificityScore = (loc) => {
+    if (!loc) return 0;
 
-const resolveBestLocation = ({ home, live, ip }) => {
-const candidates = [live, ip, home].filter(Boolean);
+    if (loc.streetNumber && loc.street) return 100;
+    if (loc.street) return 90;
+    if (loc.suburb || loc.postcode) return 80;
+    if (loc.city) return 60;
+    if (loc.state) return 40;
+    if (loc.country) return 20;
 
+    return 0;
+  };
 
-if (candidates.length === 0) return null;
+  /* ===============================
+     🧠 RESOLVE BEST LOCATION
+  =============================== */
 
-candidates.sort(
-  (a, b) => specificityScore(b) - specificityScore(a)
-);
+  const resolveBestLocation = ({ home, live, ip }) => {
+    const candidates = [live, ip, home].filter(Boolean);
 
-return candidates[0];
+    if (candidates.length === 0) return null;
 
+    candidates.sort(
+      (a, b) => specificityScore(b) - specificityScore(a)
+    );
 
-};
+    const best = candidates[0];
 
-/* ===============================
-📍 INITIALISE LOCATION
-=============================== */
+    console.log("📊 LOCATION RESOLUTION:");
+    console.log("→ Candidates:", candidates);
+    console.log("→ Selected:", best);
+    console.log("→ Source:", best?.type);
+    console.log("→ Specificity:", specificityScore(best));
 
-useEffect(() => {
-const initLocation = async () => {
-// ✅ 1. LOAD HOME (fallback only)
-const saved = localStorage.getItem("homeLocation");
+    return best;
+  };
 
+  /* ===============================
+     📍 INITIALISE LOCATION
+  =============================== */
 
-  let home = null;
-  if (saved) {
-    home = JSON.parse(saved);
-    setHomeLocation(home);
-  }
+  useEffect(() => {
+    const initLocation = async () => {
+      const saved = localStorage.getItem("homeLocation");
 
-  // ✅ 2. IP LOCATION
-  let ip = null;
-  try {
-    const res = await fetch("https://ipapi.co/json/");
-    const data = await res.json();
+      let home = null;
+      if (saved) {
+        home = JSON.parse(saved);
+        console.log("🏠 HOME LOCATION LOADED:", home);
+        setHomeLocation(home);
+      }
 
-    ip = {
-      lat: data.latitude,
-      lng: data.longitude,
-      city: data.city,
-      state: data.region_code,
-      country: data.country_name,
-      label: `${data.city}, ${data.region_code}`,
-      type: "ip",
+      let ip = null;
+      try {
+        const res = await fetch("https://ipapi.co/json/");
+        const data = await res.json();
+
+        ip = {
+          lat: data.latitude,
+          lng: data.longitude,
+          city: data.city,
+          state: data.region_code,
+          country: data.country_name,
+          label: `${data.city}, ${data.region_code}`,
+          type: "ip",
+        };
+
+        console.log("🌐 IP LOCATION:", ip);
+
+        setIpLocation(ip);
+      } catch {
+        console.error("IP location failed");
+      }
+
+      const best = resolveBestLocation({
+        home,
+        live: null,
+        ip,
+      });
+
+      setViewLocation(best);
     };
 
-    setIpLocation(ip);
-  } catch {
-    console.error("IP location failed");
-  }
+    initLocation();
+  }, []);
 
-  // 🔥 RESOLVE BEST
-  const best = resolveBestLocation({
-    home,
-    live: null,
-    ip,
-  });
+  /* ===============================
+     📡 GPS
+  =============================== */
 
-  setViewLocation(best);
-};
+  const enableLiveLocation = () => {
+    if (!navigator.geolocation) return;
 
-initLocation();
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
 
+        console.log("📡 GPS RAW:", pos.coords);
 
-}, []);
+        const address = await reverseGeocode(lat, lng);
 
-/* ===============================
-📡 GPS (USER TRIGGERED)
-=============================== */
+        const loc = {
+          lat,
+          lng,
+          ...address,
+          accuracy: pos.coords.accuracy,
+          type: "live",
+        };
 
-const enableLiveLocation = () => {
-if (!navigator.geolocation) return;
+        console.log("📍 LIVE LOCATION OBJECT:", loc);
 
+        setLiveLocation(loc);
 
-navigator.geolocation.getCurrentPosition(
-  async (pos) => {
-    const lat = pos.coords.latitude;
-    const lng = pos.coords.longitude;
+        const best = resolveBestLocation({
+          home: homeLocation,
+          live: loc,
+          ip: ipLocation,
+        });
 
-    const address = await reverseGeocode(lat, lng);
+        setViewLocation(best);
+      },
+      (err) => {
+        console.warn("GPS failed:", err.message);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0,
+      }
+    );
+  };
 
-    const loc = {
-      lat,
-      lng,
-      ...address,
-      accuracy: pos.coords.accuracy,
-      type: "live",
+  /* ===============================
+     🏠 SET HOME
+  =============================== */
+
+  const setHome = (loc) => {
+    const enriched = {
+      ...loc,
+      type: "home",
     };
 
-    setLiveLocation(loc);
+    console.log("🏠 SET HOME:", enriched);
+
+    setHomeLocation(enriched);
 
     const best = resolveBestLocation({
-      home: homeLocation,
-      live: loc,
+      home: enriched,
+      live: liveLocation,
       ip: ipLocation,
     });
 
     setViewLocation(best);
 
-    console.log("📍 LIVE LOCATION:", loc);
-  },
-  (err) => {
-    console.warn("GPS failed:", err.message);
-  },
-  {
-    enableHighAccuracy: true,
-    timeout: 10000,
-    maximumAge: 0,
-  }
-);
+    localStorage.setItem("homeLocation", JSON.stringify(enriched));
+  };
 
+  /* ===============================
+     PROVIDER
+  =============================== */
 
-};
-
-/* ===============================
-🏠 SET HOME (FALLBACK ONLY)
-=============================== */
-
-const setHome = (loc) => {
-const enriched = {
-...loc,
-type: "home",
-};
-
-
-setHomeLocation(enriched);
-
-const best = resolveBestLocation({
-  home: enriched,
-  live: liveLocation,
-  ip: ipLocation,
-});
-
-setViewLocation(best);
-
-localStorage.setItem("homeLocation", JSON.stringify(enriched));
-
-
-};
-
-/* ===============================
-PROVIDER
-=============================== */
-
-return (
-<LocationContext.Provider
-value={{
-homeLocation,
-liveLocation,
-ipLocation,
-viewLocation,
-setViewLocation,
-enableLiveLocation,
-setHome,
-}}
->
-{children}
-</LocationContext.Provider>
-);
+  return (
+    <LocationContext.Provider
+      value={{
+        homeLocation,
+        liveLocation,
+        ipLocation,
+        viewLocation,
+        setViewLocation,
+        enableLiveLocation,
+        setHome,
+      }}
+    >
+      {children}
+    </LocationContext.Provider>
+  );
 }
