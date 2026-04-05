@@ -5,13 +5,14 @@ import { useAuth } from "../../../context/AuthContext";
 
 function CommunityPlusHeader({ setActiveView, user, onLogout }) {
   const [showMenu, setShowMenu] = useState(false);
+  const [locating, setLocating] = useState(false);
   const menuRef = useRef(null);
 
   const {
     viewLocation,
     homeLocation,
     enableLiveLocation,
-    enableHomeLocation, // 🔥 NEW
+    enableHomeLocation,
     setViewLocation
   } = useLocationContext();
 
@@ -19,7 +20,7 @@ function CommunityPlusHeader({ setActiveView, user, onLogout }) {
   const effectiveUser = appUser || user;
 
   /* ===============================
-  USER LOGIC
+     USER LOGIC
   =============================== */
 
   const getUserName = () => {
@@ -69,7 +70,7 @@ function CommunityPlusHeader({ setActiveView, user, onLogout }) {
   };
 
   /* ===============================
-  CLICK OUTSIDE
+     CLICK OUTSIDE
   =============================== */
 
   useEffect(() => {
@@ -91,20 +92,30 @@ function CommunityPlusHeader({ setActiveView, user, onLogout }) {
   const initials = getInitials();
 
   /* ===============================
-  LOCATION ACTIONS
+     LOCATION ACTIONS
   =============================== */
 
-  const handleHomeClick = () => {
-    // 🔥 If no home → fetch GPS and save
-    if (!homeLocation) {
-      enableHomeLocation();
+  const handleHomeClick = async () => {
+    setLocating(true);
+
+    // Refresh if missing OR low accuracy
+    if (!homeLocation || homeLocation?.accuracy > 1000) {
+      await enableHomeLocation();
     } else {
       setViewLocation(homeLocation);
     }
+
+    setTimeout(() => setLocating(false), 1500);
+  };
+
+  const handleLiveClick = () => {
+    setLocating(true);
+    enableLiveLocation();
+    setTimeout(() => setLocating(false), 2000);
   };
 
   /* ===============================
-  RENDER
+     RENDER
   =============================== */
 
   return (
@@ -123,18 +134,25 @@ function CommunityPlusHeader({ setActiveView, user, onLogout }) {
           {/* LOCATION */}
           <div className="location-switcher">
             <span className="location-text left">
-              📍 {viewLocation?.label || "Locating..."}
+              📍 {locating
+                ? "Locating..."
+                : viewLocation?.label || "Locating..."}
             </span>
+
+            {/* 🔥 OPTIONAL ACCURACY DISPLAY */}
+            {viewLocation?.accuracy && !locating && (
+              <span className="location-accuracy">
+                ±{Math.round(viewLocation.accuracy)}m
+              </span>
+            )}
 
             <div className="location-dropdown">
 
-              {/* 🔥 UPDATED HOME */}
               <button onClick={handleHomeClick}>
                 🏠 Home
               </button>
 
-              {/* GPS */}
-              <button onClick={enableLiveLocation}>
+              <button onClick={handleLiveClick}>
                 📡 Near Me
               </button>
 
