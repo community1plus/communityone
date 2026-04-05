@@ -12,13 +12,12 @@ const [viewLocation, setViewLocation] = useState(null);
 const GOOGLE_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
 /* ===============================
-🧠 PARSE ADDRESS COMPONENTS
+🧠 PARSE ADDRESS
 =============================== */
 
 const parseAddress = (components = []) => {
 const get = (type) =>
 components.find((c) => c.types.includes(type));
-
 
 return {
   country: get("country")?.long_name,
@@ -36,7 +35,7 @@ return {
 };
 
 /* ===============================
-🌍 GOOGLE REVERSE GEOCODE
+🌍 GOOGLE GEOCODER
 =============================== */
 
 const reverseGeocodeGoogle = async (lat, lng) => {
@@ -45,40 +44,27 @@ const res = await fetch(
 `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${GOOGLE_KEY}`
 );
 
-
   const data = await res.json();
   const results = data.results || [];
 
-  console.log("🌍 GOOGLE RESULTS:", results);
-
-  // 🔥 BEST RESULT SELECTION
-  const bestResult =
+  const best =
     results.find(
       (r) =>
         r.types.includes("street_address") &&
         r.geometry?.location_type === "ROOFTOP"
     ) ||
     results.find((r) => r.types.includes("street_address")) ||
-    results.find((r) => r.types.includes("premise")) ||
     results.find((r) => r.types.includes("route")) ||
     results[0];
 
-  console.log("🎯 GOOGLE SELECTED:", bestResult?.types);
+  const parsed = parseAddress(best?.address_components || []);
 
-  const components = bestResult?.address_components || [];
-  const parsed = parseAddress(components);
+  console.log("🌍 GOOGLE:", parsed);
 
-  return {
-    ...parsed,
-    lat,
-    lng,
-    source: "google",
-  };
-} catch (err) {
-  console.warn("Google geocode failed", err);
+  return { ...parsed, lat, lng, source: "google" };
+} catch {
   return null;
 }
-
 
 };
 
@@ -92,30 +78,25 @@ const res = await fetch(
 `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
 );
 
-
   const data = await res.json();
+  const a = data.address || {};
 
-  console.log("🌍 OSM RESULT:", data);
-
-  const addr = data.address || {};
-
-  return {
-    country: addr.country,
-    state: addr.state,
-    city: addr.city || addr.town,
-    suburb: addr.suburb,
-    postcode: addr.postcode,
-    street: addr.road,
-    streetNumber: addr.house_number,
-    lat,
-    lng,
-    source: "osm",
+  const parsed = {
+    country: a.country,
+    state: a.state,
+    city: a.city || a.town,
+    suburb: a.suburb,
+    postcode: a.postcode,
+    street: a.road,
+    streetNumber: a.house_number,
   };
-} catch (err) {
-  console.warn("OSM fallback failed", err);
+
+  console.log("🌍 OSM:", parsed);
+
+  return { ...parsed, lat, lng, source: "osm" };
+} catch {
   return null;
 }
-
 
 };
 
@@ -124,81 +105,110 @@ const res = await fetch(
 =============================== */
 
 const reverseGeocode = async (lat, lng) => {
-let google = await reverseGeocodeGoogle(lat, lng);
+let g = await reverseGeocodeGoogle(lat, lng);
 
-
-// 🔥 IF GOOGLE IS NOT DETAILED → FALLBACK
-if (!google?.streetNumber) {
+if (!g?.streetNumber) {
   const osm = await reverseGeocodeOSM(lat, lng);
-
-  if (osm) {
-    google = { ...google, ...osm, source: "hybrid" };
-  }
+  if (osm) g = { ...g, ...osm, source: "hybrid" };
 }
 
-const label = [
-  google?.suburb,
-  google?.state,
-  google?.postcode,
-]
+const label = [g?.suburb, g?.state, g?.postcode]
   .filter(Boolean)
   .join(", ");
 
-const result = {
-  ...google,
-  label: label || "Near you",
-};
+const result = { ...g, label: label || "Near you" };
 
 console.log("📍 FINAL GEOCODE:", result);
 
 return result;
 
-
 };
 
 /* ===============================
-🔥 SPECIFICITY SCORING
+🎯 SPECIFICITY
 =============================== */
 
 const specificityScore = (loc) => {
 if (!loc) return 0;
-
-
 if (loc.streetNumber && loc.street) return 100;
 if (loc.street) return 90;
 if (loc.suburb || loc.postcode) return 80;
 if (loc.city) return 60;
 if (loc.state) return 40;
 if (loc.country) return 20;
-
 return 0;
+};
 
+/* ===============================
+📏 ACCURACY MODEL
+=============================== */
+
+const inferHomeAccuracy = (loc) => {
+if (loc.streetNumber) return 50;
+if (loc.street) return 150;
+if (loc.suburb) return 1000;
+if (loc.city) return 5000;
+return 10000;
+};
+
+/* ===============================
+🧠 COMBINED SCORE
+=============================== */
+
+const scoreLocation = (loc) => {
+if (!loc) return 0;
+
+const spec = specificityScore(loc);
+
+const accScore =
+  loc.accuracy < 50 ? 50 :
+  loc.accuracy < 200 ? 40 :
+  loc.accuracy < 1000 ? 30 :
+  loc.accuracy < 5000 ? 20 :
+  10;
+
+return spec + accScore;
 
 };
 
 /* ===============================
-🧠 RESOLVE BEST LOCATION
+🧠 PRECISION LABEL
+=============================== */
+
+const getPrecisionLevel = (loc) => {
+if (!loc) return "unknown";
+
+const spec = specificityScore(loc);
+const acc = loc.accuracy || 99999;
+
+if (acc < 50 && spec >= 80) return "exact";
+if (acc < 1000 && spec >= 80) return "area";
+return "approx";
+
+};
+
+/* ===============================
+🧠 RESOLVER
 =============================== */
 
 const resolveBestLocation = ({ home, live, ip }) => {
 const candidates = [live, home, ip].filter(Boolean);
 
-
-candidates.sort(
-  (a, b) => specificityScore(b) - specificityScore(a)
-);
+candidates.sort((a, b) => scoreLocation(b) - scoreLocation(a));
 
 const best = candidates[0];
 
 console.log("📊 LOCATION RESOLUTION:", {
   candidates,
   selected: best,
-  source: best?.type,
+  score: scoreLocation(best),
   specificity: specificityScore(best),
+  accuracy: best?.accuracy,
+  precision: getPrecisionLevel(best),
+  source: best?.type,
 });
 
 return best;
-
 
 };
 
@@ -210,10 +220,10 @@ useEffect(() => {
 const init = async () => {
 let home = null;
 
-
   const saved = localStorage.getItem("homeLocation");
   if (saved) {
     home = JSON.parse(saved);
+    home.accuracy = inferHomeAccuracy(home);
     setHomeLocation(home);
   }
 
@@ -229,23 +239,18 @@ let home = null;
       state: data.region_code,
       country: data.country_name,
       label: `${data.city}, ${data.region_code}`,
+      accuracy: 5000,
       type: "ip",
     };
 
     setIpLocation(ip);
   } catch {}
 
-  const best = resolveBestLocation({
-    home,
-    live: null,
-    ip,
-  });
-
+  const best = resolveBestLocation({ home, live: null, ip });
   setViewLocation(best);
 };
 
 init();
-
 
 }, []);
 
@@ -259,13 +264,10 @@ async (pos) => {
 const lat = pos.coords.latitude;
 const lng = pos.coords.longitude;
 
-
-    console.log("📡 GPS:", pos.coords);
-
-    const address = await reverseGeocode(lat, lng);
+    const geo = await reverseGeocode(lat, lng);
 
     const loc = {
-      ...address,
+      ...geo,
       accuracy: pos.coords.accuracy,
       type: "live",
     };
@@ -284,7 +286,6 @@ const lng = pos.coords.longitude;
   { enableHighAccuracy: true }
 );
 
-
 };
 
 /* ===============================
@@ -292,8 +293,11 @@ const lng = pos.coords.longitude;
 =============================== */
 
 const setHome = (loc) => {
-const enriched = { ...loc, type: "home" };
-
+const enriched = {
+...loc,
+accuracy: inferHomeAccuracy(loc),
+type: "home",
+};
 
 setHomeLocation(enriched);
 
@@ -306,7 +310,6 @@ const best = resolveBestLocation({
 setViewLocation(best);
 
 localStorage.setItem("homeLocation", JSON.stringify(enriched));
-
 
 };
 
