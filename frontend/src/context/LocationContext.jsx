@@ -31,7 +31,6 @@ return {
   streetNumber: get("street_number")?.long_name,
 };
 
-
 };
 
 /* ===============================
@@ -101,30 +100,6 @@ const res = await fetch(
 };
 
 /* ===============================
-🔥 HYBRID GEOCODER
-=============================== */
-
-const reverseGeocode = async (lat, lng) => {
-let g = await reverseGeocodeGoogle(lat, lng);
-
-if (!g?.streetNumber) {
-  const osm = await reverseGeocodeOSM(lat, lng);
-  if (osm) g = { ...g, ...osm, source: "hybrid" };
-}
-
-const label = [g?.suburb, g?.state, g?.postcode]
-  .filter(Boolean)
-  .join(", ");
-
-const result = { ...g, label: label || "Near you" };
-
-console.log("📍 FINAL GEOCODE:", result);
-
-return result;
-
-};
-
-/* ===============================
 🎯 SPECIFICITY
 =============================== */
 
@@ -140,6 +115,38 @@ return 0;
 };
 
 /* ===============================
+🔥 HYBRID GEOCODER (FIXED)
+=============================== */
+
+const reverseGeocode = async (lat, lng) => {
+let g = await reverseGeocodeGoogle(lat, lng);
+
+// 🔥 KEY FIX: use specificity trigger (not just streetNumber)
+if (specificityScore(g) < 90) {
+  const osm = await reverseGeocodeOSM(lat, lng);
+
+  if (osm) {
+    g = { ...g, ...osm, source: "hybrid" };
+  }
+}
+
+// 🔐 PRIVACY SAFE LABEL (NO STREET)
+const label = [g?.suburb, g?.state, g?.postcode]
+  .filter(Boolean)
+  .join(", ");
+
+const result = {
+  ...g,
+  label: label || "Near you",
+};
+
+console.log("📍 FINAL GEOCODE:", result);
+
+return result;
+
+};
+
+/* ===============================
 📏 ACCURACY MODEL
 =============================== */
 
@@ -150,10 +157,6 @@ if (loc.suburb) return 1000;
 if (loc.city) return 5000;
 return 10000;
 };
-
-/* ===============================
-🧠 COMBINED SCORE
-=============================== */
 
 const scoreLocation = (loc) => {
 if (!loc) return 0;
@@ -170,10 +173,6 @@ const accScore =
 return spec + accScore;
 
 };
-
-/* ===============================
-🧠 PRECISION LABEL
-=============================== */
 
 const getPrecisionLevel = (loc) => {
 if (!loc) return "unknown";
@@ -199,12 +198,10 @@ candidates.sort((a, b) => scoreLocation(b) - scoreLocation(a));
 const best = candidates[0];
 
 console.log("📊 LOCATION RESOLUTION:", {
-  candidates,
   selected: best,
-  score: scoreLocation(best),
-  specificity: specificityScore(best),
-  accuracy: best?.accuracy,
   precision: getPrecisionLevel(best),
+  accuracy: best?.accuracy,
+  specificity: specificityScore(best),
   source: best?.type,
 });
 
@@ -264,6 +261,8 @@ async (pos) => {
 const lat = pos.coords.latitude;
 const lng = pos.coords.longitude;
 
+    console.log("📡 GPS:", pos.coords);
+
     const geo = await reverseGeocode(lat, lng);
 
     const loc = {
@@ -310,6 +309,7 @@ const best = resolveBestLocation({
 setViewLocation(best);
 
 localStorage.setItem("homeLocation", JSON.stringify(enriched));
+
 
 };
 
