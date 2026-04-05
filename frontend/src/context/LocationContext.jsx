@@ -57,8 +57,6 @@ export function LocationProvider({ children }) {
 
       const parsed = parseAddress(best?.address_components || []);
 
-      console.log("🌍 GOOGLE:", parsed);
-
       return { ...parsed, lat, lng, source: "google" };
     } catch {
       return null;
@@ -78,7 +76,7 @@ export function LocationProvider({ children }) {
       const data = await res.json();
       const a = data.address || {};
 
-      const parsed = {
+      return {
         country: a.country,
         state: a.state,
         city: a.city || a.town,
@@ -86,11 +84,10 @@ export function LocationProvider({ children }) {
         postcode: a.postcode,
         street: a.road,
         streetNumber: a.house_number,
+        lat,
+        lng,
+        source: "osm",
       };
-
-      console.log("🌍 OSM:", parsed);
-
-      return { ...parsed, lat, lng, source: "osm" };
     } catch {
       return null;
     }
@@ -127,14 +124,10 @@ export function LocationProvider({ children }) {
       .filter(Boolean)
       .join(", ");
 
-    const result = {
+    return {
       ...g,
       label: label || "Near you",
     };
-
-    console.log("📍 FINAL GEOCODE:", result);
-
-    return result;
   };
 
   /* ===============================
@@ -171,12 +164,7 @@ export function LocationProvider({ children }) {
 
     const best = candidates[0];
 
-    console.log("📊 LOCATION RESOLUTION:", {
-      selected: best,
-      accuracy: best?.accuracy,
-      specificity: specificityScore(best),
-      source: best?.type,
-    });
+    console.log("📊 LOCATION RESOLUTION:", best);
 
     return best;
   };
@@ -223,7 +211,7 @@ export function LocationProvider({ children }) {
   }, []);
 
   /* ===============================
-     🚀 PRODUCTION GPS (WATCH MODE)
+     📡 LIVE GPS (UNCHANGED)
   =============================== */
 
   const enableLiveLocation = () => {
@@ -237,9 +225,6 @@ export function LocationProvider({ children }) {
         const lng = pos.coords.longitude;
         const accuracy = pos.coords.accuracy;
 
-        console.log("📡 GPS UPDATE:", pos.coords);
-
-        // ✅ Only accept better readings
         if (accuracy < bestAccuracy) {
           bestAccuracy = accuracy;
 
@@ -260,48 +245,63 @@ export function LocationProvider({ children }) {
           });
 
           setViewLocation(best);
-
-          console.log("✅ BEST LOCATION UPDATED:", loc);
         }
       },
-      (err) => console.warn("GPS ERROR:", err),
-      {
-        enableHighAccuracy: true,
-        maximumAge: 0,
-        timeout: 15000,
-      }
+      (err) => console.warn(err),
+      { enableHighAccuracy: true }
     );
 
-    // 🔋 Stop after 10s (production safe)
     setTimeout(() => {
       navigator.geolocation.clearWatch(watchId);
-      console.log("🛑 GPS WATCH STOPPED");
     }, 10000);
   };
 
   /* ===============================
-     🏠 SET HOME
+     🏠 NEW: HOME GPS (KEY FEATURE)
   =============================== */
 
-  const setHome = (loc) => {
-    const enriched = {
-      ...loc,
-      accuracy: inferHomeAccuracy(loc),
-      type: "home",
-    };
+  const enableHomeLocation = () => {
+    if (!navigator.geolocation) return;
 
-    setHomeLocation(enriched);
+    let bestAccuracy = Infinity;
 
-    const best = resolveBestLocation({
-      home: enriched,
-      live: liveLocation,
-      ip: ipLocation,
-    });
+    const watchId = navigator.geolocation.watchPosition(
+      async (pos) => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        const accuracy = pos.coords.accuracy;
 
-    setViewLocation(best);
+        if (accuracy < bestAccuracy) {
+          bestAccuracy = accuracy;
 
-    localStorage.setItem("homeLocation", JSON.stringify(enriched));
+          const geo = await reverseGeocode(lat, lng);
+
+          const loc = {
+            ...geo,
+            accuracy,
+            type: "home",
+          };
+
+          setHomeLocation(loc);
+          setViewLocation(loc);
+
+          localStorage.setItem("homeLocation", JSON.stringify(loc));
+
+          console.log("🏠 HOME SET:", loc);
+        }
+      },
+      (err) => console.warn(err),
+      { enableHighAccuracy: true }
+    );
+
+    setTimeout(() => {
+      navigator.geolocation.clearWatch(watchId);
+    }, 10000);
   };
+
+  /* ===============================
+     EXPORT
+  =============================== */
 
   return (
     <LocationContext.Provider
@@ -311,7 +311,8 @@ export function LocationProvider({ children }) {
         ipLocation,
         viewLocation,
         enableLiveLocation,
-        setHome,
+        enableHomeLocation, // 🔥 NEW
+        setViewLocation,
       }}
     >
       {children}
