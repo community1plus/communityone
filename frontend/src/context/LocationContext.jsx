@@ -6,12 +6,13 @@ export const useLocationContext = () => useContext(LocationContext);
 export function LocationProvider({ children }) {
 const [homeLocation, setHomeLocation] = useState(null);
 const [liveLocation, setLiveLocation] = useState(null);
+const [ipLocation, setIpLocation] = useState(null);
 const [viewLocation, setViewLocation] = useState(null);
 
 const GOOGLE_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
 /* ===============================
-🧠 PARSE GOOGLE ADDRESS LEVELS
+🧠 PARSE GOOGLE ADDRESS
 =============================== */
 
 const parseAddress = (components = []) => {
@@ -35,7 +36,7 @@ return {
 };
 
 /* ===============================
-🌍 REVERSE GEOCODE (FULL HIERARCHY)
+🌍 REVERSE GEOCODE
 =============================== */
 
 const reverseGeocode = async (lat, lng) => {
@@ -70,33 +71,40 @@ const res = await fetch(
 };
 
 /* ===============================
-🧠 CONFIDENCE ENGINE
+🔥 SPECIFICITY SCORING (CORE)
 =============================== */
 
-const confidenceScore = (type) => {
-switch (type) {
-case "live":
-return 100;
-case "home":
-return 80;
-case "ip":
-return 40;
-default:
+const specificityScore = (loc) => {
+if (!loc) return 0;
+
+
+if (loc.streetNumber && loc.street) return 100;
+if (loc.street) return 90;
+if (loc.suburb || loc.postcode) return 80;
+if (loc.city) return 60;
+if (loc.state) return 40;
+if (loc.country) return 20;
+
 return 0;
-}
+
+
 };
 
-const resolveBestLocation = (home, live) => {
-if (!home && !live) return null;
+/* ===============================
+🧠 RESOLVE BEST LOCATION
+=============================== */
+
+const resolveBestLocation = ({ home, live, ip }) => {
+const candidates = [live, ip, home].filter(Boolean);
 
 
-if (home && live) {
-  return confidenceScore(live.type) > confidenceScore(home.type)
-    ? live
-    : home;
-}
+if (candidates.length === 0) return null;
 
-return live || home;
+candidates.sort(
+  (a, b) => specificityScore(b) - specificityScore(a)
+);
+
+return candidates[0];
 
 
 };
@@ -107,35 +115,45 @@ return live || home;
 
 useEffect(() => {
 const initLocation = async () => {
-// ✅ 1. SAVED HOME
+// ✅ 1. LOAD HOME (fallback only)
 const saved = localStorage.getItem("homeLocation");
 
 
+  let home = null;
   if (saved) {
-    const loc = JSON.parse(saved);
-    setHomeLocation(loc);
-    setViewLocation(loc);
-    return;
+    home = JSON.parse(saved);
+    setHomeLocation(home);
   }
 
-  // ✅ 2. IP FALLBACK
+  // ✅ 2. IP LOCATION
+  let ip = null;
   try {
     const res = await fetch("https://ipapi.co/json/");
     const data = await res.json();
 
-    const loc = {
+    ip = {
       lat: data.latitude,
       lng: data.longitude,
+      city: data.city,
+      state: data.region_code,
+      country: data.country_name,
       label: `${data.city}, ${data.region_code}`,
       type: "ip",
-      confidence: confidenceScore("ip"),
     };
 
-    setHomeLocation(loc);
-    setViewLocation(loc);
+    setIpLocation(ip);
   } catch {
     console.error("IP location failed");
   }
+
+  // 🔥 RESOLVE BEST
+  const best = resolveBestLocation({
+    home,
+    live: null,
+    ip,
+  });
+
+  setViewLocation(best);
 };
 
 initLocation();
@@ -164,12 +182,16 @@ navigator.geolocation.getCurrentPosition(
       ...address,
       accuracy: pos.coords.accuracy,
       type: "live",
-      confidence: confidenceScore("live"),
     };
 
     setLiveLocation(loc);
 
-    const best = resolveBestLocation(homeLocation, loc);
+    const best = resolveBestLocation({
+      home: homeLocation,
+      live: loc,
+      ip: ipLocation,
+    });
+
     setViewLocation(best);
 
     console.log("📍 LIVE LOCATION:", loc);
@@ -188,22 +210,28 @@ navigator.geolocation.getCurrentPosition(
 };
 
 /* ===============================
-🏠 SET HOME LOCATION
+🏠 SET HOME (FALLBACK ONLY)
 =============================== */
 
 const setHome = (loc) => {
 const enriched = {
 ...loc,
 type: "home",
-confidence: confidenceScore("home"),
 };
+
 
 setHomeLocation(enriched);
 
-const best = resolveBestLocation(enriched, liveLocation);
+const best = resolveBestLocation({
+  home: enriched,
+  live: liveLocation,
+  ip: ipLocation,
+});
+
 setViewLocation(best);
 
 localStorage.setItem("homeLocation", JSON.stringify(enriched));
+
 
 };
 
@@ -216,6 +244,7 @@ return (
 value={{
 homeLocation,
 liveLocation,
+ipLocation,
 viewLocation,
 setViewLocation,
 enableLiveLocation,
