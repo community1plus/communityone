@@ -1,6 +1,6 @@
 // scripts/enqueueTiles.js
 
-import { generateTiles } from "../../services/tileGenerator.js";
+import { generateTiles } from "../services/tileGenerator.js";
 import { enqueueIngest } from "../services/ingest.js";
 
 const MELBOURNE = {
@@ -11,19 +11,25 @@ const MELBOURNE = {
 };
 
 async function run() {
-  const tiles = generateTiles(MELBOURNE, 0.2);
+  const tiles = generateTiles(MELBOURNE, 0.02);
 
   console.log(`🧱 Generated tiles: ${tiles.length}`);
 
   for (const [i, tile] of tiles.entries()) {
-  await enqueueIngest({ lat: tile.lat, lng: tile.lng, source: "google" });
-  await enqueueIngest({ lat: tile.lat, lng: tile.lng, source: "osm" });
+    await enqueueIngest({
+      lat: tile.lat,
+      lng: tile.lng,
+      source: "google"
+    });
 
-  if (i % 20 === 0) {
-    console.log(`⏳ queued ${i} tiles`);
-    await new Promise((r) => setTimeout(r, 2000)); // throttle
+    // 🔥 Disable OSM for now
+    // await enqueueIngest({ lat: tile.lat, lng: tile.lng, source: "osm" });
+
+    if (i > 0 && i % 20 === 0) {
+      console.log(`⏳ queued ${i} tiles`);
+      await new Promise((r) => setTimeout(r, 2000));
+    }
   }
-}
 
   console.log("✅ All tiles enqueued");
 }

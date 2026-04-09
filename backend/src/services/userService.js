@@ -1,4 +1,4 @@
-import { pool } from "../db/index.js";
+import { pool } from "../../db/index.js";
 
 export async function getOrCreateUserWithProfile(sub, email) {
   const client = await pool.connect();
