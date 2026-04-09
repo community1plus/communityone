@@ -1,17 +1,33 @@
 import axios from "axios";
 import { pool } from "../db/db.js";
+import { ingestQueue } from "../queue/ingestQueue.js";
+import { dedupQueue } from "../queue/dedupQueue.js";
+
+
 
 /* =====================================================
    CONFIG
 ===================================================== */
 
 const GOOGLE_KEY = process.env.GOOGLE_PLACES_API_KEY;
-const BATCH_SIZE = 100; // 🔥 now safe to increase
+const BATCH_SIZE = 100;
 
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
 /* =====================================================
-   🔥 BULK UPSERT (CORE ENGINE)
+   NORMALIZE
+===================================================== */
+
+function normalizeName(name) {
+  return name
+    ?.toLowerCase()
+    .replace(/[^a-z0-9 ]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/* =====================================================
+   🔥 BULK UPSERT (RAW INGEST ONLY)
 ===================================================== */
 
 async function bulkUpsertBusinesses(businesses) {
@@ -21,17 +37,18 @@ async function bulkUpsertBusinesses(businesses) {
   const placeholders = [];
 
   businesses.forEach((biz, i) => {
-    const idx = i * 8;
+    const idx = i * 9;
 
     placeholders.push(`
       ($${idx + 1}, $${idx + 2}, $${idx + 3}, $${idx + 4},
        $${idx + 5}, $${idx + 6},
        ST_SetSRID(ST_MakePoint($${idx + 6}, $${idx + 5}), 4326),
-       $${idx + 7}, $${idx + 8})
+       $${idx + 7}, $${idx + 8}, $${idx + 9})
     `);
 
     values.push(
       biz.name,
+      biz.normalized_name,
       biz.category,
       biz.address,
       biz.rating,
@@ -43,13 +60,13 @@ async function bulkUpsertBusinesses(businesses) {
   });
 
   const query = `
-    INSERT INTO businesses
-    (name, category, address, rating, lat, lng, location, source, external_id)
+    INSERT INTO businesses_raw
+    (name, normalized_name, category, address, rating, lat, lng, location, source, external_id)
     VALUES ${placeholders.join(",")}
     ON CONFLICT (source, external_id)
     DO UPDATE SET
       name = EXCLUDED.name,
-      rating = EXCLUDED.rating,
+      rating = GREATEST(businesses_raw.rating, EXCLUDED.rating),
       updated_at = NOW()
   `;
 
@@ -61,7 +78,17 @@ async function bulkUpsertBusinesses(businesses) {
 }
 
 /* =====================================================
-   GOOGLE PLACES INGEST (🔥 BULK)
+DEDUP
+===================================================== */
+await dedupQueue.add("dedupe-business", {
+  name: biz.name,
+  normalized_name: biz.normalized_name,
+  lat: biz.lat,
+  lng: biz.lng
+});
+
+/* =====================================================
+   GOOGLE INGEST
 ===================================================== */
 
 export async function ingestGoogle({ lat, lng, radius = 2000, type = "restaurant" }) {
@@ -84,6 +111,7 @@ export async function ingestGoogle({ lat, lng, radius = 2000, type = "restaurant
 
     const businesses = places.map((p) => ({
       name: p.name,
+      normalized_name: normalizeName(p.name),
       category: type,
       address: p.vicinity,
       rating: p.rating || 0,
@@ -93,7 +121,6 @@ export async function ingestGoogle({ lat, lng, radius = 2000, type = "restaurant
       external_id: p.place_id
     }));
 
-    // 🔥 BULK INSERT IN CHUNKS
     for (let i = 0; i < businesses.length; i += BATCH_SIZE) {
       const chunk = businesses.slice(i, i + BATCH_SIZE);
       await bulkUpsertBusinesses(chunk);
@@ -107,7 +134,7 @@ export async function ingestGoogle({ lat, lng, radius = 2000, type = "restaurant
 }
 
 /* =====================================================
-   OSM INGEST (🔥 BULK + SAFE)
+   OSM INGEST
 ===================================================== */
 
 export async function ingestOSM({ lat, lng }) {
@@ -136,6 +163,7 @@ export async function ingestOSM({ lat, lng }) {
 
     const businesses = nodes.map((n) => ({
       name: n.tags?.name || "Unknown",
+      normalized_name: normalizeName(n.tags?.name || "unknown"),
       category: n.tags?.amenity || "other",
       address: "OSM location",
       rating: 0,
@@ -145,7 +173,6 @@ export async function ingestOSM({ lat, lng }) {
       external_id: `osm_${n.id}`
     }));
 
-    // 🔥 BULK INSERT IN CHUNKS
     for (let i = 0; i < businesses.length; i += BATCH_SIZE) {
       const chunk = businesses.slice(i, i + BATCH_SIZE);
       await bulkUpsertBusinesses(chunk);
@@ -154,6 +181,21 @@ export async function ingestOSM({ lat, lng }) {
     console.log(`✅ OSM ingested: ${businesses.length}`);
 
   } catch (err) {
-    console.log("⚠️ OSM failed, skipping:", err.response?.status || err.message);
+    console.log("⚠️ OSM failed:", err.response?.status || err.message);
   }
+}
+
+/* =====================================================
+   🔥 ENQUEUE INGEST (NEW ENTRY POINT)
+===================================================== */
+
+export async function enqueueIngest({ lat, lng, source }) {
+  await ingestQueue.add(
+    "ingest-tile",
+    { lat, lng, source },
+    {
+      jobId: `${lat}-${lng}-${source}`, // prevents duplicate jobs
+      removeOnComplete: true
+    }
+  );
 }
