@@ -1,9 +1,7 @@
 import axios from "axios";
 import { pool } from "../db/db.js";
-import { ingestQueue } from "../queue/ingestQueue.js";
-import { dedupQueue } from "../queue/dedupQueue.js";
-
-
+import { ingestQueue } from "../../queue/ingestQueue.js";
+import { dedupQueue } from "../../queue/dedupQueue.js";
 
 /* =====================================================
    CONFIG
@@ -11,8 +9,6 @@ import { dedupQueue } from "../queue/dedupQueue.js";
 
 const GOOGLE_KEY = process.env.GOOGLE_PLACES_API_KEY;
 const BATCH_SIZE = 100;
-
-const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
 /* =====================================================
    NORMALIZE
@@ -27,7 +23,7 @@ function normalizeName(name) {
 }
 
 /* =====================================================
-   🔥 BULK UPSERT (RAW INGEST ONLY)
+   🔥 BULK UPSERT
 ===================================================== */
 
 async function bulkUpsertBusinesses(businesses) {
@@ -78,21 +74,10 @@ async function bulkUpsertBusinesses(businesses) {
 }
 
 /* =====================================================
-DEDUP
-===================================================== */
-await dedupQueue.add("dedupe-business", {
-  name: biz.name,
-  normalized_name: biz.normalized_name,
-  lat: biz.lat,
-  lng: biz.lng
-});
-
-/* =====================================================
    GOOGLE INGEST
 ===================================================== */
 
 export async function ingestGoogle({ lat, lng, radius = 2000, type = "restaurant" }) {
-
   const url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json";
 
   try {
@@ -121,12 +106,24 @@ export async function ingestGoogle({ lat, lng, radius = 2000, type = "restaurant
       external_id: p.place_id
     }));
 
+    // 🔥 BULK INSERT
     for (let i = 0; i < businesses.length; i += BATCH_SIZE) {
       const chunk = businesses.slice(i, i + BATCH_SIZE);
       await bulkUpsertBusinesses(chunk);
     }
 
     console.log(`✅ Google ingested: ${businesses.length}`);
+
+    // 🔥 ENQUEUE DEDUP (FIXED)
+    await Promise.all(
+      businesses.map((biz) =>
+        dedupQueue.add("dedupe-business", {
+          normalized_name: biz.normalized_name,
+          lat: biz.lat,
+          lng: biz.lng
+        })
+      )
+    );
 
   } catch (err) {
     console.error("❌ Google ingest failed:", err.message);
@@ -138,7 +135,6 @@ export async function ingestGoogle({ lat, lng, radius = 2000, type = "restaurant
 ===================================================== */
 
 export async function ingestOSM({ lat, lng }) {
-
   const query = `
     [out:json][timeout:25];
     (
@@ -173,6 +169,7 @@ export async function ingestOSM({ lat, lng }) {
       external_id: `osm_${n.id}`
     }));
 
+    // 🔥 BULK INSERT
     for (let i = 0; i < businesses.length; i += BATCH_SIZE) {
       const chunk = businesses.slice(i, i + BATCH_SIZE);
       await bulkUpsertBusinesses(chunk);
@@ -180,13 +177,24 @@ export async function ingestOSM({ lat, lng }) {
 
     console.log(`✅ OSM ingested: ${businesses.length}`);
 
+    // 🔥 ENQUEUE DEDUP (FIXED)
+    await Promise.all(
+      businesses.map((biz) =>
+        dedupQueue.add("dedupe-business", {
+          normalized_name: biz.normalized_name,
+          lat: biz.lat,
+          lng: biz.lng
+        })
+      )
+    );
+
   } catch (err) {
     console.log("⚠️ OSM failed:", err.response?.status || err.message);
   }
 }
 
 /* =====================================================
-   🔥 ENQUEUE INGEST (NEW ENTRY POINT)
+   ENQUEUE INGEST
 ===================================================== */
 
 export async function enqueueIngest({ lat, lng, source }) {
@@ -194,7 +202,7 @@ export async function enqueueIngest({ lat, lng, source }) {
     "ingest-tile",
     { lat, lng, source },
     {
-      jobId: `${lat}-${lng}-${source}`, // prevents duplicate jobs
+      jobId: `${lat}-${lng}-${source}`,
       removeOnComplete: true
     }
   );

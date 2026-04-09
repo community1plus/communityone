@@ -1,7 +1,7 @@
 // workers/ingestWorker.js
 import { Worker } from "bullmq";
 import { connection } from "../queue/connection.js";
-import { ingestGoogle, ingestOSM } from "../services/ingest.js";
+import { ingestGoogle, ingestOSM } from "../src/services/ingest.js";
 
 const worker = new Worker(
   "ingest",
