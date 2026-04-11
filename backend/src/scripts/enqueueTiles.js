@@ -1,6 +1,6 @@
 // scripts/enqueueTiles.js
 
-import { generateTiles } from "../services/tileGenerator.js";
+import { generateTiles } from ".. /services/tileGenerator.js";
 import { enqueueIngest } from "../services/ingest.js";
 
 const MELBOURNE = {
