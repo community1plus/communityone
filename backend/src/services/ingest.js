@@ -10,6 +10,9 @@ import { dedupQueue } from "../../queue/dedupQueue.js";
 const GOOGLE_KEY = process.env.GOOGLE_PLACES_API_KEY;
 const BATCH_SIZE = 100;
 
+// 🔥 expand coverage
+const GOOGLE_TYPES = ["restaurant", "cafe", "bar", "store"];
+
 /* =====================================================
    NORMALIZE
 ===================================================== */
@@ -20,6 +23,25 @@ function normalizeName(name) {
     .replace(/[^a-z0-9 ]/g, "")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+/* =====================================================
+   TILE GENERATOR (CRITICAL UPGRADE)
+===================================================== */
+
+export function generateTiles(center, step = 0.01, radius = 2) {
+  const tiles = [];
+
+  for (let i = -radius; i <= radius; i++) {
+    for (let j = -radius; j <= radius; j++) {
+      tiles.push({
+        lat: center.lat + i * step,
+        lng: center.lng + j * step
+      });
+    }
+  }
+
+  return tiles;
 }
 
 /* =====================================================
@@ -74,56 +96,61 @@ async function bulkUpsertBusinesses(businesses) {
 }
 
 /* =====================================================
-   GOOGLE INGEST
+   GOOGLE INGEST (MULTI-TYPE)
 ===================================================== */
 
-export async function ingestGoogle({ lat, lng, radius = 2000, type = "restaurant" }) {
-  const url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json";
+export async function ingestGoogle({ lat, lng }) {
+
+  console.log(`📍 Google ingest tile: ${lat}, ${lng}`);
 
   try {
-    const res = await axios.get(url, {
-      params: {
-        location: `${lat},${lng}`,
-        radius,
-        type,
-        key: GOOGLE_KEY
-      }
-    });
+    let allBusinesses = [];
 
-    const places = res.data.results || [];
+    for (const type of GOOGLE_TYPES) {
+      const res = await axios.get(
+        "https://maps.googleapis.com/maps/api/place/nearbysearch/json",
+        {
+          params: {
+            location: `${lat},${lng}`,
+            radius: 2000,
+            type,
+            key: GOOGLE_KEY
+          }
+        }
+      );
 
-    console.log(`📍 Google fetched: ${places.length}`);
+      const places = res.data.results || [];
 
-    const businesses = places.map((p) => ({
-      name: p.name,
-      normalized_name: normalizeName(p.name),
-      category: type,
-      address: p.vicinity,
-      rating: p.rating || 0,
-      lat: p.geometry.location.lat,
-      lng: p.geometry.location.lng,
-      source: "google",
-      external_id: p.place_id
-    }));
+      console.log(`📍 Google ${type}: ${places.length}`);
+
+      const businesses = places
+        .map((p) => ({
+          name: p.name,
+          normalized_name: normalizeName(p.name),
+          category: type,
+          address: p.vicinity,
+          rating: p.rating || 0,
+          lat: p.geometry.location.lat,
+          lng: p.geometry.location.lng,
+          source: "google",
+          external_id: p.place_id
+        }))
+        // 🔥 filter junk
+        .filter((b) => b.name && b.name !== "Unknown");
+
+      allBusinesses.push(...businesses);
+    }
+
+    console.log(`✅ Google total: ${allBusinesses.length}`);
 
     // 🔥 BULK INSERT
-    for (let i = 0; i < businesses.length; i += BATCH_SIZE) {
-      const chunk = businesses.slice(i, i + BATCH_SIZE);
+    for (let i = 0; i < allBusinesses.length; i += BATCH_SIZE) {
+      const chunk = allBusinesses.slice(i, i + BATCH_SIZE);
       await bulkUpsertBusinesses(chunk);
     }
 
-    console.log(`✅ Google ingested: ${businesses.length}`);
-
-    // 🔥 ENQUEUE DEDUP (FIXED)
-    await Promise.all(
-      businesses.map((biz) =>
-        dedupQueue.add("dedupe-business", {
-          normalized_name: biz.normalized_name,
-          lat: biz.lat,
-          lng: biz.lng
-        })
-      )
-    );
+    // 🔥 TILE-LEVEL DEDUP (CRITICAL CHANGE)
+    await dedupQueue.add("dedupe-tile", { lat, lng });
 
   } catch (err) {
     console.error("❌ Google ingest failed:", err.message);
@@ -135,10 +162,14 @@ export async function ingestGoogle({ lat, lng, radius = 2000, type = "restaurant
 ===================================================== */
 
 export async function ingestOSM({ lat, lng }) {
+
+  console.log(`🌍 OSM ingest tile: ${lat}, ${lng}`);
+
   const query = `
     [out:json][timeout:25];
     (
       node["amenity"](around:800,${lat},${lng});
+      node["shop"](around:800,${lat},${lng});
     );
     out;
   `;
@@ -157,17 +188,22 @@ export async function ingestOSM({ lat, lng }) {
 
     console.log(`🌍 OSM fetched: ${nodes.length}`);
 
-    const businesses = nodes.map((n) => ({
-      name: n.tags?.name || "Unknown",
-      normalized_name: normalizeName(n.tags?.name || "unknown"),
-      category: n.tags?.amenity || "other",
-      address: "OSM location",
-      rating: 0,
-      lat: n.lat,
-      lng: n.lon,
-      source: "osm",
-      external_id: `osm_${n.id}`
-    }));
+    const businesses = nodes
+      .map((n) => ({
+        name: n.tags?.name || "Unknown",
+        normalized_name: normalizeName(n.tags?.name || "unknown"),
+        category: n.tags?.amenity || n.tags?.shop || "other",
+        address: "OSM location",
+        rating: 0,
+        lat: n.lat,
+        lng: n.lon,
+        source: "osm",
+        external_id: `osm_${n.id}`
+      }))
+      // 🔥 filter junk
+      .filter((b) => b.name && b.name !== "Unknown");
+
+    console.log(`✅ OSM valid: ${businesses.length}`);
 
     // 🔥 BULK INSERT
     for (let i = 0; i < businesses.length; i += BATCH_SIZE) {
@@ -175,18 +211,8 @@ export async function ingestOSM({ lat, lng }) {
       await bulkUpsertBusinesses(chunk);
     }
 
-    console.log(`✅ OSM ingested: ${businesses.length}`);
-
-    // 🔥 ENQUEUE DEDUP (FIXED)
-    await Promise.all(
-      businesses.map((biz) =>
-        dedupQueue.add("dedupe-business", {
-          normalized_name: biz.normalized_name,
-          lat: biz.lat,
-          lng: biz.lng
-        })
-      )
-    );
+    // 🔥 TILE-LEVEL DEDUP
+    await dedupQueue.add("dedupe-tile", { lat, lng });
 
   } catch (err) {
     console.log("⚠️ OSM failed:", err.response?.status || err.message);
@@ -194,10 +220,13 @@ export async function ingestOSM({ lat, lng }) {
 }
 
 /* =====================================================
-   ENQUEUE INGEST
+   ENQUEUE INGEST (UNCHANGED BUT LOGGING ADDED)
 ===================================================== */
 
 export async function enqueueIngest({ lat, lng, source }) {
+
+  console.log(`🚀 Enqueue: ${lat}, ${lng}, ${source}`);
+
   await ingestQueue.add(
     "ingest-tile",
     { lat, lng, source },
