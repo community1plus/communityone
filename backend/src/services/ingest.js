@@ -10,7 +10,6 @@ import { dedupQueue } from "../../queue/dedupQueue.js";
 const GOOGLE_KEY = process.env.GOOGLE_PLACES_API_KEY;
 const BATCH_SIZE = 100;
 
-// 🔥 expand coverage
 const GOOGLE_TYPES = ["restaurant", "cafe", "bar", "store"];
 
 /* =====================================================
@@ -26,7 +25,7 @@ function normalizeName(name) {
 }
 
 /* =====================================================
-   TILE GENERATOR (CRITICAL UPGRADE)
+   TILE GENERATOR
 ===================================================== */
 
 export function generateTiles(center, step = 0.01, radius = 2) {
@@ -45,7 +44,7 @@ export function generateTiles(center, step = 0.01, radius = 2) {
 }
 
 /* =====================================================
-   🔥 BULK UPSERT
+   🔥 BULK UPSERT (FINAL FIXED)
 ===================================================== */
 
 async function bulkUpsertBusinesses(businesses) {
@@ -55,13 +54,13 @@ async function bulkUpsertBusinesses(businesses) {
   const placeholders = [];
 
   businesses.forEach((biz, i) => {
-    const idx = i * 9;
+    const idx = i * 9; // ✅ correct
 
     placeholders.push(`
       ($${idx + 1}, $${idx + 2}, $${idx + 3}, $${idx + 4},
-       $${idx + 5}, $${idx + 6},
-       ST_SetSRID(ST_MakePoint($${idx + 6}, $${idx + 5}), 4326),
-       $${idx + 7}, $${idx + 8}, $${idx + 9})
+       $${idx + 5}, $${idx + 6}, $${idx + 7},
+       ST_SetSRID(ST_MakePoint($${idx + 7}, $${idx + 6}), 4326),
+       $${idx + 8}, $${idx + 9})
     `);
 
     values.push(
@@ -91,12 +90,12 @@ async function bulkUpsertBusinesses(businesses) {
   try {
     await pool.query(query, values);
   } catch (err) {
-    console.error("❌ bulk upsert error:", err.message);
+    console.error("❌ bulk upsert error:", err.stack); // 🔥 full debug
   }
 }
 
 /* =====================================================
-   GOOGLE INGEST (MULTI-TYPE)
+   GOOGLE INGEST
 ===================================================== */
 
 export async function ingestGoogle({ lat, lng }) {
@@ -112,7 +111,7 @@ export async function ingestGoogle({ lat, lng }) {
         {
           params: {
             location: `${lat},${lng}`,
-            radius: 2000,
+            radius: 3000,
             type,
             key: GOOGLE_KEY
           }
@@ -135,7 +134,6 @@ export async function ingestGoogle({ lat, lng }) {
           source: "google",
           external_id: p.place_id
         }))
-        // 🔥 filter junk
         .filter((b) => b.name && b.name !== "Unknown");
 
       allBusinesses.push(...businesses);
@@ -143,13 +141,11 @@ export async function ingestGoogle({ lat, lng }) {
 
     console.log(`✅ Google total: ${allBusinesses.length}`);
 
-    // 🔥 BULK INSERT
     for (let i = 0; i < allBusinesses.length; i += BATCH_SIZE) {
       const chunk = allBusinesses.slice(i, i + BATCH_SIZE);
       await bulkUpsertBusinesses(chunk);
     }
 
-    // 🔥 TILE-LEVEL DEDUP (CRITICAL CHANGE)
     await dedupQueue.add("dedupe-tile", { lat, lng });
 
   } catch (err) {
@@ -200,18 +196,15 @@ export async function ingestOSM({ lat, lng }) {
         source: "osm",
         external_id: `osm_${n.id}`
       }))
-      // 🔥 filter junk
       .filter((b) => b.name && b.name !== "Unknown");
 
     console.log(`✅ OSM valid: ${businesses.length}`);
 
-    // 🔥 BULK INSERT
     for (let i = 0; i < businesses.length; i += BATCH_SIZE) {
       const chunk = businesses.slice(i, i + BATCH_SIZE);
       await bulkUpsertBusinesses(chunk);
     }
 
-    // 🔥 TILE-LEVEL DEDUP
     await dedupQueue.add("dedupe-tile", { lat, lng });
 
   } catch (err) {
@@ -220,7 +213,7 @@ export async function ingestOSM({ lat, lng }) {
 }
 
 /* =====================================================
-   ENQUEUE INGEST (UNCHANGED BUT LOGGING ADDED)
+   ENQUEUE INGEST
 ===================================================== */
 
 export async function enqueueIngest({ lat, lng, source }) {
