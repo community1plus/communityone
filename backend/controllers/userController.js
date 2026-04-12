@@ -1,4 +1,4 @@
-import { getOrCreateUserWithProfile } from "../services/userService.js";
+import { getOrCreateUserWithProfile } from "../src/services/userService.js";
 
 export async function getMe(req, res) {
   try {
