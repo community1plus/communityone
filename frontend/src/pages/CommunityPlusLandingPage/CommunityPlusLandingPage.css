@@ -34,9 +34,9 @@ HEADLINE + ECHO
 .headline-row {
   display: grid;
   grid-template-columns: 1fr 140px;
-  align-items: center; /* 🔥 perfect vertical alignment */
+  align-items: center;
   gap: 40px;
-  margin-bottom: 50px;
+  margin-bottom: 60px; /* 🔥 more breathing room */
 }
 
 .headline-text {
@@ -70,7 +70,7 @@ HEADLINE + ECHO
 }
 
 /* =========================
-ECHO
+ECHO (PERFECT CENTERING)
 ========================= */
 
 .echo-inline {
@@ -80,17 +80,17 @@ ECHO
   justify-content: center;
   cursor: pointer;
   position: relative;
+
+  transform: translateY(8px); /* 🔥 visual centering fix */
 }
 
 .echo-inline img {
   width: 100%;
   display: block;
-
-  /* soften white background effect */
   mix-blend-mode: multiply;
 }
 
-/* pulse */
+/* Pulse */
 
 .echo-pulse {
   position: absolute;
@@ -102,7 +102,7 @@ ECHO
   border-radius: 50%;
 
   background: radial-gradient(
-    rgba(182, 58, 43, 0.5),
+    rgba(182, 58, 43, 0.45),
     rgba(182, 58, 43, 0.1),
     transparent
   );
@@ -113,7 +113,7 @@ ECHO
 @keyframes echoPulse {
   0% {
     transform: translate(-50%, -50%) scale(0.7);
-    opacity: 0.8;
+    opacity: 0.7;
   }
   100% {
     transform: translate(-50%, -50%) scale(1.7);
@@ -127,8 +127,8 @@ CONTENT LAYOUT
 
 .content-section {
   display: grid;
-  grid-template-columns: 1.2fr 320px; /* 🔥 fixed feed column */
-  gap: 40px;
+  grid-template-columns: 1.2fr 300px; /* tighter feed column */
+  gap: 30px;
   align-items: stretch;
 }
 
@@ -142,7 +142,7 @@ MAP
   overflow: hidden;
 
   border: 1px solid rgba(0,0,0,0.1);
-  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
 }
 
 .map-box iframe {
@@ -152,15 +152,16 @@ MAP
 }
 
 /* =========================
-FEED
+FEED (PERFECT DISTRIBUTION)
 ========================= */
 
 .feed {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
 
-  height: 320px; /* 🔥 EXACTLY matches map height */
+  height: 320px;
+
+  justify-content: space-between; /* 🔥 exact top-bottom alignment */
 }
 
 /* =========================
@@ -168,12 +169,12 @@ FEED CARDS
 ========================= */
 
 .feed-card {
-  width: 100%; /* 🔥 aligned stack */
+  width: 100%;
 
-  padding: 14px 16px;
-  border-radius: 16px;
+  padding: 12px 14px;
+  border-radius: 18px;
 
-  background: rgba(255,255,255,0.65);
+  background: rgba(255,255,255,0.6);
 
   border: 1px solid rgba(0,0,0,0.08);
 
@@ -185,8 +186,8 @@ FEED CARDS
 }
 
 .feed-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.12);
 }
 
 /* TEXT */
@@ -194,7 +195,7 @@ FEED CARDS
 .feed-title {
   font-weight: 700;
   font-size: 14px;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 .feed-meta {
@@ -227,5 +228,6 @@ RESPONSIVE
 
   .echo-inline {
     margin: 0 auto;
+    transform: none;
   }
 }
