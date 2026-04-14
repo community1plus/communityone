@@ -1,17 +1,29 @@
 import React, { useEffect, useState } from "react";
 import "./CommunityPlusLandingPage.css";
 
-import { signInWithRedirect, getCurrentUser } from "aws-amplify/auth";
+import {
+  signIn,
+  signUp,
+  signInWithRedirect,
+  getCurrentUser
+} from "aws-amplify/auth";
 
 export default function CommunityPlusLandingPage() {
   const [showAuth, setShowAuth] = useState(false);
   const [authLoading, setAuthLoading] = useState(false);
+  const [authError, setAuthError] = useState("");
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   useEffect(() => {
     document.body.classList.toggle("modal-open", showAuth);
   }, [showAuth]);
 
-  const safeRedirect = async (provider) => {
+  /* ===============================
+     SAFE LOGIN ENTRY
+  =============================== */
+  const handleEntry = async () => {
     try {
       const user = await getCurrentUser();
       if (user) {
@@ -20,13 +32,40 @@ export default function CommunityPlusLandingPage() {
       }
     } catch {}
 
-    setAuthLoading(true);
-    setShowAuth(false);
+    setShowAuth(true);
+  };
 
-    if (provider) {
-      signInWithRedirect({ provider });
-    } else {
-      signInWithRedirect();
+  /* ===============================
+     EMAIL LOGIN (NO REDIRECT)
+  =============================== */
+  const handleEmailLogin = async () => {
+    setAuthLoading(true);
+    setAuthError("");
+
+    try {
+      await signIn({
+        username: email,
+        password: password
+      });
+
+      window.location.href = "/home";
+    } catch (err) {
+      setAuthError(err.message || "Login failed");
+      setAuthLoading(false);
+    }
+  };
+
+  /* ===============================
+     SOCIAL LOGIN (OPTIONAL REDIRECT)
+  =============================== */
+  const handleSocial = async (provider) => {
+    setAuthLoading(true);
+
+    try {
+      await signInWithRedirect({ provider });
+    } catch (err) {
+      setAuthError("Social login failed");
+      setAuthLoading(false);
     }
   };
 
@@ -42,7 +81,6 @@ export default function CommunityPlusLandingPage() {
         ========================= */}
         <div className="headline-row">
 
-          {/* TEXT */}
           <div className="headline-text">
             <h1 className="tagline">
               Real People. <span className="accent">Real News.</span> Real Time
@@ -52,19 +90,13 @@ export default function CommunityPlusLandingPage() {
               A map-first local feed that prioritises what’s happening <b>here</b>.
             </p>
 
-            <button
-              className="btn primary"
-              onClick={() => setShowAuth(true)}
-            >
+            <button className="btn primary" onClick={handleEntry}>
               Explore your local area
             </button>
           </div>
 
-          {/* ECHO */}
-          <div
-            className="echo-inline"
-            onClick={() => safeRedirect()}   // 🔥 direct login trigger
-          >
+          {/* 🔥 ECHO = ENTRY */}
+          <div className="echo-inline" onClick={handleEntry}>
             <img src="/logo/echo.png" alt="Echo" />
             <div className="echo-pulse"></div>
           </div>
@@ -76,7 +108,6 @@ export default function CommunityPlusLandingPage() {
         ========================= */}
         <div className="content-section">
 
-          {/* MAP */}
           <div className="map-box">
             <iframe
               title="St Kilda Map"
@@ -85,7 +116,6 @@ export default function CommunityPlusLandingPage() {
             />
           </div>
 
-          {/* FEED */}
           <div className="feed">
 
             <div className="feed-card">
@@ -109,14 +139,11 @@ export default function CommunityPlusLandingPage() {
 
       </main>
 
-      {/* AUTH MODAL */}
+      {/* =========================
+          AUTH MODAL (UNIFIED)
+      ========================= */}
       {showAuth && (
-        <div
-          className="cpl-modalOverlay"
-          onMouseDown={(e) => {
-            if (e.target === e.currentTarget) setShowAuth(false);
-          }}
-        >
+        <div className="cpl-modalOverlay">
           <div className="cpl-modal elite">
 
             <div className="cpl-modalHeader">
@@ -135,29 +162,45 @@ export default function CommunityPlusLandingPage() {
                 Sign in to your local community
               </div>
 
+              {/* EMAIL INPUT */}
+              <input
+                className="auth-input"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+
+              <input
+                className="auth-input"
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+
+              <button className="auth-btn email" onClick={handleEmailLogin}>
+                Sign in with Email
+              </button>
+
+              {authError && (
+                <div className="auth-error">{authError}</div>
+              )}
+
+              <div className="auth-divider"><span>or</span></div>
+
+              {/* SOCIAL */}
               <button
                 className="auth-btn google"
-                onClick={() => safeRedirect("Google")}
+                onClick={() => handleSocial("Google")}
               >
                 Continue with Google
               </button>
 
               <button
                 className="auth-btn facebook"
-                onClick={() => safeRedirect("Facebook")}
+                onClick={() => handleSocial("Facebook")}
               >
                 Continue with Facebook
-              </button>
-
-              <div className="auth-divider">
-                <span>or</span>
-              </div>
-
-              <button
-                className="auth-btn email"
-                onClick={() => safeRedirect()}
-              >
-                Continue with Email
               </button>
 
             </div>
@@ -165,6 +208,7 @@ export default function CommunityPlusLandingPage() {
         </div>
       )}
 
+      {/* LOADING */}
       {authLoading && (
         <div className="auth-loading-overlay">
           <div className="auth-loading-box">
