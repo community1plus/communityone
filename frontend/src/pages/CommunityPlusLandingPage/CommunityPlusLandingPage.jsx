@@ -35,90 +35,68 @@ export default function CommunityPlusLandingPage() {
 
       <main className="main-full">
 
-        {/* 🔥 APP TITLE */}
+        {/* TITLE */}
         <div className="app-title">COMMUNITY ONE</div>
 
-        <section className="layout-full">
+        {/* =========================
+            RIGHT PANEL (NOW MAIN CONTENT)
+        ========================= */}
+        <section className="right-panel">
 
-          {/* =========================
-              LEFT PANEL
-          ========================= */}
-          <div className="left-panel">
+          {/* TOP ROW: ECHO + MAP */}
+          <div className="top-row">
 
-            <div className="headline-row">
+            {/* 🔥 ECHO LEFT OF MAP */}
+            <div
+              className="echo-inline"
+              onClick={() => setShowAuth(true)}
+            >
+              <img src="/logo/echo.png" alt="Echo" />
+              <div className="echo-pulse"></div>
+            </div>
 
-              {/* TEXT BLOCK */}
-              <div className="headline-text">
-                <h1 className="tagline">
-                  Real People.{" "}
-                  <span className="accent">Real News.</span>{" "}
-                  Real Time
-                </h1>
-
-                <p className="sub">
-                  A map-first local feed that prioritises what’s happening{" "}
-                  <b>here</b>.
-                </p>
-
-                <button
-                  className="btn primary"
-                  onClick={() => setShowAuth(true)}
-                >
-                  Explore your local area
-                </button>
-              </div>
-
-              {/* 🔥 ECHO (RIGHT OF TEXT) */}
-              <div
-                className="echo-inline"
-                onClick={() => setShowAuth(true)}
-              >
-                <img src="/logo/echo.png" alt="Echo" />
-                <div className="echo-pulse"></div>
-              </div>
-
+            {/* 🔥 REAL MAP (ST KILDA) */}
+            <div className="map-box">
+              <iframe
+                title="St Kilda Map"
+                src="https://www.google.com/maps?q=St+Kilda+Melbourne&output=embed"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
             </div>
 
           </div>
 
           {/* =========================
-              RIGHT PANEL
+              FEED (STACKED CARDS)
           ========================= */}
-          <div className="right-panel">
+          <div className="feed">
 
-            <div className="content-row">
-
-              {/* FEED */}
-              <div className="feed">
-
-                <div className="feed-card">
-                  <div className="feed-title">
-                    🚧 Road closure on Collins St
-                  </div>
-                  <div className="feed-meta">
-                    📍 Melbourne CBD • 120m away
-                  </div>
-                </div>
-
-                <div className="feed-card">
-                  <div className="feed-title">
-                    ☕ New cafe opening
-                  </div>
-                  <div className="feed-meta">
-                    📍 Richmond • 350m away
-                  </div>
-                </div>
-
+            <div className="feed-card">
+              <div className="feed-title">
+                🚧 Road closure on Collins St
               </div>
-
-              {/* MAP */}
-              <div className="map-box">
-                <img
-                  src="/map-placeholder.png"
-                  alt="Map"
-                />
+              <div className="feed-meta">
+                📍 Melbourne CBD • 120m away
               </div>
+            </div>
 
+            <div className="feed-card">
+              <div className="feed-title">
+                ☕ New cafe opening
+              </div>
+              <div className="feed-meta">
+                📍 Richmond • 350m away
+              </div>
+            </div>
+
+            <div className="feed-card">
+              <div className="feed-title">
+                🚨 Police activity reported
+              </div>
+              <div className="feed-meta">
+                📍 St Kilda • 220m away
+              </div>
             </div>
 
           </div>
@@ -126,9 +104,7 @@ export default function CommunityPlusLandingPage() {
         </section>
       </main>
 
-      {/* =========================
-          AUTH MODAL
-      ========================= */}
+      {/* AUTH MODAL */}
       {showAuth && (
         <div
           className="cpl-modalOverlay"
@@ -138,7 +114,6 @@ export default function CommunityPlusLandingPage() {
         >
           <div className="cpl-modal elite">
 
-            {/* HEADER */}
             <div className="cpl-modalHeader">
               <div className="cpl-modalTitle">
                 COMMUNITY ONE
@@ -152,7 +127,6 @@ export default function CommunityPlusLandingPage() {
               </button>
             </div>
 
-            {/* BODY */}
             <div className="cpl-modalBody">
 
               <div className="auth-sub">
@@ -189,9 +163,6 @@ export default function CommunityPlusLandingPage() {
         </div>
       )}
 
-      {/* =========================
-          LOADING
-      ========================= */}
       {authLoading && (
         <div className="auth-loading-overlay">
           <div className="auth-loading-box">
