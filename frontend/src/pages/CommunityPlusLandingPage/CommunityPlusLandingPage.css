@@ -9,7 +9,7 @@ body {
 }
 
 .main-full {
-  max-width: 1000px; /* 🔥 tighter layout */
+  max-width: 1000px;
   margin: 0 auto;
   padding: 40px 20px;
 }
@@ -33,7 +33,7 @@ HEADLINE
 
 .headline-row {
   display: grid;
-  grid-template-columns: 1fr 120px; /* 🔥 tighter echo spacing */
+  grid-template-columns: 1fr 120px;
   align-items: center;
   gap: 30px;
   margin-bottom: 60px;
@@ -70,7 +70,7 @@ HEADLINE
 }
 
 /* =========================
-ECHO
+ECHO (FINAL)
 ========================= */
 
 .echo-inline {
@@ -85,7 +85,30 @@ ECHO
 
 .echo-inline img {
   width: 100%;
+  display: block;
+
   mix-blend-mode: multiply;
+
+  /* 🔥 clean + real shadow */
+  filter:
+    brightness(1.05)
+    contrast(1.08)
+    drop-shadow(0 12px 20px rgba(182,58,43,0.25));
+}
+
+/* soft glow */
+
+.echo-inline::after {
+  content: "";
+  position: absolute;
+  width: 140%;
+  height: 140%;
+  border-radius: 50%;
+  background: radial-gradient(
+    rgba(182,58,43,0.12),
+    transparent 70%
+  );
+  z-index: -1;
 }
 
 /* pulse */
@@ -125,7 +148,7 @@ CONTENT
 
 .content-section {
   display: grid;
-  grid-template-columns: 1.3fr 260px; /* 🔥 tighter right column */
+  grid-template-columns: 1.3fr 260px;
   gap: 24px;
   align-items: stretch;
 }
@@ -158,18 +181,17 @@ FEED
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-
   height: 320px;
 }
 
 /* =========================
-FEED CARDS (FIXED)
+FEED CARDS (FINAL)
 ========================= */
 
 .feed-card {
   width: 100%;
 
-  min-height: 80px; /* 🔥 DOUBLE HEIGHT */
+  min-height: 80px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -177,7 +199,7 @@ FEED CARDS (FIXED)
   padding: 16px 18px;
   border-radius: 18px;
 
-  /* 🔥 BLENDED BACKGROUND */
+  /* 🔥 blended background */
   background: #efeae4;
 
   border: 1px solid rgba(0,0,0,0.05);
