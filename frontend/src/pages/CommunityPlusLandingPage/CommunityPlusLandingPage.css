@@ -28,13 +28,13 @@ TITLE
 }
 
 /* =========================
-HEADLINE
+HEADLINE + ECHO
 ========================= */
 
 .headline-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  display: grid;
+  grid-template-columns: 1fr 140px;
+  align-items: center; /* 🔥 perfect vertical alignment */
   gap: 40px;
   margin-bottom: 50px;
 }
@@ -56,8 +56,8 @@ HEADLINE
 }
 
 .sub {
-  color: #555;
   font-size: 15px;
+  color: #555;
 }
 
 .btn {
@@ -70,29 +70,27 @@ HEADLINE
 }
 
 /* =========================
-ECHO (FIXED)
+ECHO
 ========================= */
 
 .echo-inline {
   width: 110px;
-  cursor: pointer;
-  position: relative;
-
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
+  position: relative;
 }
 
 .echo-inline img {
   width: 100%;
   display: block;
 
-  /* 🔥 visually removes white background */
+  /* soften white background effect */
   mix-blend-mode: multiply;
-  background: transparent;
 }
 
-/* Pulse */
+/* pulse */
 
 .echo-pulse {
   position: absolute;
@@ -129,7 +127,7 @@ CONTENT LAYOUT
 
 .content-section {
   display: grid;
-  grid-template-columns: 1.2fr auto;
+  grid-template-columns: 1.2fr 320px; /* 🔥 fixed feed column */
   gap: 40px;
   align-items: stretch;
 }
@@ -144,7 +142,6 @@ MAP
   overflow: hidden;
 
   border: 1px solid rgba(0,0,0,0.1);
-
   box-shadow: 0 8px 30px rgba(0,0,0,0.08);
 }
 
@@ -163,9 +160,7 @@ FEED
   flex-direction: column;
   justify-content: space-between;
 
-  height: 320px; /* 🔥 matches map */
-
-  gap: 16px;
+  height: 320px; /* 🔥 EXACTLY matches map height */
 }
 
 /* =========================
@@ -173,19 +168,18 @@ FEED CARDS
 ========================= */
 
 .feed-card {
-  width: fit-content;
-  max-width: 320px;
+  width: 100%; /* 🔥 aligned stack */
 
-  padding: 14px 18px;
-  border-radius: 20px;
+  padding: 14px 16px;
+  border-radius: 16px;
 
-  background: rgba(255,255,255,0.6);
+  background: rgba(255,255,255,0.65);
 
   border: 1px solid rgba(0,0,0,0.08);
 
   backdrop-filter: blur(6px);
 
-  box-shadow: 0 6px 18px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 
   transition: all 0.2s ease;
 }
@@ -199,13 +193,13 @@ FEED CARDS
 
 .feed-title {
   font-weight: 700;
-  font-size: 15px;
+  font-size: 14px;
   margin-bottom: 6px;
 }
 
 .feed-meta {
-  font-size: 13px;
-  color: #666;
+  font-size: 12px;
+  color: #777;
 }
 
 /* =========================
@@ -214,8 +208,8 @@ RESPONSIVE
 
 @media (max-width: 768px) {
   .headline-row {
-    flex-direction: column;
-    align-items: flex-start;
+    grid-template-columns: 1fr;
+    text-align: center;
   }
 
   .content-section {
@@ -224,6 +218,7 @@ RESPONSIVE
 
   .feed {
     height: auto;
+    gap: 12px;
   }
 
   .tagline {
