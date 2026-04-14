@@ -1,98 +1,51 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { fetchAuthSession } from "aws-amplify/auth";
+import { apiFetch } from "../../services/api";
 
 export default function AuthGate() {
   const navigate = useNavigate();
-  const { user, loading, setAppUser } = useAuth();
-
-  const lastUserRef = useRef(null);
+  const { user, appUser, setAppUser } = useAuth();
 
   useEffect(() => {
-    if (loading) return;
-
-    if (!user) {
-      navigate("/", { replace: true });
-      return;
-    }
-
-    const userKey = user?.userId || user?.username;
-
-    if (lastUserRef.current === userKey) return;
-    lastUserRef.current = userKey;
-
-    async function resolveUser() {
+    const bootstrap = async () => {
       try {
-        console.log("🔍 AuthGate: checking user");
-
-        const API_BASE = import.meta.env.VITE_API_BASE;
-        console.log("API_BASE:", import.meta.env.VITE_API_BASE);
-        /* ===============================
-           🔐 GET AUTH TOKEN
-        =============================== */
-
-        const session = await fetchAuthSession();
-        const token = session.tokens?.idToken?.toString();// 🔥 FORCE ACCESS TOKEN
-        if (!token) {
-          throw new Error("No auth token available");
+        if (!user) {
+          navigate("/");
+          return;
         }
 
-        /* ===============================
-           🌐 CALL BACKEND
-        =============================== */
+        // 🔥 1. CHECK IF USER EXISTS IN YOUR DB
+        let res = await apiFetch("/users/me");
 
-        const res = await fetch(`${API_BASE}/users/me`, {
-          method: "GET",
-          headers: {
-            "Authorization": `Bearer ${token}`, // 🔥 CRITICAL
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (!res.ok) {
-          throw new Error(`API error: ${res.status}`);
-        }
-
-        const data = await res.json(); // 🔥 CRITICAL FIX
-
-        console.log("✅ AuthGate response:", data);
-
-        /* ===============================
-           🧠 STORE USER
-        =============================== */
-
-        if (!data || !data.user) {
-          throw new Error("Invalid user response");
-        }
-
-        setAppUser(data.user);
-
-        /* ===============================
-           🚦 ROUTING
-        =============================== */
-
-        if (!data.hasProfile) {
-          navigate("/home", {
-            replace: true,
-            state: { view: "onboarding" },
+        // 🔥 2. IF NOT → CREATE USER
+        if (!res || !res.id) {
+          res = await apiFetch("/users/create", {
+            method: "POST",
+            body: JSON.stringify({
+              email: user.email,
+              sub: user.sub
+            }),
           });
+        }
+
+        setAppUser(res);
+
+        // 🔥 3. ROUTING LOGIC
+        if (!res.profileCompleted) {
+          navigate("/onboarding");
         } else {
-          navigate("/home", { replace: true });
+          navigate("/home");
         }
 
       } catch (err) {
-        console.error("❌ AuthGate error:", err);
-
-        lastUserRef.current = null;
-
-        navigate("/", { replace: true });
+        console.error("AuthGate error:", err);
+        navigate("/");
       }
-    }
+    };
 
-    resolveUser();
+    bootstrap();
+  }, [user]);
 
-  }, [user, loading, navigate, setAppUser]);
-
-  return <div>Loading...</div>;
+  return <div style={{ padding: 20 }}>Setting up your profile...</div>;
 }
