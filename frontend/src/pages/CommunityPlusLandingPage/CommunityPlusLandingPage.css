@@ -2,39 +2,67 @@
 BASE
 ========================= */
 
-.main-full {
-  width: 100%;
-  padding: 40px 60px;
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto;
+  background: #f6f3ee;
 }
 
+.main-full {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+/* TITLE */
 .app-title {
   text-align: center;
   font-size: 26px;
   font-weight: 900;
   letter-spacing: 3px;
   color: #b63a2b;
-  margin-bottom: 30px;
+  margin-bottom: 40px;
 }
 
 /* =========================
-RIGHT PANEL (MAIN CONTENT)
+HEADLINE
 ========================= */
 
-.right-panel {
-  max-width: 1000px;
-  margin: 0 auto;
-}
-
-/* =========================
-TOP ROW (ECHO + MAP)
-========================= */
-
-.top-row {
-  display: grid;
-  grid-template-columns: 120px 1fr;
-  gap: 20px;
+.headline-row {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  margin-bottom: 30px;
+  gap: 30px;
+  margin-bottom: 40px;
+}
+
+.headline-text {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.tagline {
+  font-size: 48px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.accent {
+  color: #b63a2b;
+}
+
+.sub {
+  color: #555;
+}
+
+.btn {
+  width: fit-content;
+  padding: 10px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(0,0,0,0.1);
+  background: rgba(182, 58, 43, 0.12);
+  cursor: pointer;
 }
 
 /* =========================
@@ -42,14 +70,13 @@ ECHO
 ========================= */
 
 .echo-inline {
-  width: 100px;
+  width: 110px;
   cursor: pointer;
   position: relative;
 }
 
 .echo-inline img {
   width: 100%;
-  background: transparent;
 }
 
 .echo-pulse {
@@ -65,7 +92,7 @@ ECHO
     rgba(182, 58, 43, 0.1),
     transparent
   );
-  animation: echoPulse 2s infinite ease-out;
+  animation: echoPulse 2.5s infinite ease-out;
 }
 
 @keyframes echoPulse {
@@ -80,14 +107,22 @@ ECHO
 }
 
 /* =========================
-MAP
+CONTENT
 ========================= */
 
+.content-section {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 30px;
+}
+
+/* MAP */
 .map-box {
   height: 320px;
-  border-radius: 16px;
+  border-radius: 18px;
   overflow: hidden;
-  border: 1px solid rgba(0,0,0,0.12);
+  border: 1px solid rgba(0,0,0,0.1);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
 }
 
 .map-box iframe {
@@ -96,9 +131,7 @@ MAP
   border: 0;
 }
 
-/* =========================
-FEED CARDS
-========================= */
+/* FEED */
 
 .feed {
   display: flex;
@@ -108,30 +141,20 @@ FEED CARDS
 
 .feed-card {
   padding: 16px;
-  border-radius: 12px;
-
+  border-radius: 14px;
   background: white;
-
-  border: 1px solid rgba(0,0,0,0.15);
-
-  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-
-  transition: 0.2s ease;
-}
-
-.feed-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 24px rgba(0,0,0,0.1);
+  border: 1px solid rgba(0,0,0,0.12);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
 }
 
 .feed-title {
-  font-weight: 600;
+  font-weight: 700;
   margin-bottom: 6px;
 }
 
 .feed-meta {
   font-size: 13px;
-  opacity: 0.6;
+  color: #666;
 }
 
 /* =========================
@@ -139,15 +162,16 @@ RESPONSIVE
 ========================= */
 
 @media (max-width: 768px) {
-  .top-row {
+  .headline-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .content-section {
     grid-template-columns: 1fr;
   }
 
-  .map-box {
-    height: 240px;
-  }
-
-  .echo-inline {
-    margin: 0 auto;
+  .tagline {
+    font-size: 34px;
   }
 }

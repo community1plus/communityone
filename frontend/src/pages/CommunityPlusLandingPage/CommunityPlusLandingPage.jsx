@@ -32,76 +32,81 @@ export default function CommunityPlusLandingPage() {
 
   return (
     <div className="cpl-root">
-
       <main className="main-full">
 
         {/* TITLE */}
         <div className="app-title">COMMUNITY ONE</div>
 
         {/* =========================
-            RIGHT PANEL (NOW MAIN CONTENT)
+            HEADLINE + ECHO
         ========================= */}
-        <section className="right-panel">
+        <div className="headline-row">
 
-          {/* TOP ROW: ECHO + MAP */}
-          <div className="top-row">
+          {/* TEXT */}
+          <div className="headline-text">
+            <h1 className="tagline">
+              Real People. <span className="accent">Real News.</span> Real Time
+            </h1>
 
-            {/* 🔥 ECHO LEFT OF MAP */}
-            <div
-              className="echo-inline"
+            <p className="sub">
+              A map-first local feed that prioritises what’s happening <b>here</b>.
+            </p>
+
+            <button
+              className="btn primary"
               onClick={() => setShowAuth(true)}
             >
-              <img src="/logo/echo.png" alt="Echo" />
-              <div className="echo-pulse"></div>
-            </div>
-
-            {/* 🔥 REAL MAP (ST KILDA) */}
-            <div className="map-box">
-              <iframe
-                title="St Kilda Map"
-                src="https://www.google.com/maps?q=St+Kilda+Melbourne&output=embed"
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-              />
-            </div>
-
+              Explore your local area
+            </button>
           </div>
 
-          {/* =========================
-              FEED (STACKED CARDS)
-          ========================= */}
+          {/* ECHO */}
+          <div
+            className="echo-inline"
+            onClick={() => setShowAuth(true)}
+          >
+            <img src="/logo/echo.png" alt="Echo" />
+            <div className="echo-pulse"></div>
+          </div>
+
+        </div>
+
+        {/* =========================
+            MAP + FEED
+        ========================= */}
+        <div className="content-section">
+
+          {/* MAP */}
+          <div className="map-box">
+            <iframe
+              title="St Kilda Map"
+              src="https://www.google.com/maps?q=St+Kilda+Melbourne&output=embed"
+              loading="lazy"
+            />
+          </div>
+
+          {/* FEED */}
           <div className="feed">
 
             <div className="feed-card">
-              <div className="feed-title">
-                🚧 Road closure on Collins St
-              </div>
-              <div className="feed-meta">
-                📍 Melbourne CBD • 120m away
-              </div>
+              <div className="feed-title">🚧 Road closure on Collins St</div>
+              <div className="feed-meta">📍 Melbourne CBD • 120m away</div>
             </div>
 
             <div className="feed-card">
-              <div className="feed-title">
-                ☕ New cafe opening
-              </div>
-              <div className="feed-meta">
-                📍 Richmond • 350m away
-              </div>
+              <div className="feed-title">☕ New cafe opening</div>
+              <div className="feed-meta">📍 Richmond • 350m away</div>
             </div>
 
             <div className="feed-card">
-              <div className="feed-title">
-                🚨 Police activity reported
-              </div>
-              <div className="feed-meta">
-                📍 St Kilda • 220m away
-              </div>
+              <div className="feed-title">🚨 Police activity reported</div>
+              <div className="feed-meta">📍 St Kilda • 220m away</div>
             </div>
 
           </div>
 
-        </section>
+        </div>
+
       </main>
 
       {/* AUTH MODAL */}
@@ -115,10 +120,7 @@ export default function CommunityPlusLandingPage() {
           <div className="cpl-modal elite">
 
             <div className="cpl-modalHeader">
-              <div className="cpl-modalTitle">
-                COMMUNITY ONE
-              </div>
-
+              <div className="cpl-modalTitle">COMMUNITY ONE</div>
               <button
                 className="cpl-closeBtn"
                 onClick={() => setShowAuth(false)}
@@ -170,7 +172,6 @@ export default function CommunityPlusLandingPage() {
           </div>
         </div>
       )}
-
     </div>
   );
 }
