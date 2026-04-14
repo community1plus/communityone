@@ -14,7 +14,10 @@ body {
   padding: 40px 20px;
 }
 
-/* TITLE */
+/* =========================
+TITLE
+========================= */
+
 .app-title {
   text-align: center;
   font-size: 26px;
@@ -32,8 +35,8 @@ HEADLINE
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 30px;
-  margin-bottom: 40px;
+  gap: 40px;
+  margin-bottom: 50px;
 }
 
 .headline-text {
@@ -43,7 +46,7 @@ HEADLINE
 }
 
 .tagline {
-  font-size: 48px;
+  font-size: 52px;
   font-weight: 800;
   line-height: 1.2;
 }
@@ -54,6 +57,7 @@ HEADLINE
 
 .sub {
   color: #555;
+  font-size: 15px;
 }
 
 .btn {
@@ -66,18 +70,29 @@ HEADLINE
 }
 
 /* =========================
-ECHO
+ECHO (FIXED)
 ========================= */
 
 .echo-inline {
   width: 110px;
   cursor: pointer;
   position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .echo-inline img {
   width: 100%;
+  display: block;
+
+  /* 🔥 visually removes white background */
+  mix-blend-mode: multiply;
+  background: transparent;
 }
+
+/* Pulse */
 
 .echo-pulse {
   position: absolute;
@@ -87,11 +102,13 @@ ECHO
   height: 160%;
   transform: translate(-50%, -50%);
   border-radius: 50%;
+
   background: radial-gradient(
     rgba(182, 58, 43, 0.5),
     rgba(182, 58, 43, 0.1),
     transparent
   );
+
   animation: echoPulse 2.5s infinite ease-out;
 }
 
@@ -107,21 +124,27 @@ ECHO
 }
 
 /* =========================
-CONTENT
+CONTENT LAYOUT
 ========================= */
 
 .content-section {
   display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  gap: 30px;
+  grid-template-columns: 1.2fr auto;
+  gap: 40px;
+  align-items: stretch;
 }
 
-/* MAP */
+/* =========================
+MAP
+========================= */
+
 .map-box {
   height: 320px;
   border-radius: 18px;
   overflow: hidden;
+
   border: 1px solid rgba(0,0,0,0.1);
+
   box-shadow: 0 8px 30px rgba(0,0,0,0.08);
 }
 
@@ -131,24 +154,52 @@ CONTENT
   border: 0;
 }
 
-/* FEED */
+/* =========================
+FEED
+========================= */
 
 .feed {
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
+
+  height: 320px; /* 🔥 matches map */
+
   gap: 16px;
 }
 
+/* =========================
+FEED CARDS
+========================= */
+
 .feed-card {
-  padding: 16px;
-  border-radius: 14px;
-  background: white;
-  border: 1px solid rgba(0,0,0,0.12);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  width: fit-content;
+  max-width: 320px;
+
+  padding: 14px 18px;
+  border-radius: 20px;
+
+  background: rgba(255,255,255,0.6);
+
+  border: 1px solid rgba(0,0,0,0.08);
+
+  backdrop-filter: blur(6px);
+
+  box-shadow: 0 6px 18px rgba(0,0,0,0.05);
+
+  transition: all 0.2s ease;
 }
+
+.feed-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+}
+
+/* TEXT */
 
 .feed-title {
   font-weight: 700;
+  font-size: 15px;
   margin-bottom: 6px;
 }
 
@@ -171,7 +222,15 @@ RESPONSIVE
     grid-template-columns: 1fr;
   }
 
+  .feed {
+    height: auto;
+  }
+
   .tagline {
     font-size: 34px;
+  }
+
+  .echo-inline {
+    margin: 0 auto;
   }
 }
