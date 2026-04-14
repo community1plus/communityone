@@ -8,8 +8,11 @@ import {
   resetPassword,
   confirmResetPassword,
   signInWithRedirect,
-  getCurrentUser
+  fetchAuthSession,
+  fetchUserAttributes
 } from "aws-amplify/auth";
+
+import { Hub } from "aws-amplify/utils";
 
 export default function CommunityPlusLandingPage() {
   const [showAuth, setShowAuth] = useState(false);
@@ -22,18 +25,65 @@ export default function CommunityPlusLandingPage() {
   const [password, setPassword] = useState("");
   const [confirmCode, setConfirmCode] = useState("");
 
+  /* ===============================
+     AUTH LISTENER (FIX SOCIAL DELAY)
+  =============================== */
   useEffect(() => {
-    document.body.classList.toggle("modal-open", showAuth);
-  }, [showAuth]);
+    const unsub = Hub.listen("auth", async ({ payload }) => {
+      if (payload.event === "signedIn") {
+        await routeUser();
+      }
+    });
+
+    return () => unsub();
+  }, []);
+
+  /* ===============================
+     CHECK SESSION ON LOAD
+  =============================== */
+  useEffect(() => {
+    checkSession();
+  }, []);
+
+  const checkSession = async () => {
+    try {
+      const session = await fetchAuthSession();
+
+      if (session?.tokens?.idToken) {
+        await routeUser();
+      }
+    } catch {
+      // not signed in → do nothing
+    }
+  };
+
+  /* ===============================
+     ROUTING LOGIC (CRITICAL)
+  =============================== */
+  const routeUser = async () => {
+    try {
+      const attributes = await fetchUserAttributes();
+
+      // 🔥 if no profile → send to setup
+      if (!attributes?.name) {
+        window.location.href = "/profile-setup";
+      } else {
+        window.location.href = "/home";
+      }
+    } catch {
+      window.location.href = "/home";
+    }
+  };
 
   /* ===============================
      ENTRY (ECHO / BUTTON)
   =============================== */
   const handleEntry = async () => {
     try {
-      const user = await getCurrentUser();
-      if (user) {
-        window.location.href = "/home";
+      const session = await fetchAuthSession();
+
+      if (session?.tokens?.idToken) {
+        await routeUser();
         return;
       }
     } catch {}
@@ -42,7 +92,7 @@ export default function CommunityPlusLandingPage() {
   };
 
   /* ===============================
-     LOGIN
+     EMAIL LOGIN
   =============================== */
   const handleEmailLogin = async () => {
     setAuthLoading(true);
@@ -54,7 +104,7 @@ export default function CommunityPlusLandingPage() {
         password
       });
 
-      window.location.href = "/home";
+      await routeUser();
     } catch (err) {
       setAuthError(err.message || "Login failed");
       setAuthLoading(false);
@@ -160,8 +210,10 @@ export default function CommunityPlusLandingPage() {
     <div className="cpl-root">
       <main className="main-full">
 
+        {/* TITLE */}
         <div className="app-title">COMMUNITY ONE</div>
 
+        {/* HEADLINE */}
         <div className="headline-row">
           <div className="headline-text">
             <h1 className="tagline">
@@ -184,6 +236,7 @@ export default function CommunityPlusLandingPage() {
           </div>
         </div>
 
+        {/* MAP + FEED */}
         <div className="content-section">
           <div className="map-box">
             <iframe

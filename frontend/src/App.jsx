@@ -1,67 +1,77 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
-import { useGoogleMaps } from "./context/GoogleMapsProvider"; // 🔥 NEW
+
 import CommunityPlusLandingPage from "./pages/CommunityPlusLandingPage/CommunityPlusLandingPage";
 import CommunityPlusDashboard from "./pages/Dashboard/CommunityPlusDashboard";
-import AuthGate from "./pages/AuthGate";
 import Onboarding from "./pages/Onboarding/CommunityPlusOnboarding";
+
+/* =========================
+   PROTECTED ROUTE
+========================= */
+function ProtectedRoute({ user, children }) {
+  if (!user) return <Navigate to="/" replace />;
+  return children;
+}
+
+/* =========================
+   PUBLIC ROUTE (BLOCK IF LOGGED IN)
+========================= */
+function PublicRoute({ user, children }) {
+  if (user) return <Navigate to="/home" replace />;
+  return children;
+}
 
 export default function App() {
   const { user, loading } = useAuth();
 
-  // 🔥 GLOBAL GOOGLE MAPS LOADER
-  const { isLoaded } = useGoogleMaps();
-
-  // 🔥 Prevent flicker + auth race
-  if (loading) return null;
-
-  // 🔥 Prevent Google Maps race condition
-  if (!isLoaded || !window.google) {
-    return <div style={{ padding: 20 }}>Loading maps...</div>;
+  /* =========================
+     🔥 CRITICAL FIX
+     DO NOT BLOCK RENDER
+  ========================= */
+  if (loading) {
+    return (
+      <div style={{ padding: 20 }}>
+        Initialising...
+      </div>
+    );
   }
 
   return (
     <Routes>
 
       {/* =========================
-          PUBLIC (Landing)
+          LANDING
       ========================= */}
       <Route
         path="/"
         element={
-          user ? <Navigate to="/auth" replace /> : <CommunityPlusLandingPage />
+          <PublicRoute user={user}>
+            <CommunityPlusLandingPage />
+          </PublicRoute>
         }
       />
 
       {/* =========================
-          AUTH GATE
+          ONBOARDING (FIRST LOGIN)
       ========================= */}
       <Route
-        path="/auth"
+        path="/profile-setup"
         element={
-          user ? <AuthGate /> : <Navigate to="/" replace />
+          <ProtectedRoute user={user}>
+            <Onboarding />
+          </ProtectedRoute>
         }
       />
 
       {/* =========================
-          ONBOARDING
-      ========================= */}
-      <Route
-        path="/onboarding"
-        element={
-          user ? <Onboarding /> : <Navigate to="/" replace />
-        }
-      />
-
-      {/* =========================
-          DASHBOARD (MAP DEPENDENT)
+          DASHBOARD
       ========================= */}
       <Route
         path="/home"
         element={
-          user
-            ? <CommunityPlusDashboard isLoaded={isLoaded} /> // 🔥 PASS DOWN
-            : <Navigate to="/" replace />
+          <ProtectedRoute user={user}>
+            <CommunityPlusDashboard />
+          </ProtectedRoute>
         }
       />
 
