@@ -9,7 +9,7 @@ body {
 }
 
 .main-full {
-  max-width: 1100px;
+  max-width: 1000px; /* 🔥 tighter layout */
   margin: 0 auto;
   padding: 40px 20px;
 }
@@ -28,15 +28,15 @@ TITLE
 }
 
 /* =========================
-HEADLINE + ECHO
+HEADLINE
 ========================= */
 
 .headline-row {
   display: grid;
-  grid-template-columns: 1fr 140px;
+  grid-template-columns: 1fr 120px; /* 🔥 tighter echo spacing */
   align-items: center;
-  gap: 40px;
-  margin-bottom: 60px; /* 🔥 more breathing room */
+  gap: 30px;
+  margin-bottom: 60px;
 }
 
 .headline-text {
@@ -64,33 +64,31 @@ HEADLINE + ECHO
   width: fit-content;
   padding: 10px 16px;
   border-radius: 14px;
-  border: 1px solid rgba(0,0,0,0.1);
-  background: rgba(182, 58, 43, 0.12);
+  border: 1px solid rgba(0,0,0,0.08);
+  background: rgba(182, 58, 43, 0.1);
   cursor: pointer;
 }
 
 /* =========================
-ECHO (PERFECT CENTERING)
+ECHO
 ========================= */
 
 .echo-inline {
-  width: 110px;
+  width: 100px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   position: relative;
-
-  transform: translateY(8px); /* 🔥 visual centering fix */
+  transform: translateY(6px);
 }
 
 .echo-inline img {
   width: 100%;
-  display: block;
   mix-blend-mode: multiply;
 }
 
-/* Pulse */
+/* pulse */
 
 .echo-pulse {
   position: absolute;
@@ -102,8 +100,8 @@ ECHO (PERFECT CENTERING)
   border-radius: 50%;
 
   background: radial-gradient(
-    rgba(182, 58, 43, 0.45),
-    rgba(182, 58, 43, 0.1),
+    rgba(182, 58, 43, 0.4),
+    rgba(182, 58, 43, 0.08),
     transparent
   );
 
@@ -122,13 +120,13 @@ ECHO (PERFECT CENTERING)
 }
 
 /* =========================
-CONTENT LAYOUT
+CONTENT
 ========================= */
 
 .content-section {
   display: grid;
-  grid-template-columns: 1.2fr 300px; /* tighter feed column */
-  gap: 30px;
+  grid-template-columns: 1.3fr 260px; /* 🔥 tighter right column */
+  gap: 24px;
   align-items: stretch;
 }
 
@@ -141,8 +139,9 @@ MAP
   border-radius: 18px;
   overflow: hidden;
 
-  border: 1px solid rgba(0,0,0,0.1);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  border: 1px solid rgba(0,0,0,0.08);
+
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
 }
 
 .map-box iframe {
@@ -152,42 +151,45 @@ MAP
 }
 
 /* =========================
-FEED (PERFECT DISTRIBUTION)
+FEED
 ========================= */
 
 .feed {
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
 
   height: 320px;
-
-  justify-content: space-between; /* 🔥 exact top-bottom alignment */
 }
 
 /* =========================
-FEED CARDS
+FEED CARDS (FIXED)
 ========================= */
 
 .feed-card {
   width: 100%;
 
-  padding: 12px 14px;
+  min-height: 80px; /* 🔥 DOUBLE HEIGHT */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  padding: 16px 18px;
   border-radius: 18px;
 
-  background: rgba(255,255,255,0.6);
+  /* 🔥 BLENDED BACKGROUND */
+  background: #efeae4;
 
-  border: 1px solid rgba(0,0,0,0.08);
+  border: 1px solid rgba(0,0,0,0.05);
 
-  backdrop-filter: blur(6px);
-
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 
   transition: all 0.2s ease;
 }
 
 .feed-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 24px rgba(0,0,0,0.12);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
 }
 
 /* TEXT */
@@ -195,7 +197,7 @@ FEED CARDS
 .feed-title {
   font-weight: 700;
   font-size: 14px;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
 .feed-meta {
