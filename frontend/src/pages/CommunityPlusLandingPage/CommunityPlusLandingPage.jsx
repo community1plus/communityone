@@ -33,24 +33,29 @@ export default function CommunityPlusLandingPage() {
   return (
     <div className="cpl-root">
 
-      {/* HEADER */}
-      <header className="topbar">
-        <div className="wrap topbar-inner">
-          <div className="logo center-title">COMMUNITY ONE</div>
-        </div>
-      </header>
+      <main className="main-full">
 
-      {/* HERO */}
-      <main className="wrap">
-        <section className="hero layout">
+        {/* 🔥 TITLE */}
+        <div className="app-title">COMMUNITY ONE</div>
 
-          {/* LEFT SIDE */}
+        <section className="layout-full">
+
+          {/* LEFT */}
           <div className="left-panel">
 
             <div className="headline">
               <h1 className="tagline">
                 Real People. <span className="accent">Real News.</span> Real Time
               </h1>
+
+              {/* 🔥 ECHO UNDER HEADING */}
+              <div
+                className="echo-inline"
+                onClick={() => setShowAuth(true)}
+              >
+                <img src="/logo/echo.png" alt="Echo" />
+                <div className="echo-pulse"></div>
+              </div>
 
               <p className="sub">
                 A map-first local feed that prioritises what’s happening <b>here</b>.
@@ -64,34 +69,38 @@ export default function CommunityPlusLandingPage() {
               </button>
             </div>
 
-            {/* 🔥 ECHO INLINE */}
-            <div
-              className="echo-inline"
-              onClick={() => setShowAuth(true)}
-            >
-              <img src="/logo/echo.png" alt="Echo" />
-              <div className="echo-pulse"></div>
-            </div>
-
           </div>
 
-          {/* RIGHT SIDE */}
+          {/* RIGHT */}
           <div className="right-panel">
 
-            {/* MAP */}
-            <div className="map-box">
-              Map Placeholder
-            </div>
+            {/* FEED + MAP SIDE BY SIDE */}
+            <div className="content-row">
 
-            {/* FEED CARDS */}
-            <div className="feed">
-              <div className="feed-card">
-                🚨 Road closure on Collins St
+              {/* FEED */}
+              <div className="feed">
+
+                <div className="feed-card">
+                  <div className="feed-title">Road closure on Collins St</div>
+                  <div className="feed-meta">
+                    📍 Melbourne CBD • 120m away
+                  </div>
+                </div>
+
+                <div className="feed-card">
+                  <div className="feed-title">New cafe opening</div>
+                  <div className="feed-meta">
+                    📍 Richmond • 350m away
+                  </div>
+                </div>
+
               </div>
 
-              <div className="feed-card">
-                ☕ New cafe opening in Richmond
+              {/* MAP IMAGE */}
+              <div className="map-box">
+                <img src="/map-placeholder.png" alt="Map" />
               </div>
+
             </div>
 
           </div>
@@ -99,7 +108,7 @@ export default function CommunityPlusLandingPage() {
         </section>
       </main>
 
-      {/* AUTH MODAL (UNCHANGED) */}
+      {/* AUTH MODAL */}
       {showAuth && (
         <div
           className="cpl-modalOverlay"
