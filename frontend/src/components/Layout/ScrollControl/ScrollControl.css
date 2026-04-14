@@ -1,0 +1,12 @@
+import ScrollControls from "./components/ScrollControls";
+
+function App() {
+  return (
+    <>
+      <ScrollControls />
+      {/* your routes / pages */}
+    </>
+  );
+}
+
+export default App;

@@ -7,27 +7,18 @@ export default function CommunityPlusLandingPage() {
   const [showAuth, setShowAuth] = useState(false);
   const [authLoading, setAuthLoading] = useState(false);
 
-  /* ===============================
-     SCROLL LOCK
-  =============================== */
   useEffect(() => {
     document.body.classList.toggle("modal-open", showAuth);
   }, [showAuth]);
 
-  /* ===============================
-     SAFE LOGIN (SESSION SAFE)
-  =============================== */
   const safeRedirect = async (provider) => {
     try {
       const user = await getCurrentUser();
-
       if (user) {
         window.location.href = "/home";
         return;
       }
-    } catch {
-      // not signed in → continue
-    }
+    } catch {}
 
     setAuthLoading(true);
     setShowAuth(false);
@@ -35,7 +26,7 @@ export default function CommunityPlusLandingPage() {
     if (provider) {
       signInWithRedirect({ provider });
     } else {
-      signInWithRedirect(); // Cognito email flow
+      signInWithRedirect();
     }
   };
 
@@ -46,23 +37,20 @@ export default function CommunityPlusLandingPage() {
       =============================== */}
       <header className="topbar">
         <div className="wrap topbar-inner">
-          <div className="logo">COMMUNITY ONE</div>
 
-          <div className="actions">
-            <button
-              className="btn signin"
-              onClick={() => setShowAuth(true)}
-            >
-              Sign in
-            </button>
+          {/* 🔥 LEFT LOGO (click = login) */}
+          <img
+            src="/logo/echo.png"
+            alt="Echo"
+            className="header-logo"
+            onClick={() => setShowAuth(true)}
+          />
 
-            <button
-              className="btn primary"
-              onClick={() => setShowAuth(true)}
-            >
-              Join
-            </button>
+          {/* 🔥 CENTER TITLE */}
+          <div className="logo center-title">
+            COMMUNITY ONE
           </div>
+
         </div>
       </header>
 
@@ -70,7 +58,9 @@ export default function CommunityPlusLandingPage() {
           HERO
       =============================== */}
       <main className="wrap">
-        <section className="hero">
+        <section className="hero split">
+
+          {/* LEFT CONTENT */}
           <div className="headline">
             <h1 className="tagline">
               Real People. <span className="accent">Real News.</span> Real Time
@@ -87,11 +77,20 @@ export default function CommunityPlusLandingPage() {
               Explore your local area
             </button>
           </div>
+
+          {/* 🔥 RIGHT SIDE (ANIMATED LOGO) */}
+          <div className="hero-visual">
+            <div className="echo-animated">
+              <img src="/logo/echo.png" alt="Echo Animated" />
+              <div className="echo-pulse"></div>
+            </div>
+          </div>
+
         </section>
       </main>
 
       {/* ===============================
-          ELITE AUTH MODAL
+          AUTH MODAL
       =============================== */}
       {showAuth && (
         <div
@@ -102,10 +101,8 @@ export default function CommunityPlusLandingPage() {
         >
           <div className="cpl-modal elite">
 
-            {/* HEADER */}
             <div className="cpl-modalHeader">
               <div className="cpl-modalTitle">COMMUNITY ONE</div>
-
               <button
                 className="cpl-closeBtn"
                 onClick={() => setShowAuth(false)}
@@ -114,14 +111,11 @@ export default function CommunityPlusLandingPage() {
               </button>
             </div>
 
-            {/* BODY */}
             <div className="cpl-modalBody">
-
               <div className="auth-sub">
                 Sign in to your local community
               </div>
 
-              {/* GOOGLE */}
               <button
                 className="auth-btn google"
                 onClick={() => safeRedirect("Google")}
@@ -129,7 +123,6 @@ export default function CommunityPlusLandingPage() {
                 Continue with Google
               </button>
 
-              {/* FACEBOOK */}
               <button
                 className="auth-btn facebook"
                 onClick={() => safeRedirect("Facebook")}
@@ -141,14 +134,12 @@ export default function CommunityPlusLandingPage() {
                 <span>or</span>
               </div>
 
-              {/* EMAIL */}
               <button
                 className="auth-btn email"
                 onClick={() => safeRedirect()}
               >
                 Continue with Email
               </button>
-
             </div>
           </div>
         </div>

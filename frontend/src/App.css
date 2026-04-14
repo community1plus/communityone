@@ -1,3 +1,14 @@
+/* Hide native scrollbars globally */
+
+html, body {
+  overflow-y: scroll;
+  scrollbar-width: none; /* Firefox */
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
 .counter {
   font-size: 16px;
   padding: 5px 10px;
