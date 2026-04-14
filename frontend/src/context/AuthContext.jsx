@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState, useRef } from "react";
 import {
   fetchAuthSession,
   fetchUserAttributes,
@@ -9,18 +9,23 @@ import { Hub } from "aws-amplify/utils";
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);       // Cognito user
-  const [appUser, setAppUser] = useState(null); // Backend user
+  const [user, setUser] = useState(null);
+  const [appUser, setAppUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const loadingRef = useRef(false); // 🔥 prevents duplicate loads
+
   /* ===============================
-     LOAD AUTH USER (FIXED)
+     LOAD USER (STABLE)
   =============================== */
   const loadUser = async () => {
+    // 🔥 prevent double execution
+    if (loadingRef.current) return;
+    loadingRef.current = true;
+
     try {
       const session = await fetchAuthSession();
 
-      // ✅ If no session → user is logged out (NOT loading)
       if (!session?.tokens?.idToken) {
         console.log("⚠️ No active session");
         setUser(null);
@@ -28,49 +33,48 @@ export function AuthProvider({ children }) {
         return;
       }
 
-      // ✅ Get attributes instead of getCurrentUser (more stable)
       const attributes = await fetchUserAttributes();
 
-      console.log("✅ Auth user loaded:", attributes);
+      console.log("✅ User loaded:", attributes);
 
       setUser({
         ...attributes,
-        authenticated: true
+        authenticated: true,
       });
 
     } catch (err) {
-      console.log("⚠️ Auth load error:", err);
+      console.log("⚠️ Auth error:", err);
       setUser(null);
       setAppUser(null);
     } finally {
-      // 🔥 CRITICAL — ALWAYS RUN
-      setLoading(false);
+      setLoading(false);          // 🔥 ALWAYS resolves UI
+      loadingRef.current = false; // 🔥 release lock
     }
   };
 
   /* ===============================
-     INITIAL LOAD
+     INITIAL LOAD (ONCE ONLY)
   =============================== */
   useEffect(() => {
     loadUser();
   }, []);
 
   /* ===============================
-     AUTH EVENTS
+     AUTH EVENTS (FIXED)
   =============================== */
   useEffect(() => {
     const unsubscribe = Hub.listen("auth", ({ payload }) => {
       console.log("🔔 Auth event:", payload.event);
 
       if (payload.event === "signedIn") {
-        setLoading(true);
-        loadUser();
+        // ❌ DO NOT set loading true again
+        loadUser(); // just refresh user
       }
 
       if (payload.event === "signedOut") {
         setUser(null);
         setAppUser(null);
-        setLoading(false); // 🔥 important
+        setLoading(false);
       }
     });
 
@@ -93,7 +97,7 @@ export function AuthProvider({ children }) {
         appUser,
         setAppUser,
         loading,
-        logout
+        logout,
       }}
     >
       {children}
