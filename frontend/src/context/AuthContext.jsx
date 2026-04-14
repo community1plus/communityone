@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import {
-  getCurrentUser,
   fetchAuthSession,
+  fetchUserAttributes,
   signOut,
 } from "aws-amplify/auth";
 import { Hub } from "aws-amplify/utils";
@@ -9,33 +9,41 @@ import { Hub } from "aws-amplify/utils";
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);       // 🔐 Auth user (Cognito)
-  const [appUser, setAppUser] = useState(null); // 🔥 Backend user (DB)
+  const [user, setUser] = useState(null);       // Cognito user
+  const [appUser, setAppUser] = useState(null); // Backend user
   const [loading, setLoading] = useState(true);
 
   /* ===============================
-     LOAD AUTH USER
+     LOAD AUTH USER (FIXED)
   =============================== */
   const loadUser = async () => {
     try {
       const session = await fetchAuthSession();
 
-      // ⏳ Tokens not ready yet
-      if (!session?.tokens) {
-        console.log("⏳ No tokens yet, waiting...");
+      // ✅ If no session → user is logged out (NOT loading)
+      if (!session?.tokens?.idToken) {
+        console.log("⚠️ No active session");
+        setUser(null);
+        setAppUser(null);
         return;
       }
 
-      const currentUser = await getCurrentUser();
-      console.log("✅ Auth user loaded:", currentUser);
+      // ✅ Get attributes instead of getCurrentUser (more stable)
+      const attributes = await fetchUserAttributes();
 
-      setUser(currentUser);
+      console.log("✅ Auth user loaded:", attributes);
+
+      setUser({
+        ...attributes,
+        authenticated: true
+      });
 
     } catch (err) {
-      console.log("⚠️ No authenticated user");
+      console.log("⚠️ Auth load error:", err);
       setUser(null);
-      setAppUser(null); // 🔥 reset backend user too
+      setAppUser(null);
     } finally {
+      // 🔥 CRITICAL — ALWAYS RUN
       setLoading(false);
     }
   };
@@ -48,7 +56,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   /* ===============================
-     AUTH EVENTS (OAUTH / LOGIN)
+     AUTH EVENTS
   =============================== */
   useEffect(() => {
     const unsubscribe = Hub.listen("auth", ({ payload }) => {
@@ -61,7 +69,8 @@ export function AuthProvider({ children }) {
 
       if (payload.event === "signedOut") {
         setUser(null);
-        setAppUser(null); // 🔥 important reset
+        setAppUser(null);
+        setLoading(false); // 🔥 important
       }
     });
 
@@ -80,9 +89,9 @@ export function AuthProvider({ children }) {
   return (
     <AuthContext.Provider
       value={{
-        user,        // 🔐 Cognito user
-        appUser,     // 🔥 Backend user (USE THIS IN UI)
-        setAppUser,  // 🔥 Set from AuthGate
+        user,
+        appUser,
+        setAppUser,
         loading,
         logout
       }}
