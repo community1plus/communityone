@@ -4,6 +4,9 @@ import "./CommunityPlusLandingPage.css";
 import {
   signIn,
   signUp,
+  confirmSignUp,
+  resetPassword,
+  confirmResetPassword,
   signInWithRedirect,
   getCurrentUser
 } from "aws-amplify/auth";
@@ -13,15 +16,18 @@ export default function CommunityPlusLandingPage() {
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState("");
 
+  const [authMode, setAuthMode] = useState("login");
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmCode, setConfirmCode] = useState("");
 
   useEffect(() => {
     document.body.classList.toggle("modal-open", showAuth);
   }, [showAuth]);
 
   /* ===============================
-     SAFE LOGIN ENTRY
+     ENTRY (ECHO / BUTTON)
   =============================== */
   const handleEntry = async () => {
     try {
@@ -36,7 +42,7 @@ export default function CommunityPlusLandingPage() {
   };
 
   /* ===============================
-     EMAIL LOGIN (NO REDIRECT)
+     LOGIN
   =============================== */
   const handleEmailLogin = async () => {
     setAuthLoading(true);
@@ -45,7 +51,7 @@ export default function CommunityPlusLandingPage() {
     try {
       await signIn({
         username: email,
-        password: password
+        password
       });
 
       window.location.href = "/home";
@@ -56,14 +62,95 @@ export default function CommunityPlusLandingPage() {
   };
 
   /* ===============================
-     SOCIAL LOGIN (OPTIONAL REDIRECT)
+     SIGNUP
+  =============================== */
+  const handleSignup = async () => {
+    setAuthLoading(true);
+    setAuthError("");
+
+    try {
+      await signUp({
+        username: email,
+        password,
+        options: {
+          userAttributes: { email }
+        }
+      });
+
+      setAuthMode("confirmSignup");
+      setAuthLoading(false);
+    } catch (err) {
+      setAuthError(err.message);
+      setAuthLoading(false);
+    }
+  };
+
+  /* ===============================
+     CONFIRM SIGNUP
+  =============================== */
+  const handleConfirmSignup = async () => {
+    setAuthLoading(true);
+
+    try {
+      await confirmSignUp({
+        username: email,
+        confirmationCode: confirmCode
+      });
+
+      setAuthMode("login");
+      setAuthLoading(false);
+    } catch (err) {
+      setAuthError(err.message);
+      setAuthLoading(false);
+    }
+  };
+
+  /* ===============================
+     FORGOT PASSWORD
+  =============================== */
+  const handleForgot = async () => {
+    setAuthLoading(true);
+
+    try {
+      await resetPassword({ username: email });
+      setAuthMode("resetConfirm");
+      setAuthLoading(false);
+    } catch (err) {
+      setAuthError(err.message);
+      setAuthLoading(false);
+    }
+  };
+
+  /* ===============================
+     RESET CONFIRM
+  =============================== */
+  const handleResetConfirm = async () => {
+    setAuthLoading(true);
+
+    try {
+      await confirmResetPassword({
+        username: email,
+        confirmationCode: confirmCode,
+        newPassword: password
+      });
+
+      setAuthMode("login");
+      setAuthLoading(false);
+    } catch (err) {
+      setAuthError(err.message);
+      setAuthLoading(false);
+    }
+  };
+
+  /* ===============================
+     SOCIAL LOGIN
   =============================== */
   const handleSocial = async (provider) => {
     setAuthLoading(true);
 
     try {
       await signInWithRedirect({ provider });
-    } catch (err) {
+    } catch {
       setAuthError("Social login failed");
       setAuthLoading(false);
     }
@@ -73,14 +160,9 @@ export default function CommunityPlusLandingPage() {
     <div className="cpl-root">
       <main className="main-full">
 
-        {/* TITLE */}
         <div className="app-title">COMMUNITY ONE</div>
 
-        {/* =========================
-            HEADLINE + ECHO
-        ========================= */}
         <div className="headline-row">
-
           <div className="headline-text">
             <h1 className="tagline">
               Real People. <span className="accent">Real News.</span> Real Time
@@ -95,19 +177,14 @@ export default function CommunityPlusLandingPage() {
             </button>
           </div>
 
-          {/* 🔥 ECHO = ENTRY */}
+          {/* ECHO */}
           <div className="echo-inline" onClick={handleEntry}>
             <img src="/logo/echo.png" alt="Echo" />
             <div className="echo-pulse"></div>
           </div>
-
         </div>
 
-        {/* =========================
-            MAP + FEED
-        ========================= */}
         <div className="content-section">
-
           <div className="map-box">
             <iframe
               title="St Kilda Map"
@@ -117,7 +194,6 @@ export default function CommunityPlusLandingPage() {
           </div>
 
           <div className="feed">
-
             <div className="feed-card">
               <div className="feed-title">🚧 Road closure on Collins St</div>
               <div className="feed-meta">📍 Melbourne CBD • 120m away</div>
@@ -132,15 +208,13 @@ export default function CommunityPlusLandingPage() {
               <div className="feed-title">🚨 Police activity reported</div>
               <div className="feed-meta">📍 St Kilda • 220m away</div>
             </div>
-
           </div>
-
         </div>
 
       </main>
 
       {/* =========================
-          AUTH MODAL (UNIFIED)
+          AUTH MODAL
       ========================= */}
       {showAuth && (
         <div className="cpl-modalOverlay">
@@ -159,10 +233,13 @@ export default function CommunityPlusLandingPage() {
             <div className="cpl-modalBody">
 
               <div className="auth-sub">
-                Sign in to your local community
+                {authMode === "login" && "Sign in to your local community"}
+                {authMode === "signup" && "Create your account"}
+                {authMode === "forgot" && "Reset your password"}
+                {authMode === "confirmSignup" && "Enter verification code"}
+                {authMode === "resetConfirm" && "Enter code & new password"}
               </div>
 
-              {/* EMAIL INPUT */}
               <input
                 className="auth-input"
                 placeholder="Email"
@@ -170,45 +247,101 @@ export default function CommunityPlusLandingPage() {
                 onChange={(e) => setEmail(e.target.value)}
               />
 
-              <input
-                className="auth-input"
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-
-              <button className="auth-btn email" onClick={handleEmailLogin}>
-                Sign in with Email
-              </button>
-
-              {authError && (
-                <div className="auth-error">{authError}</div>
+              {authMode !== "forgot" && authMode !== "confirmSignup" && (
+                <input
+                  className="auth-input"
+                  type="password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
               )}
 
-              <div className="auth-divider"><span>or</span></div>
+              {(authMode === "confirmSignup" || authMode === "resetConfirm") && (
+                <input
+                  className="auth-input"
+                  placeholder="Verification code"
+                  value={confirmCode}
+                  onChange={(e) => setConfirmCode(e.target.value)}
+                />
+              )}
 
-              {/* SOCIAL */}
-              <button
-                className="auth-btn google"
-                onClick={() => handleSocial("Google")}
-              >
-                Continue with Google
-              </button>
+              {authMode === "login" && (
+                <button className="auth-btn email" onClick={handleEmailLogin}>
+                  Sign in with Email
+                </button>
+              )}
 
-              <button
-                className="auth-btn facebook"
-                onClick={() => handleSocial("Facebook")}
-              >
-                Continue with Facebook
-              </button>
+              {authMode === "signup" && (
+                <button className="auth-btn email" onClick={handleSignup}>
+                  Create account
+                </button>
+              )}
+
+              {authMode === "confirmSignup" && (
+                <button className="auth-btn email" onClick={handleConfirmSignup}>
+                  Verify account
+                </button>
+              )}
+
+              {authMode === "forgot" && (
+                <button className="auth-btn email" onClick={handleForgot}>
+                  Send reset code
+                </button>
+              )}
+
+              {authMode === "resetConfirm" && (
+                <button className="auth-btn email" onClick={handleResetConfirm}>
+                  Reset password
+                </button>
+              )}
+
+              {authError && <div className="auth-error">{authError}</div>}
+
+              <div className="auth-links">
+                {authMode === "login" && (
+                  <>
+                    <span onClick={() => setAuthMode("forgot")}>
+                      Forgot password?
+                    </span>
+                    <span onClick={() => setAuthMode("signup")}>
+                      Join
+                    </span>
+                  </>
+                )}
+
+                {(authMode === "signup" || authMode === "forgot") && (
+                  <span onClick={() => setAuthMode("login")}>
+                    Back to login
+                  </span>
+                )}
+              </div>
+
+              {authMode === "login" && (
+                <>
+                  <div className="auth-divider"><span>or</span></div>
+
+                  <button
+                    className="auth-btn google"
+                    onClick={() => handleSocial("Google")}
+                  >
+                    Continue with Google
+                  </button>
+
+                  <button
+                    className="auth-btn facebook"
+                    onClick={() => handleSocial("Facebook")}
+                  >
+                    Continue with Facebook
+                  </button>
+                </>
+              )}
 
             </div>
           </div>
         </div>
       )}
 
-      {/* LOADING */}
       {authLoading && (
         <div className="auth-loading-overlay">
           <div className="auth-loading-box">
