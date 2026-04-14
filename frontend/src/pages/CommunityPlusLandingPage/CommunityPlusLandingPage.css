@@ -36,6 +36,22 @@
   line-height: 1.2;
 }
 
+.headline-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+}
+
+.headline-text {
+  flex: 1;
+}
+
+/* Echo sits to the right */
+.echo-inline {
+  width: 110px;
+  flex-shrink: 0;
+}
 .accent {
   color: #b63a2b;
 }

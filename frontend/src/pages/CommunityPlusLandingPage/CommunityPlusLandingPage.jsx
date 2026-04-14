@@ -35,20 +35,40 @@ export default function CommunityPlusLandingPage() {
 
       <main className="main-full">
 
-        {/* 🔥 TITLE */}
+        {/* 🔥 APP TITLE */}
         <div className="app-title">COMMUNITY ONE</div>
 
         <section className="layout-full">
 
-          {/* LEFT */}
+          {/* =========================
+              LEFT PANEL
+          ========================= */}
           <div className="left-panel">
 
-            <div className="headline">
-              <h1 className="tagline">
-                Real People. <span className="accent">Real News.</span> Real Time
-              </h1>
+            <div className="headline-row">
 
-              {/* 🔥 ECHO UNDER HEADING */}
+              {/* TEXT BLOCK */}
+              <div className="headline-text">
+                <h1 className="tagline">
+                  Real People.{" "}
+                  <span className="accent">Real News.</span>{" "}
+                  Real Time
+                </h1>
+
+                <p className="sub">
+                  A map-first local feed that prioritises what’s happening{" "}
+                  <b>here</b>.
+                </p>
+
+                <button
+                  className="btn primary"
+                  onClick={() => setShowAuth(true)}
+                >
+                  Explore your local area
+                </button>
+              </div>
+
+              {/* 🔥 ECHO (RIGHT OF TEXT) */}
               <div
                 className="echo-inline"
                 onClick={() => setShowAuth(true)}
@@ -57,38 +77,33 @@ export default function CommunityPlusLandingPage() {
                 <div className="echo-pulse"></div>
               </div>
 
-              <p className="sub">
-                A map-first local feed that prioritises what’s happening <b>here</b>.
-              </p>
-
-              <button
-                className="btn primary"
-                onClick={() => setShowAuth(true)}
-              >
-                Explore your local area
-              </button>
             </div>
 
           </div>
 
-          {/* RIGHT */}
+          {/* =========================
+              RIGHT PANEL
+          ========================= */}
           <div className="right-panel">
 
-            {/* FEED + MAP SIDE BY SIDE */}
             <div className="content-row">
 
               {/* FEED */}
               <div className="feed">
 
                 <div className="feed-card">
-                  <div className="feed-title">Road closure on Collins St</div>
+                  <div className="feed-title">
+                    🚧 Road closure on Collins St
+                  </div>
                   <div className="feed-meta">
                     📍 Melbourne CBD • 120m away
                   </div>
                 </div>
 
                 <div className="feed-card">
-                  <div className="feed-title">New cafe opening</div>
+                  <div className="feed-title">
+                    ☕ New cafe opening
+                  </div>
                   <div className="feed-meta">
                     📍 Richmond • 350m away
                   </div>
@@ -96,9 +111,12 @@ export default function CommunityPlusLandingPage() {
 
               </div>
 
-              {/* MAP IMAGE */}
+              {/* MAP */}
               <div className="map-box">
-                <img src="/map-placeholder.png" alt="Map" />
+                <img
+                  src="/map-placeholder.png"
+                  alt="Map"
+                />
               </div>
 
             </div>
@@ -108,7 +126,9 @@ export default function CommunityPlusLandingPage() {
         </section>
       </main>
 
-      {/* AUTH MODAL */}
+      {/* =========================
+          AUTH MODAL
+      ========================= */}
       {showAuth && (
         <div
           className="cpl-modalOverlay"
@@ -118,8 +138,12 @@ export default function CommunityPlusLandingPage() {
         >
           <div className="cpl-modal elite">
 
+            {/* HEADER */}
             <div className="cpl-modalHeader">
-              <div className="cpl-modalTitle">COMMUNITY ONE</div>
+              <div className="cpl-modalTitle">
+                COMMUNITY ONE
+              </div>
+
               <button
                 className="cpl-closeBtn"
                 onClick={() => setShowAuth(false)}
@@ -128,7 +152,9 @@ export default function CommunityPlusLandingPage() {
               </button>
             </div>
 
+            {/* BODY */}
             <div className="cpl-modalBody">
+
               <div className="auth-sub">
                 Sign in to your local community
               </div>
@@ -157,11 +183,15 @@ export default function CommunityPlusLandingPage() {
               >
                 Continue with Email
               </button>
+
             </div>
           </div>
         </div>
       )}
 
+      {/* =========================
+          LOADING
+      ========================= */}
       {authLoading && (
         <div className="auth-loading-overlay">
           <div className="auth-loading-box">
@@ -169,6 +199,7 @@ export default function CommunityPlusLandingPage() {
           </div>
         </div>
       )}
+
     </div>
   );
 }
