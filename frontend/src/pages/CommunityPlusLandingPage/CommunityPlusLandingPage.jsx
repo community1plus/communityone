@@ -63,7 +63,7 @@ export default function CommunityPlusLandingPage() {
           {/* ECHO */}
           <div
             className="echo-inline"
-            onClick={() => setShowAuth(true)}
+            onClick={() => safeRedirect()}   // 🔥 direct login trigger
           >
             <img src="/logo/echo.png" alt="Echo" />
             <div className="echo-pulse"></div>

@@ -5,7 +5,7 @@ BASE (LOCK VIEWPORT)
 html, body {
   height: 100%;
   margin: 0;
-  overflow: hidden; /* 🔥 removes scrollbar */
+  overflow: hidden;
 }
 
 body {
@@ -14,17 +14,27 @@ body {
 }
 
 /* =========================
-MAIN LAYOUT (FIT SCREEN)
+ROOT
+========================= */
+
+.cpl-root {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* =========================
+MAIN LAYOUT
 ========================= */
 
 .main-full {
-  height: 100vh; /* 🔥 force full screen */
+  height: 100%;
   max-width: 1000px;
   margin: 0 auto;
 
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* 🔥 distribute vertically */
+  justify-content: space-between;
 
   padding: 20px 20px 10px;
   box-sizing: border-box;
@@ -40,8 +50,7 @@ TITLE
   font-weight: 900;
   letter-spacing: 3px;
   color: #b63a2b;
-
-  margin-bottom: 10px; /* 🔥 reduced */
+  margin-bottom: 10px;
 }
 
 /* =========================
@@ -52,14 +61,23 @@ HEADLINE
   display: grid;
   grid-template-columns: 1fr 110px;
   align-items: center;
-
   gap: 20px;
 }
 
+.headline-text {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
 .tagline {
-  font-size: 42px; /* 🔥 reduced slightly */
+  font-size: 42px;
   font-weight: 800;
   line-height: 1.15;
+}
+
+.accent {
+  color: #b63a2b;
 }
 
 .sub {
@@ -68,12 +86,108 @@ HEADLINE
 }
 
 /* =========================
-ECHO
+BUTTON
+========================= */
+
+.btn {
+  width: fit-content;
+  padding: 8px 14px;
+  font-size: 13px;
+
+  border-radius: 14px;
+  border: 1px solid rgba(0,0,0,0.08);
+  background: rgba(182, 58, 43, 0.1);
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+.btn:hover {
+  background: rgba(182, 58, 43, 0.2);
+}
+
+/* =========================
+ECHO (FINAL POLISHED)
 ========================= */
 
 .echo-inline {
   width: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  position: relative;
   transform: translateY(4px);
+
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.echo-inline:hover {
+  transform: translateY(4px) scale(1.05);
+}
+
+.echo-inline img {
+  width: 100%;
+  display: block;
+
+  /* remove white-box feel */
+  mix-blend-mode: multiply;
+
+  /* realistic shadow */
+  filter:
+    brightness(1.05)
+    contrast(1.08)
+    drop-shadow(0 12px 20px rgba(182,58,43,0.25));
+}
+
+/* glow */
+
+.echo-inline::after {
+  content: "";
+  position: absolute;
+  width: 140%;
+  height: 140%;
+  border-radius: 50%;
+
+  background: radial-gradient(
+    rgba(182,58,43,0.12),
+    transparent 70%
+  );
+
+  z-index: -1;
+}
+
+/* pulse */
+
+.echo-pulse {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 160%;
+  height: 160%;
+
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+
+  background: radial-gradient(
+    rgba(182, 58, 43, 0.4),
+    rgba(182, 58, 43, 0.08),
+    transparent
+  );
+
+  animation: echoPulse 2.5s infinite ease-out;
+}
+
+@keyframes echoPulse {
+  0% {
+    transform: translate(-50%, -50%) scale(0.7);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.7);
+    opacity: 0;
+  }
 }
 
 /* =========================
@@ -85,20 +199,29 @@ CONTENT SECTION
   grid-template-columns: 1.3fr 240px;
   gap: 20px;
 
-  flex-grow: 1; /* 🔥 fills remaining space */
+  flex-grow: 1;
   align-items: center;
 }
 
 /* =========================
-MAP (AUTO FIT HEIGHT)
+MAP
 ========================= */
 
 .map-box {
-  height: 100%; /* 🔥 fills available space */
+  height: 100%;
   min-height: 240px;
 
   border-radius: 16px;
   overflow: hidden;
+
+  border: 1px solid rgba(0,0,0,0.08);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+}
+
+.map-box iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
 }
 
 /* =========================
@@ -114,26 +237,111 @@ FEED
 }
 
 /* =========================
-FEED CARDS
+FEED CARDS (IMPROVED)
 ========================= */
 
 .feed-card {
-  min-height: 70px;
+  width: 100%;
 
-  padding: 12px 14px;
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  padding: 14px 16px;
   border-radius: 16px;
 
-  background: #efeae4;
+  background: #efeae4; /* softer than white */
   border: 1px solid rgba(0,0,0,0.05);
+
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+
+  transition: all 0.2s ease;
+}
+
+.feed-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+.feed-title {
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+.feed-meta {
+  font-size: 12px;
+  color: #777;
 }
 
 /* =========================
-BUTTON
+MODAL
 ========================= */
 
-.btn {
-  padding: 8px 14px;
-  font-size: 13px;
+.cpl-modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cpl-modal {
+  background: white;
+  border-radius: 16px;
+  width: 320px;
+  padding: 20px;
+}
+
+.cpl-modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cpl-closeBtn {
+  border: none;
+  background: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.auth-btn {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  cursor: pointer;
+}
+
+.auth-divider {
+  text-align: center;
+  margin: 10px 0;
+}
+
+/* =========================
+LOADING
+========================= */
+
+.auth-loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-loading-box {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
 }
 
 /* =========================
@@ -142,14 +350,33 @@ RESPONSIVE
 
 @media (max-width: 768px) {
   html, body {
-    overflow: auto; /* allow scroll on mobile */
+    overflow: auto;
   }
 
   .main-full {
     height: auto;
   }
 
+  .headline-row {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
   .content-section {
     grid-template-columns: 1fr;
+  }
+
+  .feed {
+    height: auto;
+    gap: 12px;
+  }
+
+  .tagline {
+    font-size: 32px;
+  }
+
+  .echo-inline {
+    margin: 0 auto;
+    transform: none;
   }
 }
