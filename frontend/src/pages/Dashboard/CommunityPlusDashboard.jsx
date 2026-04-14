@@ -14,20 +14,19 @@ import CommunityPlusUserProfile from "../CommunityPlusUserProfile/CommunityPlusU
 import Onboarding from "../Onboarding/CommunityPlusOnboarding";
 import CommunityPlusHub from "../CommunityPlusHub/CommunityPlusHub";
 
-
 export default function CommunityPlusDashboard({ isLoaded }) {
   const navigate = useNavigate();
   const location = useLocation();
 
   const { viewLocation } = useLocationContext();
-  const { appUser, loading } = useAuth();
+  const { appUser, user, loading } = useAuth();
 
   const [activeView, setActiveView] = useState(
     location.state?.view || "dashboard"
   );
 
   /* ===============================
-     🔓 LOGOUT
+     LOGOUT
   =============================== */
 
   const handleLogout = async () => {
@@ -40,7 +39,7 @@ export default function CommunityPlusDashboard({ isLoaded }) {
   };
 
   /* ===============================
-     📍 LOCATION
+     LOCATION
   =============================== */
 
   const mapCenter =
@@ -49,11 +48,11 @@ export default function CommunityPlusDashboard({ isLoaded }) {
       : { lat: -37.8136, lng: 144.9631 };
 
   /* ===============================
-     BLOCK UNTIL USER READY
+     🔥 FIX: DO NOT BLOCK ON appUser
   =============================== */
 
-  if (loading || !appUser) {
-    return <div style={{ padding: 20 }}>Loading user...</div>;
+  if (loading) {
+    return <div style={{ padding: 20 }}>Loading...</div>;
   }
 
   /* ===============================
@@ -103,7 +102,7 @@ export default function CommunityPlusDashboard({ isLoaded }) {
 
             {/* RIGHT MAP */}
             <div className="map-column">
-              {!isLoaded || !window.google ? (
+              {!isLoaded ? (
                 <div className="map-loading">Loading map…</div>
               ) : (
                 <GoogleMap
@@ -128,7 +127,7 @@ export default function CommunityPlusDashboard({ isLoaded }) {
     <div className="dashboard-container">
 
       <CommunityPlusHeader
-        user={appUser}
+        user={appUser || user} // 🔥 fallback to Cognito user
         setActiveView={setActiveView}
         onLogout={handleLogout}
       />
@@ -143,10 +142,10 @@ export default function CommunityPlusDashboard({ isLoaded }) {
         <div
           className={`content-area ${
             ["yellowpages", "profile", "onboarding"].includes(activeView)
-            ? "full-width"
-            : ""
+              ? "full-width"
+              : ""
           }`}
-      >
+        >
           {renderView()}
         </div>
 

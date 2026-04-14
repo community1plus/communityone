@@ -23,25 +23,18 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
   const cardRefs = useRef({});
 
   /* ===============================
-     🛑 HARD GUARD (FIXES YOUR ERROR)
-  =============================== */
-  if (!isLoaded || !window.google) {
-    return <div className="map-loading">Loading map...</div>;
-  }
-
-  /* ===============================
-     📍 SYNC LOCATION
+     📍 SYNC LOCATION (SAFE)
   =============================== */
   useEffect(() => {
     if (coords?.lat && coords?.lng) {
       setMapCenter({ lat: coords.lat, lng: coords.lng });
 
-      if (mapRef.current) {
+      if (isLoaded && mapRef.current) {
         const bounds = mapRef.current.getBounds();
         if (bounds) fetchBusinesses(bounds);
       }
     }
-  }, [coords]);
+  }, [coords, isLoaded]);
 
   /* ===============================
      🔍 FETCH
@@ -77,7 +70,7 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
      🧠 SMART FETCH (DEBOUNCED)
   =============================== */
   const handleMapIdle = () => {
-    if (!mapRef.current) return;
+    if (!isLoaded || !mapRef.current) return;
 
     const bounds = mapRef.current.getBounds();
     if (!bounds) return;
@@ -117,21 +110,21 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
      🔄 INITIAL LOAD
   =============================== */
   useEffect(() => {
-    if (mapRef.current) {
+    if (isLoaded && mapRef.current) {
       const bounds = mapRef.current.getBounds();
       if (bounds) fetchBusinesses(bounds);
     }
-  }, []);
+  }, [isLoaded]);
 
   /* ===============================
      🔄 CATEGORY CHANGE
   =============================== */
   useEffect(() => {
-    if (mapRef.current) {
+    if (isLoaded && mapRef.current) {
       const bounds = mapRef.current.getBounds();
       if (bounds) fetchBusinesses(bounds);
     }
-  }, [category]);
+  }, [category, isLoaded]);
 
   /* ===============================
      📌 SELECT BUSINESS
@@ -140,8 +133,10 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
     setSelectedId(biz.id);
     setSelectedBusiness(biz);
 
-    mapRef.current?.panTo({ lat: biz.lat, lng: biz.lng });
-    mapRef.current?.setZoom(15);
+    if (mapRef.current) {
+      mapRef.current.panTo({ lat: biz.lat, lng: biz.lng });
+      mapRef.current.setZoom(15);
+    }
 
     setMapCenter({ lat: biz.lat, lng: biz.lng });
 
@@ -152,8 +147,7 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
   };
 
   /* ===============================
-     ⚡ PERFORMANCE BOOST
-     Memoized markers
+     ⚡ MEMO MARKERS
   =============================== */
   const markers = useMemo(() => {
     return businesses.map((biz) => (
@@ -212,15 +206,19 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
 
       {/* MAP */}
       <div className="map-column">
-        <GoogleMap
-          center={mapCenter}
-          zoom={14}
-          onLoad={(map) => (mapRef.current = map)}
-          onIdle={handleMapIdle}
-          mapContainerClassName="map-container loaded"
-        >
-          {markers}
-        </GoogleMap>
+        {!isLoaded ? (
+          <div className="map-loading">Loading map...</div>
+        ) : (
+          <GoogleMap
+            center={mapCenter}
+            zoom={14}
+            onLoad={(map) => (mapRef.current = map)}
+            onIdle={handleMapIdle}
+            mapContainerClassName="map-container loaded"
+          >
+            {markers}
+          </GoogleMap>
+        )}
       </div>
 
       {/* DETAIL PANEL */}
@@ -243,6 +241,7 @@ export default function CommunityPlusYellowPages({ coords, isLoaded }) {
           </div>
         </div>
       )}
+
     </div>
   );
 }
