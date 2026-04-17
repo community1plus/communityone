@@ -17,29 +17,21 @@ export default function AuthGate() {
           return;
         }
 
-        let res = await apiFetch("/users/me");
+        const res = await apiFetch("/users/me");
+        console.log("AuthGate /users/me:", res);
 
-        if (!res || !res.id) {
-          res = await apiFetch("/users/create", {
-            method: "POST",
-            body: JSON.stringify({
-              email: user.email,
-              sub: user.sub,
-              mfaEnabled: false,
-              homeAddress: null,
-              profileLevel: 0,
-              profileCompletionPercent: 0,
-            }),
-          });
+        if (!res?.user?.id) {
+          throw new Error("User record not returned from /users/me");
         }
 
         setAppUser(res);
 
         const onboardingCompleted =
-          res?.mfaEnabled === true && !!res?.homeAddress;
+          res?.user?.mfa_enabled === true &&
+          !!res?.profile?.home_address;
 
         if (!onboardingCompleted) {
-          navigate("/onboarding", { replace: true });
+          navigate("/profile-setup", { replace: true });
         } else {
           navigate("/home", { replace: true });
         }
