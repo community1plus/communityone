@@ -1,15 +1,15 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
-import CommunityPlusLandingPage from "../pages/CommunityPlusLandingPage/CommunityPlusLandingPage";
+import CommunityPlusLandingPage from "../CommunityPlusLandingPage/CommunityPlusLandingPage";
 import CommunityPlusDashboard, {
   CommunityPlusDashboardHome,
-} from "./pages/Dashboard/CommunityPlusDashboard";
-import Onboarding from "../pages/Onboarding/CommunityPlusOnboarding";
-import AuthGate from "../pages/AuthGate";
-import CommunityPlusUserProfile from "../pages/CommunityPlusUserProfile/CommunityPlusUserProfile";
-import CommunityPlusYellowPages from "../pages/YellowPages/CommunityPlusYellowPages";
-import CommunityPlusHub from "../pages/CommunityPlusHub/CommunityPlusHub";
+} from "../Dashboard/CommunityPlusDashboard";
+import Onboarding from "../Onboarding/CommunityPlusOnboarding";
+import AuthGate from "../AuthGate";
+import CommunityPlusUserProfile from "../CommunityPlusUserProfile/CommunityPlusUserProfile";
+import CommunityPlusYellowPages from "../YellowPages/CommunityPlusYellowPages";
+import CommunityPlusHub from "../CommunityPlusHub/CommunityPlusHub";
 
 function AppLoading() {
   return <div style={{ padding: 20 }}>Initialising...</div>;
