@@ -5,47 +5,52 @@ import { apiFetch } from "../../services/api";
 
 export default function AuthGate() {
   const navigate = useNavigate();
-  const { user, appUser, setAppUser } = useAuth();
+  const { user, setAppUser, authLoading } = useAuth();
 
   useEffect(() => {
+    if (authLoading) return;
+
     const bootstrap = async () => {
       try {
         if (!user) {
-          navigate("/");
+          navigate("/", { replace: true });
           return;
         }
 
-        // 🔥 1. CHECK IF USER EXISTS IN YOUR DB
         let res = await apiFetch("/users/me");
 
-        // 🔥 2. IF NOT → CREATE USER
         if (!res || !res.id) {
           res = await apiFetch("/users/create", {
             method: "POST",
             body: JSON.stringify({
               email: user.email,
-              sub: user.sub
+              sub: user.sub,
+              mfaEnabled: false,
+              homeAddress: null,
+              profileLevel: 0,
+              profileCompletionPercent: 0,
             }),
           });
         }
 
         setAppUser(res);
 
-        // 🔥 3. ROUTING LOGIC
-        if (!res.profileCompleted) {
-          navigate("/onboarding");
-        } else {
-          navigate("/home");
-        }
+        const onboardingCompleted =
+          res?.mfaEnabled === true && !!res?.homeAddress;
 
+        if (!onboardingCompleted) {
+          navigate("/onboarding", { replace: true });
+        } else {
+          navigate("/home", { replace: true });
+        }
       } catch (err) {
         console.error("AuthGate error:", err);
-        navigate("/");
+        navigate("/", { replace: true });
       }
     };
 
     bootstrap();
-  }, [user]);
+  }, [user, authLoading, navigate, setAppUser]);
 
-  return <div style={{ padding: 20 }}>Setting up your profile...</div>;
+  return <div style={{ padding: 20 }}>Setting up your account...</div>;
 }
