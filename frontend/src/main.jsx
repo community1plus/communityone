@@ -18,7 +18,12 @@ Amplify.configure({
         email: true,
         oauth: {
           domain: outputs.auth.oauth?.domain,
-          scopes: outputs.auth.oauth?.scopes ?? [],
+          scopes: [
+            "openid",
+            "email",
+            "profile",
+            "aws.cognito.signin.user.admin",
+          ],
           redirectSignIn: outputs.auth.oauth?.redirect_sign_in_uri ?? [],
           redirectSignOut: outputs.auth.oauth?.redirect_sign_out_uri ?? [],
           responseType: outputs.auth.oauth?.response_type ?? "code",
@@ -27,7 +32,7 @@ Amplify.configure({
       },
     },
   },
-})
+});
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

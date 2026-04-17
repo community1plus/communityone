@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./CommunityPlusLandingPage.css";
 
 import {
@@ -9,16 +10,16 @@ import {
   confirmResetPassword,
   signInWithRedirect,
   fetchAuthSession,
-  fetchUserAttributes
 } from "aws-amplify/auth";
 
 import { Hub } from "aws-amplify/utils";
 
 export default function CommunityPlusLandingPage() {
+  const navigate = useNavigate();
+
   const [showAuth, setShowAuth] = useState(false);
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState("");
-
   const [authMode, setAuthMode] = useState("login");
 
   const [email, setEmail] = useState("");
@@ -26,67 +27,61 @@ export default function CommunityPlusLandingPage() {
   const [confirmCode, setConfirmCode] = useState("");
 
   /* ===============================
-     AUTH LISTENER (FIX SOCIAL DELAY)
+     AUTH LISTENER
   =============================== */
   useEffect(() => {
-    const unsub = Hub.listen("auth", async ({ payload }) => {
-      if (payload.event === "signedIn") {
-        await routeUser();
+    const unsubscribe = Hub.listen("auth", ({ payload }) => {
+      if (payload?.event === "signedIn") {
+        navigate("/auth-gate", { replace: true });
       }
     });
 
-    return () => unsub();
-  }, []);
+    return () => unsubscribe();
+  }, [navigate]);
 
   /* ===============================
      CHECK SESSION ON LOAD
   =============================== */
   useEffect(() => {
+    let isMounted = true;
+
+    const checkSession = async () => {
+      try {
+        const session = await fetchAuthSession();
+
+        if (!isMounted) return;
+
+        if (session?.tokens?.idToken) {
+          navigate("/auth-gate", { replace: true });
+        }
+      } catch (err) {
+        console.warn("No active session on landing page:", err);
+      }
+    };
+
     checkSession();
-  }, []);
 
-  const checkSession = async () => {
-    try {
-      const session = await fetchAuthSession();
-
-      if (session?.tokens?.idToken) {
-        await routeUser();
-      }
-    } catch {
-      // not signed in → do nothing
-    }
-  };
+    return () => {
+      isMounted = false;
+    };
+  }, [navigate]);
 
   /* ===============================
-     ROUTING LOGIC (CRITICAL)
-  =============================== */
-  const routeUser = async () => {
-    try {
-      const attributes = await fetchUserAttributes();
-
-      // 🔥 if no profile → send to setup
-      if (!attributes?.name) {
-        window.location.href = "/profile-setup";
-      } else {
-        window.location.href = "/home";
-      }
-    } catch {
-      window.location.href = "/home";
-    }
-  };
-
-  /* ===============================
-     ENTRY (ECHO / BUTTON)
+     ENTRY
   =============================== */
   const handleEntry = async () => {
+    setAuthError("");
+
     try {
       const session = await fetchAuthSession();
 
       if (session?.tokens?.idToken) {
-        await routeUser();
+        navigate("/auth-gate", { replace: true });
         return;
       }
-    } catch {}
+    } catch (err) {
+      console.warn("No active session on entry:", err);
+    }
 
     setShowAuth(true);
   };
@@ -100,13 +95,15 @@ export default function CommunityPlusLandingPage() {
 
     try {
       await signIn({
-        username: email,
-        password
+        username: email.trim(),
+        password,
       });
 
-      await routeUser();
+      navigate("/auth-gate", { replace: true });
     } catch (err) {
-      setAuthError(err.message || "Login failed");
+      console.error("Email login failed:", err);
+      setAuthError(err?.message || "Login failed");
+    } finally {
       setAuthLoading(false);
     }
   };
@@ -120,17 +117,20 @@ export default function CommunityPlusLandingPage() {
 
     try {
       await signUp({
-        username: email,
+        username: email.trim(),
         password,
         options: {
-          userAttributes: { email }
-        }
+          userAttributes: {
+            email: email.trim(),
+          },
+        },
       });
 
       setAuthMode("confirmSignup");
-      setAuthLoading(false);
     } catch (err) {
-      setAuthError(err.message);
+      console.error("Signup failed:", err);
+      setAuthError(err?.message || "Signup failed");
+    } finally {
       setAuthLoading(false);
     }
   };
@@ -140,17 +140,20 @@ export default function CommunityPlusLandingPage() {
   =============================== */
   const handleConfirmSignup = async () => {
     setAuthLoading(true);
+    setAuthError("");
 
     try {
       await confirmSignUp({
-        username: email,
-        confirmationCode: confirmCode
+        username: email.trim(),
+        confirmationCode: confirmCode.trim(),
       });
 
       setAuthMode("login");
-      setAuthLoading(false);
+      setAuthError("Account verified. You can now sign in.");
     } catch (err) {
-      setAuthError(err.message);
+      console.error("Confirm signup failed:", err);
+      setAuthError(err?.message || "Verification failed");
+    } finally {
       setAuthLoading(false);
     }
   };
@@ -160,13 +163,18 @@ export default function CommunityPlusLandingPage() {
   =============================== */
   const handleForgot = async () => {
     setAuthLoading(true);
+    setAuthError("");
 
     try {
-      await resetPassword({ username: email });
+      await resetPassword({
+        username: email.trim(),
+      });
+
       setAuthMode("resetConfirm");
-      setAuthLoading(false);
     } catch (err) {
-      setAuthError(err.message);
+      console.error("Reset password request failed:", err);
+      setAuthError(err?.message || "Could not send reset code");
+    } finally {
       setAuthLoading(false);
     }
   };
@@ -176,18 +184,21 @@ export default function CommunityPlusLandingPage() {
   =============================== */
   const handleResetConfirm = async () => {
     setAuthLoading(true);
+    setAuthError("");
 
     try {
       await confirmResetPassword({
-        username: email,
-        confirmationCode: confirmCode,
-        newPassword: password
+        username: email.trim(),
+        confirmationCode: confirmCode.trim(),
+        newPassword: password,
       });
 
       setAuthMode("login");
-      setAuthLoading(false);
+      setAuthError("Password reset successful. You can now sign in.");
     } catch (err) {
-      setAuthError(err.message);
+      console.error("Password reset confirm failed:", err);
+      setAuthError(err?.message || "Password reset failed");
+    } finally {
       setAuthLoading(false);
     }
   };
@@ -197,10 +208,12 @@ export default function CommunityPlusLandingPage() {
   =============================== */
   const handleSocial = async (provider) => {
     setAuthLoading(true);
+    setAuthError("");
 
     try {
       await signInWithRedirect({ provider });
-    } catch {
+    } catch (err) {
+      console.error(`${provider} login failed:`, err);
       setAuthError("Social login failed");
       setAuthLoading(false);
     }
@@ -209,11 +222,8 @@ export default function CommunityPlusLandingPage() {
   return (
     <div className="cpl-root">
       <main className="main-full">
-
-        {/* TITLE */}
         <div className="app-title">COMMUNITY ONE</div>
 
-        {/* HEADLINE */}
         <div className="headline-row">
           <div className="headline-text">
             <h1 className="tagline">
@@ -229,14 +239,12 @@ export default function CommunityPlusLandingPage() {
             </button>
           </div>
 
-          {/* ECHO */}
           <div className="echo-inline" onClick={handleEntry}>
             <img src="/logo/echo.png" alt="Echo" />
             <div className="echo-pulse"></div>
           </div>
         </div>
 
-        {/* MAP + FEED */}
         <div className="content-section">
           <div className="map-box">
             <iframe
@@ -263,34 +271,33 @@ export default function CommunityPlusLandingPage() {
             </div>
           </div>
         </div>
-
       </main>
 
-      {/* =========================
-          AUTH MODAL
-      ========================= */}
       {showAuth && (
         <div className="cpl-modalOverlay">
           <div className="cpl-modal elite">
-
             <div className="cpl-modalHeader">
               <div className="cpl-modalTitle">COMMUNITY ONE</div>
               <button
                 className="cpl-closeBtn"
-                onClick={() => setShowAuth(false)}
+                onClick={() => {
+                  if (!authLoading) {
+                    setShowAuth(false);
+                    setAuthError("");
+                  }
+                }}
               >
                 ×
               </button>
             </div>
 
             <div className="cpl-modalBody">
-
               <div className="auth-sub">
                 {authMode === "login" && "Sign in to your local community"}
                 {authMode === "signup" && "Create your account"}
                 {authMode === "forgot" && "Reset your password"}
                 {authMode === "confirmSignup" && "Enter verification code"}
-                {authMode === "resetConfirm" && "Enter code & new password"}
+                {authMode === "resetConfirm" && "Enter code and new password"}
               </div>
 
               <input
@@ -320,31 +327,51 @@ export default function CommunityPlusLandingPage() {
               )}
 
               {authMode === "login" && (
-                <button className="auth-btn email" onClick={handleEmailLogin}>
+                <button
+                  className="auth-btn email"
+                  onClick={handleEmailLogin}
+                  disabled={authLoading}
+                >
                   Sign in with Email
                 </button>
               )}
 
               {authMode === "signup" && (
-                <button className="auth-btn email" onClick={handleSignup}>
+                <button
+                  className="auth-btn email"
+                  onClick={handleSignup}
+                  disabled={authLoading}
+                >
                   Create account
                 </button>
               )}
 
               {authMode === "confirmSignup" && (
-                <button className="auth-btn email" onClick={handleConfirmSignup}>
+                <button
+                  className="auth-btn email"
+                  onClick={handleConfirmSignup}
+                  disabled={authLoading}
+                >
                   Verify account
                 </button>
               )}
 
               {authMode === "forgot" && (
-                <button className="auth-btn email" onClick={handleForgot}>
+                <button
+                  className="auth-btn email"
+                  onClick={handleForgot}
+                  disabled={authLoading}
+                >
                   Send reset code
                 </button>
               )}
 
               {authMode === "resetConfirm" && (
-                <button className="auth-btn email" onClick={handleResetConfirm}>
+                <button
+                  className="auth-btn email"
+                  onClick={handleResetConfirm}
+                  disabled={authLoading}
+                >
                   Reset password
                 </button>
               )}
@@ -363,8 +390,13 @@ export default function CommunityPlusLandingPage() {
                   </>
                 )}
 
-                {(authMode === "signup" || authMode === "forgot") && (
-                  <span onClick={() => setAuthMode("login")}>
+                {(authMode === "signup" || authMode === "forgot" || authMode === "resetConfirm" || authMode === "confirmSignup") && (
+                  <span
+                    onClick={() => {
+                      setAuthMode("login");
+                      setAuthError("");
+                    }}
+                  >
                     Back to login
                   </span>
                 )}
@@ -372,11 +404,14 @@ export default function CommunityPlusLandingPage() {
 
               {authMode === "login" && (
                 <>
-                  <div className="auth-divider"><span>or</span></div>
+                  <div className="auth-divider">
+                    <span>or</span>
+                  </div>
 
                   <button
                     className="auth-btn google"
                     onClick={() => handleSocial("Google")}
+                    disabled={authLoading}
                   >
                     Continue with Google
                   </button>
@@ -384,12 +419,12 @@ export default function CommunityPlusLandingPage() {
                   <button
                     className="auth-btn facebook"
                     onClick={() => handleSocial("Facebook")}
+                    disabled={authLoading}
                   >
                     Continue with Facebook
                   </button>
                 </>
               )}
-
             </div>
           </div>
         </div>
@@ -397,9 +432,7 @@ export default function CommunityPlusLandingPage() {
 
       {authLoading && (
         <div className="auth-loading-overlay">
-          <div className="auth-loading-box">
-            Signing you in…
-          </div>
+          <div className="auth-loading-box">Signing you in…</div>
         </div>
       )}
     </div>

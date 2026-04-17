@@ -7,10 +7,20 @@ import Onboarding from "./pages/Onboarding/CommunityPlusOnboarding";
 import AuthGate from "./pages/AuthGate";
 
 /* =========================
+   LOADING SCREEN
+========================= */
+function AppLoading() {
+  return <div style={{ padding: 20 }}>Initialising...</div>;
+}
+
+/* =========================
    PROTECTED ROUTE
 ========================= */
 function ProtectedRoute({ user, children }) {
-  if (!user) return <Navigate to="/" replace />;
+  if (!user?.authenticated) {
+    return <Navigate to="/" replace />;
+  }
+
   return children;
 }
 
@@ -18,7 +28,10 @@ function ProtectedRoute({ user, children }) {
    PUBLIC ROUTE
 ========================= */
 function PublicRoute({ user, children }) {
-  if (user) return <Navigate to="/auth-gate" replace />;
+  if (user?.authenticated) {
+    return <Navigate to="/auth-gate" replace />;
+  }
+
   return children;
 }
 
@@ -26,11 +39,12 @@ export default function App() {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <div style={{ padding: 20 }}>Initialising...</div>;
+    return <AppLoading />;
   }
 
   return (
     <Routes>
+      {/* LANDING */}
       <Route
         path="/"
         element={
@@ -40,6 +54,7 @@ export default function App() {
         }
       />
 
+      {/* AUTH GATE */}
       <Route
         path="/auth-gate"
         element={
@@ -49,6 +64,7 @@ export default function App() {
         }
       />
 
+      {/* ONBOARDING */}
       <Route
         path="/profile-setup"
         element={
@@ -58,6 +74,7 @@ export default function App() {
         }
       />
 
+      {/* HOME */}
       <Route
         path="/home"
         element={
@@ -67,6 +84,7 @@ export default function App() {
         }
       />
 
+      {/* FALLBACK */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
