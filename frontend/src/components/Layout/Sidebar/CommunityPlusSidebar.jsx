@@ -16,23 +16,16 @@ export default function CommunityPlusSidebar() {
     }
   };
 
-  /* ===============================
-     NAVIGATION HELPER
-  =============================== */
   const go = (path) => {
     if (location.pathname !== path) {
       navigate(path);
     }
   };
 
-  /* ===============================
-     ACTIVE STATE
-  =============================== */
   const isActive = (path) => location.pathname === path;
 
   return (
     <aside className="sidebar">
-
       <div
         className={`sidebar-item ${isActive("/home") ? "active" : ""}`}
         onClick={() => go("/home")}
@@ -93,10 +86,7 @@ export default function CommunityPlusSidebar() {
 
       <hr className="sidebar-divider" />
 
-      <div
-        className="sidebar-item logout"
-        onClick={handleLogout}
-      >
+      <div className="sidebar-item logout" onClick={handleLogout}>
         🚪 Logout
       </div>
     </aside>

@@ -5,34 +5,35 @@ import CommunityPlusLandingPage from "./pages/CommunityPlusLandingPage/Community
 import CommunityPlusDashboard from "./pages/Dashboard/CommunityPlusDashboard";
 import Onboarding from "./pages/Onboarding/CommunityPlusOnboarding";
 import AuthGate from "./pages/AuthGate";
+import CommunityPlusUserProfile from "./pages/CommunityPlusUserProfile/CommunityPlusUserProfile";
+import CommunityPlusYellowPages from "./pages/YellowPages/CommunityPlusYellowPages";
+import CommunityPlusHub from "./pages/CommunityPlusHub/CommunityPlusHub";
 import PostComposer from "./components/Layout/Sidebar/Post/PostComposer";
-/* =========================
-   LOADING SCREEN
-========================= */
+
 function AppLoading() {
   return <div style={{ padding: 20 }}>Initialising...</div>;
 }
 
-/* =========================
-   PROTECTED ROUTE
-========================= */
 function ProtectedRoute({ user, children }) {
   if (!user?.authenticated) {
     return <Navigate to="/" replace />;
   }
-
   return children;
 }
 
-/* =========================
-   PUBLIC ROUTE
-========================= */
 function PublicRoute({ user, children }) {
   if (user?.authenticated) {
     return <Navigate to="/auth-gate" replace />;
   }
-
   return children;
+}
+
+function DashboardHome() {
+  return <div style={{ padding: 20 }}>Home content goes here</div>;
+}
+
+function PlaceholderPage({ title }) {
+  return <div style={{ padding: 20 }}>{title}</div>;
 }
 
 export default function App() {
@@ -44,7 +45,6 @@ export default function App() {
 
   return (
     <Routes>
-      {/* LANDING */}
       <Route
         path="/"
         element={
@@ -54,7 +54,6 @@ export default function App() {
         }
       />
 
-      {/* AUTH GATE */}
       <Route
         path="/auth-gate"
         element={
@@ -64,29 +63,25 @@ export default function App() {
         }
       />
 
-      {/* ONBOARDING */}
       <Route
-        path="/profile-setup"
-        element={
-          <ProtectedRoute user={user}>
-            <Onboarding />
-          </ProtectedRoute>
-        }
-      />
-
-      {/* HOME */}
-      <Route
-        path="/home"
         element={
           <ProtectedRoute user={user}>
             <CommunityPlusDashboard />
           </ProtectedRoute>
         }
-      />
+      >
+        <Route path="/home" element={<DashboardHome />} />
+        <Route path="/profile-setup" element={<Onboarding />} />
+        <Route path="/profile" element={<CommunityPlusUserProfile />} />
+        <Route path="/yellowpages" element={<CommunityPlusYellowPages />} />
+        <Route path="/communityplus" element={<CommunityPlusHub />} />
+        <Route path="/post" element={<PostComposer />} />
+        <Route path="/event" element={<PlaceholderPage title="Event page" />} />
+        <Route path="/incident" element={<PlaceholderPage title="Incident page" />} />
+        <Route path="/beacon" element={<PlaceholderPage title="Beacon page" />} />
+      </Route>
 
-      {/* FALLBACK */}
       <Route path="*" element={<Navigate to="/" replace />} />
-      <Route path="/post" element={<PostComposer />} />
     </Routes>
   );
 }

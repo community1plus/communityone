@@ -1,76 +1,54 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import React from "react";
+import { signOut } from "aws-amplify/auth";
+import { useNavigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
-import CommunityPlusLandingPage from "../CommunityPlusLandingPage/CommunityPlusLandingPage";
-import CommunityPlusDashboard from "../Dashboard/CommunityPlusDashboard";
-import Onboarding from "../Onboarding/CommunityPlusOnboarding";
-import AuthGate from "../AuthGate";
-import CommunityPlusUserProfile from "../CommunityPlusUserProfile/CommunityPlusUserProfile";
-import CommunityPlusYellowPages from "../YellowPages/CommunityPlusYellowPages";
-import CommunityPlusHub from "../CommunityPlusHub/CommunityPlusHub";
+import CommunityPlusHeader from "../../components/Layout/Header/CommunityPlusHeader";
+import CommunityPlusSidebar from "../../components/Layout/Sidebar/CommunityPlusSidebar";
 
-function AppLoading() {
-  return <div style={{ padding: 20 }}>Initialising...</div>;
-}
+export default function CommunityPlusDashboard() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { appUser, user, loading } = useAuth();
 
-function ProtectedRoute({ user, children }) {
-  if (!user?.authenticated) {
-    return <Navigate to="/" replace />;
-  }
-
-  return children;
-}
-
-function PublicRoute({ user, children }) {
-  if (user?.authenticated) {
-    return <Navigate to="/auth-gate" replace />;
-  }
-
-  return children;
-}
-
-export default function App() {
-  const { user, loading } = useAuth();
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      navigate("/", { replace: true });
+    } catch (err) {
+      console.error("Logout failed:", err);
+    }
+  };
 
   if (loading) {
-    return <AppLoading />;
+    return <div style={{ padding: 20 }}>Loading...</div>;
   }
 
+  const isFullWidthRoute = [
+    "/profile-setup",
+    "/profile",
+    "/yellowpages",
+    "/communityplus",
+    "/post",
+    "/event",
+    "/incident",
+    "/beacon",
+  ].includes(location.pathname);
+
   return (
-    <Routes>
-      <Route
-        path="/"
-        element={
-          <PublicRoute user={user}>
-            <CommunityPlusLandingPage />
-          </PublicRoute>
-        }
+    <div className="dashboard-container">
+      <CommunityPlusHeader
+        user={appUser?.user || appUser || user}
+        onLogout={handleLogout}
       />
 
-      <Route
-        path="/auth-gate"
-        element={
-          <ProtectedRoute user={user}>
-            <AuthGate />
-          </ProtectedRoute>
-        }
-      />
+      <main className="main">
+        <CommunityPlusSidebar />
 
-      <Route
-        element={
-          <ProtectedRoute user={user}>
-            <CommunityPlusDashboard />
-          </ProtectedRoute>
-        }
-      >
-        <Route path="/home" element={<CommunityPlusDashboard/>} />
-        <Route path="/profile-setup" element={<Onboarding />} />
-        <Route path="/profile" element={<CommunityPlusUserProfile />} />
-        <Route path="/yellowpages" element={<CommunityPlusYellowPages />} />
-        <Route path="/communityplus" element={<CommunityPlusHub />} />
-      </Route>
-
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+        <div className={`content-area ${isFullWidthRoute ? "full-width" : ""}`}>
+          <Outlet />
+        </div>
+      </main>
+    </div>
   );
 }
