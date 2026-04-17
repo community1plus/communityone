@@ -1,108 +1,73 @@
-import React, { createContext, useContext, useEffect, useState, useRef } from "react";
-import {
-  fetchAuthSession,
-  fetchUserAttributes,
-  signOut,
-} from "aws-amplify/auth";
-import { Hub } from "aws-amplify/utils";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { useAuth } from "./context/AuthContext";
 
-const AuthContext = createContext();
+import CommunityPlusLandingPage from "./pages/CommunityPlusLandingPage/CommunityPlusLandingPage";
+import CommunityPlusDashboard from "./pages/Dashboard/CommunityPlusDashboard";
+import Onboarding from "./pages/Onboarding/CommunityPlusOnboarding";
+import AuthGate from "./pages/AuthGate/AuthGate";
 
-export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [appUser, setAppUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  const loadingRef = useRef(false); // 🔥 prevents duplicate loads
-
-  /* ===============================
-     LOAD USER (STABLE)
-  =============================== */
-  const loadUser = async () => {
-    // 🔥 prevent double execution
-    if (loadingRef.current) return;
-    loadingRef.current = true;
-
-    try {
-      const session = await fetchAuthSession();
-
-      if (!session?.tokens?.idToken) {
-        console.log("⚠️ No active session");
-        setUser(null);
-        setAppUser(null);
-        return;
-      }
-
-      const attributes = await fetchUserAttributes();
-
-      console.log("✅ User loaded:", attributes);
-
-      setUser({
-        ...attributes,
-        authenticated: true,
-      });
-
-    } catch (err) {
-      console.log("⚠️ Auth error:", err);
-      setUser(null);
-      setAppUser(null);
-    } finally {
-      setLoading(false);          // 🔥 ALWAYS resolves UI
-      loadingRef.current = false; // 🔥 release lock
-    }
-  };
-
-  /* ===============================
-     INITIAL LOAD (ONCE ONLY)
-  =============================== */
-  useEffect(() => {
-    loadUser();
-  }, []);
-
-  /* ===============================
-     AUTH EVENTS (FIXED)
-  =============================== */
-  useEffect(() => {
-    const unsubscribe = Hub.listen("auth", ({ payload }) => {
-      console.log("🔔 Auth event:", payload.event);
-
-      if (payload.event === "signedIn") {
-        // ❌ DO NOT set loading true again
-        loadUser(); // just refresh user
-      }
-
-      if (payload.event === "signedOut") {
-        setUser(null);
-        setAppUser(null);
-        setLoading(false);
-      }
-    });
-
-    return unsubscribe;
-  }, []);
-
-  /* ===============================
-     LOGOUT
-  =============================== */
-  const logout = async () => {
-    await signOut();
-    setUser(null);
-    setAppUser(null);
-  };
-
-  return (
-    <AuthContext.Provider
-      value={{
-        user,
-        appUser,
-        setAppUser,
-        loading,
-        logout,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
+/* =========================
+   PROTECTED ROUTE
+========================= */
+function ProtectedRoute({ user, children }) {
+  if (!user) return <Navigate to="/" replace />;
+  return children;
 }
 
-export const useAuth = () => useContext(AuthContext);
+/* =========================
+   PUBLIC ROUTE
+========================= */
+function PublicRoute({ user, children }) {
+  if (user) return <Navigate to="/auth-gate" replace />;
+  return children;
+}
+
+export default function App() {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return <div style={{ padding: 20 }}>Initialising...</div>;
+  }
+
+  return (
+    <Routes>
+      <Route
+        path="/"
+        element={
+          <PublicRoute user={user}>
+            <CommunityPlusLandingPage />
+          </PublicRoute>
+        }
+      />
+
+      <Route
+        path="/auth-gate"
+        element={
+          <ProtectedRoute user={user}>
+            <AuthGate />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/profile-setup"
+        element={
+          <ProtectedRoute user={user}>
+            <Onboarding />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/home"
+        element={
+          <ProtectedRoute user={user}>
+            <CommunityPlusDashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+}
