@@ -9,7 +9,7 @@ import { AuthProvider } from "./context/AuthContext";
 import { LocationProvider } from "./context/LocationContext"; // ✅ NEW
 
 // ✅ DO NOT MODIFY outputs
-Amplify.configure(outputs);
+Amplify.configure(auth: outputs.auth);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
