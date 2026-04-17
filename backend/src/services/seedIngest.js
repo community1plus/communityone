@@ -8,10 +8,12 @@ import { enqueueIngest, generateTiles } from "./ingest.js";
 
 const MELBOURNE = { name: "Melbourne", lat: -37.8136, lng: 144.9631 };
 const SYDNEY = { name: "Sydney", lat: -33.8688, lng: 151.2093 };
+const BRISBANE = { lat: -27.4679, lng: 153.0280 };
 
 // 👉 choose cities
 const TARGETS = [
-  SYDNEY,
+  BRISBANE,  
+  //SYDNEY,
   // MELBOURNE,
 ];
 

@@ -8,11 +8,20 @@ import { ingestGoogle, ingestOSM } from "../src/services/ingest.js";
    CONFIG
 ===================================================== */
 
-// 🔥 control parallelism (VERY IMPORTANT)
-const CONCURRENCY = 2;
+// 🔥 HARD LIMIT (critical)
+const CONCURRENCY = 1;
 
-// 🔥 delay helper (for rate limiting)
+// 🔥 delays
+const GOOGLE_DELAY = 200;
+
+// 🔥 GLOBAL OSM THROTTLE (key fix)
+const OSM_MIN_INTERVAL = 4000; // 4 seconds between ALL OSM calls
+
+// 🔥 helper
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
+
+// 🔥 rolling timestamp tracker
+let lastOSMTime = 0;
 
 /* =====================================================
    WORKER
@@ -28,23 +37,49 @@ const worker = new Worker(
     console.log(`📍 Processing job: ${lat}, ${lng}, ${source}`);
 
     try {
+
+      /* ================================
+         GOOGLE (FAST + SAFE)
+      ================================= */
+
       if (source === "google") {
         await ingestGoogle({ lat, lng });
 
-        // 🔥 small delay to avoid Google rate limits
-        await delay(300);
+        // small smoothing delay
+        await delay(GOOGLE_DELAY);
+
+        return;
       }
 
-      if (source === "osm") {
-        // 🔥 bigger delay for OSM (strict API)
-        await delay(1000);
+      /* ================================
+         OSM (GLOBAL THROTTLED)
+      ================================= */
 
-        await ingestOSM({ lat, lng });
+      if (source === "osm") {
+
+        const now = Date.now();
+
+        // 🔥 enforce spacing BETWEEN ALL OSM requests
+        const wait = Math.max(0, OSM_MIN_INTERVAL - (now - lastOSMTime));
+
+        if (wait > 0) {
+          console.log(`⏳ OSM throttle: waiting ${wait}ms`);
+          await delay(wait);
+        }
+
+        try {
+          await ingestOSM({ lat, lng });
+        } finally {
+          // 🔥 update AFTER request completes
+          lastOSMTime = Date.now();
+        }
+
+        return;
       }
 
     } catch (err) {
       console.error("❌ Worker error:", err.message);
-      throw err; // let BullMQ handle retry/failure
+      throw err;
     }
   },
   {
