@@ -60,7 +60,7 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
 
     async function loadProfile() {
       try {
-        const data = await apiFetch("/api/users/me");
+        const data = await apiFetch("/users/me");
 
         if (data.profile) {
           setFormData({
