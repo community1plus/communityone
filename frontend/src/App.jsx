@@ -5,8 +5,7 @@ import CommunityPlusLandingPage from "./pages/CommunityPlusLandingPage/Community
 import CommunityPlusDashboard from "./pages/Dashboard/CommunityPlusDashboard";
 import Onboarding from "./pages/Onboarding/CommunityPlusOnboarding";
 import AuthGate from "./pages/AuthGate";
-import PostComposer from "./pages/PostComposer/PostComposer";
-
+import PostComposer from "./components/Layout/Sidebar/Post/PostComposer";
 /* =========================
    LOADING SCREEN
 ========================= */
