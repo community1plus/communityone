@@ -170,8 +170,8 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
     try {
       const endpoint =
         mode === "onboarding"
-          ? "/api/users/profile/create"
-          : "/api/users/update";
+          ? "/users/profile/create"
+          : "/users/update";
 
       await apiFetch(endpoint, {
         method: "POST",
