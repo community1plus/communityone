@@ -2,9 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 import CommunityPlusLandingPage from "../CommunityPlusLandingPage/CommunityPlusLandingPage";
-import CommunityPlusDashboard, {
-  CommunityPlusDashboardHome,
-} from "../Dashboard/CommunityPlusDashboard";
+import CommunityPlusDashboard from "../Dashboard/CommunityPlusDashboard";
 import Onboarding from "../Onboarding/CommunityPlusOnboarding";
 import AuthGate from "../AuthGate";
 import CommunityPlusUserProfile from "../CommunityPlusUserProfile/CommunityPlusUserProfile";
@@ -65,7 +63,7 @@ export default function App() {
           </ProtectedRoute>
         }
       >
-        <Route path="/home" element={<CommunityPlusDashboardHome />} />
+        <Route path="/home" element={<CommunityPlusDashboard/>} />
         <Route path="/profile-setup" element={<Onboarding />} />
         <Route path="/profile" element={<CommunityPlusUserProfile />} />
         <Route path="/yellowpages" element={<CommunityPlusYellowPages />} />
