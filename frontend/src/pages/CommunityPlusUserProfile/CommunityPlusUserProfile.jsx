@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { apiFetch } from "../../../services/api";
 import { Autocomplete, useJsApiLoader } from "@react-google-maps/api";
 import { useLocationContext } from "../../context/LocationContext";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../context/AuthContext";
 
 import "./CommunityPlusUserProfile.css";
 
