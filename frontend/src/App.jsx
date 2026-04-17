@@ -4,6 +4,7 @@ import { useAuth } from "./context/AuthContext";
 import CommunityPlusLandingPage from "./pages/CommunityPlusLandingPage/CommunityPlusLandingPage";
 import CommunityPlusDashboard from "./pages/Dashboard/CommunityPlusDashboard";
 import Onboarding from "./pages/Onboarding/CommunityPlusOnboarding";
+import AuthGate from "./pages/AuthGate/AuthGate";
 
 /* =========================
    PROTECTED ROUTE
@@ -14,34 +15,22 @@ function ProtectedRoute({ user, children }) {
 }
 
 /* =========================
-   PUBLIC ROUTE (BLOCK IF LOGGED IN)
+   PUBLIC ROUTE
 ========================= */
 function PublicRoute({ user, children }) {
-  if (user) return <Navigate to="/home" replace />;
+  if (user) return <Navigate to="/auth-gate" replace />;
   return children;
 }
 
 export default function App() {
   const { user, loading } = useAuth();
 
-  /* =========================
-     🔥 CRITICAL FIX
-     DO NOT BLOCK RENDER
-  ========================= */
   if (loading) {
-    return (
-      <div style={{ padding: 20 }}>
-        Initialising...
-      </div>
-    );
+    return <div style={{ padding: 20 }}>Initialising...</div>;
   }
 
   return (
     <Routes>
-
-      {/* =========================
-          LANDING
-      ========================= */}
       <Route
         path="/"
         element={
@@ -51,9 +40,15 @@ export default function App() {
         }
       />
 
-      {/* =========================
-          ONBOARDING (FIRST LOGIN)
-      ========================= */}
+      <Route
+        path="/auth-gate"
+        element={
+          <ProtectedRoute user={user}>
+            <AuthGate />
+          </ProtectedRoute>
+        }
+      />
+
       <Route
         path="/profile-setup"
         element={
@@ -63,9 +58,6 @@ export default function App() {
         }
       />
 
-      {/* =========================
-          DASHBOARD
-      ========================= */}
       <Route
         path="/home"
         element={
@@ -75,11 +67,7 @@ export default function App() {
         }
       />
 
-      {/* =========================
-          FALLBACK
-      ========================= */}
       <Route path="*" element={<Navigate to="/" replace />} />
-
     </Routes>
   );
 }
