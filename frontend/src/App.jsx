@@ -4,7 +4,7 @@ import { useAuth } from "./context/AuthContext";
 import CommunityPlusLandingPage from "./pages/CommunityPlusLandingPage/CommunityPlusLandingPage";
 import CommunityPlusDashboard from "./pages/Dashboard/CommunityPlusDashboard";
 import Onboarding from "./pages/Onboarding/CommunityPlusOnboarding";
-import AuthGate from "../../pages/AuthGate";
+import AuthGate from "./pages/AuthGate";
 
 /* =========================
    PROTECTED ROUTE
