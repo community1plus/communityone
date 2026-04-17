@@ -87,10 +87,6 @@ export default function App() {
       {/* FALLBACK */}
       <Route path="*" element={<Navigate to="/" replace />} />
       <Route path="/post" element={<PostComposer />} />
-      <Route path="/event" element={<EventPage />} />
-      <Route path="/incident" element={<IncidentPage />} />
-      <Route path="/beacon" element={<BeaconPage />} />
-
     </Routes>
   );
 }
