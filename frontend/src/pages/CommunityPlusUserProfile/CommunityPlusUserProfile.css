@@ -23,8 +23,10 @@ TWO-COLUMN LAYOUT (FINAL CLEAN)
   flex-direction: column;
 }
 
-.profile-layout {
-  outline: 3px solid red;
+.profile-page-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 12px;
 }
 
 .profile-left {
@@ -37,7 +39,31 @@ TWO-COLUMN LAYOUT (FINAL CLEAN)
 /* =====================================================
 CARD SYSTEM
 ===================================================== */
+.profile-page-steps {
+  display: flex;
+  gap: 12px;
 
+  font-size: 14px;
+  font-weight: 600;
+  color: #666;
+}
+
+.profile-page-steps .step {
+  cursor: pointer;
+}
+
+.profile-page-steps {
+  gap: 20px;
+}
+
+.profile-page-steps .divider {
+  display: none;
+}
+
+.profile-page-steps .step.active {
+  color: #4a0f0f; /* oxblood */
+  font-weight: 700;
+}
 .profile-left,
 .profile-guide {
   background: #ffffff;
