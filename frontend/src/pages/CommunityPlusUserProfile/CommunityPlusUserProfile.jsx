@@ -200,7 +200,9 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
   return (
     <div className="profile-container">
       <div className="profile-page-header">
-        
+        <h2 className="profile-page-title">
+          {mode === "onboarding" ? "Create Profile" : "Profile Settings"}
+        </h2>
 
         {mode === "onboarding" && (
           <div className="profile-page-steps">
