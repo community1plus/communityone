@@ -97,3 +97,156 @@ RESPONSIVE
     grid-template-columns: 1fr;
   }
 }
+
+/* =====================================================
+FORM LAYOUT
+===================================================== */
+
+.profile-left form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* =====================================================
+FORM GROUPS
+===================================================== */
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #444;
+}
+
+/* =====================================================
+INPUTS
+===================================================== */
+
+.profile-left input,
+.profile-left select {
+  width: 100%;
+  padding: 10px 12px;
+
+  border-radius: 8px;
+  border: 1px solid #ddd;
+
+  font-size: 14px;
+  box-sizing: border-box;
+  transition: 0.2s ease;
+}
+
+.profile-left input:focus,
+.profile-left select:focus {
+  outline: none;
+  border-color: #4a0f0f;
+  box-shadow: 0 0 0 2px rgba(74, 15, 15, 0.1);
+}
+
+/* =====================================================
+BUTTON
+===================================================== */
+
+.profile-left button[type="submit"] {
+  margin-top: 12px;
+
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+
+  background: #4a0f0f; /* oxblood */
+  color: #fff;
+
+  font-weight: 600;
+  font-size: 14px;
+
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.profile-left button[type="submit"]:hover {
+  background: #3a0c0c;
+}
+
+.profile-left button[type="submit"]:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* =====================================================
+LOCATION SECTION
+===================================================== */
+
+.location-section {
+  margin-top: 8px;
+  padding: 16px;
+
+  border: 1px solid #eee;
+  border-radius: 12px;
+  background: #fafafa;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.location-section > label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* =====================================================
+LOCATION ROWS
+===================================================== */
+
+.location-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  font-size: 13px;
+  gap: 10px;
+}
+
+.location-row span {
+  color: #666;
+}
+
+.location-row strong {
+  font-weight: 600;
+  color: #222;
+}
+
+/* =====================================================
+GHOST BUTTON (Use GPS)
+===================================================== */
+
+.ghost-btn {
+  background: transparent;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: 0.15s ease;
+}
+
+.ghost-btn:hover {
+  background: #f3f2ef;
+}
+
+/* =====================================================
+ERROR TEXT
+===================================================== */
+
+.error {
+  margin-top: 6px;
+  font-size: 13px;
+  color: #c44536;
+}
