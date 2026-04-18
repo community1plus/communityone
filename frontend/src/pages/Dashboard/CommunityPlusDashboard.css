@@ -51,15 +51,7 @@ APP SHELL
     radial-gradient(700px 400px at 90% 10%, rgba(13, 91, 87, 0.05), transparent 60%);
 }
 
-.main {
-  min-height: 0;
-  display: grid;
-  grid-template-columns: 260px minmax(0, 1fr);
-  align-items: start;
-  column-gap: 0;
-  box-sizing: border-box;
-  padding: 20px 0 24px 0;
-}
+
 /* =====================================================
 SIDEBAR — FLAT NAV
 ===================================================== */
@@ -200,22 +192,15 @@ CONTENT AREA
 CONTENT AREA
 ===================================================== */
 
-/* Default dashboard home */
-.content-area {
-  grid-column: 2;
-  min-width: 0;
-  max-width: 100%;
-  box-sizing: border-box;
-}
+/* Full-width views like onboarding/profile */
 
-/* Full-width views like onboarding/profile */
-/* Full-width views like onboarding/profile */
 .content-area.full-width {
   grid-column: 2;
   min-width: 0;
+  width: 100%;
   max-width: 100%;
   display: block;
-  padding: 16px 32px 32px 32px;
+  padding: 16px 32px 32px;
   box-sizing: border-box;
   overflow: visible;
 }
@@ -342,10 +327,8 @@ PROFILE / ONBOARDING LAYOUT SUPPORT
 ===================================================== */
 
 .profile-container {
-  width: 100%;
-  max-width: 1280px;
-  margin: 0 auto;
-  box-sizing: border-box;
+  width: min(1280px, 100%);
+  margin: 0;              /* 🔥 critical */
 }
 
 .profile-page-header {
@@ -387,13 +370,7 @@ PROFILE / ONBOARDING LAYOUT SUPPORT
 
 .profile-layout {
   width: 100%;
-  max-width: 1280px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 24px;
-  align-items: stretch;
-  box-sizing: border-box;
+  margin: 0;              /* 🔥 critical */
 }
 
 .profile-left,
@@ -465,9 +442,11 @@ RESPONSIVE
     grid-template-columns: 1fr;
   }
 
-  .profile-page-header {
-    max-width: 100%;
-  }
+  
+.profile-page-header {
+  width: 100%;
+  margin: 0 0 18px 0;     /* 🔥 critical */
+}
 }
 
 @media (max-width: 720px) {
