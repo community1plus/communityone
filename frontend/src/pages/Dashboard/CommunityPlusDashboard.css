@@ -1,9 +1,9 @@
 /* =====================================================
-COMMUNITY ONE — DASHBOARD (ROUTE LAYOUT DROP-IN)
+COMMUNITY ONE — DASHBOARD (CLEAN ROUTE LAYOUT)
 ===================================================== */
 
 /* =====================================================
-GLOBAL LAYOUT TOKENS
+TOKENS
 ===================================================== */
 
 :root {
@@ -17,7 +17,6 @@ GLOBAL LAYOUT TOKENS
   --layout-gap: var(--space-5);
   --layout-pad: var(--space-5);
   --layout-max-width: 1320px;
-
   --sidebar-width: 260px;
 
   --shadow-sm: 0 6px 18px rgba(20, 20, 20, 0.06);
@@ -26,7 +25,7 @@ GLOBAL LAYOUT TOKENS
 }
 
 /* =====================================================
-GLOBAL CONTAINER
+BASE
 ===================================================== */
 
 .container {
@@ -35,8 +34,12 @@ GLOBAL CONTAINER
   margin: 0 auto;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 /* =====================================================
-BASE LAYOUT
+APP SHELL
 ===================================================== */
 
 .dashboard-container {
@@ -48,34 +51,37 @@ BASE LAYOUT
     radial-gradient(700px 400px at 90% 10%, rgba(13, 91, 87, 0.05), transparent 60%);
 }
 
-/* =====================================================
-MAIN GRID
-===================================================== */
-
 .main {
-  display: grid;
-  grid-template-columns: var(--sidebar-width) 1fr;
   min-height: 0;
   height: 100%;
-  overflow: hidden;
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr;
   align-items: stretch;
+  overflow: hidden;
+  padding: 20px 0 24px 0;
+  box-sizing: border-box;
 }
 
 /* =====================================================
-SIDEBAR
+SIDEBAR — FLAT NAV
 ===================================================== */
 
 .sidebar {
   width: var(--sidebar-width);
   min-width: var(--sidebar-width);
-  background: #efe9e3;
-  border-right: 1px solid var(--line, #ddd3ca);
-  padding: var(--space-4) var(--space-3);
-  box-sizing: border-box;
+  height: 100%;
+
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  opacity: 0.98;
+  gap: 6px;
+
+  padding: 8px 12px 8px 12px;
+  box-sizing: border-box;
+
+  background: transparent;
+  border-right: none;
+
+  align-self: start;
   overflow-y: auto;
 }
 
@@ -83,48 +89,58 @@ SIDEBAR
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 12px 14px;
-  border-radius: 14px;
-  background: #f8f5f2;
-  font-size: 1.02rem;
+
+  padding: 10px 12px;
+  border-radius: 8px;
+
+  font-size: 0.98rem;
   font-weight: 500;
+  color: #2a2a2a;
+
   cursor: pointer;
+
+  background: transparent;
+  border: none;
+  box-shadow: none;
+
   transition:
-    background 0.2s ease,
-    border 0.2s ease,
-    box-shadow 0.2s ease,
-    transform 0.2s ease;
+    color 0.18s ease,
+    background 0.18s ease,
+    transform 0.12s ease;
 }
 
 .sidebar-item:hover {
-  background: #e7ddd4;
+  background: rgba(0, 0, 0, 0.04);
   transform: translateX(2px);
 }
 
 .sidebar-item.active {
-  background: #d24a36;
-  color: #fff;
-  box-shadow: var(--shadow-sm);
+  color: var(--brand, #b63a2b);
+  font-weight: 600;
+  background: rgba(182, 58, 43, 0.06);
 }
 
 .sidebar-item.logout {
-  margin-top: auto;
-  background: #f1dfda;
-  color: #8f2318;
-  font-weight: 700;
+  margin-top: 12px;
+  color: #b42318;
+  font-weight: 600;
+}
+
+.sidebar-item.logout:hover {
+  background: rgba(180, 35, 24, 0.06);
 }
 
 .sidebar-divider {
-  border: 0;
-  border-top: 1px solid var(--line, #ddd3ca);
-  margin: 10px 0;
+  border: none;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  margin: 8px 0;
 }
 
 /* =====================================================
 CONTENT AREA
 ===================================================== */
 
-/* Default dashboard view: feed + map */
+/* Default dashboard home */
 .content-area {
   min-width: 0;
   min-height: 0;
@@ -132,29 +148,33 @@ CONTENT AREA
   display: grid;
   grid-template-columns: 420px 1fr;
   gap: var(--layout-gap);
-  padding: var(--space-5);
+  padding: 0 32px 0 32px;
   box-sizing: border-box;
   align-items: stretch;
   overflow: hidden;
   animation: fadeInUp 0.3s ease;
 }
 
-/* Full-width views: onboarding / profile / yellow pages / etc */
+/* Full-width views like onboarding/profile */
 .content-area.full-width {
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
   display: flex;
   justify-content: center;
-  align-items: center;
-  padding: var(--space-5);
+  align-items: flex-start;
+  padding: 0 32px 0 32px;
+  box-sizing: border-box;
   overflow: auto;
 }
 
 .content-area.full-width > * {
   width: 100%;
-  max-width: 1320px;
+  max-width: 1280px;
 }
 
 /* =====================================================
-FEED COLUMN
+HOME VIEW
 ===================================================== */
 
 .feed-column {
@@ -190,10 +210,6 @@ FEED COLUMN
   overflow: hidden;
 }
 
-/* =====================================================
-FEED CARD
-===================================================== */
-
 .feed-card {
   border: 1px solid var(--line, #e3ddd6);
   background: rgba(255, 255, 255, 0.62);
@@ -212,10 +228,6 @@ FEED CARD
   transform: translateY(-4px) scale(1.01);
   box-shadow: var(--shadow-md);
 }
-
-/* =====================================================
-MAP COLUMN
-===================================================== */
 
 .map-column {
   display: flex;
@@ -274,7 +286,93 @@ COMPOSER VIEW
 }
 
 /* =====================================================
-GLOBAL MOTION SYSTEM
+PROFILE / ONBOARDING LAYOUT SUPPORT
+===================================================== */
+
+.profile-container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.profile-page-header {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto 18px auto;
+  box-sizing: border-box;
+}
+
+.profile-page-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 10px 0;
+  color: var(--text, #111);
+}
+
+.profile-page-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted, #666);
+}
+
+.profile-page-steps .step {
+  white-space: nowrap;
+}
+
+.profile-page-steps .step.active {
+  color: var(--brand, #b63a2b);
+  font-weight: 700;
+}
+
+.profile-page-steps .divider {
+  opacity: 0.4;
+}
+
+.profile-layout {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: stretch;
+  box-sizing: border-box;
+}
+
+.profile-left,
+.profile-right {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.profile-left > *,
+.profile-right > * {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.profile-left form,
+.profile-left .form-group,
+.profile-left input,
+.profile-left select,
+.profile-left textarea,
+.profile-left .location-section,
+.profile-left .location-input,
+.profile-guide {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* =====================================================
+GLOBAL MOTION
 ===================================================== */
 
 * {
@@ -283,10 +381,6 @@ GLOBAL MOTION SYSTEM
     border 0.2s ease,
     box-shadow 0.2s ease,
     transform 0.2s ease;
-}
-
-html {
-  scroll-behavior: smooth;
 }
 
 /* =====================================================
@@ -304,22 +398,30 @@ RESPONSIVE
 
   .content-area {
     grid-template-columns: 1fr;
-    padding: var(--layout-pad);
+    padding: 0 var(--layout-pad) 0 var(--layout-pad);
   }
 
   .content-area.full-width {
-    padding: var(--layout-pad);
+    padding: 0 var(--layout-pad) 0 var(--layout-pad);
   }
 
   .feed-column {
     max-width: none;
+  }
+
+  .profile-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-page-header {
+    max-width: 100%;
   }
 }
 
 @media (max-width: 720px) {
   .content-area,
   .content-area.full-width {
-    padding: var(--space-3);
+    padding: 0 var(--space-3) 0 var(--space-3);
   }
 
   .container {
@@ -339,138 +441,5 @@ ANIMATIONS
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-/* =====================================================
-PARENT CONTAINER OVERRIDE FOR PROFILE CENTERING
-===================================================== */
-
-.dashboard-container {
-  min-height: 100vh;
-  display: grid;
-  grid-template-rows: auto 1fr;
-}
-
-.main {
-  min-height: 0;
-  height: 100%;
-  display: grid;
-  grid-template-columns: 260px 1fr;
-  align-items: stretch;
-}
-
-/* critical: content pane must be a flex container with real height */
-.content-area {
-  min-height: 0;
-  height: 100%;
-  box-sizing: border-box;
-}
-
-/* critical: full-width pages must center inside available pane */
-.content-area.full-width {
-  min-height: 0;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center !important;
-  padding: 24px 32px 32px 32px;
-  box-sizing: border-box;
-  overflow: auto;
-}
-
-/* critical: child wrapper should not force top alignment */
-.content-area.full-width > * {
-  width: 100%;
-  max-width: 1280px;
-  margin: auto 0;
-}
-
-/* =====================================================
-PROFILE TWO-COLUMN WIDTH FIX
-===================================================== */
-
-/* overall wrapper */
-.profile-container {
-  width: 100%;
-  max-width: 1280px;
-  margin: 0 auto;
-  box-sizing: border-box;
-}
-
-/* title row aligns to the same width as the form block */
-.profile-page-header {
-  width: 100%;
-  max-width: 1280px;
-  margin: 0 auto 18px auto;
-  box-sizing: border-box;
-}
-
-/* force true 50 / 50 columns */
-.profile-layout {
-  width: 100%;
-  max-width: 1280px;
-  margin: 0 auto;
-
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 24px;
-  align-items: stretch;
-
-  box-sizing: border-box;
-}
-
-/* CRITICAL: prevent either side from overflowing its grid track */
-.profile-left,
-.profile-right {
-  width: 100%;
-  min-width: 0;
-  box-sizing: border-box;
-}
-
-/* keep cards inside their own half */
-.profile-left > *,
-.profile-right > * {
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-}
-
-/* make form controls respect container width */
-.profile-left form,
-.profile-left .form-group,
-.profile-left input,
-.profile-left select,
-.profile-left textarea,
-.profile-left .location-section,
-.profile-left .location-input {
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-}
-
-/* right guide panel should not overflow */
-.profile-guide {
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-}
-
-/* dashboard content pane should center the whole profile block cleanly */
-.content-area.full-width {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.content-area.full-width > * {
-  width: 100%;
-  max-width: 1280px;
-}
-
-/* responsive: stack on smaller screens */
-@media (max-width: 1100px) {
-  .profile-layout {
-    grid-template-columns: 1fr;
   }
 }
