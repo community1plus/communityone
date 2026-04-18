@@ -1,27 +1,22 @@
 /* =====================================================
-TWO-COLUMN LAYOUT (FINAL CLEAN)
+CONTAINER + PAGE STRUCTURE
 ===================================================== */
+
 .profile-container {
   width: 100%;
-  max-width: 1280px;
-  margin: 0 auto; /* 🔥 center it */
+  max-width: 1100px;
+  margin: 0 auto;
+  box-sizing: border-box;
 }
 
-.profile-layout {
-  display: grid;
-  
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-
-  justify-content: center; /* 🔥 key */
-  gap: 24px;
+/* spacing between header and cards */
+.profile-page-header {
+  margin-bottom: 24px;
 }
 
-/* Critical for grid overflow issues */
-.profile-layout > * {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-}
+/* =====================================================
+TITLE + STEPS
+===================================================== */
 
 .profile-page-title {
   font-size: 24px;
@@ -29,20 +24,9 @@ TWO-COLUMN LAYOUT (FINAL CLEAN)
   margin-bottom: 12px;
 }
 
-.profile-left {
-  outline: 3px solid blue;
-}
-
-.profile-guide {
-  outline: 3px solid green;
-}
-/* =====================================================
-CARD SYSTEM
-===================================================== */
 .profile-page-steps {
   display: flex;
-  gap: 12px;
-
+  gap: 20px;
   font-size: 14px;
   font-weight: 600;
   color: #666;
@@ -52,18 +36,38 @@ CARD SYSTEM
   cursor: pointer;
 }
 
-.profile-page-steps {
-  gap: 20px;
-}
-
-.profile-page-steps .divider {
-  display: none;
-}
-
 .profile-page-steps .step.active {
   color: #4a0f0f; /* oxblood */
   font-weight: 700;
 }
+
+/* =====================================================
+TWO-COLUMN LAYOUT
+===================================================== */
+
+.profile-layout {
+  display: grid;
+
+  /* responsive but controlled */
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(320px, 420px);
+
+  gap: 24px;
+
+  /* prevents awkward centering behaviour */
+  align-items: start;
+}
+
+/* critical for overflow issues */
+.profile-layout > * {
+  min-width: 0;
+}
+
+/* =====================================================
+CARD SYSTEM
+===================================================== */
+
 .profile-left,
 .profile-guide {
   background: #ffffff;
@@ -73,15 +77,23 @@ CARD SYSTEM
   box-sizing: border-box;
 }
 
-/* Left = form container */
+/* left card */
 .profile-left {
   padding: 24px;
 }
 
-/* Right = guide panel */
+/* right guide */
 .profile-guide {
   padding: 22px 24px;
   background: #faf7f4;
-  /* 🔥 ensures full height behavior */
-  height: 100%;
+}
+
+/* =====================================================
+RESPONSIVE
+===================================================== */
+
+@media (max-width: 900px) {
+  .profile-layout {
+    grid-template-columns: 1fr;
+  }
 }
