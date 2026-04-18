@@ -114,29 +114,35 @@ max-width: 520px;
 }
 
 .search-input {
-width: 100%;
+  width: 100%;
 
-padding: 8px 36px 8px 0; /* 🔥 tightened */
+  padding: 8px 36px 10px 0;
 
-font-family: var(--font-ui);
-font-size: var(--header-text-size);
-color: var(--text);
+  font-family: var(--font-ui);
+  font-size: var(--header-text-size);
+  color: var(--text);
 
-border: none;
-border-bottom: 2px solid var(--border);
+  border: none;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.15); /* 🔥 stronger baseline */
 
-background: transparent;
-outline: none;
+  background: transparent;
+  outline: none;
 
-transition: border-color var(--dur-fast);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
-.search-input::placeholder {
-color: var(--text-muted);
-}
-
+/* focus state */
 .search-input:focus {
-border-bottom-color: var(--brand);
+  border-bottom: 2px solid var(--brand);
+  box-shadow: 0 2px 0 var(--brand); /* 🔥 premium underline effect */
+}
+
+/* placeholder */
+.search-input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.7;
 }
 
 .search-enter {
@@ -370,4 +376,42 @@ to {
 opacity: 1;
 transform: translateY(0);
 }
+}
+
+/* =====================================================
+HEADER ALIGNMENT FIX (CRITICAL)
+===================================================== */
+
+/* Prevent grid overflow */
+.header-row > * {
+  min-width: 0;
+}
+
+/* Ensure center can shrink */
+.header-center {
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+}
+
+/* Fix search overflow */
+.search-wrapper {
+  width: 100%;
+  max-width: 520px;
+  min-width: 0;
+}
+
+/* Keep right side inside viewport */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+
+  justify-self: end;   /* 🔥 KEY FIX */
+  min-width: 0;
+}
+
+/* Prevent avatar clipping */
+.header {
+  overflow: hidden;
 }

@@ -1,22 +1,28 @@
 /* =====================================================
-COMMUNITY ONE — DASHBOARD (ELITE LAYOUT SYSTEM v3)
+COMMUNITY ONE — DASHBOARD (ROUTE LAYOUT DROP-IN)
 ===================================================== */
 
 /* =====================================================
-GLOBAL LAYOUT TOKENS (8pt SYSTEM)
+GLOBAL LAYOUT TOKENS
 ===================================================== */
 
 :root {
---space-1: 8px;
---space-2: 12px;
---space-3: 16px;
---space-4: 20px;
---space-5: 24px;
---space-6: 32px;
+  --space-1: 8px;
+  --space-2: 12px;
+  --space-3: 16px;
+  --space-4: 20px;
+  --space-5: 24px;
+  --space-6: 32px;
 
---layout-gap: var(--space-5);
---layout-pad: var(--space-5);
---layout-max-width: 1200px;
+  --layout-gap: var(--space-5);
+  --layout-pad: var(--space-5);
+  --layout-max-width: 1320px;
+
+  --sidebar-width: 260px;
+
+  --shadow-sm: 0 6px 18px rgba(20, 20, 20, 0.06);
+  --shadow-md: 0 12px 28px rgba(20, 20, 20, 0.1);
+  --shadow-lg: 0 18px 48px rgba(20, 20, 20, 0.14);
 }
 
 /* =====================================================
@@ -24,9 +30,9 @@ GLOBAL CONTAINER
 ===================================================== */
 
 .container {
-width: 100%;
-max-width: var(--layout-max-width);
-margin: 0 auto;
+  width: 100%;
+  max-width: var(--layout-max-width);
+  margin: 0 auto;
 }
 
 /* =====================================================
@@ -34,72 +40,117 @@ BASE LAYOUT
 ===================================================== */
 
 .dashboard-container {
-height: 100vh;
-display: grid;
-grid-template-rows: auto 1fr;
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  background:
+    radial-gradient(900px 400px at 20% 0%, rgba(182, 58, 43, 0.05), transparent 60%),
+    radial-gradient(700px 400px at 90% 10%, rgba(13, 91, 87, 0.05), transparent 60%);
 }
 
 /* =====================================================
-MAIN GRID (🔥 NOW OWNS ALL VERTICAL SPACING)
+MAIN GRID
 ===================================================== */
 
 .main {
-display: grid;
-grid-template-columns: 240px 1fr;
-height: 100%;
-overflow: hidden;
-align-items: stretch;
-height: 100%;
-padding-top: var(--content-top-offset); /* 🔥 MASTER CONTROL */
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+  align-items: stretch;
 }
 
 /* =====================================================
-SIDEBAR (ALIGNED)
+SIDEBAR
 ===================================================== */
 
 .sidebar {
-display: flex;
-flex-direction: column;
-gap: var(--space-3);
+  width: var(--sidebar-width);
+  min-width: var(--sidebar-width);
+  background: #efe9e3;
+  border-right: 1px solid var(--line, #ddd3ca);
+  padding: var(--space-4) var(--space-3);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  opacity: 0.98;
+  overflow-y: auto;
+}
 
-/* 🔥 REMOVE vertical offset */
-padding-left: var(--layout-pad);
-padding-right: var(--space-3);
-padding-top: 0;
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: #f8f5f2;
+  font-size: 1.02rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
 
-align-self: start;
+.sidebar-item:hover {
+  background: #e7ddd4;
+  transform: translateX(2px);
+}
+
+.sidebar-item.active {
+  background: #d24a36;
+  color: #fff;
+  box-shadow: var(--shadow-sm);
+}
+
+.sidebar-item.logout {
+  margin-top: auto;
+  background: #f1dfda;
+  color: #8f2318;
+  font-weight: 700;
+}
+
+.sidebar-divider {
+  border: 0;
+  border-top: 1px solid var(--line, #ddd3ca);
+  margin: 10px 0;
 }
 
 /* =====================================================
 CONTENT AREA
 ===================================================== */
 
-/* =====================================================
-FULL WIDTH VIEW SUPPORT (🔥 FIX)
-===================================================== */
-
-/* default behavior (unchanged) */
+/* Default dashboard view: feed + map */
 .content-area {
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
   display: grid;
   grid-template-columns: 420px 1fr;
   gap: var(--layout-gap);
-  padding: 0 var(--layout-pad) var(--layout-pad) 0;
-  height: 100%;
-  min-height: 0;
+  padding: var(--space-5);
   box-sizing: border-box;
-  align-items: start;
+  align-items: stretch;
+  overflow: hidden;
+  animation: fadeInUp 0.3s ease;
 }
 
-/* 🔥 NEW: full width override */
+/* Full-width views: onboarding / profile / yellow pages / etc */
 .content-area.full-width {
-  display: block;
-  padding: 0 var(--layout-pad);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--space-5);
+  overflow: auto;
 }
 
-/* 🔥 ensure child fills properly */
 .content-area.full-width > * {
   width: 100%;
-  height: 100%;
+  max-width: 1320px;
 }
 
 /* =====================================================
@@ -107,36 +158,36 @@ FEED COLUMN
 ===================================================== */
 
 .feed-column {
-width: 100%;
-max-width: 420px;
-
-display: flex;
-flex-direction: column;
-height: 100%;
-overflow: hidden;
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .feed-header {
-font-size: 14px;
-font-weight: 700;
-color: var(--muted);
-margin-bottom: var(--space-2);
-flex-shrink: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--muted, #666);
+  margin-bottom: var(--space-2);
+  flex-shrink: 0;
 }
 
 .feed-stack {
-display: flex;
-flex-direction: column;
-gap: var(--space-3);
-
-flex: 1;
-overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .feed-stack > * {
-flex: 1;
-min-height: 0;
-overflow: hidden;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 /* =====================================================
@@ -144,19 +195,22 @@ FEED CARD
 ===================================================== */
 
 .feed-card {
-border: 1px solid var(--line);
-background: rgba(255, 255, 255, 0.62);
-
-border-radius: 20px;
-padding: var(--space-3);
-
-box-shadow: var(--shadow-sm);
-transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid var(--line, #e3ddd6);
+  background: rgba(255, 255, 255, 0.62);
+  border-radius: 20px;
+  padding: var(--space-3);
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(6px);
+  transition:
+    background 0.2s ease,
+    border 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
 }
 
 .feed-card:hover {
-transform: translateY(-3px);
-box-shadow: var(--shadow-md);
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: var(--shadow-md);
 }
 
 /* =====================================================
@@ -164,43 +218,41 @@ MAP COLUMN
 ===================================================== */
 
 .map-column {
-display: flex;
-flex-direction: column;
-
-background: rgba(255, 255, 255, 0.65);
-border: 1px solid var(--line);
-border-radius: 22px;
-
-box-shadow: var(--shadow);
-overflow: hidden;
-
-width: 100%;
-height: 100%;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid var(--line, #e3ddd6);
+  border-radius: 22px;
+  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(8px);
+  overflow: hidden;
 }
 
 .map-container {
-flex: 1;
-width: 100%;
-height: 100% !important;
-
-border-radius: 18px;
-overflow: hidden;
-min-height: 0;
-
-background: #f4f1ee;
-
-opacity: 0;
-transition: opacity 0.35s ease;
+  flex: 1;
+  width: 100%;
+  height: 100% !important;
+  min-height: 0;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #f4f1ee;
+  opacity: 0;
+  transition: opacity 0.35s ease;
 }
 
 .map-container.loaded {
-opacity: 1;
+  opacity: 1;
 }
 
 .map-loading {
-padding: var(--space-4);
-text-align: center;
-color: var(--text-muted);
+  padding: var(--space-4);
+  text-align: center;
+  color: var(--text-muted, #666);
+  font-size: 13px;
+  opacity: 0.6;
 }
 
 /* =====================================================
@@ -208,65 +260,22 @@ COMPOSER VIEW
 ===================================================== */
 
 .composer-view {
-grid-column: 1 / -1;
-padding: 0 var(--layout-pad) var(--layout-pad);
-display: flex;
-justify-content: center;
-align-items: flex-start;
-width: 100%;
-height: 100%;
-box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  animation: fadeInUp 0.25s ease;
+}
+
+.composer-view > * {
+  width: 100%;
+  max-width: 1100px;
 }
 
 /* =====================================================
-RESPONSIVE
-===================================================== */
-
-@media (max-width: 1100px) {
-
-.content-area {
-grid-template-columns: 1fr;
-padding: var(--layout-pad);
-}
-
-.sidebar {
-display: none;
-padding: 0 var(--space-3) 0 var(--layout-pad);
-}
-
-.container {
-padding: 0 var(--space-3);
-}
-}
-
-@media (max-width: 720px) {
-
-.sidebar {
-display: none;
-}
-
-.content-area {
-padding: var(--space-3);
-}
-}
-
-/* =====================================================
-ELITE POLISH LAYER (NON-BREAKING ENHANCEMENTS)
-===================================================== */
-
-/* ---------------------------------
-SHADOW SYSTEM (CONSISTENT DEPTH)
---------------------------------- */
-
-:root {
-  --shadow-sm: 0 6px 18px rgba(20, 20, 20, 0.06);
-  --shadow-md: 0 12px 28px rgba(20, 20, 20, 0.1);
-  --shadow-lg: 0 18px 48px rgba(20, 20, 20, 0.14);
-}
-
-/* ---------------------------------
 GLOBAL MOTION SYSTEM
---------------------------------- */
+===================================================== */
 
 * {
   transition:
@@ -276,80 +285,51 @@ GLOBAL MOTION SYSTEM
     transform 0.2s ease;
 }
 
-/* ---------------------------------
-DASHBOARD BACKGROUND DEPTH
---------------------------------- */
-
-.dashboard-container {
-  background:
-    radial-gradient(900px 400px at 20% 0%, rgba(182, 58, 43, 0.05), transparent 60%),
-    radial-gradient(700px 400px at 90% 10%, rgba(13, 91, 87, 0.05), transparent 60%);
-}
-
-/* ---------------------------------
-SIDEBAR REFINEMENT
---------------------------------- */
-
-.sidebar {
-  opacity: 0.95;
-}
-
-/* ---------------------------------
-CONTENT AREA SMOOTHNESS
---------------------------------- */
-
-.content-area {
-  animation: fadeInUp 0.3s ease;
-}
-
-/* ---------------------------------
-FEED CARD (UPGRADED)
---------------------------------- */
-
-.feed-card {
-  backdrop-filter: blur(6px);
-}
-
-.feed-card:hover {
-  transform: translateY(-4px) scale(1.01);
-}
-
-/* ---------------------------------
-MAP COLUMN (PREMIUM GLASS)
---------------------------------- */
-
-.map-column {
-  backdrop-filter: blur(8px);
-}
-
-/* ---------------------------------
-MAP LOADING STATE
---------------------------------- */
-
-.map-loading {
-  font-size: 13px;
-  opacity: 0.6;
-}
-
-/* ---------------------------------
-COMPOSER VIEW (CENTER BALANCE)
---------------------------------- */
-
-.composer-view {
-  animation: fadeInUp 0.25s ease;
-}
-
-/* ---------------------------------
-SCROLL BEHAVIOR (SMOOTH)
---------------------------------- */
-
 html {
   scroll-behavior: smooth;
 }
 
-/* ---------------------------------
+/* =====================================================
+RESPONSIVE
+===================================================== */
+
+@media (max-width: 1100px) {
+  .main {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    display: none;
+  }
+
+  .content-area {
+    grid-template-columns: 1fr;
+    padding: var(--layout-pad);
+  }
+
+  .content-area.full-width {
+    padding: var(--layout-pad);
+  }
+
+  .feed-column {
+    max-width: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .content-area,
+  .content-area.full-width {
+    padding: var(--space-3);
+  }
+
+  .container {
+    padding: 0 var(--space-3);
+  }
+}
+
+/* =====================================================
 ANIMATIONS
---------------------------------- */
+===================================================== */
 
 @keyframes fadeInUp {
   from {
