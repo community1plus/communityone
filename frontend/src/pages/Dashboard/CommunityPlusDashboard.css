@@ -1,7 +1,3 @@
-/* =====================================================
-COMMUNITY ONE — DASHBOARD LAYOUT
-===================================================== */
-
 :root {
   --sidebar-width: 260px;
 }
@@ -14,46 +10,28 @@ APP SHELL
   min-height: 100vh;
   display: grid;
   grid-template-rows: auto 1fr;
-  background:
-    radial-gradient(900px 400px at 20% 0%, rgba(182, 58, 43, 0.05), transparent 60%),
-    radial-gradient(700px 400px at 90% 10%, rgba(13, 91, 87, 0.05), transparent 60%);
 }
 
+/* 🔥 MAIN LAYOUT FIXED */
 .main {
   display: flex;
+  min-height: 0; /* prevents overflow bugs */
 }
-
 
 /* =====================================================
 SIDEBAR
 ===================================================== */
 
-.content-area {
-  flex: 1;
+.sidebar {
+  width: var(--sidebar-width);
+  flex-shrink: 0;
 }
 
-
 /* =====================================================
-RESPONSIVE
+CONTENT
 ===================================================== */
 
-@media (max-width: 1100px) {
-  .main {
-    grid-template-columns: 1fr;
-  }
-
-  .sidebar {
-    display: none;
-  }
-
-  .content-area,
-  .content-area.full-width {
-    grid-column: 1;
-    padding-left: 24px;
-    padding-right: 24px;
-  }
-
-  .content-area:not(.full-width) {
-    grid-template-columns: 1fr;
-  }
+.content-area {
+  flex: 1;
+  min-width: 0; /* 🔥 CRITICAL for grid inside */
 }
