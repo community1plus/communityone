@@ -1,72 +1,228 @@
-return (
-  <div className="profile-container">
-    
-    {/* HEADER */}
-    <div className="profile-page-header">
-      <h2 className="profile-page-title">
-        {mode === "onboarding" ? "Create Profile" : "Profile Settings"}
-      </h2>
+export default function CommunityPlusUserProfile({ mode = "edit" }) {
+  const navigate = useNavigate();
+  const autoRef = useRef(null);
 
-      {mode === "onboarding" && (
-        <div className="profile-page-steps">
-          <span className="step active">Identity</span>
-          <span className="step">Home Address</span>
-          <span className="step">Contact</span>
-          <span className="step">Social</span>
-          <span className="step">Payment Details</span>
-        </div>
-      )}
-    </div>
+  const { appUser } = useAuth();
 
-    {/* GRID LAYOUT */}
-    <div className="profile-layout">
+  const {
+    homeLocation,
+    liveLocation,
+    viewLocation,
+    setHome,
+    enableLiveLocation,
+  } = useLocationContext();
 
-      {/* LEFT: FORM */}
-      <div className="profile-left">
-        <form onSubmit={handleSubmit}>
+  const [formData, setFormData] = useState({
+    username: "",
+    display_name: "",
+    userType: "PERSONAL",
+  });
 
-          <div className="form-group">
-            <label>Username</label>
-            <input
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-            />
+  const [manualAddress, setManualAddress] = useState("");
+  const [loading, setLoading] = useState(mode === "edit");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+
+  const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "";
+
+  const {
+    isLoaded: mapsLoaded,
+    loadError: mapsLoadError,
+  } = useJsApiLoader({
+    id: "community-one-google-maps",
+    googleMapsApiKey,
+    libraries: GOOGLE_LIBRARIES,
+  });
+
+  // ==============================
+  // EFFECTS
+  // ==============================
+
+  useEffect(() => {
+    if (homeLocation?.label) {
+      setManualAddress(homeLocation.label);
+    }
+  }, [homeLocation]);
+
+  useEffect(() => {
+    if (mode !== "edit") {
+      setLoading(false);
+      return;
+    }
+
+    async function loadProfile() {
+      try {
+        const data = await apiFetch("/users/me");
+
+        if (data.profile) {
+          setFormData({
+            username: data.profile.username || "",
+            display_name: data.profile.display_name || "",
+            userType: data.profile.userType || "PERSONAL",
+          });
+
+          if (data.profile.homeLocation?.label) {
+            setManualAddress(data.profile.homeLocation.label);
+          }
+        } else {
+          const emailPrefix = appUser?.email?.split("@")[0] || "";
+
+          setFormData({
+            username: appUser?.username || emailPrefix,
+            display_name: appUser?.name || emailPrefix,
+            userType: "PERSONAL",
+          });
+        }
+      } catch (err) {
+        console.error("Failed to load profile", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadProfile();
+  }, [mode, appUser]);
+
+  // ==============================
+  // HANDLERS
+  // ==============================
+
+  const handleChange = (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleManualAddressChange = (e) => {
+    const value = e.target.value;
+    setManualAddress(value);
+
+    setHome({
+      label: value,
+      lat: null,
+      lng: null,
+      type: "home",
+    });
+  };
+
+  const onPlaceChanged = () => {
+    const place = autoRef.current?.getPlace?.();
+    if (!place || !place.geometry) return;
+
+    const loc = {
+      label: place.formatted_address || place.name,
+      lat: place.geometry.location.lat(),
+      lng: place.geometry.location.lng(),
+      type: "home",
+    };
+
+    setManualAddress(loc.label);
+    setHome(loc);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const homeAddress = homeLocation?.label || manualAddress.trim();
+
+    if (!formData.username || !formData.display_name) {
+      setError("Please fill in all required fields.");
+      return;
+    }
+
+    if (!homeAddress) {
+      setError("Please set your home address.");
+      return;
+    }
+
+    setSaving(true);
+    setError("");
+
+    try {
+      const endpoint =
+        mode === "onboarding"
+          ? "/users/profile/create"
+          : "/users/update";
+
+      await apiFetch(endpoint, {
+        method: "POST",
+        body: JSON.stringify({
+          ...formData,
+          homeAddress,
+          homeLocation,
+        }),
+      });
+
+      if (mode === "onboarding") {
+        navigate("/home", { replace: true });
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Failed to save profile");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // ==============================
+  // RENDER
+  // ==============================
+
+  if (loading) return <div>Loading profile...</div>;
+
+  return (
+    <div className="profile-container">
+
+      {/* HEADER */}
+      <div className="profile-page-header">
+        <h2 className="profile-page-title">
+          {mode === "onboarding" ? "Create Profile" : "Profile Settings"}
+        </h2>
+
+        {mode === "onboarding" && (
+          <div className="profile-page-steps">
+            <span className="step active">Identity</span>
+            <span className="step">Home Address</span>
+            <span className="step">Contact</span>
+            <span className="step">Social</span>
+            <span className="step">Payment Details</span>
           </div>
+        )}
+      </div>
 
-          <div className="form-group">
-            <label>Display Name</label>
-            <input
-              name="display_name"
-              value={formData.display_name}
-              onChange={handleChange}
-            />
-          </div>
+      {/* GRID */}
+      <div className="profile-layout">
 
-          <div className="form-group">
-            <label>User Type</label>
-            <select
-              name="userType"
-              value={formData.userType}
-              onChange={handleChange}
-            >
-              <option value="PERSONAL">Personal</option>
-              <option value="BUSINESS">Business</option>
-              <option value="MIXED">Mixed</option>
-              <option value="COMMUNITY_SERVICE">Community Service</option>
-              <option value="GOVERNMENT">Government</option>
-            </select>
-          </div>
+        {/* LEFT */}
+        <div className="profile-left">
+          <form onSubmit={handleSubmit}>
 
-          {/* LOCATION */}
-          <div className="location-section">
-            <label>Home Location</label>
+            <div className="form-group">
+              <label>Username</label>
+              <input name="username" value={formData.username} onChange={handleChange} />
+            </div>
 
-            {googleMapsApiKey && mapsLoaded && !mapsLoadError ? (
-              <Autocomplete
-                onLoad={(auto) => (autoRef.current = auto)}
-                onPlaceChanged={onPlaceChanged}
-              >
+            <div className="form-group">
+              <label>Display Name</label>
+              <input name="display_name" value={formData.display_name} onChange={handleChange} />
+            </div>
+
+            <div className="form-group">
+              <label>User Type</label>
+              <select name="userType" value={formData.userType} onChange={handleChange}>
+                <option value="PERSONAL">Personal</option>
+                <option value="BUSINESS">Business</option>
+                <option value="MIXED">Mixed</option>
+                <option value="COMMUNITY_SERVICE">Community Service</option>
+                <option value="GOVERNMENT">Government</option>
+              </select>
+            </div>
+
+            <div className="location-section">
+              <label>Home Location</label>
+
+              <Autocomplete onLoad={(auto) => (autoRef.current = auto)} onPlaceChanged={onPlaceChanged}>
                 <input
                   placeholder="Search your suburb..."
                   className="location-input"
@@ -74,102 +230,55 @@ return (
                   onChange={handleManualAddressChange}
                 />
               </Autocomplete>
-            ) : (
-              <input
-                placeholder="Enter your suburb or address..."
-                className="location-input"
-                value={manualAddress}
-                onChange={handleManualAddressChange}
-              />
-            )}
 
-            {mapsLoadError && (
-              <p className="error">
-                Google Maps could not be loaded. Enter manually.
-              </p>
-            )}
+              <div className="location-row">
+                <span>📍 Home</span>
+                <strong>{homeLocation?.label || "Not set"}</strong>
+              </div>
 
-            {!googleMapsApiKey && (
-              <p className="error">
-                Google Maps API key missing. Manual entry enabled.
-              </p>
-            )}
+              <div className="location-row">
+                <span>📡 Current</span>
+                <strong>{liveLocation?.label || "Not active"}</strong>
+                <button type="button" onClick={enableLiveLocation} className="ghost-btn">
+                  Use GPS
+                </button>
+              </div>
 
-            <div className="location-row">
-              <span>📍 Home</span>
-              <strong>
-                {homeLocation?.label || manualAddress || "Not set"}
-              </strong>
+              <div className="location-row">
+                <span>🧭 Nearby</span>
+                <strong>{viewLocation?.label || "—"}</strong>
+              </div>
             </div>
 
-            <div className="location-row">
-              <span>📡 Current</span>
-              <strong>{liveLocation?.label || "Not active"}</strong>
-              <button
-                type="button"
-                onClick={enableLiveLocation}
-                className="ghost-btn"
-              >
-                Use GPS
-              </button>
-            </div>
+            <button type="submit" disabled={saving}>
+              {saving ? "Saving..." : "Create Profile"}
+            </button>
 
-            <div className="location-row">
-              <span>🧭 Nearby</span>
-              <strong>{viewLocation?.label || "—"}</strong>
-            </div>
+            {error && <p className="error">{error}</p>}
+          </form>
+        </div>
+
+        {/* RIGHT */}
+        <div className="profile-guide">
+          <h3>Profile Guide</h3>
+
+          <div className="guide-section">
+            <strong>Username</strong>
+            <p>Choose something simple and memorable.</p>
           </div>
 
-          <button type="submit" disabled={saving}>
-            {saving
-              ? "Saving..."
-              : mode === "onboarding"
-              ? "Create Profile"
-              : "Save Changes"}
-          </button>
+          <div className="guide-section">
+            <strong>Display Name</strong>
+            <p>This is how others see you.</p>
+          </div>
 
-          {error && <p className="error">{error}</p>}
-        </form>
+          <div className="guide-section">
+            <strong>Home Location</strong>
+            <p>Used to personalise your feed.</p>
+          </div>
+        </div>
+
       </div>
-
-      {/* RIGHT: GUIDE */}
-      <div className="profile-guide">
-        <h3>Profile Guide</h3>
-
-        <div className="guide-section">
-          <strong>Username</strong>
-          <p>Your unique identity. Choose something simple and memorable.</p>
-        </div>
-
-        <div className="guide-section">
-          <strong>Display Name</strong>
-          <p>This is how others will see you across the platform.</p>
-        </div>
-
-        <div className="guide-section">
-          <strong>User Type</strong>
-          <p>Select how you participate in the community.</p>
-        </div>
-
-        <div className="guide-section">
-          <strong>Home Location</strong>
-          <p>Your feed and alerts are powered by this location.</p>
-        </div>
-
-        <div className="guide-section">
-          <strong>Live Location (GPS)</strong>
-          <p>Enable GPS for real-time updates and local awareness.</p>
-        </div>
-
-        <div className="guide-section">
-          <strong>🚨 Emergency Beacon (Upcoming)</strong>
-          <p>
-            Verified users will be able to send SOS alerts. Activation will
-            require verification to prevent misuse.
-          </p>
-        </div>
-      </div>
-
     </div>
-  </div>
-);
+  );
+}
