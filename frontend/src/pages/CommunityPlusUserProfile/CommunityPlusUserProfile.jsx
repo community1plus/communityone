@@ -307,22 +307,22 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
             </div>
 
             <div className="profile-page-header">
-  <h2 className="profile-page-title">
-    {mode === "onboarding" ? "Create Profile" : "Profile Settings"}
-  </h2>
+              <h2 className="profile-page-title">
+              {mode === "onboarding" ? "Create Profile" : "Profile Settings"}
+              </h2>
 
-  {mode === "onboarding" && (
-    <div className="profile-page-steps">
-      <span className="step active">Identity</span>
-      <span className="divider">|</span>
-      <span className="step">Home Address</span>
-      <span className="divider">|</span>
-      <span className="step">Contact</span>
-      <span className="divider">|</span>
-      <span className="step">Social</span>
-      <span className="divider">|</span>
-      <span className="step">Payment Details</span>
-    </div>
+              {mode === "onboarding" && (
+              <div className="profile-page-steps">
+                <span className="step active">Identity</span>
+                <span className="divider">|</span>
+                <span className="step">Home Address</span>
+                <span className="divider">|</span>
+                <span className="step">Contact</span>
+                <span className="divider">|</span>
+                <span className="step">Social</span>
+                <span className="divider">|</span>
+                <span className="step">Payment Details</span>
+              </div>
   )}
 </div>
 

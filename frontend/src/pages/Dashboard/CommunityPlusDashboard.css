@@ -341,3 +341,47 @@ ANIMATIONS
     transform: translateY(0);
   }
 }
+
+/* =====================================================
+PARENT CONTAINER OVERRIDE FOR PROFILE CENTERING
+===================================================== */
+
+.dashboard-container {
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+
+.main {
+  min-height: 0;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  align-items: stretch;
+}
+
+/* critical: content pane must be a flex container with real height */
+.content-area {
+  min-height: 0;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+/* critical: full-width pages must center inside available pane */
+.content-area.full-width {
+  min-height: 0;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center !important;
+  padding: 24px 32px 32px 32px;
+  box-sizing: border-box;
+  overflow: auto;
+}
+
+/* critical: child wrapper should not force top alignment */
+.content-area.full-width > * {
+  width: 100%;
+  max-width: 1280px;
+  margin: auto 0;
+}
