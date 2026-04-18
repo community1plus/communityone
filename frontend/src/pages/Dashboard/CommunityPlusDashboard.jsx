@@ -2,9 +2,9 @@ import React from "react";
 import { signOut } from "aws-amplify/auth";
 import { useNavigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-
 import CommunityPlusHeader from "../../components/Layout/Header/CommunityPlusHeader";
 import CommunityPlusSidebar from "../../components/Layout/Sidebar/CommunityPlusSidebar";
+import "./CommunityPlusDashboard.css";
 
 export default function CommunityPlusDashboard() {
   const navigate = useNavigate();
