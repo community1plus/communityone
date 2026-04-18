@@ -20,66 +20,18 @@ APP SHELL
 }
 
 .main {
-  display: grid;
-  grid-template-columns: 240px 1fr; /* sidebar + content */
-  height: 100%;
+  display: flex;
 }
 
-.main > * {
-  min-width: 0;
-}
 
 /* =====================================================
 SIDEBAR
 ===================================================== */
 
-.sidebar {
-  grid-column: 1;
-  width: var(--sidebar-width);
-  min-width: var(--sidebar-width);
-  padding: 20px 16px;
-  box-sizing: border-box;
-  background: transparent;
-}
-
-/* =====================================================
-CONTENT AREA
-===================================================== */
-
 .content-area {
-  grid-column: 2;
-  min-width: 0;
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
+  flex: 1;
 }
 
-/* full-width views like onboarding / profile */
-.content-area.full-width {
-  grid-column: 2;
-  min-width: 0;
-  width: 100%;
-  max-width: 100%;
-  display: block;
-  padding: 16px 32px 32px 32px;
-  box-sizing: border-box;
-  overflow: visible;
-}
-
-.content-area.full-width > * {
-  width: 100%;
-  max-width: 1280px;
-}
-
-/* default dashboard home view */
-.content-area:not(.full-width) {
-  display: grid;
-  grid-template-columns: 420px minmax(0, 1fr);
-  gap: 24px;
-  padding: 0 32px;
-  align-items: start;
-  box-sizing: border-box;
-}
 
 /* =====================================================
 RESPONSIVE
