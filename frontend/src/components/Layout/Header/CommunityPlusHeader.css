@@ -415,3 +415,58 @@ HEADER ALIGNMENT FIX (CRITICAL)
 .header {
   overflow: hidden;
 }
+
+/* =====================================================
+LOCATION INPUT SIMPLIFIED
+===================================================== */
+
+.location-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.location-pin {
+  font-size: 14px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.location-pin.exact {
+  color: #1f9d55;
+}
+
+.location-pin.editable {
+  color: var(--brand);
+}
+
+.location-input {
+  min-width: 0;
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  color: var(--text);
+  outline: none;
+  padding: 2px 0;
+}
+
+.location-input.locked {
+  cursor: default;
+}
+
+.location-input.editable {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.18);
+}
+
+.location-input.editable:focus {
+  border-bottom: 1px solid var(--brand);
+}
+
+/* old switcher/dropdown no longer used */
+.location-switcher,
+.location-dropdown {
+  display: none;
+}

@@ -1,26 +1,24 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import "./CommunityPlusHeader.css";
 import { useLocationContext } from "../../../context/LocationContext";
 import { useAuth } from "../../../context/AuthContext";
 
-function CommunityPlusHeader({ setActiveView, user, onLogout }) {
+function CommunityPlusHeader({ user, onLogout }) {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [showMenu, setShowMenu] = useState(false);
-  const [locating, setLocating] = useState(false);
+  const [manualLocation, setManualLocation] = useState("");
   const menuRef = useRef(null);
 
-  const {
-    viewLocation,
-    homeLocation,
-    enableLiveLocation,
-    enableHomeLocation,
-    setViewLocation
-  } = useLocationContext();
-
+  const { viewLocation, setViewLocation } = useLocationContext();
   const { appUser } = useAuth();
-  const effectiveUser = appUser || user;
+
+  const effectiveUser = appUser?.user || appUser || user;
 
   /* ===============================
-     🧠 USER LOGIC (CLEANED)
+     USERNAME / INITIALS
   =============================== */
 
   const username = useMemo(() => {
@@ -29,9 +27,10 @@ function CommunityPlusHeader({ setActiveView, user, onLogout }) {
     const email =
       effectiveUser?.email ||
       effectiveUser?.attributes?.email ||
-      effectiveUser?.signInDetails?.loginId;
+      effectiveUser?.signInDetails?.loginId ||
+      "";
 
-    if (email && email.includes("@")) {
+    if (email.includes("@")) {
       return email.split("@")[0];
     }
 
@@ -47,17 +46,19 @@ function CommunityPlusHeader({ setActiveView, user, onLogout }) {
 
     const parts = username.split(/[\s._-]+/).filter(Boolean);
 
-    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    if (parts.length === 1) {
+      return parts[0].slice(0, 2).toUpperCase();
+    }
 
     return ((parts[0][0] || "") + (parts[1]?.[0] || "")).toUpperCase();
   }, [username]);
 
   /* ===============================
-     📍 LOCATION FORMATTER
+     LOCATION STATE
   =============================== */
 
   const formatLocationLabel = (loc) => {
-    if (!loc) return "Locating...";
+    if (!loc) return "";
 
     const stateMap = {
       Victoria: "VIC",
@@ -67,28 +68,43 @@ function CommunityPlusHeader({ setActiveView, user, onLogout }) {
       Tasmania: "TAS",
       "Western Australia": "WA",
       "Northern Territory": "NT",
-      ACT: "ACT"
+      ACT: "ACT",
     };
 
     const stateShort = stateMap[loc.state] || loc.state;
 
-    return `${loc.suburb || loc.city || ""}, ${stateShort || ""} ${loc.postcode || ""}`.trim();
+    return `${loc.suburb || loc.city || loc.label || ""}${stateShort ? `, ${stateShort}` : ""}${loc.postcode ? ` ${loc.postcode}` : ""}`.trim();
   };
 
-  /* ===============================
-     🎯 ACCURACY INTELLIGENCE
-  =============================== */
-
-  const accuracyMeta = useMemo(() => {
+  const isExactLocation = useMemo(() => {
     const acc = viewLocation?.accuracy;
-    if (!acc) return null;
-
-    if (acc <= 50) return { label: "Exact", class: "exact" };
-    if (acc <= 200) return { label: "Precise", class: "precise" };
-    if (acc <= 1000) return { label: "Approx", class: "approx" };
-
-    return { label: "Rough", class: "rough" };
+    return typeof acc === "number" && acc <= 50;
   }, [viewLocation]);
+
+  useEffect(() => {
+    const label =
+      viewLocation?.label ||
+      formatLocationLabel(viewLocation) ||
+      "";
+
+    setManualLocation(label);
+  }, [viewLocation]);
+
+  const handleManualLocationCommit = () => {
+    if (isExactLocation) return;
+
+    const value = manualLocation.trim();
+    if (!value) return;
+
+    setViewLocation({
+      ...viewLocation,
+      label: value,
+      suburb: value,
+      city: value,
+      accuracy: viewLocation?.accuracy ?? null,
+      type: "manual",
+    });
+  };
 
   /* ===============================
      CLICK OUTSIDE
@@ -102,42 +118,24 @@ function CommunityPlusHeader({ setActiveView, user, onLogout }) {
     };
 
     document.addEventListener("mousedown", handleClickOutside);
-    return () =>
+    return () => {
       document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
   const toggleMenu = () => setShowMenu((prev) => !prev);
 
   /* ===============================
-     📡 LOCATION ACTIONS (UPGRADED)
+     NAV HELPERS
   =============================== */
 
-  const handleHomeClick = async () => {
-    if (locating) return;
-    setLocating(true);
-
-    try {
-      // Refresh only if stale or missing
-      if (!homeLocation || homeLocation?.accuracy > 500) {
-        await enableHomeLocation();
-      } else {
-        setViewLocation(homeLocation);
-      }
-    } finally {
-      setLocating(false);
+  const go = (path) => {
+    if (location.pathname !== path) {
+      navigate(path);
     }
   };
 
-  const handleLiveClick = async () => {
-    if (locating) return;
-    setLocating(true);
-
-    try {
-      await enableLiveLocation();
-    } finally {
-      setLocating(false);
-    }
-  };
+  const isActive = (path) => location.pathname === path;
 
   /* ===============================
      RENDER
@@ -146,55 +144,40 @@ function CommunityPlusHeader({ setActiveView, user, onLogout }) {
   return (
     <header className="header">
       <div className="header-row">
-
         {/* LEFT */}
         <div className="header-left logo-container">
-
           <img
             src="/logo/logo.png"
             alt="Community One"
             className="logo"
+            onClick={() => go("/home")}
           />
 
-          {/* LOCATION */}
-          <div className="location-switcher">
+          <div className="location-display">
+            <span className={`location-pin ${isExactLocation ? "exact" : "editable"}`}>
+              📍
+            </span>
 
-            <div className="location-display">
-
-              <span className="location-text">
-                📍 {locating
-                  ? "Locating..."
-                  : formatLocationLabel(viewLocation)}
-              </span>
-
-              {!locating && viewLocation?.accuracy && (
-                <>
-                  <span className="location-accuracy">
-                    ±{Math.round(viewLocation.accuracy)}m
-                  </span>
-
-                  {accuracyMeta && (
-                    <span className={`location-badge ${accuracyMeta.class}`}>
-                      {accuracyMeta.label}
-                    </span>
-                  )}
-                </>
-              )}
-
-            </div>
-
-            <div className="location-dropdown">
-              <button onClick={handleHomeClick}>
-                🏠 Home
-              </button>
-
-              <button onClick={handleLiveClick}>
-                📡 Near Me
-              </button>
-            </div>
-
+            <input
+              type="text"
+              className={`location-input ${isExactLocation ? "locked" : "editable"}`}
+              value={manualLocation}
+              readOnly={isExactLocation}
+              placeholder={isExactLocation ? "Using exact location" : "Enter address"}
+              onChange={(e) => {
+                if (!isExactLocation) {
+                  setManualLocation(e.target.value);
+                }
+              }}
+              onBlur={handleManualLocationCommit}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleManualLocationCommit();
+                }
+              }}
+              title={isExactLocation ? "Using your exact current location" : "Type an address"}
+            />
           </div>
-
         </div>
 
         {/* CENTER */}
@@ -213,11 +196,7 @@ function CommunityPlusHeader({ setActiveView, user, onLogout }) {
         <div className="header-right">
           {effectiveUser && (
             <div className="user-block" ref={menuRef}>
-
-              <span
-                className="username"
-                title={effectiveUser?.email || ""}
-              >
+              <span className="username" title={effectiveUser?.email || ""}>
                 {username}
               </span>
 
@@ -227,11 +206,10 @@ function CommunityPlusHeader({ setActiveView, user, onLogout }) {
 
               {showMenu && (
                 <div className="dropdown-menu">
-
                   <div
                     className="menu-item"
                     onClick={() => {
-                      setActiveView("profile");
+                      navigate("/profile");
                       setShowMenu(false);
                     }}
                   >
@@ -247,27 +225,77 @@ function CommunityPlusHeader({ setActiveView, user, onLogout }) {
                   >
                     Logout
                   </div>
-
                 </div>
               )}
-
             </div>
           )}
         </div>
-
       </div>
 
       {/* NAV */}
       <nav className="links">
-        <button onClick={() => setActiveView("dashboard")}>Home</button>
-        <button onClick={() => setActiveView("posts")}>Posts</button>
-        <button onClick={() => setActiveView("events")}>Events</button>
-        <button onClick={() => setActiveView("incidents")}>Incidents</button>
-        <button onClick={() => setActiveView("search")}>Search</button>
-        <button onClick={() => setActiveView("communityplus")}>Community+</button>
-        <button onClick={() => setActiveView("about")}>About</button>
-        <button onClick={() => setActiveView("yellowpages")}>Yellow Pages</button>
-        <button onClick={() => setActiveView("merch")}>Merch</button>
+        <button
+          className={isActive("/home") ? "active" : ""}
+          onClick={() => go("/home")}
+        >
+          Home
+        </button>
+
+        <button
+          className={isActive("/post") ? "active" : ""}
+          onClick={() => go("/post")}
+        >
+          Posts
+        </button>
+
+        <button
+          className={isActive("/event") ? "active" : ""}
+          onClick={() => go("/event")}
+        >
+          Events
+        </button>
+
+        <button
+          className={isActive("/incident") ? "active" : ""}
+          onClick={() => go("/incident")}
+        >
+          Incidents
+        </button>
+
+        <button
+          className={isActive("/search") ? "active" : ""}
+          onClick={() => go("/search")}
+        >
+          Search
+        </button>
+
+        <button
+          className={isActive("/communityplus") ? "active" : ""}
+          onClick={() => go("/communityplus")}
+        >
+          Community+
+        </button>
+
+        <button
+          className={isActive("/about") ? "active" : ""}
+          onClick={() => go("/about")}
+        >
+          About
+        </button>
+
+        <button
+          className={isActive("/yellowpages") ? "active" : ""}
+          onClick={() => go("/yellowpages")}
+        >
+          Yellow Pages
+        </button>
+
+        <button
+          className={isActive("/merch") ? "active" : ""}
+          onClick={() => go("/merch")}
+        >
+          Merch
+        </button>
       </nav>
     </header>
   );

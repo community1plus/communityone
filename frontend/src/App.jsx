@@ -79,6 +79,9 @@ export default function App() {
         <Route path="/event" element={<PlaceholderPage title="Event page" />} />
         <Route path="/incident" element={<PlaceholderPage title="Incident page" />} />
         <Route path="/beacon" element={<PlaceholderPage title="Beacon page" />} />
+        <Route path="/search" element={<PlaceholderPage title="Search page" />} />
+        <Route path="/about" element={<PlaceholderPage title="About page" />} />
+        <Route path="/merch" element={<PlaceholderPage title="Merch page" />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
