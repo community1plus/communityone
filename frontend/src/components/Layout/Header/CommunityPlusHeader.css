@@ -186,18 +186,23 @@ RIGHT SIDE
 
 /* Avatar */
 .avatar {
-  width: 36px;
+  width: 32px;
   height: 36px;
   border-radius: 50%;
   background: var(--accent);
   color: white;
   background-color: #4a0f0f; /* oxblood red */
-  color: rgba(255, 255, 255, 0.75); /* softer white */
+  color: rgba(255, 255, 255, 0.65); /* softer white */
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
   cursor: pointer;
+  width: 40px;
+  height: 40px;
+  font-size: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
 .avatar-dropdown {
