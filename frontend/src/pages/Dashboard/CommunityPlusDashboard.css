@@ -55,7 +55,7 @@ APP SHELL
   min-height: 0;
   height: 100%;
   display: grid;
-  grid-template-columns: var(--sidebar-width) 1fr;
+  grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
   align-items: stretch;
   overflow: visible;
   padding: 20px 0 24px 0;
@@ -142,34 +142,24 @@ CONTENT AREA
 
 /* Default dashboard home */
 .content-area {
+  grid-column: 2;
   min-width: 0;
-  min-height: 0;
-  height: 100%;
-  display: grid;
-  grid-template-columns: 420px 1fr;
-  gap: var(--layout-gap);
-  padding: 0 32px 0 32px;
+  max-width: 100%;
   box-sizing: border-box;
-  align-items: stretch;
-  overflow: hidden;
-  animation: fadeInUp 0.3s ease;
 }
 
 /* Full-width views like onboarding/profile */
 /* Full-width views like onboarding/profile */
 .content-area.full-width {
+  grid-column: 2;
   min-width: 0;
-  min-height: 0;
-
-  height: auto;
+  max-width: 100%;
   display: block;
-
   padding: 16px 32px 32px 32px;
   box-sizing: border-box;
-
-  /* 🔥 REMOVE INTERNAL SCROLL */
   overflow: visible;
 }
+
 .content-area.full-width > * {
   width: 100%;
   max-width: 1280px;
