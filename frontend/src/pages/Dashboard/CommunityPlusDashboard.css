@@ -21,11 +21,8 @@ APP SHELL
 
 .main {
   display: grid;
-  grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
-  align-items: start;
-  min-height: 0;
-  padding: 20px 0 24px 0;
-  box-sizing: border-box;
+  grid-template-columns: 240px 1fr; /* sidebar + content */
+  height: 100%;
 }
 
 .main > * {
