@@ -22,6 +22,17 @@ TWO-COLUMN LAYOUT (FINAL CLEAN)
   flex-direction: column;
 }
 
+.profile-layout {
+  outline: 3px solid red;
+}
+
+.profile-left {
+  outline: 3px solid blue;
+}
+
+.profile-guide {
+  outline: 3px solid green;
+}
 /* =====================================================
 CARD SYSTEM
 ===================================================== */
@@ -44,7 +55,6 @@ CARD SYSTEM
 .profile-guide {
   padding: 22px 24px;
   background: #faf7f4;
-
   /* 🔥 ensures full height behavior */
   height: 100%;
 }
