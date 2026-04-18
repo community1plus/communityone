@@ -57,7 +57,7 @@ APP SHELL
   display: grid;
   grid-template-columns: var(--sidebar-width) 1fr;
   align-items: stretch;
-  overflow: hidden;
+  overflow: visible;
   padding: 20px 0 24px 0;
   box-sizing: border-box;
 }
@@ -156,18 +156,19 @@ CONTENT AREA
 }
 
 /* Full-width views like onboarding/profile */
+/* Full-width views like onboarding/profile */
 .content-area.full-width {
   min-width: 0;
   min-height: 0;
 
-  /* 🔥 KEY CHANGE */
   height: auto;
   display: block;
 
   padding: 16px 32px 32px 32px;
   box-sizing: border-box;
 
-  overflow-y: auto;
+  /* 🔥 REMOVE INTERNAL SCROLL */
+  overflow: visible;
 }
 .content-area.full-width > * {
   width: 100%;
