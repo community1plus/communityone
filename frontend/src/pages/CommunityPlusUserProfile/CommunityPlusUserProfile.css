@@ -320,3 +320,182 @@
     padding: 20px;
   }
 }
+
+/* =====================================================
+PROFILE PAGE LAYOUT FIX
+===================================================== */
+
+.profile-container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;   /* vertical centering inside pane */
+  min-height: 100%;
+  box-sizing: border-box;
+}
+
+.profile-page-header {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto 18px auto;  /* aligns with profile card block */
+}
+
+.profile-page-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text, #111);
+  margin: 0 0 10px 0;
+}
+
+.profile-page-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted, #666);
+}
+
+.profile-page-steps .step {
+  white-space: nowrap;
+}
+
+.profile-page-steps .step.active {
+  color: var(--brand, #b63a2b);
+  font-weight: 700;
+}
+
+.profile-page-steps .divider {
+  opacity: 0.45;
+}
+
+.profile-layout {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.6fr 0.9fr;
+  gap: 24px;
+  align-items: stretch;
+}
+
+/* make the full-width dashboard pane center this page properly */
+.content-area.full-width {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 20px;
+  padding-bottom: 28px;
+  box-sizing: border-box;
+}
+
+.content-area.full-width > * {
+  width: 100%;
+}
+
+/* responsive */
+@media (max-width: 1100px) {
+  .profile-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-page-header {
+    max-width: 100%;
+  }
+}
+
+/* =====================================================
+PROFILE PAGE ALIGNMENT FIX
+===================================================== */
+
+.profile-container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+
+  display: flex;
+  flex-direction: column;
+
+  justify-content: center;   /* 🔥 vertical centering */
+  min-height: 100%;
+  box-sizing: border-box;
+}
+
+/* header aligns with form block */
+.profile-page-header {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto 18px auto;
+}
+
+/* title */
+.profile-page-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 10px 0;
+  color: var(--text, #111);
+}
+
+/* step nav */
+.profile-page-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted, #666);
+}
+
+/* steps */
+.profile-page-steps .step {
+  white-space: nowrap;
+}
+
+.profile-page-steps .step.active {
+  color: var(--brand, #b63a2b);
+  font-weight: 700;
+}
+
+/* separators */
+.profile-page-steps .divider {
+  opacity: 0.4;
+}
+
+/* layout alignment */
+.profile-layout {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+
+  display: grid;
+  grid-template-columns: 1.6fr 0.9fr;
+  gap: 24px;
+}
+
+/* dashboard pane centering */
+.content-area.full-width {
+  display: flex;
+  justify-content: center;
+  align-items: center;  /* 🔥 FIXES vertical centering */
+}
+
+/* ensure full width inside */
+.content-area.full-width > * {
+  width: 100%;
+}
+
+/* responsive */
+@media (max-width: 1100px) {
+  .profile-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-page-header {
+    max-width: 100%;
+  }
+}
