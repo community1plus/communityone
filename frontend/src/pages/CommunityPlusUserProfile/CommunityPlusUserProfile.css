@@ -63,6 +63,11 @@ TWO-COLUMN LAYOUT
   box-sizing: border-box;
 }
 
+.profile-layout > * {
+  display: flex;
+  flex-direction: column;
+}
+
 .profile-left,
 .profile-right {
   min-width: 0;
