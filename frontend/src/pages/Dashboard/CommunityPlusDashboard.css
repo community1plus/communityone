@@ -33,5 +33,11 @@ CONTENT
 
 .content-area {
   flex: 1;
-  min-width: 0; /* 🔥 CRITICAL for grid inside */
+  min-width: 0;
+
+  /* 🔥 KEY FIXES */
+  padding: 24px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* centers your content block */
 }

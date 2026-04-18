@@ -1,6 +1,11 @@
 /* =====================================================
 TWO-COLUMN LAYOUT (FINAL CLEAN)
 ===================================================== */
+.profile-container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto; /* 🔥 center it */
+}
 
 .profile-layout {
   width: 100%;
