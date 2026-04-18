@@ -191,11 +191,21 @@ RIGHT SIDE
   border-radius: 50%;
   background: var(--accent);
   color: white;
+  background-color: #4a0f0f; /* oxblood red */
+  color: rgba(255, 255, 255, 0.75); /* softer white */
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
   cursor: pointer;
+}
+
+.avatar-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+
+  z-index: 9999; /* ensure it sits above everything */
 }
 
 .avatar-wrapper {
