@@ -385,3 +385,92 @@ PARENT CONTAINER OVERRIDE FOR PROFILE CENTERING
   max-width: 1280px;
   margin: auto 0;
 }
+
+/* =====================================================
+PROFILE TWO-COLUMN WIDTH FIX
+===================================================== */
+
+/* overall wrapper */
+.profile-container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* title row aligns to the same width as the form block */
+.profile-page-header {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto 18px auto;
+  box-sizing: border-box;
+}
+
+/* force true 50 / 50 columns */
+.profile-layout {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: stretch;
+
+  box-sizing: border-box;
+}
+
+/* CRITICAL: prevent either side from overflowing its grid track */
+.profile-left,
+.profile-right {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+/* keep cards inside their own half */
+.profile-left > *,
+.profile-right > * {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* make form controls respect container width */
+.profile-left form,
+.profile-left .form-group,
+.profile-left input,
+.profile-left select,
+.profile-left textarea,
+.profile-left .location-section,
+.profile-left .location-input {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* right guide panel should not overflow */
+.profile-guide {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* dashboard content pane should center the whole profile block cleanly */
+.content-area.full-width {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.content-area.full-width > * {
+  width: 100%;
+  max-width: 1280px;
+}
+
+/* responsive: stack on smaller screens */
+@media (max-width: 1100px) {
+  .profile-layout {
+    grid-template-columns: 1fr;
+  }
+}
