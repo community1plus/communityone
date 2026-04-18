@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { useNavigate } from "react-router-dom"; // ✅ THIS
+import { useNavigate } from "react-router-dom";
 import { Autocomplete, useJsApiLoader } from "@react-google-maps/api";
 
 import { apiFetch } from "../../../services/api";
@@ -7,6 +7,8 @@ import { useLocationContext } from "../../context/LocationContext";
 import { useAuth } from "../../context/AuthContext";
 
 import "./CommunityPlusUserProfile.css";
+
+const GOOGLE_LIBRARIES = ["places"];
 
 export default function CommunityPlusUserProfile({ mode = "edit" }) {
   const navigate = useNavigate();
@@ -35,6 +37,7 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
 
   const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "";
 
+  // ✅ CORRECT: hook INSIDE component (only once)
   const {
     isLoaded: mapsLoaded,
     loadError: mapsLoadError,
@@ -184,7 +187,6 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
   return (
     <div className="profile-container">
 
-      {/* HEADER */}
       <div className="profile-page-header">
         <h2 className="profile-page-title">
           {mode === "onboarding" ? "Create Profile" : "Profile Settings"}
@@ -201,10 +203,8 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
         )}
       </div>
 
-      {/* GRID */}
       <div className="profile-layout">
 
-        {/* LEFT */}
         <div className="profile-left">
           <form onSubmit={handleSubmit}>
 
@@ -232,14 +232,23 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
             <div className="location-section">
               <label>Home Location</label>
 
-              <Autocomplete onLoad={(auto) => (autoRef.current = auto)} onPlaceChanged={onPlaceChanged}>
+              {mapsLoaded && !mapsLoadError ? (
+                <Autocomplete onLoad={(auto) => (autoRef.current = auto)} onPlaceChanged={onPlaceChanged}>
+                  <input
+                    placeholder="Search your suburb..."
+                    className="location-input"
+                    value={manualAddress}
+                    onChange={handleManualAddressChange}
+                  />
+                </Autocomplete>
+              ) : (
                 <input
-                  placeholder="Search your suburb..."
+                  placeholder="Enter your suburb..."
                   className="location-input"
                   value={manualAddress}
                   onChange={handleManualAddressChange}
                 />
-              </Autocomplete>
+              )}
 
               <div className="location-row">
                 <span>📍 Home</span>
@@ -268,7 +277,6 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
           </form>
         </div>
 
-        {/* RIGHT */}
         <div className="profile-guide">
           <h3>Profile Guide</h3>
 
