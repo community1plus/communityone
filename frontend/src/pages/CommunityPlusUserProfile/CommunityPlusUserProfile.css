@@ -9,9 +9,9 @@ TWO-COLUMN LAYOUT (FINAL CLEAN)
 
 .profile-layout {
   display: grid;
-  grid-template-columns:
-    minmax(0, 720px)
-    minmax(0, 420px);
+  
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+
   justify-content: center; /* 🔥 key */
   gap: 24px;
 }
