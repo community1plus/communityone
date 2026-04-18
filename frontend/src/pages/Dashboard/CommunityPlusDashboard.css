@@ -23,7 +23,7 @@ SIDEBAR
 ===================================================== */
 
 .sidebar {
-  width: var(--sidebar-width);
+  width: 260px
   flex-shrink: 0;
 }
 
@@ -40,4 +40,5 @@ CONTENT
   display: flex;
   flex-direction: column;
   align-items: center; /* centers your content block */
+  padding:auto;
 }

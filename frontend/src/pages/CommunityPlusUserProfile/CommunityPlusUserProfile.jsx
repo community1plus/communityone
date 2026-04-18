@@ -332,7 +332,42 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
         </div>
 
 
-          
+          <div className="profile-guide">
+            <h3>Profile Guide</h3>
+
+            <div className="guide-section">
+              <strong>Username</strong>
+              <p>Your unique identity. Choose something simple and memorable.</p>
+            </div>
+
+            <div className="guide-section">
+              <strong>Display Name</strong>
+              <p>This is how others will see you across the platform.</p>
+            </div>
+
+            <div className="guide-section">
+              <strong>User Type</strong>
+              <p>Select how you participate in the community.</p>
+            </div>
+
+            <div className="guide-section">
+              <strong>Home Location</strong>
+              <p>Your feed and alerts are powered by this location.</p>
+            </div>
+
+            <div className="guide-section">
+              <strong>Live Location (GPS)</strong>
+              <p>Enable GPS for real-time updates and local awareness.</p>
+            </div>
+
+            <div className="guide-section">
+              <strong>🚨 Emergency Beacon (Upcoming)</strong>
+              <p>
+                Verified users will be able to send SOS alerts. Activation
+                will require verification to prevent misuse.
+              </p>
+            </div>
+          </div>
         
       </div>
     </div>
