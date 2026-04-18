@@ -5,19 +5,24 @@ import { apiFetch } from "../../services/api";
 
 export default function AuthGate() {
   const navigate = useNavigate();
-  const { user, setAppUser, authLoading } = useAuth();
+  const { user, setAppUser, loading } = useAuth();
 
   useEffect(() => {
-    if (authLoading) return;
+    if (loading) return;
 
     const bootstrap = async () => {
+      console.time("authgate-total");
+
       try {
-        if (!user) {
+        if (!user?.authenticated) {
           navigate("/", { replace: true });
           return;
         }
 
+        console.time("users-me");
         const res = await apiFetch("/users/me");
+        console.timeEnd("users-me");
+
         console.log("AuthGate /users/me:", res);
 
         if (!res?.user?.id) {
@@ -38,11 +43,13 @@ export default function AuthGate() {
       } catch (err) {
         console.error("AuthGate error:", err);
         navigate("/", { replace: true });
+      } finally {
+        console.timeEnd("authgate-total");
       }
     };
 
     bootstrap();
-  }, [user, authLoading, navigate, setAppUser]);
+  }, [user, loading, navigate, setAppUser]);
 
   return <div style={{ padding: 20 }}>Setting up your account...</div>;
 }
