@@ -1,3 +1,13 @@
+import { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom"; // ✅ THIS
+import { Autocomplete, useJsApiLoader } from "@react-google-maps/api";
+
+import { apiFetch } from "../../../services/api";
+import { useLocationContext } from "../../context/LocationContext";
+import { useAuth } from "../../context/AuthContext";
+
+import "./CommunityPlusUserProfile.css";
+
 export default function CommunityPlusUserProfile({ mode = "edit" }) {
   const navigate = useNavigate();
   const autoRef = useRef(null);
