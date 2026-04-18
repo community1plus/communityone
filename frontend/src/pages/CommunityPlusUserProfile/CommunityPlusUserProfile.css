@@ -1,4 +1,12 @@
 /* =====================================================
+ROOT
+===================================================== */
+
+:root {
+  --sidebar-width: 260px;
+}
+
+/* =====================================================
 CONTAINER + PAGE STRUCTURE
 ===================================================== */
 
@@ -6,6 +14,12 @@ CONTAINER + PAGE STRUCTURE
   width: 100%;
   max-width: 1100px;
   margin: 0 auto;
+
+  /* 🔥 enables vertical stretching */
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
   box-sizing: border-box;
 }
 
@@ -48,18 +62,18 @@ TWO-COLUMN LAYOUT
 .profile-layout {
   display: grid;
 
-  /* responsive but controlled */
   grid-template-columns:
     minmax(0, 1fr)
     minmax(320px, 420px);
 
   gap: 24px;
 
-  /* prevents awkward centering behaviour */
-  align-items: start;
+  /* 🔥 full height behavior */
+  flex: 1;
+  align-items: stretch;
 }
 
-/* critical for overflow issues */
+/* prevent overflow issues */
 .profile-layout > * {
   min-width: 0;
 }
@@ -74,6 +88,12 @@ CARD SYSTEM
   border: 1px solid #e6dfd8;
   border-radius: 18px;
   box-shadow: 0 6px 18px rgba(20, 20, 20, 0.05);
+
+  /* 🔥 stretch cards */
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
   box-sizing: border-box;
 }
 
@@ -89,16 +109,6 @@ CARD SYSTEM
 }
 
 /* =====================================================
-RESPONSIVE
-===================================================== */
-
-@media (max-width: 900px) {
-  .profile-layout {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* =====================================================
 FORM LAYOUT
 ===================================================== */
 
@@ -108,9 +118,7 @@ FORM LAYOUT
   gap: 16px;
 }
 
-/* =====================================================
-FORM GROUPS
-===================================================== */
+/* form groups */
 
 .form-group {
   display: flex;
@@ -124,9 +132,7 @@ FORM GROUPS
   color: #444;
 }
 
-/* =====================================================
-INPUTS
-===================================================== */
+/* inputs */
 
 .profile-left input,
 .profile-left select {
@@ -159,7 +165,7 @@ BUTTON
   border: none;
   border-radius: 10px;
 
-  background: #4a0f0f; /* oxblood */
+  background: #4a0f0f;
   color: #fff;
 
   font-weight: 600;
@@ -201,9 +207,7 @@ LOCATION SECTION
   color: #333;
 }
 
-/* =====================================================
-LOCATION ROWS
-===================================================== */
+/* rows */
 
 .location-row {
   display: flex;
@@ -224,7 +228,7 @@ LOCATION ROWS
 }
 
 /* =====================================================
-GHOST BUTTON (Use GPS)
+GHOST BUTTON
 ===================================================== */
 
 .ghost-btn {
@@ -249,4 +253,14 @@ ERROR TEXT
   margin-top: 6px;
   font-size: 13px;
   color: #c44536;
+}
+
+/* =====================================================
+RESPONSIVE
+===================================================== */
+
+@media (max-width: 900px) {
+  .profile-layout {
+    grid-template-columns: 1fr;
+  }
 }
