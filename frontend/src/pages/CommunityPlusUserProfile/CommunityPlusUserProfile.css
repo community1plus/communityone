@@ -7,7 +7,8 @@ PAGE WRAPPER
 ===================================================== */
 
 .profile-container {
-  width: min(1280px, 100%);
+  width: 100%;
+  max-width: 1280px;
   margin: 0;
   box-sizing: border-box;
 }
@@ -19,7 +20,8 @@ PAGE WRAPPER
 }
 
 .profile-page-title {
-  width: 100%;
+  font-size: 18px;
+  font-weight: 700;
   margin: 0 0 10px 0;
 }
 
@@ -63,11 +65,7 @@ TWO-COLUMN LAYOUT
 
 .profile-left,
 .profile-right {
-  width: 100%;
   min-width: 0;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
 }
 
 /* =====================================================
