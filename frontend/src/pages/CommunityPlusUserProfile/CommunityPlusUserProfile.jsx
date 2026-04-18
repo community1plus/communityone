@@ -20,13 +20,13 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
     liveLocation,
     viewLocation,
     setHome,
-    enableLiveLocation
+    enableLiveLocation,
   } = useLocationContext();
 
   const [formData, setFormData] = useState({
     username: "",
     display_name: "",
-    userType: "PERSONAL"
+    userType: "PERSONAL",
   });
 
   const [manualAddress, setManualAddress] = useState("");
@@ -34,16 +34,15 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
-  const googleMapsApiKey =
-    import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "";
+  const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "";
 
   const {
     isLoaded: mapsLoaded,
-    loadError: mapsLoadError
+    loadError: mapsLoadError,
   } = useJsApiLoader({
     id: "community-one-google-maps",
     googleMapsApiKey,
-    libraries: GOOGLE_LIBRARIES
+    libraries: GOOGLE_LIBRARIES,
   });
 
   useEffect(() => {
@@ -66,7 +65,7 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
           setFormData({
             username: data.profile.username || "",
             display_name: data.profile.display_name || "",
-            userType: data.profile.userType || "PERSONAL"
+            userType: data.profile.userType || "PERSONAL",
           });
 
           if (data.profile.homeLocation?.label) {
@@ -75,13 +74,12 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
             setManualAddress(data.profile.homeAddress);
           }
         } else {
+          const emailPrefix = appUser?.email?.split("@")[0] || "";
+
           setFormData({
-            username: appUser?.username || "",
-            display_name:
-              appUser?.attributes?.name ||
-              appUser?.attributes?.email?.split("@")[0] ||
-              "",
-            userType: "PERSONAL"
+            username: appUser?.username || emailPrefix,
+            display_name: appUser?.name || emailPrefix,
+            userType: "PERSONAL",
           });
         }
       } catch (err) {
@@ -97,7 +95,7 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
   const handleChange = (e) => {
     setFormData((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     }));
   };
 
@@ -105,12 +103,11 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
     const value = e.target.value;
     setManualAddress(value);
 
-    // Keep context in sync even without Google Places
     setHome({
       label: value,
       lat: null,
       lng: null,
-      type: "home"
+      type: "home",
     });
   };
 
@@ -142,7 +139,7 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
       label,
       lat: place.geometry.location.lat(),
       lng: place.geometry.location.lng(),
-      type: "home"
+      type: "home",
     };
 
     setManualAddress(label);
@@ -182,9 +179,9 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
             label: homeAddress,
             lat: null,
             lng: null,
-            type: "home"
-          }
-        })
+            type: "home",
+          },
+        }),
       });
 
       if (mode === "onboarding") {
@@ -202,11 +199,25 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
 
   return (
     <div className="profile-container">
-      <h2>
-        {mode === "onboarding"
-          ? "Create your profile"
-          : "Profile Settings"}
-      </h2>
+      <div className="profile-page-header">
+        <h2 className="profile-page-title">
+          {mode === "onboarding" ? "Create Profile" : "Profile Settings"}
+        </h2>
+
+        {mode === "onboarding" && (
+          <div className="profile-page-steps">
+            <span className="step active">Identity</span>
+            <span className="divider">|</span>
+            <span className="step">Home Address</span>
+            <span className="divider">|</span>
+            <span className="step">Contact</span>
+            <span className="divider">|</span>
+            <span className="step">Social</span>
+            <span className="divider">|</span>
+            <span className="step">Payment Details</span>
+          </div>
+        )}
+      </div>
 
       <div className="profile-layout">
         <div className="profile-left">
@@ -306,25 +317,13 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
               </div>
             </div>
 
-            <div className="profile-page-header">
-              <h2 className="profile-page-title">
-              {mode === "onboarding" ? "Create Profile" : "Profile Settings"}
-              </h2>
-
-              {mode === "onboarding" && (
-              <div className="profile-page-steps">
-                <span className="step active">Identity</span>
-                <span className="divider">|</span>
-                <span className="step">Home Address</span>
-                <span className="divider">|</span>
-                <span className="step">Contact</span>
-                <span className="divider">|</span>
-                <span className="step">Social</span>
-                <span className="divider">|</span>
-                <span className="step">Payment Details</span>
-              </div>
-  )}
-</div>
+            <button type="submit" disabled={saving}>
+              {saving
+                ? "Saving..."
+                : mode === "onboarding"
+                ? "Create Profile"
+                : "Save Changes"}
+            </button>
 
             {error && <p className="error">{error}</p>}
           </form>
