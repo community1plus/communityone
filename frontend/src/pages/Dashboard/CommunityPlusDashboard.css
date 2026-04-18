@@ -6,6 +6,10 @@ COMMUNITY ONE — DASHBOARD LAYOUT
   --sidebar-width: 260px;
 }
 
+/* =====================================================
+APP SHELL
+===================================================== */
+
 .dashboard-container {
   min-height: 100vh;
   display: grid;
@@ -24,6 +28,14 @@ COMMUNITY ONE — DASHBOARD LAYOUT
   box-sizing: border-box;
 }
 
+.main > * {
+  min-width: 0;
+}
+
+/* =====================================================
+SIDEBAR
+===================================================== */
+
 .sidebar {
   grid-column: 1;
   width: var(--sidebar-width);
@@ -33,26 +45,48 @@ COMMUNITY ONE — DASHBOARD LAYOUT
   background: transparent;
 }
 
+/* =====================================================
+CONTENT AREA
+===================================================== */
+
 .content-area {
   grid-column: 2;
   min-width: 0;
   width: 100%;
+  max-width: 100%;
   box-sizing: border-box;
 }
 
+/* full-width views like onboarding / profile */
 .content-area.full-width {
   grid-column: 2;
   min-width: 0;
   width: 100%;
+  max-width: 100%;
   display: block;
   padding: 16px 32px 32px 32px;
   box-sizing: border-box;
+  overflow: visible;
 }
 
 .content-area.full-width > * {
   width: 100%;
   max-width: 1280px;
 }
+
+/* default dashboard home view */
+.content-area:not(.full-width) {
+  display: grid;
+  grid-template-columns: 420px minmax(0, 1fr);
+  gap: 24px;
+  padding: 0 32px;
+  align-items: start;
+  box-sizing: border-box;
+}
+
+/* =====================================================
+RESPONSIVE
+===================================================== */
 
 @media (max-width: 1100px) {
   .main {
@@ -69,72 +103,8 @@ COMMUNITY ONE — DASHBOARD LAYOUT
     padding-left: 24px;
     padding-right: 24px;
   }
-}
 
-/* =====================================================
-LAYOUT LOCK — MUST BE LAST
-===================================================== */
-
-.dashboard-container {
-  min-height: 100vh;
-  display: grid;
-  grid-template-rows: auto 1fr;
-}
-
-.main {
-  display: grid !important;
-  grid-template-columns: 260px minmax(0, 1fr) !important;
-  align-items: start !important;
-  min-height: 0;
-  padding: 20px 0 24px 0;
-  box-sizing: border-box;
-}
-
-.main > * {
-  min-width: 0;
-}
-
-.sidebar {
-  grid-column: 1 !important;
-}
-
-.content-area {
-  grid-column: 2 !important;
-  min-width: 0;
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-}
-
-.content-area.full-width {
-  grid-column: 2 !important;
-  display: block !important;
-  width: 100%;
-  max-width: 100%;
-  padding: 16px 32px 32px 32px;
-  box-sizing: border-box;
-  overflow: visible !important;
-}
-
-.content-area.full-width > * {
-  width: 100%;
-  max-width: 1280px;
-}
-
-/* responsive */
-@media (max-width: 1100px) {
-  .main {
-    grid-template-columns: 1fr !important;
-  }
-
-  .sidebar {
-    display: none;
-  }
-
-  .content-area,
-  .content-area.full-width {
-    grid-column: 1 !important;
-    padding-left: 24px;
-    padding-right: 24px;
+  .content-area:not(.full-width) {
+    grid-template-columns: 1fr;
   }
 }
