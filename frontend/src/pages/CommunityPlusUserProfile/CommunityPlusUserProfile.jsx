@@ -331,7 +331,7 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
           </form>
         </div>
 
-        <div className="profile-right">
+
           <div className="profile-guide">
             <h3>Profile Guide</h3>
 
@@ -368,7 +368,7 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
               </p>
             </div>
           </div>
-        </div>
+        
       </div>
     </div>
   );
