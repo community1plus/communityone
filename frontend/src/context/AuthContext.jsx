@@ -75,7 +75,7 @@ export function AuthProvider({ children }) {
             headers: {
               "Content-Type": "application/json",
               // 🔥 future-ready (when backend uses JWT)
-              // Authorization: `Bearer ${idToken.toString()}`
+              Authorization: `Bearer ${idToken.toString()}`
             },
           }
         );
