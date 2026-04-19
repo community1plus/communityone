@@ -18,8 +18,6 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
 
   const {
     homeLocation,
-    liveLocation,
-    viewLocation,
     setHome,
     enableLiveLocation,
   } = useLocationContext();
@@ -35,7 +33,6 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
-  // ✅ STEP FLOW
   const steps = [
     "Identity",
     "Home Address",
@@ -47,23 +44,53 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
   const [currentStep, setCurrentStep] = useState(0);
 
   const nextStep = () => {
-  if (currentStep === 0) {
-    if (
-      !formData.username ||
-      !formData.display_name ||
-      !formData.userType
-    ) {
-      setError("Complete all identity fields.");
-      return;
+    if (currentStep === 0) {
+      if (
+        !formData.username ||
+        !formData.display_name ||
+        !formData.userType
+      ) {
+        setError("Complete all identity fields.");
+        return;
+      }
     }
-  }
 
-  setError("");
+    setError("");
 
-  if (currentStep < steps.length - 1) {
-    setCurrentStep((s) => s + 1);
-  }
-};
+    if (currentStep < steps.length - 1) {
+      setCurrentStep((s) => s + 1);
+    }
+  };
+
+  const prevStep = () => {
+    if (currentStep > 0) {
+      setCurrentStep((s) => s - 1);
+    }
+  };
+
+  const handleSave = async () => {
+    try {
+      await apiFetch("/users/profile/save-draft", {
+        method: "POST",
+        body: JSON.stringify({
+          ...formData,
+          homeLocation,
+        }),
+      });
+    } catch (err) {
+      console.error("Save failed", err);
+    }
+  };
+
+  const handleClose = () => {
+    if (
+      window.confirm(
+        "Are you sure you want to leave? Changes may not be saved."
+      )
+    ) {
+      navigate("/home");
+    }
+  };
 
   const googleMapsApiKey =
     import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "";
@@ -75,59 +102,11 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
       libraries: GOOGLE_LIBRARIES,
     });
 
-  // ==============================
-  // EFFECTS
-  // ==============================
-
   useEffect(() => {
     if (homeLocation?.label) {
       setManualAddress(homeLocation.label);
     }
   }, [homeLocation]);
-
-  useEffect(() => {
-    if (mode !== "edit") {
-      setLoading(false);
-      return;
-    }
-
-    async function loadProfile() {
-      try {
-        const data = await apiFetch("/users/me");
-
-        if (data.profile) {
-          setFormData({
-            username: data.profile.username || "",
-            display_name: data.profile.display_name || "",
-            userType: data.profile.userType || "PERSONAL",
-          });
-
-          if (data.profile.homeLocation?.label) {
-            setManualAddress(data.profile.homeLocation.label);
-          }
-        } else {
-          const emailPrefix =
-            appUser?.email?.split("@")[0] || "";
-
-          setFormData({
-            username: appUser?.username || emailPrefix,
-            display_name: appUser?.name || emailPrefix,
-            userType: "PERSONAL",
-          });
-        }
-      } catch (err) {
-        console.error("Failed to load profile", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadProfile();
-  }, [mode, appUser]);
-
-  // ==============================
-  // HANDLERS
-  // ==============================
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -191,28 +170,13 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
     }
   };
 
-  const prevStep = () => {
-  if (currentStep > 0) {
-    setCurrentStep((s) => s - 1);
-  }
-};
-
-  // ==============================
-  // RENDER
-  // ==============================
-
   if (loading) return <div>Loading profile...</div>;
-
-  
 
   return (
     <div className="profile-container">
 
-      {/* HEADER */}
       <div className="profile-page-header">
-        <h2 className="profile-page-title">
-          Create Profile
-        </h2>
+        <h2 className="profile-page-title">Create Profile</h2>
 
         <div className="profile-page-steps">
           {steps.map((step, index) => (
@@ -231,11 +195,9 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
 
       <div className="profile-layout">
 
-        {/* LEFT PANEL */}
         <div className="profile-left">
           <form onSubmit={handleSubmit}>
 
-            {/* STEP 1 */}
             {currentStep === 0 && (
               <>
                 <div className="form-group">
@@ -266,16 +228,13 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
                     <option value="PERSONAL">Personal</option>
                     <option value="BUSINESS">Business</option>
                     <option value="MIXED">Mixed</option>
-                    <option value="COMMUNITY_SERVICE">
-                      Community Service
-                    </option>
+                    <option value="COMMUNITY_SERVICE">Community Service</option>
                     <option value="GOVERNMENT">Government</option>
                   </select>
                 </div>
               </>
             )}
 
-            {/* STEP 2 */}
             {currentStep === 1 && (
               <div className="location-section">
                 <label>Home Location</label>
@@ -304,79 +263,71 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
             {/* NAV */}
             <div className="form-navigation">
 
-  {/* LEFT ACTIONS */}
-  <div className="nav-left">
-    <button
-      type="button"
-      className="nav-text-btn"
-      onClick={handleSave}
-    >
-      Save
-    </button>
+              <div className="nav-left">
+                <button
+                  type="button"
+                  className="nav-text-btn"
+                  onClick={handleSave}
+                >
+                  Save
+                </button>
 
-    <button
-      type="button"
-      className="nav-text-btn danger"
-      onClick={handleClose}
-    >
-      Close
-    </button>
-  </div>
+                <button
+                  type="button"
+                  className="nav-text-btn danger"
+                  onClick={handleClose}
+                >
+                  Close
+                </button>
+              </div>
 
-  {/* RIGHT NAVIGATION */}
-  <div className="nav-actions">
+              <div className="nav-actions">
 
-    {currentStep > 0 && (
-      <button
-        type="button"
-        onClick={prevStep}
-        className="nav-icon-btn ghost"
-        title="Back"
-      >
-        ‹
-      </button>
-    )}
+                {currentStep > 0 && (
+                  <button
+                    type="button"
+                    onClick={prevStep}
+                    className="nav-icon-btn ghost"
+                  >
+                    ‹
+                  </button>
+                )}
 
-    {currentStep !== 0 && currentStep < steps.length - 1 && (
-      <button
-        type="button"
-        onClick={nextStep}
-        className="nav-icon-btn skip"
-        title="Skip"
-      >
-        ↺
-      </button>
-    )}
+                {currentStep !== 0 &&
+                  currentStep < steps.length - 1 && (
+                    <button
+                      type="button"
+                      onClick={nextStep}
+                      className="nav-icon-btn skip"
+                    >
+                      ↺
+                    </button>
+                  )}
 
-    {currentStep < steps.length - 1 ? (
-      <button
-        type="button"
-        onClick={nextStep}
-        className="nav-icon-btn primary"
-        title="Next"
-      >
-        ›
-      </button>
-    ) : (
-      <button
-        type="submit"
-        className="nav-icon-btn primary"
-        title="Submit"
-      >
-        ✓
-      </button>
-    )}
-
-  </div>
-</div>
-
-</div>
+                {currentStep < steps.length - 1 ? (
+                  <button
+                    type="button"
+                    onClick={nextStep}
+                    className="nav-icon-btn primary"
+                  >
+                    ›
+                  </button>
+                ) : (
+                  <button
+                    type="submit"
+                    disabled={saving}
+                    className="nav-icon-btn primary"
+                  >
+                    ✓
+                  </button>
+                )}
+              </div>
+            </div>
 
             {error && <p className="error">{error}</p>}
           </form>
         </div>
 
-        {/* RIGHT PANEL */}
         <div className="profile-guide">
           <h3>Profile Guide</h3>
           <p>Follow the steps to complete your profile.</p>
