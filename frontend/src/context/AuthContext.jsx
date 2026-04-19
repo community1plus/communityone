@@ -12,19 +12,18 @@ import { Hub } from "aws-amplify/utils";
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [appUser, setAppUser] = useState(null);
+  const [user, setUser] = useState(null);        // Cognito user
+  const [appUser, setAppUser] = useState(null);  // Backend user
   const [loading, setLoading] = useState(true);
 
   const loadingRef = useRef(false);
   const mountedRef = useRef(true);
 
   /* ===============================
-     LOAD USER FROM SESSION
+     LOAD USER (COGNITO + BACKEND)
   =============================== */
   const loadUser = useCallback(async () => {
     if (loadingRef.current) return;
-
     loadingRef.current = true;
 
     try {
@@ -34,6 +33,7 @@ export function AuthProvider({ children }) {
 
       if (!idToken || !accessToken) {
         console.log("⚠️ No active session");
+
         if (mountedRef.current) {
           setUser(null);
           setAppUser(null);
@@ -58,17 +58,56 @@ export function AuthProvider({ children }) {
         tokenUse: idPayload.token_use || null,
       };
 
-      console.log("✅ User loaded:", normalizedUser);
+      console.log("✅ Cognito user:", normalizedUser);
 
       if (mountedRef.current) {
         setUser(normalizedUser);
       }
+
+      /* ===============================
+         🔥 FETCH BACKEND USER
+      =============================== */
+      try {
+        const res = await fetch(
+          "https://communityone-backend.onrender.com/api/users/me",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              // 🔥 future-ready (when backend uses JWT)
+              // Authorization: `Bearer ${idToken.toString()}`
+            },
+          }
+        );
+
+        const data = await res.json();
+
+        console.log("📦 /users/me response:", data);
+
+        if (mountedRef.current) {
+          setAppUser({
+            user: data.user,
+            hasProfile: data.hasProfile,
+            profile: data.profile,
+          });
+        }
+
+      } catch (err) {
+        console.error("❌ Failed to fetch /users/me:", err);
+
+        if (mountedRef.current) {
+          setAppUser(null);
+        }
+      }
+
     } catch (err) {
       console.log("⚠️ Auth error:", err);
+
       if (mountedRef.current) {
         setUser(null);
         setAppUser(null);
       }
+
     } finally {
       if (mountedRef.current) {
         setLoading(false);
@@ -110,9 +149,7 @@ export function AuthProvider({ children }) {
       }
     });
 
-    return () => {
-      unsubscribe();
-    };
+    return () => unsubscribe();
   }, [loadUser]);
 
   /* ===============================
