@@ -12,8 +12,6 @@ CONTAINER + PAGE STRUCTURE
 
 .profile-container {
   width: 100%;
-  margin: 0; /* ❌ no centering */
-
   display: flex;
   flex-direction: column;
 }
