@@ -1,22 +1,25 @@
 /* =====================================================
-COMMUNITY ONE — HEADER (PREMIUM v2 — STRIPE LEVEL)
+COMMUNITY ONE — HEADER (CLEANED + FIXED)
 ===================================================== */
 
 .header {
   position: relative;
-  top: 0;
-  left: 0;
   width: 100%;
   background: rgba(246, 243, 238, 0.72);
   backdrop-filter: blur(10px);
-  padding: 8px 40px 0 32px; /* extra right breathing room */
+
+  padding: 8px 40px 0 32px;
+
   display: flex;
   flex-direction: column;
   gap: 2px;
+
   z-index: 10;
+
   font-family: var(--font-ui);
   color: var(--text);
-  overflow: visible; /* was hidden */
+
+  overflow: visible; /* ✅ CRITICAL FIX */
   box-sizing: border-box;
 }
 
@@ -25,11 +28,14 @@ TOP ROW
 ===================================================== */
 
 .header-row {
-display: grid;
-grid-template-columns: auto 1fr auto;
-align-items: center;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  margin-bottom: -2px;
+}
 
-margin-bottom: -2px; /* 🔥 pulls nav closer */
+.header-row > * {
+  min-width: 0;
 }
 
 /* =====================================================
@@ -37,63 +43,16 @@ LOGO
 ===================================================== */
 
 .logo-container {
-display: flex;
-align-items: center;
-cursor: pointer;
-gap: 12px;grid-row: span 2;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  grid-row: span 2;
 }
 
 .logo {
-height: 64px; /* 🔥 reduced from 72px */
-object-fit: contain;
-}
-
-.location-text.left {
-  font-size: 13px;
-  color: var(--muted);
-  font-weight: 500;
-  white-space: nowrap;
-}
-
-.location-display {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.location-accuracy {
-  font-size: 11px;
-  color: #777;
-  background: #f3f2ef;
-  padding: 2px 6px;
-  border-radius: 6px;
-}
-
-.location-badge {
-  font-size: 10px;
-  font-weight: 600;
-  padding: 2px 6px;
-  border-radius: 6px;
-}
-
-.location-badge.exact {
-  background: #d4edda;
-  color: #155724;
-}
-
-.location-badge.precise {
-  background: #d1ecf1;
-  color: #0c5460;
-}
-
-.location-badge.approx {
-  background: #fff3cd;
-  color: #856404;
-}
-
-.location-badge.rough {
-  background: #f8d7da;
-  color: #721c24;
+  height: 64px;
+  object-fit: contain;
 }
 
 /* =====================================================
@@ -101,55 +60,33 @@ SEARCH
 ===================================================== */
 
 .header-center {
-display: flex;
-justify-content: center;
+  display: flex;
+  justify-content: center;
+  min-width: 0;
 }
 
 .search-wrapper {
-position: relative;
-width: 100%;
-max-width: 520px;
+  width: 100%;
+  max-width: 520px;
+  position: relative;
+  min-width: 0;
 }
 
 .search-input {
   width: 100%;
-
   padding: 8px 36px 10px 0;
 
-  font-family: var(--font-ui);
   font-size: var(--header-text-size);
-  color: var(--text);
 
   border: none;
-  border-bottom: 2px solid rgba(0, 0, 0, 0.15); /* 🔥 stronger baseline */
-
+  border-bottom: 2px solid rgba(0, 0, 0, 0.15);
   background: transparent;
   outline: none;
-
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
 }
 
-/* focus state */
 .search-input:focus {
   border-bottom: 2px solid var(--brand);
-  box-shadow: 0 2px 0 var(--brand); /* 🔥 premium underline effect */
-}
-
-/* placeholder */
-.search-input::placeholder {
-  color: var(--text-muted);
-  opacity: 0.7;
-}
-
-.search-enter {
-position: absolute;
-right: 0;
-bottom: 6px;
-
-font-size: 18px;
-color: var(--brand);
+  box-shadow: 0 2px 0 var(--brand);
 }
 
 /* =====================================================
@@ -161,330 +98,119 @@ RIGHT SIDE
   align-items: center;
   gap: 18px;
 
-  font-size: var(--header-text-size);
-  color: var(--text-muted);
-
   justify-self: end;
   min-width: 0;
-  padding-right: 6px;
-}
-
-.user-block {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  position: relative;
-  flex-shrink: 0;
-}
-
-.username {
-  font-weight: 600;
-  font-size: 13px;
-  color: var(--ink);
-  opacity: 0.85;
-}
-
-/* Avatar */
-.avatar {
-  width: 32px;
-  height: 36px;
-  border-radius: 50%;
-  background: var(--accent);
-  color: white;
-  background-color: #4a0f0f; /* oxblood red */
-  color: rgba(255, 255, 255, 0.65); /* softer white */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  cursor: pointer;
-  width: 40px;
-  height: 40px;
-  font-size: 14px;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-.avatar-dropdown {
-  position: absolute;
-  top: 100%;
-  right: 0;
-
-  z-index: 9999; /* ensure it sits above everything */
-}
-
-.avatar-wrapper {
-position: relative;
-}
-
-.header-right .avatar {
-width: 42px;
-height: 42px;
-
-border-radius: 50%;
-
-background: var(--accent);
-border: 1px solid var(--accent);
-
-color: #ffffff;
-
-font-weight: var(--fw-bold);
-font-size: var(--fs-lg);
-
-display: grid;
-place-items: center;
-
-box-shadow: 0 0 0 4px rgba(182, 58, 43, 0.25);
-
-cursor: pointer;
-
-transition: transform var(--dur-fast);
-}
-
-.header-right .avatar:hover {
-transform: scale(1.05);
 }
 
 /* =====================================================
-DROPDOWN
+AVATAR
+===================================================== */
+
+.avatar-wrapper {
+  position: relative; /* ✅ anchor dropdown */
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+
+  border-radius: 50%;
+  background-color: #4a0f0f;
+
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 700;
+  font-size: 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+
+  transition: transform 0.2s;
+}
+
+.avatar:hover {
+  transform: scale(1.05);
+}
+
+/* =====================================================
+DROPDOWN (FIXED)
 ===================================================== */
 
 .dropdown-menu {
-position: absolute;
-top: 56px;
-right: 0;
+  position: absolute;
 
-width: 180px;
+  top: calc(100% + 8px); /* sits below avatar */
+  right: 0;
 
-background: rgba(246, 243, 238, 0.95);
-backdrop-filter: blur(10px);
+  width: 180px;
 
-border: 1px solid var(--border);
-border-radius: var(--radius-md);
+  background: rgba(246, 243, 238, 0.95);
+  backdrop-filter: blur(10px);
 
-box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
 
-overflow: hidden;
-z-index: 1000;
-}
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
 
-.menu-item {
-padding: 12px 16px;
-
-font-family: var(--font-ui);
-font-size: var(--header-text-size);
-
-color: var(--text);
-
-cursor: pointer;
-
-transition: background var(--dur-fast);
-}
-
-.menu-item:hover {
-background: var(--surface-soft);
-}
-
-/* =====================================================
-NAV BAR (STRIPE-STYLE)
-===================================================== */
-
-.links {
-position: relative;
-
-height: var(--nav-height);
-
-display: flex;
-justify-content: center;
-align-items: flex-start;
-
-gap: 18px;
-
-margin-top: -4px;
-
-animation: navFade 0.4s var(--ease-out);
-}
-
-/* nav buttons */
-
-.links button {
-position: relative;
-
-background: transparent;
-border: none;
-
-font-family: var(--font-ui);
-font-size: var(--header-nav-size);
-
-padding: 6px 10px;
-
-border-radius: var(--radius-md);
-
-color: var(--text-muted);
-
-cursor: pointer;
-
-will-change: transform;
-
-transition:
-color var(--dur-fast),
-transform var(--dur-fast);
-}
-
-/* hover lift */
-
-.links button:hover {
-color: var(--text);
-transform: translateY(-1px);
-}
-
-/* underline animation */
-
-.links button::after {
-content: "";
-position: absolute;
-
-left: 50%;
-bottom: -6px;
-
-width: 0%;
-height: 2px;
-
-background: var(--brand);
-border-radius: 2px;
-
-transform: translateX(-50%);
-
-transition:
-width var(--dur-base) var(--ease-out),
-opacity var(--dur-fast);
-
-opacity: 0;
-}
-
-/* hover underline */
-
-.links button:hover::after {
-width: 60%;
-opacity: 0.6;
-}
-
-/* active */
-
-.links button.active {
-color: var(--brand);
-font-weight: var(--fw-medium);
-}
-
-.links button.active::after {
-width: 100%;
-opacity: 1;
-}
-
-/* =====================================================
-ANIMATIONS
-===================================================== */
-
-@keyframes navFade {
-from {
-opacity: 0;
-transform: translateY(-4px);
-}
-to {
-opacity: 1;
-transform: translateY(0);
-}
-}
-
-/* =====================================================
-HEADER ALIGNMENT FIX (CRITICAL)
-===================================================== */
-
-/* Prevent grid overflow */
-.header-row > * {
-  min-width: 0;
-}
-
-/* Ensure center can shrink */
-.header-center {
-  display: flex;
-  justify-content: center;
-  min-width: 0;
-}
-
-/* Fix search overflow */
-.search-wrapper {
-  width: 100%;
-  max-width: 520px;
-  min-width: 0;
-}
-
-/* Keep right side inside viewport */
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-
-  justify-self: end;   /* 🔥 KEY FIX */
-  min-width: 0;
-}
-
-/* Prevent avatar clipping */
-.header {
+  z-index: 9999; /* 🔥 ensure above all */
   overflow: hidden;
 }
 
+.menu-item {
+  padding: 12px 16px;
+  font-size: var(--header-text-size);
+  cursor: pointer;
+}
+
+.menu-item:hover {
+  background: var(--surface-soft);
+}
+
 /* =====================================================
-LOCATION INPUT SIMPLIFIED
+NAV BAR
+===================================================== */
+
+.links {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+
+  margin-top: -4px;
+}
+
+.links button {
+  background: transparent;
+  border: none;
+
+  padding: 6px 10px;
+  cursor: pointer;
+
+  color: var(--text-muted);
+  transition: 0.2s;
+}
+
+.links button:hover {
+  color: var(--text);
+}
+
+/* =====================================================
+LOCATION (CLEAN)
 ===================================================== */
 
 .location-display {
   display: flex;
   align-items: center;
   gap: 8px;
-  min-width: 0;
-}
-
-.location-pin {
-  font-size: 14px;
-  line-height: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.location-pin.exact {
-  color: #1f9d55;
-}
-
-.location-pin.editable {
-  color: var(--brand);
 }
 
 .location-input {
-  min-width: 0;
   border: none;
   background: transparent;
   font-size: 13px;
-  color: var(--text);
   outline: none;
-  padding: 2px 0;
-}
-
-.location-input.locked {
-  cursor: default;
-}
-
-.location-input.editable {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.18);
-}
-
-.location-input.editable:focus {
-  border-bottom: 1px solid var(--brand);
-}
-
-/* old switcher/dropdown no longer used */
-.location-switcher,
-.location-dropdown {
-  display: none;
 }
