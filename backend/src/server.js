@@ -133,14 +133,10 @@ app.post("/api/profile", async (req, res) => {
       payment,
     } = req.body;
 
-    // 🔥 get user from auth (VERY IMPORTANT)
-    const userId = req.user?.id; // or however you store auth
+    // 🔥 TEMP: replace auth until wired
+    const userId = "test-user-123";
 
-    if (!userId) {
-      return res.status(401).json({ error: "Unauthorized" });
-    }
-
-    const result = await db.query(
+    const result = await pool.query(
       `
       INSERT INTO user_profiles 
       (user_id, username, display_name, user_type, phone, social, payment)
@@ -160,15 +156,15 @@ app.post("/api/profile", async (req, res) => {
         display_name,
         user_type,
         phone,
-        JSON.stringify(social),
-        JSON.stringify(payment),
+        JSON.stringify(social || {}),
+        JSON.stringify(payment || {}),
       ]
     );
 
     res.json(result.rows[0]);
 
   } catch (err) {
-    console.error(err);
+    console.error("❌ PROFILE SAVE ERROR:", err);
     res.status(500).json({ error: "Server error" });
   }
 });
