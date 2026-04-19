@@ -318,3 +318,112 @@ NAV ICON BUTTONS
 .nav-icon-btn.ghost:hover {
   color: #222;
 }
+
+/* =====================================================
+FORM NAVIGATION (UPDATED)
+===================================================== */
+
+.form-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-top: auto;
+  padding-top: 16px;
+}
+
+/* left side (Save / Close) */
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* right side (arrows) */
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* =====================================================
+TEXT BUTTONS (Save / Close)
+===================================================== */
+
+.nav-text-btn {
+  background: none;
+  border: none;
+  padding: 6px 4px;
+
+  font-size: 13px;
+  font-weight: 600;
+  color: #666;
+
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.nav-text-btn:hover {
+  color: #222;
+}
+
+/* Close = destructive */
+.nav-text-btn.danger {
+  color: #a33;
+}
+
+.nav-text-btn.danger:hover {
+  color: #7a1f1f;
+}
+
+/* =====================================================
+NAV ICON BUTTONS (IMPROVED)
+===================================================== */
+
+.nav-icon-btn {
+  background: none;
+  border: none;
+  padding: 8px;
+
+  font-size: 22px; /* 🔥 thicker */
+  font-weight: 600;
+  line-height: 1;
+
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: all 0.2s ease;
+}
+
+/* NEXT / SUBMIT */
+.nav-icon-btn.primary {
+  color: #4a0f0f;
+  font-size: 26px;
+}
+
+.nav-icon-btn.primary:hover {
+  transform: translateX(3px);
+}
+
+/* SKIP */
+.nav-icon-btn.skip {
+  color: #999;
+}
+
+.nav-icon-btn.skip:hover {
+  color: #444;
+  transform: rotate(-25deg);
+}
+
+/* BACK */
+.nav-icon-btn.ghost {
+  color: #888;
+}
+
+.nav-icon-btn.ghost:hover {
+  color: #222;
+  transform: translateX(-2px);
+}

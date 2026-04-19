@@ -304,21 +304,39 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
             {/* NAV */}
             <div className="form-navigation">
 
-  {/* BACK */}
-  {currentStep > 0 && (
+  {/* LEFT ACTIONS */}
+  <div className="nav-left">
     <button
       type="button"
-      onClick={prevStep}
-      className="nav-icon-btn ghost"
-      title="Back"
+      className="nav-text-btn"
+      onClick={handleSave}
     >
-      ←
+      Save
     </button>
-  )}
 
+    <button
+      type="button"
+      className="nav-text-btn danger"
+      onClick={handleClose}
+    >
+      Close
+    </button>
+  </div>
+
+  {/* RIGHT NAVIGATION */}
   <div className="nav-actions">
 
-    {/* SKIP (only for non-required steps) */}
+    {currentStep > 0 && (
+      <button
+        type="button"
+        onClick={prevStep}
+        className="nav-icon-btn ghost"
+        title="Back"
+      >
+        ‹
+      </button>
+    )}
+
     {currentStep !== 0 && currentStep < steps.length - 1 && (
       <button
         type="button"
@@ -326,11 +344,10 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
         className="nav-icon-btn skip"
         title="Skip"
       >
-        ↷
+        ↺
       </button>
     )}
 
-    {/* NEXT / SUBMIT */}
     {currentStep < steps.length - 1 ? (
       <button
         type="button"
@@ -338,12 +355,11 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
         className="nav-icon-btn primary"
         title="Next"
       >
-        →
+        ›
       </button>
     ) : (
       <button
         type="submit"
-        disabled={saving}
         className="nav-icon-btn primary"
         title="Submit"
       >
@@ -352,6 +368,7 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
     )}
 
   </div>
+</div>
 
 </div>
 
