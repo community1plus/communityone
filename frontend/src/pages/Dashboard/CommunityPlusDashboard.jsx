@@ -45,8 +45,10 @@ export default function CommunityPlusDashboard() {
       <main className="main">
         <CommunityPlusSidebar />
 
-        <div className={`content-area ${isFullWidthRoute ? "full-width" : ""}`}>
-          <Outlet />
+       <div className={`content-area ${isFullWidthRoute ? "full-width" : ""}`}>
+          <div className="content-inner">
+             <Outlet />
+          </div>
         </div>
       </main>
     </div>
