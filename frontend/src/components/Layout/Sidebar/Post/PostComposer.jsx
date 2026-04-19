@@ -20,6 +20,8 @@ export default function PostComposer() {
     setImages((prev) => [...prev, ...files]);
   };
 
+  
+
   return (
     <div className="post-composer">
 

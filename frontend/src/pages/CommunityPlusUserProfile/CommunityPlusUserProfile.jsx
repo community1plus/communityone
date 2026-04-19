@@ -186,6 +186,40 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
     });
   };
 
+
+  const handleSave = async () => {
+  try {
+    const payload = {
+      username: formData.username,
+      display_name: formData.display_name,
+      user_type: formData.user_type,
+      phone: formData.phone,
+      social: formData.social,
+      payment: formData.payment,
+    };
+
+    const res = await fetch("/api/profile", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include", // 🔥 important if using auth cookies
+      body: JSON.stringify(payload),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.error || "Save failed");
+
+    console.log("✅ Profile saved:", data);
+    alert("Profile saved successfully");
+
+  } catch (err) {
+    console.error("❌ Save error:", err);
+    alert("Failed to save profile");
+  }
+};
+
   const onPlaceChanged = () => {
     const place = autoRef.current?.getPlace?.();
     if (!place || !place.geometry) return;
