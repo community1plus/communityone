@@ -223,15 +223,16 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
   };
   console.log("appUser:", appUser);
   useEffect(() => {
-  if (!appUser) {console.log("appUser:", appUser);} return;
+  if (!appUser?.user) return;
 
-  const emailPrefix = appUser.email?.split("@")[0] || "";
+  const email = appUser.user.email || "";
+  const emailPrefix = email.split("@")[0];
 
-  const getInitials = (name) =>
-    name
-      ? name
-          .split(" ")
-          .map((n) => n[0])
+  const getInitials = (str) =>
+    str
+      ? str
+          .split(/[.\s-_]/) // handles ade.oloyede, ade-oloyede etc
+          .map((s) => s[0])
           .join("")
           .toUpperCase()
       : "";
@@ -240,7 +241,7 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
     ...prev,
     username: prev.username || emailPrefix,
     display_name:
-      prev.display_name || getInitials(appUser.name || emailPrefix),
+      prev.display_name || getInitials(emailPrefix),
   }));
 }, [appUser]);
 
