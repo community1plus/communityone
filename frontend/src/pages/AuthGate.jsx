@@ -1,55 +1,27 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { apiFetch } from "../../services/api";
 
 export default function AuthGate() {
   const navigate = useNavigate();
-  const { user, setAppUser, loading } = useAuth();
+  const { appUser, loading } = useAuth();
 
   useEffect(() => {
     if (loading) return;
+    if (!appUser) return;
 
-    const bootstrap = async () => {
-      console.time("authgate-total");
+    console.log("🔍 AuthGate appUser:", appUser);
 
-      try {
-        if (!user?.authenticated) {
-          navigate("/", { replace: true });
-          return;
-        }
+    if (appUser.hasProfile) {
+      navigate("/home", { replace: true });
+    } else {
+      navigate("/profile-setup", { replace: true });
+    }
+  }, [appUser, loading, navigate]);
 
-        console.time("users-me");
-        const res = await apiFetch("/users/me");
-        console.timeEnd("users-me");
-
-        console.log("AuthGate /users/me:", res);
-
-        if (!res?.user?.id) {
-          throw new Error("User record not returned from /users/me");
-        }
-
-        setAppUser(res);
-
-        const onboardingCompleted =
-          res?.user?.mfa_enabled === true &&
-          !!res?.profile?.home_address;
-
-        if (!onboardingCompleted) {
-          navigate("/profile-setup", { replace: true });
-        } else {
-          navigate("/home", { replace: true });
-        }
-      } catch (err) {
-        console.error("AuthGate error:", err);
-        navigate("/", { replace: true });
-      } finally {
-        console.timeEnd("authgate-total");
-      }
-    };
-
-    bootstrap();
-  }, [user, loading, navigate, setAppUser]);
-
-  return <div style={{ padding: 20 }}>Setting up your account...</div>;
+  return (
+    <div style={{ padding: 40 }}>
+      Setting up your account...
+    </div>
+  );
 }
