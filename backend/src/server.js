@@ -173,3 +173,20 @@ app.post("/api/profile", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+
+app.get("/api/profile", async (req, res) => {
+  try {
+    const userId = req.query.user_id;
+
+    const result = await pool.query(
+      "SELECT * FROM user_profiles WHERE user_id = $1",
+      [userId]
+    );
+
+    res.json(result.rows[0] || null);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
