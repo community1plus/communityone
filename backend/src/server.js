@@ -48,6 +48,11 @@ if (!dbUrl) {
   console.log("🔐 DATABASE_URL:", safeUrl);
 }
 
+const userId = req.body.user_id;
+
+if (!userId) {
+  return res.status(400).json({ error: "Missing user_id" });
+}
 /* =====================================================
    DATABASE
 ===================================================== */
