@@ -3,20 +3,20 @@ import { getOrCreateUserWithProfile } from "../src/services/userService.js";
 export async function getMe(req, res) {
   try {
     /* =========================
-       🔍 DEBUG (VERY IMPORTANT)
+       🔍 DEBUG INPUT
     ========================= */
     console.log("👤 req.user:", req.user);
+
+    const rawUser = req.user || {};
 
     /* =========================
        🧠 NORMALISE USER
     ========================= */
-    const rawUser = req.user || {};
-
     const sub = (
       rawUser.userId ||
       rawUser.sub ||
       ""
-    ).trim(); // 🔥 CRITICAL FIX
+    ).trim();
 
     const email =
       rawUser.email ||
@@ -26,17 +26,24 @@ export async function getMe(req, res) {
 
     if (!sub) {
       console.error("❌ INVALID USER OBJECT:", rawUser);
-      throw new Error("Missing user identifier (sub/userId)");
+      return res.status(400).json({
+        error: "Missing user identifier (sub/userId)",
+        rawUser
+      });
     }
 
     console.log("➡️ getMe using:", { sub, email });
 
     /* =========================
-       🔥 SERVICE CALL
+       🔥 SERVICE CALL (FIXED)
     ========================= */
     const result = await getOrCreateUserWithProfile(sub, email);
 
     const { user, profile, debug } = result;
+
+    if (!user || !user.id) {
+      throw new Error("User creation or retrieval failed");
+    }
 
     /* =========================
        ✅ RESPONSE
@@ -45,9 +52,7 @@ export async function getMe(req, res) {
       user,
       profile,
       hasProfile: !!profile && profile.is_completed,
-
-      // 🔥 TEMP DEBUG (REMOVE IN PROD)
-      debug
+      debug // 🔥 remove in production later
     });
 
   } catch (err) {

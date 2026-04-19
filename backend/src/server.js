@@ -24,7 +24,13 @@ process.on("unhandledRejection", (err) => {
 /* =========================
    🔥 MIDDLEWARE
 ========================= */
-app.use(cors());
+app.use(cors({
+  origin: "https://main.d1ss8rtrtimogr.amplifyapp.com",
+  credentials: true,
+}));
+
+app.options("*", cors());
+
 app.use(express.json());
 
 const PORT = process.env.PORT || 5000;
@@ -114,4 +120,55 @@ app.get("/api/test", (req, res) => {
 ===================================================== */
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
+});
+
+app.post("/api/profile", async (req, res) => {
+  try {
+    const {
+      username,
+      display_name,
+      user_type,
+      phone,
+      social,
+      payment,
+    } = req.body;
+
+    // 🔥 get user from auth (VERY IMPORTANT)
+    const userId = req.user?.id; // or however you store auth
+
+    if (!userId) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const result = await db.query(
+      `
+      INSERT INTO user_profiles 
+      (user_id, username, display_name, user_type, phone, social, payment)
+      VALUES ($1,$2,$3,$4,$5,$6,$7)
+      ON CONFLICT (user_id) DO UPDATE SET
+        username = EXCLUDED.username,
+        display_name = EXCLUDED.display_name,
+        user_type = EXCLUDED.user_type,
+        phone = EXCLUDED.phone,
+        social = EXCLUDED.social,
+        payment = EXCLUDED.payment
+      RETURNING *
+      `,
+      [
+        userId,
+        username,
+        display_name,
+        user_type,
+        phone,
+        JSON.stringify(social),
+        JSON.stringify(payment),
+      ]
+    );
+
+    res.json(result.rows[0]);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
 });
