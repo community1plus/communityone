@@ -21,6 +21,11 @@ CONTAINER + PAGE STRUCTURE
   margin-bottom: 24px;
 }
 
+.form-navigation {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
 /* =====================================================
 TITLE + STEPS
 ===================================================== */
