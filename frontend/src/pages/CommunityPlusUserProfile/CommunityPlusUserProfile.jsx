@@ -223,7 +223,7 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
   };
 
   useEffect(() => {
-  if (!appUser) return;
+  if (!appUser) {console.log("appUser:", appUser);} return;
 
   const emailPrefix = appUser.email?.split("@")[0] || "";
 
