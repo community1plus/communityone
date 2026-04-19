@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./CommunityPlusHeader.css";
 import { useLocationContext } from "../../../context/LocationContext";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../../context/AuthContext";
 
 function CommunityPlusHeader({ user, onLogout }) {
   const navigate = useNavigate();
