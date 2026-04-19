@@ -47,32 +47,23 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
   const [currentStep, setCurrentStep] = useState(0);
 
   const nextStep = () => {
-    if (currentStep === 0) {
-      if (!formData.username || !formData.display_name) {
-        setError("Please fill in all required fields.");
-        return;
-      }
+  if (currentStep === 0) {
+    if (
+      !formData.username ||
+      !formData.display_name ||
+      !formData.userType
+    ) {
+      setError("Complete all identity fields.");
+      return;
     }
+  }
 
-    if (currentStep === 1) {
-      if (!manualAddress && !homeLocation?.label) {
-        setError("Please set your home address.");
-        return;
-      }
-    }
+  setError("");
 
-    setError("");
-
-    if (currentStep < steps.length - 1) {
-      setCurrentStep((s) => s + 1);
-    }
-  };
-
-  const prevStep = () => {
-    if (currentStep > 0) {
-      setCurrentStep((s) => s - 1);
-    }
-  };
+  if (currentStep < steps.length - 1) {
+    setCurrentStep((s) => s + 1);
+  }
+};
 
   const googleMapsApiKey =
     import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "";
@@ -304,26 +295,57 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
 
             {/* NAV */}
             <div className="form-navigation">
-              {currentStep > 0 && (
-                <button
-                  type="button"
-                  onClick={prevStep}
-                  className="ghost-btn"
-                >
-                  Back
-                </button>
-              )}
 
-              {currentStep < steps.length - 1 ? (
-                <button type="button" onClick={nextStep}>
-                  Next
-                </button>
-              ) : (
-                <button type="submit" disabled={saving}>
-                  {saving ? "Saving..." : "Create Profile"}
-                </button>
-              )}
-            </div>
+  {/* BACK */}
+  {currentStep > 0 && (
+    <button
+      type="button"
+      onClick={prevStep}
+      className="nav-icon-btn ghost"
+      title="Back"
+    >
+      ←
+    </button>
+  )}
+
+  <div className="nav-actions">
+
+    {/* SKIP (only for non-required steps) */}
+    {currentStep !== 0 && currentStep < steps.length - 1 && (
+      <button
+        type="button"
+        onClick={nextStep}
+        className="nav-icon-btn skip"
+        title="Skip"
+      >
+        ↷
+      </button>
+    )}
+
+    {/* NEXT / SUBMIT */}
+    {currentStep < steps.length - 1 ? (
+      <button
+        type="button"
+        onClick={nextStep}
+        className="nav-icon-btn primary"
+        title="Next"
+      >
+        →
+      </button>
+    ) : (
+      <button
+        type="submit"
+        disabled={saving}
+        className="nav-icon-btn primary"
+        title="Submit"
+      >
+        ✓
+      </button>
+    )}
+
+  </div>
+
+</div>
 
             {error && <p className="error">{error}</p>}
           </form>
