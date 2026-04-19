@@ -221,7 +221,7 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
       setSaving(false);
     }
   };
-
+  console.log("appUser:", appUser);
   useEffect(() => {
   if (!appUser) {console.log("appUser:", appUser);} return;
 
