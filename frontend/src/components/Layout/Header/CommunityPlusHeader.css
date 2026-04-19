@@ -93,17 +93,22 @@ RIGHT SIDE
 
 .header-right {
   display: flex;
-  align-items: center;
-  gap: 18px;
+  align-items: center;   /* ✅ vertical alignment */
+  gap: 12px;             /* tighter spacing */
   justify-self: end;
+  height: 100%;          /* ensures alignment with row */
 }
 
+.header-right span {
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
 /* =====================================================
 AVATAR
 ===================================================== */
 
 .avatar-wrapper {
-  position: relative; /* anchor for dropdown */
   display: flex;
   align-items: center;
 }
