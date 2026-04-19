@@ -12,8 +12,15 @@ CONTAINER + PAGE STRUCTURE
 
 .profile-container {
   width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+
+  /* 🔥 enables vertical stretching */
+  flex: 1;
+
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
 }
 
 /* spacing between header and cards */
@@ -21,11 +28,6 @@ CONTAINER + PAGE STRUCTURE
   margin-bottom: 24px;
 }
 
-.form-navigation {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
-}
 /* =====================================================
 TITLE + STEPS
 ===================================================== */
