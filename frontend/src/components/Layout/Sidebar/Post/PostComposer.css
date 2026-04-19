@@ -1,163 +1,204 @@
 /* =====================================================
-POST COMPOSER — ELITE SYSTEM v5 (PRODUCTION)
-===================================================== */
-
-/* =====================================================
-BASE
+CREATE POST — FINAL CLEAN
 ===================================================== */
 
 .post-composer {
   width: 100%;
   flex: 1;
-  min-width: 0;
+
   display: flex;
-  height: 100%;
+  flex-direction: column;
+
+  min-height: 0;
+  box-sizing: border-box;
 }
 
 /* =====================================================
-GRID
+GRID LAYOUT
 ===================================================== */
 
 .composer-wrapper {
   display: grid;
   grid-template-columns: 1.4fr 1fr;
+
   gap: var(--layout-gap);
 
   width: 100%;
   max-width: 1100px;
   margin: 0 auto;
 
-  height: 100%;
-  align-items: start;
+  flex: 1;
+  min-height: 0;
+
+  align-items: stretch;
 }
 
 /* =====================================================
-🧱 PANEL SYSTEM
+PANELS
 ===================================================== */
 
-.panel {
-  background: rgba(255, 255, 255, 0.65);
-  border: 1px solid var(--line);
-  border-radius: 22px;
-  backdrop-filter: blur(10px);
+.composer-left,
+.composer-right {
+  background: var(--surface-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
 
-  box-shadow:
-    0 10px 30px rgba(0,0,0,0.05),
-    inset 0 1px 0 rgba(255,255,255,0.5);
-}
+  padding: 20px;
 
-/* =====================================================
-LEFT PANEL
-===================================================== */
-
-.composer-left {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
 
-  padding: var(--space-4);
-  height: 100%;
-
-  background: rgba(255, 255, 255, 0.65);
-  border: 1px solid var(--line);
-  border-radius: 22px;
-
-  backdrop-filter: blur(10px);
-
-  box-shadow:
-    0 10px 30px rgba(0,0,0,0.05),
-    inset 0 1px 0 rgba(255,255,255,0.5);
+  min-height: 0;
 }
 
-/* remove heading offset */
-.composer-left h1,
-.composer-left h2,
-.composer-left h3,
-.composer-left h4 {
-  margin: 0;
+/* 🔥 key fix */
+.composer-left {
+  justify-content: space-between;
+  gap: 16px;
 }
 
 /* =====================================================
-CATEGORY SYSTEM
+HEADER
+===================================================== */
+
+.composer-left h2 {
+  font-size: 22px;
+  margin-bottom: 8px;
+}
+
+/* =====================================================
+CATEGORY CHIPS
 ===================================================== */
 
 .category-row {
   display: flex;
-  gap: var(--space-2);
-  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 12px;
 }
 
 .category-chip {
   padding: 6px 12px;
-  border-radius: 999px;
-
-  border: 1px solid var(--line);
-  background: rgba(255,255,255,0.6);
-
-  font-size: var(--text-sm);
-  color: var(--muted);
-
+  border-radius: 20px;
+  background: #f2f2f2;
   cursor: pointer;
-
-  transition:
-    transform var(--dur-fast),
-    background var(--dur-fast),
-    box-shadow var(--dur-fast);
+  font-size: 13px;
+  transition: 0.2s;
 }
 
 .category-chip:hover {
-  transform: translateY(-1px);
-  background: rgba(255,255,255,0.9);
+  background: #e6e6e6;
 }
 
 .category-chip.active {
-  background: var(--accent);
+  background: #4a0f0f;
   color: white;
-  border-color: transparent;
-  box-shadow: 0 6px 16px rgba(200,72,60,0.25);
 }
 
 /* =====================================================
-RIGHT PANEL
+FORM INPUTS
 ===================================================== */
 
-.composer-right {
+.form-section {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: 12px;
+}
 
-  padding: var(--space-4);
-  height: 100%;
+.composer-input {
+  width: 100%;
+  padding: 10px 12px;
 
-  background: #f9f7f4;
-  border-radius: 18px;
+  border-radius: var(--radius-md);
+  border: 1px solid #ddd;
 
-  min-height: 0;
+  font-size: 14px;
+}
 
-  box-shadow:
-    0 10px 30px rgba(0,0,0,0.05),
-    inset 0 1px 0 rgba(255,255,255,0.5);
+.composer-textarea {
+  width: 100%;
+  flex: 1;
 
-  position: relative;
-  overflow: hidden;
+  min-height: 120px;
+  padding: 12px;
+
+  border-radius: var(--radius-md);
+  border: 1px solid #ddd;
+
+  resize: none;
+  font-size: 14px;
 }
 
 /* =====================================================
-SCROLL AREA
+DROP ZONE
+===================================================== */
+
+.drop-zone {
+  border: 2px dashed #ddd;
+  border-radius: var(--radius-md);
+
+  padding: 20px;
+  text-align: center;
+
+  margin-top: auto; /* 🔥 pushes down */
+
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.drop-zone:hover {
+  border-color: #4a0f0f;
+}
+
+.drop-zone-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.drop-title {
+  font-weight: 600;
+}
+
+.drop-sub {
+  font-size: 13px;
+  color: #666;
+}
+
+/* =====================================================
+ACTIONS
+===================================================== */
+
+.composer-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.icon-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  opacity: 0.7;
+  transition: 0.2s;
+}
+
+.icon-btn:hover {
+  opacity: 1;
+}
+
+.cancel-btn {
+  margin-left: auto;
+  color: #c44536;
+}
+
+/* =====================================================
+RIGHT PANEL (PREVIEW)
 ===================================================== */
 
 .preview-scroll {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-
   flex: 1;
-  justify-content: flex-start;
-
   overflow-y: auto;
-  padding-right: 6px;
-  padding-bottom: 6px;
-
   min-height: 0;
 }
 
@@ -166,320 +207,72 @@ EMPTY STATE
 ===================================================== */
 
 .empty-preview {
-  position: relative;
-
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 
   height: 100%;
-  gap: var(--space-2);
   text-align: center;
-}
-
-.empty-preview::before {
-  content: "";
-  position: absolute;
-  width: 240px;
-  height: 240px;
-
-  background: radial-gradient(
-    circle,
-    rgba(214,75,58,0.18),
-    rgba(214,75,58,0.05),
-    transparent 70%
-  );
-
-  filter: blur(30px);
-  border-radius: 50%;
-
-  animation: glowPulse 4s ease-in-out infinite;
 }
 
 .empty-logo {
-  width: 82px;
-  opacity: 0.85;
-  animation: floatLogo 3.2s ease-in-out infinite;
+  width: 60px;
+  opacity: 0.6;
+  margin-bottom: 12px;
 }
 
 .empty-text {
-  font-size: var(--text-sm);
-  color: var(--muted);
+  font-size: 14px;
+  color: #666;
 }
 
 /* =====================================================
-INPUTS
-===================================================== */
-
-.composer-input,
-.composer-textarea {
-  width: 100%;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-
-  padding: var(--space-3);
-  background: rgba(255, 255, 255, 0.7);
-
-  font-size: var(--text-md);
-
-  transition:
-    border-color var(--dur-fast),
-    box-shadow var(--dur-fast);
-}
-
-.composer-input:focus,
-.composer-textarea:focus {
-  outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(214,75,58,0.12);
-}
-
-.composer-textarea {
-  height: 120px;
-  resize: none;
-}
-
-/* =====================================================
-DROP ZONE
-===================================================== */
-
-.drop-zone {
-  position: relative;
-  overflow: hidden;
-
-  border: 2px dashed var(--line);
-  border-radius: 14px;
-  padding: var(--space-4);
-
-  text-align: center;
-  cursor: pointer;
-
-  transition:
-    transform var(--dur-fast),
-    box-shadow var(--dur-fast),
-    border-color var(--dur-fast);
-}
-
-.drop-zone:hover {
-  border-color: var(--accent);
-}
-
-.drop-zone.active {
-  transform: scale(1.02);
-  border-color: var(--accent);
-
-  box-shadow:
-    0 0 0 3px rgba(200,72,60,0.12),
-    0 8px 24px rgba(0,0,0,0.08);
-}
-
-.drop-zone-inner {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.drop-title {
-  font-weight: var(--fw-medium);
-}
-
-.drop-sub {
-  font-size: var(--text-xs);
-  color: var(--muted);
-}
-
-/* =====================================================
-BUTTONS
-===================================================== */
-
-.icon-btn {
-  font-size: 18px;
-  padding: 10px 12px;
-  border-radius: 12px;
-
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.6);
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  cursor: pointer;
-
-  transition:
-    transform var(--dur-fast),
-    box-shadow var(--dur-fast);
-}
-
-.icon-btn:hover {
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: var(--shadow-sm);
-}
-
-.icon-btn:active {
-  transform: scale(0.92);
-}
-
-.cancel-btn {
-  color: #c23b2e;
-}
-
-.composer-actions {
-  display: flex;
-  gap: var(--space-2);
-  margin-top: var(--space-3);
-}
-
-/* =====================================================
-TOOLTIPS
-===================================================== */
-
-.tooltip {
-  position: relative;
-}
-
-.tooltip::after {
-  content: attr(data-tip);
-  position: absolute;
-
-  bottom: -34px;
-  left: 50%;
-  transform: translateX(-50%) scale(0.9);
-
-  background: rgba(0,0,0,0.75);
-  color: white;
-
-  padding: 4px 8px;
-  border-radius: 6px;
-
-  font-size: 11px;
-  white-space: nowrap;
-
-  opacity: 0;
-  pointer-events: none;
-
-  transition: all 0.15s ease;
-}
-
-.tooltip:hover::after {
-  opacity: 1;
-  transform: translateX(-50%) scale(1);
-}
-
-/* =====================================================
-GRID PREVIEW
+IMAGE GRID
 ===================================================== */
 
 .preview-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-  gap: var(--space-1);
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
 }
 
 .preview-grid-item {
   position: relative;
-  cursor: grab;
-
-  transition:
-    transform var(--dur-base),
-    box-shadow var(--dur-base);
-}
-
-.preview-grid-item:hover {
-  transform: scale(1.04);
-  box-shadow: var(--shadow-md);
 }
 
 .preview-grid-img {
   width: 100%;
-  height: 90px;
+  height: 140px;
   object-fit: cover;
-  border-radius: 10px;
+  border-radius: 8px;
 }
 
-/* DELETE */
+/* delete overlay */
 
 .delete-overlay {
   position: absolute;
   top: 6px;
   right: 6px;
 
-  background: rgba(0,0,0,0.6);
+  background: rgba(0, 0, 0, 0.6);
   color: white;
 
   border: none;
-  border-radius: 6px;
-  padding: 2px 6px;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
 
+  font-size: 12px;
   cursor: pointer;
-
-  transition: transform var(--dur-fast);
-}
-
-.delete-overlay:hover {
-  transform: scale(1.15);
-  background: rgba(200,72,60,0.9);
-}
-
-/* PROGRESS */
-
-.progress-bar {
-  position: absolute;
-  bottom: 4px;
-  left: 4px;
-  right: 4px;
-
-  height: 4px;
-  background: rgba(0,0,0,0.1);
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.progress-fill {
-  height: 100%;
-  background: var(--accent);
-  transition: width 0.2s ease;
 }
 
 /* =====================================================
 RESPONSIVE
 ===================================================== */
 
-@media (max-width: 1024px) {
+@media (max-width: 900px) {
   .composer-wrapper {
     grid-template-columns: 1fr;
   }
-
-  .composer-right {
-    order: -1;
-  }
-}
-
-@media (max-width: 640px) {
-  .composer-left,
-  .composer-right {
-    padding: var(--space-3);
-    border-radius: 16px;
-  }
-
-  .composer-actions {
-    justify-content: space-between;
-  }
-}
-
-/* =====================================================
-ANIMATIONS
-===================================================== */
-
-@keyframes floatLogo {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0px); }
-}
-
-@keyframes glowPulse {
-  0% { transform: scale(0.9); opacity: 0.5; }
-  50% { transform: scale(1.15); opacity: 0.9; }
-  100% { transform: scale(0.9); opacity: 0.5; }
 }
