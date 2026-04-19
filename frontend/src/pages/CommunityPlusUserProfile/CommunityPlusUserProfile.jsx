@@ -2,7 +2,6 @@ import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Autocomplete, useJsApiLoader } from "@react-google-maps/api";
 
-import { apiFetch } from "../../../services/api";
 import { useLocationContext } from "../../context/LocationContext";
 import { useAuth } from "../../context/AuthContext";
 
@@ -15,36 +14,29 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
   const autoRef = useRef(null);
 
   const { appUser } = useAuth();
-
-  const {
-    homeLocation,
-    setHome,
-  } = useLocationContext();
+  const { homeLocation, setHome } = useLocationContext();
 
   /* ==============================
-   AUTO DATA HELPERS
+     HELPERS
   ============================== */
 
-  const emailPrefix = appUser?.email?.split("@")[0] || "";
-
-  const getInitials = (name) =>
-    name
-      ? name
-          .split(" ")
-          .map((n) => n[0])
+  const getInitials = (str) =>
+    str
+      ? str
+          .split(/[.\s-_]/)
+          .map((s) => s[0])
           .join("")
           .toUpperCase()
       : "";
 
   /* ==============================
-   STATE
+     STATE
   ============================== */
 
   const [formData, setFormData] = useState({
-    username: emailPrefix,
-    display_name: getInitials(appUser?.name || emailPrefix),
+    username: "",
+    display_name: "",
     userType: "PERSONAL",
-
     phone: "",
     countryCode: "+61",
 
@@ -63,7 +55,6 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
   });
 
   const [manualAddress, setManualAddress] = useState("");
-  const [loading, setLoading] = useState(mode === "edit");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -78,79 +69,47 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
   const [currentStep, setCurrentStep] = useState(0);
 
   /* ==============================
-   STEP LOGIC
-  ============================== */
-
-  const nextStep = () => {
-    if (currentStep === 0) {
-      if (
-        !formData.username ||
-        !formData.display_name ||
-        !formData.userType
-      ) {
-        setError("Complete all identity fields.");
-        return;
-      }
-    }
-
-    if (currentStep === 2 && !formData.phone) {
-      setError("Enter your phone number.");
-      return;
-    }
-
-    setError("");
-
-    if (currentStep < steps.length - 1) {
-      setCurrentStep((s) => s + 1);
-    }
-  };
-
-  const prevStep = () => {
-    if (currentStep > 0) {
-      setCurrentStep((s) => s - 1);
-    }
-  };
-
-  /* ==============================
-   ACTIONS
-  ============================== */
-
-  const handleClose = () => {
-    if (window.confirm("Leave without saving?")) {
-      navigate("/home");
-    }
-  };
-
-  const verifySocial = (platform) => {
-    alert(`${platform} verification coming soon`);
-  };
-
-  /* ==============================
-   GOOGLE MAPS
-  ============================== */
-
-  const googleMapsApiKey =
-    import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "";
-
-  const { isLoaded: mapsLoaded, loadError: mapsLoadError } =
-    useJsApiLoader({
-      id: "community-one-google-maps",
-      googleMapsApiKey,
-      libraries: GOOGLE_LIBRARIES,
-    });
-
-  /* ==============================
-   EFFECTS
+     AUTO POPULATE
   ============================== */
 
   useEffect(() => {
-    if (homeLocation?.label) {
-      setManualAddress(homeLocation.label);
-    }
-  }, [homeLocation]);
+    if (!appUser?.user) return;
+
+    const email = appUser.user.email || "";
+    const prefix = email.split("@")[0];
+
+    setFormData((prev) => ({
+      ...prev,
+      username: prefix,
+      display_name: getInitials(prefix),
+    }));
+  }, [appUser]);
 
   /* ==============================
-   HANDLERS
+     GOOGLE MAPS
+  ============================== */
+
+  const { isLoaded } = useJsApiLoader({
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+    libraries: GOOGLE_LIBRARIES,
+  });
+
+  const onPlaceChanged = () => {
+    const place = autoRef.current?.getPlace();
+    if (!place?.geometry) return;
+
+    const loc = {
+      label: place.formatted_address,
+      lat: place.geometry.location.lat(),
+      lng: place.geometry.location.lng(),
+    };
+
+    setManualAddress(loc.label);
+    setHome(loc);
+  };
+
+  /* ==============================
+     HANDLERS
   ============================== */
 
   const handleChange = (e) => {
@@ -160,125 +119,93 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
     }));
   };
 
-  const handleManualAddressChange = (e) => {
-    const value = e.target.value;
-    setManualAddress(value);
-
-    setHome({
-      label: value,
-      lat: null,
-      lng: null,
-      type: "home",
-    });
-  };
-
-
   const handleSave = async () => {
-  try {
-    const payload = {
-  user_id: appUser.user.id, // 🔥 ADD THIS
-  username,
-  display_name,
-  user_type,
-  phone,
-  social,
-  payment
-};
-
-    const res = await apiFetch("/profile", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include", // 🔥 important if using auth cookies
-      body: JSON.stringify(payload),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) throw new Error(data.error || "Save failed");
-
-    console.log("✅ Profile saved:", data);
-    alert("Profile saved successfully");
-
-  } catch (err) {
-    console.error("❌ Save error:", err);
-    alert("Failed to save profile");
-  }
-};
-
-  const onPlaceChanged = () => {
-    const place = autoRef.current?.getPlace?.();
-    if (!place || !place.geometry) return;
-
-    const loc = {
-      label: place.formatted_address || place.name,
-      lat: place.geometry.location.lat(),
-      lng: place.geometry.location.lng(),
-    };
-
-    setManualAddress(loc.label);
-    setHome(loc);
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    setSaving(true);
-
     try {
-      await apiFetch("/users/profile/create", {
-        method: "POST",
-        body: JSON.stringify({
-          ...formData,
-          homeLocation,
-        }),
-      });
+      setSaving(true);
+      setError("");
 
-      navigate("/home", { replace: true });
-    } catch {
-      setError("Failed to save profile");
+      const payload = {
+        user_id: appUser?.user?.id,
+
+        username: formData.username,
+        display_name: formData.display_name,
+        user_type: formData.userType,
+
+        phone: formData.phone,
+        social: formData.social,
+        payment: formData.card,
+
+        homeLocation,
+      };
+
+      console.log("🚀 PAYLOAD:", payload);
+
+      const res = await fetch(
+        "https://communityone-backend.onrender.com/api/profile",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error || "Save failed");
+
+      console.log("✅ Profile saved:", data);
+      alert("Profile saved successfully");
+
+      navigate("/home");
+
+    } catch (err) {
+      console.error("❌ Save error:", err);
+      setError(err.message || "Failed to save profile");
     } finally {
       setSaving(false);
     }
   };
-  console.log("appUser:", appUser);
-  useEffect(() => {
-  if (!appUser?.user) return;
 
-  const email = appUser.user.email || "";
-  const emailPrefix = email.split("@")[0];
+  const handleClose = () => {
+    navigate("/home");
+  };
 
-  const getInitials = (str) =>
-    str
-      ? str
-          .split(/[.\s-_]/) // handles ade.oloyede, ade-oloyede etc
-          .map((s) => s[0])
-          .join("")
-          .toUpperCase()
-      : "";
+  const nextStep = () => {
+    if (currentStep === 0 && !formData.userType) {
+      setError("Select account type");
+      return;
+    }
 
-  setFormData((prev) => ({
-    ...prev,
-    username: prev.username || emailPrefix,
-    display_name:
-      prev.display_name || getInitials(emailPrefix),
-  }));
-}, [appUser]);
+    if (currentStep === 2 && !formData.phone) {
+      setError("Enter phone number");
+      return;
+    }
 
-  if (loading) return <div>Loading...</div>;
+    setError("");
+    setCurrentStep((s) => Math.min(s + 1, steps.length - 1));
+  };
+
+  const prevStep = () => {
+    setCurrentStep((s) => Math.max(s - 1, 0));
+  };
+
+  /* ==============================
+     UI
+  ============================== */
 
   return (
     <div className="profile-container">
 
       <div className="profile-page-header">
-        <h2 className="profile-page-title">Create Profile</h2>
+        <h2>Create Profile</h2>
 
         <div className="profile-page-steps">
           {steps.map((step, i) => (
             <span
               key={step}
-              className={`step ${i === currentStep ? "active" : ""}`}
+              className={i === currentStep ? "active" : ""}
               onClick={() => setCurrentStep(i)}
             >
               {step}
@@ -290,124 +217,68 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
       <div className="profile-layout">
 
         <div className="profile-left">
-          <form onSubmit={handleSubmit}>
 
-            {/* STEP 1 */}
-            {currentStep === 0 && (
-              <>
-                <div className="form-group">
-                  <label>Username</label>
-                  <input value={formData.username} readOnly />
-                </div>
+          {/* STEP 1 */}
+          {currentStep === 0 && (
+            <>
+              <input value={formData.username} readOnly />
+              <input value={formData.display_name} readOnly />
 
-                <div className="form-group">
-                  <label>Display Name</label>
-                  <input value={formData.display_name} readOnly />
-                </div>
+              <select
+                name="userType"
+                value={formData.userType}
+                onChange={handleChange}
+              >
+                <option value="PERSONAL">Personal</option>
+                <option value="BUSINESS">Business</option>
+              </select>
+            </>
+          )}
 
-                <div className="form-group">
-                  <label>User Type</label>
-                  <select
-                    name="userType"
-                    value={formData.userType}
-                    onChange={handleChange}
-                  >
-                    <option value="PERSONAL">Personal</option>
-                    <option value="BUSINESS">Business</option>
-                    <option value="MIXED">Mixed</option>
-                    <option value="COMMUNITY_SERVICE">Community</option>
-                    <option value="GOVERNMENT">Government</option>
-                  </select>
-                </div>
-              </>
-            )}
+          {/* STEP 2 */}
+          {currentStep === 1 && isLoaded && (
+            <Autocomplete
+              onLoad={(auto) => (autoRef.current = auto)}
+              onPlaceChanged={onPlaceChanged}
+            >
+              <input
+                value={manualAddress}
+                onChange={(e) => setManualAddress(e.target.value)}
+              />
+            </Autocomplete>
+          )}
 
-            {/* STEP 2 */}
-            {currentStep === 1 && (
-              <div className="location-section">
-                <label>Home Location</label>
-                <Autocomplete
-                  onLoad={(auto) => (autoRef.current = auto)}
-                  onPlaceChanged={onPlaceChanged}
-                >
-                  <input
-                    value={manualAddress}
-                    onChange={handleManualAddressChange}
-                  />
-                </Autocomplete>
-              </div>
-            )}
+          {/* STEP 3 */}
+          {currentStep === 2 && (
+            <input
+              placeholder="Phone"
+              value={formData.phone}
+              onChange={(e) =>
+                setFormData({ ...formData, phone: e.target.value })
+              }
+            />
+          )}
 
-            {/* STEP 3 */}
-            {currentStep === 2 && (
-              <div className="form-group">
-                <label>Phone</label>
-                <div style={{ display: "flex", gap: "8px" }}>
-                  <input value={formData.countryCode} />
-                  <input
-                    placeholder="Phone number"
-                    value={formData.phone}
-                    onChange={(e) =>
-                      setFormData({ ...formData, phone: e.target.value })
-                    }
-                  />
-                </div>
-              </div>
-            )}
+          {/* NAV */}
+          <div className="form-navigation">
+            <button onClick={handleSave} disabled={saving}>
+              Save
+            </button>
 
-            {/* STEP 4 */}
-            {currentStep === 3 &&
-              ["youtube", "twitter", "instagram"].map((p) => (
-                <div key={p} className="form-group">
-                  <input
-                    placeholder={`${p}`}
-                    value={formData.social[p]}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        social: { ...formData.social, [p]: e.target.value },
-                      })
-                    }
-                  />
-                  <button type="button" onClick={() => verifySocial(p)}>
-                    Verify
-                  </button>
-                </div>
-              ))}
+            <button onClick={handleClose}>
+              Close
+            </button>
 
-            {/* STEP 5 */}
-            {currentStep === 4 && (
-              <>
-                <input
-                  placeholder="Card Number"
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      card: { ...formData.card, number: e.target.value },
-                    })
-                  }
-                />
-              </>
-            )}
-
-            {/* NAV (UNCHANGED) */}
-            <div className="form-navigation">
-              <div className="nav-left">
-                <button type="button" onClick={handleSave}>Save</button>
-                <button type="button" onClick={handleClose}>Close</button>
-              </div>
-
-              <div className="nav-actions">
-                {currentStep > 0 && (
-                  <button onClick={prevStep}>‹</button>
-                )}
-                <button onClick={nextStep}>›</button>
-              </div>
+            <div>
+              {currentStep > 0 && (
+                <button onClick={prevStep}>‹</button>
+              )}
+              <button onClick={nextStep}>›</button>
             </div>
+          </div>
 
-            {error && <p className="error">{error}</p>}
+          {error && <p className="error">{error}</p>}
 
-          </form>
         </div>
 
         <div className="profile-guide">
