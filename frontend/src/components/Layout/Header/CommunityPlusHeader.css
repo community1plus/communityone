@@ -234,3 +234,21 @@ LOCATION
   font-size: 13px;
   outline: none;
 }
+
+.user-block {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.username {
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.avatar-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
