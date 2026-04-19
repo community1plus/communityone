@@ -115,20 +115,6 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
    ACTIONS
   ============================== */
 
-  const handleSave = async () => {
-    try {
-      await apiFetch("/users/profile/save-draft", {
-        method: "POST",
-        body: JSON.stringify({
-          ...formData,
-          homeLocation,
-        }),
-      });
-    } catch (err) {
-      console.error("Save failed", err);
-    }
-  };
-
   const handleClose = () => {
     if (window.confirm("Leave without saving?")) {
       navigate("/home");
