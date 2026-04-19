@@ -13,8 +13,7 @@ CONTAINER + PAGE STRUCTURE
 .profile-container {
   width: 100%;
   max-width: 1100px;
-  margin: 0 auto;
-
+ 
   /* 🔥 enables vertical stretching */
   flex: 1;
 
