@@ -184,7 +184,7 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
       payment: formData.payment,
     };
 
-    const res = await apiFetch("/api/profile", {
+    const res = await apiFetch("/profile", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
