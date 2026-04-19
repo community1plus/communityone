@@ -71,7 +71,6 @@ export default function App() {
         }
       >
         <Route path="/home" element={<DashboardHome />} />
-        <Route path="/profile" element={<Onboarding />} />
         <Route path="/profile" element={<CommunityPlusUserProfile />} />
         <Route path="/yellowpages" element={<CommunityPlusYellowPages />} />
         <Route path="/communityplus" element={<CommunityPlusHub />} />
