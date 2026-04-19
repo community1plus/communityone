@@ -191,11 +191,19 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
     }
   };
 
+  const prevStep = () => {
+  if (currentStep > 0) {
+    setCurrentStep((s) => s - 1);
+  }
+};
+
   // ==============================
   // RENDER
   // ==============================
 
   if (loading) return <div>Loading profile...</div>;
+
+  
 
   return (
     <div className="profile-container">
