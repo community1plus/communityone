@@ -222,6 +222,28 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
     }
   };
 
+  useEffect(() => {
+  if (!appUser) return;
+
+  const emailPrefix = appUser.email?.split("@")[0] || "";
+
+  const getInitials = (name) =>
+    name
+      ? name
+          .split(" ")
+          .map((n) => n[0])
+          .join("")
+          .toUpperCase()
+      : "";
+
+  setFormData((prev) => ({
+    ...prev,
+    username: prev.username || emailPrefix,
+    display_name:
+      prev.display_name || getInitials(appUser.name || emailPrefix),
+  }));
+}, [appUser]);
+
   if (loading) return <div>Loading...</div>;
 
   return (
