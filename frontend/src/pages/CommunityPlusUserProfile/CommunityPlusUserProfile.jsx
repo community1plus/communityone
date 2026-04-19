@@ -176,13 +176,14 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
   const handleSave = async () => {
   try {
     const payload = {
-      username: formData.username,
-      display_name: formData.display_name,
-      user_type: formData.user_type,
-      phone: formData.phone,
-      social: formData.social,
-      payment: formData.payment,
-    };
+  user_id: appUser.user.id, // 🔥 ADD THIS
+  username,
+  display_name,
+  user_type,
+  phone,
+  social,
+  payment
+};
 
     const res = await apiFetch("/profile", {
       method: "POST",
