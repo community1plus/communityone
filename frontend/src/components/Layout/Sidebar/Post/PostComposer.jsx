@@ -33,18 +33,6 @@ export default function PostComposer() {
           {/* HEADER */}
           <div>
             <h2>Create a Post</h2>
-
-            <div className="category-row">
-              {categories.map((c) => (
-                <div
-                  key={c}
-                  className={`category-chip ${category === c ? "active" : ""}`}
-                  onClick={() => setCategory(c)}
-                >
-                  {c.charAt(0).toUpperCase() + c.slice(1)}
-                </div>
-              ))}
-            </div>
           </div>
 
           {/* INPUTS */}
