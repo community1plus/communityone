@@ -13,7 +13,7 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
   const navigate = useNavigate();
   const autoRef = useRef(null);
 
-  const { appUser } = useAuth();
+  const { appUser, setAppUser } = useAuth();
   const { homeLocation, setHome } = useLocationContext();
 
   /* ==============================
@@ -38,7 +38,6 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
     display_name: "",
     userType: "PERSONAL",
     phone: "",
-    countryCode: "+61",
 
     social: {
       youtube: "",
@@ -69,7 +68,7 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
   const [currentStep, setCurrentStep] = useState(0);
 
   /* ==============================
-     AUTO POPULATE
+     AUTO POPULATE (NEW USERS)
   ============================== */
 
   useEffect(() => {
@@ -83,6 +82,35 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
       username: prefix,
       display_name: getInitials(prefix),
     }));
+  }, [appUser]);
+
+  /* ==============================
+     PREFILL EXISTING PROFILE (NEW)
+  ============================== */
+
+  useEffect(() => {
+    if (!appUser?.profile) return;
+
+    const p = appUser.profile;
+
+    console.log("📦 Prefilling profile:", p);
+
+    setFormData((prev) => ({
+      ...prev,
+      username: p.username || prev.username,
+      display_name: p.display_name || prev.display_name,
+      userType: p.user_type || prev.userType,
+      phone: p.phone || "",
+
+      social: p.social || prev.social,
+      card: p.payment || prev.card,
+    }));
+
+    if (p.homeLocation) {
+      setManualAddress(p.homeLocation.label || "");
+      setHome(p.homeLocation);
+    }
+
   }, [appUser]);
 
   /* ==============================
@@ -109,15 +137,8 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
   };
 
   /* ==============================
-     HANDLERS
+     SAVE (UPGRADED)
   ============================== */
-
-  const handleChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
 
   const handleSave = async () => {
     try {
@@ -156,9 +177,22 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
       if (!res.ok) throw new Error(data.error || "Save failed");
 
       console.log("✅ Profile saved:", data);
-      alert("Profile saved successfully");
 
-      navigate("/home");
+      /* ==========================
+         🔥 UPDATE GLOBAL STATE
+      ========================== */
+
+      setAppUser((prev) => ({
+        ...prev,
+        hasProfile: true,
+        profile: data,
+      }));
+
+      /* ==========================
+         🔥 REDIRECT
+      ========================== */
+
+      navigate("/home", { replace: true });
 
     } catch (err) {
       console.error("❌ Save error:", err);
@@ -199,7 +233,7 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
     <div className="profile-container">
 
       <div className="profile-page-header">
-        <h2>Create Profile</h2>
+        <h2>{mode === "edit" ? "Edit Profile" : "Create Profile"}</h2>
 
         <div className="profile-page-steps">
           {steps.map((step, i) => (
@@ -218,7 +252,6 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
 
         <div className="profile-left">
 
-          {/* STEP 1 */}
           {currentStep === 0 && (
             <>
               <input value={formData.username} readOnly />
@@ -227,7 +260,9 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
               <select
                 name="userType"
                 value={formData.userType}
-                onChange={handleChange}
+                onChange={(e) =>
+                  setFormData({ ...formData, userType: e.target.value })
+                }
               >
                 <option value="PERSONAL">Personal</option>
                 <option value="BUSINESS">Business</option>
@@ -235,7 +270,6 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
             </>
           )}
 
-          {/* STEP 2 */}
           {currentStep === 1 && isLoaded && (
             <Autocomplete
               onLoad={(auto) => (autoRef.current = auto)}
@@ -248,7 +282,6 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
             </Autocomplete>
           )}
 
-          {/* STEP 3 */}
           {currentStep === 2 && (
             <input
               placeholder="Phone"
@@ -259,7 +292,6 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
             />
           )}
 
-          {/* NAV */}
           <div className="form-navigation">
             <button onClick={handleSave} disabled={saving}>
               Save

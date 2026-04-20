@@ -427,3 +427,70 @@ NAV ICON BUTTONS (IMPROVED)
   color: #222;
   transform: translateX(-2px);
 }
+
+/* ================= FILE LIST ================= */
+
+.file-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.file-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 10px;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  background: #fff;
+}
+
+/* THUMB */
+.file-thumb {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f4f4f4;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.file-thumb img,
+.file-thumb video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* INFO */
+.file-info {
+  flex: 1;
+}
+
+.file-name {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.file-meta {
+  font-size: 11px;
+  color: #777;
+}
+
+/* ACTIONS */
+.file-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.file-actions button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 14px;
+}
