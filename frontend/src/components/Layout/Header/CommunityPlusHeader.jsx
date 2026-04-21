@@ -75,42 +75,70 @@ export default function CommunityPlusHeader({ user, onLogout }) {
     !!viewLocation?.label;
 
   /* ===============================
-     GOOGLE AUTOCOMPLETE
+     GOOGLE AUTOCOMPLETE (FIXED)
   =============================== */
 
   useEffect(() => {
-    if (!window.google || !window.google.maps || !inputRef.current) return;
+    let interval;
 
-    const autocomplete =
-      new window.google.maps.places.Autocomplete(inputRef.current, {
-        types: ["(regions)"], // suburbs, cities
-        componentRestrictions: { country: "au" },
-      });
+    const initAutocomplete = () => {
+      if (
+        !window.google ||
+        !window.google.maps ||
+        !inputRef.current
+      ) {
+        return false;
+      }
 
-    autocomplete.addListener("place_changed", () => {
-      const place = autocomplete.getPlace();
-
-      if (!place.geometry) return;
-
-      const getComponent = (type) =>
-        place.address_components?.find((c) =>
-          c.types.includes(type)
+      const autocomplete =
+        new window.google.maps.places.Autocomplete(
+          inputRef.current,
+          {
+            types: ["(regions)"],
+            componentRestrictions: { country: "au" },
+          }
         );
 
-      const newLocation = {
-        label: place.formatted_address,
-        lat: place.geometry.location.lat(),
-        lng: place.geometry.location.lng(),
-        suburb: getComponent("locality")?.long_name,
-        state: getComponent("administrative_area_level_1")?.short_name,
-        postcode: getComponent("postal_code")?.long_name,
-        type: "manual",
-      };
+      autocomplete.addListener("place_changed", () => {
+        const place = autocomplete.getPlace();
+        if (!place.geometry) return;
 
-      console.log("📍 Autocomplete selected:", newLocation);
+        const getComponent = (type) =>
+          place.address_components?.find((c) =>
+            c.types.includes(type)
+          );
 
-      setViewLocation(newLocation, "manual");
-    });
+        const newLocation = {
+          label: place.formatted_address,
+          lat: place.geometry.location.lat(),
+          lng: place.geometry.location.lng(),
+          suburb: getComponent("locality")?.long_name,
+          state:
+            getComponent(
+              "administrative_area_level_1"
+            )?.short_name,
+          postcode:
+            getComponent("postal_code")?.long_name,
+          type: "manual",
+        };
+
+        console.log("📍 Selected:", newLocation);
+
+        setViewLocation(newLocation, "manual");
+      });
+
+      return true;
+    };
+
+    if (!initAutocomplete()) {
+      interval = setInterval(() => {
+        if (initAutocomplete()) {
+          clearInterval(interval);
+        }
+      }, 300);
+    }
+
+    return () => clearInterval(interval);
   }, []);
 
   /* ===============================
@@ -118,31 +146,43 @@ export default function CommunityPlusHeader({ user, onLogout }) {
   =============================== */
 
   const handleResolveLocation = async () => {
+    console.log("📍 Pin clicked");
+
     setResolving(true);
 
     try {
-      await enableLiveLocation();
+      const loc = await enableLiveLocation();
+      console.log("✅ Live location:", loc);
     } catch (err) {
-      console.error("Location resolve failed:", err);
+      console.error("❌ Location error:", err);
     } finally {
       setResolving(false);
     }
   };
 
   /* ===============================
-     CLICK OUTSIDE (MENU)
+     MENU OUTSIDE CLICK
   =============================== */
 
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (menuRef.current && !menuRef.current.contains(e.target)) {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(e.target)
+      ) {
         setShowMenu(false);
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener(
+      "mousedown",
+      handleClickOutside
+    );
     return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener(
+        "mousedown",
+        handleClickOutside
+      );
   }, []);
 
   /* ===============================
@@ -164,8 +204,8 @@ export default function CommunityPlusHeader({ user, onLogout }) {
 
   return (
     <header className="header">
-      {/* TOP ROW */}
       <div className="header-row">
+
         {/* LEFT */}
         <div className="logo-container">
           <img
@@ -191,6 +231,7 @@ export default function CommunityPlusHeader({ user, onLogout }) {
               ref={inputRef}
               className="location-input"
               placeholder="Enter suburb or city"
+              autoComplete="off"
             />
           </div>
         </div>
@@ -206,14 +247,21 @@ export default function CommunityPlusHeader({ user, onLogout }) {
         </div>
 
         {/* RIGHT */}
-        <div className="header-right" ref={menuRef}>
+        <div
+          className="header-right"
+          ref={menuRef}
+        >
           {effectiveUser && (
             <div className="user-block">
-              <span className="username">{username}</span>
+              <span className="username">
+                {username}
+              </span>
 
               <div
                 className="avatar"
-                onClick={() => setShowMenu(!showMenu)}
+                onClick={() =>
+                  setShowMenu(!showMenu)
+                }
               >
                 {initials}
               </div>
@@ -229,7 +277,9 @@ export default function CommunityPlusHeader({ user, onLogout }) {
 
                   <div
                     className="menu-item"
-                    onClick={() => onLogout?.()}
+                    onClick={() =>
+                      onLogout?.()
+                    }
                   >
                     Logout
                   </div>
@@ -244,28 +294,36 @@ export default function CommunityPlusHeader({ user, onLogout }) {
       <nav className="links">
         <button
           onClick={() => go("/home")}
-          className={isActive("/home") ? "active" : ""}
+          className={
+            isActive("/home") ? "active" : ""
+          }
         >
           Home
         </button>
 
         <button
           onClick={() => go("/post")}
-          className={isActive("/post") ? "active" : ""}
+          className={
+            isActive("/post") ? "active" : ""
+          }
         >
           Post
         </button>
 
         <button
           onClick={() => go("/event")}
-          className={isActive("/event") ? "active" : ""}
+          className={
+            isActive("/event") ? "active" : ""
+          }
         >
           Event
         </button>
 
         <button
           onClick={() => go("/incident")}
-          className={isActive("/incident") ? "active" : ""}
+          className={
+            isActive("/incident") ? "active" : ""
+          }
         >
           Incident
         </button>
