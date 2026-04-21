@@ -11,6 +11,9 @@ import { useLocationContext } from "../../../context/LocationContext";
 import { useAuth } from "../../../context/AuthContext";
 import LocationPin from "../../UI/LocationPin";
 
+// 🔥 IMPORT RESOLVER
+import { resolveLocation } from "../../../services/resolveLocation";
+
 export default function CommunityPlusHeader({ user, onLogout }) {
   const navigate = useNavigate();
   const routeLocation = useLocation();
@@ -75,7 +78,21 @@ export default function CommunityPlusHeader({ user, onLogout }) {
     !!viewLocation?.label;
 
   /* ===============================
-     GOOGLE AUTOCOMPLETE (FIXED)
+     SYNC INPUT DISPLAY
+  =============================== */
+
+  useEffect(() => {
+    if (!inputRef.current) return;
+
+    if (viewLocation?.fullLabel) {
+      inputRef.current.value = viewLocation.fullLabel;
+    } else if (viewLocation?.label) {
+      inputRef.current.value = viewLocation.label;
+    }
+  }, [viewLocation?.updatedAt]);
+
+  /* ===============================
+     GOOGLE AUTOCOMPLETE (ENHANCED)
   =============================== */
 
   useEffect(() => {
@@ -94,37 +111,31 @@ export default function CommunityPlusHeader({ user, onLogout }) {
         new window.google.maps.places.Autocomplete(
           inputRef.current,
           {
-            types: ["(regions)"],
+            types: ["geocode"], // 🔥 FULL ADDRESS
             componentRestrictions: { country: "au" },
           }
         );
 
-      autocomplete.addListener("place_changed", () => {
+      autocomplete.addListener("place_changed", async () => {
         const place = autocomplete.getPlace();
         if (!place.geometry) return;
 
-        const getComponent = (type) =>
-          place.address_components?.find((c) =>
-            c.types.includes(type)
-          );
+        const lat = place.geometry.location.lat();
+        const lng = place.geometry.location.lng();
 
-        const newLocation = {
-          label: place.formatted_address,
-          lat: place.geometry.location.lat(),
-          lng: place.geometry.location.lng(),
-          suburb: getComponent("locality")?.long_name,
-          state:
-            getComponent(
-              "administrative_area_level_1"
-            )?.short_name,
-          postcode:
-            getComponent("postal_code")?.long_name,
-          type: "manual",
-        };
+        console.log("📍 Raw selection:", lat, lng);
 
-        console.log("📍 Selected:", newLocation);
+        try {
+          // 🔥 ENRICH HERE
+          const enriched = await resolveLocation({ lat, lng });
 
-        setViewLocation(newLocation, "manual");
+          console.log("✅ Enriched location:", enriched);
+
+          setViewLocation(enriched, "manual");
+
+        } catch (err) {
+          console.error("❌ Enrichment failed:", err);
+        }
       });
 
       return true;
@@ -230,7 +241,7 @@ export default function CommunityPlusHeader({ user, onLogout }) {
             <input
               ref={inputRef}
               className="location-input"
-              placeholder="Enter suburb or city"
+              placeholder="Enter address or suburb"
               autoComplete="off"
             />
           </div>
@@ -247,10 +258,7 @@ export default function CommunityPlusHeader({ user, onLogout }) {
         </div>
 
         {/* RIGHT */}
-        <div
-          className="header-right"
-          ref={menuRef}
-        >
+        <div className="header-right" ref={menuRef}>
           {effectiveUser && (
             <div className="user-block">
               <span className="username">
@@ -294,36 +302,28 @@ export default function CommunityPlusHeader({ user, onLogout }) {
       <nav className="links">
         <button
           onClick={() => go("/home")}
-          className={
-            isActive("/home") ? "active" : ""
-          }
+          className={isActive("/home") ? "active" : ""}
         >
           Home
         </button>
 
         <button
           onClick={() => go("/post")}
-          className={
-            isActive("/post") ? "active" : ""
-          }
+          className={isActive("/post") ? "active" : ""}
         >
           Post
         </button>
 
         <button
           onClick={() => go("/event")}
-          className={
-            isActive("/event") ? "active" : ""
-          }
+          className={isActive("/event") ? "active" : ""}
         >
           Event
         </button>
 
         <button
           onClick={() => go("/incident")}
-          className={
-            isActive("/incident") ? "active" : ""
-          }
+          className={isActive("/incident") ? "active" : ""}
         >
           Incident
         </button>
