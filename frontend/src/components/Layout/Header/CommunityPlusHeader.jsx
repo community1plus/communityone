@@ -4,15 +4,15 @@ import React, {
   useRef,
   useMemo,
 } from "react";
+
 import { useNavigate, useLocation } from "react-router-dom";
 import "./CommunityPlusHeader.css";
-
 import { useLocationContext } from "../../../context/LocationContext";
 import { useAuth } from "../../../context/AuthContext";
 import LocationPin from "../../UI/LocationPin";
 
 // 🔥 IMPORT RESOLVER
-import { resolveLocation } from "../../../services/resolveLocation";
+import { resolveLocation } from ".../../../services/resolveLocation";
 
 export default function CommunityPlusHeader({ user, onLogout }) {
   const navigate = useNavigate();
