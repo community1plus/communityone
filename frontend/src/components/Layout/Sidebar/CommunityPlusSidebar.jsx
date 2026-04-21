@@ -37,7 +37,7 @@ export default function CommunityPlusSidebar() {
         className={`sidebar-item ${isActive("/post") ? "active" : ""}`}
         onClick={() => go("/post")}
       >
-        ➕ Post
+        ➕ Now
       </div>
 
       <div
@@ -64,24 +64,10 @@ export default function CommunityPlusSidebar() {
       <hr className="sidebar-divider" />
 
       <div
-        className={`sidebar-item ${isActive("/profile") ? "active" : ""}`}
-        onClick={() => go("/profile")}
-      >
-        👤 Profile
-      </div>
-
-      <div
         className={`sidebar-item ${isActive("/yellowpages") ? "active" : ""}`}
         onClick={() => go("/yellowpages")}
       >
         📒 Yellow Pages
-      </div>
-
-      <div
-        className={`sidebar-item ${isActive("/communityplus") ? "active" : ""}`}
-        onClick={() => go("/communityplus")}
-      >
-        🌐 Community+
       </div>
 
       <hr className="sidebar-divider" />

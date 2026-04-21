@@ -4,15 +4,53 @@ const LocationContext = createContext();
 export const useLocationContext = () => useContext(LocationContext);
 
 export function LocationProvider({ children }) {
+  /* ===============================
+     STATE
+  =============================== */
+
   const [homeLocation, setHomeLocation] = useState(null);
   const [liveLocation, setLiveLocation] = useState(null);
   const [ipLocation, setIpLocation] = useState(null);
-  const [viewLocation, setViewLocation] = useState(null);
+
+  const [viewLocation, setViewLocationState] = useState(() => {
+    const saved = localStorage.getItem("viewLocation");
+    return saved ? JSON.parse(saved) : null;
+  });
+
+  const [locationMode, setLocationMode] = useState("auto"); // "auto" | "manual"
 
   const GOOGLE_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
   /* ===============================
-     🧠 PARSE ADDRESS
+     SAFE SET VIEW LOCATION
+  =============================== */
+
+  const setViewLocation = (loc, mode = "manual") => {
+    if (!loc) return;
+
+    const newLocation = {
+      ...loc,
+      updatedAt: Date.now(), // 🔥 force re-render
+    };
+
+    console.log("📍 setViewLocation:", newLocation, "mode:", mode);
+
+    setLocationMode(mode);
+    setViewLocationState(newLocation);
+  };
+
+  /* ===============================
+     PERSIST VIEW LOCATION
+  =============================== */
+
+  useEffect(() => {
+    if (viewLocation) {
+      localStorage.setItem("viewLocation", JSON.stringify(viewLocation));
+    }
+  }, [viewLocation]);
+
+  /* ===============================
+     PARSE ADDRESS
   =============================== */
 
   const parseAddress = (components = []) => {
@@ -33,7 +71,7 @@ export function LocationProvider({ children }) {
   };
 
   /* ===============================
-     🌍 GOOGLE GEOCODER
+     GOOGLE GEOCODER
   =============================== */
 
   const reverseGeocodeGoogle = async (lat, lng) => {
@@ -64,7 +102,7 @@ export function LocationProvider({ children }) {
   };
 
   /* ===============================
-     🌍 OSM FALLBACK
+     OSM FALLBACK
   =============================== */
 
   const reverseGeocodeOSM = async (lat, lng) => {
@@ -94,7 +132,7 @@ export function LocationProvider({ children }) {
   };
 
   /* ===============================
-     🎯 SPECIFICITY
+     SPECIFICITY
   =============================== */
 
   const specificityScore = (loc) => {
@@ -109,7 +147,7 @@ export function LocationProvider({ children }) {
   };
 
   /* ===============================
-     🔥 HYBRID GEOCODER
+     HYBRID GEOCODER
   =============================== */
 
   const reverseGeocode = async (lat, lng) => {
@@ -131,7 +169,7 @@ export function LocationProvider({ children }) {
   };
 
   /* ===============================
-     📏 SCORING
+     SCORING
   =============================== */
 
   const inferHomeAccuracy = (loc) => {
@@ -170,7 +208,7 @@ export function LocationProvider({ children }) {
   };
 
   /* ===============================
-     📍 INIT
+     INIT
   =============================== */
 
   useEffect(() => {
@@ -185,6 +223,7 @@ export function LocationProvider({ children }) {
       }
 
       let ip = null;
+
       try {
         const res = await fetch("https://ipapi.co/json/");
         const data = await res.json();
@@ -203,15 +242,17 @@ export function LocationProvider({ children }) {
         setIpLocation(ip);
       } catch {}
 
-      const best = resolveBestLocation({ home, live: null, ip });
-      setViewLocation(best);
+      if (locationMode !== "manual") {
+        const best = resolveBestLocation({ home, live: null, ip });
+        setViewLocation(best, "auto");
+      }
     };
 
     init();
   }, []);
 
   /* ===============================
-     📡 LIVE GPS (UNCHANGED)
+     LIVE LOCATION
   =============================== */
 
   const enableLiveLocation = () => {
@@ -238,13 +279,15 @@ export function LocationProvider({ children }) {
 
           setLiveLocation(loc);
 
-          const best = resolveBestLocation({
-            home: homeLocation,
-            live: loc,
-            ip: ipLocation,
-          });
+          if (locationMode !== "manual") {
+            const best = resolveBestLocation({
+              home: homeLocation,
+              live: loc,
+              ip: ipLocation,
+            });
 
-          setViewLocation(best);
+            setViewLocation(best, "auto");
+          }
         }
       },
       (err) => console.warn(err),
@@ -257,7 +300,7 @@ export function LocationProvider({ children }) {
   };
 
   /* ===============================
-     🏠 NEW: HOME GPS (KEY FEATURE)
+     HOME LOCATION (GPS)
   =============================== */
 
   const enableHomeLocation = () => {
@@ -283,7 +326,7 @@ export function LocationProvider({ children }) {
           };
 
           setHomeLocation(loc);
-          setViewLocation(loc);
+          setViewLocation(loc, "auto");
 
           localStorage.setItem("homeLocation", JSON.stringify(loc));
 
@@ -310,9 +353,9 @@ export function LocationProvider({ children }) {
         liveLocation,
         ipLocation,
         viewLocation,
-        enableLiveLocation,
-        enableHomeLocation, // 🔥 NEW
         setViewLocation,
+        enableLiveLocation,
+        enableHomeLocation,
       }}
     >
       {children}
