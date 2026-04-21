@@ -1,10 +1,15 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useMemo,
+} from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./CommunityPlusHeader.css";
 
 import { useLocationContext } from "../../../context/LocationContext";
 import { useAuth } from "../../../context/AuthContext";
-import LocationPin from "../../UI/LocationPin";
+import LocationPin from "../../components/UI/LocationPin";
 
 export default function CommunityPlusHeader({ user, onLogout }) {
   const navigate = useNavigate();
@@ -18,10 +23,10 @@ export default function CommunityPlusHeader({ user, onLogout }) {
 
   const { appUser } = useAuth();
 
-  const [manualLocation, setManualLocation] = useState("");
   const [showMenu, setShowMenu] = useState(false);
   const [resolving, setResolving] = useState(false);
 
+  const inputRef = useRef(null);
   const menuRef = useRef(null);
 
   const effectiveUser = appUser?.user || appUser || user;
@@ -54,7 +59,10 @@ export default function CommunityPlusHeader({ user, onLogout }) {
       return parts[0].slice(0, 2).toUpperCase();
     }
 
-    return ((parts[0][0] || "") + (parts[1]?.[0] || "")).toUpperCase();
+    return (
+      (parts[0][0] || "") +
+      (parts[1]?.[0] || "")
+    ).toUpperCase();
   }, [username]);
 
   /* ===============================
@@ -67,20 +75,43 @@ export default function CommunityPlusHeader({ user, onLogout }) {
     !!viewLocation?.label;
 
   /* ===============================
-     SYNC INPUT FROM CONTEXT
+     GOOGLE AUTOCOMPLETE
   =============================== */
 
   useEffect(() => {
-    if (!viewLocation) return;
+    if (!window.google || !window.google.maps || !inputRef.current) return;
 
-    const label =
-      viewLocation.label ||
-      viewLocation.suburb ||
-      viewLocation.city ||
-      "";
+    const autocomplete =
+      new window.google.maps.places.Autocomplete(inputRef.current, {
+        types: ["(regions)"], // suburbs, cities
+        componentRestrictions: { country: "au" },
+      });
 
-    setManualLocation(label);
-  }, [viewLocation?.updatedAt]);
+    autocomplete.addListener("place_changed", () => {
+      const place = autocomplete.getPlace();
+
+      if (!place.geometry) return;
+
+      const getComponent = (type) =>
+        place.address_components?.find((c) =>
+          c.types.includes(type)
+        );
+
+      const newLocation = {
+        label: place.formatted_address,
+        lat: place.geometry.location.lat(),
+        lng: place.geometry.location.lng(),
+        suburb: getComponent("locality")?.long_name,
+        state: getComponent("administrative_area_level_1")?.short_name,
+        postcode: getComponent("postal_code")?.long_name,
+        type: "manual",
+      };
+
+      console.log("📍 Autocomplete selected:", newLocation);
+
+      setViewLocation(newLocation, "manual");
+    });
+  }, []);
 
   /* ===============================
      RESOLVE LOCATION (PIN CLICK)
@@ -96,24 +127,6 @@ export default function CommunityPlusHeader({ user, onLogout }) {
     } finally {
       setResolving(false);
     }
-  };
-
-  /* ===============================
-     MANUAL LOCATION COMMIT
-  =============================== */
-
-  const handleCommit = () => {
-    const value = manualLocation.trim();
-    if (!value) return;
-
-    const newLocation = {
-      label: value,
-      suburb: value,
-      city: value,
-      type: "manual",
-    };
-
-    setViewLocation(newLocation, "manual");
   };
 
   /* ===============================
@@ -142,7 +155,8 @@ export default function CommunityPlusHeader({ user, onLogout }) {
     }
   };
 
-  const isActive = (path) => routeLocation.pathname === path;
+  const isActive = (path) =>
+    routeLocation.pathname === path;
 
   /* ===============================
      RENDER
@@ -150,10 +164,8 @@ export default function CommunityPlusHeader({ user, onLogout }) {
 
   return (
     <header className="header">
-
       {/* TOP ROW */}
       <div className="header-row">
-
         {/* LEFT */}
         <div className="logo-container">
           <img
@@ -164,7 +176,6 @@ export default function CommunityPlusHeader({ user, onLogout }) {
           />
 
           <div className="location-display">
-
             <LocationPin
               resolved={hasLocation}
               loading={resolving}
@@ -177,19 +188,10 @@ export default function CommunityPlusHeader({ user, onLogout }) {
             />
 
             <input
+              ref={inputRef}
               className="location-input"
-              value={manualLocation}
-              placeholder="Enter location"
-              onChange={(e) => setManualLocation(e.target.value)}
-              onBlur={handleCommit}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  handleCommit();
-                  e.target.blur();
-                }
-              }}
+              placeholder="Enter suburb or city"
             />
-
           </div>
         </div>
 
@@ -207,7 +209,6 @@ export default function CommunityPlusHeader({ user, onLogout }) {
         <div className="header-right" ref={menuRef}>
           {effectiveUser && (
             <div className="user-block">
-
               <span className="username">{username}</span>
 
               <div
@@ -234,21 +235,41 @@ export default function CommunityPlusHeader({ user, onLogout }) {
                   </div>
                 </div>
               )}
-
             </div>
           )}
         </div>
-
       </div>
 
-      {/* NAV (MINIMAL — YOU CAN REMOVE LATER) */}
+      {/* NAV */}
       <nav className="links">
-        <button onClick={() => go("/home")} className={isActive("/home") ? "active" : ""}>Home</button>
-        <button onClick={() => go("/post")} className={isActive("/post") ? "active" : ""}>Post</button>
-        <button onClick={() => go("/event")} className={isActive("/event") ? "active" : ""}>Event</button>
-        <button onClick={() => go("/incident")} className={isActive("/incident") ? "active" : ""}>Incident</button>
-      </nav>
+        <button
+          onClick={() => go("/home")}
+          className={isActive("/home") ? "active" : ""}
+        >
+          Home
+        </button>
 
+        <button
+          onClick={() => go("/post")}
+          className={isActive("/post") ? "active" : ""}
+        >
+          Post
+        </button>
+
+        <button
+          onClick={() => go("/event")}
+          className={isActive("/event") ? "active" : ""}
+        >
+          Event
+        </button>
+
+        <button
+          onClick={() => go("/incident")}
+          className={isActive("/incident") ? "active" : ""}
+        >
+          Incident
+        </button>
+      </nav>
     </header>
   );
 }
