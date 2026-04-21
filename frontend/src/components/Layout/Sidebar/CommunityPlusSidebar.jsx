@@ -26,19 +26,30 @@ export default function CommunityPlusSidebar() {
 
   return (
     <aside className="sidebar">
+
+      {/* ===============================
+          CORE MODES
+      =============================== */}
+
       <div
-        className={`sidebar-item ${isActive("/home") ? "active" : ""}`}
-        onClick={() => go("/home")}
+        className={`sidebar-item ${isActive("/now") ? "active" : ""}`}
+        onClick={() => go("/now")}
       >
-        🏠 Home
+        ⚡ Now
       </div>
 
       <div
-        className={`sidebar-item ${isActive("/post") ? "active" : ""}`}
-        onClick={() => go("/post")}
+        className={`sidebar-item ${isActive("/blob") ? "active" : ""}`}
+        onClick={() => go("/blob")}
       >
-        ➕ Now
+        🧠 Blob
       </div>
+
+      <hr className="sidebar-divider" />
+
+      {/* ===============================
+          ACTIONS
+      =============================== */}
 
       <div
         className={`sidebar-item ${isActive("/event") ? "active" : ""}`}
@@ -63,18 +74,14 @@ export default function CommunityPlusSidebar() {
 
       <hr className="sidebar-divider" />
 
-      <div
-        className={`sidebar-item ${isActive("/yellowpages") ? "active" : ""}`}
-        onClick={() => go("/yellowpages")}
-      >
-        📒 Yellow Pages
-      </div>
-
-      <hr className="sidebar-divider" />
+      {/* ===============================
+          SESSION
+      =============================== */}
 
       <div className="sidebar-item logout" onClick={handleLogout}>
         🚪 Logout
       </div>
+
     </aside>
   );
 }
