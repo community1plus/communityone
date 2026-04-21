@@ -1,0 +1,37 @@
+.location-pin {
+  cursor: pointer;
+  margin-right: 6px;
+
+  font-size: 14px;
+  opacity: 0.9;
+
+  transition: all 0.15s ease;
+}
+
+/* resolved (green, subtle) */
+.location-pin.resolved {
+  color: #2ecc71;
+}
+
+/* unresolved (red, understated) */
+.location-pin.unresolved {
+  color: #e74c3c;
+  opacity: 0.8;
+}
+
+/* hover = slight emphasis */
+.location-pin:hover {
+  transform: scale(1.1);
+  opacity: 1;
+}
+
+/* loading pulse */
+.location-pin.loading {
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.4; }
+  50% { opacity: 1; }
+  100% { opacity: 0.4; }
+}

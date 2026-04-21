@@ -4,16 +4,23 @@ import "./CommunityPlusHeader.css";
 
 import { useLocationContext } from "../../../context/LocationContext";
 import { useAuth } from "../../../context/AuthContext";
+import LocationPin from "../../components/UI/LocationPin"; // adjust path if needed
 
 export default function CommunityPlusHeader({ user, onLogout }) {
   const navigate = useNavigate();
   const routeLocation = useLocation();
 
-  const { viewLocation, setViewLocation } = useLocationContext();
+  const {
+    viewLocation,
+    setViewLocation,
+    enableLiveLocation,
+  } = useLocationContext();
+
   const { appUser } = useAuth();
 
   const [manualLocation, setManualLocation] = useState("");
   const [showMenu, setShowMenu] = useState(false);
+  const [resolving, setResolving] = useState(false);
 
   const menuRef = useRef(null);
 
@@ -33,7 +40,6 @@ export default function CommunityPlusHeader({ user, onLogout }) {
       "";
 
     if (email.includes("@")) return email.split("@")[0];
-
     if (effectiveUser?.username) return effectiveUser.username;
 
     return "Member";
@@ -52,37 +58,16 @@ export default function CommunityPlusHeader({ user, onLogout }) {
   }, [username]);
 
   /* ===============================
-     LOCATION HELPERS
+     LOCATION STATE
   =============================== */
 
-  const formatLocationLabel = (loc) => {
-    if (!loc) return "";
-
-    const stateMap = {
-      Victoria: "VIC",
-      "New South Wales": "NSW",
-      Queensland: "QLD",
-      "South Australia": "SA",
-      Tasmania: "TAS",
-      "Western Australia": "WA",
-      "Northern Territory": "NT",
-      ACT: "ACT",
-    };
-
-    const stateShort = stateMap[loc.state] || loc.state;
-
-    return `${loc.suburb || loc.city || loc.label || ""}${
-      stateShort ? `, ${stateShort}` : ""
-    }${loc.postcode ? ` ${loc.postcode}` : ""}`.trim();
-  };
-
-  const isExactLocation = useMemo(() => {
-    const acc = viewLocation?.accuracy;
-    return typeof acc === "number" && acc <= 50;
-  }, [viewLocation]);
+  const hasLocation =
+    !!viewLocation?.lat ||
+    !!viewLocation?.suburb ||
+    !!viewLocation?.label;
 
   /* ===============================
-     SYNC INPUT FROM CONTEXT
+     SYNC INPUT
   =============================== */
 
   useEffect(() => {
@@ -90,21 +75,34 @@ export default function CommunityPlusHeader({ user, onLogout }) {
 
     const label =
       viewLocation.label ||
-      formatLocationLabel(viewLocation) ||
+      viewLocation.suburb ||
+      viewLocation.city ||
       "";
 
     setManualLocation(label);
-
-    console.log("📍 Header viewLocation:", viewLocation);
   }, [viewLocation?.updatedAt]);
 
   /* ===============================
-     COMMIT LOCATION (FIXED)
+     RESOLVE LOCATION
+  =============================== */
+
+  const handleResolveLocation = async () => {
+    setResolving(true);
+
+    try {
+      await enableLiveLocation();
+    } catch (err) {
+      console.error("Location resolve failed:", err);
+    } finally {
+      setResolving(false);
+    }
+  };
+
+  /* ===============================
+     MANUAL COMMIT
   =============================== */
 
   const handleCommit = () => {
-    if (isExactLocation) return;
-
     const value = manualLocation.trim();
     if (!value) return;
 
@@ -112,11 +110,6 @@ export default function CommunityPlusHeader({ user, onLogout }) {
       label: value,
       suburb: value,
       city: value,
-      state: null,
-      postcode: null,
-      lat: null,
-      lng: null,
-      accuracy: null,
       type: "manual",
     };
 
@@ -173,14 +166,21 @@ export default function CommunityPlusHeader({ user, onLogout }) {
 
           {/* LOCATION */}
           <div className="location-display">
-            <span className={`location-pin ${isExactLocation ? "exact" : ""}`}>
-              📍
-            </span>
+
+            <LocationPin
+              resolved={hasLocation}
+              loading={resolving}
+              onClick={handleResolveLocation}
+              title={
+                hasLocation
+                  ? "Location detected (click to refresh)"
+                  : "Click to detect location"
+              }
+            />
 
             <input
-              className={`location-input ${isExactLocation ? "locked" : ""}`}
+              className="location-input"
               value={manualLocation}
-              readOnly={isExactLocation}
               placeholder="Enter location"
               onChange={(e) => setManualLocation(e.target.value)}
               onBlur={handleCommit}
@@ -191,8 +191,8 @@ export default function CommunityPlusHeader({ user, onLogout }) {
                 }
               }}
             />
-          </div>
 
+          </div>
         </div>
 
         {/* CENTER */}
@@ -204,13 +204,10 @@ export default function CommunityPlusHeader({ user, onLogout }) {
 
         {/* RIGHT */}
         <div className="header-right" ref={menuRef}>
-
           {effectiveUser && (
             <div className="user-block">
 
-              <span className="username">
-                {username}
-              </span>
+              <span className="username">{username}</span>
 
               <div
                 className="avatar"
@@ -239,24 +236,17 @@ export default function CommunityPlusHeader({ user, onLogout }) {
 
             </div>
           )}
-
         </div>
 
       </div>
 
       {/* NAV */}
       <nav className="links">
-
         <button onClick={() => go("/home")} className={isActive("/home") ? "active" : ""}>Home</button>
         <button onClick={() => go("/post")} className={isActive("/post") ? "active" : ""}>Post</button>
         <button onClick={() => go("/event")} className={isActive("/event") ? "active" : ""}>Event</button>
         <button onClick={() => go("/incident")} className={isActive("/incident") ? "active" : ""}>Incident</button>
         <button onClick={() => go("/search")} className={isActive("/search") ? "active" : ""}>Search</button>
-        <button onClick={() => go("/communityplus")} className={isActive("/communityplus") ? "active" : ""}>Community+</button>
-        <button onClick={() => go("/yellowpages")} className={isActive("/yellowpages") ? "active" : ""}>Yellow Pages</button>
-        <button onClick={() => go("/about")} className={isActive("/about") ? "active" : ""}>About</button>
-        <button onClick={() => go("/merch")} className={isActive("/merch") ? "active" : ""}>Merch</button>
-
       </nav>
 
     </header>
