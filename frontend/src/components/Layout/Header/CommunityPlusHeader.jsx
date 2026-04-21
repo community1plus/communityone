@@ -1,254 +1,195 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import "./CommunityPlusHeader.css";
+import React, { createContext, useContext, useEffect, useState } from "react";
 
-import { useLocationContext } from "../../../context/LocationContext";
-import { useAuth } from "../../../context/AuthContext";
-import LocationPin from "../../UI/LocationPin";
+const LocationContext = createContext();
+export const useLocationContext = () => useContext(LocationContext);
 
-export default function CommunityPlusHeader({ user, onLogout }) {
-  const navigate = useNavigate();
-  const routeLocation = useLocation();
-
-  const {
-    viewLocation,
-    setViewLocation,
-    enableLiveLocation,
-  } = useLocationContext();
-
-  const { appUser } = useAuth();
-
-  const [manualLocation, setManualLocation] = useState("");
-  const [showMenu, setShowMenu] = useState(false);
-  const [resolving, setResolving] = useState(false);
-
-  const menuRef = useRef(null);
-
-  const effectiveUser = appUser?.user || appUser || user;
-
+export function LocationProvider({ children }) {
   /* ===============================
-     USERNAME / INITIALS
+     STATE
   =============================== */
 
-  const username = useMemo(() => {
-    if (!effectiveUser) return "Member";
+  const [homeLocation, setHomeLocation] = useState(null);
+  const [liveLocation, setLiveLocation] = useState(null);
+  const [ipLocation, setIpLocation] = useState(null);
 
-    const email =
-      effectiveUser?.email ||
-      effectiveUser?.attributes?.email ||
-      effectiveUser?.signInDetails?.loginId ||
-      "";
+  const [viewLocation, setViewLocationState] = useState(() => {
+    const saved = localStorage.getItem("viewLocation");
+    return saved ? JSON.parse(saved) : null;
+  });
 
-    if (email.includes("@")) return email.split("@")[0];
-    if (effectiveUser?.username) return effectiveUser.username;
-
-    return "Member";
-  }, [effectiveUser]);
-
-  const initials = useMemo(() => {
-    if (!username) return "ME";
-
-    const parts = username.split(/[\s._-]+/).filter(Boolean);
-
-    if (parts.length === 1) {
-      return parts[0].slice(0, 2).toUpperCase();
-    }
-
-    return ((parts[0][0] || "") + (parts[1]?.[0] || "")).toUpperCase();
-  }, [username]);
+  const [manualLocation, setManualLocation] = useState(null);
+  const [locationMode, setLocationMode] = useState("auto"); // "auto" | "manual"
 
   /* ===============================
-     LOCATION STATE
+     SAFE SETTER
   =============================== */
 
-  const hasLocation =
-    !!viewLocation?.lat ||
-    !!viewLocation?.suburb ||
-    !!viewLocation?.label;
+  const setViewLocation = (loc, mode = "manual") => {
+    if (!loc) return;
 
-  /* ===============================
-     SYNC INPUT
-  =============================== */
-
-  useEffect(() => {
-    if (!viewLocation) return;
-
-    const label =
-      viewLocation.label ||
-      viewLocation.suburb ||
-      viewLocation.city ||
-      "";
-
-    setManualLocation(label);
-  }, [viewLocation?.updatedAt]);
-
-  /* ===============================
-     RESOLVE LOCATION
-  =============================== */
-
-  const handleResolveLocation = async () => {
-    setResolving(true);
-
-    try {
-      await enableLiveLocation();
-    } catch (err) {
-      console.error("Location resolve failed:", err);
-    } finally {
-      setResolving(false);
-    }
-  };
-
-  /* ===============================
-     MANUAL COMMIT
-  =============================== */
-
-  const handleCommit = () => {
-    const value = manualLocation.trim();
-    if (!value) return;
-
-    const newLocation = {
-      label: value,
-      suburb: value,
-      city: value,
-      type: "manual",
+    const newLoc = {
+      ...loc,
+      updatedAt: Date.now(),
     };
 
-    setViewLocation(newLocation, "manual");
+    console.log("📍 setViewLocation:", newLoc, "mode:", mode);
+
+    if (mode === "manual") {
+      setManualLocation(newLoc);
+      setLocationMode("manual");
+    }
+
+    setViewLocationState(newLoc);
   };
 
   /* ===============================
-     MENU OUTSIDE CLICK
+     PERSIST
   =============================== */
 
   useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (menuRef.current && !menuRef.current.contains(e.target)) {
-        setShowMenu(false);
+    if (viewLocation) {
+      localStorage.setItem("viewLocation", JSON.stringify(viewLocation));
+    }
+  }, [viewLocation]);
+
+  /* ===============================
+     INIT (CLEAN + CONTROLLED)
+  =============================== */
+
+  useEffect(() => {
+    const init = async () => {
+      let home = null;
+
+      // 1. Load HOME first (primary fallback)
+      const savedHome = localStorage.getItem("homeLocation");
+      if (savedHome) {
+        home = JSON.parse(savedHome);
+        setHomeLocation(home);
+      }
+
+      // 2. ONLY set viewLocation if home exists
+      if (locationMode !== "manual" && home) {
+        setViewLocation(home, "auto");
+      }
+
+      // 3. Fetch IP quietly (DO NOT activate)
+      try {
+        const res = await fetch("https://ipapi.co/json/");
+        const data = await res.json();
+
+        const ip = {
+          lat: data.latitude,
+          lng: data.longitude,
+          city: data.city,
+          state: data.region_code,
+          label: `${data.city}, ${data.region_code}`,
+          type: "ip",
+        };
+
+        setIpLocation(ip);
+      } catch {
+        console.warn("IP location failed");
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
+    init();
   }, []);
 
   /* ===============================
-     NAV HELPERS
+     LIVE LOCATION (PIN CLICK ONLY)
   =============================== */
 
-  const go = (path) => {
-    if (routeLocation.pathname !== path) {
-      navigate(path);
-    }
+  const enableLiveLocation = async () => {
+    if (!navigator.geolocation) return;
+
+    return new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const loc = {
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+            accuracy: pos.coords.accuracy,
+            label: "Current location",
+            type: "live",
+          };
+
+          console.log("📍 Live location:", loc);
+
+          setLiveLocation(loc);
+
+          if (locationMode !== "manual") {
+            setViewLocation(loc, "auto");
+          }
+
+          resolve(loc);
+        },
+        (err) => {
+          console.error("Geolocation error:", err);
+
+          // 🔥 OPTIONAL: fallback to IP ONLY after failure
+          if (ipLocation && locationMode !== "manual") {
+            console.log("⚠️ Falling back to IP");
+
+            setViewLocation(ipLocation, "auto");
+            resolve(ipLocation);
+          } else {
+            reject(err);
+          }
+        },
+        { enableHighAccuracy: true }
+      );
+    });
   };
 
-  const isActive = (path) => routeLocation.pathname === path;
+  /* ===============================
+     SET HOME LOCATION (OPTIONAL)
+  =============================== */
+
+  const enableHomeLocation = async () => {
+    if (!navigator.geolocation) return;
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const loc = {
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+          label: "Home",
+          type: "home",
+        };
+
+        console.log("🏠 Home set:", loc);
+
+        setHomeLocation(loc);
+        localStorage.setItem("homeLocation", JSON.stringify(loc));
+
+        if (locationMode !== "manual") {
+          setViewLocation(loc, "auto");
+        }
+      },
+      (err) => console.error(err),
+      { enableHighAccuracy: true }
+    );
+  };
 
   /* ===============================
-     RENDER
+     EXPORT
   =============================== */
 
   return (
-    <header className="header">
+    <LocationContext.Provider
+      value={{
+        viewLocation,
+        setViewLocation,
 
-      {/* TOP ROW */}
-      <div className="header-row">
+        homeLocation,
+        liveLocation,
+        ipLocation,
 
-        {/* LEFT */}
-        <div className="logo-container">
-
-          <img
-            src="/logo/logo.png"
-            alt="Community One"
-            className="logo"
-            onClick={() => go("/home")}
-          />
-
-          {/* LOCATION */}
-          <div className="location-display">
-
-            <LocationPin
-              resolved={hasLocation}
-              loading={resolving}
-              onClick={handleResolveLocation}
-              title={
-                hasLocation
-                  ? "Location detected (click to refresh)"
-                  : "Click to detect location"
-              }
-            />
-
-            <input
-              className="location-input"
-              value={manualLocation}
-              placeholder="Enter location"
-              onChange={(e) => setManualLocation(e.target.value)}
-              onBlur={handleCommit}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  handleCommit();
-                  e.target.blur();
-                }
-              }}
-            />
-
-          </div>
-        </div>
-
-        {/* CENTER */}
-        <div className="header-center">
-          <div className="search-wrapper">
-            <input className="search-input" placeholder="Search" />
-          </div>
-        </div>
-
-        {/* RIGHT */}
-        <div className="header-right" ref={menuRef}>
-          {effectiveUser && (
-            <div className="user-block">
-
-              <span className="username">{username}</span>
-
-              <div
-                className="avatar"
-                onClick={() => setShowMenu(!showMenu)}
-              >
-                {initials}
-              </div>
-
-              {showMenu && (
-                <div className="dropdown-menu">
-                  <div
-                    className="menu-item"
-                    onClick={() => go("/profile")}
-                  >
-                    Profile
-                  </div>
-
-                  <div
-                    className="menu-item"
-                    onClick={() => onLogout?.()}
-                  >
-                    Logout
-                  </div>
-                </div>
-              )}
-
-            </div>
-          )}
-        </div>
-
-      </div>
-
-      {/* NAV */}
-      <nav className="links">
-        <button onClick={() => go("/home")} className={isActive("/home") ? "active" : ""}>Home</button>
-        <button onClick={() => go("/post")} className={isActive("/post") ? "active" : ""}>Post</button>
-        <button onClick={() => go("/event")} className={isActive("/event") ? "active" : ""}>Event</button>
-        <button onClick={() => go("/incident")} className={isActive("/incident") ? "active" : ""}>Incident</button>
-        <button onClick={() => go("/search")} className={isActive("/search") ? "active" : ""}>Search</button>
-      </nav>
-
-    </header>
+        enableLiveLocation,
+        enableHomeLocation,
+      }}
+    >
+      {children}
+    </LocationContext.Provider>
   );
 }
