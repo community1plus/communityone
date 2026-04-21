@@ -1,364 +1,259 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import "./CommunityPlusHeader.css";
 
-const LocationContext = createContext();
-export const useLocationContext = () => useContext(LocationContext);
+import { useLocationContext } from "../../../context/LocationContext";
+import { useAuth } from "../../../context/AuthContext";
 
-export function LocationProvider({ children }) {
+export default function CommunityPlusHeader({ user, onLogout }) {
+  const navigate = useNavigate();
+  const routeLocation = useLocation();
+
+  const {
+    viewLocation,
+    setViewLocation,
+    enableLiveLocation,
+  } = useLocationContext();
+
+  const { appUser } = useAuth();
+
+  const [manualLocation, setManualLocation] = useState("");
+  const [showMenu, setShowMenu] = useState(false);
+  const [resolving, setResolving] = useState(false);
+
+  const menuRef = useRef(null);
+
+  const effectiveUser = appUser?.user || appUser || user;
+
   /* ===============================
-     STATE
+     USERNAME / INITIALS
   =============================== */
 
-  const [homeLocation, setHomeLocation] = useState(null);
-  const [liveLocation, setLiveLocation] = useState(null);
-  const [ipLocation, setIpLocation] = useState(null);
+  const username = useMemo(() => {
+    if (!effectiveUser) return "Member";
 
-  const [viewLocation, setViewLocationState] = useState(() => {
-    const saved = localStorage.getItem("viewLocation");
-    return saved ? JSON.parse(saved) : null;
-  });
+    const email =
+      effectiveUser?.email ||
+      effectiveUser?.attributes?.email ||
+      effectiveUser?.signInDetails?.loginId ||
+      "";
 
-  const [locationMode, setLocationMode] = useState("auto"); // "auto" | "manual"
+    if (email.includes("@")) return email.split("@")[0];
+    if (effectiveUser?.username) return effectiveUser.username;
 
-  const GOOGLE_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+    return "Member";
+  }, [effectiveUser]);
+
+  const initials = useMemo(() => {
+    if (!username) return "ME";
+
+    const parts = username.split(/[\s._-]+/).filter(Boolean);
+
+    if (parts.length === 1) {
+      return parts[0].slice(0, 2).toUpperCase();
+    }
+
+    return ((parts[0][0] || "") + (parts[1]?.[0] || "")).toUpperCase();
+  }, [username]);
 
   /* ===============================
-     SAFE SET VIEW LOCATION
+     LOCATION STATE
   =============================== */
 
-  const setViewLocation = (loc, mode = "manual") => {
-    if (!loc) return;
+  const hasLocation =
+    !!viewLocation?.lat ||
+    !!viewLocation?.suburb ||
+    !!viewLocation?.label;
+
+  /* ===============================
+     SYNC INPUT
+  =============================== */
+
+  useEffect(() => {
+    if (!viewLocation) return;
+
+    const label =
+      viewLocation.label ||
+      viewLocation.suburb ||
+      viewLocation.city ||
+      "";
+
+    setManualLocation(label);
+
+    console.log("📍 Header location:", viewLocation);
+  }, [viewLocation?.updatedAt]);
+
+  /* ===============================
+     RESOLVE LOCATION (PIN CLICK)
+  =============================== */
+
+  const handleResolveLocation = async () => {
+    console.log("📍 Resolving location...");
+
+    setResolving(true);
+
+    try {
+      await enableLiveLocation();
+    } catch (err) {
+      console.error("Location resolve failed:", err);
+    } finally {
+      setResolving(false);
+    }
+  };
+
+  /* ===============================
+     MANUAL COMMIT
+  =============================== */
+
+  const handleCommit = () => {
+    const value = manualLocation.trim();
+    if (!value) return;
 
     const newLocation = {
-      ...loc,
-      updatedAt: Date.now(), // 🔥 force re-render
+      label: value,
+      suburb: value,
+      city: value,
+      type: "manual",
     };
 
-    console.log("📍 setViewLocation:", newLocation, "mode:", mode);
-
-    setLocationMode(mode);
-    setViewLocationState(newLocation);
+    setViewLocation(newLocation, "manual");
   };
 
   /* ===============================
-     PERSIST VIEW LOCATION
+     MENU OUTSIDE CLICK
   =============================== */
 
   useEffect(() => {
-    if (viewLocation) {
-      localStorage.setItem("viewLocation", JSON.stringify(viewLocation));
-    }
-  }, [viewLocation]);
-
-  /* ===============================
-     PARSE ADDRESS
-  =============================== */
-
-  const parseAddress = (components = []) => {
-    const get = (type) =>
-      components.find((c) => c.types.includes(type));
-
-    return {
-      country: get("country")?.long_name,
-      state: get("administrative_area_level_1")?.short_name,
-      city: get("locality")?.long_name,
-      suburb:
-        get("sublocality_level_1")?.long_name ||
-        get("locality")?.long_name,
-      postcode: get("postal_code")?.long_name,
-      street: get("route")?.long_name,
-      streetNumber: get("street_number")?.long_name,
-    };
-  };
-
-  /* ===============================
-     GOOGLE GEOCODER
-  =============================== */
-
-  const reverseGeocodeGoogle = async (lat, lng) => {
-    try {
-      const res = await fetch(
-        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${GOOGLE_KEY}`
-      );
-
-      const data = await res.json();
-      const results = data.results || [];
-
-      const best =
-        results.find(
-          (r) =>
-            r.types.includes("street_address") &&
-            r.geometry?.location_type === "ROOFTOP"
-        ) ||
-        results.find((r) => r.types.includes("street_address")) ||
-        results.find((r) => r.types.includes("route")) ||
-        results[0];
-
-      const parsed = parseAddress(best?.address_components || []);
-
-      return { ...parsed, lat, lng, source: "google" };
-    } catch {
-      return null;
-    }
-  };
-
-  /* ===============================
-     OSM FALLBACK
-  =============================== */
-
-  const reverseGeocodeOSM = async (lat, lng) => {
-    try {
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
-      );
-
-      const data = await res.json();
-      const a = data.address || {};
-
-      return {
-        country: a.country,
-        state: a.state,
-        city: a.city || a.town,
-        suburb: a.suburb,
-        postcode: a.postcode,
-        street: a.road,
-        streetNumber: a.house_number,
-        lat,
-        lng,
-        source: "osm",
-      };
-    } catch {
-      return null;
-    }
-  };
-
-  /* ===============================
-     SPECIFICITY
-  =============================== */
-
-  const specificityScore = (loc) => {
-    if (!loc) return 0;
-    if (loc.streetNumber && loc.street) return 100;
-    if (loc.street) return 90;
-    if (loc.suburb || loc.postcode) return 80;
-    if (loc.city) return 60;
-    if (loc.state) return 40;
-    if (loc.country) return 20;
-    return 0;
-  };
-
-  /* ===============================
-     HYBRID GEOCODER
-  =============================== */
-
-  const reverseGeocode = async (lat, lng) => {
-    let g = await reverseGeocodeGoogle(lat, lng);
-
-    if (specificityScore(g) < 90) {
-      const osm = await reverseGeocodeOSM(lat, lng);
-      if (osm) g = { ...g, ...osm, source: "hybrid" };
-    }
-
-    const label = [g?.suburb, g?.state, g?.postcode]
-      .filter(Boolean)
-      .join(", ");
-
-    return {
-      ...g,
-      label: label || "Near you",
-    };
-  };
-
-  /* ===============================
-     SCORING
-  =============================== */
-
-  const inferHomeAccuracy = (loc) => {
-    if (loc.streetNumber) return 50;
-    if (loc.street) return 150;
-    if (loc.suburb) return 1000;
-    if (loc.city) return 5000;
-    return 10000;
-  };
-
-  const scoreLocation = (loc) => {
-    if (!loc) return 0;
-
-    const spec = specificityScore(loc);
-
-    const accScore =
-      loc.accuracy < 50 ? 50 :
-      loc.accuracy < 200 ? 40 :
-      loc.accuracy < 1000 ? 30 :
-      loc.accuracy < 5000 ? 20 :
-      10;
-
-    return spec + accScore;
-  };
-
-  const resolveBestLocation = ({ home, live, ip }) => {
-    const candidates = [live, home, ip].filter(Boolean);
-
-    candidates.sort((a, b) => scoreLocation(b) - scoreLocation(a));
-
-    const best = candidates[0];
-
-    console.log("📊 LOCATION RESOLUTION:", best);
-
-    return best;
-  };
-
-  /* ===============================
-     INIT
-  =============================== */
-
-  useEffect(() => {
-    const init = async () => {
-      let home = null;
-
-      const saved = localStorage.getItem("homeLocation");
-      if (saved) {
-        home = JSON.parse(saved);
-        home.accuracy = inferHomeAccuracy(home);
-        setHomeLocation(home);
-      }
-
-      let ip = null;
-
-      try {
-        const res = await fetch("https://ipapi.co/json/");
-        const data = await res.json();
-
-        ip = {
-          lat: data.latitude,
-          lng: data.longitude,
-          city: data.city,
-          state: data.region_code,
-          country: data.country_name,
-          label: `${data.city}, ${data.region_code}`,
-          accuracy: 5000,
-          type: "ip",
-        };
-
-        setIpLocation(ip);
-      } catch {}
-
-      if (locationMode !== "manual") {
-        const best = resolveBestLocation({ home, live: null, ip });
-        setViewLocation(best, "auto");
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setShowMenu(false);
       }
     };
 
-    init();
+    document.addEventListener("mousedown", handleClickOutside);
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   /* ===============================
-     LIVE LOCATION
+     NAV HELPERS
   =============================== */
 
-  const enableLiveLocation = () => {
-    if (!navigator.geolocation) return;
-
-    let bestAccuracy = Infinity;
-
-    const watchId = navigator.geolocation.watchPosition(
-      async (pos) => {
-        const lat = pos.coords.latitude;
-        const lng = pos.coords.longitude;
-        const accuracy = pos.coords.accuracy;
-
-        if (accuracy < bestAccuracy) {
-          bestAccuracy = accuracy;
-
-          const geo = await reverseGeocode(lat, lng);
-
-          const loc = {
-            ...geo,
-            accuracy,
-            type: "live",
-          };
-
-          setLiveLocation(loc);
-
-          if (locationMode !== "manual") {
-            const best = resolveBestLocation({
-              home: homeLocation,
-              live: loc,
-              ip: ipLocation,
-            });
-
-            setViewLocation(best, "auto");
-          }
-        }
-      },
-      (err) => console.warn(err),
-      { enableHighAccuracy: true }
-    );
-
-    setTimeout(() => {
-      navigator.geolocation.clearWatch(watchId);
-    }, 10000);
+  const go = (path) => {
+    if (routeLocation.pathname !== path) {
+      navigate(path);
+    }
   };
 
-  /* ===============================
-     HOME LOCATION (GPS)
-  =============================== */
-
-  const enableHomeLocation = () => {
-    if (!navigator.geolocation) return;
-
-    let bestAccuracy = Infinity;
-
-    const watchId = navigator.geolocation.watchPosition(
-      async (pos) => {
-        const lat = pos.coords.latitude;
-        const lng = pos.coords.longitude;
-        const accuracy = pos.coords.accuracy;
-
-        if (accuracy < bestAccuracy) {
-          bestAccuracy = accuracy;
-
-          const geo = await reverseGeocode(lat, lng);
-
-          const loc = {
-            ...geo,
-            accuracy,
-            type: "home",
-          };
-
-          setHomeLocation(loc);
-          setViewLocation(loc, "auto");
-
-          localStorage.setItem("homeLocation", JSON.stringify(loc));
-
-          console.log("🏠 HOME SET:", loc);
-        }
-      },
-      (err) => console.warn(err),
-      { enableHighAccuracy: true }
-    );
-
-    setTimeout(() => {
-      navigator.geolocation.clearWatch(watchId);
-    }, 10000);
-  };
+  const isActive = (path) => routeLocation.pathname === path;
 
   /* ===============================
-     EXPORT
+     RENDER
   =============================== */
 
   return (
-    <LocationContext.Provider
-      value={{
-        homeLocation,
-        liveLocation,
-        ipLocation,
-        viewLocation,
-        setViewLocation,
-        enableLiveLocation,
-        enableHomeLocation,
-      }}
-    >
-      {children}
-    </LocationContext.Provider>
+    <header className="header">
+
+      <div className="header-row">
+
+        {/* LEFT */}
+        <div className="logo-container">
+          <img
+            src="/logo/logo.png"
+            alt="Community One"
+            className="logo"
+            onClick={() => go("/home")}
+          />
+
+          <div className="location-display">
+
+            {/* PIN */}
+            <span
+              className={`location-pin ${
+                hasLocation ? "resolved" : "unresolved"
+              } ${resolving ? "loading" : ""}`}
+              onClick={handleResolveLocation}
+              title={
+                hasLocation
+                  ? "Location detected (click to refresh)"
+                  : "Click to detect location"
+              }
+            >
+              {resolving ? "⏳" : "📍"}
+            </span>
+
+            {/* INPUT */}
+            <input
+              className="location-input"
+              value={manualLocation}
+              placeholder="Enter location"
+              onChange={(e) => setManualLocation(e.target.value)}
+              onBlur={handleCommit}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleCommit();
+                  e.target.blur();
+                }
+              }}
+            />
+
+          </div>
+        </div>
+
+        {/* CENTER */}
+        <div className="header-center">
+          <div className="search-wrapper">
+            <input className="search-input" placeholder="Search" />
+          </div>
+        </div>
+
+        {/* RIGHT */}
+        <div className="header-right" ref={menuRef}>
+          {effectiveUser && (
+            <div className="user-block">
+
+              <span className="username">{username}</span>
+
+              <div
+                className="avatar"
+                onClick={() => setShowMenu(!showMenu)}
+              >
+                {initials}
+              </div>
+
+              {showMenu && (
+                <div className="dropdown-menu">
+                  <div
+                    className="menu-item"
+                    onClick={() => go("/profile")}
+                  >
+                    Profile
+                  </div>
+
+                  <div
+                    className="menu-item"
+                    onClick={() => onLogout?.()}
+                  >
+                    Logout
+                  </div>
+                </div>
+              )}
+
+            </div>
+          )}
+        </div>
+
+      </div>
+
+      {/* NAV */}
+      <nav className="links">
+        <button onClick={() => go("/home")} className={isActive("/home") ? "active" : ""}>Home</button>
+        <button onClick={() => go("/post")} className={isActive("/post") ? "active" : ""}>Post</button>
+        <button onClick={() => go("/event")} className={isActive("/event") ? "active" : ""}>Event</button>
+        <button onClick={() => go("/incident")} className={isActive("/incident") ? "active" : ""}>Incident</button>
+        <button onClick={() => go("/search")} className={isActive("/search") ? "active" : ""}>Search</button>
+      </nav>
+
+    </header>
   );
 }
