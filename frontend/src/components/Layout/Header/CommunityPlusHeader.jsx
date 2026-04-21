@@ -4,7 +4,7 @@ import "./CommunityPlusHeader.css";
 
 import { useLocationContext } from "../../../context/LocationContext";
 import { useAuth } from "../../../context/AuthContext";
-import LocationPin from "../../components/UI/LocationPin"; // adjust path if needed
+import LocationPin from "../../UI/LocationPin";
 
 export default function CommunityPlusHeader({ user, onLogout }) {
   const navigate = useNavigate();
