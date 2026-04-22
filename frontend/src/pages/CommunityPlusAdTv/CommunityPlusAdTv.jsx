@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import "./AdTV.css";
+import "./CommunityPlusAdTv.css";
 
 export default function CommunityPlusAdTv({ ads = [], context = "feed" }) {
 
