@@ -71,19 +71,19 @@ export default function CommunityPlusHeader({ user, onLogout }) {
     !!viewLocation?.suburb ||
     !!viewLocation?.label;
 
+  const locationText =
+    viewLocation?.fullLabel ||
+    viewLocation?.label ||
+    "";
+
   /* ===============================
      SYNC INPUT DISPLAY
   =============================== */
 
   useEffect(() => {
     if (!inputRef.current) return;
-
-    if (viewLocation?.fullLabel) {
-      inputRef.current.value = viewLocation.fullLabel;
-    } else if (viewLocation?.label) {
-      inputRef.current.value = viewLocation.label;
-    }
-  }, [viewLocation?.updatedAt]);
+    inputRef.current.value = locationText;
+  }, [locationText]);
 
   /* ===============================
      GOOGLE AUTOCOMPLETE
@@ -206,7 +206,8 @@ export default function CommunityPlusHeader({ user, onLogout }) {
       <div className="header-row">
 
         {/* LEFT */}
-        <div className="logo-container">
+        <div className="header-left">
+
           <img
             src="/logo/logo.png"
             alt="Community One"
@@ -214,7 +215,9 @@ export default function CommunityPlusHeader({ user, onLogout }) {
             onClick={() => go("/home")}
           />
 
+          {/* 🔥 LOCATION (UPGRADED) */}
           <div className="location-display">
+
             <LocationPin
               resolved={hasLocation}
               loading={resolving}
@@ -224,9 +227,10 @@ export default function CommunityPlusHeader({ user, onLogout }) {
             <input
               ref={inputRef}
               className="location-input body"
-              placeholder="Enter address or suburb"
+              placeholder="Enter suburb or address"
               autoComplete="off"
             />
+
           </div>
         </div>
 
@@ -244,6 +248,7 @@ export default function CommunityPlusHeader({ user, onLogout }) {
         <div className="header-right" ref={menuRef}>
           {effectiveUser && (
             <div className="user-block">
+
               <span className="username label">
                 {username}
               </span>
@@ -257,6 +262,7 @@ export default function CommunityPlusHeader({ user, onLogout }) {
 
               {showMenu && (
                 <div className="dropdown-menu panel">
+
                   <div
                     className="menu-item"
                     onClick={() => go("/profile")}
@@ -270,6 +276,7 @@ export default function CommunityPlusHeader({ user, onLogout }) {
                   >
                     Logout
                   </div>
+
                 </div>
               )}
             </div>
