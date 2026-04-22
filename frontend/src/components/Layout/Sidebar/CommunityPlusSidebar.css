@@ -94,6 +94,26 @@ AD.TV SUPERSCRIPT ALIGNMENT
 .sidebar-btn .adtv-sp {
   margin-left: 2px;
 }
+.adtv-sp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 0.85em;
+  height: 0.85em;
+
+  font-size: 0.5em;
+  font-weight: 700;
+
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 50%;
+
+  margin-left: 0;              /* 🔥 tighter */
+  transform: translateY(-2px);/* 🔥 better alignment */
+
+  line-height: 1;
+}
 
 /* =====================================================
 LOGOUT

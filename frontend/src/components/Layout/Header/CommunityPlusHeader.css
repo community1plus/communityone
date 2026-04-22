@@ -43,14 +43,33 @@ LOCATION DISPLAY (🔥 IMPORTANT)
 .location-display {
   display: flex;
   align-items: center;
-  gap: var(--space-xs);
+  gap: 6px;
 
-  padding: 4px 8px;
-  border-radius: var(--radius-sm);
+  padding: 4px 10px;
+  border-radius: 999px;
 
   background: rgba(0, 0, 0, 0.04);
 
-  min-width: 220px;
+  min-width: 200px;
+  max-width: 320px;
+}
+
+.location-input {
+  border: none;
+  background: transparent;
+  outline: none;
+
+  font-size: 13px;
+  width: 100%;
+}
+
+.location-input {
+  border: none;
+  background: transparent;
+  outline: none;
+
+  font-size: 13px;
+  width: 100%;
 }
 
 /* input inside location */
@@ -151,18 +170,22 @@ RIGHT (USER)
 NAV LINKS
 ===================================================== */
 
-.links {
-  display: flex;
-  gap: 6px;
+.links .btn {
+  background: transparent;
+  border: none;
+
+  padding: 6px 10px;
+  border-radius: 999px;
+
+  transition: background 0.15s ease;
 }
 
-.links .btn {
-  font-size: 13px;
+.links .btn:hover {
+  background: rgba(0, 0, 0, 0.05);
 }
 
 .links .active {
-  background: rgba(0, 0, 0, 0.06);
-  border-radius: var(--radius-sm);
+  background: rgba(0, 0, 0, 0.08);
 }
 
 /* =====================================================

@@ -74,3 +74,21 @@
 .btn-block {
   width: 100%;
 }
+
+.links .btn {
+  background: transparent;
+  border: none;
+
+  padding: 6px 10px;
+  border-radius: 999px;
+
+  transition: background 0.15s ease;
+}
+
+.links .btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.links .active {
+  background: rgba(0, 0, 0, 0.08);
+}
