@@ -9,6 +9,17 @@ const CATEGORIES = [
 const SCOPES = ["Local", "Nearby", "Global"];
 
 export default function PostComposer() {
+
+  /* =========================
+     MODE (NEW)
+  ========================= */
+
+  const [mode, setMode] = useState("now"); // now | blob
+
+  /* =========================
+     CORE STATE
+  ========================= */
+
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
 
@@ -28,6 +39,18 @@ export default function PostComposer() {
   const fileInputRef = useRef();
   const dragItem = useRef();
   const dragOverItem = useRef();
+
+  /* =========================
+     MODE DEFAULTS (CRITICAL)
+  ========================= */
+
+  useEffect(() => {
+    if (mode === "now") {
+      setScope("Local");
+      setCategory("News");
+      setIsAd(false); // no ads in NOW
+    }
+  }, [mode]);
 
   /* =========================
      TAGS
@@ -158,13 +181,14 @@ export default function PostComposer() {
     }
 
     const payload = {
+      mode, // 🔥 NEW (IMPORTANT)
       title,
       content,
       category,
       scope,
       tags,
       media: uploaded,
-      ad: isAd ? {
+      ad: (mode === "blob" && isAd) ? {
         slots: selectedSlots,
         total: selectedSlots.reduce(
           (sum, h) => sum + (slotPricing[h]?.price || 0),
@@ -179,7 +203,7 @@ export default function PostComposer() {
       body: JSON.stringify(payload)
     });
 
-    alert("Post submitted");
+    alert(mode === "now" ? "Posted to Now" : "Published");
   };
 
   /* =========================
@@ -189,44 +213,77 @@ export default function PostComposer() {
   return (
     <div className="composer">
 
+      {/* MODE SWITCH */}
+      <div className="mode-switch">
+        <button
+          className={mode === "now" ? "active" : ""}
+          onClick={() => setMode("now")}
+        >
+          ⚡ Now
+        </button>
+
+        <button
+          className={mode === "blob" ? "active" : ""}
+          onClick={() => setMode("blob")}
+        >
+          🧠 Blob
+        </button>
+      </div>
+
       {/* TOP */}
       <div className="top">
         <input
-          placeholder="Headline..."
+          placeholder={
+            mode === "now"
+              ? "What's happening right now?"
+              : "Headline..."
+          }
           value={title}
           onChange={e=>setTitle(e.target.value)}
         />
 
-        <select className="borderless" value={category} onChange={e=>setCategory(e.target.value)}>
-          {CATEGORIES.map(c=><option key={c}>{c}</option>)}
-        </select>
+        {mode === "blob" && (
+          <>
+            <select className="borderless" value={category} onChange={e=>setCategory(e.target.value)}>
+              {CATEGORIES.map(c=><option key={c}>{c}</option>)}
+            </select>
 
-        <select className="borderless" value={scope} onChange={e=>setScope(e.target.value)}>
-          {SCOPES.map(s=><option key={s}>{s}</option>)}
-        </select>
+            <select className="borderless" value={scope} onChange={e=>setScope(e.target.value)}>
+              {SCOPES.map(s=><option key={s}>{s}</option>)}
+            </select>
+          </>
+        )}
       </div>
 
       <textarea
-        placeholder="What's happening..."
+        placeholder={
+          mode === "now"
+            ? "Quick update..."
+            : "Write something detailed..."
+        }
         value={content}
         onChange={e=>setContent(e.target.value)}
       />
 
-      {/* TAGS */}
-      <input
-        placeholder="Add tags"
-        value={tagInput}
-        onChange={e=>setTagInput(e.target.value)}
-        onKeyDown={handleTagKey}
-      />
+      {/* TAGS (BLOB ONLY) */}
+      {mode === "blob" && (
+        <>
+          <input
+            placeholder="Add tags"
+            value={tagInput}
+            onChange={e=>setTagInput(e.target.value)}
+            onKeyDown={handleTagKey}
+          />
 
-      <div className="tag-list">
-        {tags.map(tag=>(
-          <span key={tag} onClick={()=>setTags(tags.filter(t=>t!==tag))}>
-            {tag} ✕
-          </span>
-        ))}
-      </div>
+          <div className="tag-list">
+            {tags.map(tag=>(
+              <span key={tag} onClick={()=>setTags(tags.filter(t=>t!==tag))}>
+                {tag} ✕
+              </span>
+            ))}
+          </div>
+        </>
+      )}
 
       {/* FILE UPLOAD */}
       <input
@@ -263,46 +320,52 @@ export default function PostComposer() {
         ))}
       </div>
 
-      {/* AD MODE */}
-      <label>
-        <input type="checkbox" checked={isAd} onChange={()=>setIsAd(!isAd)} />
-        Promote this post
-      </label>
+      {/* AD MODE (BLOB ONLY) */}
+      {mode === "blob" && (
+        <>
+          <label className="ad-toggle">
+            <input
+              type="checkbox"
+              checked={isAd}
+              onChange={()=>setIsAd(!isAd)}
+            />
+            Promote this post
+          </label>
 
-      {/* SLOT GRID */}
-      {isAd && (
-        <div className="slots">
-          {[...Array(24)].map((_, hour)=>(
-            <button
-              key={hour}
-              className={selectedSlots.includes(hour) ? "active" : ""}
-              onClick={()=>{
-                setSelectedSlots(prev =>
-                  prev.includes(hour)
-                    ? prev.filter(h=>h!==hour)
-                    : [...prev, hour]
-                );
-              }}
-            >
-              {hour}:00 ${slotPricing[hour]?.price || "--"}
-            </button>
-          ))}
-        </div>
-      )}
+          {isAd && (
+            <>
+              <div className="slots">
+                {[...Array(24)].map((_, hour)=>(
+                  <button
+                    key={hour}
+                    className={selectedSlots.includes(hour) ? "active" : ""}
+                    onClick={()=>{
+                      setSelectedSlots(prev =>
+                        prev.includes(hour)
+                          ? prev.filter(h=>h!==hour)
+                          : [...prev, hour]
+                      );
+                    }}
+                  >
+                    {hour}:00 ${slotPricing[hour]?.price || "--"}
+                  </button>
+                ))}
+              </div>
 
-      {/* TOTAL */}
-      {isAd && (
-        <div>
-          Total: $
-          {selectedSlots.reduce(
-            (sum,h)=>sum+(slotPricing[h]?.price||0),0
+              <div className="slot-total">
+                Total: $
+                {selectedSlots.reduce(
+                  (sum,h)=>sum+(slotPricing[h]?.price||0),0
+                )}
+              </div>
+            </>
           )}
-        </div>
+        </>
       )}
 
       {/* SUBMIT */}
       <button className="submit-btn" onClick={handleSubmit}>
-        Submit
+        {mode === "now" ? "Post Now" : "Publish"}
       </button>
 
       {/* PREVIEW */}
