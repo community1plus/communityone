@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { resolveLocation as enrichLocation } from "../services/resolveLocation";
 
 const LocationContext = createContext();
 export const useLocationContext = () => useContext(LocationContext);
@@ -53,14 +54,14 @@ export function LocationProvider({ children }) {
   }, [viewLocation]);
 
   /* ===============================
-     RESOLUTION LOGIC (CLEAN)
+     RESOLUTION LOGIC (NO IP)
   =============================== */
 
-  const resolveLocation = ({ mode, manual, home, live, ip }) => {
+  const resolveLocation = ({ mode, manual, home, live }) => {
     if (mode === "manual" && manual) return manual;
     if (home) return home;
     if (live) return live;
-    return ip || null;
+    return null; // 🚨 IP REMOVED
   };
 
   /* ===============================
@@ -69,8 +70,10 @@ export function LocationProvider({ children }) {
 
   useEffect(() => {
     const init = async () => {
+      // 🚨 DO NOT override manual
+      if (locationMode === "manual") return;
+
       let home = null;
-      let ip = null;
 
       // 1. Load home location
       const savedHome = localStorage.getItem("homeLocation");
@@ -79,40 +82,35 @@ export function LocationProvider({ children }) {
         setHomeLocation(home);
       }
 
-      // 2. Only fetch IP if nothing else exists
-      if (!home) {
-        try {
-          const res = await fetch("https://ipapi.co/json/");
-          const data = await res.json();
+      // 2. Fetch IP (HINT ONLY)
+      try {
+        const res = await fetch("https://ipapi.co/json/");
+        const data = await res.json();
 
-          ip = {
-            lat: data.latitude,
-            lng: data.longitude,
-            city: data.city,
-            state: data.region_code,
-            label: `${data.city}, ${data.region_code}`,
-            type: "ip",
-          };
+        const ip = {
+          lat: data.latitude,
+          lng: data.longitude,
+          city: data.city,
+          state: data.region_code,
+          label: `${data.city}, ${data.region_code}`,
+          type: "ip",
+        };
 
-          setIpLocation(ip);
-        } catch (err) {
-          console.warn("IP location failed");
-        }
+        setIpLocation(ip); // ✅ store only (DO NOT set view)
+      } catch (err) {
+        console.warn("IP location failed");
       }
 
-      // 3. Resolve location (respect manual)
-      if (locationMode !== "manual") {
-        const resolved = resolveLocation({
-          mode: locationMode,
-          manual: manualLocation,
-          home,
-          live: null,
-          ip,
-        });
+      // 3. Resolve ONLY trusted sources
+      const resolved = resolveLocation({
+        mode: locationMode,
+        manual: manualLocation,
+        home,
+        live: null,
+      });
 
-        if (resolved) {
-          setViewLocation(resolved, "auto");
-        }
+      if (resolved) {
+        setViewLocation(resolved, "auto");
       }
     };
 
@@ -120,7 +118,7 @@ export function LocationProvider({ children }) {
   }, []);
 
   /* ===============================
-     LIVE LOCATION (PIN CLICK)
+     LIVE LOCATION (GPS + ENRICHED)
   =============================== */
 
   const enableLiveLocation = async () => {
@@ -128,27 +126,35 @@ export function LocationProvider({ children }) {
 
     return new Promise((resolve, reject) => {
       navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const loc = {
-            lat: pos.coords.latitude,
-            lng: pos.coords.longitude,
-            accuracy: pos.coords.accuracy,
-            label: "Current location",
-            type: "live",
-          };
+        async (pos) => {
+          try {
+            const lat = pos.coords.latitude;
+            const lng = pos.coords.longitude;
+            const accuracy = pos.coords.accuracy;
 
-          console.log("📍 Live location:", loc);
+            console.log("📡 GPS:", { lat, lng, accuracy });
 
-          setLiveLocation(loc);
+            // 🔥 ENRICH LOCATION
+            const enriched = await enrichLocation({
+              lat,
+              lng,
+              accuracy,
+            });
 
-          if (locationMode !== "manual") {
-            setViewLocation(loc, "auto");
+            setLiveLocation(enriched);
+
+            if (locationMode !== "manual") {
+              setViewLocation(enriched, "auto");
+            }
+
+            resolve(enriched);
+          } catch (err) {
+            console.error("❌ Enrichment failed:", err);
+            reject(err);
           }
-
-          resolve(loc);
         },
         (err) => {
-          console.error("Geolocation error:", err);
+          console.error("❌ Geolocation error:", err);
           reject(err);
         },
         { enableHighAccuracy: true }
@@ -157,28 +163,36 @@ export function LocationProvider({ children }) {
   };
 
   /* ===============================
-     SET HOME LOCATION (OPTIONAL)
+     SET HOME LOCATION
   =============================== */
 
   const enableHomeLocation = async () => {
     if (!navigator.geolocation) return;
 
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const loc = {
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude,
-          label: "Home",
-          type: "home",
-        };
+      async (pos) => {
+        try {
+          const enriched = await enrichLocation({
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+            accuracy: pos.coords.accuracy,
+          });
 
-        setHomeLocation(loc);
-        localStorage.setItem("homeLocation", JSON.stringify(loc));
+          const loc = {
+            ...enriched,
+            type: "home",
+          };
 
-        console.log("🏠 Home location set:", loc);
+          setHomeLocation(loc);
+          localStorage.setItem("homeLocation", JSON.stringify(loc));
 
-        if (locationMode !== "manual") {
-          setViewLocation(loc, "auto");
+          console.log("🏠 Home location set:", loc);
+
+          if (locationMode !== "manual") {
+            setViewLocation(loc, "auto");
+          }
+        } catch (err) {
+          console.error(err);
         }
       },
       (err) => console.error(err),
