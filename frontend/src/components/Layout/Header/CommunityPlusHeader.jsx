@@ -13,6 +13,8 @@ import LocationPin from "../../UI/LocationPin";
 
 // ✅ FIXED PATH
 import { LocationProvider } from "../../../context/LocationProvider";
+import { resolveLocation } from "../../../services/resolveLocation";
+impot resolveLocation
 
 export default function CommunityPlusHeader({ user, onLogout }) {
   const navigate = useNavigate();
