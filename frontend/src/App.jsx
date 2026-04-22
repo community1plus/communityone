@@ -1,6 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
-
 import CommunityPlusLandingPage from "./pages/CommunityPlusLandingPage/CommunityPlusLandingPage";
 import CommunityPlusDashboard from "./pages/Dashboard/CommunityPlusDashboard";
 import Onboarding from "./pages/Onboarding/CommunityPlusOnboarding";
@@ -9,6 +8,7 @@ import CommunityPlusUserProfile from "./pages/CommunityPlusUserProfile/Community
 import CommunityPlusYellowPages from "./pages/YellowPages/CommunityPlusYellowPages";
 import CommunityPlusHub from "./pages/CommunityPlusHub/CommunityPlusHub";
 import PostComposer from "./components/Layout/Sidebar/Post/PostComposer";
+import CommunityPlusAdTv from "./pages/CommunityPlusAdTv/CommunityPlusAdTv";
 
 function AppLoading() {
   return <div style={{ padding: 20 }}>Initialising...</div>;
@@ -76,13 +76,14 @@ export default function App() {
         <Route path="/yellowpages" element={<CommunityPlusYellowPages />} />
         <Route path="/communityplus" element={<CommunityPlusHub />} />
         <Route path="/post" element={<PostComposer />} />
+        <Route path="/adtv" element={<CommunityPlusAdTv title="adtv page" />} />
         <Route path="/event" element={<PlaceholderPage title="Event page" />} />
         <Route path="/incident" element={<PlaceholderPage title="Incident page" />} />
         <Route path="/beacon" element={<PlaceholderPage title="Beacon page" />} />
         <Route path="/search" element={<PlaceholderPage title="Search page" />} />
         <Route path="/about" element={<PlaceholderPage title="About page" />} />
         <Route path="/merch" element={<PlaceholderPage title="Merch page" />} />
-        <Route path="/adtv" element={<PlaceholderPage title="adtv page" />} />
+        
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
