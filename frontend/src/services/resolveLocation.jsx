@@ -1,4 +1,4 @@
-const GOOGLE_API_KEY = import.meta.env.VITE.GOOGLE_MAPS_API_KEY;
+const GOOGLE_API_KEY = import.meta.env.GOOGLE_MAPS_API_KEY;
 
 /* ===============================
    HELPERS
