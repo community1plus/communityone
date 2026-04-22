@@ -38,17 +38,8 @@ SIDEBAR
 CONTENT AREA (OUTER LAYER)
 ===================================================== */
 
-.content-area {
-  flex: 1;
-  min-width: 0;
-
-  display: flex;
-  flex-direction: column;
-
-  align-items: flex-start; /* 🔥 critical */
-
-  padding: 20px 32px; /* tighter spacing */
-  box-sizing: border-box;
+.main-content {
+  padding: 20px 24px;
 }
 
 /* controls page width + alignment */

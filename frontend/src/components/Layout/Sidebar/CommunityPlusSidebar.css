@@ -1,6 +1,15 @@
 /* =====================================================
 SIDEBAR — SYSTEM ALIGNED (FLAT NAV)
 ===================================================== */
+.meta {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+
+  color: rgba(0, 0, 0, 0.45);
+  margin: 6px 0 2px;
+}
 
 .sidebar {
   width: 260px;
