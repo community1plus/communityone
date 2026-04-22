@@ -13,13 +13,29 @@ export function LocationProvider({ children }) {
   const [liveLocation, setLiveLocation] = useState(null);
   const [ipLocation, setIpLocation] = useState(null);
 
+  // 🔥 FIX: prevent restoring IP as active location
   const [viewLocation, setViewLocationState] = useState(() => {
     const saved = localStorage.getItem("viewLocation");
-    return saved ? JSON.parse(saved) : null;
+
+    if (!saved) return null;
+
+    try {
+      const parsed = JSON.parse(saved);
+
+      // 🚨 BLOCK IP RESTORE
+      if (parsed?.type === "ip") {
+        console.log("🚫 Ignoring stored IP location");
+        return null;
+      }
+
+      return parsed;
+    } catch {
+      return null;
+    }
   });
 
   const [manualLocation, setManualLocation] = useState(null);
-  const [locationMode, setLocationMode] = useState("auto"); // "auto" | "manual"
+  const [locationMode, setLocationMode] = useState("auto");
 
   /* ===============================
      SAFE SETTER
@@ -54,6 +70,25 @@ export function LocationProvider({ children }) {
   }, [viewLocation]);
 
   /* ===============================
+     CLEANUP OLD IP (ONE-TIME)
+  =============================== */
+
+  useEffect(() => {
+    const saved = localStorage.getItem("viewLocation");
+
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+
+        if (parsed?.type === "ip") {
+          localStorage.removeItem("viewLocation");
+          console.log("🧹 Cleared old IP location");
+        }
+      } catch {}
+    }
+  }, []);
+
+  /* ===============================
      RESOLUTION LOGIC (NO IP)
   =============================== */
 
@@ -61,7 +96,7 @@ export function LocationProvider({ children }) {
     if (mode === "manual" && manual) return manual;
     if (home) return home;
     if (live) return live;
-    return null; // 🚨 IP REMOVED
+    return null; // 🚨 IP NEVER USED
   };
 
   /* ===============================
@@ -96,12 +131,12 @@ export function LocationProvider({ children }) {
           type: "ip",
         };
 
-        setIpLocation(ip); // ✅ store only (DO NOT set view)
+        setIpLocation(ip); // ✅ DO NOT set as viewLocation
       } catch (err) {
         console.warn("IP location failed");
       }
 
-      // 3. Resolve ONLY trusted sources
+      // 3. Resolve trusted sources only
       const resolved = resolveLocation({
         mode: locationMode,
         manual: manualLocation,
@@ -134,7 +169,6 @@ export function LocationProvider({ children }) {
 
             console.log("📡 GPS:", { lat, lng, accuracy });
 
-            // 🔥 ENRICH LOCATION
             const enriched = await enrichLocation({
               lat,
               lng,
