@@ -9,6 +9,7 @@ import CommunityPlusYellowPages from "./pages/YellowPages/CommunityPlusYellowPag
 import CommunityPlusHub from "./pages/CommunityPlusHub/CommunityPlusHub";
 import PostComposer from "./components/Layout/Sidebar/Post/PostComposer";
 import CommunityPlusAdTv from "./pages/CommunityPlusAdTv/CommunityPlusAdTv";
+ import AdTvPage from "./pages/AdTvPage/AdTvPage ";
 import "./styles/tokens.css";
 import "./styles/base.css";
 import "./Typography/Typography.css";
@@ -81,6 +82,7 @@ export default function App() {
         <Route path="/communityplus" element={<CommunityPlusHub />} />
         <Route path="/post" element={<PostComposer />} />
         <Route path="/adtv" element={<CommunityPlusAdTv title="adtv page" />} />
+        <Route path="/adtv" element={<AdTvPage />} />
         <Route path="/event" element={<PlaceholderPage title="Event page" />} />
         <Route path="/incident" element={<PlaceholderPage title="Incident page" />} />
         <Route path="/beacon" element={<PlaceholderPage title="Beacon page" />} />

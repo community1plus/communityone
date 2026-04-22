@@ -1,13 +1,20 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useLocation } from "react-router-dom";
 import "./CommunityPlusAdTv.css";
 
 export default function CommunityPlusAdTv({ ads = [], context = "feed" }) {
-
   const [currentIndex, setCurrentIndex] = useState(0);
   const [expanded, setExpanded] = useState(false);
   const [visible, setVisible] = useState(true);
 
   const videoRef = useRef();
+  const location = useLocation();
+
+  /* =========================
+     HIDE ON AD.TV PAGE
+  ========================= */
+
+  if (location.pathname === "/adtv") return null;
 
   /* =========================
      PLAYLIST ROTATION
@@ -62,7 +69,6 @@ export default function CommunityPlusAdTv({ ads = [], context = "feed" }) {
         ${expanded ? "adtv-expanded" : ""}
       `}
     >
-
       {/* BRAND */}
       <div className="adtv-brand">
         AD.TV <span className="adtv-sp">SP</span>
@@ -83,7 +89,6 @@ export default function CommunityPlusAdTv({ ads = [], context = "feed" }) {
 
       {/* CONTROLS */}
       <div className="adtv-controls">
-
         <button className="btn btn-ghost" onClick={togglePlay}>
           ⏯
         </button>
@@ -110,9 +115,7 @@ export default function CommunityPlusAdTv({ ads = [], context = "feed" }) {
         >
           ×
         </button>
-
       </div>
-
     </div>
   );
 }
