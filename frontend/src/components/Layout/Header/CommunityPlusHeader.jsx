@@ -7,11 +7,9 @@ import React, {
 
 import { useNavigate, useLocation } from "react-router-dom";
 import "./CommunityPlusHeader.css";
-import { useLocationContext, LocationProvider  } from "../../../context/LocationProvider";
+import { useLocationContext } from "../../../context/LocationProvider";
 import { useAuth } from "../../../context/AuthContext";
 import LocationPin from "../../UI/LocationPin";
-
-// ✅ FIXED PATH
 
 import { resolveLocation } from "../../../services/resolveLocation";
 
@@ -19,11 +17,7 @@ export default function CommunityPlusHeader({ user, onLogout }) {
   const navigate = useNavigate();
   const routeLocation = useLocation();
 
-  const {
-    viewLocation,
-    setViewLocation,
-  } = useLocationContext();
-
+  const { viewLocation, setViewLocation } = useLocationContext();
   const { appUser } = useAuth();
 
   const [showMenu, setShowMenu] = useState(false);
@@ -92,7 +86,7 @@ export default function CommunityPlusHeader({ user, onLogout }) {
   }, [viewLocation?.updatedAt]);
 
   /* ===============================
-     GOOGLE AUTOCOMPLETE (ENRICHED)
+     GOOGLE AUTOCOMPLETE
   =============================== */
 
   useEffect(() => {
@@ -103,9 +97,7 @@ export default function CommunityPlusHeader({ user, onLogout }) {
         !window.google ||
         !window.google.maps ||
         !inputRef.current
-      ) {
-        return false;
-      }
+      ) return false;
 
       const autocomplete =
         new window.google.maps.places.Autocomplete(
@@ -123,20 +115,14 @@ export default function CommunityPlusHeader({ user, onLogout }) {
         const lat = place.geometry.location.lat();
         const lng = place.geometry.location.lng();
 
-        console.log("📍 Raw selection:", lat, lng);
-
         try {
-          // 🔥 Manual input has no accuracy → assume medium (100m)
           const enriched = await resolveLocation({
             lat,
             lng,
             accuracy: 100,
           });
 
-          console.log("✅ Enriched location:", enriched);
-
           setViewLocation(enriched, "manual");
-
         } catch (err) {
           console.error("❌ Enrichment failed:", err);
         }
@@ -147,9 +133,7 @@ export default function CommunityPlusHeader({ user, onLogout }) {
 
     if (!initAutocomplete()) {
       interval = setInterval(() => {
-        if (initAutocomplete()) {
-          clearInterval(interval);
-        }
+        if (initAutocomplete()) clearInterval(interval);
       }, 300);
     }
 
@@ -157,69 +141,47 @@ export default function CommunityPlusHeader({ user, onLogout }) {
   }, []);
 
   /* ===============================
-     RESOLVE LOCATION (PIN CLICK - GPS)
+     GPS LOCATION
   =============================== */
 
   const handleResolveLocation = async () => {
-    console.log("📍 Pin clicked");
-
     setResolving(true);
 
-    try {
-      navigator.geolocation.getCurrentPosition(
-        async (pos) => {
-          const lat = pos.coords.latitude;
-          const lng = pos.coords.longitude;
-          const accuracy = pos.coords.accuracy;
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const { latitude: lat, longitude: lng, accuracy } = pos.coords;
 
-          console.log("📡 GPS:", { lat, lng, accuracy });
+        const enriched = await resolveLocation({
+          lat,
+          lng,
+          accuracy,
+        });
 
-          const enriched = await resolveLocation({
-            lat,
-            lng,
-            accuracy, // 🔥 REAL ACCURACY USED HERE
-          });
-
-          console.log("✅ Live enriched:", enriched);
-
-          setViewLocation(enriched, "auto");
-          setResolving(false);
-        },
-        (err) => {
-          console.error("❌ Geolocation error:", err);
-          setResolving(false);
-        },
-        { enableHighAccuracy: true }
-      );
-    } catch (err) {
-      console.error("❌ Location error:", err);
-      setResolving(false);
-    }
+        setViewLocation(enriched, "auto");
+        setResolving(false);
+      },
+      (err) => {
+        console.error("❌ Geolocation error:", err);
+        setResolving(false);
+      },
+      { enableHighAccuracy: true }
+    );
   };
 
   /* ===============================
-     MENU OUTSIDE CLICK
+     OUTSIDE CLICK
   =============================== */
 
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (
-        menuRef.current &&
-        !menuRef.current.contains(e.target)
-      ) {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
         setShowMenu(false);
       }
     };
 
-    document.addEventListener(
-      "mousedown",
-      handleClickOutside
-    );
+    document.addEventListener("mousedown", handleClickOutside);
     return () =>
-      document.removeEventListener(
-        "mousedown",
-        handleClickOutside
-      );
+      document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   /* ===============================
@@ -232,15 +194,15 @@ export default function CommunityPlusHeader({ user, onLogout }) {
     }
   };
 
-  const isActive = (path) =>
-    routeLocation.pathname === path;
+  const isActive = (path) => routeLocation.pathname === path;
 
   /* ===============================
      RENDER
   =============================== */
 
   return (
-    <header className="header">
+    <header className="header panel">
+
       <div className="header-row">
 
         {/* LEFT */}
@@ -257,16 +219,11 @@ export default function CommunityPlusHeader({ user, onLogout }) {
               resolved={hasLocation}
               loading={resolving}
               onClick={handleResolveLocation}
-              title={
-                hasLocation
-                  ? "Location detected (click to refresh)"
-                  : "Click to detect location"
-              }
             />
 
             <input
               ref={inputRef}
-              className="location-input"
+              className="location-input body"
               placeholder="Enter address or suburb"
               autoComplete="off"
             />
@@ -277,7 +234,7 @@ export default function CommunityPlusHeader({ user, onLogout }) {
         <div className="header-center">
           <div className="search-wrapper">
             <input
-              className="search-input"
+              className="search-input body"
               placeholder="Search"
             />
           </div>
@@ -287,21 +244,19 @@ export default function CommunityPlusHeader({ user, onLogout }) {
         <div className="header-right" ref={menuRef}>
           {effectiveUser && (
             <div className="user-block">
-              <span className="username">
+              <span className="username label">
                 {username}
               </span>
 
               <div
                 className="avatar"
-                onClick={() =>
-                  setShowMenu(!showMenu)
-                }
+                onClick={() => setShowMenu(!showMenu)}
               >
                 {initials}
               </div>
 
               {showMenu && (
-                <div className="dropdown-menu">
+                <div className="dropdown-menu panel">
                   <div
                     className="menu-item"
                     onClick={() => go("/profile")}
@@ -311,9 +266,7 @@ export default function CommunityPlusHeader({ user, onLogout }) {
 
                   <div
                     className="menu-item"
-                    onClick={() =>
-                      onLogout?.()
-                    }
+                    onClick={() => onLogout?.()}
                   >
                     Logout
                   </div>
@@ -327,44 +280,43 @@ export default function CommunityPlusHeader({ user, onLogout }) {
       {/* NAV */}
       <nav className="links">
 
-  <button
-    onClick={() => go("/home")}
-    className={isActive("/home") ? "active" : ""}
-  >
-    Home
-  </button>
+        <button
+          onClick={() => go("/home")}
+          className={`btn btn-ghost ${isActive("/home") ? "active" : ""}`}
+        >
+          Home
+        </button>
 
-  <button
-    onClick={() => go("/post")}
-    className={isActive("/post") ? "active" : ""}
-  >
-    Post
-  </button>
+        <button
+          onClick={() => go("/post")}
+          className={`btn btn-ghost ${isActive("/post") ? "active" : ""}`}
+        >
+          Post
+        </button>
 
-  <button
-    onClick={() => go("/event")}
-    className={isActive("/event") ? "active" : ""}
-  >
-    Event
-  </button>
+        <button
+          onClick={() => go("/event")}
+          className={`btn btn-ghost ${isActive("/event") ? "active" : ""}`}
+        >
+          Event
+        </button>
 
-  <button
-    onClick={() => go("/incident")}
-    className={isActive("/incident") ? "active" : ""}
-  >
-    Incident
-  </button>
+        <button
+          onClick={() => go("/incident")}
+          className={`btn btn-ghost ${isActive("/incident") ? "active" : ""}`}
+        >
+          Incident
+        </button>
 
-  {/* 🔥 AD.TV (NEW) */}
-  <button
-    onClick={() => go("/adtv")}
-    className={isActive("/adtv") ? "active" : ""}
-  >
-    📺 <span className="label">AD.TV</span>
-    <span className="adtv-sp">SP</span>
-  </button>
+        <button
+          onClick={() => go("/adtv")}
+          className={`btn btn-ghost ${isActive("/adtv") ? "active" : ""}`}
+        >
+          📺 <span className="label">AD.TV</span>
+          <span className="adtv-sp">SP</span>
+        </button>
 
-</nav>
+      </nav>
     </header>
   );
 }
