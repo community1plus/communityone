@@ -9,6 +9,10 @@ import CommunityPlusYellowPages from "./pages/YellowPages/CommunityPlusYellowPag
 import CommunityPlusHub from "./pages/CommunityPlusHub/CommunityPlusHub";
 import PostComposer from "./components/Layout/Sidebar/Post/PostComposer";
 import CommunityPlusAdTv from "./pages/CommunityPlusAdTv/CommunityPlusAdTv";
+import "./styles/tokens.css";
+import "./styles/base.css";
+import "./Typography/Typography.css";
+import "./theme/theme.css";
 
 function AppLoading() {
   return <div style={{ padding: 20 }}>Initialising...</div>;
