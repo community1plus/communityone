@@ -12,7 +12,7 @@ import { useAuth } from "../../../context/AuthContext";
 import LocationPin from "../../UI/LocationPin";
 
 // ✅ FIXED PATH
-import { resolveLocation } from "../../../context/LocationProvider";
+import { LocationProvider } from "../../../context/LocationProvider";
 
 export default function CommunityPlusHeader({ user, onLogout }) {
   const navigate = useNavigate();
