@@ -326,34 +326,45 @@ export default function CommunityPlusHeader({ user, onLogout }) {
 
       {/* NAV */}
       <nav className="links">
-        <button
-          onClick={() => go("/home")}
-          className={isActive("/home") ? "active" : ""}
-        >
-          Home
-        </button>
 
-        <button
-          onClick={() => go("/post")}
-          className={isActive("/post") ? "active" : ""}
-        >
-          Post
-        </button>
+  <button
+    onClick={() => go("/home")}
+    className={isActive("/home") ? "active" : ""}
+  >
+    Home
+  </button>
 
-        <button
-          onClick={() => go("/event")}
-          className={isActive("/event") ? "active" : ""}
-        >
-          Event
-        </button>
+  <button
+    onClick={() => go("/post")}
+    className={isActive("/post") ? "active" : ""}
+  >
+    Post
+  </button>
 
-        <button
-          onClick={() => go("/incident")}
-          className={isActive("/incident") ? "active" : ""}
-        >
-          Incident
-        </button>
-      </nav>
+  <button
+    onClick={() => go("/event")}
+    className={isActive("/event") ? "active" : ""}
+  >
+    Event
+  </button>
+
+  <button
+    onClick={() => go("/incident")}
+    className={isActive("/incident") ? "active" : ""}
+  >
+    Incident
+  </button>
+
+  {/* 🔥 AD.TV (NEW) */}
+  <button
+    onClick={() => go("/adtv")}
+    className={isActive("/adtv") ? "active" : ""}
+  >
+    📺 <span className="label">AD.TV</span>
+    <span className="adtv-sp">SP</span>
+  </button>
+
+</nav>
     </header>
   );
 }

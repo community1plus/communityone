@@ -252,3 +252,17 @@ LOCATION
   display: flex;
   align-items: center;
 }
+
+/* AD.TV superscript alignment */
+
+.links .adtv-sp {
+  margin-left: 4px;
+  transform: translateY(-3px);
+}
+
+/* keep header buttons consistent with system */
+
+.links button {
+  font-size: 13px;
+  font-weight: 600;
+}
