@@ -1,89 +1,76 @@
+/* =========================
+   BASE BUTTON
+========================= */
+
 .btn {
-display: inline-flex;
-align-items: center;
-justify-content: center;
-gap: var(--space-1); /* 🔥 supports icons + text */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 
-padding: var(--space-2) var(--space-3);
-border-radius: var(--radius-md);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
 
-font-size: 14px;
-font-weight: 500;
-cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
 
-border: 1px solid var(--line);
-background: rgba(255,255,255,0.6);
+  cursor: pointer;
+  transition: all 0.2s ease;
 
-transition:
-transform var(--transition-fast),
-background var(--transition-fast),
-box-shadow var(--transition-fast);
-
-white-space: nowrap;
+  border: none;
 }
 
-/* hover */
-.btn:hover {
-transform: translateY(-1px);
-background: rgba(255,255,255,0.85);
-box-shadow: var(--shadow-sm);
-}
-
-/* active */
-.btn:active {
-transform: scale(0.96);
-}
-
-/* disabled */
-.btn:disabled {
-opacity: 0.5;
-cursor: not-allowed;
-transform: none;
-box-shadow: none;
-}
-
-/* =====================================================
-VARIANTS
-===================================================== */
+/* =========================
+   PRIMARY (THEME DRIVEN)
+========================= */
 
 .btn-primary {
-background: var(--accent);
-color: white;
-border: none;
+  background: var(--accent);
+  color: #fff;
 }
 
 .btn-primary:hover {
-background: var(--accent);
-box-shadow: var(--shadow-md);
+  opacity: 0.9;
 }
 
-/* subtle */
+/* =========================
+   SECONDARY
+========================= */
+
+.btn-secondary {
+  background: #eee;
+  color: var(--text-primary);
+}
+
+.btn-secondary:hover {
+  background: #e5e5e5;
+}
+
+/* =========================
+   GHOST (MINIMAL UI)
+========================= */
+
 .btn-ghost {
-background: transparent;
-border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-primary);
 }
 
-/* =====================================================
-ICON BUTTON (IMPORTANT FOR YOU)
-===================================================== */
-
-.btn-icon {
-padding: var(--space-2);
-border-radius: var(--radius-md);
+.btn-ghost:hover {
+  background: rgba(0,0,0,0.05);
 }
 
-/* square icon button */
-.btn-icon-square {
-width: 36px;
-height: 36px;
-padding: 0;
+/* =========================
+   DANGER (FOR INCIDENTS ETC)
+========================= */
+
+.btn-danger {
+  background: #c53030;
+  color: #fff;
 }
 
-/* =====================================================
-UTILITY
-===================================================== */
+/* =========================
+   FULL WIDTH
+========================= */
 
-/* full width button */
 .btn-block {
-width: 100%;
+  width: 100%;
 }

@@ -10,15 +10,7 @@ const SCOPES = ["Local", "Nearby", "Global"];
 
 export default function PostComposer() {
 
-  /* =========================
-     MODE (NEW)
-  ========================= */
-
-  const [mode, setMode] = useState("now"); // now | blob
-
-  /* =========================
-     CORE STATE
-  ========================= */
+  const [mode, setMode] = useState("now");
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -41,14 +33,14 @@ export default function PostComposer() {
   const dragOverItem = useRef();
 
   /* =========================
-     MODE DEFAULTS (CRITICAL)
+     MODE DEFAULTS
   ========================= */
 
   useEffect(() => {
     if (mode === "now") {
       setScope("Local");
       setCategory("News");
-      setIsAd(false); // no ads in NOW
+      setIsAd(false);
     }
   }, [mode]);
 
@@ -71,7 +63,7 @@ export default function PostComposer() {
   };
 
   /* =========================
-     FILE HANDLING
+     FILES
   ========================= */
 
   const handleFiles = (incoming) => {
@@ -85,115 +77,27 @@ export default function PostComposer() {
       id: crypto.randomUUID(),
       file,
       url: URL.createObjectURL(file),
-      progress: 0,
       thumbnail: null
     }));
 
     setFiles(prev => [...prev, ...enriched]);
-    enriched.forEach(generateThumbnail);
   };
-
-  const generateThumbnail = (fileObj) => {
-    if (!fileObj.file.type.startsWith("video")) return;
-
-    const video = document.createElement("video");
-    video.src = fileObj.url;
-    video.currentTime = 1;
-
-    video.addEventListener("loadeddata", () => {
-      const canvas = document.createElement("canvas");
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-
-      canvas.getContext("2d").drawImage(video, 0, 0);
-
-      const thumb = canvas.toDataURL("image/png");
-
-      setFiles(prev =>
-        prev.map(f =>
-          f.id === fileObj.id ? { ...f, thumbnail: thumb } : f
-        )
-      );
-    });
-  };
-
-  /* =========================
-     DRAG REORDER
-  ========================= */
-
-  const handleSort = () => {
-    const _files = [...files];
-    const dragged = _files.splice(dragItem.current, 1)[0];
-    _files.splice(dragOverItem.current, 0, dragged);
-    setFiles(_files);
-  };
-
-  /* =========================
-     S3 UPLOAD
-  ========================= */
-
-  const uploadToS3 = async (fileObj) => {
-    const res = await fetch("/api/upload-url", {
-      method: "POST",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({
-        fileName: fileObj.file.name,
-        fileType: fileObj.file.type
-      })
-    });
-
-    const { uploadUrl, fileUrl } = await res.json();
-
-    await fetch(uploadUrl, {
-      method: "PUT",
-      body: fileObj.file
-    });
-
-    return fileUrl;
-  };
-
-  /* =========================
-     SLOT PRICING
-  ========================= */
-
-  useEffect(() => {
-    if (!isAd) return;
-
-    fetch("/api/slots/pricing")
-      .then(res => res.json())
-      .then(setSlotPricing);
-  }, [isAd]);
 
   /* =========================
      SUBMIT
   ========================= */
 
   const handleSubmit = async () => {
-    let uploaded = [];
-
-    for (let f of files) {
-      const url = await uploadToS3(f);
-      uploaded.push({
-        url,
-        type: f.file.type,
-        name: f.file.name
-      });
-    }
-
     const payload = {
-      mode, // 🔥 NEW (IMPORTANT)
+      mode,
       title,
       content,
       category,
       scope,
       tags,
-      media: uploaded,
+      media: files,
       ad: (mode === "blob" && isAd) ? {
-        slots: selectedSlots,
-        total: selectedSlots.reduce(
-          (sum, h) => sum + (slotPricing[h]?.price || 0),
-          0
-        )
+        slots: selectedSlots
       } : null
     };
 
@@ -211,173 +115,139 @@ export default function PostComposer() {
   ========================= */
 
   return (
-    <div className="composer">
+    <div className={`composer panel ${mode === "now" ? "theme-now panel-compact" : "theme-blob"}`}>
 
       {/* MODE SWITCH */}
       <div className="mode-switch">
-        <button
-          className={mode === "now" ? "active" : ""}
-          onClick={() => setMode("now")}
-        >
+        <button className={`btn ${mode==="now"?"btn-primary":""}`} onClick={()=>setMode("now")}>
           ⚡ Now
         </button>
 
-        <button
-          className={mode === "blob" ? "active" : ""}
-          onClick={() => setMode("blob")}
-        >
+        <button className={`btn ${mode==="blob"?"btn-primary":""}`} onClick={()=>setMode("blob")}>
           🧠 Blob
         </button>
       </div>
 
-      {/* TOP */}
-      <div className="top">
+      {/* HEADER */}
+      <div className="panel-header">
         <input
-          placeholder={
-            mode === "now"
-              ? "What's happening right now?"
-              : "Headline..."
-          }
+          className="body"
+          placeholder={mode==="now" ? "What's happening right now?" : "Headline..."}
           value={title}
-          onChange={e=>setTitle(e.target.value)}
+          onChange={(e)=>setTitle(e.target.value)}
+        />
+      </div>
+
+      {/* BODY */}
+      <div className="panel-body">
+
+        <textarea
+          className={`body ${mode==="now"?"now-text":"blob-text"}`}
+          placeholder={mode==="now" ? "Quick update..." : "Write something detailed..."}
+          value={content}
+          onChange={(e)=>setContent(e.target.value)}
         />
 
+        {/* BLOB OPTIONS */}
         {mode === "blob" && (
           <>
-            <select className="borderless" value={category} onChange={e=>setCategory(e.target.value)}>
+            <div className="meta">Category</div>
+            <select className="body" value={category} onChange={(e)=>setCategory(e.target.value)}>
               {CATEGORIES.map(c=><option key={c}>{c}</option>)}
             </select>
 
-            <select className="borderless" value={scope} onChange={e=>setScope(e.target.value)}>
+            <div className="meta">Scope</div>
+            <select className="body" value={scope} onChange={(e)=>setScope(e.target.value)}>
               {SCOPES.map(s=><option key={s}>{s}</option>)}
             </select>
+
+            {/* TAGS */}
+            <input
+              className="body"
+              placeholder="Add tags"
+              value={tagInput}
+              onChange={(e)=>setTagInput(e.target.value)}
+              onKeyDown={handleTagKey}
+            />
+
+            <div className="tag-list">
+              {tags.map(tag=>(
+                <span key={tag} className="label">
+                  {tag}
+                </span>
+              ))}
+            </div>
           </>
         )}
-      </div>
 
-      <textarea
-        placeholder={
-          mode === "now"
-            ? "Quick update..."
-            : "Write something detailed..."
-        }
-        value={content}
-        onChange={e=>setContent(e.target.value)}
-      />
+        {/* FILES */}
+        <button className="btn btn-secondary" onClick={()=>fileInputRef.current.click()}>
+          Upload
+        </button>
 
-      {/* TAGS (BLOB ONLY) */}
-      {mode === "blob" && (
-        <>
-          <input
-            placeholder="Add tags"
-            value={tagInput}
-            onChange={e=>setTagInput(e.target.value)}
-            onKeyDown={handleTagKey}
-          />
+        <input
+          type="file"
+          hidden
+          multiple
+          ref={fileInputRef}
+          onChange={(e)=>handleFiles(Array.from(e.target.files))}
+        />
 
-          <div className="tag-list">
-            {tags.map(tag=>(
-              <span key={tag} onClick={()=>setTags(tags.filter(t=>t!==tag))}>
-                {tag} ✕
-              </span>
-            ))}
-          </div>
-        </>
-      )}
-
-      {/* FILE UPLOAD */}
-      <input
-        type="file"
-        hidden
-        multiple
-        ref={fileInputRef}
-        onChange={(e)=>handleFiles(Array.from(e.target.files))}
-      />
-
-      <button onClick={()=>fileInputRef.current.click()}>
-        Upload
-      </button>
-
-      {/* FILE LIST */}
-      <div className="files">
-        {files.map((f, index)=>(
-          <div
-            key={f.id}
-            draggable
-            onDragStart={()=>dragItem.current=index}
-            onDragEnter={()=>dragOverItem.current=index}
-            onDragEnd={handleSort}
-          >
-            {f.thumbnail
-              ? <img src={f.thumbnail}/>
-              : f.file.type.startsWith("image")
+        <div className="files">
+          {files.map(f=>(
+            <div key={f.id} className="panel panel-hover panel-compact">
+              {f.file.type.startsWith("image")
                 ? <img src={f.url}/>
-                : <span>📄</span>
-            }
+                : <span className="meta">Video</span>
+              }
+            </div>
+          ))}
+        </div>
 
-            <button onClick={()=>setPreview(f)}>👁</button>
-          </div>
-        ))}
-      </div>
+        {/* AD MODE */}
+        {mode === "blob" && (
+          <>
+            <label className="label">
+              <input type="checkbox" checked={isAd} onChange={()=>setIsAd(!isAd)} />
+              Promote
+            </label>
 
-      {/* AD MODE (BLOB ONLY) */}
-      {mode === "blob" && (
-        <>
-          <label className="ad-toggle">
-            <input
-              type="checkbox"
-              checked={isAd}
-              onChange={()=>setIsAd(!isAd)}
-            />
-            Promote this post
-          </label>
-
-          {isAd && (
-            <>
+            {isAd && (
               <div className="slots">
-                {[...Array(24)].map((_, hour)=>(
+                {[...Array(24)].map((_,h)=>(
                   <button
-                    key={hour}
-                    className={selectedSlots.includes(hour) ? "active" : ""}
+                    key={h}
+                    className={`btn ${selectedSlots.includes(h) ? "btn-primary" : "btn-secondary"}`}
                     onClick={()=>{
                       setSelectedSlots(prev =>
-                        prev.includes(hour)
-                          ? prev.filter(h=>h!==hour)
-                          : [...prev, hour]
+                        prev.includes(h)
+                          ? prev.filter(x=>x!==h)
+                          : [...prev, h]
                       );
                     }}
                   >
-                    {hour}:00 ${slotPricing[hour]?.price || "--"}
+                    {h}:00
                   </button>
                 ))}
               </div>
+            )}
+          </>
+        )}
 
-              <div className="slot-total">
-                Total: $
-                {selectedSlots.reduce(
-                  (sum,h)=>sum+(slotPricing[h]?.price||0),0
-                )}
-              </div>
-            </>
-          )}
-        </>
-      )}
+      </div>
 
-      {/* SUBMIT */}
-      <button className="submit-btn" onClick={handleSubmit}>
-        {mode === "now" ? "Post Now" : "Publish"}
-      </button>
+      {/* FOOTER */}
+      <div className="panel-footer">
+        <button className="btn btn-primary btn-block" onClick={handleSubmit}>
+          {mode==="now" ? "Post Now" : "Publish"}
+        </button>
+      </div>
 
       {/* PREVIEW */}
       {preview && (
         <div className="modal" onClick={()=>setPreview(null)}>
           <div onClick={e=>e.stopPropagation()}>
-            {preview.file.type.startsWith("video") && (
-              <video src={preview.url} controls />
-            )}
-            {preview.file.type.startsWith("image") && (
-              <img src={preview.url}/>
-            )}
+            <img src={preview.url}/>
           </div>
         </div>
       )}

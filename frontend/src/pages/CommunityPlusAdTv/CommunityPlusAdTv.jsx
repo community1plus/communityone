@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import "./AdTV.css";
 
 export default function CommunityPlusAdTv({ ads = [], context = "feed" }) {
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [expanded, setExpanded] = useState(false);
   const [visible, setVisible] = useState(true);
@@ -17,7 +18,7 @@ export default function CommunityPlusAdTv({ ads = [], context = "feed" }) {
 
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % ads.length);
-    }, 15000); // rotate every 15s
+    }, 15000);
 
     return () => clearInterval(interval);
   }, [ads]);
@@ -29,54 +30,66 @@ export default function CommunityPlusAdTv({ ads = [], context = "feed" }) {
   ========================= */
 
   useEffect(() => {
-    if (context === "composer") {
-      setVisible(false);
-    } else {
-      setVisible(true);
-    }
+    setVisible(context !== "composer");
   }, [context]);
 
   if (!visible || !currentAd) return null;
+
+  /* =========================
+     CONTROLS
+  ========================= */
+
+  const togglePlay = () => {
+    if (!videoRef.current) return;
+
+    if (videoRef.current.paused) {
+      videoRef.current.play();
+    } else {
+      videoRef.current.pause();
+    }
+  };
 
   /* =========================
      UI
   ========================= */
 
   return (
-    <div className={`ad-tv ${expanded ? "expanded" : ""}`}>
+    <div
+      className={`
+        theme-adtv 
+        adtv-container 
+        panel 
+        ${expanded ? "adtv-expanded" : ""}
+      `}
+    >
 
-      {/* BADGE */}
-      <div className="ad-tv-badge">
-        AD.TV <span className="sp">SP</span>
+      {/* BRAND */}
+      <div className="adtv-brand">
+        AD.TV <span className="adtv-sp">SP</span>
       </div>
 
       {/* VIDEO */}
-      <video
-        ref={videoRef}
-        src={currentAd.url}
-        autoPlay
-        muted
-        loop
-        playsInline
-        className="ad-tv-video"
-      />
+      <div className="adtv-video-wrapper">
+        <video
+          ref={videoRef}
+          src={currentAd.url}
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="adtv-video"
+        />
+      </div>
 
       {/* CONTROLS */}
-      <div className="ad-tv-controls">
+      <div className="adtv-controls">
 
-        <button
-          onClick={() => {
-            if (videoRef.current.paused) {
-              videoRef.current.play();
-            } else {
-              videoRef.current.pause();
-            }
-          }}
-        >
+        <button className="btn btn-ghost" onClick={togglePlay}>
           ⏯
         </button>
 
         <button
+          className="btn btn-ghost"
           onClick={() =>
             setCurrentIndex((prev) => (prev + 1) % ads.length)
           }
@@ -84,11 +97,17 @@ export default function CommunityPlusAdTv({ ads = [], context = "feed" }) {
           →
         </button>
 
-        <button onClick={() => setExpanded(!expanded)}>
+        <button
+          className="btn btn-ghost"
+          onClick={() => setExpanded(!expanded)}
+        >
           ⤢
         </button>
 
-        <button onClick={() => setVisible(false)}>
+        <button
+          className="btn btn-ghost"
+          onClick={() => setVisible(false)}
+        >
           ×
         </button>
 

@@ -75,6 +75,20 @@ export default function CommunityPlusSidebar() {
       <hr className="sidebar-divider" />
 
       {/* ===============================
+          AD.TV (NEW)
+      =============================== */}
+
+      <div
+        className={`sidebar-item ${isActive("/adtv") ? "active" : ""}`}
+        onClick={() => go("/adtv")}
+>
+          📺 <span className="label">AD.TV</span>
+      <span className="adtv-sp">SP</span>
+      </div>
+
+      <hr className="sidebar-divider" />
+
+      {/* ===============================
           SESSION
       =============================== */}
 

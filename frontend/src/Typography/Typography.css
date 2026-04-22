@@ -1,19 +1,129 @@
-/* ===============================
-   GLOBAL TYPE UTILITIES
-=============================== */
+/* =========================
+   GLOBAL TYPOGRAPHY
+========================= */
 
-.text-xs { font-size: var(--fs-xs); }
-.text-sm { font-size: var(--fs-sm); }
-.text-md { font-size: var(--fs-md); }
-.text-lg { font-size: var(--fs-lg); }
-.text-xl { font-size: var(--fs-xl); }
+body {
+  font-family: var(--font-primary);
+  font-size: var(--text-md);
+  line-height: 1.4;
+}
 
-/* Weights */
-.fw-regular { font-weight: var(--fw-regular); }
-.fw-medium { font-weight: var(--fw-medium); }
-.fw-bold { font-weight: var(--fw-bold); }
+/* =========================
+   HEADINGS
+========================= */
 
-/* Colors */
-.text-main { color: var(--text-main); }
-.text-muted { color: var(--text-muted); }
-.text-accent { color: var(--text-accent); }
+.h1 {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.h2 {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.h3 {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* =========================
+   BODY TEXT
+========================= */
+
+.body {
+  font-size: var(--text-md);
+  font-weight: 400;
+  color: var(--color-text);
+}
+
+/* =========================
+   META (timestamps, location)
+========================= */
+
+.meta {
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+}
+
+/* =========================
+   LABELS (SYSTEM SIGNATURE)
+========================= */
+
+.label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+/* =========================
+   REAL TALK (CALLOUT STYLE)
+========================= */
+
+.real-talk {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+/* =========================
+   NOW MODE TEXT
+========================= */
+
+.now-text {
+  font-weight: 600;
+}
+
+/* =========================
+   BLOB MODE TEXT
+========================= */
+
+.blob-text {
+  font-weight: 400;
+}
+
+/* =========================
+   AD.TV TEXT (PREMIUM DARK)
+========================= */
+
+.adtv-text {
+  color: #fff;
+  font-weight: 500;
+}
+
+/* =========================
+   AD.TV BRANDING
+========================= */
+
+.adtv-brand {
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.adtv-sp {
+  font-size: 8px;
+  border: 1px solid #fff;
+  border-radius: 50%;
+  padding: 1px 3px;
+  margin-left: 3px;
+}
+
+/* =========================
+   TRUST INDICATORS
+========================= */
+
+.trust-high {
+  color: #1a7f37;
+  font-weight: 600;
+}
+
+.trust-medium {
+  color: #b7791f;
+}
+
+.trust-low {
+  color: #c53030;
+}

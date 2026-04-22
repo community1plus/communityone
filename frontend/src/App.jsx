@@ -82,6 +82,7 @@ export default function App() {
         <Route path="/search" element={<PlaceholderPage title="Search page" />} />
         <Route path="/about" element={<PlaceholderPage title="About page" />} />
         <Route path="/merch" element={<PlaceholderPage title="Merch page" />} />
+        <Route path="/adtv" element={<PlaceholderPage title="adtv page" />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
