@@ -1,289 +1,180 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { resolveLocation as enrichLocation } from "../../services/resolveLocation";
+const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
-const LocationContext = createContext();
-export const useLocationContext = () => useContext(LocationContext);
+/* ===============================
+   HELPERS
+=============================== */
 
-export function LocationProvider({ children }) {
-  /* ===============================
-     STATE
-  =============================== */
+const getComponent = (components, types) => {
+  for (let type of types) {
+    const match = components.find(c => c.types.includes(type));
+    if (match) return match.long_name;
+  }
+  return null;
+};
 
-  const [homeLocation, setHomeLocation] = useState(null);
-  const [liveLocation, setLiveLocation] = useState(null);
-  const [ipLocation, setIpLocation] = useState(null);
+// 🔥 Detect major roads (to avoid misleading labels)
+const isMajorRoad = (street = "") => {
+  return /highway|hwy|freeway|fwy|road|rd/i.test(street);
+};
 
-  const [viewLocation, setViewLocationState] = useState(() => {
-    const saved = localStorage.getItem("viewLocation");
+/* ===============================
+   MAIN RESOLVER
+=============================== */
 
-    if (!saved) return null;
+export async function resolveLocation({ lat, lng, accuracy = 999 }) {
+  try {
+    const res = await fetch(
+      `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${GOOGLE_API_KEY}`
+    );
 
-    try {
-      const parsed = JSON.parse(saved);
+    const data = await res.json();
 
-      // 🚨 Prevent restoring old IP-based location
-      if (parsed?.type === "ip") {
-        console.log("🚫 Ignoring stored IP location");
-        return null;
+    /* ===============================
+       HANDLE GOOGLE STATUS
+    =============================== */
+
+    if (data.status !== "OK") {
+      console.error("❌ Google Geocode status:", data.status);
+
+      if (data.status === "REQUEST_DENIED") {
+        throw new Error("Geocode API denied (check API key)");
       }
 
-      return parsed;
-    } catch {
-      return null;
+      if (data.status === "OVER_QUERY_LIMIT") {
+        throw new Error("Geocode quota exceeded");
+      }
+
+      if (data.status === "ZERO_RESULTS") {
+        console.warn("⚠️ No address found for coordinates");
+
+        return {
+          lat,
+          lng,
+          accuracy,
+          suburb: null,
+          state: null,
+          label: "Approx location",
+          fullLabel: null,
+          hint: null,
+          precision: accuracy <= 200 ? "medium" : "low",
+          source: "coords-only",
+          updatedAt: Date.now(),
+        };
+      }
     }
-  });
 
-  const [manualLocation, setManualLocation] = useState(null);
-  const [locationMode, setLocationMode] = useState("auto");
+    if (!data.results || !data.results.length) {
+      throw new Error("No geocode results");
+    }
 
-  /* ===============================
-     SETTER
-  =============================== */
+    const result = data.results[0];
+    const components = result.address_components;
 
-  const setViewLocation = (loc, mode = "manual") => {
-    if (!loc) return;
+    /* ===============================
+       EXTRACT FIELDS
+    =============================== */
 
-    const newLoc = {
-      ...loc,
+    const street = getComponent(components, ["route"]);
+
+    const suburb = getComponent(components, [
+      "locality",
+      "sublocality",
+      "administrative_area_level_2",
+    ]);
+
+    const city = getComponent(components, ["locality"]);
+
+    const state = getComponent(components, [
+      "administrative_area_level_1",
+    ]);
+
+    const postcode = getComponent(components, ["postal_code"]);
+
+    const finalSuburb = suburb || city || state;
+
+    /* ===============================
+       PRECISION (ACCURACY + ADDRESS)
+    =============================== */
+
+    let precision = "low";
+
+    if (street && finalSuburb && accuracy <= 50) {
+      precision = "high";
+    } else if (finalSuburb && accuracy <= 200) {
+      precision = "medium";
+    } else {
+      precision = "low";
+    }
+
+    /* ===============================
+       🔥 SMART LABEL STRATEGY (UPGRADED)
+    =============================== */
+
+    let label;
+    let hint = null;
+
+    if (precision === "high") {
+      // Only show full address if VERY confident
+      label = result.formatted_address;
+    } else if (precision === "medium") {
+      // Suburb only (avoid misleading street names)
+      label = `${finalSuburb || "Unknown"}, ${state || ""}`;
+
+      // Only show hint if NOT a major road
+      if (street && !isMajorRoad(street)) {
+        hint = `near ${street}`;
+      }
+    } else {
+      // Low precision → broad only
+      label = `${finalSuburb || "Unknown"}, ${state || ""}`;
+    }
+
+    /* ===============================
+       FINAL OBJECT
+    =============================== */
+
+    const location = {
+      lat,
+      lng,
+      accuracy,
+
+      street,
+      suburb: finalSuburb,
+      city,
+      state,
+      postcode,
+
+      label,
+      fullLabel: result.formatted_address,
+      hint,
+
+      precision,
+      source: "gps+google",
       updatedAt: Date.now(),
     };
 
-    console.log("📍 setViewLocation:", newLoc, "mode:", mode);
+    console.log("📍 Resolved location:", location);
 
-    if (mode === "manual") {
-      setManualLocation(newLoc);
-      setLocationMode("manual");
-    }
+    return location;
 
-    setViewLocationState(newLoc);
-  };
+  } catch (err) {
+    console.error("❌ resolveLocation failed:", err);
 
-  /* ===============================
-     PERSIST
-  =============================== */
+    return {
+      lat,
+      lng,
+      accuracy,
 
-  useEffect(() => {
-    if (viewLocation) {
-      localStorage.setItem("viewLocation", JSON.stringify(viewLocation));
-    }
-  }, [viewLocation]);
+      suburb: null,
+      state: null,
 
-  /* ===============================
-     CLEAN OLD IP
-  =============================== */
+      label: "Unknown location",
+      fullLabel: null,
+      hint: null,
 
-  useEffect(() => {
-    const saved = localStorage.getItem("viewLocation");
-
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (parsed?.type === "ip") {
-          localStorage.removeItem("viewLocation");
-          console.log("🧹 Cleared old IP location");
-        }
-      } catch {}
-    }
-  }, []);
-
-  /* ===============================
-     RESOLUTION (NO IP)
-  =============================== */
-
-  const resolveLocation = ({ mode, manual, home, live }) => {
-    if (mode === "manual" && manual) return manual;
-    if (home) return home;
-    if (live) return live;
-    return null;
-  };
-
-  /* ===============================
-     INIT
-  =============================== */
-
-  useEffect(() => {
-    const init = async () => {
-      if (locationMode === "manual") return;
-
-      let home = null;
-
-      // Load home
-      const savedHome = localStorage.getItem("homeLocation");
-      if (savedHome) {
-        home = JSON.parse(savedHome);
-        setHomeLocation(home);
-      }
-
-      // Fetch IP (HINT ONLY)
-      try {
-        const res = await fetch("https://ipapi.co/json/");
-        const data = await res.json();
-
-        const ip = {
-          lat: data.latitude,
-          lng: data.longitude,
-          city: data.city,
-          state: data.region_code,
-          label: `${data.city}, ${data.region_code}`,
-          type: "ip",
-        };
-
-        setIpLocation(ip);
-      } catch {
-        console.warn("IP location failed");
-      }
-
-      const resolved = resolveLocation({
-        mode: locationMode,
-        manual: manualLocation,
-        home,
-        live: null,
-      });
-
-      if (resolved) {
-        setViewLocation(resolved, "auto");
-      }
+      precision: accuracy <= 200 ? "medium" : "low",
+      source: "fallback",
+      updatedAt: Date.now(),
     };
-
-    init();
-  }, []);
-
-  /* ===============================
-     🔥 HIGH ACCURACY LIVE LOCATION
-  =============================== */
-
-  const enableLiveLocation = async () => {
-    if (!navigator.geolocation) return;
-
-    return new Promise((resolve, reject) => {
-      let bestReading = null;
-      let attempts = 0;
-
-      const MAX_ATTEMPTS = 5;
-      const MAX_TIME = 10000;
-      const GOOD_ACCURACY = 50;
-
-      console.log("📡 Starting high-accuracy sampling...");
-
-      const watchId = navigator.geolocation.watchPosition(
-        async (pos) => {
-          attempts++;
-
-          const reading = {
-            lat: pos.coords.latitude,
-            lng: pos.coords.longitude,
-            accuracy: pos.coords.accuracy,
-          };
-
-          console.log(`📍 Sample ${attempts}:`, reading);
-
-          if (!bestReading || reading.accuracy < bestReading.accuracy) {
-            bestReading = reading;
-          }
-
-          const isGoodEnough = reading.accuracy <= GOOD_ACCURACY;
-          const isMaxAttempts = attempts >= MAX_ATTEMPTS;
-
-          if (isGoodEnough || isMaxAttempts) {
-            navigator.geolocation.clearWatch(watchId);
-
-            try {
-              console.log("✅ Best reading:", bestReading);
-
-              const enriched = await enrichLocation(bestReading);
-
-              setLiveLocation(enriched);
-
-              if (locationMode !== "manual") {
-                setViewLocation(enriched, "auto");
-              }
-
-              resolve(enriched);
-            } catch (err) {
-              reject(err);
-            }
-          }
-        },
-        (err) => {
-          navigator.geolocation.clearWatch(watchId);
-          reject(err);
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: MAX_TIME,
-          maximumAge: 0,
-        }
-      );
-
-      // Timeout fallback
-      setTimeout(() => {
-        navigator.geolocation.clearWatch(watchId);
-
-        if (!bestReading) {
-          reject(new Error("No readings"));
-          return;
-        }
-
-        console.log("⏱ Timeout — using best:", bestReading);
-
-        enrichLocation(bestReading)
-          .then(resolve)
-          .catch(reject);
-      }, MAX_TIME + 1000);
-    });
-  };
-
-  /* ===============================
-     HOME LOCATION
-  =============================== */
-
-  const enableHomeLocation = async () => {
-    if (!navigator.geolocation) return;
-
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        const enriched = await enrichLocation({
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude,
-          accuracy: pos.coords.accuracy,
-        });
-
-        const loc = {
-          ...enriched,
-          type: "home",
-        };
-
-        setHomeLocation(loc);
-        localStorage.setItem("homeLocation", JSON.stringify(loc));
-
-        if (locationMode !== "manual") {
-          setViewLocation(loc, "auto");
-        }
-      },
-      (err) => console.error(err),
-      { enableHighAccuracy: true }
-    );
-  };
-
-  /* ===============================
-     EXPORT
-  =============================== */
-
-  return (
-    <LocationContext.Provider
-      value={{
-        viewLocation,
-        setViewLocation,
-
-        homeLocation,
-        liveLocation,
-        ipLocation,
-
-        enableLiveLocation,
-        enableHomeLocation,
-      }}
-    >
-      {children}
-    </LocationContext.Provider>
-  );
+  }
 }
