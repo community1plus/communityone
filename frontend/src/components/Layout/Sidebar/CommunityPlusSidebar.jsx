@@ -25,24 +25,28 @@ export default function CommunityPlusSidebar() {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <aside className="sidebar">
+    <aside className="sidebar panel">
 
       {/* ===============================
           CORE MODES
       =============================== */}
 
-      <div
-        className={`sidebar-item ${isActive("/now") ? "active" : ""}`}
-        onClick={() => go("/now")}
-      >
-        ⚡ Now
-      </div>
+      <div className="sidebar-group">
+        <div className="meta">Modes</div>
 
-      <div
-        className={`sidebar-item ${isActive("/blob") ? "active" : ""}`}
-        onClick={() => go("/blob")}
-      >
-        🧠 Blob
+        <button
+          className={`btn btn-ghost sidebar-btn ${isActive("/now") ? "active" : ""}`}
+          onClick={() => go("/now")}
+        >
+          ⚡ <span className="label">Now</span>
+        </button>
+
+        <button
+          className={`btn btn-ghost sidebar-btn ${isActive("/blob") ? "active" : ""}`}
+          onClick={() => go("/blob")}
+        >
+          🧠 <span className="label">Blob</span>
+        </button>
       </div>
 
       <hr className="sidebar-divider" />
@@ -51,39 +55,47 @@ export default function CommunityPlusSidebar() {
           ACTIONS
       =============================== */}
 
-      <div
-        className={`sidebar-item ${isActive("/event") ? "active" : ""}`}
-        onClick={() => go("/event")}
-      >
-        📅 Event
-      </div>
+      <div className="sidebar-group">
+        <div className="meta">Actions</div>
 
-      <div
-        className={`sidebar-item ${isActive("/incident") ? "active" : ""}`}
-        onClick={() => go("/incident")}
-      >
-        🚨 Incident
-      </div>
+        <button
+          className={`btn btn-ghost sidebar-btn ${isActive("/event") ? "active" : ""}`}
+          onClick={() => go("/event")}
+        >
+          📅 Event
+        </button>
 
-      <div
-        className={`sidebar-item ${isActive("/beacon") ? "active" : ""}`}
-        onClick={() => go("/beacon")}
-      >
-        📡 Beacon
+        <button
+          className={`btn btn-ghost sidebar-btn ${isActive("/incident") ? "active" : ""}`}
+          onClick={() => go("/incident")}
+        >
+          🚨 Incident
+        </button>
+
+        <button
+          className={`btn btn-ghost sidebar-btn ${isActive("/beacon") ? "active" : ""}`}
+          onClick={() => go("/beacon")}
+        >
+          📡 Beacon
+        </button>
       </div>
 
       <hr className="sidebar-divider" />
 
       {/* ===============================
-          AD.TV (NEW)
+          AD.TV
       =============================== */}
 
-      <div
-        className={`sidebar-item ${isActive("/adtv") ? "active" : ""}`}
-        onClick={() => go("/adtv")}
->
+      <div className="sidebar-group">
+        <div className="meta">Media</div>
+
+        <button
+          className={`btn btn-ghost sidebar-btn ${isActive("/adtv") ? "active" : ""}`}
+          onClick={() => go("/adtv")}
+        >
           📺 <span className="label">AD.TV</span>
-      <span className="adtv-sp">SP</span>
+          <span className="adtv-sp">SP</span>
+        </button>
       </div>
 
       <hr className="sidebar-divider" />
@@ -92,8 +104,13 @@ export default function CommunityPlusSidebar() {
           SESSION
       =============================== */}
 
-      <div className="sidebar-item logout" onClick={handleLogout}>
-        🚪 Logout
+      <div className="sidebar-group">
+        <button
+          className="btn btn-ghost sidebar-btn logout"
+          onClick={handleLogout}
+        >
+          🚪 Logout
+        </button>
       </div>
 
     </aside>
