@@ -7,14 +7,13 @@ import React, {
 
 import { useNavigate, useLocation } from "react-router-dom";
 import "./CommunityPlusHeader.css";
-import { useLocationContext } from "../../../context/LocationProvider";
+import { useLocationContext, LocationProvider  } from "../../../context/LocationProvider";
 import { useAuth } from "../../../context/AuthContext";
 import LocationPin from "../../UI/LocationPin";
 
 // ✅ FIXED PATH
-import { LocationProvider } from "../../../context/LocationProvider";
+
 import { resolveLocation } from "../../../services/resolveLocation";
-impot resolveLocation
 
 export default function CommunityPlusHeader({ user, onLogout }) {
   const navigate = useNavigate();
