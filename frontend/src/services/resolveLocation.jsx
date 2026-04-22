@@ -16,7 +16,7 @@ const getComponent = (components, types) => {
    MAIN RESOLVER
 =============================== */
 
-export async function resolveLocation({ lat, lng, accuracy }) {
+export async function resolveLocation({ lat, lng, accuracy = 999 }) {
   try {
     const res = await fetch(
       `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${GOOGLE_API_KEY}`
@@ -25,7 +25,7 @@ export async function resolveLocation({ lat, lng, accuracy }) {
     const data = await res.json();
 
     /* ===============================
-       🔥 HANDLE GOOGLE STATUS (CRITICAL)
+       HANDLE GOOGLE STATUS
     =============================== */
 
     if (data.status !== "OK") {
@@ -52,6 +52,7 @@ export async function resolveLocation({ lat, lng, accuracy }) {
 
           label: "Approx location",
           fullLabel: null,
+          hint: null,
 
           precision: accuracy <= 200 ? "medium" : "low",
           source: "coords-only",
@@ -94,7 +95,7 @@ export async function resolveLocation({ lat, lng, accuracy }) {
     const finalSuburb = suburb || city || state;
 
     /* ===============================
-       🔥 PRECISION (ACCURACY + ADDRESS)
+       PRECISION (ACCURACY + ADDRESS)
     =============================== */
 
     let precision = "low";
@@ -105,6 +106,28 @@ export async function resolveLocation({ lat, lng, accuracy }) {
       precision = "medium";
     } else {
       precision = "low";
+    }
+
+    /* ===============================
+       🔥 SMART LABEL STRATEGY (KEY FIX)
+    =============================== */
+
+    let label;
+    let hint = null;
+
+    if (precision === "high") {
+      // High confidence → show full address
+      label = result.formatted_address;
+    } else if (precision === "medium") {
+      // Medium → suburb only + optional hint
+      label = `${finalSuburb || "Unknown"}, ${state || ""}`;
+
+      if (street) {
+        hint = `near ${street}`;
+      }
+    } else {
+      // Low → broad only
+      label = `${finalSuburb || "Unknown"}, ${state || ""}`;
     }
 
     /* ===============================
@@ -122,8 +145,9 @@ export async function resolveLocation({ lat, lng, accuracy }) {
       state,
       postcode,
 
-      label: `${finalSuburb || "Unknown"}, ${state || ""}`,
+      label,
       fullLabel: result.formatted_address,
+      hint, // 🔥 NEW (optional UI usage)
 
       precision,
       source: "gps+google",
@@ -147,6 +171,7 @@ export async function resolveLocation({ lat, lng, accuracy }) {
 
       label: "Unknown location",
       fullLabel: null,
+      hint: null,
 
       precision: accuracy <= 200 ? "medium" : "low",
       source: "fallback",
