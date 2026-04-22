@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./PostComposer.css";
 
 export default function PostComposer() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [files, setFiles] = useState([]);
+
+  const [preview, setPreview] = useState(null); // 🔥 modal preview
 
   /* =========================
      HELPERS
@@ -14,6 +16,10 @@ export default function PostComposer() {
     if (bytes < 1024) return bytes + " B";
     if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
     return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+  };
+
+  const formatDate = (ts) => {
+    return new Date(ts).toLocaleString();
   };
 
   const getFileType = (file) => {
@@ -42,7 +48,10 @@ export default function PostComposer() {
       file,
       url: URL.createObjectURL(file),
       id: crypto.randomUUID(),
-      createdAt: new Date(),
+
+      // 🔥 Metadata
+      uploadedAt: new Date(),
+      lastModified: file.lastModified,
     }));
 
     setFiles((prev) => [...prev, ...enriched]);
@@ -58,13 +67,22 @@ export default function PostComposer() {
   };
 
   const removeFile = (id) => {
-    setFiles((prev) => prev.filter((f) => f.id !== id));
+    setFiles((prev) => {
+      const file = prev.find((f) => f.id === id);
+      if (file) URL.revokeObjectURL(file.url); // 🔥 cleanup
+      return prev.filter((f) => f.id !== id);
+    });
   };
 
-  const previewFile = (file) => {
-    const url = URL.createObjectURL(file);
-    window.open(url);
-  };
+  /* =========================
+     CLEANUP (IMPORTANT)
+  ========================= */
+
+  useEffect(() => {
+    return () => {
+      files.forEach((f) => URL.revokeObjectURL(f.url));
+    };
+  }, [files]);
 
   /* =========================
      UI
@@ -109,7 +127,9 @@ export default function PostComposer() {
 
             <label htmlFor="fileUpload" className="drop-zone-inner">
               <div className="drop-title">Drag & drop files</div>
-              <div className="drop-sub">Images, Video (≤300MB), Audio, PDF</div>
+              <div className="drop-sub">
+                Images, Video (≤300MB), Audio, PDF
+              </div>
             </label>
           </div>
 
@@ -127,7 +147,7 @@ export default function PostComposer() {
           ) : (
             <div className="file-list">
 
-              {files.map(({ file, url, id, createdAt }) => {
+              {files.map(({ file, url, id, uploadedAt, lastModified }) => {
                 const type = getFileType(file);
 
                 return (
@@ -135,14 +155,8 @@ export default function PostComposer() {
 
                     {/* THUMBNAIL */}
                     <div className="file-thumb">
-                      {type === "image" && (
-                        <img src={url} alt="" />
-                      )}
-
-                      {type === "video" && (
-                        <video src={url} />
-                      )}
-
+                      {type === "image" && <img src={url} alt="" />}
+                      {type === "video" && <video src={url} />}
                       {type === "audio" && <span>🎧</span>}
                       {type === "file" && <span>📄</span>}
                     </div>
@@ -150,22 +164,37 @@ export default function PostComposer() {
                     {/* INFO */}
                     <div className="file-info">
                       <div className="file-name">{file.name}</div>
+
                       <div className="file-meta">
                         {formatSize(file.size)} • {file.type}
+                      </div>
+
+                      {/* 🔥 NEW METADATA */}
+                      <div className="file-meta-sub">
+                        Uploaded: {formatDate(uploadedAt)}
+                      </div>
+
+                      <div className="file-meta-sub">
+                        File date: {formatDate(lastModified)}
                       </div>
                     </div>
 
                     {/* ACTIONS */}
                     <div className="file-actions">
-                      <button onClick={() => previewFile(file)}>👁</button>
+                      <button onClick={() => setPreview({ file, url })}>
+                        👁
+                      </button>
+
                       <button onClick={() => removeFile(id)}>✕</button>
 
                       <button
                         onClick={() =>
                           alert(
-                            `Name: ${file.name}\nSize: ${formatSize(
-                              file.size
-                            )}\nType: ${file.type}\nUploaded: ${createdAt}`
+                            `Name: ${file.name}
+Size: ${formatSize(file.size)}
+Type: ${file.type}
+Uploaded: ${formatDate(uploadedAt)}
+File Date: ${formatDate(lastModified)}`
                           )
                         }
                       >
@@ -183,6 +212,48 @@ export default function PostComposer() {
         </div>
 
       </div>
+
+      {/* ================= PREVIEW MODAL ================= */}
+      {preview && (
+        <div className="preview-modal" onClick={() => setPreview(null)}>
+          <div
+            className="preview-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="preview-close"
+              onClick={() => setPreview(null)}
+            >
+              ✕
+            </button>
+
+            {preview.file.type.startsWith("image") && (
+              <img src={preview.url} className="preview-media" />
+            )}
+
+            {preview.file.type.startsWith("video") && (
+              <video
+                src={preview.url}
+                controls
+                className="preview-media"
+              />
+            )}
+
+            {preview.file.type.startsWith("audio") && (
+              <audio src={preview.url} controls />
+            )}
+
+            {!preview.file.type.match(/image|video|audio/) && (
+              <div className="preview-fallback">
+                <p>{preview.file.name}</p>
+                <a href={preview.url} download>
+                  Download file
+                </a>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
