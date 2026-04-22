@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { resolveLocation as enrichLocation } from "../services/resolveLocation";
+import { resolveLocation as enrichLocation } from "../../services/resolveLocation";
 
 const LocationContext = createContext();
 export const useLocationContext = () => useContext(LocationContext);
