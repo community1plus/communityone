@@ -9,6 +9,7 @@ import CommunityPlusYellowPages from "./pages/YellowPages/CommunityPlusYellowPag
 import CommunityPlusHub from "./pages/CommunityPlusHub/CommunityPlusHub";
 import PostComposer from "./components/Layout/Sidebar/Post/PostComposer";
 import CommunityPlusAdTv from "./pages/CommunityPlusAdTv/CommunityPlusAdTv";
+import CommunityPlusAdTvPage from "./pages/CommunityPlusAdTvPage/CommunityPlusAdTvPage";
 import "./styles/tokens.css";
 import "./styles/base.css";
 import "./Typography/Typography.css";
