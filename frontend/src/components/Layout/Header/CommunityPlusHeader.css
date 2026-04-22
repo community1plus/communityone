@@ -255,6 +255,7 @@ LOCATION
 
 /* AD.TV superscript alignment */
 
+
 .links .adtv-sp {
   margin-left: 4px;
   transform: translateY(-3px);
@@ -266,3 +267,4 @@ LOCATION
   font-size: 13px;
   font-weight: 600;
 }
+
