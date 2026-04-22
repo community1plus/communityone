@@ -1,181 +1,94 @@
-const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+const enableLiveLocation = async () => {
+  if (!navigator.geolocation) return;
 
-/* ===============================
-   HELPERS
-=============================== */
+  return new Promise((resolve, reject) => {
+    let bestReading = null;
+    let attempts = 0;
 
-const getComponent = (components, types) => {
-  for (let type of types) {
-    const match = components.find(c => c.types.includes(type));
-    if (match) return match.long_name;
-  }
-  return null;
-};
+    const MAX_ATTEMPTS = 5;        // 🔥 number of samples
+    const MAX_TIME = 10000;       // 🔥 max time (10s)
+    const GOOD_ACCURACY = 50;     // 🔥 stop early if this is reached
 
-/* ===============================
-   MAIN RESOLVER
-=============================== */
+    console.log("📡 Starting high-accuracy sampling...");
 
-export async function resolveLocation({ lat, lng, accuracy = 999 }) {
-  try {
-    const res = await fetch(
-      `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${GOOGLE_API_KEY}`
+    const watchId = navigator.geolocation.watchPosition(
+      async (pos) => {
+        attempts++;
+
+        const reading = {
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+          accuracy: pos.coords.accuracy,
+        };
+
+        console.log(`📍 Sample ${attempts}:`, reading);
+
+        // 🔥 Keep best (lowest accuracy value)
+        if (
+          !bestReading ||
+          reading.accuracy < bestReading.accuracy
+        ) {
+          bestReading = reading;
+        }
+
+        // 🔥 Stop conditions
+        const isGoodEnough = reading.accuracy <= GOOD_ACCURACY;
+        const isMaxAttempts = attempts >= MAX_ATTEMPTS;
+
+        if (isGoodEnough || isMaxAttempts) {
+          navigator.geolocation.clearWatch(watchId);
+
+          try {
+            console.log("✅ Best reading selected:", bestReading);
+
+            const enriched = await enrichLocation({
+              lat: bestReading.lat,
+              lng: bestReading.lng,
+              accuracy: bestReading.accuracy,
+            });
+
+            setLiveLocation(enriched);
+
+            if (locationMode !== "manual") {
+              setViewLocation(enriched, "auto");
+            }
+
+            resolve(enriched);
+          } catch (err) {
+            console.error("❌ Enrichment failed:", err);
+            reject(err);
+          }
+        }
+      },
+      (err) => {
+        console.error("❌ Geolocation error:", err);
+        navigator.geolocation.clearWatch(watchId);
+        reject(err);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: MAX_TIME,
+        maximumAge: 0,
+      }
     );
 
-    const data = await res.json();
+    // 🔥 Hard timeout fallback
+    setTimeout(() => {
+      navigator.geolocation.clearWatch(watchId);
 
-    /* ===============================
-       HANDLE GOOGLE STATUS
-    =============================== */
-
-    if (data.status !== "OK") {
-      console.error("❌ Google Geocode status:", data.status);
-
-      if (data.status === "REQUEST_DENIED") {
-        throw new Error("Geocode API denied (check API key)");
+      if (!bestReading) {
+        reject(new Error("No location readings"));
+        return;
       }
 
-      if (data.status === "OVER_QUERY_LIMIT") {
-        throw new Error("Geocode quota exceeded");
-      }
+      console.log("⏱ Timeout — using best reading:", bestReading);
 
-      if (data.status === "ZERO_RESULTS") {
-        console.warn("⚠️ No address found for coordinates");
+      enrichLocation({
+        lat: bestReading.lat,
+        lng: bestReading.lng,
+        accuracy: bestReading.accuracy,
+      }).then(resolve).catch(reject);
 
-        return {
-          lat,
-          lng,
-          accuracy,
-
-          suburb: null,
-          state: null,
-
-          label: "Approx location",
-          fullLabel: null,
-          hint: null,
-
-          precision: accuracy <= 200 ? "medium" : "low",
-          source: "coords-only",
-          updatedAt: Date.now(),
-        };
-      }
-    }
-
-    if (!data.results || !data.results.length) {
-      throw new Error("No geocode results");
-    }
-
-    const result = data.results[0];
-    const components = result.address_components;
-
-    /* ===============================
-       EXTRACT FIELDS
-    =============================== */
-
-    const street = getComponent(components, ["route"]);
-
-    const suburb = getComponent(components, [
-      "locality",
-      "sublocality",
-      "administrative_area_level_2",
-    ]);
-
-    const city = getComponent(components, ["locality"]);
-
-    const state = getComponent(components, [
-      "administrative_area_level_1",
-    ]);
-
-    const postcode = getComponent(components, ["postal_code"]);
-
-    /* ===============================
-       ENFORCE MINIMUM (SUBURB)
-    =============================== */
-
-    const finalSuburb = suburb || city || state;
-
-    /* ===============================
-       PRECISION (ACCURACY + ADDRESS)
-    =============================== */
-
-    let precision = "low";
-
-    if (street && finalSuburb && accuracy <= 50) {
-      precision = "high";
-    } else if (finalSuburb && accuracy <= 200) {
-      precision = "medium";
-    } else {
-      precision = "low";
-    }
-
-    /* ===============================
-       🔥 SMART LABEL STRATEGY (KEY FIX)
-    =============================== */
-
-    let label;
-    let hint = null;
-
-    if (precision === "high") {
-      // High confidence → show full address
-      label = result.formatted_address;
-    } else if (precision === "medium") {
-      // Medium → suburb only + optional hint
-      label = `${finalSuburb || "Unknown"}, ${state || ""}`;
-
-      if (street) {
-        hint = `near ${street}`;
-      }
-    } else {
-      // Low → broad only
-      label = `${finalSuburb || "Unknown"}, ${state || ""}`;
-    }
-
-    /* ===============================
-       FINAL OBJECT
-    =============================== */
-
-    const location = {
-      lat,
-      lng,
-      accuracy,
-
-      street,
-      suburb: finalSuburb,
-      city,
-      state,
-      postcode,
-
-      label,
-      fullLabel: result.formatted_address,
-      hint, // 🔥 NEW (optional UI usage)
-
-      precision,
-      source: "gps+google",
-      updatedAt: Date.now(),
-    };
-
-    console.log("📍 Resolved location:", location);
-
-    return location;
-
-  } catch (err) {
-    console.error("❌ resolveLocation failed:", err);
-
-    return {
-      lat,
-      lng,
-      accuracy,
-
-      suburb: null,
-      state: null,
-
-      label: "Unknown location",
-      fullLabel: null,
-      hint: null,
-
-      precision: accuracy <= 200 ? "medium" : "low",
-      source: "fallback",
-      updatedAt: Date.now(),
-    };
-  }
-}
+    }, MAX_TIME + 1000);
+  });
+};
