@@ -352,3 +352,37 @@ RESPONSIVE
   font-size: 11px;
   opacity: 0.6;
 }
+
+.borderless {
+  border: none;
+  background: transparent;
+}
+
+.submit-btn {
+  margin-top: 10px;
+  padding: 10px;
+  background: black;
+  color: white;
+  cursor: pointer;
+}
+
+.files {
+  display: flex;
+  gap: 10px;
+}
+
+.progress {
+  height: 4px;
+  background: #eee;
+}
+
+.progress div {
+  height: 100%;
+  background: green;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+}

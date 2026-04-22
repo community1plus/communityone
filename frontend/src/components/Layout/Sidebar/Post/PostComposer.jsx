@@ -1,259 +1,324 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import "./PostComposer.css";
+
+const CATEGORIES = [
+  "News","Opinion","Events","Business","Food & Drink",
+  "Entertainment","Sport","Lifestyle","Health","Tech & Science"
+];
+
+const SCOPES = ["Local", "Nearby", "Global"];
 
 export default function PostComposer() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [files, setFiles] = useState([]);
 
-  const [preview, setPreview] = useState(null); // 🔥 modal preview
+  const [category, setCategory] = useState("News");
+  const [scope, setScope] = useState("Local");
+
+  const [tags, setTags] = useState([]);
+  const [tagInput, setTagInput] = useState("");
+
+  const [files, setFiles] = useState([]);
+  const [preview, setPreview] = useState(null);
+
+  const [isAd, setIsAd] = useState(false);
+  const [selectedSlots, setSelectedSlots] = useState([]);
+  const [slotPricing, setSlotPricing] = useState({});
+
+  const fileInputRef = useRef();
+  const dragItem = useRef();
+  const dragOverItem = useRef();
 
   /* =========================
-     HELPERS
+     TAGS
   ========================= */
 
-  const formatSize = (bytes) => {
-    if (bytes < 1024) return bytes + " B";
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
-    return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+  const addTag = (tag) => {
+    const clean = tag.toLowerCase().trim();
+    if (!clean || tags.includes(clean)) return;
+    setTags([...tags, clean]);
   };
 
-  const formatDate = (ts) => {
-    return new Date(ts).toLocaleString();
-  };
-
-  const getFileType = (file) => {
-    if (file.type.startsWith("image")) return "image";
-    if (file.type.startsWith("video")) return "video";
-    if (file.type.startsWith("audio")) return "audio";
-    return "file";
+  const handleTagKey = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      addTag(tagInput);
+      setTagInput("");
+    }
   };
 
   /* =========================
      FILE HANDLING
   ========================= */
 
-  const validateFile = (file) => {
-    if (file.type.startsWith("video") && file.size > 300 * 1024 * 1024) {
-      alert("Video exceeds 300MB limit");
-      return false;
-    }
-    return true;
-  };
-
   const handleFiles = (incoming) => {
-    const valid = incoming.filter(validateFile);
+    const videos = incoming.filter(f => f.type.startsWith("video"));
+    const others = incoming.filter(f => !f.type.startsWith("video"));
 
-    const enriched = valid.map((file) => ({
+    if (videos.length > 4) return alert("Max 4 videos");
+    if (others.length > 2) return alert("Max 2 files/images");
+
+    const enriched = incoming.map(file => ({
+      id: crypto.randomUUID(),
       file,
       url: URL.createObjectURL(file),
-      id: crypto.randomUUID(),
-
-      // 🔥 Metadata
-      uploadedAt: new Date(),
-      lastModified: file.lastModified,
+      progress: 0,
+      thumbnail: null
     }));
 
-    setFiles((prev) => [...prev, ...enriched]);
+    setFiles(prev => [...prev, ...enriched]);
+    enriched.forEach(generateThumbnail);
   };
 
-  const handleDrop = (e) => {
-    e.preventDefault();
-    handleFiles(Array.from(e.dataTransfer.files));
-  };
+  const generateThumbnail = (fileObj) => {
+    if (!fileObj.file.type.startsWith("video")) return;
 
-  const handleUpload = (e) => {
-    handleFiles(Array.from(e.target.files));
-  };
+    const video = document.createElement("video");
+    video.src = fileObj.url;
+    video.currentTime = 1;
 
-  const removeFile = (id) => {
-    setFiles((prev) => {
-      const file = prev.find((f) => f.id === id);
-      if (file) URL.revokeObjectURL(file.url); // 🔥 cleanup
-      return prev.filter((f) => f.id !== id);
+    video.addEventListener("loadeddata", () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+
+      canvas.getContext("2d").drawImage(video, 0, 0);
+
+      const thumb = canvas.toDataURL("image/png");
+
+      setFiles(prev =>
+        prev.map(f =>
+          f.id === fileObj.id ? { ...f, thumbnail: thumb } : f
+        )
+      );
     });
   };
 
   /* =========================
-     CLEANUP (IMPORTANT)
+     DRAG REORDER
+  ========================= */
+
+  const handleSort = () => {
+    const _files = [...files];
+    const dragged = _files.splice(dragItem.current, 1)[0];
+    _files.splice(dragOverItem.current, 0, dragged);
+    setFiles(_files);
+  };
+
+  /* =========================
+     S3 UPLOAD
+  ========================= */
+
+  const uploadToS3 = async (fileObj) => {
+    const res = await fetch("/api/upload-url", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({
+        fileName: fileObj.file.name,
+        fileType: fileObj.file.type
+      })
+    });
+
+    const { uploadUrl, fileUrl } = await res.json();
+
+    await fetch(uploadUrl, {
+      method: "PUT",
+      body: fileObj.file
+    });
+
+    return fileUrl;
+  };
+
+  /* =========================
+     SLOT PRICING
   ========================= */
 
   useEffect(() => {
-    return () => {
-      files.forEach((f) => URL.revokeObjectURL(f.url));
+    if (!isAd) return;
+
+    fetch("/api/slots/pricing")
+      .then(res => res.json())
+      .then(setSlotPricing);
+  }, [isAd]);
+
+  /* =========================
+     SUBMIT
+  ========================= */
+
+  const handleSubmit = async () => {
+    let uploaded = [];
+
+    for (let f of files) {
+      const url = await uploadToS3(f);
+      uploaded.push({
+        url,
+        type: f.file.type,
+        name: f.file.name
+      });
+    }
+
+    const payload = {
+      title,
+      content,
+      category,
+      scope,
+      tags,
+      media: uploaded,
+      ad: isAd ? {
+        slots: selectedSlots,
+        total: selectedSlots.reduce(
+          (sum, h) => sum + (slotPricing[h]?.price || 0),
+          0
+        )
+      } : null
     };
-  }, [files]);
+
+    await fetch("/api/posts", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify(payload)
+    });
+
+    alert("Post submitted");
+  };
 
   /* =========================
      UI
   ========================= */
 
   return (
-    <div className="post-composer">
-      <div className="composer-wrapper">
+    <div className="composer">
 
-        {/* ================= LEFT ================= */}
-        <div className="composer-left">
+      {/* TOP */}
+      <div className="top">
+        <input
+          placeholder="Headline..."
+          value={title}
+          onChange={e=>setTitle(e.target.value)}
+        />
 
-          <h2>Create a Post</h2>
+        <select className="borderless" value={category} onChange={e=>setCategory(e.target.value)}>
+          {CATEGORIES.map(c=><option key={c}>{c}</option>)}
+        </select>
 
-          <input
-            className="composer-input"
-            placeholder="Enter a headline..."
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-
-          <textarea
-            className="composer-textarea"
-            placeholder="Write something..."
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-          />
-
-          {/* DROP ZONE */}
-          <div
-            className="drop-zone"
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={handleDrop}
-          >
-            <input
-              type="file"
-              multiple
-              hidden
-              id="fileUpload"
-              onChange={handleUpload}
-            />
-
-            <label htmlFor="fileUpload" className="drop-zone-inner">
-              <div className="drop-title">Drag & drop files</div>
-              <div className="drop-sub">
-                Images, Video (≤300MB), Audio, PDF
-              </div>
-            </label>
-          </div>
-
-        </div>
-
-        {/* ================= RIGHT ================= */}
-        <div className="composer-right">
-
-          {files.length === 0 ? (
-            <div className="empty-preview">
-              <div className="empty-text">
-                Upload content to preview your post
-              </div>
-            </div>
-          ) : (
-            <div className="file-list">
-
-              {files.map(({ file, url, id, uploadedAt, lastModified }) => {
-                const type = getFileType(file);
-
-                return (
-                  <div key={id} className="file-row">
-
-                    {/* THUMBNAIL */}
-                    <div className="file-thumb">
-                      {type === "image" && <img src={url} alt="" />}
-                      {type === "video" && <video src={url} />}
-                      {type === "audio" && <span>🎧</span>}
-                      {type === "file" && <span>📄</span>}
-                    </div>
-
-                    {/* INFO */}
-                    <div className="file-info">
-                      <div className="file-name">{file.name}</div>
-
-                      <div className="file-meta">
-                        {formatSize(file.size)} • {file.type}
-                      </div>
-
-                      {/* 🔥 NEW METADATA */}
-                      <div className="file-meta-sub">
-                        Uploaded: {formatDate(uploadedAt)}
-                      </div>
-
-                      <div className="file-meta-sub">
-                        File date: {formatDate(lastModified)}
-                      </div>
-                    </div>
-
-                    {/* ACTIONS */}
-                    <div className="file-actions">
-                      <button onClick={() => setPreview({ file, url })}>
-                        👁
-                      </button>
-
-                      <button onClick={() => removeFile(id)}>✕</button>
-
-                      <button
-                        onClick={() =>
-                          alert(
-                            `Name: ${file.name}
-Size: ${formatSize(file.size)}
-Type: ${file.type}
-Uploaded: ${formatDate(uploadedAt)}
-File Date: ${formatDate(lastModified)}`
-                          )
-                        }
-                      >
-                        ℹ️
-                      </button>
-                    </div>
-
-                  </div>
-                );
-              })}
-
-            </div>
-          )}
-
-        </div>
-
+        <select className="borderless" value={scope} onChange={e=>setScope(e.target.value)}>
+          {SCOPES.map(s=><option key={s}>{s}</option>)}
+        </select>
       </div>
 
-      {/* ================= PREVIEW MODAL ================= */}
-      {preview && (
-        <div className="preview-modal" onClick={() => setPreview(null)}>
+      <textarea
+        placeholder="What's happening..."
+        value={content}
+        onChange={e=>setContent(e.target.value)}
+      />
+
+      {/* TAGS */}
+      <input
+        placeholder="Add tags"
+        value={tagInput}
+        onChange={e=>setTagInput(e.target.value)}
+        onKeyDown={handleTagKey}
+      />
+
+      <div className="tag-list">
+        {tags.map(tag=>(
+          <span key={tag} onClick={()=>setTags(tags.filter(t=>t!==tag))}>
+            {tag} ✕
+          </span>
+        ))}
+      </div>
+
+      {/* FILE UPLOAD */}
+      <input
+        type="file"
+        hidden
+        multiple
+        ref={fileInputRef}
+        onChange={(e)=>handleFiles(Array.from(e.target.files))}
+      />
+
+      <button onClick={()=>fileInputRef.current.click()}>
+        Upload
+      </button>
+
+      {/* FILE LIST */}
+      <div className="files">
+        {files.map((f, index)=>(
           <div
-            className="preview-content"
-            onClick={(e) => e.stopPropagation()}
+            key={f.id}
+            draggable
+            onDragStart={()=>dragItem.current=index}
+            onDragEnter={()=>dragOverItem.current=index}
+            onDragEnd={handleSort}
           >
+            {f.thumbnail
+              ? <img src={f.thumbnail}/>
+              : f.file.type.startsWith("image")
+                ? <img src={f.url}/>
+                : <span>📄</span>
+            }
+
+            <button onClick={()=>setPreview(f)}>👁</button>
+          </div>
+        ))}
+      </div>
+
+      {/* AD MODE */}
+      <label>
+        <input type="checkbox" checked={isAd} onChange={()=>setIsAd(!isAd)} />
+        Promote this post
+      </label>
+
+      {/* SLOT GRID */}
+      {isAd && (
+        <div className="slots">
+          {[...Array(24)].map((_, hour)=>(
             <button
-              className="preview-close"
-              onClick={() => setPreview(null)}
+              key={hour}
+              className={selectedSlots.includes(hour) ? "active" : ""}
+              onClick={()=>{
+                setSelectedSlots(prev =>
+                  prev.includes(hour)
+                    ? prev.filter(h=>h!==hour)
+                    : [...prev, hour]
+                );
+              }}
             >
-              ✕
+              {hour}:00 ${slotPricing[hour]?.price || "--"}
             </button>
+          ))}
+        </div>
+      )}
 
-            {preview.file.type.startsWith("image") && (
-              <img src={preview.url} className="preview-media" />
-            )}
+      {/* TOTAL */}
+      {isAd && (
+        <div>
+          Total: $
+          {selectedSlots.reduce(
+            (sum,h)=>sum+(slotPricing[h]?.price||0),0
+          )}
+        </div>
+      )}
 
+      {/* SUBMIT */}
+      <button className="submit-btn" onClick={handleSubmit}>
+        Submit
+      </button>
+
+      {/* PREVIEW */}
+      {preview && (
+        <div className="modal" onClick={()=>setPreview(null)}>
+          <div onClick={e=>e.stopPropagation()}>
             {preview.file.type.startsWith("video") && (
-              <video
-                src={preview.url}
-                controls
-                className="preview-media"
-              />
+              <video src={preview.url} controls />
             )}
-
-            {preview.file.type.startsWith("audio") && (
-              <audio src={preview.url} controls />
-            )}
-
-            {!preview.file.type.match(/image|video|audio/) && (
-              <div className="preview-fallback">
-                <p>{preview.file.name}</p>
-                <a href={preview.url} download>
-                  Download file
-                </a>
-              </div>
+            {preview.file.type.startsWith("image") && (
+              <img src={preview.url}/>
             )}
           </div>
         </div>
       )}
+
     </div>
   );
 }
