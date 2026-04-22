@@ -6,7 +6,7 @@ import { Amplify } from "aws-amplify";
 import outputs from "./amplify_outputs.json";
 
 import { AuthProvider } from "./context/AuthContext";
-import { LocationProvider } from "./context/LocationContext"; // ✅ NEW
+import { LocationProvider } from "./context/LocationProvider.jsx"; // ✅ NEW
 
 // ✅ DO NOT MODIFY outputs
 Amplify.configure({

@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Autocomplete, useJsApiLoader } from "@react-google-maps/api";
 
-import { useLocationContext } from "../../context/LocationContext";
+import { useLocationContext } from "../../context/LocationProvider";
 import { useAuth } from "../../context/AuthContext";
 
 import "./CommunityPlusUserProfile.css";
