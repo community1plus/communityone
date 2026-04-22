@@ -11,8 +11,8 @@ import { useLocationContext } from "../../../context/LocationContext";
 import { useAuth } from "../../../context/AuthContext";
 import LocationPin from "../../UI/LocationPin";
 
-// 🔥 IMPORT RESOLVER
-import { resolveLocation } from ".../../../services/resolveLocation";
+// ✅ FIXED PATH
+import { resolveLocation } from "../../../services/resolveLocation";
 
 export default function CommunityPlusHeader({ user, onLogout }) {
   const navigate = useNavigate();
@@ -21,7 +21,6 @@ export default function CommunityPlusHeader({ user, onLogout }) {
   const {
     viewLocation,
     setViewLocation,
-    enableLiveLocation,
   } = useLocationContext();
 
   const { appUser } = useAuth();
@@ -92,7 +91,7 @@ export default function CommunityPlusHeader({ user, onLogout }) {
   }, [viewLocation?.updatedAt]);
 
   /* ===============================
-     GOOGLE AUTOCOMPLETE (ENHANCED)
+     GOOGLE AUTOCOMPLETE (ENRICHED)
   =============================== */
 
   useEffect(() => {
@@ -111,7 +110,7 @@ export default function CommunityPlusHeader({ user, onLogout }) {
         new window.google.maps.places.Autocomplete(
           inputRef.current,
           {
-            types: ["geocode"], // 🔥 FULL ADDRESS
+            types: ["geocode"],
             componentRestrictions: { country: "au" },
           }
         );
@@ -126,8 +125,12 @@ export default function CommunityPlusHeader({ user, onLogout }) {
         console.log("📍 Raw selection:", lat, lng);
 
         try {
-          // 🔥 ENRICH HERE
-          const enriched = await resolveLocation({ lat, lng });
+          // 🔥 Manual input has no accuracy → assume medium (100m)
+          const enriched = await resolveLocation({
+            lat,
+            lng,
+            accuracy: 100,
+          });
 
           console.log("✅ Enriched location:", enriched);
 
@@ -153,7 +156,7 @@ export default function CommunityPlusHeader({ user, onLogout }) {
   }, []);
 
   /* ===============================
-     RESOLVE LOCATION (PIN CLICK)
+     RESOLVE LOCATION (PIN CLICK - GPS)
   =============================== */
 
   const handleResolveLocation = async () => {
@@ -162,11 +165,33 @@ export default function CommunityPlusHeader({ user, onLogout }) {
     setResolving(true);
 
     try {
-      const loc = await enableLiveLocation();
-      console.log("✅ Live location:", loc);
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          const accuracy = pos.coords.accuracy;
+
+          console.log("📡 GPS:", { lat, lng, accuracy });
+
+          const enriched = await resolveLocation({
+            lat,
+            lng,
+            accuracy, // 🔥 REAL ACCURACY USED HERE
+          });
+
+          console.log("✅ Live enriched:", enriched);
+
+          setViewLocation(enriched, "auto");
+          setResolving(false);
+        },
+        (err) => {
+          console.error("❌ Geolocation error:", err);
+          setResolving(false);
+        },
+        { enableHighAccuracy: true }
+      );
     } catch (err) {
       console.error("❌ Location error:", err);
-    } finally {
       setResolving(false);
     }
   };

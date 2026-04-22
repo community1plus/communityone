@@ -16,13 +16,49 @@ const getComponent = (components, types) => {
    MAIN RESOLVER
 =============================== */
 
-export async function resolveLocation({ lat, lng }) {
+export async function resolveLocation({ lat, lng, accuracy }) {
   try {
     const res = await fetch(
       `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${GOOGLE_API_KEY}`
     );
 
     const data = await res.json();
+
+    /* ===============================
+       🔥 HANDLE GOOGLE STATUS (CRITICAL)
+    =============================== */
+
+    if (data.status !== "OK") {
+      console.error("❌ Google Geocode status:", data.status);
+
+      if (data.status === "REQUEST_DENIED") {
+        throw new Error("Geocode API denied (check API key)");
+      }
+
+      if (data.status === "OVER_QUERY_LIMIT") {
+        throw new Error("Geocode quota exceeded");
+      }
+
+      if (data.status === "ZERO_RESULTS") {
+        console.warn("⚠️ No address found for coordinates");
+
+        return {
+          lat,
+          lng,
+          accuracy,
+
+          suburb: null,
+          state: null,
+
+          label: "Approx location",
+          fullLabel: null,
+
+          precision: accuracy <= 200 ? "medium" : "low",
+          source: "coords-only",
+          updatedAt: Date.now(),
+        };
+      }
+    }
 
     if (!data.results || !data.results.length) {
       throw new Error("No geocode results");
@@ -58,13 +94,18 @@ export async function resolveLocation({ lat, lng }) {
     const finalSuburb = suburb || city || state;
 
     /* ===============================
-       PRECISION
+       🔥 PRECISION (ACCURACY + ADDRESS)
     =============================== */
 
     let precision = "low";
 
-    if (street && finalSuburb) precision = "high";
-    else if (finalSuburb) precision = "medium";
+    if (street && finalSuburb && accuracy <= 50) {
+      precision = "high";
+    } else if (finalSuburb && accuracy <= 200) {
+      precision = "medium";
+    } else {
+      precision = "low";
+    }
 
     /* ===============================
        FINAL OBJECT
@@ -73,6 +114,7 @@ export async function resolveLocation({ lat, lng }) {
     const location = {
       lat,
       lng,
+      accuracy,
 
       street,
       suburb: finalSuburb,
@@ -80,7 +122,7 @@ export async function resolveLocation({ lat, lng }) {
       state,
       postcode,
 
-      label: `${finalSuburb}, ${state}`,
+      label: `${finalSuburb || "Unknown"}, ${state || ""}`,
       fullLabel: result.formatted_address,
 
       precision,
@@ -98,10 +140,15 @@ export async function resolveLocation({ lat, lng }) {
     return {
       lat,
       lng,
+      accuracy,
+
       suburb: null,
       state: null,
+
       label: "Unknown location",
-      precision: "low",
+      fullLabel: null,
+
+      precision: accuracy <= 200 ? "medium" : "low",
       source: "fallback",
       updatedAt: Date.now(),
     };
