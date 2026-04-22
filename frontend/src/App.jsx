@@ -81,7 +81,7 @@ export default function App() {
         <Route path="/communityplus" element={<CommunityPlusHub />} />
         <Route path="/post" element={<PostComposer />} />
         <Route path="/adtv" element={<CommunityPlusAdTv title="adtv page" />} />
-        <Route path="/adtv" element={<AdTvPage />} />
+        <Route path="/adtv" element={<CommunityPlusAdTvPage />} />
         <Route path="/event" element={<PlaceholderPage title="Event page" />} />
         <Route path="/incident" element={<PlaceholderPage title="Incident page" />} />
         <Route path="/beacon" element={<PlaceholderPage title="Beacon page" />} />

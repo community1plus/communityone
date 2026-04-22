@@ -1,4 +1,4 @@
-export default function AdTvPage() {
+export default function CommunityPlusAdTvPage() {
   return (
     <div style={{ padding: "24px" }}>
       <h1 className="h1">AD.TV</h1>
