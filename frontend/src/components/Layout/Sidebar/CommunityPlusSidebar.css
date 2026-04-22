@@ -1,5 +1,5 @@
 /* =====================================================
-SIDEBAR — FLAT NAV (NO BUTTONS)
+SIDEBAR — SYSTEM ALIGNED (FLAT NAV)
 ===================================================== */
 
 .sidebar {
@@ -9,12 +9,11 @@ SIDEBAR — FLAT NAV (NO BUTTONS)
 
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--space-xs);
 
-  padding: 20px 16px;
+  padding: var(--space-lg) var(--space-md);
   box-sizing: border-box;
 
-  /* 🔥 same as main background */
   background: transparent;
   border-right: none;
 
@@ -22,24 +21,34 @@ SIDEBAR — FLAT NAV (NO BUTTONS)
 }
 
 /* =====================================================
-ITEMS — TEXT STYLE (NOT BUTTONS)
+GROUPING (NEW — STRUCTURE)
 ===================================================== */
 
-.sidebar-item {
+.sidebar-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+/* =====================================================
+ITEMS — FLAT (NOT BUTTONS)
+===================================================== */
+
+.sidebar-item,
+.sidebar-btn {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-sm);
 
-  padding: 10px 12px;
-  border-radius: 8px;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
 
-  font-size: 0.98rem;
+  font-size: var(--text-md);
   font-weight: 500;
-  color: #2a2a2a;
+  color: var(--text-primary);
 
   cursor: pointer;
 
-  /* 🔥 remove button styling */
   background: transparent;
   border: none;
   box-shadow: none;
@@ -50,31 +59,56 @@ ITEMS — TEXT STYLE (NOT BUTTONS)
     transform 0.12s ease;
 }
 
-/* subtle hover (not button-like) */
-.sidebar-item:hover {
+/* subtle hover */
+.sidebar-item:hover,
+.sidebar-btn:hover {
   background: rgba(0, 0, 0, 0.04);
   transform: translateX(2px);
 }
 
-/* active state (clean indicator) */
-.sidebar-item.active {
-  color: var(--brand, #b63a2b);
+/* =====================================================
+ACTIVE STATE (THEME-DRIVEN)
+===================================================== */
+
+.sidebar-item.active,
+.sidebar-btn.active {
+  color: var(--accent);
   font-weight: 600;
-  background: rgba(182, 58, 43, 0.06);
+  background: rgba(0, 0, 0, 0.04);
+}
+
+/* =====================================================
+LABEL INTEGRATION (TYPOGRAPHY SYSTEM)
+===================================================== */
+
+.sidebar-item .label,
+.sidebar-btn .label {
+  font-size: 0.75em;
+}
+
+/* =====================================================
+AD.TV SUPERSCRIPT ALIGNMENT
+===================================================== */
+
+.sidebar-item .adtv-sp,
+.sidebar-btn .adtv-sp {
+  margin-left: 2px;
 }
 
 /* =====================================================
 LOGOUT
 ===================================================== */
 
-.sidebar-item.logout {
-  margin-top: 12px;
-  color: #b42318;
+.sidebar-item.logout,
+.sidebar-btn.logout {
+  margin-top: var(--space-sm);
+  color: #c53030;
   font-weight: 600;
 }
 
-.sidebar-item.logout:hover {
-  background: rgba(180, 35, 24, 0.06);
+.sidebar-item.logout:hover,
+.sidebar-btn.logout:hover {
+  background: rgba(197, 48, 48, 0.08);
 }
 
 /* =====================================================
@@ -84,7 +118,7 @@ DIVIDER
 .sidebar-divider {
   border: none;
   border-top: 1px solid rgba(0, 0, 0, 0.08);
-  margin: 8px 0;
+  margin: var(--space-sm) 0;
 }
 
 /* =====================================================
