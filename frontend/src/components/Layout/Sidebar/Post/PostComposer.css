@@ -314,3 +314,41 @@ RESPONSIVE
   font-size: 11px;
   opacity: 0.6;
 }
+
+.preview-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.preview-content {
+  position: relative;
+  max-width: 90%;
+  max-height: 90%;
+}
+
+.preview-media {
+  max-width: 100%;
+  max-height: 80vh;
+  border-radius: 12px;
+}
+
+.preview-close {
+  position: absolute;
+  top: -40px;
+  right: 0;
+  font-size: 20px;
+  background: none;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.file-meta-sub {
+  font-size: 11px;
+  opacity: 0.6;
+}
