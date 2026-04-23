@@ -1,6 +1,6 @@
 import React from "react";
-import CommunityPlusAdTv from "../components/AdTV/CommunityPlusAdTv";
-import AdSlotDial from "../components/AdSlotDial";
+import CommunityPlusAdTv from "../components/CommunityPlusAdTv/CommunityPlusAdTv";
+//import AdSlotDial from "../components/AdSlotDial";
 
 export default function CommunityPlusAdTvPage() {
   const mockSlots = Array.from({ length: 24 }).map(() => ({
