@@ -1,5 +1,5 @@
 /* =====================================================
-CONTAINER (same role as profile-container)
+CONTAINER (IDENTICAL ROLE AS profile-container)
 ===================================================== */
 
 .adtv-container {
@@ -31,72 +31,61 @@ HEADER (CHANNEL IDENTITY)
 }
 
 /* =====================================================
-MAIN LAYOUT (MATCHES PROFILE PATTERN)
+MAIN GRID (MATCH PROFILE EXACTLY)
 ===================================================== */
 
 .adtv-layout {
   display: grid;
-  grid-template-columns: minmax(0, 2fr) 320px;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
   gap: 20px;
 
-  align-items: start;
+  align-items: stretch; /* 🔥 CRITICAL */
 }
 
 /* =====================================================
-LEFT COLUMN (PRIMARY SURFACE)
+LEFT + RIGHT (MATCH PROFILE COLUMN BEHAVIOUR)
 ===================================================== */
 
-.adtv-left {
+.adtv-left,
+.adtv-right {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  height: 100%;       /* 🔥 CRITICAL */
   min-width: 0;
 }
 
 /* =====================================================
-RIGHT COLUMN (CONTROL PANEL)
-===================================================== */
-
-.adtv-right {
-  display: flex;
-  flex-direction: column;
-}
-
-/* =====================================================
-TV STAGE (OUTER FRAME)
+TV CARD (MATCH profile-left STYLE)
 ===================================================== */
 
 .adtv-stage {
-  width: 100%;
-  border-radius: 16px;
-  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #e6dfd8;
+  border-radius: 18px;
+  box-shadow: 0 6px 18px rgba(20, 20, 20, 0.05);
+
+  padding: 16px;
 
   display: flex;
   flex-direction: column;
-
-  /* subtle system background */
-  background:
-    radial-gradient(circle, rgba(0,0,0,0.08) 1px, transparent 1px);
-  background-size: 12px 12px;
-
-  border: 1px solid rgba(0,0,0,0.08);
+  gap: 12px;
+  flex: 1;
 }
 
 /* =====================================================
-TV CONTAINER (RESPONSIVE 16:9)
+TV CONTAINER (16:9 + FILL)
 ===================================================== */
 
 .adtv-tv-container {
   width: 100%;
   aspect-ratio: 16 / 9;
 
-  position: relative;
+  border-radius: 12px;
   overflow: hidden;
 
   display: flex;
 }
 
-/* force TV to fill container */
 .adtv-tv-container > * {
   width: 100%;
   height: 100%;
@@ -104,23 +93,26 @@ TV CONTAINER (RESPONSIVE 16:9)
 }
 
 /* =====================================================
-CONTROL PANEL (RIGHT SIDE)
+RIGHT PANEL (MATCH profile-guide STYLE)
 ===================================================== */
 
 .adtv-panel {
-  padding: 16px;
-  border-radius: 16px;
+  background: #faf7f4;
+  border: 1px solid #e6dfd8;
+  border-radius: 18px;
+  box-shadow: 0 6px 18px rgba(20, 20, 20, 0.05);
 
-  background: rgba(0, 0, 0, 0.04);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  padding: 22px 24px;
 
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
+
+  height: 100%; /* 🔥 CRITICAL */
 }
 
 /* =====================================================
-MODE SWITCHER (UNDER TV)
+MODE BAR (UNDER TV)
 ===================================================== */
 
 .adtv-mode-bar {
@@ -130,7 +122,7 @@ MODE SWITCHER (UNDER TV)
 }
 
 /* =====================================================
-SECTIONS (NOW PLAYING, UPCOMING, ETC)
+SECTIONS
 ===================================================== */
 
 .adtv-section {
@@ -140,7 +132,7 @@ SECTIONS (NOW PLAYING, UPCOMING, ETC)
 }
 
 /* =====================================================
-NOW PLAYING PREVIEW
+PREVIEW
 ===================================================== */
 
 .adtv-mini-preview {
@@ -197,8 +189,8 @@ RESPONSIVE
     grid-template-columns: 1fr;
   }
 
-  .adtv-right {
-    width: 100%;
+  .adtv-panel {
+    height: auto;
   }
 }
 
