@@ -7,22 +7,35 @@ SIDEBAR BASE
   flex-shrink: 0;
 
   padding: 16px 14px;
+
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 14px; /* 🔥 tighter rhythm */
 
   background: #faf7f4;
   border-right: 1px solid #e6dfd8;
 }
 
 /* =====================================================
-SECTION
+SECTION (WITH DIVIDER SYSTEM)
 ===================================================== */
 
 .sidebar-section {
   display: flex;
   flex-direction: column;
   gap: 6px;
+
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06); /* 🔥 subtle divider */
+}
+
+/* remove divider on last section */
+.sidebar-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
 }
 
 /* =====================================================
@@ -35,11 +48,11 @@ SECTION TITLE
   letter-spacing: 0.08em;
   color: #8c837a;
 
-  margin-bottom: 6px;
+  margin-bottom: 8px; /* 🔥 slightly more breathing room */
 }
 
 /* =====================================================
-ITEMS
+ITEMS (NON-CLICKABLE)
 ===================================================== */
 
 .sidebar-item {
@@ -49,7 +62,7 @@ ITEMS
 }
 
 /* =====================================================
-LINKS (BUTTONS)
+LINKS (PRIMARY INTERACTION)
 ===================================================== */
 
 .sidebar-link {
@@ -66,7 +79,7 @@ LINKS (BUTTONS)
   text-align: left;
   cursor: pointer;
 
-  transition: background 0.15s ease;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
 /* hover */
@@ -80,7 +93,12 @@ LINKS (BUTTONS)
   font-weight: 600;
 }
 
-/* logout */
+/* logout (semantic emphasis) */
 .sidebar-link.logout {
   color: #d92d20;
+}
+
+/* optional: hover for logout */
+.sidebar-link.logout:hover {
+  background: rgba(217, 45, 32, 0.08);
 }
