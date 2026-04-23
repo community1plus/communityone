@@ -2,6 +2,7 @@ import React, { useState, useMemo, useCallback } from "react";
 
 import CommunityPlusAdTv from "../CommunityPlusAdTv/CommunityPlusAdTv";
 import CommunityPlusAdSlotDial from "../CommunityPlusAdSlotDial/CommunityPlusAdSlotDial";
+import "./CommunityPlusAdTvPage.css";
 
 const MODES = ["live", "schedule", "upload"];
 
