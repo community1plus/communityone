@@ -46,6 +46,7 @@ export default function CommunityPlusAdTvPage() {
       </div>
 
       {/* 🔥 NEW: SLOT DIAL */}
+      {/**
       <div className="adtv-section">
         <h2 className="h2">Book a Slot</h2>
         <div className="meta">SELECT AN HOUR</div>
@@ -57,6 +58,7 @@ export default function CommunityPlusAdTvPage() {
           }}
         />
       </div>
+      **/}
 
       {/* UPCOMING */}
       <div className="adtv-section">
