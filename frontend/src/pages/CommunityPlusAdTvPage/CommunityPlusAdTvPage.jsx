@@ -1,16 +1,7 @@
-import React, { useState, useMemo, useCallback } from "react";
-import CommunityPlusAdTv from "../CommunityPlusAdTv/CommunityPlusAdTv";
-import CommunityPlusAdSlotDial from "../CommunityPlusAdSlotDial/CommunityPlusAdSlotDial";
-
-const MODES = ["live", "schedule", "upload"];
-
 export default function CommunityPlusAdTvPage() {
   const [tvMode, setTvMode] = useState("live");
   const [selectedSlot, setSelectedSlot] = useState(null);
 
-  /* =========================
-     STABLE SLOT DATA
-  ========================= */
   const slots = useMemo(
     () =>
       Array.from({ length: 24 }, () => ({
@@ -20,9 +11,6 @@ export default function CommunityPlusAdTvPage() {
     []
   );
 
-  /* =========================
-     HANDLERS
-  ========================= */
   const handleSelectSlot = useCallback((hour) => {
     setSelectedSlot(hour);
     setTvMode("schedule");
@@ -32,15 +20,9 @@ export default function CommunityPlusAdTvPage() {
     setTvMode(mode);
   }, []);
 
-  /* =========================
-     DERIVED STATE
-  ========================= */
   const selectedLabel =
     selectedSlot !== null ? `Selected: ${selectedSlot}:00` : "Select an hour";
 
-  /* =========================
-     RENDER
-  ========================= */
   return (
     <div className="adtv-page">
       <div className="page-container">
@@ -59,87 +41,92 @@ export default function CommunityPlusAdTvPage() {
           </div>
         </header>
 
-        {/* STAGE */}
-        <section className="adtv-stage-wrapper">
-          <div className="adtv-stage-layout">
+        {/* MAIN CONTENT BLOCK */}
+        <main>
 
-            {/* TV */}
-            <div className="adtv-stage">
-              <div className="adtv-tv-container">
-                <CommunityPlusAdTv
-                  mode="page"
-                  context="page"
-                  tvMode={tvMode}
-                  selectedSlot={selectedSlot}
-                />
+          {/* STAGE */}
+          <section className="adtv-stage-wrapper">
+            <div className="adtv-stage-layout">
+
+              {/* TV */}
+              <div className="adtv-stage">
+                <div className="adtv-tv-container">
+                  <CommunityPlusAdTv
+                    mode="page"
+                    context="page"
+                    tvMode={tvMode}
+                    selectedSlot={selectedSlot}
+                  />
+                </div>
               </div>
+
+              {/* DIAL */}
+              <aside className="adtv-dial-panel">
+                <header className="adtv-dial-header">
+                  <div className="h3">Book Slot</div>
+                  <div className="meta">{selectedLabel}</div>
+                </header>
+
+                <div className="adtv-dial-body">
+                  <CommunityPlusAdSlotDial
+                    slots={slots}
+                    onSelectSlot={handleSelectSlot}
+                  />
+                </div>
+              </aside>
+
             </div>
+          </section>
 
-            {/* CONTROL PANEL */}
-            <aside className="adtv-dial-panel">
-              <header className="adtv-dial-header">
-                <div className="h3">Book Slot</div>
-                <div className="meta">{selectedLabel}</div>
-              </header>
+          {/* MODE CONTROLS */}
+          <section className="adtv-mode-bar">
+            {MODES.map((mode) => (
+              <button
+                key={mode}
+                className={`btn btn-ghost ${tvMode === mode ? "active" : ""}`}
+                onClick={() => handleModeChange(mode)}
+              >
+                {mode[0].toUpperCase() + mode.slice(1)}
+              </button>
+            ))}
+          </section>
 
-              <div className="adtv-dial-body">
-                <CommunityPlusAdSlotDial
-                  slots={slots}
-                  onSelectSlot={handleSelectSlot}
-                />
-              </div>
-            </aside>
+          {/* SUPPORTING */}
+          <section className="adtv-section">
+            <h2 className="h2">Now Playing</h2>
+            <div className="meta">CURRENT AD STREAM</div>
 
-          </div>
-        </section>
+            <div className="adtv-mini-preview">
+              {selectedSlot !== null
+                ? `Preview for ${selectedSlot}:00 slot`
+                : "Active campaign preview"}
+            </div>
+          </section>
 
-        {/* MODE CONTROLS */}
-        <section className="adtv-mode-bar">
-          {MODES.map((mode) => (
+          <section className="adtv-section">
+            <h2 className="h2">Upcoming Slots</h2>
+            <div className="meta">SCHEDULED ADS</div>
+
+            <div className="adtv-slot-list">
+              <div>18:00 — Restaurant Promo</div>
+              <div>19:00 — Event Ad</div>
+              <div>20:00 — Local Business</div>
+            </div>
+          </section>
+
+          <section className="adtv-section">
+            <h2 className="h2">Upload / Preview</h2>
+            <div className="meta">CREATE AND TEST ADS</div>
+
             <button
-              key={mode}
-              className={`btn btn-ghost ${tvMode === mode ? "active" : ""}`}
-              onClick={() => handleModeChange(mode)}
+              className="btn btn-primary"
+              onClick={() => handleModeChange("upload")}
             >
-              {mode[0].toUpperCase() + mode.slice(1)}
+              Upload Ad
             </button>
-          ))}
-        </section>
+          </section>
 
-        {/* SUPPORTING CONTENT */}
-        <section className="adtv-section">
-          <h2 className="h2">Now Playing</h2>
-          <div className="meta">CURRENT AD STREAM</div>
-
-          <div className="adtv-mini-preview">
-            {selectedSlot !== null
-              ? `Preview for ${selectedSlot}:00 slot`
-              : "Active campaign preview"}
-          </div>
-        </section>
-
-        <section className="adtv-section">
-          <h2 className="h2">Upcoming Slots</h2>
-          <div className="meta">SCHEDULED ADS</div>
-
-          <div className="adtv-slot-list">
-            <div>18:00 — Restaurant Promo</div>
-            <div>19:00 — Event Ad</div>
-            <div>20:00 — Local Business</div>
-          </div>
-        </section>
-
-        <section className="adtv-section">
-          <h2 className="h2">Upload / Preview</h2>
-          <div className="meta">CREATE AND TEST ADS</div>
-
-          <button
-            className="btn btn-primary"
-            onClick={() => handleModeChange("upload")}
-          >
-            Upload Ad
-          </button>
-        </section>
+        </main>
 
       </div>
     </div>

@@ -1,9 +1,8 @@
 /* =====================================================
-PAGE (GLOBAL CONTAINER)
+PAGE (CONTAINER LAYER)
 ===================================================== */
 
 .adtv-page {
-  height: 100%;
   display: flex;
   flex-direction: column;
 }
@@ -38,47 +37,55 @@ STAGE WRAPPER
 }
 
 /* =====================================================
-STAGE LAYOUT (TV + DIAL SYSTEM)
+STAGE LAYOUT (TV + DIAL)
 ===================================================== */
-.adtv-tv-container {
-  flex: 1;           /* 🔥 fills stage */
-  min-height: 0;     /* 🔥 prevents overflow bug */
 
-  display: flex;
-  flex-direction: column;
+.adtv-stage-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) 320px;
+  gap: 24px;
+  align-items: start;
 }
 
-.adtv-tv-container > * {
-  flex: 1;
-  min-height: 0;
-}
+/* =====================================================
+TV STAGE (OUTER FRAME)
+===================================================== */
 
 .adtv-stage {
   width: 100%;
   min-width: 0;
+
   padding: 16px;
   border-radius: 16px;
-  /* 🔥 constrain height */
-  height: 420px;              /* ← key fix */
-  max-height: 420px;
-  display: flex;
-  flex-direction: column;
+
   background:
     radial-gradient(circle, rgba(0,0,0,0.08) 1px, transparent 1px);
   background-size: 12px 12px;
+
   border: 1px solid rgba(0,0,0,0.08);
-  overflow: hidden;         /* 🔥 prevents bleed */
 }
 
 /* =====================================================
-TV STAGE (PRIMARY SURFACE)
+TV CONTAINER (RESPONSIVE 16:9)
 ===================================================== */
 
-.adtv-stage {
-  height: 100%;         /* 🔥 THIS is key */
+.adtv-tv-container {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+
+  position: relative;
+  overflow: hidden;
+
+  border-radius: 12px;
+
   display: flex;
-  align-items: center;
-  justify-content: center;
+}
+
+/* force TV component to fill */
+.adtv-tv-container > * {
+  width: 100%;
+  height: 100%;
+  display: flex;
 }
 
 /* =====================================================
@@ -87,6 +94,7 @@ DIAL PANEL (CONTROL SURFACE)
 
 .adtv-dial-panel {
   width: 100%;
+  max-width: 320px;
 
   padding: 16px;
   border-radius: 16px;
@@ -94,14 +102,27 @@ DIAL PANEL (CONTROL SURFACE)
   background: rgba(0, 0, 0, 0.04);
   border: 1px solid rgba(0, 0, 0, 0.08);
 
-  position: sticky;
-  top: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* =====================================================
+DIAL HEADER + BODY (MATCHES JSX)
+===================================================== */
+
+.adtv-dial-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.adtv-dial-body {
+  flex: 1;
+  min-height: 0;
 
   display: flex;
   flex-direction: column;
-  gap: 6px;
-
-  align-self: start; /* 🔥 FIX alignment */
 }
 
 /* =====================================================
@@ -121,11 +142,6 @@ SUPPORTING SECTIONS
 
 .adtv-section {
   margin-top: 32px;
-
-  /* 🔥 align with stage */
-  max-width: 1100px;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 .adtv-section .h2 {
@@ -184,26 +200,19 @@ SLOT LIST
 RESPONSIVE
 ===================================================== */
 
-/* 🔥 collapse when needed */
 @media (max-width: 1000px) {
   .adtv-stage-layout {
     grid-template-columns: 1fr;
   }
 
   .adtv-dial-panel {
-    position: relative;
-    top: auto;
-  }
-
-  .adtv-stage {
     max-width: 100%;
   }
 }
 
-/* 🔥 mobile tightening */
 @media (max-width: 768px) {
   .adtv-stage {
-    padding: 16px;
+    padding: 12px;
   }
 
   .adtv-mode-bar {
