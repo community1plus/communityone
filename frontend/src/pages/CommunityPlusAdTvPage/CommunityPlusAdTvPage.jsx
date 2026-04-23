@@ -1,18 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import CommunityPlusAdTv from "../CommunityPlusAdTv/CommunityPlusAdTv";
-//import AdSlotDial from "../components/AdSlotDial";
 
 export default function CommunityPlusAdTvPage() {
-  const mockSlots = Array.from({ length: 24 }).map(() => ({
-    count: Math.floor(Math.random() * 5),
-    capacity: 5,
-  }));
+  const [tvMode, setTvMode] = useState("live"); // 🔥 future-ready
 
   return (
     <div className="adtv-page">
 
-      {/* HERO */}
-      <div className="adtv-hero panel">
+      {/* =========================
+         HERO / CHANNEL HEADER
+      ========================= */}
+      <div className="adtv-hero">
 
         <div className="adtv-hero-header">
           <h1 className="h1">
@@ -28,12 +26,54 @@ export default function CommunityPlusAdTvPage() {
           LIVE AD CHANNEL • LOCATION-AWARE • TIME-BASED
         </div>
 
-        {/* 🔥 REAL PLAYER */}
-        <div className="adtv-player">
-          <CommunityPlusAdTv mode="page" context="page" />
+      </div>
+
+      {/* =========================
+         TV STAGE (PRIMARY SURFACE)
+      ========================= */}
+      <div className="adtv-stage-wrapper">
+
+        <div className="adtv-stage">
+          <CommunityPlusAdTv
+            mode="page"
+            context="page"
+            tvMode={tvMode}
+          />
         </div>
 
       </div>
+
+      {/* =========================
+         MODE SWITCHER (KEY UX)
+      ========================= */}
+      <div className="adtv-mode-bar">
+
+        <button
+          className={`btn btn-ghost ${tvMode === "live" ? "active" : ""}`}
+          onClick={() => setTvMode("live")}
+        >
+          Live
+        </button>
+
+        <button
+          className={`btn btn-ghost ${tvMode === "schedule" ? "active" : ""}`}
+          onClick={() => setTvMode("schedule")}
+        >
+          Schedule
+        </button>
+
+        <button
+          className={`btn btn-ghost ${tvMode === "upload" ? "active" : ""}`}
+          onClick={() => setTvMode("upload")}
+        >
+          Upload
+        </button>
+
+      </div>
+
+      {/* =========================
+         SUPPORTING CONTENT
+      ========================= */}
 
       {/* NOW PLAYING */}
       <div className="adtv-section">
@@ -44,21 +84,6 @@ export default function CommunityPlusAdTvPage() {
           Active campaign preview
         </div>
       </div>
-
-      {/* 🔥 NEW: SLOT DIAL */}
-      {/**
-      <div className="adtv-section">
-        <h2 className="h2">Book a Slot</h2>
-        <div className="meta">SELECT AN HOUR</div>
-
-        <AdSlotDial
-          slots={mockSlots}
-          onSelectSlot={(hour) => {
-            console.log("Selected hour:", hour);
-          }}
-        />
-      </div>
-      **/}
 
       {/* UPCOMING */}
       <div className="adtv-section">

@@ -1,15 +1,19 @@
-/* PAGE */
+/* =========================
+PAGE (LAYOUT CONTAINER)
+========================= */
 
 .adtv-page {
   padding: 20px 24px;
-  max-width: 720px;
+  max-width: 980px;           /* 🔥 give TV room to breathe */
+  margin: 0 auto;
 }
 
-/* HERO */
+/* =========================
+HERO (CHANNEL IDENTITY)
+========================= */
 
 .adtv-hero {
-  margin-bottom: 24px;
-  padding: 16px;
+  margin-bottom: 16px;
 }
 
 .adtv-hero-header {
@@ -19,18 +23,63 @@
 }
 
 .adtv-live {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   color: #ff3b30;
+  letter-spacing: 0.5px;
 }
+
+/* =========================
+TV STAGE (PRIMARY SURFACE)
+========================= */
+
+.adtv-stage-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.adtv-stage {
+  width: 100%;
+  max-width: 900px;
+
+  padding: 24px;
+  border-radius: 16px;
+
+  /* 🔥 dotted system background */
+  background:
+    radial-gradient(circle, rgba(0,0,0,0.08) 1px, transparent 1px);
+  background-size: 12px 12px;
+
+  border: 1px solid rgba(0,0,0,0.08);
+}
+
+/* =========================
+MODE SWITCHER (CONTROL LAYER)
+========================= */
+
+.adtv-mode-bar {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+
+  margin-top: 16px;
+}
+
+/* =========================
+PLAYER (LEGACY SAFE)
+========================= */
 
 .adtv-player {
   margin-top: 12px;
-  height: 240px;
   border-radius: 10px;
   overflow: hidden;
   background: #000;
 }
+
+/* =========================
+PLACEHOLDER (IF USED)
+========================= */
 
 .adtv-placeholder {
   color: #fff;
@@ -41,28 +90,77 @@
   opacity: 0.7;
 }
 
-/* SECTIONS */
+/* =========================
+SUPPORTING SECTIONS
+========================= */
 
 .adtv-section {
-  margin-bottom: 28px;
+  margin-top: 28px;          /* 🔥 spacing from TV */
 }
+
+/* subtle separation from TV */
+.adtv-section .h2 {
+  margin-bottom: 4px;
+}
+
+/* =========================
+NOW PLAYING PREVIEW
+========================= */
 
 .adtv-mini-preview {
   margin-top: 10px;
-  height: 100px;
-  background: rgba(0,0,0,0.05);
-  border-radius: 8px;
+  height: 110px;
+
+  border-radius: 10px;
+
+  background: rgba(0,0,0,0.04);
 
   display: flex;
   align-items: center;
   justify-content: center;
+
+  transition: background 0.2s ease;
 }
 
-/* SLOT LIST */
+.adtv-mini-preview:hover {
+  background: rgba(0,0,0,0.06);
+}
+
+/* =========================
+SLOT LIST
+========================= */
 
 .adtv-slot-list {
   margin-top: 10px;
+
   display: flex;
   flex-direction: column;
   gap: 6px;
+}
+
+.adtv-slot-list div {
+  padding: 6px 8px;
+  border-radius: 6px;
+
+  background: rgba(0,0,0,0.03);
+
+  font-size: 13px;
+}
+
+.adtv-slot-list div:hover {
+  background: rgba(0,0,0,0.06);
+}
+
+/* =========================
+RESPONSIVE
+========================= */
+
+@media (max-width: 768px) {
+  .adtv-page {
+    padding: 16px;
+  }
+
+  .adtv-stage {
+    padding: 16px;
+  }
 }
