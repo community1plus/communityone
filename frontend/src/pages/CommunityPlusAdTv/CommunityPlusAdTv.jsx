@@ -126,6 +126,26 @@ export default function CommunityPlusAdTv({
   /* =========================
      UI
   ========================= */
+
+  return (
+  <div style={{
+    position: "fixed",
+    bottom: 20,
+    right: 20,
+    width: 300,
+    height: 200,
+    background: "red",
+    zIndex: 9999
+  }}>
+    TEST TV
+  </div>
+);
+
+console.log("MODE:", mode);
+console.log("PATH:", location.pathname);
+console.log("VISIBLE:", visible);
+console.log("ADS:", ads);
+
   return (
     <div
       className={`adtv-tv-shell ${
