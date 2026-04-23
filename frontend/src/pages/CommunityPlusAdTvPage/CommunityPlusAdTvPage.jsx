@@ -1,4 +1,10 @@
 import React, { useState, useMemo, useCallback } from "react";
+
+import CommunityPlusAdTv from "../CommunityPlusAdTv/CommunityPlusAdTv";
+import CommunityPlusAdSlotDial from "../CommunityPlusAdSlotDial/CommunityPlusAdSlotDial";
+
+const MODES = ["live", "schedule", "upload"];
+
 export default function CommunityPlusAdTvPage() {
   const [tvMode, setTvMode] = useState("live");
   const [selectedSlot, setSelectedSlot] = useState(null);
@@ -28,7 +34,6 @@ export default function CommunityPlusAdTvPage() {
     <div className="adtv-page">
       <div className="page-container">
 
-        {/* HERO */}
         <header className="adtv-hero">
           <div className="adtv-hero-header">
             <h1 className="h1">
@@ -42,14 +47,11 @@ export default function CommunityPlusAdTvPage() {
           </div>
         </header>
 
-        {/* MAIN CONTENT BLOCK */}
         <main>
 
-          {/* STAGE */}
           <section className="adtv-stage-wrapper">
             <div className="adtv-stage-layout">
 
-              {/* TV */}
               <div className="adtv-stage">
                 <div className="adtv-tv-container">
                   <CommunityPlusAdTv
@@ -61,7 +63,6 @@ export default function CommunityPlusAdTvPage() {
                 </div>
               </div>
 
-              {/* DIAL */}
               <aside className="adtv-dial-panel">
                 <header className="adtv-dial-header">
                   <div className="h3">Book Slot</div>
@@ -79,7 +80,6 @@ export default function CommunityPlusAdTvPage() {
             </div>
           </section>
 
-          {/* MODE CONTROLS */}
           <section className="adtv-mode-bar">
             {MODES.map((mode) => (
               <button
@@ -92,7 +92,6 @@ export default function CommunityPlusAdTvPage() {
             ))}
           </section>
 
-          {/* SUPPORTING */}
           <section className="adtv-section">
             <h2 className="h2">Now Playing</h2>
             <div className="meta">CURRENT AD STREAM</div>
