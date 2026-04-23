@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import
+import "./CommunityPlusSidebar.css";
 
 export default function CommunityPlusSidebar() {
   const navigate = useNavigate();
