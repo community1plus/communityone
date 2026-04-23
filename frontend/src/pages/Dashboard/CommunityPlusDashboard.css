@@ -39,7 +39,10 @@ CONTENT AREA (OUTER LAYER)
 ===================================================== */
 
 .main-content {
+  flex: 1;
+  display: flex;
   padding: 20px 24px;
+  min-width: 0;
 }
 
 /* controls page width + alignment */
