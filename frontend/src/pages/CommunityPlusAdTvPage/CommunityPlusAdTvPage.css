@@ -3,8 +3,7 @@ PAGE (WIDTH CONSTRAINT ONLY)
 ===================================================== */
 
 .adtv-page {
-  padding: 20px 24px;
-  max-width: 1200px;
+  max-width: 100%;
   margin: 0 auto;
 }
 
