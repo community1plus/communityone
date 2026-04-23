@@ -1,24 +1,26 @@
 /* =====================================================
-PAGE (CONTAINER LAYER)
+CONTAINER (same role as profile-container)
 ===================================================== */
 
-.adtv-page {
+.adtv-container {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+
   display: flex;
   flex-direction: column;
 }
 
 /* =====================================================
-HERO (CHANNEL IDENTITY)
+HEADER (CHANNEL IDENTITY)
 ===================================================== */
 
-.adtv-hero {
-  margin-bottom: 16px;
-}
+.adtv-header {
+  margin-bottom: 20px;
 
-.adtv-hero-header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .adtv-live {
@@ -29,21 +31,35 @@ HERO (CHANNEL IDENTITY)
 }
 
 /* =====================================================
-STAGE WRAPPER
+MAIN LAYOUT (MATCHES PROFILE PATTERN)
 ===================================================== */
 
-.adtv-stage-wrapper {
-  margin-top: 16px;
+.adtv-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) 320px;
+  gap: 20px;
+
+  align-items: start;
 }
 
 /* =====================================================
-STAGE LAYOUT (TV + DIAL)
+LEFT COLUMN (PRIMARY SURFACE)
 ===================================================== */
 
-.adtv-stage-layout {
-  display: grid;
-  grid-template-columns: 2fr 320px;
-  gap: 24px;
+.adtv-left {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+
+/* =====================================================
+RIGHT COLUMN (CONTROL PANEL)
+===================================================== */
+
+.adtv-right {
+  display: flex;
+  flex-direction: column;
 }
 
 /* =====================================================
@@ -52,11 +68,13 @@ TV STAGE (OUTER FRAME)
 
 .adtv-stage {
   width: 100%;
-  min-width: 0;
-
-  padding: 16px;
   border-radius: 16px;
+  overflow: hidden;
 
+  display: flex;
+  flex-direction: column;
+
+  /* subtle system background */
   background:
     radial-gradient(circle, rgba(0,0,0,0.08) 1px, transparent 1px);
   background-size: 12px 12px;
@@ -75,12 +93,10 @@ TV CONTAINER (RESPONSIVE 16:9)
   position: relative;
   overflow: hidden;
 
-  border-radius: 12px;
-
   display: flex;
 }
 
-/* force TV component to fill */
+/* force TV to fill container */
 .adtv-tv-container > * {
   width: 100%;
   height: 100%;
@@ -88,13 +104,10 @@ TV CONTAINER (RESPONSIVE 16:9)
 }
 
 /* =====================================================
-DIAL PANEL (CONTROL SURFACE)
+CONTROL PANEL (RIGHT SIDE)
 ===================================================== */
 
-.adtv-dial-panel {
-  width: 100%;
-  max-width: 320px;
-
+.adtv-panel {
   padding: 16px;
   border-radius: 16px;
 
@@ -103,48 +116,27 @@ DIAL PANEL (CONTROL SURFACE)
 
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 /* =====================================================
-DIAL HEADER + BODY (MATCHES JSX)
-===================================================== */
-
-.adtv-dial-header {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.adtv-dial-body {
-  flex: 1;
-  min-height: 0;
-
-  display: flex;
-  flex-direction: column;
-}
-
-/* =====================================================
-MODE SWITCHER
+MODE SWITCHER (UNDER TV)
 ===================================================== */
 
 .adtv-mode-bar {
   display: flex;
-  justify-content: center;
   gap: 10px;
-  margin-top: 20px;
+  flex-wrap: wrap;
 }
 
 /* =====================================================
-SUPPORTING SECTIONS
+SECTIONS (NOW PLAYING, UPCOMING, ETC)
 ===================================================== */
 
 .adtv-section {
-  margin-top: 32px;
-}
-
-.adtv-section .h2 {
-  margin-bottom: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 /* =====================================================
@@ -152,7 +144,7 @@ NOW PLAYING PREVIEW
 ===================================================== */
 
 .adtv-mini-preview {
-  margin-top: 10px;
+  margin-top: 6px;
   height: 110px;
 
   border-radius: 10px;
@@ -175,7 +167,8 @@ SLOT LIST
 ===================================================== */
 
 .adtv-slot-list {
-  margin-top: 10px;
+  margin-top: 6px;
+
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -200,21 +193,21 @@ RESPONSIVE
 ===================================================== */
 
 @media (max-width: 1000px) {
-  .adtv-stage-layout {
+  .adtv-layout {
     grid-template-columns: 1fr;
   }
 
-  .adtv-dial-panel {
-    max-width: 100%;
+  .adtv-right {
+    width: 100%;
   }
 }
 
 @media (max-width: 768px) {
-  .adtv-stage {
-    padding: 12px;
+  .adtv-container {
+    padding: 0 8px;
   }
 
   .adtv-mode-bar {
-    flex-wrap: wrap;
+    justify-content: flex-start;
   }
 }
