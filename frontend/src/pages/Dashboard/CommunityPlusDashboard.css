@@ -1,5 +1,6 @@
 :root {
   --sidebar-width: 260px;
+  --content-max-width: 1100px;
 }
 
 /* =====================================================
@@ -13,16 +14,13 @@ APP SHELL
 }
 
 /* =====================================================
-MAIN LAYOUT
+MAIN LAYOUT (SIDEBAR + CONTENT)
 ===================================================== */
+
 .main {
   display: flex;
-
-  /* 🔥 only job: layout structure */
-  min-height: calc(100vh - 64px);
-
-  /* critical for overflow handling */
-  min-width: 0;
+  width: 100%;
+  height: 100%;
 }
 
 /* =====================================================
@@ -35,34 +33,66 @@ SIDEBAR
 }
 
 /* =====================================================
-CONTENT AREA (OUTER LAYER)
+CONTENT AREA (OUTER FLEX LAYER)
 ===================================================== */
 
-.main-content {
+/* 🔥 THIS MUST MATCH YOUR JSX: content-area */
+.content-area {
   flex: 1;
+  min-width: 0;            /* 🔥 critical */
+
   display: flex;
+  flex-direction: column;
+
   padding: 20px 24px;
-  min-width: 0;
 }
 
-/* controls page width + alignment */
+/* =====================================================
+CONTENT INNER (WIDTH + ALIGNMENT ONLY)
+===================================================== */
+
 .content-inner {
   width: 100%;
-  max-width: 1100px;
+  min-width: 0;
 
-  /* 🔥 aligns with header/nav */
+  max-width: var(--content-max-width);
+
+  /* 🔥 aligns with header (left-aligned system) */
   margin: 0;
 
   display: flex;
   flex-direction: column;
+  gap: 16px;
 }
+
 /* =====================================================
-INNER CONTAINER (CRITICAL FOR ALIGNMENT)
+FULL WIDTH MODE (OVERRIDE)
+===================================================== */
+
+.content-area.full-width .content-inner {
+  max-width: none;     /* 🔥 removes constraint */
+  width: 100%;
+}
+
+/* =====================================================
+PAGE CONTAINER (REUSABLE PATTERN)
+===================================================== */
+
+/* use this inside pages like AD.TV if needed */
+.page-container {
+  width: 100%;
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* =====================================================
+LEGACY / PROFILE (SAFE KEEP)
 ===================================================== */
 
 .profile-container {
   width: 100%;
-  max-width: 1100px;
+  max-width: var(--content-max-width);
   margin: 0 auto;
   box-sizing: border-box;
 }
