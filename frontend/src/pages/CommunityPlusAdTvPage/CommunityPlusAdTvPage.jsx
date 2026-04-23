@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import CommunityPlusAdTv from "../CommunityPlusAdTv/CommunityPlusAdTv";
+import CommunityPlusAdSlotDial from "../CommunityPlusAdSlotDial/CommunityPlusAdSlotDial";
 
 export default function CommunityPlusAdTvPage() {
   const [tvMode, setTvMode] = useState("live"); // 🔥 future-ready

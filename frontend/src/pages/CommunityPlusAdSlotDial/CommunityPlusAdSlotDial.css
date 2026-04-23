@@ -1,0 +1,78 @@
+.dial-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.dial {
+  position: relative;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+
+  background: #111;
+  overflow: hidden;
+}
+
+/* segments */
+
+.dial-segment {
+  position: absolute;
+  width: 50%;
+  height: 50%;
+  top: 50%;
+  left: 50%;
+
+  transform-origin: 0% 0%;
+  cursor: pointer;
+
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.06);
+
+  transition: background 0.2s ease;
+}
+
+.dial-segment:hover {
+  background: rgba(255,255,255,0.12);
+}
+
+/* states */
+
+.dial-segment.available {
+  background: rgba(0, 200, 0, 0.15);
+}
+
+.dial-segment.full {
+  background: rgba(255, 0, 0, 0.2);
+}
+
+/* labels */
+
+.dial-label {
+  position: absolute;
+  transform: rotate(90deg);
+  font-size: 10px;
+  color: #fff;
+}
+
+/* center */
+
+.dial-center {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+
+  border-radius: 50%;
+  background: #000;
+
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-weight: 600;
+  color: #fff;
+}
