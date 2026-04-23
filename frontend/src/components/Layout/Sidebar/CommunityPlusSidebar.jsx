@@ -93,8 +93,8 @@ export default function CommunityPlusSidebar() {
           className={`btn btn-ghost sidebar-btn ${isActive("/adtv") ? "active" : ""}`}
           onClick={() => go("/adtv")}
         >
-          📺 <div className="adtv-logo">
-            AD.TV <span className="adtv-sp">SP</span>
+         <div className="adtv-logo">
+             📺 AD.TV <span className="adtv-sp">SP</span>
           </div>
         </button>
       </div>
