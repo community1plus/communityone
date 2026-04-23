@@ -3,13 +3,16 @@ HEADER CONTAINER
 ===================================================== */
 
 .header {
-  position: relative; /* 🔥 required for centered nav */
+  position: relative;
 
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
 
   padding: var(--space-sm) var(--space-md);
+
+  background: #fff; /* 🔥 anchor header */
+  border-bottom: 1px solid #e6dfd8;
 }
 
 /* =====================================================
@@ -54,6 +57,8 @@ LOCATION
 
   min-width: 200px;
   max-width: 320px;
+
+  transition: background 0.15s ease;
 }
 
 .location-input {
@@ -65,7 +70,6 @@ LOCATION
   font-size: var(--text-sm);
 }
 
-/* focus */
 .location-display:focus-within {
   background: rgba(0, 0, 0, 0.06);
 }
@@ -149,7 +153,7 @@ RIGHT (USER)
 }
 
 /* =====================================================
-🔥 CENTERED NAV (NEW SYSTEM)
+🔥 CENTERED NAV
 ===================================================== */
 
 .header-nav {
@@ -160,6 +164,8 @@ RIGHT (USER)
   display: flex;
   align-items: center;
   gap: 28px;
+
+  height: 100%; /* 🔥 stabilises vertical alignment */
 }
 
 /* =====================================================
@@ -168,8 +174,8 @@ NAV ITEMS (MATCH SIDEBAR)
 
 .nav-item {
   font-size: 14px;
-  font-weight: 600; /* 🔥 matches sidebar */
-  color: #2c2c2c;
+  font-weight: 600;
+  color: #6f675f; /* 🔥 softer default */
 
   background: transparent;
   border: none;
@@ -184,29 +190,40 @@ NAV ITEMS (MATCH SIDEBAR)
   color: #000;
 }
 
+/* active page */
 .nav-item.active {
+  color: #000;
   font-weight: 700;
 }
 
 /* =====================================================
-DROPDOWN NAV GROUP
+NAV GROUP (DROPDOWN)
 ===================================================== */
 
 .nav-group {
   position: relative;
 }
 
-/* dropdown */
+/* highlight parent when active */
+.nav-group.active .nav-item {
+  color: #000;
+  font-weight: 700;
+}
+
+/* =====================================================
+DROPDOWN
+===================================================== */
+
 .nav-dropdown {
   position: absolute;
-  top: 110%;
+  top: 120%;
   left: 0;
 
   background: #ffffff;
   border: 1px solid #e6dfd8;
   border-radius: 10px;
 
-  padding: 8px 0;
+  padding: 6px 0;
   min-width: 160px;
 
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
@@ -215,18 +232,30 @@ DROPDOWN NAV GROUP
   flex-direction: column;
 }
 
-/* show on hover */
+/* show */
 .nav-group:hover .nav-dropdown {
   display: flex;
 }
 
-/* dropdown items */
+/* =====================================================
+DROPDOWN ITEMS
+===================================================== */
+
 .nav-dropdown div {
   padding: 8px 12px;
   font-size: 13px;
+  color: #2c2c2c;
   cursor: pointer;
+
+  transition: background 0.15s ease;
 }
 
 .nav-dropdown div:hover {
   background: rgba(0, 0, 0, 0.05);
+}
+
+/* active dropdown item */
+.nav-dropdown .active {
+  background: rgba(0, 0, 0, 0.08);
+  font-weight: 600;
 }

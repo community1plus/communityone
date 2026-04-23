@@ -10,9 +10,9 @@ SIDEBAR BASE
 
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
 
-  background: #faf7f4;
+  background: #fbf9f7; /* 🔥 softer than before */
   border-right: 1px solid #e6dfd8;
 }
 
@@ -48,6 +48,13 @@ SECTION TITLE
   color: #8c837a;
 
   margin-bottom: 8px;
+
+  transition: color 0.15s ease;
+}
+
+/* subtle group hover polish */
+.sidebar-section:hover .sidebar-title {
+  color: #6f665f;
 }
 
 /* =====================================================
@@ -55,8 +62,8 @@ LINKS (PRIMARY NAV ITEMS)
 ===================================================== */
 
 .sidebar-link {
-  display: flex;              /* 🔥 ensures vertical stacking */
-  width: 100%;                /* 🔥 prevents inline wrapping */
+  display: flex;
+  width: 100%;
 
   align-items: center;
   gap: 10px;
@@ -102,22 +109,38 @@ HOVER STATE
   background: rgba(0, 0, 0, 0.05);
 }
 
-/* subtle press effect */
+/* press effect */
 .sidebar-link:active {
   transform: scale(0.98);
 }
 
 /* =====================================================
-ACTIVE STATE (CURRENT PAGE)
+ACTIVE STATE (IMPROVED)
 ===================================================== */
 
 .sidebar-link.active {
   background: rgba(0, 0, 0, 0.08);
   font-weight: 600;
+
+  position: relative;
+}
+
+/* 🔥 left accent bar (big UX upgrade) */
+.sidebar-link.active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+
+  width: 3px;
+  border-radius: 2px;
+
+  background: #000;
 }
 
 /* =====================================================
-PLATFORM ITEMS (slightly stronger presence)
+PLATFORM GROUP (slightly elevated)
 ===================================================== */
 
 .sidebar-section:nth-child(3) .sidebar-link {
@@ -137,15 +160,7 @@ LOGOUT (DESTRUCTIVE ACTION)
 }
 
 /* =====================================================
-OPTIONAL: SUBTLE GROUP HOVER (nice polish)
-===================================================== */
-
-.sidebar-section:hover .sidebar-title {
-  color: #6f665f;
-}
-
-/* =====================================================
-RESPONSIVE (optional future-proofing)
+RESPONSIVE
 ===================================================== */
 
 @media (max-width: 900px) {

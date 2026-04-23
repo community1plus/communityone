@@ -1,98 +1,49 @@
 import { useNavigate, useLocation } from "react-router-dom";
+import { NAVIGATION } from "../../config/navigationConfig"; // 🔥 adjust path if needed
 import "./CommunityPlusSidebar.css";
 
 export default function CommunityPlusSidebar() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const sidebar = NAVIGATION.find((n) => n.group === "sidebar");
+
   const isActive = (path) => location.pathname === path;
 
   return (
     <aside className="sidebar">
 
-      {/* =========================
-         MODES
-      ========================= */}
-      <div className="sidebar-section">
-        <div className="sidebar-title">MODES</div>
+      {sidebar.sections.map((section) => (
+        <div key={section.title} className="sidebar-section">
 
-        <div className="sidebar-item">⚡ NOW</div>
-        <div className="sidebar-item">🧠 BLOB</div>
-      </div>
+          <div className="sidebar-title">{section.title}</div>
 
-      {/* =========================
-         ACTIONS (USER COMMANDS)
-      ========================= */}
-      <div className="sidebar-section">
-        <div className="sidebar-title">ACTIONS</div>
+          {section.items.map((item) => {
+            const active = item.path && isActive(item.path);
 
-        <button
-          className="sidebar-link"
-          onClick={() => navigate("/event")}
-        >
-          📅 Event
-        </button>
+            return (
+              <button
+                key={item.label}
+                className={`sidebar-link ${active ? "active" : ""} ${
+                  item.action === "logout" ? "logout" : ""
+                }`}
+                onClick={() => {
+                  if (item.action === "logout") {
+                    // 🔥 plug your logout here
+                    console.log("logout");
+                  } else if (item.path) {
+                    navigate(item.path);
+                  }
+                }}
+              >
+                <span>{item.icon}</span>
+                {item.label}
+              </button>
+            );
+          })}
 
-        <button
-          className="sidebar-link"
-          onClick={() => navigate("/incident")}
-        >
-          🚨 Incident
-        </button>
-
-        <button
-          className="sidebar-link"
-          onClick={() => navigate("/beacon")}
-        >
-          📡 Beacon
-        </button>
-      </div>
-
-      {/* =========================
-         PLATFORM (SURFACES)
-      ========================= */}
-      <div className="sidebar-section">
-        <div className="sidebar-title">PLATFORM</div>
-
-        <button
-          className={`sidebar-link ${isActive("/communityplus") ? "active" : ""}`}
-          onClick={() => navigate("/communityplus")}
-        >
-          🌐 Community+
-        </button>
-
-        <button
-          className={`sidebar-link ${isActive("/yellowpages") ? "active" : ""}`}
-          onClick={() => navigate("/yellowpages")}
-        >
-          📒 Yellow Pages
-        </button>
-
-        <button
-          className={`sidebar-link ${isActive("/channels") ? "active" : ""}`}
-          onClick={() => navigate("/channels")}
-        >
-          📺 Channels
-        </button>
-      </div>
-
-      {/* =========================
-         ACCOUNT
-      ========================= */}
-      <div className="sidebar-section">
-        <div className="sidebar-title">ACCOUNT</div>
-
-        <button
-          className="sidebar-link"
-          onClick={() => navigate("/profile")}
-        >
-          👤 Profile
-        </button>
-
-        <button className="sidebar-link logout">
-          🚪 Logout
-        </button>
-      </div>
+        </div>
+      ))}
 
     </aside>
   );
