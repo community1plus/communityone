@@ -1,5 +1,5 @@
 /* =====================================================
-CONTAINER (IDENTICAL ROLE AS profile-container)
+CONTAINER (MATCH PROFILE EXACTLY)
 ===================================================== */
 
 .adtv-container {
@@ -7,20 +7,19 @@ CONTAINER (IDENTICAL ROLE AS profile-container)
   max-width: 1100px;
   margin: 0 auto;
 
+  flex: 1; /* 🔥 THIS was missing */
+
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
 }
 
 /* =====================================================
-HEADER (CHANNEL IDENTITY)
+HEADER
 ===================================================== */
 
 .adtv-header {
-  margin-bottom: 20px;
-
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  margin-bottom: 24px;
 }
 
 .adtv-live {
@@ -31,49 +30,58 @@ HEADER (CHANNEL IDENTITY)
 }
 
 /* =====================================================
-MAIN GRID (MATCH PROFILE EXACTLY)
+LAYOUT (COPY PROFILE GRID LOGIC)
 ===================================================== */
 
 .adtv-layout {
   display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-  gap: 20px;
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(320px, 420px);
 
+  gap: 24px;
+
+  flex: 1;                 /* 🔥 CRITICAL */
   align-items: stretch;
 }
 
-/* =====================================================
-LEFT + RIGHT (MATCH PROFILE COLUMN BEHAVIOUR)
-===================================================== */
-
-.adtv-left,
-.adtv-right {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
+.adtv-layout > * {
   min-width: 0;
 }
 
 /* =====================================================
-TV CARD (MATCH profile-left STYLE)
+CARD SYSTEM (IDENTICAL TO PROFILE)
 ===================================================== */
 
-.adtv-stage {
+.adtv-left,
+.adtv-right {
   background: #ffffff;
   border: 1px solid #e6dfd8;
   border-radius: 18px;
   box-shadow: 0 6px 18px rgba(20, 20, 20, 0.05);
 
-  padding: 14px; /* 🔥 tightened */
-
   display: flex;
   flex-direction: column;
+  height: 100%;
+
+  box-sizing: border-box;
+}
+
+/* left = main content */
+.adtv-left {
+  padding: 24px;
+  gap: 20px;
+}
+
+/* right = guide/control */
+.adtv-right {
+  padding: 22px 24px;
+  background: #faf7f4;
   gap: 12px;
-  flex: 1;
 }
 
 /* =====================================================
-TV CONTAINER (16:9 + FILL)
+TV
 ===================================================== */
 
 .adtv-tv-container {
@@ -93,45 +101,13 @@ TV CONTAINER (16:9 + FILL)
 }
 
 /* =====================================================
-RIGHT PANEL (MATCH profile-guide STYLE)
-===================================================== */
-
-.adtv-panel {
-  background: #f8f5f2; /* 🔥 improved contrast */
-  border: 1px solid #e6dfd8;
-  border-radius: 18px;
-  box-shadow: 0 6px 18px rgba(20, 20, 20, 0.05);
-
-  padding: 22px 24px;
-
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-
-  height: 100%;
-
-  justify-content: space-between; /* 🔥 vertical anchoring */
-}
-
-/* =====================================================
-DIAL STRUCTURE (FIX FLOATING CONTENT)
-===================================================== */
-
-.adtv-panel .adtv-dial-body {
-  margin-top: 12px;
-}
-
-/* =====================================================
-MODE BAR (UNDER TV)
+MODE BAR
 ===================================================== */
 
 .adtv-mode-bar {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
-
-  margin-top: 16px;        /* 🔥 spacing fix */
-  justify-content: flex-start; /* 🔥 better alignment */
 }
 
 /* =====================================================
@@ -159,60 +135,14 @@ PREVIEW
   display: flex;
   align-items: center;
   justify-content: center;
-
-  transition: background 0.2s ease;
-}
-
-.adtv-mini-preview:hover {
-  background: rgba(0, 0, 0, 0.06);
-}
-
-/* =====================================================
-SLOT LIST
-===================================================== */
-
-.adtv-slot-list {
-  margin-top: 6px;
-
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.adtv-slot-list div {
-  padding: 6px 8px;
-  border-radius: 6px;
-
-  background: rgba(0, 0, 0, 0.03);
-  font-size: 13px;
-
-  transition: background 0.15s ease;
-}
-
-.adtv-slot-list div:hover {
-  background: rgba(0, 0, 0, 0.06);
 }
 
 /* =====================================================
 RESPONSIVE
 ===================================================== */
 
-@media (max-width: 1000px) {
+@media (max-width: 900px) {
   .adtv-layout {
     grid-template-columns: 1fr;
-  }
-
-  .adtv-panel {
-    height: auto;
-  }
-}
-
-@media (max-width: 768px) {
-  .adtv-container {
-    padding: 0 8px;
-  }
-
-  .adtv-mode-bar {
-    justify-content: flex-start;
   }
 }
