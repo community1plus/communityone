@@ -1,161 +1,86 @@
 /* =====================================================
-SIDEBAR — SYSTEM ALIGNED (FLAT NAV)
+SIDEBAR BASE
 ===================================================== */
-.meta {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-
-  color: rgba(0, 0, 0, 0.45);
-  margin: 6px 0 2px;
-}
 
 .sidebar {
   width: 260px;
-  min-width: 260px;
-  height: 100%;
+  flex-shrink: 0;
 
+  padding: 16px 14px;
   display: flex;
   flex-direction: column;
-  gap: var(--space-xs);
+  gap: 18px;
 
-  padding: var(--space-lg) var(--space-md);
-  box-sizing: border-box;
-
-  background: transparent;
-  border-right: none;
-
-  align-self: start;
+  background: #faf7f4;
+  border-right: 1px solid #e6dfd8;
 }
 
 /* =====================================================
-GROUPING (NEW — STRUCTURE)
+SECTION
 ===================================================== */
 
-.sidebar-group {
+.sidebar-section {
   display: flex;
   flex-direction: column;
-  gap: var(--space-xs);
+  gap: 6px;
 }
 
 /* =====================================================
-ITEMS — FLAT (NOT BUTTONS)
+SECTION TITLE
 ===================================================== */
 
-.sidebar-item,
-.sidebar-btn {
+.sidebar-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: #8c837a;
+
+  margin-bottom: 6px;
+}
+
+/* =====================================================
+ITEMS
+===================================================== */
+
+.sidebar-item {
+  font-size: 13px;
+  color: #444;
+  padding: 6px 8px;
+}
+
+/* =====================================================
+LINKS (BUTTONS)
+===================================================== */
+
+.sidebar-link {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
+  gap: 8px;
 
-  padding: var(--space-sm) var(--space-md);
-  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  border-radius: 8px;
 
-  font-size: var(--text-md);
-  font-weight: 500;
-  color: var(--text-primary);
-
+  font-size: 14px;
+  background: transparent;
+  border: none;
+  text-align: left;
   cursor: pointer;
 
-  background: transparent;
-  border: none;
-  box-shadow: none;
-
-  transition:
-    color 0.18s ease,
-    background 0.18s ease,
-    transform 0.12s ease;
+  transition: background 0.15s ease;
 }
 
-/* subtle hover */
-.sidebar-item:hover,
-.sidebar-btn:hover {
-  background: rgba(0, 0, 0, 0.04);
-  transform: translateX(2px);
+/* hover */
+.sidebar-link:hover {
+  background: rgba(0, 0, 0, 0.05);
 }
 
-/* =====================================================
-ACTIVE STATE (THEME-DRIVEN)
-===================================================== */
-
-.sidebar-item.active,
-.sidebar-btn.active {
-  color: var(--accent);
-  font-weight: 600;
-  background: rgba(0, 0, 0, 0.04);
-}
-
-/* =====================================================
-LABEL INTEGRATION (TYPOGRAPHY SYSTEM)
-===================================================== */
-
-.sidebar-item .label,
-.sidebar-btn .label {
-  font-size: 0.75em;
-}
-
-/* =====================================================
-AD.TV SUPERSCRIPT ALIGNMENT
-===================================================== */
-
-.sidebar-item .adtv-sp,
-.sidebar-btn .adtv-sp {
-  margin-left: 2px;
-}
-.adtv-sp {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  width: 0.85em;
-  height: 0.85em;
-
-  font-size: 0.5em;
-  font-weight: 700;
-
-  color: var(--accent);
-  border: 1px solid var(--accent);
-  border-radius: 50%;
-
-  margin-left: 0;              /* 🔥 tighter */
-  transform: translateY(-2px);/* 🔥 better alignment */
-
-  line-height: 1;
-}
-
-/* =====================================================
-LOGOUT
-===================================================== */
-
-.sidebar-item.logout,
-.sidebar-btn.logout {
-  margin-top: var(--space-sm);
-  color: #c53030;
+/* active */
+.sidebar-link.active {
+  background: rgba(0, 0, 0, 0.08);
   font-weight: 600;
 }
 
-.sidebar-item.logout:hover,
-.sidebar-btn.logout:hover {
-  background: rgba(197, 48, 48, 0.08);
-}
-
-/* =====================================================
-DIVIDER
-===================================================== */
-
-.sidebar-divider {
-  border: none;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
-  margin: var(--space-sm) 0;
-}
-
-/* =====================================================
-RESPONSIVE
-===================================================== */
-
-@media (max-width: 1100px) {
-  .sidebar {
-    display: none;
-  }
+/* logout */
+.sidebar-link.logout {
+  color: #d92d20;
 }
