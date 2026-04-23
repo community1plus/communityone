@@ -137,6 +137,38 @@ PREVIEW
   justify-content: center;
 }
 
+.adtv-panel {
+  justify-content: flex-start;
+}
+
+.adtv-left {
+  gap: 16px; /* instead of 20px */
+}
+
+.adtv-panel-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  margin-bottom: 10px; /* tighter */
+}
+
+.adtv-panel-body {
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;        /* center horizontally */
+  justify-content: flex-start; /* 🔥 anchor to top */
+  .adtv-panel-body > * {
+  width: 100%;
+  max-width: 260px;   /* 🔥 reduces dial size */
+}
+  padding-top: 12px;
+
+}
+
 /* =====================================================
 RESPONSIVE
 ===================================================== */
