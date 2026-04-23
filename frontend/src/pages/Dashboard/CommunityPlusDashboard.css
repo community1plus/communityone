@@ -4,7 +4,7 @@
 }
 
 /* =====================================================
-GLOBAL RESET
+GLOBAL
 ===================================================== */
 
 *,
@@ -26,23 +26,24 @@ body {
 }
 
 /* =====================================================
-APP SHELL (SINGLE SOURCE OF TRUTH)
+APP SHELL (TOP LEVEL)
 ===================================================== */
 
-.dashboard-container {
-  height: 100vh;                 /* 🔥 ONLY ONE ROOT HEIGHT */
+.app-shell {
+  height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
 /* =====================================================
-MAIN LAYOUT
+MAIN LAYOUT (SIDEBAR + CONTENT)
 ===================================================== */
 
-.main {
+.layout-main {
   flex: 1;
   display: flex;
-  min-height: 0;
+
+  min-height: 0; /* 🔥 critical */
 }
 
 /* =====================================================
@@ -58,8 +59,9 @@ SIDEBAR
 CONTENT AREA (SCROLL CONTAINER)
 ===================================================== */
 
-.content-area {
+.layout-content {
   flex: 1;
+
   min-width: 0;
   min-height: 0;
 
@@ -68,16 +70,18 @@ CONTENT AREA (SCROLL CONTAINER)
 
   overflow: auto;
 
-  padding: 20px 24px;   /* 🔥 restore alignment */
+  padding: 20px 24px;
 }
 
 /* =====================================================
-CONTENT INNER
+INNER CONTENT
 ===================================================== */
 
-.content-inner {
+.layout-inner {
   flex: 1;
+
   min-height: 0;
+  min-width: 0;
 
   display: flex;
   flex-direction: column;
@@ -85,25 +89,14 @@ CONTENT INNER
   width: 100%;
   max-width: var(--content-max-width);
 
-  margin: 0 auto;       /* 🔥 center content */
+  margin: 0 auto;
 }
 
 /* =====================================================
 FULL WIDTH MODE
 ===================================================== */
 
-.content-area.full-width .content-inner {
+.layout-content.full-width .layout-inner {
   max-width: none;
   margin: 0;
-}
-
-/* =====================================================
-PAGE CONTAINER
-===================================================== */
-
-.page-container,
-.profile-container {
-  width: 100%;
-  max-width: var(--content-max-width);
-  margin: 0 auto;
 }
