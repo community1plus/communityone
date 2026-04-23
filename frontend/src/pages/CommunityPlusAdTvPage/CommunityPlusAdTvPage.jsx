@@ -34,17 +34,22 @@ export default function CommunityPlusAdTvPage() {
     setTvMode(mode);
   }, []);
 
+  /* =========================
+     DERIVED
+  ========================= */
   const selectedLabel =
     selectedSlot !== null ? `Selected: ${selectedSlot}:00` : "Select an hour";
 
   /* =========================
-     UI
+     RENDER
   ========================= */
   return (
     <div className="adtv-container">
 
-      {/* HEADER */}
-      <div className="adtv-header">
+      {/* =========================
+         HEADER
+      ========================= */}
+      <header className="adtv-header">
         <h1 className="h1">
           AD.TV <span className="adtv-sp">SP</span>
         </h1>
@@ -54,16 +59,20 @@ export default function CommunityPlusAdTvPage() {
         <div className="meta">
           LIVE AD CHANNEL • LOCATION-AWARE • TIME-BASED
         </div>
-      </div>
+      </header>
 
-      {/* MAIN LAYOUT */}
+      {/* =========================
+         MAIN LAYOUT
+      ========================= */}
       <div className="adtv-layout">
 
-        {/* LEFT COLUMN */}
-        <div className="adtv-left">
+        {/* =========================
+           LEFT COLUMN
+        ========================= */}
+        <main className="adtv-left">
 
-          {/* TV */}
-          <div className="adtv-stage">
+          {/* TV CARD */}
+          <section className="adtv-stage">
             <div className="adtv-tv-container">
               <CommunityPlusAdTv
                 mode="page"
@@ -72,25 +81,27 @@ export default function CommunityPlusAdTvPage() {
                 selectedSlot={selectedSlot}
               />
             </div>
-          </div>
+          </section>
 
           {/* MODE SWITCH */}
-          <div className="adtv-mode-bar">
-            {MODES.map((mode) => (
-              <button
-                key={mode}
-                className={`btn btn-ghost ${
-                  tvMode === mode ? "active" : ""
-                }`}
-                onClick={() => handleModeChange(mode)}
-              >
-                {mode[0].toUpperCase() + mode.slice(1)}
-              </button>
-            ))}
-          </div>
+          <section className="adtv-mode-bar">
+            {MODES.map((mode) => {
+              const isActive = tvMode === mode;
+
+              return (
+                <button
+                  key={mode}
+                  className={`btn btn-ghost ${isActive ? "active" : ""}`}
+                  onClick={() => handleModeChange(mode)}
+                >
+                  {mode[0].toUpperCase() + mode.slice(1)}
+                </button>
+              );
+            })}
+          </section>
 
           {/* NOW PLAYING */}
-          <div className="adtv-section">
+          <section className="adtv-section">
             <h2 className="h2">Now Playing</h2>
             <div className="meta">CURRENT AD STREAM</div>
 
@@ -99,10 +110,10 @@ export default function CommunityPlusAdTvPage() {
                 ? `Preview for ${selectedSlot}:00 slot`
                 : "Active campaign preview"}
             </div>
-          </div>
+          </section>
 
           {/* UPCOMING */}
-          <div className="adtv-section">
+          <section className="adtv-section">
             <h2 className="h2">Upcoming Slots</h2>
             <div className="meta">SCHEDULED ADS</div>
 
@@ -111,10 +122,10 @@ export default function CommunityPlusAdTvPage() {
               <div>19:00 — Event Ad</div>
               <div>20:00 — Local Business</div>
             </div>
-          </div>
+          </section>
 
           {/* UPLOAD */}
-          <div className="adtv-section">
+          <section className="adtv-section">
             <h2 className="h2">Upload / Preview</h2>
             <div className="meta">CREATE AND TEST ADS</div>
 
@@ -124,24 +135,34 @@ export default function CommunityPlusAdTvPage() {
             >
               Upload Ad
             </button>
-          </div>
+          </section>
 
-        </div>
+        </main>
 
-        {/* RIGHT COLUMN (DIAL / CONTROL PANEL) */}
-        <div className="adtv-right">
+        {/* =========================
+           RIGHT COLUMN
+        ========================= */}
+        <aside className="adtv-right">
 
           <div className="adtv-panel">
-            <div className="h3">Book Slot</div>
-            <div className="meta">{selectedLabel}</div>
 
-            <CommunityPlusAdSlotDial
-              slots={slots}
-              onSelectSlot={handleSelectSlot}
-            />
+            {/* PANEL HEADER */}
+            <div className="adtv-panel-header">
+              <div className="h3">Book Slot</div>
+              <div className="meta">{selectedLabel}</div>
+            </div>
+
+            {/* PANEL BODY */}
+            <div className="adtv-panel-body">
+              <CommunityPlusAdSlotDial
+                slots={slots}
+                onSelectSlot={handleSelectSlot}
+              />
+            </div>
+
           </div>
 
-        </div>
+        </aside>
 
       </div>
     </div>

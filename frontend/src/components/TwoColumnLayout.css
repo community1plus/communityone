@@ -1,0 +1,69 @@
+/* =====================================================
+CONTAINER (same as profile-container / adtv-container)
+===================================================== */
+
+.two-col-container {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* =====================================================
+GRID LAYOUT
+===================================================== */
+
+.two-col-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 20px;
+
+  align-items: stretch;
+}
+
+/* =====================================================
+LEFT / RIGHT COLUMNS
+===================================================== */
+
+.two-col-left,
+.two-col-right {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 0;
+}
+
+/* =====================================================
+CARD BASE (REUSABLE)
+===================================================== */
+
+.two-col-card {
+  background: #ffffff;
+  border: 1px solid #e6dfd8;
+  border-radius: 18px;
+  box-shadow: 0 6px 18px rgba(20, 20, 20, 0.05);
+
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* left card */
+.two-col-card.left {
+  padding: 24px;
+}
+
+/* right card */
+.two-col-card.right {
+  padding: 22px 24px;
+  background: #faf7f4;
+}
+
+/* =====================================================
+RESPONSIVE
+===================================================== */
+
+@media (max-width: 1000px) {
+  .two-col-layout {
+    grid-template-columns: 1fr;
+  }
+}
