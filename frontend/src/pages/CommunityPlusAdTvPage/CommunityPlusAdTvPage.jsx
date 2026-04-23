@@ -1,149 +1,148 @@
-import React, { useState, useMemo, useCallback } from "react";
+/* =====================================================
+CONTAINER (MATCH PROFILE EXACTLY)
+===================================================== */
 
-import CommunityPlusAdTv from "../CommunityPlusAdTv/CommunityPlusAdTv";
-import CommunityPlusAdSlotDial from "../CommunityPlusAdSlotDial/CommunityPlusAdSlotDial";
-import "./CommunityPlusAdTvPage.css";
+.adtv-container {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
 
-const MODES = ["live", "schedule", "upload"];
+  flex: 1; /* 🔥 THIS was missing */
 
-export default function CommunityPlusAdTvPage() {
-  const [tvMode, setTvMode] = useState("live");
-  const [selectedSlot, setSelectedSlot] = useState(null);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
 
-  /* =========================
-     DATA
-  ========================= */
-  const slots = useMemo(
-    () =>
-      Array.from({ length: 24 }, () => ({
-        count: Math.floor(Math.random() * 5),
-        capacity: 5,
-      })),
-    []
-  );
+/* =====================================================
+HEADER
+===================================================== */
 
-  /* =========================
-     HANDLERS
-  ========================= */
-  const handleSelectSlot = useCallback((hour) => {
-    setSelectedSlot(hour);
-    setTvMode("schedule");
-  }, []);
+.adtv-header {
+  margin-bottom: 24px;
+}
 
-  const handleModeChange = useCallback((mode) => {
-    setTvMode(mode);
-  }, []);
+.adtv-live {
+  font-size: 11px;
+  font-weight: 700;
+  color: #ff3b30;
+  letter-spacing: 0.5px;
+}
 
-  const selectedLabel =
-    selectedSlot !== null ? `Selected: ${selectedSlot}:00` : "Select an hour";
+/* =====================================================
+LAYOUT (COPY PROFILE GRID LOGIC)
+===================================================== */
 
-  /* =========================
-     UI
-  ========================= */
-  return (
-    <div className="adtv-container">
+.adtv-layout {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(320px, 420px);
 
-      {/* HEADER */}
-      <div className="adtv-header">
-        <h1 className="h1">
-          AD.TV <span className="adtv-sp">SP</span>
-        </h1>
+  gap: 24px;
 
-        <div className="adtv-live">● LIVE</div>
+  flex: 1;                 /* 🔥 CRITICAL */
+  align-items: stretch;
+}
 
-        <div className="meta">
-          LIVE AD CHANNEL • LOCATION-AWARE • TIME-BASED
-        </div>
-      </div>
+.adtv-layout > * {
+  min-width: 0;
+}
 
-      {/* MAIN LAYOUT */}
-      <div className="adtv-layout">
+/* =====================================================
+CARD SYSTEM (IDENTICAL TO PROFILE)
+===================================================== */
 
-        {/* LEFT COLUMN */}
-        <div className="adtv-left">
+.adtv-left,
+.adtv-right {
+  background: #ffffff;
+  border: 1px solid #e6dfd8;
+  border-radius: 18px;
+  box-shadow: 0 6px 18px rgba(20, 20, 20, 0.05);
 
-          {/* TV */}
-          <div className="adtv-stage">
-            <div className="adtv-tv-container">
-              <CommunityPlusAdTv
-                mode="page"
-                context="page"
-                tvMode={tvMode}
-                selectedSlot={selectedSlot}
-              />
-            </div>
-          </div>
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 
-          {/* MODE SWITCH */}
-          <div className="adtv-mode-bar">
-            {MODES.map((mode) => (
-              <button
-                key={mode}
-                className={`btn btn-ghost ${
-                  tvMode === mode ? "active" : ""
-                }`}
-                onClick={() => handleModeChange(mode)}
-              >
-                {mode[0].toUpperCase() + mode.slice(1)}
-              </button>
-            ))}
-          </div>
+  box-sizing: border-box;
+}
 
-          {/* NOW PLAYING */}
-          <div className="adtv-section">
-            <h2 className="h2">Now Playing</h2>
-            <div className="meta">CURRENT AD STREAM</div>
+/* left = main content */
+.adtv-left {
+  padding: 24px;
+  gap: 20px;
+}
 
-            <div className="adtv-mini-preview">
-              {selectedSlot !== null
-                ? `Preview for ${selectedSlot}:00 slot`
-                : "Active campaign preview"}
-            </div>
-          </div>
+/* right = guide/control */
+.adtv-right {
+  padding: 22px 24px;
+  background: #faf7f4;
+  gap: 12px;
+}
 
-          {/* UPCOMING */}
-          <div className="adtv-section">
-            <h2 className="h2">Upcoming Slots</h2>
-            <div className="meta">SCHEDULED ADS</div>
+/* =====================================================
+TV
+===================================================== */
 
-            <div className="adtv-slot-list">
-              <div>18:00 — Restaurant Promo</div>
-              <div>19:00 — Event Ad</div>
-              <div>20:00 — Local Business</div>
-            </div>
-          </div>
+.adtv-tv-container {
+  width: 100%;
+  aspect-ratio: 16 / 9;
 
-          {/* UPLOAD */}
-          <div className="adtv-section">
-            <h2 className="h2">Upload / Preview</h2>
-            <div className="meta">CREATE AND TEST ADS</div>
+  border-radius: 12px;
+  overflow: hidden;
 
-            <button
-              className="btn btn-primary"
-              onClick={() => handleModeChange("upload")}
-            >
-              Upload Ad
-            </button>
-          </div>
+  display: flex;
+}
 
-        </div>
+.adtv-tv-container > * {
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
 
-        {/* RIGHT COLUMN (DIAL / CONTROL PANEL) */}
-        <div className="adtv-right">
+/* =====================================================
+MODE BAR
+===================================================== */
 
-          <div className="adtv-panel">
-            <div className="h3">Book Slot</div>
-            <div className="meta">{selectedLabel}</div>
+.adtv-mode-bar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
 
-            <CommunityPlusAdSlotDial
-              slots={slots}
-              onSelectSlot={handleSelectSlot}
-            />
-          </div>
+/* =====================================================
+SECTIONS
+===================================================== */
 
-        </div>
+.adtv-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
 
-      </div>
-    </div>
-  );
+/* =====================================================
+PREVIEW
+===================================================== */
+
+.adtv-mini-preview {
+  margin-top: 6px;
+  height: 110px;
+
+  border-radius: 10px;
+
+  background: rgba(0, 0, 0, 0.04);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* =====================================================
+RESPONSIVE
+===================================================== */
+
+@media (max-width: 900px) {
+  .adtv-layout {
+    grid-template-columns: 1fr;
+  }
 }

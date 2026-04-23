@@ -1,65 +1,95 @@
 /* =====================================================
-CONTAINER (MATCH PROFILE EXACTLY)
+ROOT
 ===================================================== */
 
-.adtv-container {
+:root {
+  --sidebar-width: 260px;
+}
+
+/* =====================================================
+CONTAINER + PAGE STRUCTURE
+===================================================== */
+
+.profile-container {
   width: 100%;
   max-width: 1100px;
   margin: 0 auto;
 
-  flex: 1; /* 🔥 THIS was missing */
+  /* 🔥 enables vertical stretching */
+  flex: 1;
 
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
 }
 
-/* =====================================================
-HEADER
-===================================================== */
-
-.adtv-header {
+/* spacing between header and cards */
+.profile-page-header {
   margin-bottom: 24px;
 }
 
-.adtv-live {
-  font-size: 11px;
+/* =====================================================
+TITLE + STEPS
+===================================================== */
+
+.profile-page-title {
+  font-size: 24px;
   font-weight: 700;
-  color: #ff3b30;
-  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+}
+
+.profile-page-steps {
+  display: flex;
+  gap: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #666;
+}
+
+.profile-page-steps .step {
+  cursor: pointer;
+}
+
+.profile-page-steps .step.active {
+  color: #4a0f0f; /* oxblood */
+  font-weight: 700;
 }
 
 /* =====================================================
-LAYOUT (COPY PROFILE GRID LOGIC)
+TWO-COLUMN LAYOUT
 ===================================================== */
 
-.adtv-layout {
+.profile-layout {
   display: grid;
+
   grid-template-columns:
     minmax(0, 1fr)
     minmax(320px, 420px);
 
   gap: 24px;
 
-  flex: 1;                 /* 🔥 CRITICAL */
+  /* 🔥 full height behavior */
+  flex: 1;
   align-items: stretch;
 }
 
-.adtv-layout > * {
+/* prevent overflow issues */
+.profile-layout > * {
   min-width: 0;
 }
 
 /* =====================================================
-CARD SYSTEM (IDENTICAL TO PROFILE)
+CARD SYSTEM
 ===================================================== */
 
-.adtv-left,
-.adtv-right {
+.profile-left,
+.profile-guide {
   background: #ffffff;
   border: 1px solid #e6dfd8;
   border-radius: 18px;
   box-shadow: 0 6px 18px rgba(20, 20, 20, 0.05);
 
+  /* 🔥 stretch cards */
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -67,74 +97,162 @@ CARD SYSTEM (IDENTICAL TO PROFILE)
   box-sizing: border-box;
 }
 
-/* left = main content */
-.adtv-left {
+/* left card */
+.profile-left {
   padding: 24px;
-  gap: 20px;
 }
 
-/* right = guide/control */
-.adtv-right {
+/* right guide */
+.profile-guide {
   padding: 22px 24px;
   background: #faf7f4;
-  gap: 12px;
 }
 
 /* =====================================================
-TV
+FORM LAYOUT
 ===================================================== */
 
-.adtv-tv-container {
-  width: 100%;
-  aspect-ratio: 16 / 9;
-
-  border-radius: 12px;
-  overflow: hidden;
-
-  display: flex;
-}
-
-.adtv-tv-container > * {
-  width: 100%;
-  height: 100%;
-  display: flex;
-}
-
-/* =====================================================
-MODE BAR
-===================================================== */
-
-.adtv-mode-bar {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-/* =====================================================
-SECTIONS
-===================================================== */
-
-.adtv-section {
+.profile-left form {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 16px;
+}
+
+/* form groups */
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #444;
+}
+
+/* inputs */
+
+.profile-left input,
+.profile-left select {
+  width: 100%;
+  padding: 10px 12px;
+
+  border-radius: 8px;
+  border: 1px solid #ddd;
+
+  font-size: 14px;
+  box-sizing: border-box;
+  transition: 0.2s ease;
+}
+
+.profile-left input:focus,
+.profile-left select:focus {
+  outline: none;
+  border-color: #4a0f0f;
+  box-shadow: 0 0 0 2px rgba(74, 15, 15, 0.1);
 }
 
 /* =====================================================
-PREVIEW
+BUTTON
 ===================================================== */
 
-.adtv-mini-preview {
-  margin-top: 6px;
-  height: 110px;
+.profile-left button[type="submit"] {
+  margin-top: 12px;
 
+  padding: 12px;
+  border: none;
   border-radius: 10px;
 
-  background: rgba(0, 0, 0, 0.04);
+  background: #4a0f0f;
+  color: #fff;
+
+  font-weight: 600;
+  font-size: 14px;
+
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.profile-left button[type="submit"]:hover {
+  background: #3a0c0c;
+}
+
+.profile-left button[type="submit"]:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* =====================================================
+LOCATION SECTION
+===================================================== */
+
+.location-section {
+  margin-top: 8px;
+  padding: 16px;
+
+  border: 1px solid #eee;
+  border-radius: 12px;
+  background: #fafafa;
 
   display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.location-section > label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* rows */
+
+.location-row {
+  display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+
+  font-size: 13px;
+  gap: 10px;
+}
+
+.location-row span {
+  color: #666;
+}
+
+.location-row strong {
+  font-weight: 600;
+  color: #222;
+}
+
+/* =====================================================
+GHOST BUTTON
+===================================================== */
+
+.ghost-btn {
+  background: transparent;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: 0.15s ease;
+}
+
+.ghost-btn:hover {
+  background: #f3f2ef;
+}
+
+/* =====================================================
+ERROR TEXT
+===================================================== */
+
+.error {
+  margin-top: 6px;
+  font-size: 13px;
+  color: #c44536;
 }
 
 /* =====================================================
@@ -142,7 +260,237 @@ RESPONSIVE
 ===================================================== */
 
 @media (max-width: 900px) {
-  .adtv-layout {
+  .profile-layout {
     grid-template-columns: 1fr;
   }
+}
+
+/* =========================================
+NAV ICON BUTTONS
+========================================= */
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-icon-btn {
+  background: none;
+  border: none;
+  padding: 6px;
+
+  font-size: 18px;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: 0.2s ease;
+}
+
+/* primary (next / submit) */
+.nav-icon-btn.primary {
+  color: #4a0f0f;
+  font-size: 22px;
+}
+
+.nav-icon-btn.primary:hover {
+  transform: translateX(2px);
+}
+
+/* skip */
+.nav-icon-btn.skip {
+  color: #888;
+}
+
+.nav-icon-btn.skip:hover {
+  color: #444;
+  transform: rotate(-20deg);
+}
+
+/* back */
+.nav-icon-btn.ghost {
+  color: #888;
+}
+
+.nav-icon-btn.ghost:hover {
+  color: #222;
+}
+
+/* =====================================================
+FORM NAVIGATION (UPDATED)
+===================================================== */
+
+.form-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-top: auto;
+  padding-top: 16px;
+}
+
+/* left side (Save / Close) */
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* right side (arrows) */
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* =====================================================
+TEXT BUTTONS (Save / Close)
+===================================================== */
+
+.nav-text-btn {
+  background: none;
+  border: none;
+  padding: 6px 4px;
+
+  font-size: 13px;
+  font-weight: 600;
+  color: #666;
+
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.nav-text-btn:hover {
+  color: #222;
+}
+
+/* Close = destructive */
+.nav-text-btn.danger {
+  color: #a33;
+}
+
+.nav-text-btn.danger:hover {
+  color: #7a1f1f;
+}
+
+/* =====================================================
+NAV ICON BUTTONS (IMPROVED)
+===================================================== */
+
+.nav-icon-btn {
+  background: none;
+  border: none;
+  padding: 8px;
+
+  font-size: 22px; /* 🔥 thicker */
+  font-weight: 600;
+  line-height: 1;
+
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: all 0.2s ease;
+}
+
+/* NEXT / SUBMIT */
+.nav-icon-btn.primary {
+  color: #4a0f0f;
+  font-size: 26px;
+}
+
+.nav-icon-btn.primary:hover {
+  transform: translateX(3px);
+}
+
+/* SKIP */
+.nav-icon-btn.skip {
+  color: #999;
+}
+
+.nav-icon-btn.skip:hover {
+  color: #444;
+  transform: rotate(-25deg);
+}
+
+/* BACK */
+.nav-icon-btn.ghost {
+  color: #888;
+}
+
+.nav-icon-btn.ghost:hover {
+  color: #222;
+  transform: translateX(-2px);
+}
+
+/* ================= FILE LIST ================= */
+
+.file-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.file-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 10px;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  background: #fff;
+}
+
+/* THUMB */
+.file-thumb {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f4f4f4;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.file-thumb img,
+.file-thumb video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* INFO */
+.file-info {
+  flex: 1;
+}
+
+.file-name {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.file-meta {
+  font-size: 11px;
+  color: #777;
+}
+
+/* ACTIONS */
+.file-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.file-actions button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 14px;
 }
