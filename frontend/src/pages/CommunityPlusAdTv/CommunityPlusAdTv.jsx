@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
-import "./AdTV.css";
+import "./CommunityPlusAdTv.css";
 
 export default function CommunityPlusAdTv({ ads = [], context = "feed" }) {
   const [currentIndex, setCurrentIndex] = useState(0);
