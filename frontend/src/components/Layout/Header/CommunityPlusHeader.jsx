@@ -91,7 +91,6 @@ export default function CommunityPlusHeader({ user, onLogout }) {
 
   console.log("AD.TV LOADED");
 
-  return <div>AD.TV</div>;
   
   useEffect(() => {
     let interval;
