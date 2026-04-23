@@ -3,17 +3,14 @@
   --content-max-width: 1100px;
 }
 
+/* =====================================================
+GLOBAL RESET
+===================================================== */
+
 *,
 *::before,
 *::after {
   box-sizing: border-box;
-}
-
-/* =====================================================
-ROOT LOCK (CRITICAL)
-===================================================== */
-body {
-  overflow-x: hidden;
 }
 
 html,
@@ -22,42 +19,30 @@ body,
   height: 100%;
   margin: 0;
   padding: 0;
-  margin: 0;
 }
 
-* {
-  outline: 1px solid red;
+body {
+  overflow-x: hidden;
 }
-.layout-main,
-.layout-content,
-.layout-inner {
-  min-width: 0;
-}
+
 /* =====================================================
-APP SHELL
+APP SHELL (SINGLE SOURCE OF TRUTH)
 ===================================================== */
-.app-shell {
-  min-height: 100vh;          /* 🔥 must be explicit */
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  max-width:100%;
-  overflow: hidden;       /* 🔥 PREVENT expansion */
-}
+
 .dashboard-container {
-  height: 100vh;                 /* 🔥 replaces min-height */
+  height: 100vh;                 /* 🔥 ONLY ONE ROOT HEIGHT */
   display: flex;
   flex-direction: column;
 }
 
 /* =====================================================
-MAIN LAYOUT (SIDEBAR + CONTENT)
+MAIN LAYOUT
 ===================================================== */
 
 .main {
-  flex: 1;                        /* 🔥 replaces height: 100% */
+  flex: 1;
   display: flex;
-  min-height: 0;                  /* 🔥 critical for overflow */
+  min-height: 0;
 }
 
 /* =====================================================
@@ -70,8 +55,9 @@ SIDEBAR
 }
 
 /* =====================================================
-CONTENT AREA (SCROLL LAYER)
+CONTENT AREA (SCROLL CONTAINER)
 ===================================================== */
+
 .content-area {
   flex: 1;
   min-width: 0;
@@ -80,17 +66,13 @@ CONTENT AREA (SCROLL LAYER)
   display: flex;
   flex-direction: column;
 
-  overflow: auto;             /* 🔥 THIS FIXES YOUR ISSUE */
+  overflow: auto;
+
+  padding: 20px 24px;   /* 🔥 restore alignment */
 }
 
-
-.main { background: rgba(255,0,0,0.05); }
-.content-area { background: rgba(0,255,0,0.05); }
-.content-inner { background: rgba(0,0,255,0.05); }
-
-
 /* =====================================================
-CONTENT INNER (WIDTH CONTROL)
+CONTENT INNER
 ===================================================== */
 
 .content-inner {
@@ -100,36 +82,28 @@ CONTENT INNER (WIDTH CONTROL)
   display: flex;
   flex-direction: column;
 
-  max-width: 1100px;
+  width: 100%;
+  max-width: var(--content-max-width);
+
+  margin: 0 auto;       /* 🔥 center content */
 }
+
 /* =====================================================
-FULL WIDTH MODE (ROUTE-BASED)
+FULL WIDTH MODE
 ===================================================== */
 
 .content-area.full-width .content-inner {
   max-width: none;
-  width: 100%;
-  margin: 0;                      /* 🔥 remove centering when full width */
+  margin: 0;
 }
 
 /* =====================================================
-REUSABLE PAGE CONTAINER
+PAGE CONTAINER
 ===================================================== */
 
-.page-container {
-  width: 100%;
-  max-width: var(--content-max-width);
-  margin: 0 auto;
-  box-sizing: border-box;
-}
-
-/* =====================================================
-LEGACY / PROFILE
-===================================================== */
-
+.page-container,
 .profile-container {
   width: 100%;
   max-width: var(--content-max-width);
   margin: 0 auto;
-  box-sizing: border-box;
 }
