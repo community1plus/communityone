@@ -42,13 +42,10 @@ STAGE LAYOUT (TV + DIAL SYSTEM)
 ===================================================== */
 
 .adtv-stage-layout {
-  flex: 1;
   display: grid;
-
   grid-template-columns: 2fr 1fr;
   gap: 28px;
-
-  min-height: 0;        /* 🔥 prevents overflow bugs */
+  align-items: start;
 }
 
 /* =====================================================

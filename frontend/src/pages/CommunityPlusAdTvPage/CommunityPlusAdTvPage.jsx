@@ -25,7 +25,7 @@ export default function CommunityPlusAdTvPage() {
   };
 
   return (
-    <div className="adtv-page">
+    <div className="adtv-page page-container">
 
       {/* =========================
          HERO / CHANNEL HEADER
