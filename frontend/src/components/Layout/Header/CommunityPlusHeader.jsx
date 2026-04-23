@@ -1,4 +1,4 @@
-import { NAVIGATION } from "../../../config/navigationConfig";
+import { NAVIGATION } from "../Navigation/navigationConfig"; // 🔥 adjust path if needed
 import { useNavigate, useLocation } from "react-router-dom";
 
 const nav = NAVIGATION.find((n) => n.group === "main");

@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { NAVIGATION } from "../../config/navigationConfig"; // 🔥 adjust path if needed
+import { NAVIGATION } from "../Navigation/navigationConfig"; // 🔥 adjust path if needed
 import "./CommunityPlusSidebar.css";
 
 export default function CommunityPlusSidebar() {
