@@ -18,6 +18,10 @@ TV SHELL (OUTER FRAME)
     inset 0 1px 0 rgba(255,255,255,0.05);
 
   z-index: 1000;
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 /* subtle “TV edge” */
@@ -29,6 +33,20 @@ TV SHELL (OUTER FRAME)
   pointer-events: none;
 
   box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04);
+}
+
+/* =========================
+EMBEDDED MODE (PAGE)
+========================= */
+
+.adtv-embedded {
+  position: relative !important;
+  bottom: unset;
+  right: unset;
+
+  width: 100%;
+  max-width: 720px;
+  margin: 12px 0;
 }
 
 /* =========================
@@ -48,6 +66,11 @@ SCREEN (INNER DISPLAY)
   justify-content: center;
 
   position: relative;
+}
+
+/* larger screen in page mode */
+.adtv-embedded .adtv-screen {
+  height: 320px;
 }
 
 /* subtle screen glow */
@@ -88,9 +111,9 @@ EMPTY STATE (BRANDING)
   justify-content: center;
 
   gap: 10px;
-}
 
-/* AD.TV LOGO */
+  padding: 12px;
+}
 
 .adtv-logo {
   font-weight: 700;
@@ -104,15 +127,39 @@ ECHO (MASCOT)
 
 .adtv-echo {
   font-size: 30px;
-
   animation: echoFloat 3s ease-in-out infinite;
 }
 
-/* 🔥 upgraded animation */
 @keyframes echoFloat {
   0%   { transform: translateY(0) scale(1); opacity: 0.6; }
   50%  { transform: translateY(-4px) scale(1.1); opacity: 1; }
   100% { transform: translateY(0) scale(1); opacity: 0.6; }
+}
+
+/* =========================
+IN-TV PANELS (NEW)
+========================= */
+
+.adtv-panel {
+  color: #fff;
+  text-align: center;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+  padding: 12px;
+}
+
+.adtv-slot-list {
+  margin-top: 8px;
+  font-size: 12px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 /* =========================
@@ -124,15 +171,15 @@ CONTROLS BAR
   justify-content: space-between;
   align-items: center;
 
-  margin-top: 8px;
   padding: 4px 6px;
 
   border-radius: 8px;
   background: rgba(255,255,255,0.04);
+
+  backdrop-filter: blur(6px);
 }
 
-/* buttons */
-
+/* button group feel */
 .adtv-controls-bar button {
   background: transparent;
   border: none;
@@ -154,7 +201,7 @@ CONTROLS BAR
 }
 
 /* =========================
-OPTIONAL: LIVE DOT
+LIVE DOT
 ========================= */
 
 .adtv-live-dot {
