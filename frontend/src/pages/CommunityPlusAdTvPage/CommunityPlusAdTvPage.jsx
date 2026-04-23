@@ -34,44 +34,33 @@ export default function CommunityPlusAdTvPage() {
       ========================= */}
       <div className="adtv-stage-wrapper">
 
-        <div className="adtv-stage">
-          <CommunityPlusAdTv
-            mode="page"
-            context="page"
-            tvMode={tvMode}
-          />
-        </div>
+  <div className="adtv-stage-layout">
 
-      </div>
+    {/* LEFT: TV */}
+    <div className="adtv-stage">
+      <CommunityPlusAdTv
+        mode="page"
+        context="page"
+        tvMode={tvMode}
+      />
+    </div>
 
-      {/* =========================
-         MODE SWITCHER (KEY UX)
-      ========================= */}
-      <div className="adtv-mode-bar">
+    {/* RIGHT: SLOT DIAL */}
+    <div className="adtv-dial-panel">
+      <div className="h3">Book Slot</div>
+      <div className="meta">Select an hour</div>
 
-        <button
-          className={`btn btn-ghost ${tvMode === "live" ? "active" : ""}`}
-          onClick={() => setTvMode("live")}
-        >
-          Live
-        </button>
+      <AdSlotDial
+        slots={mockSlots}
+        onSelectSlot={(hour) => {
+          console.log("Selected hour:", hour);
+        }}
+      />
+    </div>
 
-        <button
-          className={`btn btn-ghost ${tvMode === "schedule" ? "active" : ""}`}
-          onClick={() => setTvMode("schedule")}
-        >
-          Schedule
-        </button>
+  </div>
 
-        <button
-          className={`btn btn-ghost ${tvMode === "upload" ? "active" : ""}`}
-          onClick={() => setTvMode("upload")}
-        >
-          Upload
-        </button>
-
-      </div>
-
+</div>
       {/* =========================
          SUPPORTING CONTENT
       ========================= */}

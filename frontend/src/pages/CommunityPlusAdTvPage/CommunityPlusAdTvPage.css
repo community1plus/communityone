@@ -32,7 +32,26 @@ HERO (CHANNEL IDENTITY)
 /* =========================
 TV STAGE (PRIMARY SURFACE)
 ========================= */
+/* =========================
+STAGE LAYOUT (TV + DIAL)
+========================= */
 
+.adtv-stage-layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 24px;
+  align-items: start;
+}
+
+/* right panel */
+
+.adtv-dial-panel {
+  padding: 16px;
+  border-radius: 14px;
+
+  background: rgba(0,0,0,0.03);
+  border: 1px solid rgba(0,0,0,0.06);
+}
 .adtv-stage-wrapper {
   display: flex;
   justify-content: center;

@@ -54,10 +54,11 @@ SCREEN (INNER DISPLAY)
 ========================= */
 
 .adtv-screen {
-  width: 100%;
-  height: 180px;
+  position: relative;
 
-  background: radial-gradient(circle at center, #111 0%, #000 100%);
+  width: 100%;
+  height: 100%;
+
   border-radius: 12px;
   overflow: hidden;
 
@@ -65,7 +66,12 @@ SCREEN (INNER DISPLAY)
   align-items: center;
   justify-content: center;
 
-  position: relative;
+  /* 🔥 dotted grey background INSIDE TV */
+  background:
+    radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px),
+    #000;
+
+  background-size: 10px 10px;
 }
 
 /* larger screen in page mode */
