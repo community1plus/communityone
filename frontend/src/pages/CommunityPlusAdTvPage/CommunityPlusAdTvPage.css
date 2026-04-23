@@ -36,10 +36,16 @@ TV STAGE (PRIMARY SURFACE)
 STAGE LAYOUT (TV + DIAL)
 ========================= */
 
+
+/* =========================
+STAGE LAYOUT (TV + DIAL)
+========================= */
+
 .adtv-stage-layout {
   display: grid;
-  grid-template-columns: 1fr 320px;
-  gap: 24px;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 32px;
+
   align-items: start;
 }
 
@@ -51,6 +57,8 @@ STAGE LAYOUT (TV + DIAL)
 
   background: rgba(0,0,0,0.03);
   border: 1px solid rgba(0,0,0,0.06);
+  width: 320px;
+  flex-shrink: 0;
 }
 .adtv-stage-wrapper {
   display: flex;
@@ -61,6 +69,7 @@ STAGE LAYOUT (TV + DIAL)
 .adtv-stage {
   width: 100%;
   max-width: 900px;
+  min-width: 0; /* 🔥 critical for grid */
 
   padding: 24px;
   border-radius: 16px;
@@ -181,5 +190,15 @@ RESPONSIVE
 
   .adtv-stage {
     padding: 16px;
+  }
+}
+
+@media (max-width: 900px) {
+  .adtv-stage-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .adtv-dial-panel {
+    width: 100%;
   }
 }
