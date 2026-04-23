@@ -24,6 +24,16 @@ TV SHELL (OUTER FRAME)
   gap: 8px;
 }
 
+.adtv-tv-shell.adtv-embedded {
+  width: 100%;
+  height: 100%;
+
+  max-width: 900px;
+  max-height: 520px;
+  aspect-ratio: 16 / 9;   /* 🔥 makes it behave like a real TV */
+  margin: 0 auto;
+}
+
 /* subtle “TV edge” */
 .adtv-tv-shell::after {
   content: "";

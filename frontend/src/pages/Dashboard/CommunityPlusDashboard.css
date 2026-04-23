@@ -87,7 +87,7 @@ INNER CONTENT
   flex-direction: column;
 
   width: 100%;
-  max-width: var(--content-max-width);
+  max-width: none;
   overflow: hidden; /* 🔥 prevent children overflow */
   margin: 0 auto;
 }
