@@ -1,5 +1,5 @@
 import React from "react";
-import CommunityPlusAdTv from "../components/CommunityPlusAdTv/CommunityPlusAdTv";
+import CommunityPlusAdTv from "../CommunityPlusAdTv/CommunityPlusAdTv";
 //import AdSlotDial from "../components/AdSlotDial";
 
 export default function CommunityPlusAdTvPage() {
