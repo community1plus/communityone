@@ -54,7 +54,7 @@ MAIN LAYOUT (SIDEBAR + CONTENT)
 .main {
   flex: 1;                        /* 🔥 replaces height: 100% */
   display: flex;
-
+  width: 100%;
   min-height: 0;                  /* 🔥 critical for overflow */
 }
 
@@ -107,6 +107,7 @@ FULL WIDTH MODE (ROUTE-BASED)
 
 .content-area.full-width .content-inner {
   max-width: none;
+  width: 100%;
   margin: 0;                      /* 🔥 remove centering when full width */
 }
 
