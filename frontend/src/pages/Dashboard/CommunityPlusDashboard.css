@@ -17,7 +17,13 @@ body,
 /* =====================================================
 APP SHELL
 ===================================================== */
+.app-shell {
+  height: 100vh;          /* 🔥 must be explicit */
+  display: flex;
+  flex-direction: column;
 
+  overflow: hidden;       /* 🔥 PREVENT expansion */
+}
 .dashboard-container {
   height: 100vh;                 /* 🔥 replaces min-height */
   display: flex;
