@@ -50,7 +50,7 @@ export default function CommunityPlusAdTvPage() {
       <div className="h3">Book Slot</div>
       <div className="meta">Select an hour</div>
 
-      <AdSlotDial
+      <CommunityPlusAdSlotDial
         slots={mockSlots}
         onSelectSlot={(hour) => {
           console.log("Selected hour:", hour);
