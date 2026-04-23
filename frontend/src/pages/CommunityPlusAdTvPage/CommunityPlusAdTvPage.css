@@ -40,12 +40,34 @@ STAGE WRAPPER
 /* =====================================================
 STAGE LAYOUT (TV + DIAL SYSTEM)
 ===================================================== */
+.adtv-tv-container {
+  flex: 1;           /* 🔥 fills stage */
+  min-height: 0;     /* 🔥 prevents overflow bug */
 
-.adtv-stage-layout {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 28px;
-  align-items: start;
+  display: flex;
+  flex-direction: column;
+}
+
+.adtv-tv-container > * {
+  flex: 1;
+  min-height: 0;
+}
+
+.adtv-stage {
+  width: 100%;
+  min-width: 0;
+  padding: 16px;
+  border-radius: 16px;
+  /* 🔥 constrain height */
+  height: 420px;              /* ← key fix */
+  max-height: 420px;
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(circle, rgba(0,0,0,0.08) 1px, transparent 1px);
+  background-size: 12px 12px;
+  border: 1px solid rgba(0,0,0,0.08);
+  overflow: hidden;         /* 🔥 prevents bleed */
 }
 
 /* =====================================================

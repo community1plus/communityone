@@ -2,6 +2,8 @@ import React, { useState, useMemo, useCallback } from "react";
 import CommunityPlusAdTv from "../CommunityPlusAdTv/CommunityPlusAdTv";
 import CommunityPlusAdSlotDial from "../CommunityPlusAdSlotDial/CommunityPlusAdSlotDial";
 
+const MODES = ["live", "schedule", "upload"];
+
 export default function CommunityPlusAdTvPage() {
   const [tvMode, setTvMode] = useState("live");
   const [selectedSlot, setSelectedSlot] = useState(null);
@@ -9,12 +11,14 @@ export default function CommunityPlusAdTvPage() {
   /* =========================
      STABLE SLOT DATA
   ========================= */
-  const slots = useMemo(() => {
-    return Array.from({ length: 24 }).map(() => ({
-      count: Math.floor(Math.random() * 5),
-      capacity: 5,
-    }));
-  }, []);
+  const slots = useMemo(
+    () =>
+      Array.from({ length: 24 }, () => ({
+        count: Math.floor(Math.random() * 5),
+        capacity: 5,
+      })),
+    []
+  );
 
   /* =========================
      HANDLERS
@@ -29,23 +33,24 @@ export default function CommunityPlusAdTvPage() {
   }, []);
 
   /* =========================
+     DERIVED STATE
+  ========================= */
+  const selectedLabel =
+    selectedSlot !== null ? `Selected: ${selectedSlot}:00` : "Select an hour";
+
+  /* =========================
      RENDER
   ========================= */
   return (
     <div className="adtv-page">
-
-      {/* 🔥 CRITICAL: ALIGN WITH PROFILE */}
       <div className="page-container">
 
-        {/* =========================
-           HERO
-        ========================= */}
+        {/* HERO */}
         <header className="adtv-hero">
           <div className="adtv-hero-header">
             <h1 className="h1">
               AD.TV <span className="adtv-sp">SP</span>
             </h1>
-
             <div className="adtv-live">● LIVE</div>
           </div>
 
@@ -54,59 +59,54 @@ export default function CommunityPlusAdTvPage() {
           </div>
         </header>
 
-        {/* =========================
-           STAGE (TV + DIAL)
-        ========================= */}
+        {/* STAGE */}
         <section className="adtv-stage-wrapper">
           <div className="adtv-stage-layout">
 
             {/* TV */}
             <div className="adtv-stage">
-              <CommunityPlusAdTv
-                mode="page"
-                context="page"
-                tvMode={tvMode}
-                selectedSlot={selectedSlot}
-              />
+              <div className="adtv-tv-container">
+                <CommunityPlusAdTv
+                  mode="page"
+                  context="page"
+                  tvMode={tvMode}
+                  selectedSlot={selectedSlot}
+                />
+              </div>
             </div>
 
             {/* CONTROL PANEL */}
             <aside className="adtv-dial-panel">
-              <div className="h3">Book Slot</div>
+              <header className="adtv-dial-header">
+                <div className="h3">Book Slot</div>
+                <div className="meta">{selectedLabel}</div>
+              </header>
 
-              <div className="meta">
-                {selectedSlot !== null
-                  ? `Selected: ${selectedSlot}:00`
-                  : "Select an hour"}
+              <div className="adtv-dial-body">
+                <CommunityPlusAdSlotDial
+                  slots={slots}
+                  onSelectSlot={handleSelectSlot}
+                />
               </div>
-
-              <CommunityPlusAdSlotDial
-                slots={slots}
-                onSelectSlot={handleSelectSlot}
-              />
             </aside>
 
           </div>
         </section>
 
-        {/* =========================
-           MODE CONTROLS
-        ========================= */}
+        {/* MODE CONTROLS */}
         <section className="adtv-mode-bar">
-          {["live", "schedule", "upload"].map((mode) => (
+          {MODES.map((mode) => (
             <button
               key={mode}
               className={`btn btn-ghost ${tvMode === mode ? "active" : ""}`}
               onClick={() => handleModeChange(mode)}
             >
-              {mode.charAt(0).toUpperCase() + mode.slice(1)}
+              {mode[0].toUpperCase() + mode.slice(1)}
             </button>
           ))}
         </section>
 
-        {/* =========================
-           SUPPORTING CONTENT
-        ========================= */}
+        {/* SUPPORTING CONTENT */}
         <section className="adtv-section">
           <h2 className="h2">Now Playing</h2>
           <div className="meta">CURRENT AD STREAM</div>
