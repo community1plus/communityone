@@ -1,10 +1,10 @@
 /* =====================================================
-PAGE (LAYOUT CONTAINER)
+PAGE (WIDTH CONSTRAINT ONLY)
 ===================================================== */
 
 .adtv-page {
   padding: 20px 24px;
-  max-width: 1100px; /* 🔥 slightly wider for dial + TV */
+  max-width: 1200px;
   margin: 0 auto;
 }
 
@@ -30,27 +30,31 @@ HERO (CHANNEL IDENTITY)
 }
 
 /* =====================================================
-STAGE LAYOUT (TV + DIAL SYSTEM)
+STAGE WRAPPER (SPACING ONLY — NO LAYOUT)
 ===================================================== */
 
 .adtv-stage-wrapper {
   margin-top: 16px;
 }
 
+/* =====================================================
+STAGE LAYOUT (SINGLE SOURCE OF TRUTH)
+===================================================== */
+
 .adtv-stage-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
-  gap: 32px;
+  grid-template-columns: 2fr 1fr; /* 🔥 TV dominant */
+  gap: 28px;
   align-items: start;
 }
 
 /* =====================================================
-TV STAGE (PRIMARY SURFACE)
+TV STAGE (VISUAL CONTAINER ONLY)
 ===================================================== */
 
 .adtv-stage {
   width: 100%;
-  min-width: 0; /* 🔥 critical for grid */
+  min-width: 0;
 
   padding: 24px;
   border-radius: 16px;
@@ -85,14 +89,13 @@ DIAL PANEL (CONTROL SURFACE)
 }
 
 /* =====================================================
-MODE SWITCHER (CONTROL LAYER)
+MODE SWITCHER
 ===================================================== */
 
 .adtv-mode-bar {
   display: flex;
   justify-content: center;
   gap: 10px;
-
   margin-top: 16px;
 }
 
@@ -137,7 +140,6 @@ SLOT LIST
 
 .adtv-slot-list {
   margin-top: 10px;
-
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -161,8 +163,8 @@ SLOT LIST
 RESPONSIVE
 ===================================================== */
 
-/* 🔥 TABLET / SMALL DESKTOP */
-@media (max-width: 1200px) {
+/* 🔥 STACK WHEN SPACE IS ACTUALLY CONSTRAINED */
+@media (max-width: 1000px) {
   .adtv-stage-layout {
     grid-template-columns: 1fr;
   }
@@ -170,11 +172,10 @@ RESPONSIVE
   .adtv-dial-panel {
     position: relative;
     top: auto;
-    width: 100%;
   }
 }
 
-/* 🔥 MOBILE */
+/* 🔥 MOBILE TIGHTENING */
 @media (max-width: 768px) {
   .adtv-page {
     padding: 16px;
