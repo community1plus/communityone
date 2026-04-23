@@ -27,6 +27,7 @@ export default function CommunityPlusDashboard() {
   }
 
   const isFullWidthRoute = [
+    "/adtv",
     "/profile-setup",
     "/profile",
     "/yellowpages",
