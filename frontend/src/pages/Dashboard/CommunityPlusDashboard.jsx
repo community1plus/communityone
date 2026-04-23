@@ -2,8 +2,10 @@ import React from "react";
 import { signOut } from "aws-amplify/auth";
 import { useNavigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+
 import CommunityPlusHeader from "../../components/Layout/Header/CommunityPlusHeader";
 import CommunityPlusSidebar from "../../components/Layout/Sidebar/CommunityPlusSidebar";
+
 import "./CommunityPlusDashboard.css";
 
 export default function CommunityPlusDashboard() {
@@ -35,22 +37,32 @@ export default function CommunityPlusDashboard() {
     "/beacon",
   ].includes(location.pathname);
 
+  const effectiveUser = appUser?.user || appUser || user;
+
   return (
-    <div className="dashboard-container">
+    <div className="app-shell">
+
+      {/* HEADER */}
       <CommunityPlusHeader
-        user={appUser?.user || appUser || user}
+        user={effectiveUser}
         onLogout={handleLogout}
       />
 
-      <main className="main">
+      {/* MAIN LAYOUT */}
+      <div className="layout-main">
+
+        {/* SIDEBAR */}
         <CommunityPlusSidebar />
 
-       <div className={`content-area ${isFullWidthRoute ? "full-width" : ""}`}>
-          <div className="content-inner">
-             <Outlet />
+        {/* CONTENT */}
+        <div className={`layout-content ${isFullWidthRoute ? "full-width" : ""}`}>
+
+          <div className="layout-inner">
+            <Outlet />
           </div>
+
         </div>
-      </main>
+      </div>
     </div>
   );
 }

@@ -4,13 +4,23 @@
 }
 
 /* =====================================================
+ROOT LOCK (CRITICAL)
+===================================================== */
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+/* =====================================================
 APP SHELL
 ===================================================== */
 
 .dashboard-container {
-  min-height: 100vh;
-  display: grid;
-  grid-template-rows: auto 1fr;
+  height: 100vh;                 /* 🔥 replaces min-height */
+  display: flex;
+  flex-direction: column;
 }
 
 /* =====================================================
@@ -18,9 +28,10 @@ MAIN LAYOUT (SIDEBAR + CONTENT)
 ===================================================== */
 
 .main {
+  flex: 1;                        /* 🔥 replaces height: 100% */
   display: flex;
-  width: 100%;
-  height: 100%;
+
+  min-height: 0;                  /* 🔥 critical for overflow */
 }
 
 /* =====================================================
@@ -33,22 +44,24 @@ SIDEBAR
 }
 
 /* =====================================================
-CONTENT AREA (OUTER FLEX LAYER)
+CONTENT AREA (SCROLL LAYER)
 ===================================================== */
 
-/* 🔥 THIS MUST MATCH YOUR JSX: content-area */
 .content-area {
   flex: 1;
-  min-width: 0;            /* 🔥 critical */
+  min-width: 0;
 
   display: flex;
   flex-direction: column;
+
+  overflow-y: auto;               /* 🔥 scroll lives here */
+  overflow-x: hidden;
 
   padding: 20px 24px;
 }
 
 /* =====================================================
-CONTENT INNER (WIDTH + ALIGNMENT ONLY)
+CONTENT INNER (WIDTH CONTROL)
 ===================================================== */
 
 .content-inner {
@@ -57,8 +70,7 @@ CONTENT INNER (WIDTH + ALIGNMENT ONLY)
 
   max-width: var(--content-max-width);
 
-  /* 🔥 aligns with header (left-aligned system) */
-  margin: 0;
+  margin: 0 auto;                 /* 🔥 center content (important fix) */
 
   display: flex;
   flex-direction: column;
@@ -66,19 +78,18 @@ CONTENT INNER (WIDTH + ALIGNMENT ONLY)
 }
 
 /* =====================================================
-FULL WIDTH MODE (OVERRIDE)
+FULL WIDTH MODE (ROUTE-BASED)
 ===================================================== */
 
 .content-area.full-width .content-inner {
-  max-width: none;     /* 🔥 removes constraint */
-  width: 100%;
+  max-width: none;
+  margin: 0;                      /* 🔥 remove centering when full width */
 }
 
 /* =====================================================
-PAGE CONTAINER (REUSABLE PATTERN)
+REUSABLE PAGE CONTAINER
 ===================================================== */
 
-/* use this inside pages like AD.TV if needed */
 .page-container {
   width: 100%;
   max-width: var(--content-max-width);
@@ -87,7 +98,7 @@ PAGE CONTAINER (REUSABLE PATTERN)
 }
 
 /* =====================================================
-LEGACY / PROFILE (SAFE KEEP)
+LEGACY / PROFILE
 ===================================================== */
 
 .profile-container {
