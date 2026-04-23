@@ -319,8 +319,8 @@ export default function CommunityPlusHeader({ user, onLogout }) {
           onClick={() => go("/adtv")}
           className={`btn btn-ghost ${isActive("/adtv") ? "active" : ""}`}
         >
-          📺 <div className="adtv-logo">
-            AD.TV <span className="adtv-sp">SP</span>
+          <div className="adtv-logo">
+             AD.TV
           </div>
         </button>
 

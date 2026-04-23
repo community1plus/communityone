@@ -94,7 +94,7 @@ export default function CommunityPlusSidebar() {
           onClick={() => go("/adtv")}
         >
          <div className="adtv-logo">
-             📺 AD.TV <span className="adtv-sp">SP</span>
+             📺 AD.TV 
           </div>
         </button>
       </div>

@@ -51,7 +51,7 @@ export default function CommunityPlusAdTvPage() {
       ========================= */}
       <header className="adtv-header">
         <h1 className="h1">
-          AD.TV <span className="adtv-sp">SP</span>
+          AD.TV
         </h1>
 
         <div className="adtv-live">● LIVE</div>
