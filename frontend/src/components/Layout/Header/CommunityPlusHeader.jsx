@@ -89,9 +89,6 @@ export default function CommunityPlusHeader({ user, onLogout }) {
      GOOGLE AUTOCOMPLETE
   =============================== */
 
-  console.log("AD.TV LOADED");
-
-  
   useEffect(() => {
     let interval;
 

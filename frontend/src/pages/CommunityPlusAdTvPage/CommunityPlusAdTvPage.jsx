@@ -1,12 +1,17 @@
 import React from "react";
+import CommunityPlusAdTv from "../components/AdTV/CommunityPlusAdTv";
+import AdSlotDial from "../components/AdSlotDial";
 
 export default function CommunityPlusAdTvPage() {
+  const mockSlots = Array.from({ length: 24 }).map(() => ({
+    count: Math.floor(Math.random() * 5),
+    capacity: 5,
+  }));
+
   return (
     <div className="adtv-page">
 
-      {/* =========================
-         HERO (CHANNEL ANCHOR)
-      ========================= */}
+      {/* HERO */}
       <div className="adtv-hero panel">
 
         <div className="adtv-hero-header">
@@ -23,18 +28,14 @@ export default function CommunityPlusAdTvPage() {
           LIVE AD CHANNEL • LOCATION-AWARE • TIME-BASED
         </div>
 
-        {/* PLAYER */}
+        {/* 🔥 REAL PLAYER */}
         <div className="adtv-player">
-          <div className="adtv-placeholder">
-            ▶ Live Ad Stream
-          </div>
+          <CommunityPlusAdTv mode="page" context="page" />
         </div>
 
       </div>
 
-      {/* =========================
-         NOW PLAYING
-      ========================= */}
+      {/* NOW PLAYING */}
       <div className="adtv-section">
         <h2 className="h2">Now Playing</h2>
         <div className="meta">CURRENT AD STREAM</div>
@@ -44,9 +45,20 @@ export default function CommunityPlusAdTvPage() {
         </div>
       </div>
 
-      {/* =========================
-         UPCOMING SLOTS
-      ========================= */}
+      {/* 🔥 NEW: SLOT DIAL */}
+      <div className="adtv-section">
+        <h2 className="h2">Book a Slot</h2>
+        <div className="meta">SELECT AN HOUR</div>
+
+        <AdSlotDial
+          slots={mockSlots}
+          onSelectSlot={(hour) => {
+            console.log("Selected hour:", hour);
+          }}
+        />
+      </div>
+
+      {/* UPCOMING */}
       <div className="adtv-section">
         <h2 className="h2">Upcoming Slots</h2>
         <div className="meta">SCHEDULED ADS</div>
@@ -58,9 +70,7 @@ export default function CommunityPlusAdTvPage() {
         </div>
       </div>
 
-      {/* =========================
-         UPLOAD / PREVIEW
-      ========================= */}
+      {/* UPLOAD */}
       <div className="adtv-section">
         <h2 className="h2">Upload / Preview</h2>
         <div className="meta">CREATE AND TEST ADS</div>
