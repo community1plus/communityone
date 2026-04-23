@@ -5,14 +5,26 @@ import "./CommunityPlusAdTv.css";
 export default function CommunityPlusAdTv({
   ads = [],
   context = "feed",
-  mode = "floating",      // 🔥 NEW (floating | page)
-  tvMode = "live",        // 🔥 NEW (live | schedule | upload | idle)
+  mode = "floating", // floating | page
+  tvMode = "live",   // live | schedule | upload | idle
 }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [visible, setVisible] = useState(true);
 
-  const videoRef = useRef();
+  const videoRef = useRef(null);
   const location = useLocation();
+
+  /* =========================
+     DEBUG (SAFE)
+  ========================= */
+  useEffect(() => {
+    console.log("AD.TV:", {
+      mode,
+      path: location.pathname,
+      visible,
+      ads,
+    });
+  }, [mode, location.pathname, visible, ads]);
 
   /* =========================
      HIDE FLOATING ON /adtv
@@ -48,9 +60,12 @@ export default function CommunityPlusAdTv({
   ========================= */
   const togglePlay = () => {
     if (!videoRef.current) return;
-    videoRef.current.paused
-      ? videoRef.current.play()
-      : videoRef.current.pause();
+
+    if (videoRef.current.paused) {
+      videoRef.current.play();
+    } else {
+      videoRef.current.pause();
+    }
   };
 
   /* =========================
@@ -58,7 +73,7 @@ export default function CommunityPlusAdTv({
   ========================= */
 
   const renderContent = () => {
-    // 🔥 PRIORITY: live ad
+    // 🎬 LIVE MODE
     if (tvMode === "live" && currentAd) {
       return (
         <video
@@ -73,7 +88,7 @@ export default function CommunityPlusAdTv({
       );
     }
 
-    // 🔥 NO ADS → IDLE
+    // 💤 IDLE (NO ADS)
     if (!currentAd || tvMode === "idle") {
       return (
         <div className="adtv-empty">
@@ -90,7 +105,7 @@ export default function CommunityPlusAdTv({
       );
     }
 
-    // 🔥 SCHEDULE VIEW
+    // 🕒 SCHEDULE
     if (tvMode === "schedule") {
       return (
         <div className="adtv-panel">
@@ -106,7 +121,7 @@ export default function CommunityPlusAdTv({
       );
     }
 
-    // 🔥 UPLOAD VIEW
+    // ⬆️ UPLOAD
     if (tvMode === "upload") {
       return (
         <div className="adtv-panel">
@@ -124,27 +139,8 @@ export default function CommunityPlusAdTv({
   };
 
   /* =========================
-     UI
+     UI (FINAL)
   ========================= */
-
-  return (
-  <div style={{
-    position: "fixed",
-    bottom: 20,
-    right: 20,
-    width: 300,
-    height: 200,
-    background: "red",
-    zIndex: 9999
-  }}>
-    TEST TV
-  </div>
-);
-
-console.log("MODE:", mode);
-console.log("PATH:", location.pathname);
-console.log("VISIBLE:", visible);
-console.log("ADS:", ads);
 
   return (
     <div
@@ -161,15 +157,19 @@ console.log("ADS:", ads);
       {/* CONTROLS */}
       <div className="adtv-controls-bar">
 
+        {/* Close */}
         <button onClick={() => setVisible(false)}>×</button>
 
+        {/* Floating controls only */}
         {mode !== "page" && (
           <>
             <button onClick={togglePlay}>⏯</button>
 
             <button
               onClick={() =>
-                setCurrentIndex((prev) => (prev + 1) % ads.length)
+                setCurrentIndex((prev) =>
+                  ads.length ? (prev + 1) % ads.length : 0
+                )
               }
             >
               →
