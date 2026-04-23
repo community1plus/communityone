@@ -11,7 +11,7 @@ HERO (CHANNEL IDENTITY)
 ===================================================== */
 
 .adtv-hero {
-  margin-bottom: 16px; /* 🔥 fix invalid value */
+  margin-bottom: 16px;
 }
 
 .adtv-hero-header {
@@ -28,7 +28,7 @@ HERO (CHANNEL IDENTITY)
 }
 
 /* =====================================================
-STAGE WRAPPER (CENTER SYSTEM)
+STAGE WRAPPER
 ===================================================== */
 
 .adtv-stage-wrapper {
@@ -36,21 +36,25 @@ STAGE WRAPPER (CENTER SYSTEM)
 }
 
 /* =====================================================
-STAGE LAYOUT (ANCHOR SYSTEM)
+STAGE LAYOUT (TV + DIAL SYSTEM)
 ===================================================== */
 
 .adtv-stage-layout {
   display: grid;
-
-  /* 🔥 balanced layout */
   grid-template-columns: 1.6fr 1fr;
-
   gap: 28px;
+
   align-items: start;
 
-  /* 🔥 CRITICAL: anchor width */
+  /* 🔥 anchor + grouping */
   max-width: 1100px;
   margin: 0 auto;
+
+  padding: 20px;
+  border-radius: 18px;
+
+  background: rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 /* =====================================================
@@ -60,11 +64,12 @@ TV STAGE (PRIMARY SURFACE)
 .adtv-stage {
   width: 100%;
   min-width: 0;
+  max-width: 720px; /* 🔥 prevents domination */
 
   padding: 24px;
   border-radius: 16px;
 
-  /* 🔥 subtle system grid */
+  /* 🔥 dotted system background */
   background:
     radial-gradient(circle, rgba(0, 0, 0, 0.07) 1px, transparent 1px);
   background-size: 12px 12px;
@@ -90,7 +95,9 @@ DIAL PANEL (CONTROL SURFACE)
 
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
+
+  align-self: start; /* 🔥 FIX alignment */
 }
 
 /* =====================================================
@@ -110,6 +117,8 @@ SUPPORTING SECTIONS
 
 .adtv-section {
   margin-top: 32px;
+
+  /* 🔥 align with stage */
   max-width: 1100px;
   margin-left: auto;
   margin-right: auto;
@@ -171,7 +180,7 @@ SLOT LIST
 RESPONSIVE
 ===================================================== */
 
-/* 🔥 collapse when genuinely constrained */
+/* 🔥 collapse when needed */
 @media (max-width: 1000px) {
   .adtv-stage-layout {
     grid-template-columns: 1fr;
@@ -180,6 +189,10 @@ RESPONSIVE
   .adtv-dial-panel {
     position: relative;
     top: auto;
+  }
+
+  .adtv-stage {
+    max-width: 100%;
   }
 }
 
