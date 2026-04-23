@@ -37,7 +37,7 @@ body,
 APP SHELL
 ===================================================== */
 .app-shell {
-  height: 100vh;          /* 🔥 must be explicit */
+  min-height: 100vh;          /* 🔥 must be explicit */
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -80,7 +80,7 @@ CONTENT AREA (SCROLL LAYER)
   width: 100%;
   display: flex;
   flex-direction: column;
-
+  min-height: 0;
   overflow-y: auto;               /* 🔥 scroll lives here */
   overflow-x: hidden;
 
@@ -100,7 +100,7 @@ CONTENT INNER (WIDTH CONTROL)
   width: 100%;
   min-width: 0;
 
-  max-width: var(--content-max-width);
+  max-width: 1100px;
 
   margin: 0 auto;                 /* 🔥 center content (important fix) */
 
