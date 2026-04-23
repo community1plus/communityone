@@ -1,38 +1,72 @@
 /* =========================
-CONTAINER
+TV SHELL (OUTER FRAME)
 ========================= */
 
-
-.adtv-container {
+.adtv-tv-shell {
   position: fixed;
   bottom: 20px;
   right: 20px;
 
-  width: 280px;
-  height: 160px;
+  width: 320px;
+  border-radius: 16px;
 
-  overflow: hidden;
-  z-index: 999;
+  background: linear-gradient(145deg, #1a1a1a, #0d0d0d);
+  padding: 10px;
 
-  transition: all 0.25s ease;
+  box-shadow:
+    0 10px 35px rgba(0,0,0,0.35),
+    inset 0 1px 0 rgba(255,255,255,0.05);
+
+  z-index: 1000;
 }
 
-/* EXPANDED */
-.adtv-expanded {
-  width: 70vw;
-  height: 70vh;
-  bottom: 15vh;
-  right: 15vw;
+/* subtle “TV edge” */
+.adtv-tv-shell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  pointer-events: none;
+
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04);
+}
+
+/* =========================
+SCREEN (INNER DISPLAY)
+========================= */
+
+.adtv-screen {
+  width: 100%;
+  height: 180px;
+
+  background: radial-gradient(circle at center, #111 0%, #000 100%);
+  border-radius: 12px;
+  overflow: hidden;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  position: relative;
+}
+
+/* subtle screen glow */
+.adtv-screen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  background: radial-gradient(
+    circle at center,
+    rgba(255,255,255,0.04),
+    transparent 70%
+  );
 }
 
 /* =========================
 VIDEO
 ========================= */
-
-.adtv-video-wrapper {
-  width: 100%;
-  height: 100%;
-}
 
 .adtv-video {
   width: 100%;
@@ -41,25 +75,99 @@ VIDEO
 }
 
 /* =========================
-CONTROLS
+EMPTY STATE (BRANDING)
 ========================= */
 
-.adtv-controls {
-  position: absolute;
-  bottom: 6px;
-  right: 6px;
+.adtv-empty {
+  text-align: center;
+  color: #fff;
 
   display: flex;
-  gap: 4px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 10px;
+}
+
+/* AD.TV LOGO */
+
+.adtv-logo {
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 0.5px;
 }
 
 /* =========================
-BRAND (already from typography)
+ECHO (MASCOT)
 ========================= */
 
-.adtv-brand {
-  position: absolute;
-  top: 6px;
-  left: 8px;
-  z-index: 2;
+.adtv-echo {
+  font-size: 30px;
+
+  animation: echoFloat 3s ease-in-out infinite;
+}
+
+/* 🔥 upgraded animation */
+@keyframes echoFloat {
+  0%   { transform: translateY(0) scale(1); opacity: 0.6; }
+  50%  { transform: translateY(-4px) scale(1.1); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 0.6; }
+}
+
+/* =========================
+CONTROLS BAR
+========================= */
+
+.adtv-controls-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-top: 8px;
+  padding: 4px 6px;
+
+  border-radius: 8px;
+  background: rgba(255,255,255,0.04);
+}
+
+/* buttons */
+
+.adtv-controls-bar button {
+  background: transparent;
+  border: none;
+  color: #fff;
+
+  font-size: 13px;
+  cursor: pointer;
+
+  opacity: 0.75;
+  padding: 4px 6px;
+  border-radius: 6px;
+
+  transition: all 0.15s ease;
+}
+
+.adtv-controls-bar button:hover {
+  opacity: 1;
+  background: rgba(255,255,255,0.08);
+}
+
+/* =========================
+OPTIONAL: LIVE DOT
+========================= */
+
+.adtv-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ff3b30;
+
+  animation: pulseDot 1.4s infinite;
+}
+
+@keyframes pulseDot {
+  0% { opacity: 0.4; }
+  50% { opacity: 1; }
+  100% { opacity: 0.4; }
 }
