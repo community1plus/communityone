@@ -5,6 +5,12 @@ import CommunityPlusAdSlotDial from "../CommunityPlusAdSlotDial/CommunityPlusAdS
 export default function CommunityPlusAdTvPage() {
   const [tvMode, setTvMode] = useState("live"); // 🔥 future-ready
 
+
+   const mockSlots = Array.from({ length: 24 }).map(() => ({
+      count: Math.floor(Math.random() * 5),
+      capacity: 5,
+    }));
+
   return (
     <div className="adtv-page">
 
