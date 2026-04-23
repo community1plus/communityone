@@ -1,5 +1,5 @@
 import React from "react";
-import "./AdSlotDial.css";
+import "./CommunityPlusAdSlotDial.css";
 
 export default function AdSlotDial({
   slots = [],
