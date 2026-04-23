@@ -1,15 +1,28 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import CommunityPlusAdTv from "../CommunityPlusAdTv/CommunityPlusAdTv";
 import CommunityPlusAdSlotDial from "../CommunityPlusAdSlotDial/CommunityPlusAdSlotDial";
 
 export default function CommunityPlusAdTvPage() {
-  const [tvMode, setTvMode] = useState("live"); // 🔥 future-ready
+  const [tvMode, setTvMode] = useState("live");
+  const [selectedSlot, setSelectedSlot] = useState(null);
 
-
-   const mockSlots = Array.from({ length: 24 }).map(() => ({
+  /* =========================
+     STABLE SLOT DATA (IMPORTANT)
+  ========================= */
+  const slots = useMemo(() => {
+    return Array.from({ length: 24 }).map(() => ({
       count: Math.floor(Math.random() * 5),
       capacity: 5,
     }));
+  }, []);
+
+  /* =========================
+     HANDLERS
+  ========================= */
+  const handleSelectSlot = (hour) => {
+    setSelectedSlot(hour);
+    setTvMode("schedule"); // 🔥 reflect selection in TV
+  };
 
   return (
     <div className="adtv-page">
@@ -36,37 +49,69 @@ export default function CommunityPlusAdTvPage() {
       </div>
 
       {/* =========================
-         TV STAGE (PRIMARY SURFACE)
+         TV + CONTROL SYSTEM
       ========================= */}
       <div className="adtv-stage-wrapper">
 
-  <div className="adtv-stage-layout">
+        <div className="adtv-stage-layout">
 
-    {/* LEFT: TV */}
-    <div className="adtv-stage">
-      <CommunityPlusAdTv
-        mode="page"
-        context="page"
-        tvMode={tvMode}
-      />
-    </div>
+          {/* LEFT: TV */}
+          <div className="adtv-stage">
+            <CommunityPlusAdTv
+              mode="page"
+              context="page"
+              tvMode={tvMode}
+              selectedSlot={selectedSlot} // 🔥 NEW
+            />
+          </div>
 
-    {/* RIGHT: SLOT DIAL */}
-    <div className="adtv-dial-panel">
-      <div className="h3">Book Slot</div>
-      <div className="meta">Select an hour</div>
+          {/* RIGHT: SLOT DIAL */}
+          <div className="adtv-dial-panel">
+            <div className="h3">Book Slot</div>
+            <div className="meta">
+              {selectedSlot !== null
+                ? `Selected: ${selectedSlot}:00`
+                : "Select an hour"}
+            </div>
 
-      <CommunityPlusAdSlotDial
-        slots={mockSlots}
-        onSelectSlot={(hour) => {
-          console.log("Selected hour:", hour);
-        }}
-      />
-    </div>
+            <CommunityPlusAdSlotDial
+              slots={slots}
+              onSelectSlot={handleSelectSlot}
+            />
+          </div>
 
-  </div>
+        </div>
 
-</div>
+      </div>
+
+      {/* =========================
+         MODE CONTROLS
+      ========================= */}
+      <div className="adtv-mode-bar">
+
+        <button
+          className={`btn btn-ghost ${tvMode === "live" ? "active" : ""}`}
+          onClick={() => setTvMode("live")}
+        >
+          Live
+        </button>
+
+        <button
+          className={`btn btn-ghost ${tvMode === "schedule" ? "active" : ""}`}
+          onClick={() => setTvMode("schedule")}
+        >
+          Schedule
+        </button>
+
+        <button
+          className={`btn btn-ghost ${tvMode === "upload" ? "active" : ""}`}
+          onClick={() => setTvMode("upload")}
+        >
+          Upload
+        </button>
+
+      </div>
+
       {/* =========================
          SUPPORTING CONTENT
       ========================= */}
@@ -77,7 +122,9 @@ export default function CommunityPlusAdTvPage() {
         <div className="meta">CURRENT AD STREAM</div>
 
         <div className="adtv-mini-preview">
-          Active campaign preview
+          {selectedSlot !== null
+            ? `Preview for ${selectedSlot}:00 slot`
+            : "Active campaign preview"}
         </div>
       </div>
 
@@ -98,7 +145,10 @@ export default function CommunityPlusAdTvPage() {
         <h2 className="h2">Upload / Preview</h2>
         <div className="meta">CREATE AND TEST ADS</div>
 
-        <button className="btn btn-primary">
+        <button
+          className="btn btn-primary"
+          onClick={() => setTvMode("upload")}
+        >
           Upload Ad
         </button>
       </div>
