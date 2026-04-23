@@ -1,10 +1,9 @@
 /* =====================================================
-PAGE (WIDTH CONSTRAINT ONLY)
+PAGE (GLOBAL CONTAINER)
 ===================================================== */
 
 .adtv-page {
-  max-width: 100%;
-  margin: 0 auto;
+  width: 100%;
 }
 
 /* =====================================================
@@ -12,7 +11,7 @@ HERO (CHANNEL IDENTITY)
 ===================================================== */
 
 .adtv-hero {
-  margin-bottom: 0 auto;
+  margin-bottom: 16px; /* 🔥 fix invalid value */
 }
 
 .adtv-hero-header {
@@ -29,7 +28,7 @@ HERO (CHANNEL IDENTITY)
 }
 
 /* =====================================================
-STAGE WRAPPER (SPACING ONLY — NO LAYOUT)
+STAGE WRAPPER (CENTER SYSTEM)
 ===================================================== */
 
 .adtv-stage-wrapper {
@@ -37,18 +36,25 @@ STAGE WRAPPER (SPACING ONLY — NO LAYOUT)
 }
 
 /* =====================================================
-STAGE LAYOUT (SINGLE SOURCE OF TRUTH)
+STAGE LAYOUT (ANCHOR SYSTEM)
 ===================================================== */
 
 .adtv-stage-layout {
   display: grid;
-  grid-template-columns: 2fr 1fr; /* 🔥 TV dominant */
+
+  /* 🔥 balanced layout */
+  grid-template-columns: 1.6fr 1fr;
+
   gap: 28px;
   align-items: start;
+
+  /* 🔥 CRITICAL: anchor width */
+  max-width: 1100px;
+  margin: 0 auto;
 }
 
 /* =====================================================
-TV STAGE (VISUAL CONTAINER ONLY)
+TV STAGE (PRIMARY SURFACE)
 ===================================================== */
 
 .adtv-stage {
@@ -58,9 +64,9 @@ TV STAGE (VISUAL CONTAINER ONLY)
   padding: 24px;
   border-radius: 16px;
 
-  /* 🔥 dotted system background */
+  /* 🔥 subtle system grid */
   background:
-    radial-gradient(circle, rgba(0, 0, 0, 0.08) 1px, transparent 1px);
+    radial-gradient(circle, rgba(0, 0, 0, 0.07) 1px, transparent 1px);
   background-size: 12px 12px;
 
   border: 1px solid rgba(0, 0, 0, 0.08);
@@ -95,7 +101,7 @@ MODE SWITCHER
   display: flex;
   justify-content: center;
   gap: 10px;
-  margin-top: 16px;
+  margin-top: 20px;
 }
 
 /* =====================================================
@@ -104,6 +110,9 @@ SUPPORTING SECTIONS
 
 .adtv-section {
   margin-top: 32px;
+  max-width: 1100px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .adtv-section .h2 {
@@ -162,7 +171,7 @@ SLOT LIST
 RESPONSIVE
 ===================================================== */
 
-/* 🔥 STACK WHEN SPACE IS ACTUALLY CONSTRAINED */
+/* 🔥 collapse when genuinely constrained */
 @media (max-width: 1000px) {
   .adtv-stage-layout {
     grid-template-columns: 1fr;
@@ -174,13 +183,13 @@ RESPONSIVE
   }
 }
 
-/* 🔥 MOBILE TIGHTENING */
+/* 🔥 mobile tightening */
 @media (max-width: 768px) {
-  .adtv-page {
+  .adtv-stage {
     padding: 16px;
   }
 
-  .adtv-stage {
-    padding: 16px;
+  .adtv-mode-bar {
+    flex-wrap: wrap;
   }
 }
