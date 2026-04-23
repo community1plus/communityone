@@ -1,115 +1,94 @@
-import React from "react";
-import { signOut } from "aws-amplify/auth";
 import { useNavigate, useLocation } from "react-router-dom";
-import "./CommunityPlusSidebar.css";
 
 export default function CommunityPlusSidebar() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const handleLogout = async () => {
-    try {
-      await signOut();
-      navigate("/", { replace: true });
-    } catch (err) {
-      console.error("Logout failed:", err);
-    }
-  };
-
-  const go = (path) => {
-    if (location.pathname !== path) {
-      navigate(path);
-    }
-  };
-
   const isActive = (path) => location.pathname === path;
 
   return (
-    <aside className="sidebar panel">
+    <aside className="sidebar">
 
-      {/* ===============================
-          CORE MODES
-      =============================== */}
+      {/* =========================
+         MODES
+      ========================= */}
+      <div className="sidebar-section">
+        <div className="sidebar-title">MODES</div>
 
-      <div className="sidebar-group">
-        <div className="meta">Modes</div>
-
-        <button
-          className={`btn btn-ghost sidebar-btn ${isActive("/now") ? "active" : ""}`}
-          onClick={() => go("/now")}
-        >
-          ⚡ <span className="label">Now</span>
-        </button>
-
-        <button
-          className={`btn btn-ghost sidebar-btn ${isActive("/blob") ? "active" : ""}`}
-          onClick={() => go("/blob")}
-        >
-          🧠 <span className="label">Blob</span>
-        </button>
+        <div className="sidebar-item">⚡ NOW</div>
+        <div className="sidebar-item">🧠 BLOB</div>
       </div>
 
-      <hr className="sidebar-divider" />
-
-      {/* ===============================
-          ACTIONS
-      =============================== */}
-
-      <div className="sidebar-group">
-        <div className="meta">Actions</div>
+      {/* =========================
+         ACTIONS (USER COMMANDS)
+      ========================= */}
+      <div className="sidebar-section">
+        <div className="sidebar-title">ACTIONS</div>
 
         <button
-          className={`btn btn-ghost sidebar-btn ${isActive("/event") ? "active" : ""}`}
-          onClick={() => go("/event")}
+          className="sidebar-link"
+          onClick={() => navigate("/event")}
         >
           📅 Event
         </button>
 
         <button
-          className={`btn btn-ghost sidebar-btn ${isActive("/incident") ? "active" : ""}`}
-          onClick={() => go("/incident")}
+          className="sidebar-link"
+          onClick={() => navigate("/incident")}
         >
           🚨 Incident
         </button>
 
         <button
-          className={`btn btn-ghost sidebar-btn ${isActive("/beacon") ? "active" : ""}`}
-          onClick={() => go("/beacon")}
+          className="sidebar-link"
+          onClick={() => navigate("/beacon")}
         >
           📡 Beacon
         </button>
       </div>
 
-      <hr className="sidebar-divider" />
-
-      {/* ===============================
-          AD.TV
-      =============================== */}
-
-      <div className="sidebar-group">
-        <div className="meta">Media</div>
+      {/* =========================
+         PLATFORM (SURFACES)
+      ========================= */}
+      <div className="sidebar-section">
+        <div className="sidebar-title">PLATFORM</div>
 
         <button
-          className={`btn btn-ghost sidebar-btn ${isActive("/adtv") ? "active" : ""}`}
-          onClick={() => go("/adtv")}
+          className={`sidebar-link ${isActive("/communityplus") ? "active" : ""}`}
+          onClick={() => navigate("/communityplus")}
         >
-         <div className="adtv-logo">
-             📺 AD.TV 
-          </div>
+          🌐 Community+
+        </button>
+
+        <button
+          className={`sidebar-link ${isActive("/yellowpages") ? "active" : ""}`}
+          onClick={() => navigate("/yellowpages")}
+        >
+          📒 Yellow Pages
+        </button>
+
+        <button
+          className={`sidebar-link ${isActive("/channels") ? "active" : ""}`}
+          onClick={() => navigate("/channels")}
+        >
+          📺 Channels
         </button>
       </div>
 
-      <hr className="sidebar-divider" />
+      {/* =========================
+         ACCOUNT
+      ========================= */}
+      <div className="sidebar-section">
+        <div className="sidebar-title">ACCOUNT</div>
 
-      {/* ===============================
-          SESSION
-      =============================== */}
-
-      <div className="sidebar-group">
         <button
-          className="btn btn-ghost sidebar-btn logout"
-          onClick={handleLogout}
+          className="sidebar-link"
+          onClick={() => navigate("/profile")}
         >
+          👤 Profile
+        </button>
+
+        <button className="sidebar-link logout">
           🚪 Logout
         </button>
       </div>
