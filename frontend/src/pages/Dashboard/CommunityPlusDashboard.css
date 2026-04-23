@@ -42,7 +42,7 @@ MAIN LAYOUT (SIDEBAR + CONTENT)
 .layout-main {
   flex: 1;
   display: flex;
-
+  overflow: hidden; /* 🔥 prevent children overflow */
   min-height: 0; /* 🔥 critical */
 }
 
@@ -67,8 +67,8 @@ CONTENT AREA (SCROLL CONTAINER)
 
   display: flex;
   flex-direction: column;
-
-  overflow: auto;
+  
+  overflow: hidden;
 
   padding: 20px 24px;
 }
@@ -88,7 +88,7 @@ INNER CONTENT
 
   width: 100%;
   max-width: var(--content-max-width);
-
+  overflow: hidden; /* 🔥 prevent children overflow */
   margin: 0 auto;
 }
 
