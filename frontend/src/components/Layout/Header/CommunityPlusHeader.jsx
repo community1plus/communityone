@@ -63,7 +63,7 @@ export default function CommunityPlusHeader({ user, onLogout }) {
   }, [username]);
 
   /* ===============================
-     LOCATION STATE
+     LOCATION
   =============================== */
 
   const hasLocation =
@@ -76,18 +76,10 @@ export default function CommunityPlusHeader({ user, onLogout }) {
     viewLocation?.label ||
     "";
 
-  /* ===============================
-     SYNC INPUT DISPLAY
-  =============================== */
-
   useEffect(() => {
     if (!inputRef.current) return;
     inputRef.current.value = locationText;
   }, [locationText]);
-
-  /* ===============================
-     GOOGLE AUTOCOMPLETE
-  =============================== */
 
   useEffect(() => {
     let interval;
@@ -115,17 +107,13 @@ export default function CommunityPlusHeader({ user, onLogout }) {
         const lat = place.geometry.location.lat();
         const lng = place.geometry.location.lng();
 
-        try {
-          const enriched = await resolveLocation({
-            lat,
-            lng,
-            accuracy: 100,
-          });
+        const enriched = await resolveLocation({
+          lat,
+          lng,
+          accuracy: 100,
+        });
 
-          setViewLocation(enriched, "manual");
-        } catch (err) {
-          console.error("❌ Enrichment failed:", err);
-        }
+        setViewLocation(enriched, "manual");
       });
 
       return true;
@@ -139,10 +127,6 @@ export default function CommunityPlusHeader({ user, onLogout }) {
 
     return () => clearInterval(interval);
   }, []);
-
-  /* ===============================
-     GPS LOCATION
-  =============================== */
 
   const handleResolveLocation = async () => {
     setResolving(true);
@@ -160,32 +144,13 @@ export default function CommunityPlusHeader({ user, onLogout }) {
         setViewLocation(enriched, "auto");
         setResolving(false);
       },
-      (err) => {
-        console.error("❌ Geolocation error:", err);
-        setResolving(false);
-      },
+      () => setResolving(false),
       { enableHighAccuracy: true }
     );
   };
 
   /* ===============================
-     OUTSIDE CLICK
-  =============================== */
-
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (menuRef.current && !menuRef.current.contains(e.target)) {
-        setShowMenu(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  /* ===============================
-     NAVIGATION
+     NAV HELPERS
   =============================== */
 
   const go = (path) => {
@@ -203,11 +168,11 @@ export default function CommunityPlusHeader({ user, onLogout }) {
   return (
     <header className="header panel">
 
+      {/* TOP ROW */}
       <div className="header-row">
 
         {/* LEFT */}
         <div className="header-left">
-
           <img
             src="/logo/logo.png"
             alt="Community One"
@@ -215,9 +180,7 @@ export default function CommunityPlusHeader({ user, onLogout }) {
             onClick={() => go("/home")}
           />
 
-          {/* 🔥 LOCATION (UPGRADED) */}
           <div className="location-display">
-
             <LocationPin
               resolved={hasLocation}
               loading={resolving}
@@ -230,18 +193,15 @@ export default function CommunityPlusHeader({ user, onLogout }) {
               placeholder="Enter suburb or address"
               autoComplete="off"
             />
-
           </div>
         </div>
 
-        {/* CENTER */}
+        {/* CENTER SEARCH */}
         <div className="header-center">
-          <div className="search-wrapper">
-            <input
-              className="search-input body"
-              placeholder="Search"
-            />
-          </div>
+          <input
+            className="search-input body"
+            placeholder="Search"
+          />
         </div>
 
         {/* RIGHT */}
@@ -262,67 +222,66 @@ export default function CommunityPlusHeader({ user, onLogout }) {
 
               {showMenu && (
                 <div className="dropdown-menu panel">
-
-                  <div
-                    className="menu-item"
-                    onClick={() => go("/profile")}
-                  >
+                  <div onClick={() => go("/profile")}>
                     Profile
                   </div>
-
-                  <div
-                    className="menu-item"
-                    onClick={() => onLogout?.()}
-                  >
+                  <div onClick={() => onLogout?.()}>
                     Logout
                   </div>
-
                 </div>
               )}
             </div>
           )}
         </div>
+
       </div>
 
-      {/* NAV */}
-      <nav className="links">
+      {/* 🔥 CENTERED NAV */}
+      <nav className="header-nav">
 
         <button
           onClick={() => go("/home")}
-          className={`btn btn-ghost ${isActive("/home") ? "active" : ""}`}
+          className={`nav-item ${isActive("/home") ? "active" : ""}`}
         >
           Home
         </button>
 
+        {/* FEED */}
+        <div className="nav-group">
+          <button className="nav-item">Feed</button>
+
+          <div className="nav-dropdown">
+            <div onClick={() => go("/feed/all")}>All</div>
+            <div onClick={() => go("/feed/incidents")}>Incidents</div>
+            <div onClick={() => go("/feed/alerts")}>Alerts</div>
+            <div onClick={() => go("/feed/beacons")}>Beacons</div>
+          </div>
+        </div>
+
         <button
           onClick={() => go("/post")}
-          className={`btn btn-ghost ${isActive("/post") ? "active" : ""}`}
+          className={`nav-item ${isActive("/post") ? "active" : ""}`}
         >
-          Post
+          Posts
         </button>
 
         <button
-          onClick={() => go("/event")}
-          className={`btn btn-ghost ${isActive("/event") ? "active" : ""}`}
+          onClick={() => go("/yellowpages")}
+          className={`nav-item ${isActive("/yellowpages") ? "active" : ""}`}
         >
-          Event
+          Yellow Pages
         </button>
 
-        <button
-          onClick={() => go("/incident")}
-          className={`btn btn-ghost ${isActive("/incident") ? "active" : ""}`}
-        >
-          Incident
-        </button>
+        {/* DASHBOARD */}
+        <div className="nav-group">
+          <button className="nav-item">Dashboard</button>
 
-        <button
-          onClick={() => go("/adtv")}
-          className={`btn btn-ghost ${isActive("/adtv") ? "active" : ""}`}
-        >
-          <div className="adtv-logo">
-             AD.TV
+          <div className="nav-dropdown">
+            <div onClick={() => go("/dashboard/categories")}>
+              Categories
+            </div>
           </div>
-        </button>
+        </div>
 
       </nav>
     </header>
