@@ -1,57 +1,11 @@
 /* =====================================================
 CONTAINER
 ===================================================== */
-/* 🔥 critical layout fixes */
-.profile-container {
-  min-height: 0;
-}
 
-.profile-layout {
-  min-height: 0;
-}
-
-/* 🔥 stepper polish */
-.profile-stepper {
-  padding-bottom: 8px;
-  border-bottom: 1px solid #eee;
-}
-
-/* 🔥 better step distribution */
-.profile-page-steps {
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-}
-
-/* 🔥 better completed state */
-.step.complete {
-  background: #f1ece8;
-  color: #4a0f0f;
-}
-
-/* optional checkmark */
-.step.complete::after {
-  content: "✓";
-  margin-left: 6px;
-  font-size: 11px;
-}
-
-/* 🔥 ensure cards stretch */
-.profile-left,
-.profile-guide {
-  flex: 1;
-}
-
-/* 🔥 spacing fix */
-.form-navigation {
-  padding-top: 16px;
-}
-
-/* 🔥 missing class */
-.form-actions {
-  display: flex;
-  gap: 10px;
-}
 .profile-container {
   flex: 1;
+  min-height: 0;
+
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -64,54 +18,66 @@ HEADER
 .profile-page-header {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-}
-
-.profile-page-title {
-  font-size: 24px;
-  font-weight: 700;
+  gap: 16px;
 }
 
 /* =====================================================
-🔥 STEPPER SYSTEM
+🔥 STEPPER (CONNECTED SYSTEM)
 ===================================================== */
 
 .profile-stepper {
+  position: relative;
+
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
+
+  padding-bottom: 12px;
 }
 
-/* progress bar */
+/* progress track (behind steps) */
 .progress-bar {
-  width: 100%;
-  height: 4px;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+
+  height: 2px;
   background: #eee;
-  border-radius: 4px;
-  overflow: hidden;
+
+  transform: translateY(-50%);
+  z-index: 0;
 }
 
+/* progress fill */
 .progress-fill {
   height: 100%;
   background: #4a0f0f;
   transition: width 0.25s ease;
 }
 
-/* steps */
+/* steps container */
 .profile-page-steps {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
   gap: 12px;
+  position: relative;
+  z-index: 1;
 }
 
-/* step */
+/* =====================================================
+STEP
+===================================================== */
+
 .step {
   display: flex;
   align-items: center;
   justify-content: center;
 
-  padding: 8px 10px;
-  border-radius: 10px;
+  padding: 10px 14px;
+  border-radius: 12px;
 
   font-size: 13px;
   font-weight: 600;
@@ -120,7 +86,8 @@ HEADER
   color: #8c837a;
 
   cursor: pointer;
-  transition: all 0.15s ease;
+
+  transition: all 0.2s ease;
 }
 
 /* hover */
@@ -136,8 +103,15 @@ HEADER
 
 /* completed */
 .step.complete {
-  background: #e8e3df;
-  color: #2c2c2c;
+  background: rgba(74, 15, 15, 0.08);
+  color: #4a0f0f;
+}
+
+/* optional checkmark */
+.step.complete::after {
+  content: "✓";
+  margin-left: 6px;
+  font-size: 11px;
 }
 
 /* =====================================================
@@ -146,6 +120,7 @@ LAYOUT
 
 .profile-layout {
   flex: 1;
+  min-height: 0;
 
   display: grid;
   grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
@@ -162,6 +137,8 @@ CARDS
 
 .profile-left,
 .profile-guide {
+  flex: 1;
+
   display: flex;
   flex-direction: column;
 
@@ -176,6 +153,8 @@ CARDS
   background: #fff;
   padding: 24px;
   gap: 16px;
+
+  justify-content: space-between; /* 🔥 fixes vertical spacing */
 }
 
 /* right */
@@ -203,10 +182,17 @@ NAVIGATION
 
 .form-navigation {
   margin-top: auto;
+  padding-top: 16px;
 
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+/* action group */
+.form-actions {
+  display: flex;
+  gap: 10px;
 }
 
 /* =====================================================
@@ -220,5 +206,11 @@ RESPONSIVE
 
   .profile-guide {
     position: static;
+  }
+
+  /* stack steps nicely */
+  .profile-page-steps {
+    flex-wrap: wrap;
+    justify-content: center;
   }
 }
