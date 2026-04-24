@@ -10,6 +10,11 @@ import Card from "../../components/UI/Card";
 import Section from "../../components/UI/Section";
 import Button from "../../components/UI/Button";
 
+// 🔥 NEW FORM SYSTEM
+import Input from "../../components/UI/Form/Input";
+import Select from "../../components/UI/Form/Select";
+import Field from "../../components/UI/Form/Field";
+
 import "../../styles/system.css";
 
 const GOOGLE_LIBRARIES = ["places"];
@@ -137,6 +142,7 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
       }));
 
       navigate("/home", { replace: true });
+
     } catch (err) {
       setError(err.message || "Failed to save profile");
     } finally {
@@ -182,52 +188,106 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
             {/* STEP 1 */}
             {currentStep === 0 && (
               <>
-                <input className="input" value={formData.username} readOnly />
-                <input className="input" value={formData.display_name} readOnly />
+                <Field label="Username">
+                  <Input value={formData.username} readOnly />
+                </Field>
 
-                <select
-                  className="input"
-                  value={formData.userType}
-                  onChange={(e) =>
-                    setFormData({ ...formData, userType: e.target.value })
-                  }
-                >
-                  <option value="PERSONAL">Personal</option>
-                  <option value="BUSINESS">Business</option>
-                </select>
+                <Field label="Display Name">
+                  <Input value={formData.display_name} readOnly />
+                </Field>
+
+                <Field label="Account Type">
+                  <Select
+                    value={formData.userType}
+                    onChange={(e) =>
+                      setFormData({ ...formData, userType: e.target.value })
+                    }
+                  >
+                    <option value="PERSONAL">Personal</option>
+                    <option value="BUSINESS">Business</option>
+                  </Select>
+                </Field>
               </>
             )}
 
             {/* STEP 2 */}
             {currentStep === 1 && isLoaded && (
-              <Autocomplete
-                onLoad={(auto) => (autoRef.current = auto)}
-                onPlaceChanged={onPlaceChanged}
-              >
-                <input
-                  className="input"
-                  value={manualAddress}
-                  onChange={(e) => setManualAddress(e.target.value)}
-                  placeholder="Enter address"
-                />
-              </Autocomplete>
+              <Field label="Home Location">
+                <Autocomplete
+                  onLoad={(auto) => (autoRef.current = auto)}
+                  onPlaceChanged={onPlaceChanged}
+                >
+                  <Input
+                    value={manualAddress}
+                    onChange={(e) => setManualAddress(e.target.value)}
+                    placeholder="Enter address"
+                  />
+                </Autocomplete>
+              </Field>
             )}
 
             {/* STEP 3 */}
             {currentStep === 2 && (
-              <input
-                className="input"
-                placeholder="Phone"
-                value={formData.phone}
-                onChange={(e) =>
-                  setFormData({ ...formData, phone: e.target.value })
-                }
-              />
+              <Field label="Phone">
+                <Input
+                  value={formData.phone}
+                  onChange={(e) =>
+                    setFormData({ ...formData, phone: e.target.value })
+                  }
+                  placeholder="Enter phone"
+                />
+              </Field>
+            )}
+
+            {/* STEP 4 */}
+            {currentStep === 3 && (
+              <>
+                <Field label="Instagram">
+                  <Input
+                    value={formData.social.instagram}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        social: { ...formData.social, instagram: e.target.value },
+                      })
+                    }
+                  />
+                </Field>
+
+                <Field label="Twitter">
+                  <Input
+                    value={formData.social.twitter}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        social: { ...formData.social, twitter: e.target.value },
+                      })
+                    }
+                  />
+                </Field>
+              </>
+            )}
+
+            {/* STEP 5 */}
+            {currentStep === 4 && (
+              <>
+                <Field label="Card Number">
+                  <Input
+                    value={formData.card.number}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        card: { ...formData.card, number: e.target.value },
+                      })
+                    }
+                  />
+                </Field>
+              </>
             )}
 
           </Section>
 
-          {/* NAVIGATION */}
+          {/* NAV */}
           <div className="form-navigation">
 
             <Button variant="ghost" onClick={() => navigate("/home")}>
@@ -258,12 +318,10 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
 
         {/* RIGHT */}
         <Card variant="soft">
-
           <Section
             title="Profile Guide"
             meta="Add details to improve visibility and trust"
           />
-
         </Card>
 
       </div>

@@ -148,3 +148,34 @@ RESPONSIVE
     grid-template-columns: 1fr;
   }
 }
+
+/* =====================================================
+FORM SYSTEM
+===================================================== */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.field-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #444;
+}
+
+.field-hint {
+  font-size: 12px;
+  color: #8c837a;
+}
+
+.field-error {
+  font-size: 12px;
+  color: #c44536;
+}
+
+/* spacing between fields */
+.section .field + .field {
+  margin-top: 10px;
+}
