@@ -1,115 +1,99 @@
 /* =====================================================
-ROOT
-===================================================== */
-
-:root {
-  --sidebar-width: 260px;
-}
-
-/* =====================================================
-CONTAINER + PAGE STRUCTURE
+CONTAINER (ALIGNED WITH DASHBOARD RAIL)
 ===================================================== */
 
 .profile-container {
   width: 100%;
-  max-width: 1100px;
-  margin: 0 auto;
-
-  /* 🔥 enables vertical stretching */
-  flex: 1;
-
   display: flex;
   flex-direction: column;
-  box-sizing: border-box;
-}
-
-/* spacing between header and cards */
-.profile-page-header {
-  margin-bottom: 24px;
+  gap: 20px;
 }
 
 /* =====================================================
-TITLE + STEPS
+HEADER (TITLE + STEPS)
 ===================================================== */
+
+.profile-page-header {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
 
 .profile-page-title {
   font-size: 24px;
   font-weight: 700;
-  margin-bottom: 12px;
 }
 
 .profile-page-steps {
   display: flex;
-  gap: 20px;
+  gap: 18px;
+
   font-size: 14px;
   font-weight: 600;
-  color: #666;
+  color: #8c837a;
 }
 
 .profile-page-steps .step {
   cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.profile-page-steps .step:hover {
+  color: #444;
 }
 
 .profile-page-steps .step.active {
-  color: #4a0f0f; /* oxblood */
+  color: #4a0f0f;
   font-weight: 700;
 }
 
 /* =====================================================
-TWO-COLUMN LAYOUT
+LAYOUT (MATCHES ADTV)
 ===================================================== */
 
 .profile-layout {
   display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
+  gap: 20px;
 
-  grid-template-columns:
-    minmax(0, 1fr)
-    minmax(320px, 420px);
-
-  gap: 24px;
-
-  /* 🔥 full height behavior */
-  flex: 1;
   align-items: stretch;
 }
 
-/* prevent overflow issues */
 .profile-layout > * {
   min-width: 0;
 }
 
 /* =====================================================
-CARD SYSTEM
+CARD SYSTEM (UNIFIED)
 ===================================================== */
 
 .profile-left,
 .profile-guide {
-  background: #ffffff;
-  border: 1px solid #e6dfd8;
   border-radius: 18px;
-  box-shadow: 0 6px 18px rgba(20, 20, 20, 0.05);
+  border: 1px solid #e6dfd8;
 
-  /* 🔥 stretch cards */
+  box-shadow: 0 8px 24px rgba(20, 20, 20, 0.06);
+
   display: flex;
   flex-direction: column;
-  height: 100%;
-
-  box-sizing: border-box;
 }
 
-/* left card */
+/* LEFT (FORM CARD) */
 .profile-left {
+  background: #fff;
   padding: 24px;
+  gap: 16px;
 }
 
-/* right guide */
+/* RIGHT (GUIDE PANEL) */
 .profile-guide {
-  padding: 22px 24px;
   background: #faf7f4;
+  padding: 22px 24px;
+  gap: 10px;
 }
 
 /* =====================================================
-FORM LAYOUT
+FORM
 ===================================================== */
 
 .profile-left form {
@@ -118,61 +102,101 @@ FORM LAYOUT
   gap: 16px;
 }
 
-/* form groups */
+/* GROUP */
 
 .form-group {
   display: flex;
   flex-direction: column;
+  gap: 4px;
 }
 
 .form-group label {
   font-size: 13px;
   font-weight: 600;
-  margin-bottom: 4px;
   color: #444;
 }
 
-/* inputs */
+/* INPUTS */
 
 .profile-left input,
 .profile-left select {
   width: 100%;
   padding: 10px 12px;
 
-  border-radius: 8px;
+  border-radius: 10px;
   border: 1px solid #ddd;
 
   font-size: 14px;
-  box-sizing: border-box;
-  transition: 0.2s ease;
+
+  transition: all 0.2s ease;
 }
 
 .profile-left input:focus,
 .profile-left select:focus {
   outline: none;
   border-color: #4a0f0f;
-  box-shadow: 0 0 0 2px rgba(74, 15, 15, 0.1);
+  box-shadow: 0 0 0 2px rgba(74, 15, 15, 0.08);
 }
 
 /* =====================================================
-BUTTON
+LOCATION SECTION
+===================================================== */
+
+.location-section {
+  margin-top: 6px;
+  padding: 14px;
+
+  border-radius: 12px;
+  border: 1px solid #eee;
+
+  background: #fafafa;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.location-section > label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.location-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  font-size: 13px;
+  gap: 10px;
+}
+
+.location-row span {
+  color: #666;
+}
+
+.location-row strong {
+  color: #222;
+}
+
+/* =====================================================
+BUTTON SYSTEM
 ===================================================== */
 
 .profile-left button[type="submit"] {
-  margin-top: 12px;
+  margin-top: 8px;
 
   padding: 12px;
-  border: none;
   border-radius: 10px;
+  border: none;
 
   background: #4a0f0f;
   color: #fff;
 
-  font-weight: 600;
   font-size: 14px;
+  font-weight: 600;
 
   cursor: pointer;
-  transition: 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .profile-left button[type="submit"]:hover {
@@ -184,60 +208,18 @@ BUTTON
   cursor: not-allowed;
 }
 
-/* =====================================================
-LOCATION SECTION
-===================================================== */
-
-.location-section {
-  margin-top: 8px;
-  padding: 16px;
-
-  border: 1px solid #eee;
-  border-radius: 12px;
-  background: #fafafa;
-
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.location-section > label {
-  font-size: 13px;
-  font-weight: 600;
-  color: #333;
-}
-
-/* rows */
-
-.location-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  font-size: 13px;
-  gap: 10px;
-}
-
-.location-row span {
-  color: #666;
-}
-
-.location-row strong {
-  font-weight: 600;
-  color: #222;
-}
-
-/* =====================================================
-GHOST BUTTON
-===================================================== */
+/* GHOST BUTTON */
 
 .ghost-btn {
-  background: transparent;
   border: 1px solid #ddd;
-  border-radius: 8px;
+  background: transparent;
+
   padding: 6px 10px;
+  border-radius: 8px;
+
   font-size: 12px;
   cursor: pointer;
+
   transition: 0.15s ease;
 }
 
@@ -246,149 +228,56 @@ GHOST BUTTON
 }
 
 /* =====================================================
-ERROR TEXT
-===================================================== */
-
-.error {
-  margin-top: 6px;
-  font-size: 13px;
-  color: #c44536;
-}
-
-/* =====================================================
-RESPONSIVE
-===================================================== */
-
-@media (max-width: 900px) {
-  .profile-layout {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* =========================================
-NAV ICON BUTTONS
-========================================= */
-
-.nav-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.nav-icon-btn {
-  background: none;
-  border: none;
-  padding: 6px;
-
-  font-size: 18px;
-  cursor: pointer;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  transition: 0.2s ease;
-}
-
-/* primary (next / submit) */
-.nav-icon-btn.primary {
-  color: #4a0f0f;
-  font-size: 22px;
-}
-
-.nav-icon-btn.primary:hover {
-  transform: translateX(2px);
-}
-
-/* skip */
-.nav-icon-btn.skip {
-  color: #888;
-}
-
-.nav-icon-btn.skip:hover {
-  color: #444;
-  transform: rotate(-20deg);
-}
-
-/* back */
-.nav-icon-btn.ghost {
-  color: #888;
-}
-
-.nav-icon-btn.ghost:hover {
-  color: #222;
-}
-
-/* =====================================================
-FORM NAVIGATION (UPDATED)
+FORM NAVIGATION (CLEANED)
 ===================================================== */
 
 .form-navigation {
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
 
   margin-top: auto;
   padding-top: 16px;
 }
 
-/* left side (Save / Close) */
 .nav-left {
   display: flex;
-  align-items: center;
   gap: 14px;
 }
 
-/* right side (arrows) */
-.nav-actions {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-/* =====================================================
-TEXT BUTTONS (Save / Close)
-===================================================== */
+/* TEXT BUTTONS */
 
 .nav-text-btn {
   background: none;
   border: none;
-  padding: 6px 4px;
 
   font-size: 13px;
   font-weight: 600;
   color: #666;
 
   cursor: pointer;
-  transition: 0.2s ease;
 }
 
 .nav-text-btn:hover {
   color: #222;
 }
 
-/* Close = destructive */
 .nav-text-btn.danger {
   color: #a33;
 }
 
-.nav-text-btn.danger:hover {
-  color: #7a1f1f;
-}
+/* ICON BUTTONS */
 
-/* =====================================================
-NAV ICON BUTTONS (IMPROVED)
-===================================================== */
+.nav-actions {
+  display: flex;
+  gap: 16px;
+}
 
 .nav-icon-btn {
   background: none;
   border: none;
-  padding: 8px;
 
-  font-size: 22px; /* 🔥 thicker */
-  font-weight: 600;
-  line-height: 1;
-
+  font-size: 22px;
   cursor: pointer;
 
   display: flex;
@@ -398,7 +287,6 @@ NAV ICON BUTTONS (IMPROVED)
   transition: all 0.2s ease;
 }
 
-/* NEXT / SUBMIT */
 .nav-icon-btn.primary {
   color: #4a0f0f;
   font-size: 26px;
@@ -408,17 +296,6 @@ NAV ICON BUTTONS (IMPROVED)
   transform: translateX(3px);
 }
 
-/* SKIP */
-.nav-icon-btn.skip {
-  color: #999;
-}
-
-.nav-icon-btn.skip:hover {
-  color: #444;
-  transform: rotate(-25deg);
-}
-
-/* BACK */
 .nav-icon-btn.ghost {
   color: #888;
 }
@@ -428,7 +305,27 @@ NAV ICON BUTTONS (IMPROVED)
   transform: translateX(-2px);
 }
 
-/* ================= FILE LIST ================= */
+.nav-icon-btn.skip {
+  color: #999;
+}
+
+.nav-icon-btn.skip:hover {
+  color: #444;
+  transform: rotate(-20deg);
+}
+
+/* =====================================================
+ERROR
+===================================================== */
+
+.error {
+  font-size: 13px;
+  color: #c44536;
+}
+
+/* =====================================================
+FILE LIST
+===================================================== */
 
 .file-list {
   display: flex;
@@ -442,17 +339,20 @@ NAV ICON BUTTONS (IMPROVED)
   gap: 12px;
 
   padding: 10px;
+
   border: 1px solid #eee;
   border-radius: 10px;
   background: #fff;
 }
 
-/* THUMB */
+/* thumb */
+
 .file-thumb {
   width: 48px;
   height: 48px;
   border-radius: 8px;
   overflow: hidden;
+
   background: #f4f4f4;
 
   display: flex;
@@ -467,7 +367,8 @@ NAV ICON BUTTONS (IMPROVED)
   object-fit: cover;
 }
 
-/* INFO */
+/* info */
+
 .file-info {
   flex: 1;
 }
@@ -482,15 +383,26 @@ NAV ICON BUTTONS (IMPROVED)
   color: #777;
 }
 
-/* ACTIONS */
+/* actions */
+
 .file-actions {
   display: flex;
   gap: 6px;
 }
 
 .file-actions button {
-  border: none;
   background: transparent;
+  border: none;
   cursor: pointer;
   font-size: 14px;
+}
+
+/* =====================================================
+RESPONSIVE
+===================================================== */
+
+@media (max-width: 900px) {
+  .profile-layout {
+    grid-template-columns: 1fr;
+  }
 }

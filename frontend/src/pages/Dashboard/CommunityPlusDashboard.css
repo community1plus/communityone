@@ -5,6 +5,9 @@ ROOT VARIABLES
 :root {
   --sidebar-width: 260px;
   --content-max-width: 1100px;
+
+  --page-padding-x: 24px;
+  --page-padding-y: 20px;
 }
 
 /* =====================================================
@@ -29,7 +32,7 @@ body {
 }
 
 /* =====================================================
-APP SHELL (TOP LEVEL)
+APP SHELL
 ===================================================== */
 
 .app-shell {
@@ -45,7 +48,7 @@ MAIN LAYOUT (SIDEBAR + CONTENT)
 .layout-main {
   flex: 1;
   display: flex;
-  min-height: 0; /* 🔥 prevents overflow bugs */
+  min-height: 0; /* 🔥 critical for scroll containment */
 }
 
 /* =====================================================
@@ -58,7 +61,7 @@ SIDEBAR
 }
 
 /* =====================================================
-CONTENT AREA (OUTER LAYER)
+CONTENT AREA (OUTER)
 ===================================================== */
 
 .layout-content {
@@ -68,37 +71,66 @@ CONTENT AREA (OUTER LAYER)
 
   display: flex;
   flex-direction: column;
+  align-items: center; /* 🔥 centers ALL pages */
 
-  padding: 20px 24px;
+  padding: var(--page-padding-y) var(--page-padding-x);
 }
 
 /* =====================================================
-CONTENT INNER (WIDTH CONTROL)
+CONTENT INNER (PRIMARY RAIL)
 ===================================================== */
 
 .layout-inner {
   width: 100%;
-  min-width: 0;
-
   max-width: var(--content-max-width);
+  min-width: 0;
 
   display: flex;
   flex-direction: column;
+
+  /* 🔥 subtle page flow improvement */
+  gap: 16px;
 }
 
 /* =====================================================
-FULL WIDTH MODE (FOR AD.TV, MAPS, ETC)
-===================================================== */
-
-.layout-content.full-width .layout-inner {
-  max-width: none;   /* 🔥 unlocks layout */
-}
-
-/* =====================================================
-OPTIONAL: FULL BLEED FEEL
+FULL WIDTH MODE (ADTV, MAPS, ETC)
 ===================================================== */
 
 .layout-content.full-width {
-  padding-left: 24px;
-  padding-right: 24px;
+  align-items: stretch; /* 🔥 allow full bleed */
+}
+
+/* remove width constraint */
+.layout-content.full-width .layout-inner {
+  max-width: none;
+}
+
+/* optional: keep horizontal breathing */
+.layout-content.full-width {
+  padding-left: var(--page-padding-x);
+  padding-right: var(--page-padding-x);
+}
+
+/* =====================================================
+SCROLL BEHAVIOUR (OPTIONAL BUT NICE)
+===================================================== */
+
+.layout-content {
+  overflow-y: auto;
+}
+
+/* =====================================================
+RESPONSIVE
+===================================================== */
+
+@media (max-width: 1000px) {
+  .sidebar {
+    width: 220px;
+  }
+}
+
+@media (max-width: 768px) {
+  .layout-content {
+    padding: 16px 12px;
+  }
 }
