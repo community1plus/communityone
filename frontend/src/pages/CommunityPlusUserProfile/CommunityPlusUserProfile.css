@@ -1,7 +1,55 @@
 /* =====================================================
 CONTAINER
 ===================================================== */
+/* 🔥 critical layout fixes */
+.profile-container {
+  min-height: 0;
+}
 
+.profile-layout {
+  min-height: 0;
+}
+
+/* 🔥 stepper polish */
+.profile-stepper {
+  padding-bottom: 8px;
+  border-bottom: 1px solid #eee;
+}
+
+/* 🔥 better step distribution */
+.profile-page-steps {
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+}
+
+/* 🔥 better completed state */
+.step.complete {
+  background: #f1ece8;
+  color: #4a0f0f;
+}
+
+/* optional checkmark */
+.step.complete::after {
+  content: "✓";
+  margin-left: 6px;
+  font-size: 11px;
+}
+
+/* 🔥 ensure cards stretch */
+.profile-left,
+.profile-guide {
+  flex: 1;
+}
+
+/* 🔥 spacing fix */
+.form-navigation {
+  padding-top: 16px;
+}
+
+/* 🔥 missing class */
+.form-actions {
+  display: flex;
+  gap: 10px;
+}
 .profile-container {
   flex: 1;
   display: flex;
