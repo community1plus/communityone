@@ -5,7 +5,12 @@ import { Autocomplete, useJsApiLoader } from "@react-google-maps/api";
 import { useLocationContext } from "../../context/LocationProvider";
 import { useAuth } from "../../context/AuthContext";
 
-import "../../styles/system.css"; // 🔥 NEW SYSTEM
+import PageHeader from "../../components/UI/PageHeader";
+import Card from "../../components/UI/Card";
+import Section from "../../components/UI/Section";
+import Button from "../../components/UI/Button";
+
+import "../../styles/system.css";
 
 const GOOGLE_LIBRARIES = ["places"];
 
@@ -30,13 +35,7 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
   const [error, setError] = useState("");
   const [currentStep, setCurrentStep] = useState(0);
 
-  const steps = [
-    "Identity",
-    "Home",
-    "Contact",
-    "Social",
-    "Payment",
-  ];
+  const steps = ["Identity", "Home", "Contact", "Social", "Payment"];
 
   /* ==============================
      PREFILL
@@ -138,7 +137,6 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
       }));
 
       navigate("/home", { replace: true });
-
     } catch (err) {
       setError(err.message || "Failed to save profile");
     } finally {
@@ -156,34 +154,32 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
   return (
     <div className="page-container">
 
-      {/* HEADER */}
-      <div className="page-header">
-        <h1 className="section-title">
-          {mode === "edit" ? "Edit Profile" : "Create Profile"}
-        </h1>
+      <PageHeader
+        title={mode === "edit" ? "Edit Profile" : "Create Profile"}
+        meta="Complete your profile to unlock platform features"
+      />
 
-        <div className="profile-page-steps">
-          {steps.map((step, i) => (
-            <span
-              key={step}
-              className={`step ${i === currentStep ? "active" : ""}`}
-              onClick={() => setCurrentStep(i)}
-            >
-              {step}
-            </span>
-          ))}
-        </div>
+      {/* STEP NAV */}
+      <div className="profile-page-steps">
+        {steps.map((step, i) => (
+          <span
+            key={step}
+            className={`step ${i === currentStep ? "active" : ""}`}
+            onClick={() => setCurrentStep(i)}
+          >
+            {step}
+          </span>
+        ))}
       </div>
 
-      {/* LAYOUT */}
       <div className="page-layout">
 
         {/* LEFT */}
-        <div className="card card-primary">
+        <Card>
 
-          {/* STEP CONTENT */}
-          <div className="section">
+          <Section>
 
+            {/* STEP 1 */}
             {currentStep === 0 && (
               <>
                 <input className="input" value={formData.username} readOnly />
@@ -202,6 +198,7 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
               </>
             )}
 
+            {/* STEP 2 */}
             {currentStep === 1 && isLoaded && (
               <Autocomplete
                 onLoad={(auto) => (autoRef.current = auto)}
@@ -216,6 +213,7 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
               </Autocomplete>
             )}
 
+            {/* STEP 3 */}
             {currentStep === 2 && (
               <input
                 className="input"
@@ -227,36 +225,28 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
               />
             )}
 
-          </div>
+          </Section>
 
-          {/* NAV */}
+          {/* NAVIGATION */}
           <div className="form-navigation">
 
-            <div className="nav-left">
-              <button className="btn-ghost" onClick={() => navigate("/home")}>
-                Close
-              </button>
-            </div>
+            <Button variant="ghost" onClick={() => navigate("/home")}>
+              Close
+            </Button>
 
-            <div className="nav-actions">
+            <div style={{ display: "flex", gap: 10 }}>
               {currentStep > 0 && (
-                <button className="nav-icon-btn ghost" onClick={prevStep}>
-                  ‹
-                </button>
+                <Button variant="ghost" onClick={prevStep}>
+                  Back
+                </Button>
               )}
 
               {currentStep < steps.length - 1 ? (
-                <button className="nav-icon-btn primary" onClick={nextStep}>
-                  ›
-                </button>
+                <Button onClick={nextStep}>Next</Button>
               ) : (
-                <button
-                  className="btn-primary"
-                  onClick={handleSave}
-                  disabled={saving}
-                >
+                <Button onClick={handleSave} disabled={saving}>
                   Save
-                </button>
+                </Button>
               )}
             </div>
 
@@ -264,17 +254,17 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
 
           {error && <div className="error">{error}</div>}
 
-        </div>
+        </Card>
 
         {/* RIGHT */}
-        <div className="card card-soft">
-          <div className="section">
-            <div className="section-title">Profile Guide</div>
-            <div className="section-meta">
-              Complete your profile to unlock platform features.
-            </div>
-          </div>
-        </div>
+        <Card variant="soft">
+
+          <Section
+            title="Profile Guide"
+            meta="Add details to improve visibility and trust"
+          />
+
+        </Card>
 
       </div>
 
