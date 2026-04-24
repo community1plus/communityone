@@ -4,6 +4,8 @@ ROOT VARIABLES
 
 :root {
   --sidebar-width: 260px;
+  --sidebar-width-collapsed: 72px;
+
   --content-max-width: 1100px;
 
   --page-padding-x: 24px;
@@ -48,16 +50,24 @@ MAIN LAYOUT (SIDEBAR + CONTENT)
 .layout-main {
   flex: 1;
   display: flex;
-  min-height: 0; /* 🔥 critical for scroll containment */
+  min-height: 0; /* 🔥 critical */
 }
 
 /* =====================================================
-SIDEBAR
+SIDEBAR (RESPONSIVE + STABLE)
 ===================================================== */
 
 .sidebar {
-  width: var(--sidebar-width);
+  width: clamp(200px, 18vw, var(--sidebar-width));
+  min-width: 200px;
   flex-shrink: 0;
+}
+
+/* optional collapse */
+@media (max-width: 900px) {
+  .sidebar {
+    width: var(--sidebar-width-collapsed);
+  }
 }
 
 /* =====================================================
@@ -71,9 +81,13 @@ CONTENT AREA (OUTER)
 
   display: flex;
   flex-direction: column;
-  align-items: center; /* 🔥 centers ALL pages */
+
+  /* 🔥 key: allows vertical growth */
+  align-items: stretch;
 
   padding: var(--page-padding-y) var(--page-padding-x);
+
+  overflow-y: auto;
 }
 
 /* =====================================================
@@ -81,6 +95,7 @@ CONTENT INNER (PRIMARY RAIL)
 ===================================================== */
 
 .layout-inner {
+  flex: 1; /* 🔥 CRITICAL FIX */
   width: 100%;
   max-width: var(--content-max-width);
   min-width: 0;
@@ -88,35 +103,40 @@ CONTENT INNER (PRIMARY RAIL)
   display: flex;
   flex-direction: column;
 
-  /* 🔥 subtle page flow improvement */
+  margin: 0 auto; /* center horizontally */
+
   gap: 16px;
 }
 
 /* =====================================================
-FULL WIDTH MODE (ADTV, MAPS, ETC)
+PAGE LAYOUT (CARDS / SPLIT VIEW)
 ===================================================== */
 
-.layout-content.full-width {
-  align-items: stretch; /* 🔥 allow full bleed */
+.page-layout {
+  flex: 1; /* 🔥 fills vertical space */
+
+  display: flex;
+  gap: 20px;
+
+  align-items: stretch; /* 🔥 equal height columns */
 }
 
-/* remove width constraint */
-.layout-content.full-width .layout-inner {
-  max-width: none;
-}
-
-/* optional: keep horizontal breathing */
-.layout-content.full-width {
-  padding-left: var(--page-padding-x);
-  padding-right: var(--page-padding-x);
+/* children grow evenly */
+.page-layout > * {
+  flex: 1;
+  min-width: 0;
 }
 
 /* =====================================================
-SCROLL BEHAVIOUR (OPTIONAL BUT NICE)
+FULL WIDTH MODE (MAPS / ADTV)
 ===================================================== */
 
-.layout-content {
-  overflow-y: auto;
+.layout-content.full-width {
+  align-items: stretch;
+}
+
+.layout-content.full-width .layout-inner {
+  max-width: none;
 }
 
 /* =====================================================
@@ -132,5 +152,9 @@ RESPONSIVE
 @media (max-width: 768px) {
   .layout-content {
     padding: 16px 12px;
+  }
+
+  .page-layout {
+    flex-direction: column; /* 🔥 stack cards */
   }
 }

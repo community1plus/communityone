@@ -3,21 +3,33 @@ SIDEBAR BASE
 ===================================================== */
 
 .sidebar {
-  width: 260px;
+  width: clamp(200px, 18vw, 260px);
+  min-width: 200px;
   flex-shrink: 0;
-
-  padding: 16px 14px;
 
   display: flex;
   flex-direction: column;
-  gap: 18px;
 
-  background: #fbf9f7; /* 🔥 softer than before */
+  padding: 16px 12px;
+  gap: 20px;
+
+  background: #fbf9f7;
   border-right: 1px solid #e6dfd8;
+
+  transition: width 0.2s ease;
 }
 
 /* =====================================================
-SECTION (WITH DIVIDERS)
+COLLAPSED MODE (🔥 FUTURE PROOF)
+===================================================== */
+
+.sidebar.collapsed {
+  width: 72px;
+  min-width: 72px;
+}
+
+/* =====================================================
+SECTION
 ===================================================== */
 
 .sidebar-section {
@@ -26,15 +38,11 @@ SECTION (WITH DIVIDERS)
   gap: 6px;
 
   padding-bottom: 14px;
-  margin-bottom: 14px;
-
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .sidebar-section:last-child {
   border-bottom: none;
-  margin-bottom: 0;
-  padding-bottom: 0;
 }
 
 /* =====================================================
@@ -45,28 +53,35 @@ SECTION TITLE
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.08em;
+
   color: #8c837a;
 
-  margin-bottom: 8px;
+  padding: 0 6px;
+  margin-bottom: 6px;
 
   transition: color 0.15s ease;
 }
 
-/* subtle group hover polish */
+/* hover polish */
 .sidebar-section:hover .sidebar-title {
   color: #6f665f;
 }
 
+/* hide titles when collapsed */
+.sidebar.collapsed .sidebar-title {
+  display: none;
+}
+
 /* =====================================================
-LINKS (PRIMARY NAV ITEMS)
+LINKS
 ===================================================== */
 
 .sidebar-link {
   display: flex;
-  width: 100%;
-
   align-items: center;
   gap: 10px;
+
+  width: 100%;
 
   padding: 8px 10px;
   border-radius: 10px;
@@ -79,6 +94,8 @@ LINKS (PRIMARY NAV ITEMS)
   text-align: left;
   cursor: pointer;
 
+  position: relative;
+
   transition:
     background 0.15s ease,
     color 0.15s ease,
@@ -86,7 +103,7 @@ LINKS (PRIMARY NAV ITEMS)
 }
 
 /* =====================================================
-ICON ALIGNMENT
+ICON
 ===================================================== */
 
 .sidebar-link .icon {
@@ -101,35 +118,39 @@ ICON ALIGNMENT
   flex-shrink: 0;
 }
 
+/* label (🔥 needed for collapse) */
+.sidebar-link .label {
+  white-space: nowrap;
+}
+
+/* hide labels when collapsed */
+.sidebar.collapsed .sidebar-link .label {
+  display: none;
+}
+
 /* =====================================================
-HOVER STATE
+HOVER / ACTIVE
 ===================================================== */
 
 .sidebar-link:hover {
   background: rgba(0, 0, 0, 0.05);
 }
 
-/* press effect */
 .sidebar-link:active {
   transform: scale(0.98);
 }
 
-/* =====================================================
-ACTIVE STATE (IMPROVED)
-===================================================== */
-
+/* active */
 .sidebar-link.active {
   background: rgba(0, 0, 0, 0.08);
   font-weight: 600;
-
-  position: relative;
 }
 
-/* 🔥 left accent bar (big UX upgrade) */
+/* 🔥 clean accent (less intrusive) */
 .sidebar-link.active::before {
   content: "";
   position: absolute;
-  left: 0;
+  left: -6px;
   top: 6px;
   bottom: 6px;
 
@@ -140,15 +161,15 @@ ACTIVE STATE (IMPROVED)
 }
 
 /* =====================================================
-PLATFORM GROUP (slightly elevated)
+GROUP VARIANTS (NO nth-child 🔥)
 ===================================================== */
 
-.sidebar-section:nth-child(3) .sidebar-link {
+.sidebar-section.platform .sidebar-link {
   font-weight: 500;
 }
 
 /* =====================================================
-LOGOUT (DESTRUCTIVE ACTION)
+LOGOUT
 ===================================================== */
 
 .sidebar-link.logout {
@@ -165,6 +186,7 @@ RESPONSIVE
 
 @media (max-width: 900px) {
   .sidebar {
-    width: 220px;
+    width: 72px;
+    min-width: 72px;
   }
 }

@@ -1,12 +1,17 @@
 /* =====================================================
-CONTAINER (ALIGNED WITH DASHBOARD RAIL)
+CONTAINER (ALIGNED WITH DASHBOARD SYSTEM)
 ===================================================== */
 
 .profile-container {
-  width: 100%;
+  flex: 1; /* 🔥 critical */
   display: flex;
   flex-direction: column;
   gap: 20px;
+}
+
+/* optional vertical centering (page-specific) */
+.profile-container.centered {
+  justify-content: center;
 }
 
 /* =====================================================
@@ -48,10 +53,12 @@ HEADER (TITLE + STEPS)
 }
 
 /* =====================================================
-LAYOUT (MATCHES ADTV)
+LAYOUT (STRETCH FIX 🔥)
 ===================================================== */
 
 .profile-layout {
+  flex: 1; /* 🔥 fills vertical space */
+
   display: grid;
   grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
   gap: 20px;
@@ -64,22 +71,23 @@ LAYOUT (MATCHES ADTV)
 }
 
 /* =====================================================
-CARD SYSTEM (UNIFIED)
+CARD SYSTEM (ALIGNED WITH GLOBAL UI)
 ===================================================== */
 
 .profile-left,
 .profile-guide {
+  display: flex;
+  flex-direction: column;
+
   border-radius: 18px;
   border: 1px solid #e6dfd8;
 
   box-shadow: 0 8px 24px rgba(20, 20, 20, 0.06);
-
-  display: flex;
-  flex-direction: column;
 }
 
 /* LEFT (FORM CARD) */
 .profile-left {
+  flex: 1; /* 🔥 stretch */
   background: #fff;
   padding: 24px;
   gap: 16px;
@@ -87,55 +95,19 @@ CARD SYSTEM (UNIFIED)
 
 /* RIGHT (GUIDE PANEL) */
 .profile-guide {
+  flex: 1; /* 🔥 stretch */
   background: #faf7f4;
   padding: 22px 24px;
   gap: 10px;
 }
 
 /* =====================================================
-FORM
+FORM BUILDER COMPATIBILITY
 ===================================================== */
 
-.profile-left form {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-/* GROUP */
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.form-group label {
-  font-size: 13px;
-  font-weight: 600;
-  color: #444;
-}
-
-/* INPUTS */
-
-.profile-left input,
-.profile-left select {
-  width: 100%;
-  padding: 10px 12px;
-
-  border-radius: 10px;
-  border: 1px solid #ddd;
-
-  font-size: 14px;
-
-  transition: all 0.2s ease;
-}
-
-.profile-left input:focus,
-.profile-left select:focus {
-  outline: none;
-  border-color: #4a0f0f;
-  box-shadow: 0 0 0 2px rgba(74, 15, 15, 0.08);
+/* spacing between generated fields */
+.profile-left .field {
+  margin-bottom: 6px;
 }
 
 /* =====================================================
@@ -156,162 +128,18 @@ LOCATION SECTION
   gap: 10px;
 }
 
-.location-section > label {
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.location-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  font-size: 13px;
-  gap: 10px;
-}
-
-.location-row span {
-  color: #666;
-}
-
-.location-row strong {
-  color: #222;
-}
-
 /* =====================================================
-BUTTON SYSTEM
-===================================================== */
-
-.profile-left button[type="submit"] {
-  margin-top: 8px;
-
-  padding: 12px;
-  border-radius: 10px;
-  border: none;
-
-  background: #4a0f0f;
-  color: #fff;
-
-  font-size: 14px;
-  font-weight: 600;
-
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.profile-left button[type="submit"]:hover {
-  background: #3a0c0c;
-}
-
-.profile-left button[type="submit"]:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/* GHOST BUTTON */
-
-.ghost-btn {
-  border: 1px solid #ddd;
-  background: transparent;
-
-  padding: 6px 10px;
-  border-radius: 8px;
-
-  font-size: 12px;
-  cursor: pointer;
-
-  transition: 0.15s ease;
-}
-
-.ghost-btn:hover {
-  background: #f3f2ef;
-}
-
-/* =====================================================
-FORM NAVIGATION (CLEANED)
+FORM NAVIGATION
 ===================================================== */
 
 .form-navigation {
+  margin-top: auto; /* 🔥 pushes to bottom */
+
   display: flex;
   justify-content: space-between;
   align-items: center;
 
-  margin-top: auto;
   padding-top: 16px;
-}
-
-.nav-left {
-  display: flex;
-  gap: 14px;
-}
-
-/* TEXT BUTTONS */
-
-.nav-text-btn {
-  background: none;
-  border: none;
-
-  font-size: 13px;
-  font-weight: 600;
-  color: #666;
-
-  cursor: pointer;
-}
-
-.nav-text-btn:hover {
-  color: #222;
-}
-
-.nav-text-btn.danger {
-  color: #a33;
-}
-
-/* ICON BUTTONS */
-
-.nav-actions {
-  display: flex;
-  gap: 16px;
-}
-
-.nav-icon-btn {
-  background: none;
-  border: none;
-
-  font-size: 22px;
-  cursor: pointer;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  transition: all 0.2s ease;
-}
-
-.nav-icon-btn.primary {
-  color: #4a0f0f;
-  font-size: 26px;
-}
-
-.nav-icon-btn.primary:hover {
-  transform: translateX(3px);
-}
-
-.nav-icon-btn.ghost {
-  color: #888;
-}
-
-.nav-icon-btn.ghost:hover {
-  color: #222;
-  transform: translateX(-2px);
-}
-
-.nav-icon-btn.skip {
-  color: #999;
-}
-
-.nav-icon-btn.skip:hover {
-  color: #444;
-  transform: rotate(-20deg);
 }
 
 /* =====================================================
@@ -324,7 +152,7 @@ ERROR
 }
 
 /* =====================================================
-FILE LIST
+FILE LIST (UNCHANGED BUT CLEANED)
 ===================================================== */
 
 .file-list {
@@ -344,8 +172,6 @@ FILE LIST
   border-radius: 10px;
   background: #fff;
 }
-
-/* thumb */
 
 .file-thumb {
   width: 48px;
@@ -367,8 +193,6 @@ FILE LIST
   object-fit: cover;
 }
 
-/* info */
-
 .file-info {
   flex: 1;
 }
@@ -383,18 +207,9 @@ FILE LIST
   color: #777;
 }
 
-/* actions */
-
 .file-actions {
   display: flex;
   gap: 6px;
-}
-
-.file-actions button {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
 }
 
 /* =====================================================
