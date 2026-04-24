@@ -1,14 +1,57 @@
-export default function Field({ label, hint, error, children }) {
+export default function Field({
+  label,
+  hint,
+  error,
+  success,
+  loading,
+  children,
+}) {
+  /* =========================
+     STATE FLAGS
+  ========================= */
+
+  const hasError = !!error;
+  const isSuccess = !!success && !hasError && !loading;
+
+  /* =========================
+     RENDER
+  ========================= */
+
   return (
-    <div className="field">
+    <div
+      className={`field 
+        ${hasError ? "field-error-state" : ""}
+        ${isSuccess ? "field-success-state" : ""}
+        ${loading ? "field-loading-state" : ""}
+      `}
+    >
+      {/* LABEL */}
+      {label && (
+        <label className="field-label">
+          {label}
 
-      {label && <label className="field-label">{label}</label>}
+          {/* STATUS INDICATORS */}
+          <span className="field-status">
+            {loading && <span className="field-loading">⏳</span>}
+            {isSuccess && <span className="field-success">✓</span>}
+          </span>
+        </label>
+      )}
 
-      {children}
+      {/* INPUT */}
+      <div className="field-control">{children}</div>
 
-      {hint && <div className="field-hint">{hint}</div>}
-      {error && <div className="field-error">{error}</div>}
+      {/* HINT */}
+      {!error && hint && (
+        <div className="field-hint">{hint}</div>
+      )}
 
+      {/* ERROR */}
+      {error && (
+        <div className="field-error">
+          {error}
+        </div>
+      )}
     </div>
   );
 }

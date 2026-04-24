@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Autocomplete, useJsApiLoader } from "@react-google-maps/api";
 
@@ -10,41 +10,168 @@ import Card from "../../components/UI/Card";
 import Section from "../../components/UI/Section";
 import Button from "../../components/UI/Button";
 
-// 🔥 NEW FORM SYSTEM
-import Input from "../../components/UI/Form/Input";
-import Select from "../../components/UI/Form/Select";
-import Field from "../../components/UI/Form/Field";
+import FormBuilder from "../../components/UI/Form/FormBuilder";
+import useForm from "../../hooks/useForm";
 
 import "../../styles/system.css";
 
 const GOOGLE_LIBRARIES = ["places"];
 
-export default function CommunityPlusUserProfile({ mode = "edit" }) {
+/* =========================
+   CONFIG
+========================= */
+
+const PROFILE_STEPS = [
+  {
+    title: "Identity",
+    fields: [
+      { name: "username", label: "Username", readOnly: true },
+      {
+        name: "userType",
+        label: "Account Type",
+        type: "select",
+        options: [
+          { value: "PERSONAL", label: "Personal" },
+          { value: "BUSINESS", label: "Business" },
+        ],
+      },
+    ],
+  },
+  {
+    title: "Home",
+    fields: [
+      { name: "homeLocation", label: "Home Location", type: "location" },
+    ],
+  },
+  {
+    title: "Contact",
+    fields: [
+      {
+        name: "phone",
+        label: "Phone",
+        validate: (v) => {
+          if (!v) return "Phone required";
+          if (!/^\d{8,15}$/.test(v)) return "Invalid phone";
+          return null;
+        },
+      },
+    ],
+  },
+  {
+    title: "Social",
+    fields: [
+      {
+        name: "social.instagram",
+        label: "Instagram",
+        validate: (v) =>
+          v && !v.startsWith("@") ? "Must start with @" : null,
+      },
+    ],
+  },
+  {
+    title: "Payment",
+    fields: [
+      {
+        name: "card.number",
+        label: "Card Number",
+        validate: (v) =>
+          v && v.length < 12 ? "Invalid card number" : null,
+      },
+    ],
+  },
+];
+
+/* =========================
+   VALIDATOR BUILDER
+========================= */
+
+const buildValidator = (steps) => {
+  return (values) => {
+    const errors = {};
+
+    const setIn = (obj, path, value) => {
+      const keys = path.split(".");
+      let curr = obj;
+
+      keys.forEach((key, i) => {
+        if (i === keys.length - 1) {
+          curr[key] = value;
+        } else {
+          curr[key] = curr[key] || {};
+          curr = curr[key];
+        }
+      });
+    };
+
+    steps.forEach((step) => {
+      step.fields.forEach((field) => {
+        if (!field.validate) return;
+
+        const value = field.name
+          .split(".")
+          .reduce((acc, key) => acc?.[key], values);
+
+        const error = field.validate(value, values);
+
+        if (error) setIn(errors, field.name, error);
+      });
+    });
+
+    return errors;
+  };
+};
+
+/* =========================
+   COMPONENT
+========================= */
+
+export default function CommunityPlusUserProfile() {
   const navigate = useNavigate();
   const autoRef = useRef(null);
 
   const { appUser, setAppUser } = useAuth();
   const { homeLocation, setHome } = useLocationContext();
 
-  const [formData, setFormData] = useState({
-    username: "",
-    display_name: "",
-    userType: "PERSONAL",
-    phone: "",
-    social: { youtube: "", twitter: "", instagram: "" },
-    card: { number: "", expiry: "", cvc: "", name: "" },
+  /* =========================
+     FORM
+  ========================= */
+
+  const validate = useMemo(
+    () => buildValidator(PROFILE_STEPS),
+    []
+  );
+
+  const form = useForm({
+    initialValues: {
+      username: "",
+      display_name: "",
+      userType: "PERSONAL",
+      phone: "",
+      social: { instagram: "", twitter: "" },
+      card: { number: "" },
+    },
+    validate,
+    persistKey: "profile-form", // 🔥 autosave enabled
   });
+
+  const {
+    values,
+    validateAll,
+    setValue,
+    isFormValidating,
+    clearStorage,
+  } = form;
 
   const [manualAddress, setManualAddress] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [currentStep, setCurrentStep] = useState(0);
 
-  const steps = ["Identity", "Home", "Contact", "Social", "Payment"];
+  const steps = PROFILE_STEPS.map((s) => s.title);
 
-  /* ==============================
+  /* =========================
      PREFILL
-  ============================== */
+  ========================= */
 
   useEffect(() => {
     if (!appUser?.user) return;
@@ -52,37 +179,13 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
     const email = appUser.user.email || "";
     const prefix = email.split("@")[0];
 
-    setFormData((prev) => ({
-      ...prev,
-      username: prefix,
-      display_name: prefix.slice(0, 2).toUpperCase(),
-    }));
-  }, [appUser]);
+    setValue("username", prefix);
+    setValue("display_name", prefix.slice(0, 2).toUpperCase());
+  }, [appUser?.user?.email]);
 
-  useEffect(() => {
-    if (!appUser?.profile) return;
-
-    const p = appUser.profile;
-
-    setFormData((prev) => ({
-      ...prev,
-      username: p.username || prev.username,
-      display_name: p.display_name || prev.display_name,
-      userType: p.user_type || prev.userType,
-      phone: p.phone || "",
-      social: p.social || prev.social,
-      card: p.payment || prev.card,
-    }));
-
-    if (p.homeLocation) {
-      setManualAddress(p.homeLocation.label || "");
-      setHome(p.homeLocation);
-    }
-  }, [appUser]);
-
-  /* ==============================
+  /* =========================
      GOOGLE
-  ============================== */
+  ========================= */
 
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
@@ -90,6 +193,8 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
   });
 
   const onPlaceChanged = () => {
+    if (!isLoaded) return;
+
     const place = autoRef.current?.getPlace();
     if (!place?.geometry) return;
 
@@ -103,23 +208,21 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
     setHome(loc);
   };
 
-  /* ==============================
-     ACTIONS
-  ============================== */
+  /* =========================
+     SAVE
+  ========================= */
 
   const handleSave = async () => {
+    const isValid = await validateAll();
+    if (!isValid) return;
+
     try {
       setSaving(true);
       setError("");
 
       const payload = {
         user_id: appUser?.user?.id,
-        username: formData.username,
-        display_name: formData.display_name,
-        user_type: formData.userType,
-        phone: formData.phone,
-        social: formData.social,
-        payment: formData.card,
+        ...values,
         homeLocation,
       };
 
@@ -135,6 +238,9 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Save failed");
 
+      // 🔥 clear autosave
+      clearStorage();
+
       setAppUser((prev) => ({
         ...prev,
         hasProfile: true,
@@ -144,28 +250,36 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
       navigate("/home", { replace: true });
 
     } catch (err) {
-      setError(err.message || "Failed to save profile");
+      setError(err.message);
     } finally {
       setSaving(false);
     }
   };
 
-  const nextStep = () => setCurrentStep((s) => Math.min(s + 1, steps.length - 1));
-  const prevStep = () => setCurrentStep((s) => Math.max(s - 1, 0));
+  /* =========================
+     NAVIGATION
+  ========================= */
 
-  /* ==============================
+  const nextStep = () =>
+    setCurrentStep((s) =>
+      Math.min(s + 1, PROFILE_STEPS.length - 1)
+    );
+
+  const prevStep = () =>
+    setCurrentStep((s) => Math.max(s - 1, 0));
+
+  /* =========================
      RENDER
-  ============================== */
+  ========================= */
 
   return (
     <div className="page-container">
 
       <PageHeader
-        title={mode === "edit" ? "Edit Profile" : "Create Profile"}
+        title="Edit Profile"
         meta="Complete your profile to unlock platform features"
       />
 
-      {/* STEP NAV */}
       <div className="profile-page-steps">
         {steps.map((step, i) => (
           <span
@@ -180,116 +294,24 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
 
       <div className="page-layout">
 
-        {/* LEFT */}
         <Card>
-
           <Section>
-
-            {/* STEP 1 */}
-            {currentStep === 0 && (
-              <>
-                <Field label="Username">
-                  <Input value={formData.username} readOnly />
-                </Field>
-
-                <Field label="Display Name">
-                  <Input value={formData.display_name} readOnly />
-                </Field>
-
-                <Field label="Account Type">
-                  <Select
-                    value={formData.userType}
-                    onChange={(e) =>
-                      setFormData({ ...formData, userType: e.target.value })
-                    }
-                  >
-                    <option value="PERSONAL">Personal</option>
-                    <option value="BUSINESS">Business</option>
-                  </Select>
-                </Field>
-              </>
-            )}
-
-            {/* STEP 2 */}
-            {currentStep === 1 && isLoaded && (
-              <Field label="Home Location">
-                <Autocomplete
-                  onLoad={(auto) => (autoRef.current = auto)}
-                  onPlaceChanged={onPlaceChanged}
-                >
-                  <Input
-                    value={manualAddress}
-                    onChange={(e) => setManualAddress(e.target.value)}
-                    placeholder="Enter address"
-                  />
-                </Autocomplete>
-              </Field>
-            )}
-
-            {/* STEP 3 */}
-            {currentStep === 2 && (
-              <Field label="Phone">
-                <Input
-                  value={formData.phone}
-                  onChange={(e) =>
-                    setFormData({ ...formData, phone: e.target.value })
-                  }
-                  placeholder="Enter phone"
-                />
-              </Field>
-            )}
-
-            {/* STEP 4 */}
-            {currentStep === 3 && (
-              <>
-                <Field label="Instagram">
-                  <Input
-                    value={formData.social.instagram}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        social: { ...formData.social, instagram: e.target.value },
-                      })
-                    }
-                  />
-                </Field>
-
-                <Field label="Twitter">
-                  <Input
-                    value={formData.social.twitter}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        social: { ...formData.social, twitter: e.target.value },
-                      })
-                    }
-                  />
-                </Field>
-              </>
-            )}
-
-            {/* STEP 5 */}
-            {currentStep === 4 && (
-              <>
-                <Field label="Card Number">
-                  <Input
-                    value={formData.card.number}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        card: { ...formData.card, number: e.target.value },
-                      })
-                    }
-                  />
-                </Field>
-              </>
-            )}
-
+            <FormBuilder
+              steps={PROFILE_STEPS}
+              currentStep={currentStep}
+              form={form}
+              extra={{
+                Autocomplete,
+                autoRef,
+                manualAddress,
+                setManualAddress,
+                onPlaceChanged,
+                isLoaded,
+              }}
+            />
           </Section>
 
-          {/* NAV */}
           <div className="form-navigation">
-
             <Button variant="ghost" onClick={() => navigate("/home")}>
               Close
             </Button>
@@ -301,22 +323,22 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
                 </Button>
               )}
 
-              {currentStep < steps.length - 1 ? (
+              {currentStep < PROFILE_STEPS.length - 1 ? (
                 <Button onClick={nextStep}>Next</Button>
               ) : (
-                <Button onClick={handleSave} disabled={saving}>
-                  Save
+                <Button
+                  onClick={handleSave}
+                  disabled={saving || isFormValidating}
+                >
+                  {isFormValidating ? "Validating..." : "Save"}
                 </Button>
               )}
             </div>
-
           </div>
 
           {error && <div className="error">{error}</div>}
-
         </Card>
 
-        {/* RIGHT */}
         <Card variant="soft">
           <Section
             title="Profile Guide"
@@ -325,7 +347,6 @@ export default function CommunityPlusUserProfile({ mode = "edit" }) {
         </Card>
 
       </div>
-
     </div>
   );
 }
