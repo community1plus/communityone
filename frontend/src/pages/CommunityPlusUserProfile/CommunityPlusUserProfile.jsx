@@ -13,6 +13,7 @@ import FormBuilder from "../../components/UI/Form/FormBuilder";
 import useForm from "../../hooks/useForm";
 
 import "../../styles/system.css";
+import "./CommunityPlusUserProfile.css";
 
 
 const GOOGLE_LIBRARIES = ["places"];
