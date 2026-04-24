@@ -1,21 +1,16 @@
 /* =====================================================
-CONTAINER (ALIGNED WITH DASHBOARD SYSTEM)
+CONTAINER
 ===================================================== */
 
 .profile-container {
-  flex: 1; /* 🔥 critical */
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-/* optional vertical centering (page-specific) */
-.profile-container.centered {
-  justify-content: center;
-}
-
 /* =====================================================
-HEADER (TITLE + STEPS)
+HEADER
 ===================================================== */
 
 .profile-page-header {
@@ -29,41 +24,84 @@ HEADER (TITLE + STEPS)
   font-weight: 700;
 }
 
-.profile-page-steps {
+/* =====================================================
+🔥 STEPPER SYSTEM
+===================================================== */
+
+.profile-stepper {
   display: flex;
-  gap: 18px;
+  flex-direction: column;
+  gap: 12px;
+}
 
-  font-size: 14px;
+/* progress bar */
+.progress-bar {
+  width: 100%;
+  height: 4px;
+  background: #eee;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #4a0f0f;
+  transition: width 0.25s ease;
+}
+
+/* steps */
+.profile-page-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+/* step */
+.step {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 8px 10px;
+  border-radius: 10px;
+
+  font-size: 13px;
   font-weight: 600;
+
+  background: #fff;
   color: #8c837a;
-}
 
-.profile-page-steps .step {
   cursor: pointer;
-  transition: color 0.15s ease;
+  transition: all 0.15s ease;
 }
 
-.profile-page-steps .step:hover {
-  color: #444;
+/* hover */
+.step:hover {
+  background: rgba(0, 0, 0, 0.05);
 }
 
-.profile-page-steps .step.active {
-  color: #4a0f0f;
-  font-weight: 700;
+/* active */
+.step.active {
+  background: #4a0f0f;
+  color: #fff;
+}
+
+/* completed */
+.step.complete {
+  background: #e8e3df;
+  color: #2c2c2c;
 }
 
 /* =====================================================
-LAYOUT (STRETCH FIX 🔥)
+LAYOUT
 ===================================================== */
 
 .profile-layout {
-  flex: 1; /* 🔥 fills vertical space */
+  flex: 1;
 
   display: grid;
   grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
   gap: 20px;
-
-  align-items: stretch;
 }
 
 .profile-layout > * {
@@ -71,7 +109,7 @@ LAYOUT (STRETCH FIX 🔥)
 }
 
 /* =====================================================
-CARD SYSTEM (ALIGNED WITH GLOBAL UI)
+CARDS
 ===================================================== */
 
 .profile-left,
@@ -85,131 +123,42 @@ CARD SYSTEM (ALIGNED WITH GLOBAL UI)
   box-shadow: 0 8px 24px rgba(20, 20, 20, 0.06);
 }
 
-/* LEFT (FORM CARD) */
+/* left */
 .profile-left {
-  flex: 1; /* 🔥 stretch */
   background: #fff;
   padding: 24px;
   gap: 16px;
 }
 
-/* RIGHT (GUIDE PANEL) */
+/* right */
 .profile-guide {
-  flex: 1; /* 🔥 stretch */
   background: #faf7f4;
   padding: 22px 24px;
   gap: 10px;
+
+  position: sticky;
+  top: 20px;
+  height: fit-content;
 }
 
 /* =====================================================
-FORM BUILDER COMPATIBILITY
+FORM
 ===================================================== */
 
-/* spacing between generated fields */
 .profile-left .field {
   margin-bottom: 6px;
 }
 
 /* =====================================================
-LOCATION SECTION
-===================================================== */
-
-.location-section {
-  margin-top: 6px;
-  padding: 14px;
-
-  border-radius: 12px;
-  border: 1px solid #eee;
-
-  background: #fafafa;
-
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-/* =====================================================
-FORM NAVIGATION
+NAVIGATION
 ===================================================== */
 
 .form-navigation {
-  margin-top: auto; /* 🔥 pushes to bottom */
+  margin-top: auto;
 
   display: flex;
   justify-content: space-between;
   align-items: center;
-
-  padding-top: 16px;
-}
-
-/* =====================================================
-ERROR
-===================================================== */
-
-.error {
-  font-size: 13px;
-  color: #c44536;
-}
-
-/* =====================================================
-FILE LIST (UNCHANGED BUT CLEANED)
-===================================================== */
-
-.file-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.file-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-
-  padding: 10px;
-
-  border: 1px solid #eee;
-  border-radius: 10px;
-  background: #fff;
-}
-
-.file-thumb {
-  width: 48px;
-  height: 48px;
-  border-radius: 8px;
-  overflow: hidden;
-
-  background: #f4f4f4;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.file-thumb img,
-.file-thumb video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.file-info {
-  flex: 1;
-}
-
-.file-name {
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.file-meta {
-  font-size: 11px;
-  color: #777;
-}
-
-.file-actions {
-  display: flex;
-  gap: 6px;
 }
 
 /* =====================================================
@@ -219,5 +168,9 @@ RESPONSIVE
 @media (max-width: 900px) {
   .profile-layout {
     grid-template-columns: 1fr;
+  }
+
+  .profile-guide {
+    position: static;
   }
 }
