@@ -15,7 +15,7 @@ import { Hub } from "aws-amplify/utils";
    STORAGE
 ========================= */
 
-const STORAGE_KEY = "auth_cache_v3";
+const STORAGE_KEY = "auth_cache_v5";
 
 /* =========================
    CONTEXT
@@ -31,17 +31,13 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [appUser, setAppUser] = useState(undefined);
 
+  const [token, setToken] = useState(null);
+
   const [loading, setLoading] = useState(true);
   const [initialized, setInitialized] = useState(false);
 
   const mountedRef = useRef(true);
   const loadingRef = useRef(false);
-
-  /* =========================
-     TOKEN (🔥 NEW)
-  ========================= */
-
-  const [token, setToken] = useState(null);
 
   /* =========================
      CACHE LOAD
@@ -84,7 +80,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   /* =========================
-     LOAD USER
+     LOAD USER (🔥 FIXED CORE)
   ========================= */
 
   const loadUser = useCallback(async () => {
@@ -94,15 +90,28 @@ export function AuthProvider({ children }) {
 
     try {
       const session = await fetchAuthSession();
-
       const tokens = session?.tokens;
 
-      if (!tokens?.idToken) {
+      /* =========================
+         🔥 HANDLE NO TOKEN (FIX)
+      ========================= */
+
+      if (!tokens?.accessToken) {
+        console.warn("⚠️ No access token");
+
+        if (mountedRef.current) {
+          setUser(null);
+          setAppUser(null);
+          setToken(null);
+          setLoading(false);
+          setInitialized(true); // 🔥 CRITICAL FIX
+        }
+
         return;
       }
 
-      const idToken = tokens.idToken.toString();
-      const payload = tokens.idToken.payload || {};
+      const accessToken = tokens.accessToken.toString();
+      const payload = tokens.idToken?.payload || {};
 
       const normalizedUser = {
         authenticated: true,
@@ -114,7 +123,7 @@ export function AuthProvider({ children }) {
 
       if (mountedRef.current) {
         setUser(normalizedUser);
-        setToken(idToken);
+        setToken(accessToken);
       }
 
       /* =========================
@@ -128,12 +137,15 @@ export function AuthProvider({ children }) {
           "https://communityone-backend.onrender.com/api/users/me",
           {
             headers: {
-              Authorization: `Bearer ${idToken}`,
+              Authorization: `Bearer ${accessToken}`,
             },
           }
         );
 
-        if (res.status !== 401) {
+        if (res.status === 401) {
+          console.warn("⚠️ /me unauthorized");
+          appUserData = null;
+        } else {
           const data = await res.json();
 
           appUserData = {
@@ -142,16 +154,15 @@ export function AuthProvider({ children }) {
             profile: data?.profile || null,
           };
         }
-
-      } catch {
-        console.warn("Backend sync failed");
+      } catch (err) {
+        console.error("Backend sync failed:", err);
       }
 
       if (mountedRef.current) {
         setAppUser(appUserData);
       }
 
-      persistCache(normalizedUser, appUserData, idToken);
+      persistCache(normalizedUser, appUserData, accessToken);
 
     } catch (err) {
       console.error("Auth error:", err);
@@ -194,6 +205,8 @@ export function AuthProvider({ children }) {
     const unsub = Hub.listen("auth", ({ payload }) => {
       const event = payload?.event;
 
+      console.log("🔔 Auth event:", event);
+
       if (event === "signedIn" || event === "tokenRefresh") {
         loadUser();
       }
@@ -235,7 +248,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   /* =========================
-     MEMO VALUE
+     CONTEXT VALUE
   ========================= */
 
   const value = useMemo(
@@ -243,7 +256,7 @@ export function AuthProvider({ children }) {
       user,
       appUser,
       setAppUser,
-      token,          // 🔥 NEW
+      token,
       loading,
       initialized,
       logout,
