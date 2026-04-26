@@ -15,7 +15,6 @@ import useForm from "../../hooks/useForm";
 import "../../styles/system.css";
 import "./CommunityPlusUserProfile.css";
 
-
 const GOOGLE_LIBRARIES = ["places"];
 
 /* =========================
@@ -66,17 +65,6 @@ const PROFILE_STEPS = [
         label: "Instagram",
         validate: (v) =>
           v && !v.startsWith("@") ? "Must start with @" : null,
-      },
-    ],
-  },
-  {
-    title: "Payment",
-    fields: [
-      {
-        name: "card.number",
-        label: "Card Number",
-        validate: (v) =>
-          v && v.length < 12 ? "Invalid card number" : null,
       },
     ],
   },
@@ -131,10 +119,7 @@ export default function CommunityPlusUserProfile() {
   const { appUser, setAppUser } = useAuth();
   const { homeLocation, setHome } = useLocationContext();
 
-  const validate = useMemo(
-    () => buildValidator(PROFILE_STEPS),
-    []
-  );
+  const validate = useMemo(() => buildValidator(PROFILE_STEPS), []);
 
   const form = useForm({
     initialValues: {
@@ -143,7 +128,6 @@ export default function CommunityPlusUserProfile() {
       userType: "PERSONAL",
       phone: "",
       social: { instagram: "", twitter: "" },
-      card: { number: "" },
     },
     validate,
     persistKey: "profile-form",
@@ -177,8 +161,13 @@ export default function CommunityPlusUserProfile() {
     const email = appUser.user.email || "";
     const prefix = email.split("@")[0];
 
-    setValue("username", prefix);
-    setValue("display_name", prefix.slice(0, 2).toUpperCase());
+    if (!values.username) {
+      setValue("username", prefix);
+    }
+
+    if (!values.display_name) {
+      setValue("display_name", prefix.slice(0, 2).toUpperCase());
+    }
   }, [appUser?.user?.email]);
 
   /* =========================
@@ -248,9 +237,12 @@ export default function CommunityPlusUserProfile() {
         "https://communityone-backend.onrender.com/api/profile",
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            // 🔥 ADD TOKEN WHEN READY
+            // Authorization: `Bearer ${token}`
+          },
           body: JSON.stringify({
-            user_id: appUser?.user?.id,
             ...values,
             homeLocation,
           }),
@@ -284,48 +276,55 @@ export default function CommunityPlusUserProfile() {
   return (
     <div className="profile-container">
 
-      {/* HEADER */}
-      <div className="profile-page-header">
-        <PageHeader
-          title="Edit Profile"
-          meta="Complete your profile to unlock platform features"
-        />
-
-        {/* STEPPER */}
-        <div className="profile-stepper">
-
-          <div className="progress-bar">
-            <div
-              className="progress-fill"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-
-          <div className="profile-page-steps">
-            {steps.map((step, i) => {
-              const active = i === currentStep;
-              const complete = i < currentStep;
-
-              return (
-                <div
-                  key={step}
-                  className={`step ${active ? "active" : ""} ${complete ? "complete" : ""}`}
-                  onClick={() => setCurrentStep(i)}
-                >
-                  {step}
-                </div>
-              );
-            })}
-          </div>
-
-        </div>
-      </div>
-
-      {/* MAIN */}
       <div className="profile-layout">
 
         {/* LEFT */}
         <div className="profile-left">
+
+          {/* HEADER */}
+          <div className="profile-page-header">
+            <PageHeader
+              title="Edit Profile"
+              meta="Complete your profile to unlock platform features"
+            />
+
+            <div className="profile-stepper">
+              <div className="progress-bar">
+                <div
+                  className="progress-fill"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+
+              <div className="profile-page-steps">
+                {steps.map((step, i) => {
+                  const active = i === currentStep;
+                  const complete = i < currentStep;
+
+                  return (
+                    <div
+                      key={step}
+                      className={`step ${active ? "active" : ""} ${complete ? "complete" : ""}`}
+                      onClick={async () => {
+                        if (i === currentStep) return;
+
+                        if (i > currentStep) {
+                          const ok = await validateStep();
+                          if (!ok) return;
+                        }
+
+                        setCurrentStep(i);
+                      }}
+                    >
+                      {step}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* FORM */}
           <Section>
             <FormBuilder
               steps={PROFILE_STEPS}
@@ -342,6 +341,7 @@ export default function CommunityPlusUserProfile() {
             />
           </Section>
 
+          {/* NAV */}
           <div className="form-navigation">
 
             <Button variant="ghost" onClick={() => navigate("/home")}>
@@ -362,7 +362,11 @@ export default function CommunityPlusUserProfile() {
                   onClick={handleSave}
                   disabled={saving || isFormValidating}
                 >
-                  {isFormValidating ? "Validating..." : "Save"}
+                  {saving
+                    ? "Saving..."
+                    : isFormValidating
+                    ? "Validating..."
+                    : "Save"}
                 </Button>
               )}
             </div>
