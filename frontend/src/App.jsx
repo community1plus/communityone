@@ -99,7 +99,7 @@ export default function App() {
         {/* =========================
            CORE
         ========================= */}
-        <Route path="home" element={<Home />} />
+        <Route path="home" element={<CommunityPlusHome />} />
         <Route path="communityplus" element={<CommunityPlusHub />} />
         <Route path="channels" element={<CommunityPlusAdTvPage />} />
 
