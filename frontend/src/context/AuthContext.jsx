@@ -1,150 +1,272 @@
-const loadUser = useCallback(async () => {
-  if (!mountedRef.current) return;
-  if (loadingRef.current) return;
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useRef,
+  useCallback,
+} from "react";
 
-  loadingRef.current = true;
+import { fetchAuthSession, signOut } from "aws-amplify/auth";
+import { Hub } from "aws-amplify/utils";
 
-  try {
-    // 🔥 small delay → allow Amplify to hydrate after redirect
-    await new Promise((r) => setTimeout(r, 100));
+/* =========================
+   CONTEXT
+========================= */
 
-    let session;
+const AuthContext = createContext(null);
 
-    /* =========================
-       SAFE SESSION FETCH
-    ========================= */
+/* =========================
+   PROVIDER
+========================= */
+
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(null);
+  const [appUser, setAppUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const loadingRef = useRef(false);
+  const mountedRef = useRef(true);
+
+  /* =========================
+     LOAD USER (🔥 HARDENED)
+  ========================= */
+
+  const loadUser = useCallback(async () => {
+    if (!mountedRef.current || loadingRef.current) return;
+
+    loadingRef.current = true;
 
     try {
-      session = await fetchAuthSession({ forceRefresh: true });
+      /* =========================
+         HYDRATION DELAY
+      ========================= */
+      await new Promise((r) => setTimeout(r, 100));
+
+      let session;
+
+      /* =========================
+         SAFE SESSION FETCH
+      ========================= */
+
+      try {
+        session = await fetchAuthSession({ forceRefresh: true });
+      } catch {
+        console.log("⚠️ No active session");
+
+        if (mountedRef.current) {
+          setUser(null);
+          setAppUser(null);
+        }
+        return;
+      }
+
+      let tokens = session?.tokens;
+
+      /* =========================
+         TOKEN RETRY (🔥 KEY FIX)
+      ========================= */
+
+      if (!tokens?.idToken || !tokens?.accessToken) {
+        console.log("⚠️ Missing tokens → retry");
+
+        await new Promise((r) => setTimeout(r, 400));
+
+        try {
+          const retrySession = await fetchAuthSession();
+          tokens = retrySession?.tokens;
+
+          if (!tokens?.idToken || !tokens?.accessToken) {
+            console.log("❌ Tokens still missing");
+
+            if (mountedRef.current) {
+              setUser(null);
+              setAppUser(null);
+            }
+            return;
+          }
+
+          session = retrySession;
+
+        } catch {
+          console.log("❌ Retry failed");
+
+          if (mountedRef.current) {
+            setUser(null);
+            setAppUser(null);
+          }
+          return;
+        }
+      }
+
+      /* =========================
+         NORMALISE USER
+      ========================= */
+
+      const idToken = tokens.idToken;
+      const accessToken = tokens.accessToken;
+
+      const idPayload = idToken.payload || {};
+      const accessPayload = accessToken.payload || {};
+
+      const normalizedUser = {
+        authenticated: true,
+        sub: idPayload.sub || null,
+        email: idPayload.email || null,
+        email_verified: idPayload.email_verified || false,
+        username:
+          accessPayload.username ||
+          idPayload["cognito:username"] ||
+          idPayload.username ||
+          null,
+        name: idPayload.name || null,
+      };
+
+      if (mountedRef.current) {
+        setUser(normalizedUser);
+      }
+
+      /* =========================
+         BACKEND USER
+      ========================= */
+
+      try {
+        const res = await fetch(
+          "https://communityone-backend.onrender.com/api/users/me",
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${idToken.toString()}`,
+            },
+          }
+        );
+
+        const data = await res.json();
+
+        if (mountedRef.current) {
+          setAppUser({
+            user: data?.user || null,
+            hasProfile: data?.hasProfile || false,
+            profile: data?.profile || null,
+          });
+        }
+
+      } catch (err) {
+        console.error("❌ Backend fetch failed:", err);
+
+        if (mountedRef.current) {
+          setAppUser({
+            user: null,
+            hasProfile: false,
+            profile: null,
+          });
+        }
+      }
+
     } catch (err) {
-      console.log("⚠️ No active session (expected)");
+      console.error("❌ Auth fatal error:", err);
 
       if (mountedRef.current) {
         setUser(null);
         setAppUser(null);
       }
 
-      return;
+    } finally {
+      if (mountedRef.current) {
+        setLoading(false);
+      }
+
+      loadingRef.current = false;
     }
+  }, []);
 
-    let tokens = session?.tokens;
+  /* =========================
+     INITIAL LOAD
+  ========================= */
 
-    /* =========================
-       🔥 TOKEN RETRY (CRITICAL FIX)
-    ========================= */
+  useEffect(() => {
+    mountedRef.current = true;
+    loadUser();
 
-    if (!tokens?.idToken || !tokens?.accessToken) {
-      console.log("⚠️ Missing tokens, retrying...");
+    return () => {
+      mountedRef.current = false;
+    };
+  }, [loadUser]);
 
-      await new Promise((r) => setTimeout(r, 500));
+  /* =========================
+     AUTH EVENTS
+  ========================= */
 
-      try {
-        const retrySession = await fetchAuthSession();
-        tokens = retrySession?.tokens;
+  useEffect(() => {
+    const unsub = Hub.listen("auth", ({ payload }) => {
+      const event = payload?.event;
 
-        if (!tokens?.idToken || !tokens?.accessToken) {
-          console.log("❌ Still no tokens after retry");
+      console.log("🔔 Auth event:", event);
 
-          if (mountedRef.current) {
-            setUser(null);
-            setAppUser(null);
-          }
+      if (event === "signedIn" || event === "tokenRefresh") {
+        setLoading(true);
+        loadUser();
+      }
 
-          return;
-        }
-
-        session = retrySession;
-
-      } catch (err) {
-        console.log("❌ Retry failed");
-
+      if (event === "signedOut") {
         if (mountedRef.current) {
           setUser(null);
           setAppUser(null);
+          setLoading(false);
         }
-
-        return;
       }
-    }
+    });
 
-    /* =========================
-       NORMAL FLOW
-    ========================= */
+    return () => unsub();
+  }, [loadUser]);
 
-    const idToken = tokens.idToken;
-    const accessToken = tokens.accessToken;
+  /* =========================
+     SOFT LOGOUT (🔥 FINAL)
+  ========================= */
 
-    const idPayload = idToken.payload || {};
-    const accessPayload = accessToken.payload || {};
-
-    const normalizedUser = {
-      authenticated: true,
-      sub: idPayload.sub || null,
-      email: idPayload.email || null,
-      email_verified: idPayload.email_verified || false,
-      username:
-        accessPayload.username ||
-        idPayload["cognito:username"] ||
-        idPayload.username ||
-        null,
-      name: idPayload.name || null,
-    };
-
-    if (mountedRef.current) {
-      setUser(normalizedUser);
-    }
-
-    /* =========================
-       BACKEND USER
-    ========================= */
-
+  const logout = useCallback(async () => {
     try {
-      const res = await fetch(
-        "https://communityone-backend.onrender.com/api/users/me",
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${idToken.toString()}`,
-          },
-        }
-      );
-
-      const data = await res.json();
-
-      if (mountedRef.current) {
-        setAppUser({
-          user: data?.user || null,
-          hasProfile: data?.hasProfile || false,
-          profile: data?.profile || null,
-        });
-      }
-
+      await signOut({ global: true });
     } catch (err) {
-      console.error("❌ Backend fetch failed:", err);
-
+      console.error("Logout error:", err);
+    } finally {
       if (mountedRef.current) {
-        setAppUser({
-          user: null,
-          hasProfile: false,
-          profile: null,
-        });
+        setUser(null);
+        setAppUser(null);
+        setLoading(false);
       }
     }
+  }, []);
 
-  } catch (err) {
-    console.error("❌ Auth fatal error:", err);
+  /* =========================
+     CONTEXT VALUE
+  ========================= */
 
-    if (mountedRef.current) {
-      setUser(null);
-      setAppUser(null);
-    }
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        appUser,
+        setAppUser,
+        loading,
+        logout,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+}
 
-  } finally {
-    if (mountedRef.current) {
-      setLoading(false);
-    }
+/* =========================
+   HOOK (🔥 REQUIRED EXPORT)
+========================= */
 
-    loadingRef.current = false;
+export function useAuth() {
+  const context = useContext(AuthContext);
+
+  if (!context) {
+    throw new Error("useAuth must be used within AuthProvider");
   }
-}, []);
+
+  return context;
+}
