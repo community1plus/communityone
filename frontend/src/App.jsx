@@ -1,6 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
-
 import CommunityPlusLandingPage from "./pages/CommunityPlusLandingPage/CommunityPlusLandingPage";
 import CommunityPlusDashboard from "./pages/Dashboard/CommunityPlusDashboard";
 import Onboarding from "./pages/Onboarding/CommunityPlusOnboarding";
@@ -12,8 +11,7 @@ import PostComposer from "./components/Layout/Sidebar/Post/PostComposer";
 import CommunityPlusAdTvPage from "./pages/CommunityPlusAdTvPage/CommunityPlusAdTvPage";
 
 // 🔥 replace later with your real Home (feed + map)
-import Home from "./pages/Home/Home";
-
+import CommunityPlusHome from "./pages/CommunityPlusHome/CommunityPlusHome"
 import "./styles/tokens.css";
 import "./styles/base.css";
 import "./Typography/Typography.css";
