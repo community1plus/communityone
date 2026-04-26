@@ -3,7 +3,7 @@ import { signOut } from "aws-amplify/auth";
 import { useNavigate, Outlet, useLocation } from "react-router-dom";
 
 import { useAuth } from "../../context/AuthContext";
-import { MapProvider, useMap } from "../../../context/MapContext";
+import { MapProvider, useMap } from "../../context/MapContext";
 import useVoiceAlerts from "../../hooks/useVoiceAlerts";
 import CommunityPlusHeader from "../../components/Layout/Header/CommunityPlusHeader";
 import CommunityPlusSidebar from "../../components/Layout/Sidebar/CommunityPlusSidebar";
