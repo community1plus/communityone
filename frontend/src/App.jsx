@@ -1,8 +1,8 @@
-import { Routes, Route, Navigate, Outlet } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 
 /* =========================
-   PAGES (✅ VERIFY PATHS)
+   PAGES
 ========================= */
 
 import CommunityPlusLandingPage from "./pages/CommunityPlusLandingPage/CommunityPlusLandingPage";
@@ -11,11 +11,11 @@ import Onboarding from "./pages/Onboarding/CommunityPlusOnboarding";
 import AuthGate from "./pages/AuthGate";
 import CommunityPlusUserProfile from "./pages/CommunityPlusUserProfile/CommunityPlusUserProfile";
 import CommunityPlusYellowPages from "./pages/YellowPages/CommunityPlusYellowPages";
-import CommunityPlusHub from "./pages/CommunityPlusHub/CommunityPlusHub";
+import CommunityPlusHub from "./pages/CommunityPlusHub/CommunityPlusHub"; // ✅ FIXED
 import CommunityPlusAdTvPage from "./pages/CommunityPlusAdTvPage/CommunityPlusAdTvPage";
 import CommunityPlusHome from "./pages/CommunityPlusHome/CommunityPlusHome";
 
-/* 🔥 IMPORTANT: this path is often wrong */
+/* 🔥 check this path exists */
 import PostComposer from "./components/Layout/Sidebar/Post/PostComposer";
 
 /* =========================
@@ -36,31 +36,27 @@ function AppLoading() {
 }
 
 /* =========================
-   ROUTE GUARDS (SIMPLIFIED)
+   ROUTE GUARDS (FIXED)
 ========================= */
 
-function RequireAuth() {
-  const { user, loading } = useAuth();
-
+function ProtectedRoute({ user, loading, children }) {
   if (loading) return <AppLoading />;
 
   if (!user?.authenticated) {
     return <Navigate to="/" replace />;
   }
 
-  return <Outlet />;
+  return children;
 }
 
-function RequirePublic() {
-  const { user, loading } = useAuth();
-
+function PublicRoute({ user, loading, children }) {
   if (loading) return <AppLoading />;
 
   if (user?.authenticated) {
     return <Navigate to="/auth-gate" replace />;
   }
 
-  return <Outlet />;
+  return children;
 }
 
 /* =========================
@@ -68,56 +64,71 @@ function RequirePublic() {
 ========================= */
 
 export default function App() {
+  const { user, loading } = useAuth();
+
   return (
     <Routes>
 
       {/* =========================
          PUBLIC
       ========================= */}
-      <Route element={<RequirePublic />}>
-        <Route path="/" element={<CommunityPlusLandingPage />} />
-      </Route>
+      <Route
+        path="/"
+        element={
+          <PublicRoute user={user} loading={loading}>
+            <CommunityPlusLandingPage />
+          </PublicRoute>
+        }
+      />
 
       {/* =========================
          AUTH GATE
       ========================= */}
-      <Route element={<RequireAuth />}>
-        <Route path="/auth-gate" element={<AuthGate />} />
-      </Route>
+      <Route
+        path="/auth-gate"
+        element={
+          <ProtectedRoute user={user} loading={loading}>
+            <AuthGate />
+          </ProtectedRoute>
+        }
+      />
 
       {/* =========================
-         APP SHELL
+         DASHBOARD (🔥 FIXED PATH)
       ========================= */}
-      <Route element={<RequireAuth />}>
-        <Route path="/*" element={<CommunityPlusDashboard />}>
+      <Route
+        path="/*"
+        element={
+          <ProtectedRoute user={user} loading={loading}>
+            <CommunityPlusDashboard />
+          </ProtectedRoute>
+        }
+      >
+        {/* DEFAULT */}
+        <Route index element={<Navigate to="home" replace />} />
 
-          {/* DEFAULT */}
-          <Route index element={<Navigate to="home" replace />} />
+        {/* CORE */}
+        <Route path="home" element={<CommunityPlusHome />} />
+        <Route path="communityplus" element={<CommunityPlusHub />} />
+        <Route path="channels" element={<CommunityPlusAdTvPage />} />
 
-          {/* CORE */}
-          <Route path="home" element={<CommunityPlusHome />} />
-          <Route path="communityplus" element={<CommunityPlusHub />} />
-          <Route path="channels" element={<CommunityPlusAdTvPage />} />
+        {/* PROFILE */}
+        <Route path="profile-setup" element={<Onboarding />} />
+        <Route path="profile" element={<CommunityPlusUserProfile />} />
 
-          {/* PROFILE */}
-          <Route path="profile-setup" element={<Onboarding />} />
-          <Route path="profile" element={<CommunityPlusUserProfile />} />
+        {/* DIRECTORY */}
+        <Route path="yellowpages" element={<CommunityPlusYellowPages />} />
 
-          {/* DIRECTORY */}
-          <Route path="yellowpages" element={<CommunityPlusYellowPages />} />
+        {/* ACTIONS */}
+        <Route path="post" element={<PostComposer />} />
+        <Route path="event" element={<SimplePage title="Event" />} />
+        <Route path="incident" element={<SimplePage title="Incident" />} />
+        <Route path="beacon" element={<SimplePage title="Beacon" />} />
 
-          {/* ACTIONS */}
-          <Route path="post" element={<PostComposer />} />
-          <Route path="event" element={<SimplePage title="Event" />} />
-          <Route path="incident" element={<SimplePage title="Incident" />} />
-          <Route path="beacon" element={<SimplePage title="Beacon" />} />
-
-          {/* MISC */}
-          <Route path="search" element={<SimplePage title="Search" />} />
-          <Route path="about" element={<SimplePage title="About" />} />
-          <Route path="merch" element={<SimplePage title="Merch" />} />
-
-        </Route>
+        {/* MISC */}
+        <Route path="search" element={<SimplePage title="Search" />} />
+        <Route path="about" element={<SimplePage title="About" />} />
+        <Route path="merch" element={<SimplePage title="Merch" />} />
       </Route>
 
       {/* =========================
@@ -130,7 +141,7 @@ export default function App() {
 }
 
 /* =========================
-   SIMPLE PAGE (avoids inline JSX duplication)
+   SIMPLE PAGE
 ========================= */
 
 function SimplePage({ title }) {
