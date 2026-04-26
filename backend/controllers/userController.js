@@ -3,70 +3,53 @@ import { getOrCreateUserWithProfile } from "../src/services/userService.js";
 export async function getMe(req, res) {
   try {
     /* =========================
-       🔍 DEBUG INPUT
+       🔐 TRUSTED USER (FROM MIDDLEWARE)
     ========================= */
-    console.log("👤 req.user:", req.user);
 
-    const rawUser = req.user || {};
-
-    /* =========================
-       🧠 NORMALISE USER
-    ========================= */
-    const sub = (
-      rawUser.userId ||
-      rawUser.sub ||
-      ""
-    ).trim();
-
-    const email =
-      rawUser.email ||
-      rawUser.signInDetails?.loginId ||
-      rawUser.attributes?.email ||
-      null;
+    const { sub, email } = req.user || {};
 
     if (!sub) {
-      console.error("❌ INVALID USER OBJECT:", rawUser);
-      return res.status(400).json({
-        error: "Missing user identifier (sub/userId)",
-        rawUser
+      console.error("❌ Missing user.sub from middleware");
+      return res.status(401).json({
+        error: "Unauthorized: invalid token payload",
       });
     }
 
-    console.log("➡️ getMe using:", { sub, email });
+    console.log("➡️ getMe:", { sub, email });
 
     /* =========================
-       🔥 SERVICE CALL (FIXED)
+       🔥 SERVICE CALL
     ========================= */
-    const result = await getOrCreateUserWithProfile(sub, email);
 
-    const { user, profile, debug } = result;
+    const { user, profile } =
+      await getOrCreateUserWithProfile(sub, email);
 
-    if (!user || !user.id) {
-      throw new Error("User creation or retrieval failed");
+    if (!user?.id) {
+      throw new Error("User creation/retrieval failed");
     }
 
     /* =========================
        ✅ RESPONSE
     ========================= */
+
     return res.json({
       user,
       profile,
-      hasProfile: !!profile && profile.is_completed,
-      debug // 🔥 remove in production later
+      hasProfile: !!profile?.is_completed,
     });
 
   } catch (err) {
     /* =========================
        ❌ ERROR HANDLING
     ========================= */
-    console.error("🔥 getMe FULL ERROR:", err);
+
+    console.error("🔥 getMe ERROR:", err);
 
     return res.status(500).json({
-      error: err.message || "Unknown server error",
-      stack:
-        process.env.NODE_ENV === "development"
-          ? err.stack
-          : undefined
+      error: err.message || "Internal server error",
+      ...(process.env.NODE_ENV === "development" && {
+        stack: err.stack,
+      }),
     });
   }
 }
