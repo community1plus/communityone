@@ -6,7 +6,7 @@ import { useAuth } from "../../context/AuthContext";
 import { MapProvider, useMap } from "../../context/MapContext";
 
 import useVoiceAlerts from "../../../hooks/useVoiceAlerts";
-import useProfileSync from "../../../hooks/useProfileSync"; // 🔥 NEW
+import useProfileSync from "../../hooks/useProfileSync";
 
 import CommunityPlusHeader from "../../components/Layout/Header/CommunityPlusHeader";
 import CommunityPlusSidebar from "../../components/Layout/Sidebar/CommunityPlusSidebar";
