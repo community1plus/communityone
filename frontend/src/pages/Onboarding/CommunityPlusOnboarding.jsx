@@ -1,9 +1,9 @@
 import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { useAuth } from "../../context/AuthContext";
-import { useUI } from "../../context/UIContext";
-import useAPI from "../../api/useAPI";
+import { useAuth } from "../../src/context/AuthContext";
+import { useUI } from "../../src/context/UIContext";
+import useAPI from "../../src/api/useAPI";
 
 import CommunityPlusUserProfile from "../CommunityPlusUserProfile/CommunityPlusUserProfile";
 
