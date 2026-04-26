@@ -1,16 +1,20 @@
-import { useMemo, useCallback, useEffect } from "react";
+import { useMemo, useCallback, useEffect, useRef } from "react";
 import { signOut } from "aws-amplify/auth";
 import { useNavigate, Outlet, useLocation } from "react-router-dom";
 
 import { useAuth } from "../../context/AuthContext";
 import { MapProvider, useMap } from "../../context/MapContext";
+
 import useVoiceAlerts from "../../../hooks/useVoiceAlerts";
+import useProfileSync from "../../../hooks/useProfileSync"; // 🔥 NEW
+
 import CommunityPlusHeader from "../../components/Layout/Header/CommunityPlusHeader";
 import CommunityPlusSidebar from "../../components/Layout/Sidebar/CommunityPlusSidebar";
+
 import "./CommunityPlusDashboard.css";
 
 /* =====================================================
-   INNER APP (uses MapContext)
+   INNER APP (🔥 CORE RUNTIME)
 ===================================================== */
 
 function DashboardInner({ effectiveUser, onLogout }) {
@@ -22,11 +26,22 @@ function DashboardInner({ effectiveUser, onLogout }) {
     updateUserLocation,
   } = useMap();
 
+  const locationFetchedRef = useRef(false); // 🔥 prevent repeat calls
+
   /* =========================
-     GET USER LOCATION (🔥 ONCE)
+     🔥 REAL-TIME PROFILE SYNC
+  ========================= */
+
+  useProfileSync(); // ✅ activates backend → UI sync
+
+  /* =========================
+     📍 USER LOCATION (ONCE)
   ========================= */
 
   useEffect(() => {
+    if (locationFetchedRef.current) return;
+    locationFetchedRef.current = true;
+
     if (!navigator.geolocation) return;
 
     navigator.geolocation.getCurrentPosition(
@@ -43,7 +58,7 @@ function DashboardInner({ effectiveUser, onLogout }) {
   }, [updateUserLocation]);
 
   /* =========================
-     COUNTS (for voice + UI)
+     📊 COUNTS
   ========================= */
 
   const counts = useMemo(() => {
@@ -55,7 +70,7 @@ function DashboardInner({ effectiveUser, onLogout }) {
   }, [filteredMarkers]);
 
   /* =========================
-     VOICE ALERTS (🔥 PROXIMITY AWARE)
+     🔊 VOICE ALERTS
   ========================= */
 
   useVoiceAlerts({
@@ -65,7 +80,7 @@ function DashboardInner({ effectiveUser, onLogout }) {
   });
 
   /* =========================
-     LAYOUT CONTROL
+     📐 LAYOUT CONTROL
   ========================= */
 
   const isFullWidthRoute = useMemo(() => {
@@ -123,7 +138,7 @@ export default function CommunityPlusDashboard() {
   const { appUser, user, loading } = useAuth();
 
   /* =========================
-     USER
+     USER RESOLUTION
   ========================= */
 
   const effectiveUser = useMemo(
@@ -137,7 +152,7 @@ export default function CommunityPlusDashboard() {
 
   const handleLogout = useCallback(async () => {
     try {
-      await signOut();
+      await signOut({ global: true });
       navigate("/", { replace: true });
     } catch (err) {
       console.error("Logout failed:", err);
@@ -153,7 +168,7 @@ export default function CommunityPlusDashboard() {
   }
 
   /* =========================
-     PROVIDER WRAP
+     PROVIDERS
   ========================= */
 
   return (

@@ -1,55 +1,52 @@
-import { fetchAuthSession } from "aws-amplify/auth";
-
 const API_BASE = "https://communityone-backend.onrender.com/api";
 
-export async function apiFetch(path, options = {}) {
-  let token = null;
+/* ===============================
+   CORE FETCH
+=============================== */
 
-  /* ===============================
-     🔐 GET COGNITO TOKEN
-  =============================== */
-  try {
-    const session = await fetchAuthSession();
-    console.log("SESSION:", session); // 🔍 debug
-    // Prefer ID token, fallback to access token
-    token = session.tokens?.idToken?.toString();
-
-  } catch (err) {
-    console.warn("⚠️ No auth session available:", err);
-  }
-
-  console.log("TOKEN:", token); // 🔍 debug
-
-  /* ===============================
-     🚀 MAKE REQUEST
-  =============================== */
+export async function apiFetch(path, { method = "GET", body, token, headers = {} } = {}) {
   const res = await fetch(`${API_BASE}${path}`, {
-    ...options,
+    method,
     headers: {
       "Content-Type": "application/json",
-      ...(token && { Authorization: `Bearer ${token}` }), // 🔥 CRITICAL
-      ...(options.headers || {}),
+      ...(token && { Authorization: `Bearer ${token}` }),
+      ...headers,
     },
+    ...(body && { body: JSON.stringify(body) }),
   });
 
   /* ===============================
-     ❌ ERROR HANDLING
+     ERROR HANDLING
   =============================== */
+
   if (!res.ok) {
     let errorMessage = `API error: ${res.status}`;
 
     try {
       const errData = await res.json();
       errorMessage = errData.error || errorMessage;
-    } catch {
-      // ignore JSON parse errors
-    }
+    } catch {}
 
     throw new Error(errorMessage);
   }
 
-  /* ===============================
-     ✅ SUCCESS
-  =============================== */
   return res.json();
 }
+
+/* ===============================
+   HELPERS (🔥 CLEAN DX)
+=============================== */
+
+export const api = {
+  get: (path, token) =>
+    apiFetch(path, { method: "GET", token }),
+
+  post: (path, body, token) =>
+    apiFetch(path, { method: "POST", body, token }),
+
+  put: (path, body, token) =>
+    apiFetch(path, { method: "PUT", body, token }),
+
+  del: (path, token) =>
+    apiFetch(path, { method: "DELETE", token }),
+};

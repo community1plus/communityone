@@ -28,7 +28,7 @@ export function AuthProvider({ children }) {
   const mountedRef = useRef(true);
 
   /* =========================
-     LOAD USER (🔥 CLEAN)
+     LOAD USER (🔥 STABLE)
   ========================= */
 
   const loadUser = useCallback(async () => {
@@ -42,18 +42,26 @@ export function AuthProvider({ children }) {
       console.log("TOKENS:", tokens);
 
       /* =========================
-         🔥 NO TOKENS → WAIT (NO RETRY)
+         NO TOKENS → WAIT FOR EVENT
       ========================= */
 
       if (!tokens?.idToken || !tokens?.accessToken) {
-        console.log("⚠️ No tokens yet (waiting for signedIn)");
+        console.log("⚠️ No tokens yet (waiting)");
 
         if (mountedRef.current) {
-          setLoading(false); // 🔥 prevent infinite loading
+          setUser(null);
+          setAppUser(null);
+          setLoading(false); // 🔥 IMPORTANT
         }
 
         return;
       }
+
+      /* =========================
+         🔥 TOKEN STRING (NEW)
+      ========================= */
+
+      const tokenString = tokens.idToken.toString();
 
       /* =========================
          NORMALISE USER
@@ -73,6 +81,8 @@ export function AuthProvider({ children }) {
           idPayload.username ||
           null,
         name: idPayload.name || null,
+
+        token: tokenString, // 🔥 CRITICAL ADD
       };
 
       if (mountedRef.current) {
@@ -80,7 +90,7 @@ export function AuthProvider({ children }) {
       }
 
       /* =========================
-         BACKEND USER
+         BACKEND USER (SYNC)
       ========================= */
 
       try {
@@ -89,12 +99,14 @@ export function AuthProvider({ children }) {
           {
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${tokens.idToken.toString()}`,
+              Authorization: `Bearer ${tokenString}`,
             },
           }
         );
 
         const data = await res.json();
+
+        console.log("📦 BACKEND USER:", data);
 
         if (mountedRef.current) {
           setAppUser({
@@ -145,7 +157,7 @@ export function AuthProvider({ children }) {
   }, [loadUser]);
 
   /* =========================
-     AUTH EVENTS (🔥 CORE FIX)
+     AUTH EVENTS
   ========================= */
 
   useEffect(() => {
@@ -155,8 +167,8 @@ export function AuthProvider({ children }) {
       console.log("🔔 Auth event:", event);
 
       if (event === "signedIn") {
-        setLoading(true);   // 🔥 trigger re-load
-        loadUser();         // 🔥 tokens now available
+        setLoading(true);
+        loadUser();
       }
 
       if (event === "tokenRefresh") {
@@ -176,7 +188,7 @@ export function AuthProvider({ children }) {
   }, [loadUser]);
 
   /* =========================
-     LOGOUT (SOFT)
+     LOGOUT
   ========================= */
 
   const logout = useCallback(async () => {

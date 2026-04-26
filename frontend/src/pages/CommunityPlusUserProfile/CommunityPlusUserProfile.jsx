@@ -1,9 +1,11 @@
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Autocomplete, useJsApiLoader } from "@react-google-maps/api";
 
 import { useLocationContext } from "../../context/LocationProvider";
 import { useAuth } from "../../context/AuthContext";
+
+import { api } from "../../services/api";
 
 import PageHeader from "../../components/UI/PageHeader";
 import Section from "../../components/UI/Section";
@@ -39,9 +41,7 @@ const PROFILE_STEPS = [
   },
   {
     title: "Home",
-    fields: [
-      { name: "homeLocation", label: "Home Location", type: "location" },
-    ],
+    fields: [{ name: "homeLocation", label: "Home Location", type: "location" }],
   },
   {
     title: "Contact",
@@ -74,38 +74,35 @@ const PROFILE_STEPS = [
    VALIDATOR
 ========================= */
 
-const buildValidator = (steps) => {
-  return (values) => {
-    const errors = {};
+const buildValidator = (steps) => (values) => {
+  const errors = {};
 
-    const setIn = (obj, path, value) => {
-      const keys = path.split(".");
-      let curr = obj;
-
-      keys.forEach((key, i) => {
-        if (i === keys.length - 1) curr[key] = value;
-        else {
-          curr[key] = curr[key] || {};
-          curr = curr[key];
-        }
-      });
-    };
-
-    steps.forEach((step) => {
-      step.fields.forEach((field) => {
-        if (!field.validate) return;
-
-        const value = field.name
-          .split(".")
-          .reduce((acc, key) => acc?.[key], values);
-
-        const error = field.validate(value, values);
-        if (error) setIn(errors, field.name, error);
-      });
+  const setIn = (obj, path, value) => {
+    const keys = path.split(".");
+    let curr = obj;
+    keys.forEach((key, i) => {
+      if (i === keys.length - 1) curr[key] = value;
+      else {
+        curr[key] = curr[key] || {};
+        curr = curr[key];
+      }
     });
-
-    return errors;
   };
+
+  steps.forEach((step) => {
+    step.fields.forEach((field) => {
+      if (!field.validate) return;
+
+      const value = field.name
+        .split(".")
+        .reduce((acc, key) => acc?.[key], values);
+
+      const error = field.validate(value, values);
+      if (error) setIn(errors, field.name, error);
+    });
+  });
+
+  return errors;
 };
 
 /* =========================
@@ -116,7 +113,7 @@ export default function CommunityPlusUserProfile() {
   const navigate = useNavigate();
   const autoRef = useRef(null);
 
-  const { appUser, setAppUser } = useAuth();
+  const { appUser, setAppUser, user } = useAuth();
   const { homeLocation, setHome } = useLocationContext();
 
   const validate = useMemo(() => buildValidator(PROFILE_STEPS), []);
@@ -127,7 +124,7 @@ export default function CommunityPlusUserProfile() {
       display_name: "",
       userType: "PERSONAL",
       phone: "",
-      social: { instagram: "", twitter: "" },
+      social: { instagram: "" },
     },
     validate,
     persistKey: "profile-form",
@@ -152,6 +149,38 @@ export default function CommunityPlusUserProfile() {
   const progress = ((currentStep + 1) / PROFILE_STEPS.length) * 100;
 
   /* =========================
+     COMPLETION %
+  ========================= */
+
+  const completion = useMemo(() => {
+    let filled = 0;
+    let total = 0;
+
+    PROFILE_STEPS.forEach((step) => {
+      step.fields.forEach((f) => {
+        total++;
+        const val = f.name.split(".").reduce((a, k) => a?.[k], values);
+        if (val) filled++;
+      });
+    });
+
+    return Math.round((filled / total) * 100);
+  }, [values]);
+
+  /* =========================
+     STEP PERSISTENCE
+  ========================= */
+
+  useEffect(() => {
+    const saved = localStorage.getItem("profile-step");
+    if (saved) setCurrentStep(Number(saved));
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("profile-step", currentStep);
+  }, [currentStep]);
+
+  /* =========================
      PREFILL
   ========================= */
 
@@ -164,11 +193,7 @@ export default function CommunityPlusUserProfile() {
     if (!values.username) {
       setValue("username", prefix);
     }
-
-    if (!values.display_name) {
-      setValue("display_name", prefix.slice(0, 2).toUpperCase());
-    }
-  }, [appUser?.user?.email]);
+  }, [appUser?.user?.email, values.username, setValue]);
 
   /* =========================
      GOOGLE
@@ -179,7 +204,7 @@ export default function CommunityPlusUserProfile() {
     libraries: GOOGLE_LIBRARIES,
   });
 
-  const onPlaceChanged = () => {
+  const onPlaceChanged = useCallback(() => {
     const place = autoRef.current?.getPlace();
     if (!place?.geometry) return;
 
@@ -191,68 +216,77 @@ export default function CommunityPlusUserProfile() {
 
     setManualAddress(loc.label);
     setHome(loc);
-  };
+  }, [setHome]);
 
   /* =========================
-     STEP VALIDATION
+     VALIDATION
   ========================= */
 
-  const validateStep = async () => {
+  const validateStep = useCallback(async () => {
     const stepFields = PROFILE_STEPS[currentStep].fields;
-
     stepFields.forEach((f) => setTouched(f.name, true));
 
     const isValid = await validateAll();
     const hasErrors = stepFields.some((f) => getError(f.name));
 
     return isValid && !hasErrors;
-  };
-
-  /* =========================
-     NAVIGATION
-  ========================= */
+  }, [currentStep, validateAll, getError, setTouched]);
 
   const nextStep = async () => {
-    const ok = await validateStep();
-    if (!ok) return;
-
-    setCurrentStep((s) => s + 1);
+    if (await validateStep()) {
+      setCurrentStep((s) => s + 1);
+    }
   };
 
   const prevStep = () =>
     setCurrentStep((s) => Math.max(s - 1, 0));
 
   /* =========================
-     SAVE
+     AUTOSAVE
   ========================= */
 
-  const handleSave = async () => {
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      localStorage.setItem("profile-draft", JSON.stringify(values));
+    }, 500);
+
+    return () => clearTimeout(timeout);
+  }, [values]);
+
+  /* =========================
+     🔥 SAVE (HARDENED)
+  ========================= */
+
+  const handleSave = useCallback(async () => {
+    if (saving) return;
+
     const isValid = await validateAll();
     if (!isValid) return;
 
     try {
       setSaving(true);
+      setError("");
 
-      const res = await fetch(
-        "https://communityone-backend.onrender.com/api/profile",
+      if (!user?.token) {
+        throw new Error("Authentication required");
+      }
+
+      if (!homeLocation) {
+        throw new Error("Please select a valid location");
+      }
+
+      const data = await api.post(
+        "/profile",
         {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            // 🔥 ADD TOKEN WHEN READY
-            // Authorization: `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            ...values,
-            homeLocation,
-          }),
-        }
+          ...values,
+          homeLocation,
+        },
+        user.token
       );
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
-
       clearStorage();
+      localStorage.removeItem("profile-draft");
+      localStorage.removeItem("profile-step");
 
       setAppUser((prev) => ({
         ...prev,
@@ -263,11 +297,12 @@ export default function CommunityPlusUserProfile() {
       navigate("/home", { replace: true });
 
     } catch (err) {
-      setError(err.message);
+      console.error("Save failed:", err);
+      setError(err.message || "Failed to save profile");
     } finally {
       setSaving(false);
     }
-  };
+  }, [values, homeLocation, user?.token, validateAll, saving]);
 
   /* =========================
      RENDER
@@ -275,17 +310,14 @@ export default function CommunityPlusUserProfile() {
 
   return (
     <div className="profile-container">
-
       <div className="profile-layout">
 
-        {/* LEFT */}
         <div className="profile-left">
 
-          {/* HEADER */}
           <div className="profile-page-header">
             <PageHeader
               title="Edit Profile"
-              meta="Complete your profile to unlock platform features"
+              meta={`Completion: ${completion}%`}
             />
 
             <div className="profile-stepper">
@@ -306,13 +338,7 @@ export default function CommunityPlusUserProfile() {
                       key={step}
                       className={`step ${active ? "active" : ""} ${complete ? "complete" : ""}`}
                       onClick={async () => {
-                        if (i === currentStep) return;
-
-                        if (i > currentStep) {
-                          const ok = await validateStep();
-                          if (!ok) return;
-                        }
-
+                        if (i > currentStep && !(await validateStep())) return;
                         setCurrentStep(i);
                       }}
                     >
@@ -324,7 +350,6 @@ export default function CommunityPlusUserProfile() {
             </div>
           </div>
 
-          {/* FORM */}
           <Section>
             <FormBuilder
               steps={PROFILE_STEPS}
@@ -341,9 +366,7 @@ export default function CommunityPlusUserProfile() {
             />
           </Section>
 
-          {/* NAV */}
           <div className="form-navigation">
-
             <Button variant="ghost" onClick={() => navigate("/home")}>
               Close
             </Button>
@@ -370,17 +393,15 @@ export default function CommunityPlusUserProfile() {
                 </Button>
               )}
             </div>
-
           </div>
 
           {error && <div className="error">{error}</div>}
         </div>
 
-        {/* RIGHT */}
         <div className="profile-guide">
           <Section
             title="Profile Guide"
-            meta="Add details to improve visibility and trust"
+            meta="Complete all steps to unlock full platform features"
           />
         </div>
 
