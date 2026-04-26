@@ -50,7 +50,9 @@ export function AuthProvider({ children }) {
       ========================= */
 
       try {
-        session = await fetchAuthSession({ forceRefresh: true });
+        const session = await fetchAuthSession();
+        console.log("SESSION:", session);
+        console.log("TOKENS:", session?.tokens);
       } catch {
         console.log("⚠️ No active session");
 
