@@ -6,28 +6,25 @@ export default function AuthGate() {
   const navigate = useNavigate();
   const { appUser, loading } = useAuth();
 
-  console.log("🔥 RENDER:", { appUser, loading });
-
   useEffect(() => {
-    console.log("⚡ EFFECT RUN:", { appUser, loading });
+    if (loading) return;
 
-    if (loading) {
-      console.log("⏳ Still loading...");
-      return;
-    }
+    /* =========================
+       NOT AUTHENTICATED
+    ========================= */
 
     if (!appUser) {
-      console.log("❌ No appUser");
+      navigate("/", { replace: true });
       return;
     }
 
-    console.log("✅ User loaded:", appUser);
+    /* =========================
+       AUTHENTICATED
+    ========================= */
 
     if (appUser.hasProfile) {
-      console.log("➡️ NAVIGATE HOME");
       navigate("/home", { replace: true });
     } else {
-      console.log("➡️ NAVIGATE PROFILE SETUP");
       navigate("/profile-setup", { replace: true });
     }
 
