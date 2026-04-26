@@ -3,6 +3,7 @@ import React, {
   useEffect,
   useRef,
   useMemo,
+  useCallback,
 } from "react";
 
 import { useNavigate, useLocation } from "react-router-dom";
@@ -12,7 +13,7 @@ import { useAuth } from "../../../context/AuthContext";
 import LocationPin from "../../UI/LocationPin";
 import { resolveLocation } from "../../../services/resolveLocation";
 
-import { NAVIGATION } from "../Navigation/navigationConfig"; // 🔥 adjust path if needed
+import { NAVIGATION } from "../../config/navigation/navigationConfig"; // ✅ fixed path
 
 export default function CommunityPlusHeader({ user, onLogout }) {
   const navigate = useNavigate();
@@ -29,7 +30,43 @@ export default function CommunityPlusHeader({ user, onLogout }) {
 
   const effectiveUser = appUser?.user || appUser || user;
 
-  const nav = NAVIGATION.find((n) => n.group === "main"); // 🔥 NEW
+  /* ===============================
+     NAV CONFIG (MEMOIZED)
+  =============================== */
+
+  const nav = useMemo(
+    () => NAVIGATION.find((n) => n.group === "main") || { items: [] },
+    []
+  );
+
+  /* ===============================
+     NAV HELPERS (FIXED)
+  =============================== */
+
+  const isActiveRoute = useCallback(
+    (path) => {
+      if (!path) return false;
+
+      return (
+        routeLocation.pathname === path ||
+        routeLocation.pathname.startsWith(path + "/")
+      );
+    },
+    [routeLocation.pathname]
+  );
+
+  const isGroupActive = (children) =>
+    children?.some((child) => isActiveRoute(child.path));
+
+  const go = useCallback(
+    (path) => {
+      if (!path) return;
+      if (routeLocation.pathname !== path) {
+        navigate(path);
+      }
+    },
+    [navigate, routeLocation.pathname]
+  );
 
   /* ===============================
      USERNAME / INITIALS
@@ -66,7 +103,7 @@ export default function CommunityPlusHeader({ user, onLogout }) {
   }, [username]);
 
   /* ===============================
-     LOCATION
+     LOCATION (UNCHANGED)
   =============================== */
 
   const hasLocation =
@@ -88,20 +125,13 @@ export default function CommunityPlusHeader({ user, onLogout }) {
     let interval;
 
     const initAutocomplete = () => {
-      if (
-        !window.google ||
-        !window.google.maps ||
-        !inputRef.current
-      ) return false;
+      if (!window.google?.maps || !inputRef.current) return false;
 
       const autocomplete =
-        new window.google.maps.places.Autocomplete(
-          inputRef.current,
-          {
-            types: ["geocode"],
-            componentRestrictions: { country: "au" },
-          }
-        );
+        new window.google.maps.places.Autocomplete(inputRef.current, {
+          types: ["geocode"],
+          componentRestrictions: { country: "au" },
+        });
 
       autocomplete.addListener("place_changed", async () => {
         const place = autocomplete.getPlace();
@@ -110,12 +140,7 @@ export default function CommunityPlusHeader({ user, onLogout }) {
         const lat = place.geometry.location.lat();
         const lng = place.geometry.location.lng();
 
-        const enriched = await resolveLocation({
-          lat,
-          lng,
-          accuracy: 100,
-        });
-
+        const enriched = await resolveLocation({ lat, lng, accuracy: 100 });
         setViewLocation(enriched, "manual");
       });
 
@@ -138,12 +163,7 @@ export default function CommunityPlusHeader({ user, onLogout }) {
       async (pos) => {
         const { latitude: lat, longitude: lng, accuracy } = pos.coords;
 
-        const enriched = await resolveLocation({
-          lat,
-          lng,
-          accuracy,
-        });
-
+        const enriched = await resolveLocation({ lat, lng, accuracy });
         setViewLocation(enriched, "auto");
         setResolving(false);
       },
@@ -151,18 +171,6 @@ export default function CommunityPlusHeader({ user, onLogout }) {
       { enableHighAccuracy: true }
     );
   };
-
-  /* ===============================
-     NAV HELPERS
-  =============================== */
-
-  const go = (path) => {
-    if (routeLocation.pathname !== path) {
-      navigate(path);
-    }
-  };
-
-  const isActive = (path) => routeLocation.pathname === path;
 
   /* ===============================
      RENDER
@@ -199,7 +207,7 @@ export default function CommunityPlusHeader({ user, onLogout }) {
           </div>
         </div>
 
-        {/* CENTER SEARCH */}
+        {/* CENTER */}
         <div className="header-center">
           <input
             className="search-input body"
@@ -211,10 +219,7 @@ export default function CommunityPlusHeader({ user, onLogout }) {
         <div className="header-right" ref={menuRef}>
           {effectiveUser && (
             <div className="user-block">
-
-              <span className="username label">
-                {username}
-              </span>
+              <span className="username label">{username}</span>
 
               <div
                 className="avatar"
@@ -225,12 +230,8 @@ export default function CommunityPlusHeader({ user, onLogout }) {
 
               {showMenu && (
                 <div className="dropdown-menu panel">
-                  <div onClick={() => go("/profile")}>
-                    Profile
-                  </div>
-                  <div onClick={() => onLogout?.()}>
-                    Logout
-                  </div>
+                  <div onClick={() => go("/profile")}>Profile</div>
+                  <div onClick={() => onLogout?.()}>Logout</div>
                 </div>
               )}
             </div>
@@ -239,48 +240,52 @@ export default function CommunityPlusHeader({ user, onLogout }) {
 
       </div>
 
-      {/* 🔥 CONFIG-DRIVEN NAV */}
+      {/* 🔥 NAV (REFACTORED) */}
       <nav className="header-nav">
 
-        {nav?.items.map((item) => {
+        {nav.items.map((item) => {
 
-          if (item.children) {
-            const isGroupActive = item.children.some((child) =>
-              isActive(child.path)
-            );
+          /* GROUP */
+          if (item.type === "group") {
+            const active = isGroupActive(item.children);
 
             return (
               <div
-                key={item.label}
-                className={`nav-group ${isGroupActive ? "active" : ""}`}
+                key={item.id}
+                className={`nav-group ${active ? "active" : ""}`}
               >
                 <button className="nav-item">
                   {item.label}
                 </button>
 
                 <div className="nav-dropdown">
-                  {item.children.map((child) => (
-                    <div
-                      key={child.path}
-                      className={`nav-dropdown-item ${
-                        isActive(child.path) ? "active" : ""
-                      }`}
-                      onClick={() => go(child.path)}
-                    >
-                      {child.label}
-                    </div>
-                  ))}
+                  {item.children.map((child) => {
+                    const childActive = isActiveRoute(child.path);
+
+                    return (
+                      <div
+                        key={child.id}
+                        className={`nav-dropdown-item ${
+                          childActive ? "active" : ""
+                        }`}
+                        onClick={() => go(child.path)}
+                      >
+                        {child.label}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             );
           }
 
+          /* ROUTE */
+          const active = isActiveRoute(item.path);
+
           return (
             <button
-              key={item.path}
-              className={`nav-item ${
-                isActive(item.path) ? "active" : ""
-              }`}
+              key={item.id}
+              className={`nav-item ${active ? "active" : ""}`}
               onClick={() => go(item.path)}
             >
               {item.label}

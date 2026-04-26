@@ -1,0 +1,31 @@
+.filter-chips {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.chip {
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+
+  background: #f3f0ec;
+  color: #2c2c2c;
+}
+
+.chip.clickable {
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.chip.clickable:hover {
+  background: #e6dfd8;
+}
+
+.chip.removable {
+  cursor: pointer;
+  background: #4a0f0f;
+  color: #fff;
+}

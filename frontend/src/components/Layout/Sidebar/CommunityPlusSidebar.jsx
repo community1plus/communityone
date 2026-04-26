@@ -1,33 +1,95 @@
+import { useMemo, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { NAVIGATION } from "../Navigation/navigationConfig";
+import { NAVIGATION } from "../../config/navigation/navigationConfig";
+import { useMap } from "../../context/MapContext";
+
 import "./CommunityPlusSidebar.css";
 
 export default function CommunityPlusSidebar() {
   const navigate = useNavigate();
-  const location = useLocation();
+  const { pathname } = useLocation();
 
-  const sidebar = NAVIGATION.find((n) => n.group === "sidebar");
+  /* =========================
+     GLOBAL STATE
+  ========================= */
+
+  const { mode, setMode, scope, setScope } = useMap();
+
+  /* =========================
+     NAV CONFIG
+  ========================= */
+
+  const sidebar = useMemo(
+    () => NAVIGATION.find((n) => n.group === "sidebar") || { sections: [] },
+    []
+  );
 
   /* =========================
      HELPERS
   ========================= */
 
-  const isActive = (path) => {
-    if (!path) return false;
-    return location.pathname.startsWith(path); // 🔥 better matching
-  };
-
-  const handleClick = (item) => {
-    if (item.action === "logout") {
-      // 🔥 plug real logout here
-      console.log("logout");
-      return;
+  const goToFeed = useCallback(() => {
+    if (pathname !== "/communityplus") {
+      navigate("/communityplus");
     }
+  }, [pathname, navigate]);
 
-    if (item.path) {
-      navigate(item.path);
-    }
-  };
+  const isActive = useCallback(
+    (item) => {
+      switch (item.type) {
+        case "route":
+          return (
+            item.path &&
+            (pathname === item.path ||
+              pathname.startsWith(item.path + "/"))
+          );
+
+        case "mode":
+          return item.value === mode;
+
+        case "scope":
+          return item.value === scope;
+
+        default:
+          return false;
+      }
+    },
+    [pathname, mode, scope]
+  );
+
+  /* =========================
+     CLICK HANDLER
+  ========================= */
+
+  const handleClick = useCallback(
+    (item) => {
+      switch (item.type) {
+        case "route":
+          item.path && navigate(item.path);
+          return;
+
+        case "action":
+          if (item.action === "logout") {
+            console.log("logout");
+          }
+          return;
+
+        case "mode":
+          setMode(item.value);
+          goToFeed();
+          return;
+
+        case "scope":
+          setScope(item.value);
+          goToFeed();
+          return;
+
+        default:
+          return;
+      }
+    },
+    [navigate, setMode, setScope, goToFeed]
+  );
 
   /* =========================
      RENDER
@@ -35,47 +97,37 @@ export default function CommunityPlusSidebar() {
 
   return (
     <aside className="sidebar">
-
       {sidebar.sections.map((section) => (
         <div
-          key={section.title}
+          key={section.id}
           className={`sidebar-section ${section.variant || ""}`}
         >
-          {/* TITLE */}
-          <div className="sidebar-title">
-            {section.title}
-          </div>
+          <div className="sidebar-title">{section.title}</div>
 
-          {/* ITEMS */}
           {section.items.map((item) => {
-            const active = isActive(item.path);
+            const active = isActive(item);
 
             return (
               <button
-                key={item.label}
-                className={`sidebar-link 
-                  ${active ? "active" : ""} 
-                  ${item.action === "logout" ? "logout" : ""}
-                `}
+                key={item.id}
+                className={[
+                  "sidebar-link",
+                  active && "active",
+                  item.type === "action" && "action",
+                  item.action === "logout" && "logout",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
                 onClick={() => handleClick(item)}
-                data-label={item.label} // 🔥 tooltip support
                 aria-current={active ? "page" : undefined}
               >
-                {/* ICON */}
-                <span className="icon">
-                  {item.icon}
-                </span>
-
-                {/* LABEL */}
-                <span className="label">
-                  {item.label}
-                </span>
+                <span className="icon">{item.icon}</span>
+                <span className="label">{item.label}</span>
               </button>
             );
           })}
         </div>
       ))}
-
     </aside>
   );
 }

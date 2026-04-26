@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
+
 import CommunityPlusLandingPage from "./pages/CommunityPlusLandingPage/CommunityPlusLandingPage";
 import CommunityPlusDashboard from "./pages/Dashboard/CommunityPlusDashboard";
 import Onboarding from "./pages/Onboarding/CommunityPlusOnboarding";
@@ -8,16 +9,27 @@ import CommunityPlusUserProfile from "./pages/CommunityPlusUserProfile/Community
 import CommunityPlusYellowPages from "./pages/YellowPages/CommunityPlusYellowPages";
 import CommunityPlusHub from "./pages/CommunityPlusHub/CommunityPlusHub";
 import PostComposer from "./components/Layout/Sidebar/Post/PostComposer";
-import CommunityPlusAdTv from "./pages/CommunityPlusAdTv/CommunityPlusAdTv";
 import CommunityPlusAdTvPage from "./pages/CommunityPlusAdTvPage/CommunityPlusAdTvPage";
+
+// 🔥 replace later with your real Home (feed + map)
+import Home from "./pages/Home/Home";
+
 import "./styles/tokens.css";
 import "./styles/base.css";
 import "./Typography/Typography.css";
 import "./theme/theme.css";
 
+/* =========================
+   LOADING
+========================= */
+
 function AppLoading() {
   return <div style={{ padding: 20 }}>Initialising...</div>;
 }
+
+/* =========================
+   ROUTE GUARDS
+========================= */
 
 function ProtectedRoute({ user, children }) {
   if (!user?.authenticated) {
@@ -33,23 +45,21 @@ function PublicRoute({ user, children }) {
   return children;
 }
 
-function DashboardHome() {
-  return <div style={{ padding: 20 }}>Home content goes here</div>;
-}
-
-function PlaceholderPage({ title }) {
-  return <div style={{ padding: 20 }}>{title}</div>;
-}
+/* =========================
+   APP
+========================= */
 
 export default function App() {
   const { user, loading } = useAuth();
 
-  if (loading) {
-    return <AppLoading />;
-  }
+  if (loading) return <AppLoading />;
 
   return (
     <Routes>
+
+      {/* =========================
+         PUBLIC
+      ========================= */}
       <Route
         path="/"
         element={
@@ -59,6 +69,9 @@ export default function App() {
         }
       />
 
+      {/* =========================
+         AUTH GATE
+      ========================= */}
       <Route
         path="/auth-gate"
         element={
@@ -68,30 +81,61 @@ export default function App() {
         }
       />
 
+      {/* =========================
+         APP SHELL (DASHBOARD)
+      ========================= */}
       <Route
+        path="/"
         element={
           <ProtectedRoute user={user}>
             <CommunityPlusDashboard />
           </ProtectedRoute>
         }
       >
-        <Route path="/home" element={<DashboardHome />} />
-        <Route path="/profile-setup" element={<Onboarding />} />
-        <Route path="/profile" element={<CommunityPlusUserProfile />} />
-        <Route path="/yellowpages" element={<CommunityPlusYellowPages />} />
-        <Route path="/communityplus" element={<CommunityPlusHub />} />
-        <Route path="/post" element={<PostComposer />} />
-        <Route path="/channels" element={<CommunityPlusAdTvPage />} />
-        <Route path="/event" element={<PlaceholderPage title="Event page" />} />
-        <Route path="/incident" element={<PlaceholderPage title="Incident page" />} />
-        <Route path="/beacon" element={<PlaceholderPage title="Beacon page" />} />
-        <Route path="/search" element={<PlaceholderPage title="Search page" />} />
-        <Route path="/about" element={<PlaceholderPage title="About page" />} />
-        <Route path="/merch" element={<PlaceholderPage title="Merch page" />} />
-        
+
+        {/* 🔥 default redirect */}
+        <Route index element={<Navigate to="home" replace />} />
+
+        {/* =========================
+           CORE
+        ========================= */}
+        <Route path="home" element={<Home />} />
+        <Route path="communityplus" element={<CommunityPlusHub />} />
+        <Route path="channels" element={<CommunityPlusAdTvPage />} />
+
+        {/* =========================
+           PROFILE
+        ========================= */}
+        <Route path="profile-setup" element={<Onboarding />} />
+        <Route path="profile" element={<CommunityPlusUserProfile />} />
+
+        {/* =========================
+           DIRECTORY
+        ========================= */}
+        <Route path="yellowpages" element={<CommunityPlusYellowPages />} />
+
+        {/* =========================
+           ACTIONS
+        ========================= */}
+        <Route path="post" element={<PostComposer />} />
+        <Route path="event" element={<div style={{ padding: 20 }}>Event</div>} />
+        <Route path="incident" element={<div style={{ padding: 20 }}>Incident</div>} />
+        <Route path="beacon" element={<div style={{ padding: 20 }}>Beacon</div>} />
+
+        {/* =========================
+           MISC
+        ========================= */}
+        <Route path="search" element={<div style={{ padding: 20 }}>Search</div>} />
+        <Route path="about" element={<div style={{ padding: 20 }}>About</div>} />
+        <Route path="merch" element={<div style={{ padding: 20 }}>Merch</div>} />
+
       </Route>
 
+      {/* =========================
+         FALLBACK
+      ========================= */}
       <Route path="*" element={<Navigate to="/" replace />} />
+
     </Routes>
   );
 }

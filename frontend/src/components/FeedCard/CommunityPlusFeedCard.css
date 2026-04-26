@@ -130,3 +130,25 @@ MAP COLUMN (OPTICAL BALANCE)
 .map-column {
 transform: translateY(-1px); /* 🔥 subtle counter-balance */
 }
+
+.feed-card.active {
+  border: 2px solid #4a0f0f;
+  background: rgba(74, 15, 15, 0.05);
+}
+
+/* type styling */
+.feed-card.type-incident {
+  border-left: 4px solid #d92d20;
+}
+
+.feed-card.type-event {
+  border-left: 4px solid #2e7d32;
+}
+
+.feed-card.type-alert {
+  border-left: 4px solid #f59e0b;
+}
+
+.feed-card.type-post {
+  border-left: 4px solid #555;
+}

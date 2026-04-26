@@ -1,6 +1,6 @@
 export const NAVIGATION = [
   /* =====================================================
-     HEADER NAV
+     HEADER NAV (TOP BAR)
   ===================================================== */
   {
     group: "main",
@@ -15,11 +15,26 @@ export const NAVIGATION = [
       {
         id: "feed",
         label: "Feed",
+        type: "group",
         children: [
-          { id: "feed-all", label: "All", path: "/communityplus" },
-          { id: "feed-incidents", label: "Incidents", path: "/incident" },
-          { id: "feed-alerts", label: "Alerts", path: "/alerts" },
-          { id: "feed-beacons", label: "Beacons", path: "/beacon" },
+          {
+            id: "feed-all",
+            label: "All",
+            type: "route",
+            path: "/communityplus",
+          },
+          {
+            id: "feed-incidents",
+            label: "Incidents",
+            type: "route",
+            path: "/incident",
+          },
+          {
+            id: "feed-alerts",
+            label: "Alerts",
+            type: "route",
+            path: "/beacon",
+          },
         ],
       },
 
@@ -40,47 +55,32 @@ export const NAVIGATION = [
       {
         id: "dashboard",
         label: "Dashboard",
+        type: "group",
         children: [
-          { id: "categories", label: "Categories", path: "/dashboard" },
+          {
+            id: "channels",
+            label: "Channels",
+            type: "route",
+            path: "/channels",
+          },
         ],
       },
     ],
   },
 
   /* =====================================================
-     SIDEBAR NAV
+     SIDEBAR
   ===================================================== */
   {
     group: "sidebar",
-
     sections: [
-      /* 🔥 SCOPE (NEW) */
-      {
-        id: "scope",
-        title: "SCOPE",
-        variant: "scope",
-        items: [
-          {
-            id: "scope-local",
-            label: "Local",
-            icon: "📍",
-            type: "scope",
-            value: "LOCAL",
-          },
-          {
-            id: "scope-global",
-            label: "Global",
-            icon: "🌍",
-            type: "scope",
-            value: "GLOBAL",
-          },
-        ],
-      },
-
-      /* 🔥 MODES */
+      /* =========================
+         MODES (MAP BEHAVIOUR)
+      ========================= */
       {
         id: "modes",
         title: "MODES",
+        variant: "modes",
         items: [
           {
             id: "mode-now",
@@ -99,7 +99,9 @@ export const NAVIGATION = [
         ],
       },
 
-      /* ACTIONS */
+      /* =========================
+         ACTIONS
+      ========================= */
       {
         id: "actions",
         title: "ACTIONS",
@@ -128,11 +130,20 @@ export const NAVIGATION = [
         ],
       },
 
-      /* PLATFORM */
+      /* =========================
+         PLATFORM
+      ========================= */
       {
         id: "platform",
         title: "PLATFORM",
         items: [
+          {
+            id: "home",
+            label: "Home",
+            icon: "🏠",
+            type: "route",
+            path: "/home",
+          },
           {
             id: "community",
             label: "Community+",
@@ -154,19 +165,12 @@ export const NAVIGATION = [
             type: "route",
             path: "/channels",
           },
-
-          /* 🔥 NEW */
-          {
-            id: "helpdesk",
-            label: "Helpdesk",
-            icon: "🛠️",
-            type: "route",
-            path: "/helpdesk",
-          },
         ],
       },
 
-      /* ACCOUNT */
+      /* =========================
+         ACCOUNT
+      ========================= */
       {
         id: "account",
         title: "ACCOUNT",
