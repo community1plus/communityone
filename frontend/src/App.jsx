@@ -33,13 +33,12 @@ function AppLoading() {
 }
 
 /* =========================
-   ROUTE GUARDS (🔥 FIXED)
+   ROUTE GUARDS
 ========================= */
 
 function ProtectedRoute({ user, loading, children }) {
   if (loading) return <AppLoading />;
 
-  // 🔥 explicit check (fixes blank screen bug)
   if (!user || !user.authenticated) {
     return <Navigate to="/" replace />;
   }
@@ -50,7 +49,6 @@ function ProtectedRoute({ user, loading, children }) {
 function PublicRoute({ user, loading, children }) {
   if (loading) return <AppLoading />;
 
-  // 🔥 only redirect if truly authenticated
   if (user && user.authenticated) {
     return <Navigate to="/home" replace />;
   }
@@ -59,14 +57,20 @@ function PublicRoute({ user, loading, children }) {
 }
 
 /* =========================
-   ONBOARDING GUARD
+   ONBOARDING GUARD (🔥 FIXED)
 ========================= */
 
 function RequireOnboarding({ appUser, loading, children }) {
   if (loading) return <AppLoading />;
 
-  // 🔥 allow render if backend not ready yet
   if (!appUser) return children;
+
+  const path = window.location.pathname;
+
+  // 🔥 allow onboarding route inside dashboard
+  if (path.startsWith("/profile-setup")) {
+    return children;
+  }
 
   if (!appUser.hasProfile) {
     return <Navigate to="/profile-setup" replace />;
@@ -82,11 +86,8 @@ function RequireOnboarding({ appUser, loading, children }) {
 export default function App() {
   const { user, appUser, loading } = useAuth();
 
-  /* 🔥 DEBUG (remove later) */
-  console.log("APP STATE:", { user, appUser, loading });
-
   /* =========================
-     🔥 FAILSAFE (CRITICAL FIX)
+     FAILSAFE
   ========================= */
 
   if (!loading && (!user || !user.authenticated)) {
@@ -113,19 +114,7 @@ export default function App() {
       />
 
       {/* =========================
-         PROFILE SETUP
-      ========================= */}
-      <Route
-        path="/profile-setup"
-        element={
-          <ProtectedRoute user={user} loading={loading}>
-            <Onboarding />
-          </ProtectedRoute>
-        }
-      />
-
-      {/* =========================
-         APP SHELL
+         APP SHELL (🔥 FIXED)
       ========================= */}
       <Route
         path="/*"
@@ -139,6 +128,9 @@ export default function App() {
       >
         {/* DEFAULT */}
         <Route index element={<Navigate to="home" replace />} />
+
+        {/* 🔥 FIX: PROFILE SETUP INSIDE DASHBOARD */}
+        <Route path="profile-setup" element={<Onboarding />} />
 
         {/* CORE */}
         <Route path="home" element={<CommunityPlusHome />} />
