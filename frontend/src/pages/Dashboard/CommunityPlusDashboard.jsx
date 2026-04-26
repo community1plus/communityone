@@ -19,6 +19,8 @@ import "./CommunityPlusDashboard.css";
 
 function DashboardInner({ effectiveUser, onLogout }) {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
+  const { appUser } = useAuth();
 
   const {
     filteredMarkers,
@@ -26,16 +28,30 @@ function DashboardInner({ effectiveUser, onLogout }) {
     updateUserLocation,
   } = useMap();
 
-  const locationFetchedRef = useRef(false); // 🔥 prevent repeat calls
+  const locationFetchedRef = useRef(false);
 
   /* =========================
-     🔥 REAL-TIME PROFILE SYNC
+     🔥 PROFILE SYNC
   ========================= */
 
-  useProfileSync(); // ✅ activates backend → UI sync
+  useProfileSync();
 
   /* =========================
-     📍 USER LOCATION (ONCE)
+     🔒 ONBOARDING ENFORCEMENT
+  ========================= */
+
+  useEffect(() => {
+    if (!appUser) return;
+
+    const isOnboardingRoute = pathname.startsWith("/profile-setup");
+
+    if (!appUser.hasProfile && !isOnboardingRoute) {
+      navigate("/profile-setup", { replace: true });
+    }
+  }, [appUser, pathname, navigate]);
+
+  /* =========================
+     📍 LOCATION (SAFE + ONCE)
   ========================= */
 
   useEffect(() => {
@@ -51,8 +67,12 @@ function DashboardInner({ effectiveUser, onLogout }) {
           lng: pos.coords.longitude,
         });
       },
-      () => {
-        console.warn("Location access denied");
+      (err) => {
+        console.warn("📍 Location denied:", err?.message);
+      },
+      {
+        enableHighAccuracy: false,
+        timeout: 5000,
       }
     );
   }, [updateUserLocation]);
@@ -70,7 +90,7 @@ function DashboardInner({ effectiveUser, onLogout }) {
   }, [filteredMarkers]);
 
   /* =========================
-     🔊 VOICE ALERTS
+     🔊 VOICE ALERTS (STABLE)
   ========================= */
 
   useVoiceAlerts({
@@ -86,6 +106,7 @@ function DashboardInner({ effectiveUser, onLogout }) {
   const isFullWidthRoute = useMemo(() => {
     const FULL_WIDTH_ROUTES = [
       "/profile",
+      "/profile-setup", // 🔥 include onboarding
       "/yellowpages",
       "/communityplus",
       "/post",
@@ -147,12 +168,16 @@ export default function CommunityPlusDashboard() {
   );
 
   /* =========================
-     LOGOUT
+     LOGOUT (HARDENED)
   ========================= */
 
   const handleLogout = useCallback(async () => {
     try {
       await signOut({ global: true });
+
+      // 🔥 clear any local onboarding state
+      localStorage.removeItem("onboarding_draft");
+
       navigate("/", { replace: true });
     } catch (err) {
       console.error("Logout failed:", err);
@@ -160,11 +185,15 @@ export default function CommunityPlusDashboard() {
   }, [navigate]);
 
   /* =========================
-     LOADING
+     LOADING STATE
   ========================= */
 
   if (loading) {
-    return <div style={{ padding: 20 }}>Loading...</div>;
+    return (
+      <div style={{ padding: 20 }}>
+        Initialising your workspace...
+      </div>
+    );
   }
 
   /* =========================
