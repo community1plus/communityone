@@ -5,6 +5,7 @@ import React, {
   useState,
   useRef,
   useCallback,
+  useMemo,
 } from "react";
 
 import { fetchAuthSession, signOut } from "aws-amplify/auth";
@@ -14,7 +15,7 @@ import { Hub } from "aws-amplify/utils";
    STORAGE
 ========================= */
 
-const STORAGE_KEY = "auth_cache_v1";
+const STORAGE_KEY = "auth_cache_v3";
 
 /* =========================
    CONTEXT
@@ -27,19 +28,23 @@ const AuthContext = createContext(null);
 ========================= */
 
 export function AuthProvider({ children }) {
-  /* =========================
-     STATE
-  ========================= */
-
   const [user, setUser] = useState(null);
   const [appUser, setAppUser] = useState(undefined);
+
   const [loading, setLoading] = useState(true);
+  const [initialized, setInitialized] = useState(false);
 
   const mountedRef = useRef(true);
   const loadingRef = useRef(false);
 
   /* =========================
-     🔥 LOAD CACHE (INSTANT UI)
+     TOKEN (🔥 NEW)
+  ========================= */
+
+  const [token, setToken] = useState(null);
+
+  /* =========================
+     CACHE LOAD
   ========================= */
 
   useEffect(() => {
@@ -49,30 +54,29 @@ export function AuthProvider({ children }) {
       if (cached) {
         const parsed = JSON.parse(cached);
 
-        console.log("⚡ CACHE HIT");
-
         setUser(parsed.user || null);
         setAppUser(parsed.appUser ?? null);
+        setToken(parsed.token || null);
 
-        // 🔥 allow UI immediately
         setLoading(false);
       }
-    } catch (err) {
+    } catch {
       console.warn("Cache parse failed");
     }
   }, []);
 
   /* =========================
-     🔥 SAVE CACHE
+     CACHE SAVE
   ========================= */
 
-  const persistCache = useCallback((userData, appUserData) => {
+  const persistCache = useCallback((userData, appUserData, token) => {
     try {
       localStorage.setItem(
         STORAGE_KEY,
         JSON.stringify({
           user: userData,
           appUser: appUserData,
+          token,
           ts: Date.now(),
         })
       );
@@ -80,7 +84,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   /* =========================
-     LOAD USER (REAL SOURCE)
+     LOAD USER
   ========================= */
 
   const loadUser = useCallback(async () => {
@@ -89,42 +93,28 @@ export function AuthProvider({ children }) {
     loadingRef.current = true;
 
     try {
-      let session;
-
-      try {
-        session = await fetchAuthSession();
-      } catch {
-        if (mountedRef.current) {
-          setUser(null);
-          setAppUser(null);
-        }
-        return;
-      }
+      const session = await fetchAuthSession();
 
       const tokens = session?.tokens;
 
-      if (!tokens?.idToken || !tokens?.accessToken) {
-        console.log("⚠️ Tokens not ready");
+      if (!tokens?.idToken) {
         return;
       }
 
-      const idPayload = tokens.idToken.payload || {};
-      const accessPayload = tokens.accessToken.payload || {};
+      const idToken = tokens.idToken.toString();
+      const payload = tokens.idToken.payload || {};
 
       const normalizedUser = {
         authenticated: true,
-        sub: idPayload.sub || null,
-        email: idPayload.email || null,
-        username:
-          accessPayload.username ||
-          idPayload["cognito:username"] ||
-          null,
-        name: idPayload.name || null,
-        token: tokens.idToken.toString(),
+        sub: payload.sub || null,
+        email: payload.email || null,
+        username: payload["cognito:username"] || null,
+        name: payload.name || null,
       };
 
       if (mountedRef.current) {
         setUser(normalizedUser);
+        setToken(idToken);
       }
 
       /* =========================
@@ -138,40 +128,30 @@ export function AuthProvider({ children }) {
           "https://communityone-backend.onrender.com/api/users/me",
           {
             headers: {
-              Authorization: `Bearer ${normalizedUser.token}`,
+              Authorization: `Bearer ${idToken}`,
             },
           }
         );
 
-        const data = await res.json();
+        if (res.status !== 401) {
+          const data = await res.json();
 
-        appUserData = {
-          user: data?.user || null,
-          hasProfile: data?.hasProfile ?? false,
-          profile: data?.profile || null,
-        };
-
-        if (mountedRef.current) {
-          setAppUser(appUserData);
+          appUserData = {
+            user: data?.user || null,
+            hasProfile: data?.hasProfile ?? false,
+            profile: data?.profile || null,
+          };
         }
 
-      } catch (err) {
-        console.error("Backend sync failed");
-
-        if (mountedRef.current) {
-          setAppUser({
-            user: null,
-            hasProfile: false,
-            profile: null,
-          });
-        }
+      } catch {
+        console.warn("Backend sync failed");
       }
 
-      /* =========================
-         🔥 SAVE CACHE
-      ========================= */
+      if (mountedRef.current) {
+        setAppUser(appUserData);
+      }
 
-      persistCache(normalizedUser, appUserData);
+      persistCache(normalizedUser, appUserData, idToken);
 
     } catch (err) {
       console.error("Auth error:", err);
@@ -179,11 +159,13 @@ export function AuthProvider({ children }) {
       if (mountedRef.current) {
         setUser(null);
         setAppUser(null);
+        setToken(null);
       }
 
     } finally {
       if (mountedRef.current) {
         setLoading(false);
+        setInitialized(true);
       }
 
       loadingRef.current = false;
@@ -191,13 +173,12 @@ export function AuthProvider({ children }) {
   }, [persistCache]);
 
   /* =========================
-     INITIAL LOAD (BACKGROUND)
+     INIT
   ========================= */
 
   useEffect(() => {
     mountedRef.current = true;
 
-    // 🔥 delay avoids blocking first paint
     setTimeout(loadUser, 50);
 
     return () => {
@@ -213,14 +194,7 @@ export function AuthProvider({ children }) {
     const unsub = Hub.listen("auth", ({ payload }) => {
       const event = payload?.event;
 
-      console.log("🔔 Auth event:", event);
-
-      if (event === "signedIn") {
-        setAppUser(undefined);
-        loadUser();
-      }
-
-      if (event === "tokenRefresh") {
+      if (event === "signedIn" || event === "tokenRefresh") {
         loadUser();
       }
 
@@ -230,7 +204,9 @@ export function AuthProvider({ children }) {
         if (mountedRef.current) {
           setUser(null);
           setAppUser(null);
+          setToken(null);
           setLoading(false);
+          setInitialized(true);
         }
       }
     });
@@ -251,25 +227,32 @@ export function AuthProvider({ children }) {
       if (mountedRef.current) {
         setUser(null);
         setAppUser(null);
+        setToken(null);
         setLoading(false);
+        setInitialized(true);
       }
     }
   }, []);
 
   /* =========================
-     CONTEXT
+     MEMO VALUE
   ========================= */
 
+  const value = useMemo(
+    () => ({
+      user,
+      appUser,
+      setAppUser,
+      token,          // 🔥 NEW
+      loading,
+      initialized,
+      logout,
+    }),
+    [user, appUser, token, loading, initialized, logout]
+  );
+
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        appUser,
-        setAppUser,
-        loading,
-        logout,
-      }}
-    >
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

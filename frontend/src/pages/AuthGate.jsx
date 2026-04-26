@@ -4,35 +4,26 @@ import { useAuth } from "../context/AuthContext";
 
 export default function AuthGate() {
   const navigate = useNavigate();
-  const { appUser, loading } = useAuth();
+  const { user, appUser, loading, initialized } = useAuth();
 
   useEffect(() => {
-    if (loading) return;
+    if (!initialized) return; // 🔥 WAIT
 
-    /* =========================
-       NOT AUTHENTICATED
-    ========================= */
-
-    if (!appUser) {
+    if (!user) {
       navigate("/", { replace: true });
       return;
     }
 
-    /* =========================
-       AUTHENTICATED
-    ========================= */
-
-    if (appUser.hasProfile) {
-      navigate("/home", { replace: true });
-    } else {
-      navigate("/profile-setup", { replace: true });
+    if (user && !appUser?.hasProfile) {
+      navigate("/onboarding", { replace: true });
+      return;
     }
 
-  }, [appUser, loading, navigate]);
+    if (user && appUser?.hasProfile) {
+      navigate("/app", { replace: true });
+    }
 
-  return (
-    <div style={{ padding: 40 }}>
-      Setting up your account...
-    </div>
-  );
+  }, [user, appUser, initialized, navigate]);
+
+  return <div style={{ padding: 20 }}>Loading...</div>;
 }
