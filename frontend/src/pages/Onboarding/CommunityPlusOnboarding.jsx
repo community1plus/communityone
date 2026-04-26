@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { useAuth } from "../../context/AuthContext";
 import { useUI } from "../../context/UIContext";
-import useAPI from "../../hooks/useAPI";
+import useAPI from "../../../hooks/useAPI";
 
 import CommunityPlusUserProfile from "../CommunityPlusUserProfile/CommunityPlusUserProfile";
 
