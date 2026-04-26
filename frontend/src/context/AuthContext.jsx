@@ -6,6 +6,7 @@ import React, {
   useRef,
   useCallback,
 } from "react";
+
 import { fetchAuthSession, signOut } from "aws-amplify/auth";
 import { Hub } from "aws-amplify/utils";
 
@@ -19,30 +20,58 @@ export function AuthProvider({ children }) {
   const loadingRef = useRef(false);
   const mountedRef = useRef(true);
 
-  /* ===============================
-     LOAD USER (COGNITO + BACKEND)
-  =============================== */
+  /* =====================================================
+     LOAD USER (🔥 HARDENED)
+  ===================================================== */
+
   const loadUser = useCallback(async () => {
+    if (!mountedRef.current) return;
     if (loadingRef.current) return;
+
     loadingRef.current = true;
 
     try {
-      const session = await fetchAuthSession();
-      const idToken = session?.tokens?.idToken;
-      const accessToken = session?.tokens?.accessToken;
+      let session;
 
-      if (!idToken || !accessToken) {
-        console.log("⚠️ No active session");
+      /* =========================
+         SAFE SESSION FETCH
+      ========================= */
+
+      try {
+        session = await fetchAuthSession({ forceRefresh: true });
+      } catch (err) {
+        console.log("⚠️ No active session (expected)");
 
         if (mountedRef.current) {
           setUser(null);
           setAppUser(null);
         }
+
         return;
       }
 
+      const tokens = session?.tokens;
+
+      if (!tokens?.idToken || !tokens?.accessToken) {
+        console.log("⚠️ Missing tokens");
+
+        if (mountedRef.current) {
+          setUser(null);
+          setAppUser(null);
+        }
+
+        return;
+      }
+
+      const idToken = tokens.idToken;
+      const accessToken = tokens.accessToken;
+
       const idPayload = idToken.payload || {};
       const accessPayload = accessToken.payload || {};
+
+      /* =========================
+         NORMALISE USER
+      ========================= */
 
       const normalizedUser = {
         authenticated: true,
@@ -55,18 +84,16 @@ export function AuthProvider({ children }) {
           idPayload.username ||
           null,
         name: idPayload.name || null,
-        tokenUse: idPayload.token_use || null,
       };
-
-      console.log("✅ Cognito user:", normalizedUser);
 
       if (mountedRef.current) {
         setUser(normalizedUser);
       }
 
-      /* ===============================
-         🔥 FETCH BACKEND USER
-      =============================== */
+      /* =========================
+         FETCH BACKEND USER
+      ========================= */
+
       try {
         const res = await fetch(
           "https://communityone-backend.onrender.com/api/users/me",
@@ -74,34 +101,36 @@ export function AuthProvider({ children }) {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
-              // 🔥 future-ready (when backend uses JWT)
-              Authorization: `Bearer ${idToken.toString()}`
+              Authorization: `Bearer ${idToken.toString()}`,
             },
           }
         );
 
         const data = await res.json();
 
-        console.log("📦 /users/me response:", data);
-
         if (mountedRef.current) {
           setAppUser({
-            user: data.user,
-            hasProfile: data.hasProfile,
-            profile: data.profile,
+            user: data?.user || null,
+            hasProfile: data?.hasProfile || false,
+            profile: data?.profile || null,
           });
         }
 
       } catch (err) {
-        console.error("❌ Failed to fetch /users/me:", err);
+        console.error("❌ Backend fetch failed:", err);
 
+        /* 🔥 DO NOT BREAK AUTH */
         if (mountedRef.current) {
-          setAppUser(null);
+          setAppUser({
+            user: null,
+            hasProfile: false,
+            profile: null,
+          });
         }
       }
 
     } catch (err) {
-      console.log("⚠️ Auth error:", err);
+      console.error("❌ Auth fatal error:", err);
 
       if (mountedRef.current) {
         setUser(null);
@@ -112,13 +141,15 @@ export function AuthProvider({ children }) {
       if (mountedRef.current) {
         setLoading(false);
       }
+
       loadingRef.current = false;
     }
   }, []);
 
-  /* ===============================
+  /* =====================================================
      INITIAL LOAD
-  =============================== */
+  ===================================================== */
+
   useEffect(() => {
     mountedRef.current = true;
     loadUser();
@@ -128,15 +159,18 @@ export function AuthProvider({ children }) {
     };
   }, [loadUser]);
 
-  /* ===============================
-     AUTH EVENTS
-  =============================== */
+  /* =====================================================
+     AUTH EVENTS (🔥 STABLE)
+  ===================================================== */
+
   useEffect(() => {
     const unsubscribe = Hub.listen("auth", ({ payload }) => {
       const event = payload?.event;
+
       console.log("🔔 Auth event:", event);
 
       if (event === "signedIn" || event === "tokenRefresh") {
+        setLoading(true); // 🔥 important
         loadUser();
       }
 
@@ -152,20 +186,24 @@ export function AuthProvider({ children }) {
     return () => unsubscribe();
   }, [loadUser]);
 
-  /* ===============================
-     LOGOUT
-  =============================== */
+  /* =====================================================
+     LOGOUT (🔥 HARD RESET)
+  ===================================================== */
+
   const logout = useCallback(async () => {
     try {
-      await signOut();
+      await signOut({ global: true });
+    } catch (err) {
+      console.error("Logout error:", err);
     } finally {
-      if (mountedRef.current) {
-        setUser(null);
-        setAppUser(null);
-        setLoading(false);
-      }
+      /* 🔥 guarantee clean state */
+      window.location.href = "/";
     }
   }, []);
+
+  /* =====================================================
+     CONTEXT VALUE
+  ===================================================== */
 
   return (
     <AuthContext.Provider
@@ -182,11 +220,15 @@ export function AuthProvider({ children }) {
   );
 }
 
+/* =====================================================
+   HOOK
+===================================================== */
+
 export function useAuth() {
   const context = useContext(AuthContext);
 
   if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error("useAuth must be used within AuthProvider");
   }
 
   return context;
