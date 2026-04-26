@@ -8,14 +8,11 @@ import { useAuth } from "./context/AuthContext";
 import CommunityPlusLandingPage from "./pages/CommunityPlusLandingPage/CommunityPlusLandingPage";
 import CommunityPlusDashboard from "./pages/Dashboard/CommunityPlusDashboard";
 import Onboarding from "./pages/Onboarding/CommunityPlusOnboarding";
-import AuthGate from "./pages/AuthGate";
 import CommunityPlusUserProfile from "./pages/CommunityPlusUserProfile/CommunityPlusUserProfile";
 import CommunityPlusYellowPages from "./pages/YellowPages/CommunityPlusYellowPages";
-import CommunityPlusHub from "./pages/CommunityPlusHub/CommunityPlusHub"; // ✅ FIXED
+import CommunityPlusHub from "./pages/CommunityPlusHub/CommunityPlusHub";
 import CommunityPlusAdTvPage from "./pages/CommunityPlusAdTvPage/CommunityPlusAdTvPage";
 import CommunityPlusHome from "./pages/CommunityPlusHome/CommunityPlusHome";
-
-/* 🔥 check this path exists */
 import PostComposer from "./components/Layout/Sidebar/Post/PostComposer";
 
 /* =========================
@@ -36,24 +33,32 @@ function AppLoading() {
 }
 
 /* =========================
-   ROUTE GUARDS (FIXED)
+   AUTH GUARDS
 ========================= */
 
 function ProtectedRoute({ user, loading, children }) {
   if (loading) return <AppLoading />;
-
-  if (!user?.authenticated) {
-    return <Navigate to="/" replace />;
-  }
-
+  if (!user?.authenticated) return <Navigate to="/" replace />;
   return children;
 }
 
 function PublicRoute({ user, loading, children }) {
   if (loading) return <AppLoading />;
+  if (user?.authenticated) return <Navigate to="/home" replace />;
+  return children;
+}
 
-  if (user?.authenticated) {
-    return <Navigate to="/auth-gate" replace />;
+/* =========================
+   🔥 ONBOARDING GUARD
+========================= */
+
+function RequireOnboarding({ appUser, loading, children }) {
+  if (loading) return <AppLoading />;
+
+  if (!appUser) return children;
+
+  if (!appUser.hasProfile) {
+    return <Navigate to="/profile-setup" replace />;
   }
 
   return children;
@@ -64,7 +69,7 @@ function PublicRoute({ user, loading, children }) {
 ========================= */
 
 export default function App() {
-  const { user, loading } = useAuth();
+  const { user, appUser, loading } = useAuth();
 
   return (
     <Routes>
@@ -82,25 +87,27 @@ export default function App() {
       />
 
       {/* =========================
-         AUTH GATE
+         PROFILE SETUP (ALWAYS ALLOWED)
       ========================= */}
       <Route
-        path="/auth-gate"
+        path="/profile-setup"
         element={
           <ProtectedRoute user={user} loading={loading}>
-            <AuthGate />
+            <Onboarding />
           </ProtectedRoute>
         }
       />
 
       {/* =========================
-         DASHBOARD (🔥 FIXED PATH)
+         APP SHELL
       ========================= */}
       <Route
         path="/*"
         element={
           <ProtectedRoute user={user} loading={loading}>
-            <CommunityPlusDashboard />
+            <RequireOnboarding appUser={appUser} loading={loading}>
+              <CommunityPlusDashboard />
+            </RequireOnboarding>
           </ProtectedRoute>
         }
       >
@@ -113,7 +120,6 @@ export default function App() {
         <Route path="channels" element={<CommunityPlusAdTvPage />} />
 
         {/* PROFILE */}
-        <Route path="profile-setup" element={<Onboarding />} />
         <Route path="profile" element={<CommunityPlusUserProfile />} />
 
         {/* DIRECTORY */}
