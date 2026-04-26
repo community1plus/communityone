@@ -1,7 +1,7 @@
 import { useMemo, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { NAVIGATION } from "../../../config/navigation";
-import { useMap } from "../../context/MapContext";
+import { NAVIGATION } from "../../../config/navigation/navigationConfig";
+import { useMap } from "../../../context/MapContext";
 
 import "./CommunityPlusSidebar.css";
 
