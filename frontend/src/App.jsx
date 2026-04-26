@@ -7,7 +7,7 @@ import { useAuth } from "./context/AuthContext";
 
 import CommunityPlusLandingPage from "../src/pages/CommunityPlusLandingPage/CommunityPlusLandingPage";
 import CommunityPlusDashboard from "../src/pages/Dashboard/CommunityPlusDashboard";
-import CommunityPlusOnboarding from "../src/pages/Onboarding/Onboarding";
+import CommunityPlusOnboarding from "../src/pages/Onboarding/CommunityPlusOnboarding.jsx";
 import CommunityPlusUserProfile from "../src/pages/CommunityPlusUserProfile/CommunityPlusUserProfile";
 
 /* =========================
