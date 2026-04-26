@@ -1,78 +1,278 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useRef,
+  useCallback,
+  useMemo,
+} from "react";
 
-/* =====================================================
-   AUTH GATE (🔥 STABLE + DEBUG ENABLED)
-===================================================== */
+import { fetchAuthSession, signOut } from "aws-amplify/auth";
+import { Hub } from "aws-amplify/utils";
 
-export default function AuthGate() {
-  const navigate = useNavigate();
+/* =========================
+   STORAGE
+========================= */
 
-  const {
-    user,
-    appUser,
-    loading,
-    initialized,
-  } = useAuth();
+const STORAGE_KEY = "auth_cache_v4";
+
+/* =========================
+   CONTEXT
+========================= */
+
+const AuthContext = createContext(null);
+
+/* =========================
+   PROVIDER
+========================= */
+
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(null);
+  const [appUser, setAppUser] = useState(undefined);
+
+  const [token, setToken] = useState(null);
+
+  const [loading, setLoading] = useState(true);
+  const [initialized, setInitialized] = useState(false);
+
+  const mountedRef = useRef(true);
+  const loadingRef = useRef(false);
 
   /* =========================
-     🔍 DEBUG LOGGING
-  ========================= */
-
-  console.log("🔐 AUTH GATE STATE:", {
-    user,
-    appUser,
-    loading,
-    initialized,
-  });
-
-  /* =========================
-     🚫 HARD BLOCK (CRITICAL)
-  ========================= */
-
-  if (!initialized) {
-    console.log("⏳ Auth not initialized yet");
-    return <div style={{ padding: 20 }}>Initialising...</div>;
-  }
-
-  /* =========================
-     ROUTING LOGIC
+     CACHE LOAD
   ========================= */
 
   useEffect(() => {
-    console.log("🚦 AuthGate routing decision start");
+    try {
+      const cached = localStorage.getItem(STORAGE_KEY);
 
-    if (!user) {
-      console.log("➡️ No user → redirect to landing");
-      navigate("/", { replace: true });
-      return;
+      if (cached) {
+        const parsed = JSON.parse(cached);
+
+        setUser(parsed.user || null);
+        setAppUser(parsed.appUser ?? null);
+        setToken(parsed.token || null);
+
+        setLoading(false); // instant UI
+      }
+    } catch {
+      console.warn("Cache parse failed");
     }
-
-    // 🔥 IMPORTANT: distinguish undefined vs null
-    if (appUser === undefined) {
-      console.log("⏳ appUser still loading → wait");
-      return;
-    }
-
-    if (appUser === null || !appUser?.hasProfile) {
-      console.log("➡️ No profile → onboarding");
-      navigate("/onboarding", { replace: true });
-      return;
-    }
-
-    console.log("➡️ User ready → dashboard");
-    navigate("/app", { replace: true });
-
-  }, [user, appUser, navigate]);
+  }, []);
 
   /* =========================
-     FALLBACK UI
+     CACHE SAVE
   ========================= */
 
-  return (
-    <div style={{ padding: 20 }}>
-      Routing...
-    </div>
+  const persistCache = useCallback((userData, appUserData, token) => {
+    try {
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({
+          user: userData,
+          appUser: appUserData,
+          token,
+          ts: Date.now(),
+        })
+      );
+    } catch {}
+  }, []);
+
+  /* =========================
+     LOAD USER (🔥 FIXED)
+  ========================= */
+
+  const loadUser = useCallback(async () => {
+    if (!mountedRef.current || loadingRef.current) return;
+
+    loadingRef.current = true;
+
+    try {
+      const session = await fetchAuthSession();
+
+      const tokens = session?.tokens;
+
+      if (!tokens?.accessToken) {
+        console.warn("⚠️ No access token");
+        return;
+      }
+
+      /* =========================
+         ✅ USE ACCESS TOKEN
+      ========================= */
+
+      const accessToken = tokens.accessToken.toString();
+      const payload = tokens.idToken?.payload || {};
+
+      const normalizedUser = {
+        authenticated: true,
+        sub: payload.sub || null,
+        email: payload.email || null,
+        username: payload["cognito:username"] || null,
+        name: payload.name || null,
+      };
+
+      if (mountedRef.current) {
+        setUser(normalizedUser);
+        setToken(accessToken);
+      }
+
+      /* =========================
+         BACKEND SYNC (/me)
+      ========================= */
+
+      let appUserData = null;
+
+      try {
+        const res = await fetch(
+          "https://communityone-backend.onrender.com/api/users/me",
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`, // 🔥 FIXED
+            },
+          }
+        );
+
+        if (res.status === 401) {
+          console.warn("⚠️ Unauthorized /me");
+          appUserData = null;
+        } else {
+          const data = await res.json();
+
+          appUserData = {
+            user: data?.user || null,
+            hasProfile: data?.hasProfile ?? false,
+            profile: data?.profile || null,
+          };
+        }
+      } catch (err) {
+        console.error("Backend sync failed:", err);
+      }
+
+      if (mountedRef.current) {
+        setAppUser(appUserData);
+      }
+
+      persistCache(normalizedUser, appUserData, accessToken);
+
+    } catch (err) {
+      console.error("Auth error:", err);
+
+      if (mountedRef.current) {
+        setUser(null);
+        setAppUser(null);
+        setToken(null);
+      }
+
+    } finally {
+      if (mountedRef.current) {
+        setLoading(false);
+        setInitialized(true); // 🔥 CRITICAL
+      }
+
+      loadingRef.current = false;
+    }
+  }, [persistCache]);
+
+  /* =========================
+     INIT
+  ========================= */
+
+  useEffect(() => {
+    mountedRef.current = true;
+
+    setTimeout(loadUser, 50);
+
+    return () => {
+      mountedRef.current = false;
+    };
+  }, [loadUser]);
+
+  /* =========================
+     AUTH EVENTS
+  ========================= */
+
+  useEffect(() => {
+    const unsub = Hub.listen("auth", ({ payload }) => {
+      const event = payload?.event;
+
+      console.log("🔔 Auth event:", event);
+
+      if (event === "signedIn" || event === "tokenRefresh") {
+        loadUser();
+      }
+
+      if (event === "signedOut") {
+        localStorage.removeItem(STORAGE_KEY);
+
+        if (mountedRef.current) {
+          setUser(null);
+          setAppUser(null);
+          setToken(null);
+          setLoading(false);
+          setInitialized(true);
+        }
+      }
+    });
+
+    return () => unsub();
+  }, [loadUser]);
+
+  /* =========================
+     LOGOUT
+  ========================= */
+
+  const logout = useCallback(async () => {
+    try {
+      await signOut({ global: true });
+    } finally {
+      localStorage.removeItem(STORAGE_KEY);
+
+      if (mountedRef.current) {
+        setUser(null);
+        setAppUser(null);
+        setToken(null);
+        setLoading(false);
+        setInitialized(true);
+      }
+    }
+  }, []);
+
+  /* =========================
+     CONTEXT VALUE
+  ========================= */
+
+  const value = useMemo(
+    () => ({
+      user,
+      appUser,
+      setAppUser,
+      token,          // 🔥 NOW USED BY useAPI
+      loading,
+      initialized,
+      logout,
+    }),
+    [user, appUser, token, loading, initialized, logout]
   );
+
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+/* =========================
+   HOOK
+========================= */
+
+export function useAuth() {
+  const ctx = useContext(AuthContext);
+
+  if (!ctx) {
+    throw new Error("useAuth must be used within AuthProvider");
+  }
+
+  return ctx;
 }
