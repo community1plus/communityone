@@ -1,7 +1,7 @@
 import "./CommunityPlusHub.css";
 import { useNavigate } from "react-router-dom";
 import { useMap } from "../../context/MapContext";
-import { categories } from "../../config/navigation/categories";
+import { CATEGORIES } from "../../config/navigation/categories";
 import { useCallback } from "react";
 
 export default function CommunityPlusHub() {
