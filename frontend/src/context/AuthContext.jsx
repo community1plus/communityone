@@ -11,6 +11,12 @@ import { fetchAuthSession, signOut } from "aws-amplify/auth";
 import { Hub } from "aws-amplify/utils";
 
 /* =========================
+   STORAGE
+========================= */
+
+const STORAGE_KEY = "auth_cache_v1";
+
+/* =========================
    CONTEXT
 ========================= */
 
@@ -21,51 +27,86 @@ const AuthContext = createContext(null);
 ========================= */
 
 export function AuthProvider({ children }) {
+  /* =========================
+     STATE
+  ========================= */
+
   const [user, setUser] = useState(null);
-  const [appUser, setAppUser] = useState(null);
+  const [appUser, setAppUser] = useState(undefined);
   const [loading, setLoading] = useState(true);
 
   const mountedRef = useRef(true);
+  const loadingRef = useRef(false);
 
   /* =========================
-     LOAD USER (🔥 STABLE)
+     🔥 LOAD CACHE (INSTANT UI)
+  ========================= */
+
+  useEffect(() => {
+    try {
+      const cached = localStorage.getItem(STORAGE_KEY);
+
+      if (cached) {
+        const parsed = JSON.parse(cached);
+
+        console.log("⚡ CACHE HIT");
+
+        setUser(parsed.user || null);
+        setAppUser(parsed.appUser ?? null);
+
+        // 🔥 allow UI immediately
+        setLoading(false);
+      }
+    } catch (err) {
+      console.warn("Cache parse failed");
+    }
+  }, []);
+
+  /* =========================
+     🔥 SAVE CACHE
+  ========================= */
+
+  const persistCache = useCallback((userData, appUserData) => {
+    try {
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({
+          user: userData,
+          appUser: appUserData,
+          ts: Date.now(),
+        })
+      );
+    } catch {}
+  }, []);
+
+  /* =========================
+     LOAD USER (REAL SOURCE)
   ========================= */
 
   const loadUser = useCallback(async () => {
-    if (!mountedRef.current) return;
+    if (!mountedRef.current || loadingRef.current) return;
+
+    loadingRef.current = true;
 
     try {
-      const session = await fetchAuthSession();
-      const tokens = session?.tokens;
+      let session;
 
-      console.log("SESSION:", session);
-      console.log("TOKENS:", tokens);
-
-      /* =========================
-         NO TOKENS → WAIT FOR EVENT
-      ========================= */
-
-      if (!tokens?.idToken || !tokens?.accessToken) {
-        console.log("⚠️ No tokens yet (waiting)");
-
+      try {
+        session = await fetchAuthSession();
+      } catch {
         if (mountedRef.current) {
           setUser(null);
           setAppUser(null);
-          setLoading(false); // 🔥 IMPORTANT
         }
-
         return;
       }
 
-      /* =========================
-         🔥 TOKEN STRING (NEW)
-      ========================= */
+      const tokens = session?.tokens;
 
-      const tokenString = tokens.idToken.toString();
-
-      /* =========================
-         NORMALISE USER
-      ========================= */
+      if (!tokens?.idToken || !tokens?.accessToken) {
+        console.log("⚠️ Tokens not ready");
+        return;
+      }
 
       const idPayload = tokens.idToken.payload || {};
       const accessPayload = tokens.accessToken.payload || {};
@@ -74,15 +115,12 @@ export function AuthProvider({ children }) {
         authenticated: true,
         sub: idPayload.sub || null,
         email: idPayload.email || null,
-        email_verified: idPayload.email_verified || false,
         username:
           accessPayload.username ||
           idPayload["cognito:username"] ||
-          idPayload.username ||
           null,
         name: idPayload.name || null,
-
-        token: tokenString, // 🔥 CRITICAL ADD
+        token: tokens.idToken.toString(),
       };
 
       if (mountedRef.current) {
@@ -90,34 +128,35 @@ export function AuthProvider({ children }) {
       }
 
       /* =========================
-         BACKEND USER (SYNC)
+         BACKEND SYNC
       ========================= */
+
+      let appUserData = null;
 
       try {
         const res = await fetch(
           "https://communityone-backend.onrender.com/api/users/me",
           {
             headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${tokenString}`,
+              Authorization: `Bearer ${normalizedUser.token}`,
             },
           }
         );
 
         const data = await res.json();
 
-        console.log("📦 BACKEND USER:", data);
+        appUserData = {
+          user: data?.user || null,
+          hasProfile: data?.hasProfile ?? false,
+          profile: data?.profile || null,
+        };
 
         if (mountedRef.current) {
-          setAppUser({
-            user: data?.user || null,
-            hasProfile: data?.hasProfile || false,
-            profile: data?.profile || null,
-          });
+          setAppUser(appUserData);
         }
 
       } catch (err) {
-        console.error("❌ Backend fetch failed:", err);
+        console.error("Backend sync failed");
 
         if (mountedRef.current) {
           setAppUser({
@@ -128,8 +167,14 @@ export function AuthProvider({ children }) {
         }
       }
 
+      /* =========================
+         🔥 SAVE CACHE
+      ========================= */
+
+      persistCache(normalizedUser, appUserData);
+
     } catch (err) {
-      console.error("❌ Auth error:", err);
+      console.error("Auth error:", err);
 
       if (mountedRef.current) {
         setUser(null);
@@ -140,16 +185,20 @@ export function AuthProvider({ children }) {
       if (mountedRef.current) {
         setLoading(false);
       }
+
+      loadingRef.current = false;
     }
-  }, []);
+  }, [persistCache]);
 
   /* =========================
-     INITIAL LOAD
+     INITIAL LOAD (BACKGROUND)
   ========================= */
 
   useEffect(() => {
     mountedRef.current = true;
-    loadUser();
+
+    // 🔥 delay avoids blocking first paint
+    setTimeout(loadUser, 50);
 
     return () => {
       mountedRef.current = false;
@@ -167,7 +216,7 @@ export function AuthProvider({ children }) {
       console.log("🔔 Auth event:", event);
 
       if (event === "signedIn") {
-        setLoading(true);
+        setAppUser(undefined);
         loadUser();
       }
 
@@ -176,6 +225,8 @@ export function AuthProvider({ children }) {
       }
 
       if (event === "signedOut") {
+        localStorage.removeItem(STORAGE_KEY);
+
         if (mountedRef.current) {
           setUser(null);
           setAppUser(null);
@@ -194,9 +245,9 @@ export function AuthProvider({ children }) {
   const logout = useCallback(async () => {
     try {
       await signOut({ global: true });
-    } catch (err) {
-      console.error("Logout error:", err);
     } finally {
+      localStorage.removeItem(STORAGE_KEY);
+
       if (mountedRef.current) {
         setUser(null);
         setAppUser(null);
@@ -206,7 +257,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   /* =========================
-     CONTEXT VALUE
+     CONTEXT
   ========================= */
 
   return (
@@ -229,11 +280,11 @@ export function AuthProvider({ children }) {
 ========================= */
 
 export function useAuth() {
-  const context = useContext(AuthContext);
+  const ctx = useContext(AuthContext);
 
-  if (!context) {
+  if (!ctx) {
     throw new Error("useAuth must be used within AuthProvider");
   }
 
-  return context;
+  return ctx;
 }

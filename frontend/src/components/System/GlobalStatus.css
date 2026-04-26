@@ -1,0 +1,36 @@
+/* 🔥 TOP LOADER */
+.top-loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 100%;
+  background: linear-gradient(90deg, #4a0f0f, #ff6b6b);
+  animation: loadingSlide 1s infinite;
+  z-index: 9999;
+}
+
+@keyframes loadingSlide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* 🔥 SAVE INDICATOR */
+.save-indicator {
+  position: fixed;
+  top: 10px;
+  right: 20px;
+
+  background: #111;
+  color: #fff;
+
+  padding: 8px 12px;
+  border-radius: 8px;
+
+  font-size: 13px;
+  font-weight: 500;
+
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+
+  z-index: 9999;
+}

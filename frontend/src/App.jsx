@@ -1,173 +1,252 @@
-import { Routes, Route, Navigate } from "react-router-dom";
-import { useAuth } from "./context/AuthContext";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useRef,
+  useCallback,
+} from "react";
+
+import { fetchAuthSession, signOut } from "aws-amplify/auth";
+import { Hub } from "aws-amplify/utils";
 
 /* =========================
-   PAGES
+   CONTEXT
 ========================= */
 
-import CommunityPlusLandingPage from "./pages/CommunityPlusLandingPage/CommunityPlusLandingPage";
-import CommunityPlusDashboard from "./pages/Dashboard/CommunityPlusDashboard";
-import Onboarding from "./pages/Onboarding/CommunityPlusOnboarding";
-import CommunityPlusUserProfile from "./pages/CommunityPlusUserProfile/CommunityPlusUserProfile";
-import CommunityPlusYellowPages from "./pages/YellowPages/CommunityPlusYellowPages";
-import CommunityPlusHub from "./pages/CommunityPlusHub/CommunityPlusHub";
-import CommunityPlusAdTvPage from "./pages/CommunityPlusAdTvPage/CommunityPlusAdTvPage";
-import CommunityPlusHome from "./pages/CommunityPlusHome/CommunityPlusHome";
-import PostComposer from "./components/Layout/Sidebar/Post/PostComposer";
+const AuthContext = createContext(null);
 
 /* =========================
-   STYLES
+   PROVIDER
 ========================= */
 
-import "./styles/tokens.css";
-import "./styles/base.css";
-import "./Typography/Typography.css";
-import "./theme/theme.css";
-
-/* =========================
-   LOADING
-========================= */
-
-function AppLoading() {
-  return <div style={{ padding: 20 }}>Initialising...</div>;
-}
-
-/* =========================
-   ROUTE GUARDS
-========================= */
-
-function ProtectedRoute({ user, loading, children }) {
-  if (loading) return <AppLoading />;
-
-  if (!user || !user.authenticated) {
-    return <Navigate to="/" replace />;
-  }
-
-  return children;
-}
-
-function PublicRoute({ user, loading, children }) {
-  if (loading) return <AppLoading />;
-
-  if (user && user.authenticated) {
-    return <Navigate to="/home" replace />;
-  }
-
-  return children;
-}
-
-/* =========================
-   ONBOARDING GUARD (🔥 FIXED)
-========================= */
-
-function RequireOnboarding({ appUser, loading, children }) {
-  if (loading) return <AppLoading />;
-
-  if (!appUser) return children;
-
-  const path = window.location.pathname;
-
-  // 🔥 allow onboarding route inside dashboard
-  if (path.startsWith("/profile-setup")) {
-    return children;
-  }
-
-  if (!appUser.hasProfile) {
-    return <Navigate to="/profile-setup" replace />;
-  }
-
-  return children;
-}
-
-/* =========================
-   APP
-========================= */
-
-export default function App() {
-  const { user, appUser, loading } = useAuth();
-
+export function AuthProvider({ children }) {
   /* =========================
-     FAILSAFE
+     STATE (🔥 FIXED)
   ========================= */
 
-  if (!loading && (!user || !user.authenticated)) {
-    return <CommunityPlusLandingPage />;
-  }
+  const [user, setUser] = useState(null);
+  const [appUser, setAppUser] = useState(undefined); // 🔥 undefined = not loaded
+  const [loading, setLoading] = useState(true);
+
+  const mountedRef = useRef(true);
+  const loadingRef = useRef(false);
 
   /* =========================
-     ROUTES
+     LOAD USER (🔥 HARDENED)
   ========================= */
+
+  const loadUser = useCallback(async () => {
+    if (!mountedRef.current || loadingRef.current) return;
+
+    loadingRef.current = true;
+
+    try {
+      /* =========================
+         FETCH SESSION
+      ========================= */
+
+      let session;
+      try {
+        session = await fetchAuthSession();
+      } catch {
+        // No session is normal
+        if (mountedRef.current) {
+          setUser(null);
+          setAppUser(null);
+        }
+        return;
+      }
+
+      const tokens = session?.tokens;
+
+      console.log("SESSION:", session);
+      console.log("TOKENS:", tokens);
+
+      /* =========================
+         WAIT FOR TOKENS (🔥 FIX)
+      ========================= */
+
+      if (!tokens?.idToken || !tokens?.accessToken) {
+        console.log("⚠️ Tokens not ready yet");
+
+        // 🔥 DO NOT set loading false here
+        return;
+      }
+
+      /* =========================
+         NORMALISE USER
+      ========================= */
+
+      const idPayload = tokens.idToken.payload || {};
+      const accessPayload = tokens.accessToken.payload || {};
+
+      const normalizedUser = {
+        authenticated: true,
+        sub: idPayload.sub || null,
+        email: idPayload.email || null,
+        email_verified: idPayload.email_verified || false,
+        username:
+          accessPayload.username ||
+          idPayload["cognito:username"] ||
+          idPayload.username ||
+          null,
+        name: idPayload.name || null,
+        token: tokens.idToken.toString(),
+      };
+
+      if (mountedRef.current) {
+        setUser(normalizedUser);
+      }
+
+      /* =========================
+         BACKEND USER (🔥 SYNC)
+      ========================= */
+
+      try {
+        const res = await fetch(
+          "https://communityone-backend.onrender.com/api/users/me",
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${normalizedUser.token}`,
+            },
+          }
+        );
+
+        const data = await res.json();
+
+        console.log("📦 BACKEND USER:", data);
+
+        if (mountedRef.current) {
+          setAppUser({
+            user: data?.user || null,
+            hasProfile: data?.hasProfile ?? false,
+            profile: data?.profile || null,
+          });
+        }
+
+      } catch (err) {
+        console.error("❌ Backend fetch failed:", err);
+
+        if (mountedRef.current) {
+          setAppUser({
+            user: null,
+            hasProfile: false,
+            profile: null,
+          });
+        }
+      }
+
+    } catch (err) {
+      console.error("❌ Auth error:", err);
+
+      if (mountedRef.current) {
+        setUser(null);
+        setAppUser(null);
+      }
+
+    } finally {
+      if (mountedRef.current) {
+        setLoading(false); // 🔥 ONLY here
+      }
+
+      loadingRef.current = false;
+    }
+  }, []);
+
+  /* =========================
+     INITIAL LOAD
+  ========================= */
+
+  useEffect(() => {
+    mountedRef.current = true;
+    loadUser();
+
+    return () => {
+      mountedRef.current = false;
+    };
+  }, [loadUser]);
+
+  /* =========================
+     AUTH EVENTS
+  ========================= */
+
+  useEffect(() => {
+    const unsub = Hub.listen("auth", ({ payload }) => {
+      const event = payload?.event;
+
+      console.log("🔔 Auth event:", event);
+
+      if (event === "signedIn") {
+        setLoading(true);
+        setAppUser(undefined); // 🔥 reset properly
+        loadUser();
+      }
+
+      if (event === "tokenRefresh") {
+        loadUser();
+      }
+
+      if (event === "signedOut") {
+        if (mountedRef.current) {
+          setUser(null);
+          setAppUser(null);
+          setLoading(false);
+        }
+      }
+    });
+
+    return () => unsub();
+  }, [loadUser]);
+
+  /* =========================
+     LOGOUT
+  ========================= */
+
+  const logout = useCallback(async () => {
+    try {
+      await signOut({ global: true });
+    } catch (err) {
+      console.error("Logout error:", err);
+    } finally {
+      if (mountedRef.current) {
+        setUser(null);
+        setAppUser(null);
+        setLoading(false);
+      }
+    }
+  }, []);
+
+  /* =========================
+     CONTEXT VALUE
+  ========================= */
+
+  const value = {
+    user,
+    appUser,
+    setAppUser,
+    loading,
+    logout,
+  };
 
   return (
-    <Routes>
-
-      {/* =========================
-         PUBLIC
-      ========================= */}
-      <Route
-        path="/"
-        element={
-          <PublicRoute user={user} loading={loading}>
-            <CommunityPlusLandingPage />
-          </PublicRoute>
-        }
-      />
-
-      {/* =========================
-         APP SHELL (🔥 FIXED)
-      ========================= */}
-      <Route
-        path="/*"
-        element={
-          <ProtectedRoute user={user} loading={loading}>
-            <RequireOnboarding appUser={appUser} loading={loading}>
-              <CommunityPlusDashboard />
-            </RequireOnboarding>
-          </ProtectedRoute>
-        }
-      >
-        {/* DEFAULT */}
-        <Route index element={<Navigate to="home" replace />} />
-
-        {/* 🔥 FIX: PROFILE SETUP INSIDE DASHBOARD */}
-        <Route path="profile-setup" element={<Onboarding />} />
-
-        {/* CORE */}
-        <Route path="home" element={<CommunityPlusHome />} />
-        <Route path="communityplus" element={<CommunityPlusHub />} />
-        <Route path="channels" element={<CommunityPlusAdTvPage />} />
-
-        {/* PROFILE */}
-        <Route path="profile" element={<CommunityPlusUserProfile />} />
-
-        {/* DIRECTORY */}
-        <Route path="yellowpages" element={<CommunityPlusYellowPages />} />
-
-        {/* ACTIONS */}
-        <Route path="post" element={<PostComposer />} />
-        <Route path="event" element={<SimplePage title="Event" />} />
-        <Route path="incident" element={<SimplePage title="Incident" />} />
-        <Route path="beacon" element={<SimplePage title="Beacon" />} />
-
-        {/* MISC */}
-        <Route path="search" element={<SimplePage title="Search" />} />
-        <Route path="about" element={<SimplePage title="About" />} />
-        <Route path="merch" element={<SimplePage title="Merch" />} />
-      </Route>
-
-      {/* =========================
-         FALLBACK
-      ========================= */}
-      <Route path="*" element={<Navigate to="/" replace />} />
-
-    </Routes>
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
   );
 }
 
 /* =========================
-   SIMPLE PAGE
+   HOOK
 ========================= */
 
-function SimplePage({ title }) {
-  return <div style={{ padding: 20 }}>{title}</div>;
+export function useAuth() {
+  const context = useContext(AuthContext);
+
+  if (!context) {
+    throw new Error("useAuth must be used within AuthProvider");
+  }
+
+  return context;
 }

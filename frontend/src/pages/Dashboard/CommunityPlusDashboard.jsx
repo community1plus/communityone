@@ -4,12 +4,14 @@ import { useNavigate, Outlet, useLocation } from "react-router-dom";
 
 import { useAuth } from "../../context/AuthContext";
 import { MapProvider, useMap } from "../../context/MapContext";
+import { useUI } from "../../context/UIContext";
 
 import useVoiceAlerts from "../../../hooks/useVoiceAlerts";
 import useProfileSync from "../../hooks/useProfileSync";
 
 import CommunityPlusHeader from "../../components/Layout/Header/CommunityPlusHeader";
 import CommunityPlusSidebar from "../../components/Layout/Sidebar/CommunityPlusSidebar";
+import GlobalStatusBar from "../../components/System/GlobalStatusBar";
 
 import "./CommunityPlusDashboard.css";
 
@@ -20,7 +22,9 @@ import "./CommunityPlusDashboard.css";
 function DashboardInner({ effectiveUser, onLogout }) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
-  const { appUser } = useAuth();
+
+  const { appUser, loading } = useAuth();
+  const { startLoading, stopLoading } = useUI();
 
   const {
     filteredMarkers,
@@ -37,21 +41,21 @@ function DashboardInner({ effectiveUser, onLogout }) {
   useProfileSync();
 
   /* =========================
-     🔒 ONBOARDING ENFORCEMENT
+     🔒 ONBOARDING ENFORCEMENT (FIXED)
   ========================= */
 
   useEffect(() => {
-    if (!appUser) return;
+    if (loading || appUser === undefined) return;
 
     const isOnboardingRoute = pathname.startsWith("/profile-setup");
 
-    if (!appUser.hasProfile && !isOnboardingRoute) {
+    if (!appUser?.hasProfile && !isOnboardingRoute) {
       navigate("/profile-setup", { replace: true });
     }
-  }, [appUser, pathname, navigate]);
+  }, [appUser, loading, pathname, navigate]);
 
   /* =========================
-     📍 LOCATION (SAFE + ONCE)
+     📍 LOCATION (ISOLATED)
   ========================= */
 
   useEffect(() => {
@@ -60,25 +64,29 @@ function DashboardInner({ effectiveUser, onLogout }) {
 
     if (!navigator.geolocation) return;
 
+    startLoading();
+
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         updateUserLocation({
           lat: pos.coords.latitude,
           lng: pos.coords.longitude,
         });
+        stopLoading();
       },
       (err) => {
         console.warn("📍 Location denied:", err?.message);
+        stopLoading();
       },
       {
         enableHighAccuracy: false,
         timeout: 5000,
       }
     );
-  }, [updateUserLocation]);
+  }, [updateUserLocation, startLoading, stopLoading]);
 
   /* =========================
-     📊 COUNTS
+     📊 COUNTS (OPTIMISED)
   ========================= */
 
   const counts = useMemo(() => {
@@ -90,7 +98,7 @@ function DashboardInner({ effectiveUser, onLogout }) {
   }, [filteredMarkers]);
 
   /* =========================
-     🔊 VOICE ALERTS (STABLE)
+     🔊 VOICE ALERTS
   ========================= */
 
   useVoiceAlerts({
@@ -106,7 +114,7 @@ function DashboardInner({ effectiveUser, onLogout }) {
   const isFullWidthRoute = useMemo(() => {
     const FULL_WIDTH_ROUTES = [
       "/profile",
-      "/profile-setup", // 🔥 include onboarding
+      "/profile-setup",
       "/yellowpages",
       "/communityplus",
       "/post",
@@ -128,6 +136,8 @@ function DashboardInner({ effectiveUser, onLogout }) {
 
   return (
     <div className="app-shell">
+      <GlobalStatusBar /> {/* 🔥 GLOBAL UX */}
+
       <CommunityPlusHeader
         user={effectiveUser}
         onLogout={onLogout}
@@ -168,14 +178,13 @@ export default function CommunityPlusDashboard() {
   );
 
   /* =========================
-     LOGOUT (HARDENED)
+     LOGOUT (CLEAN)
   ========================= */
 
   const handleLogout = useCallback(async () => {
     try {
       await signOut({ global: true });
 
-      // 🔥 clear any local onboarding state
       localStorage.removeItem("onboarding_draft");
 
       navigate("/", { replace: true });
@@ -185,7 +194,7 @@ export default function CommunityPlusDashboard() {
   }, [navigate]);
 
   /* =========================
-     LOADING STATE
+     LOADING (STRICT)
   ========================= */
 
   if (loading) {
