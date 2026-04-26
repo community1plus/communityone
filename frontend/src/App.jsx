@@ -33,28 +33,39 @@ function AppLoading() {
 }
 
 /* =========================
-   AUTH GUARDS
+   ROUTE GUARDS (🔥 FIXED)
 ========================= */
 
 function ProtectedRoute({ user, loading, children }) {
   if (loading) return <AppLoading />;
-  if (!user?.authenticated) return <Navigate to="/" replace />;
+
+  // 🔥 explicit check (fixes blank screen bug)
+  if (!user || !user.authenticated) {
+    return <Navigate to="/" replace />;
+  }
+
   return children;
 }
 
 function PublicRoute({ user, loading, children }) {
   if (loading) return <AppLoading />;
-  if (user?.authenticated) return <Navigate to="/home" replace />;
+
+  // 🔥 only redirect if truly authenticated
+  if (user && user.authenticated) {
+    return <Navigate to="/home" replace />;
+  }
+
   return children;
 }
 
 /* =========================
-   🔥 ONBOARDING GUARD
+   ONBOARDING GUARD
 ========================= */
 
 function RequireOnboarding({ appUser, loading, children }) {
   if (loading) return <AppLoading />;
 
+  // 🔥 allow render if backend not ready yet
   if (!appUser) return children;
 
   if (!appUser.hasProfile) {
@@ -70,6 +81,21 @@ function RequireOnboarding({ appUser, loading, children }) {
 
 export default function App() {
   const { user, appUser, loading } = useAuth();
+
+  /* 🔥 DEBUG (remove later) */
+  console.log("APP STATE:", { user, appUser, loading });
+
+  /* =========================
+     🔥 FAILSAFE (CRITICAL FIX)
+  ========================= */
+
+  if (!loading && (!user || !user.authenticated)) {
+    return <CommunityPlusLandingPage />;
+  }
+
+  /* =========================
+     ROUTES
+  ========================= */
 
   return (
     <Routes>
@@ -87,7 +113,7 @@ export default function App() {
       />
 
       {/* =========================
-         PROFILE SETUP (ALWAYS ALLOWED)
+         PROFILE SETUP
       ========================= */}
       <Route
         path="/profile-setup"
