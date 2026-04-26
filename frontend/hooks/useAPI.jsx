@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { createAPI } from "./api"; // your existing api file
+import { createAPI } from "../../services/api";
 import { useAuth } from "../context/AuthContext";
 import { useUI } from "../context/UIContext";
 
