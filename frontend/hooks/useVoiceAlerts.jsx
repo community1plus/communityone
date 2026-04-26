@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { getDistanceMeters } from "../utils/distance";
+import { getDistanceMeters } from "../../src/utils/location";
 
 export default function useVoiceAlerts({
   counts,
