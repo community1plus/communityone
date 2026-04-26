@@ -2,7 +2,7 @@ import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 
 /* =========================
-   PAGES
+   PAGES (✅ VERIFY PATHS)
 ========================= */
 
 import CommunityPlusLandingPage from "./pages/CommunityPlusLandingPage/CommunityPlusLandingPage";
@@ -12,9 +12,11 @@ import AuthGate from "./pages/AuthGate";
 import CommunityPlusUserProfile from "./pages/CommunityPlusUserProfile/CommunityPlusUserProfile";
 import CommunityPlusYellowPages from "./pages/YellowPages/CommunityPlusYellowPages";
 import CommunityPlusHub from "./pages/CommunityPlusHub/CommunityPlusHub";
-import PostComposer from "./components/Layout/Sidebar/Post/PostComposer";
 import CommunityPlusAdTvPage from "./pages/CommunityPlusAdTvPage/CommunityPlusAdTvPage";
 import CommunityPlusHome from "./pages/CommunityPlusHome/CommunityPlusHome";
+
+/* 🔥 IMPORTANT: this path is often wrong */
+import PostComposer from "./components/Layout/Sidebar/Post/PostComposer";
 
 /* =========================
    STYLES
@@ -34,27 +36,17 @@ function AppLoading() {
 }
 
 /* =========================
-   AUTH HELPERS
-========================= */
-
-function usePermissions() {
-  const { user, appUser } = useAuth();
-
-  return {
-    role: appUser?.role || user?.role || "user",
-    features: appUser?.features || user?.features || [],
-  };
-}
-
-/* =========================
-   ROUTE GUARDS
+   ROUTE GUARDS (SIMPLIFIED)
 ========================= */
 
 function RequireAuth() {
   const { user, loading } = useAuth();
 
   if (loading) return <AppLoading />;
-  if (!user?.authenticated) return <Navigate to="/" replace />;
+
+  if (!user?.authenticated) {
+    return <Navigate to="/" replace />;
+  }
 
   return <Outlet />;
 }
@@ -63,34 +55,9 @@ function RequirePublic() {
   const { user, loading } = useAuth();
 
   if (loading) return <AppLoading />;
-  if (user?.authenticated) return <Navigate to="/auth-gate" replace />;
 
-  return <Outlet />;
-}
-
-/* =========================
-   FEATURE GUARD
-========================= */
-
-function RequireFeature({ feature }) {
-  const { features } = usePermissions();
-
-  if (!features.includes(feature)) {
-    return <Navigate to="/home" replace />;
-  }
-
-  return <Outlet />;
-}
-
-/* =========================
-   ROLE GUARD
-========================= */
-
-function RequireRole({ roles }) {
-  const { role } = usePermissions();
-
-  if (!roles.includes(role)) {
-    return <Navigate to="/home" replace />;
+  if (user?.authenticated) {
+    return <Navigate to="/auth-gate" replace />;
   }
 
   return <Outlet />;
@@ -104,17 +71,23 @@ export default function App() {
   return (
     <Routes>
 
-      {/* PUBLIC */}
+      {/* =========================
+         PUBLIC
+      ========================= */}
       <Route element={<RequirePublic />}>
         <Route path="/" element={<CommunityPlusLandingPage />} />
       </Route>
 
-      {/* AUTH GATE */}
+      {/* =========================
+         AUTH GATE
+      ========================= */}
       <Route element={<RequireAuth />}>
         <Route path="/auth-gate" element={<AuthGate />} />
       </Route>
 
-      {/* APP SHELL */}
+      {/* =========================
+         APP SHELL
+      ========================= */}
       <Route element={<RequireAuth />}>
         <Route path="/*" element={<CommunityPlusDashboard />}>
 
@@ -124,42 +97,42 @@ export default function App() {
           {/* CORE */}
           <Route path="home" element={<CommunityPlusHome />} />
           <Route path="communityplus" element={<CommunityPlusHub />} />
-
-          {/* FEATURE-GATED */}
-          <Route element={<RequireFeature feature="ads" />}>
-            <Route path="channels" element={<CommunityPlusAdTvPage />} />
-          </Route>
+          <Route path="channels" element={<CommunityPlusAdTvPage />} />
 
           {/* PROFILE */}
           <Route path="profile-setup" element={<Onboarding />} />
           <Route path="profile" element={<CommunityPlusUserProfile />} />
 
-          {/* DIRECTORY (feature gated) */}
-          <Route element={<RequireFeature feature="yellowpages" />}>
-            <Route path="yellowpages" element={<CommunityPlusYellowPages />} />
-          </Route>
+          {/* DIRECTORY */}
+          <Route path="yellowpages" element={<CommunityPlusYellowPages />} />
 
           {/* ACTIONS */}
-          <Route element={<RequireFeature feature="posts" />}>
-            <Route path="post" element={<PostComposer />} />
-          </Route>
+          <Route path="post" element={<PostComposer />} />
+          <Route path="event" element={<SimplePage title="Event" />} />
+          <Route path="incident" element={<SimplePage title="Incident" />} />
+          <Route path="beacon" element={<SimplePage title="Beacon" />} />
 
-          {/* ROLE-GATED (example) */}
-          <Route element={<RequireRole roles={["admin"]} />}>
-            <Route path="admin" element={<div>Admin Panel</div>} />
-          </Route>
-
-          {/* BASIC */}
-          <Route path="event" element={<div style={{ padding: 20 }}>Event</div>} />
-          <Route path="incident" element={<div style={{ padding: 20 }}>Incident</div>} />
-          <Route path="beacon" element={<div style={{ padding: 20 }}>Beacon</div>} />
+          {/* MISC */}
+          <Route path="search" element={<SimplePage title="Search" />} />
+          <Route path="about" element={<SimplePage title="About" />} />
+          <Route path="merch" element={<SimplePage title="Merch" />} />
 
         </Route>
       </Route>
 
-      {/* FALLBACK */}
+      {/* =========================
+         FALLBACK
+      ========================= */}
       <Route path="*" element={<Navigate to="/" replace />} />
 
     </Routes>
   );
+}
+
+/* =========================
+   SIMPLE PAGE (avoids inline JSX duplication)
+========================= */
+
+function SimplePage({ title }) {
+  return <div style={{ padding: 20 }}>{title}</div>;
 }
