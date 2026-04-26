@@ -1,5 +1,9 @@
 import { useMemo } from "react";
-import { createAPI } from "../../services/api";
+import { createAPI } from "../src/services/api";
+
+/* =====================================================
+   API FETCH (🔥 CORE)
+===================================================== */
 import { useAuth } from "../context/AuthContext";
 import { useUI } from "../context/UIContext";
 
