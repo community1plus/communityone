@@ -5,9 +5,9 @@ import { useAuth } from "./context/AuthContext";
    PAGES
 ========================= */
 
-import CommunityPlusLandingPage from "./pages/Landing/CommunityPlusLandingPage";
-import CommunityPlusDashboard from "./pages/Dashboard/CommunityPlusDashboard";
-import CommunityPlusOnboarding from "./pages/Profile/CommunityPlusOnboarding";
+import CommunityPlusLandingPage from "../pages/Landing/CommunityPlusLandingPage";
+import CommunityPlusDashboard from "../pages/Dashboard/CommunityPlusDashboard";
+import CommunityPlusOnboarding from "../pages/Profile/CommunityPlusOnboarding";
 
 /* =========================
    ROUTE GUARDS
