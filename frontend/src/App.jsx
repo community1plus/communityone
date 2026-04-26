@@ -5,10 +5,10 @@ import { useAuth } from "./context/AuthContext";
    PAGES (MATCH YOUR FOLDERS)
 ========================= */
 
-import CommunityPlusLandingPage from "../pages/CommunityPlusLandingPage/CommunityPlusLandingPage";
-import CommunityPlusDashboard from "../pages/Dashboard/CommunityPlusDashboard";
-import CommunityPlusOnboarding from "../pages/Onboarding/Onboarding";
-import CommunityPlusUserProfile from "../pages/CommunityPlusUserProfile/CommunityPlusUserProfile";
+import CommunityPlusLandingPage from "../src/pages/CommunityPlusLandingPage/CommunityPlusLandingPage";
+import CommunityPlusDashboard from "../src/pages/Dashboard/CommunityPlusDashboard";
+import CommunityPlusOnboarding from "../src/pages/Onboarding/Onboarding";
+import CommunityPlusUserProfile from "../src/pages/CommunityPlusUserProfile/CommunityPlusUserProfile";
 
 /* =========================
    ROUTE GUARDS
