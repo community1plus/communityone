@@ -4,7 +4,7 @@ import { createAPI } from "../src/services/api";
 /* =====================================================
    API FETCH (🔥 CORE)
 ===================================================== */
-import { useAuth } from "../src/context
+import { useAuth } from "../src/context/AuthContext";
 import { useUI } from "../src/context/UIContext";
 
 /* =====================================================
