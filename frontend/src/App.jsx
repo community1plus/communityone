@@ -2,12 +2,13 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 
 /* =========================
-   PAGES
+   PAGES (MATCH YOUR FOLDERS)
 ========================= */
 
-import CommunityPlusLandingPage from "../pages/Landing/CommunityPlusLandingPage";
-import CommunityPlusDashboard from "../pages/Dashboard/CommunityPlusDashboard";
-import CommunityPlusOnboarding from "../pages/Profile/CommunityPlusOnboarding";
+import CommunityPlusLandingPage from "./pages/CommunityPlusLandingPage/CommunityPlusLandingPage";
+import CommunityPlusDashboard from "./pages/Dashboard/CommunityPlusDashboard";
+import CommunityPlusOnboarding from "./pages/Onboarding/Onboarding";
+import CommunityPlusUserProfile from "./pages/CommunityPlusUserProfile/CommunityPlusUserProfile";
 
 /* =========================
    ROUTE GUARDS
@@ -49,16 +50,10 @@ function OnboardingGate({ children }) {
 function App() {
   return (
     <Routes>
-      {/* =========================
-         PUBLIC
-      ========================= */}
-
+      {/* PUBLIC */}
       <Route path="/" element={<CommunityPlusLandingPage />} />
 
-      {/* =========================
-         ONBOARDING
-      ========================= */}
-
+      {/* ONBOARDING */}
       <Route
         path="/onboarding"
         element={
@@ -68,10 +63,21 @@ function App() {
         }
       />
 
-      {/* =========================
-         DASHBOARD
-      ========================= */}
+      {/* PROFILE EDIT (INSIDE APP SHELL) */}
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <OnboardingGate>
+              <CommunityPlusDashboard />
+            </OnboardingGate>
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<CommunityPlusUserProfile />} />
+      </Route>
 
+      {/* DASHBOARD */}
       <Route
         path="/app/*"
         element={
@@ -83,17 +89,10 @@ function App() {
         }
       />
 
-      {/* =========================
-         FALLBACK
-      ========================= */}
-
+      {/* FALLBACK */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
-
-/* =========================
-   🔥 THIS FIXES YOUR ERROR
-========================= */
 
 export default App;
