@@ -10,7 +10,7 @@ import useAPI from "../../../hooks/useAPI";
 import useAutosave from "../../../hooks/useAutosave";
 import useOptimisticUpdate from "../../hooks/useOptimisticUpdate";
 import useDirtyFields from "../../../hooks/useDirtyFields";
-import { buildPatch } from "../utils/buildPatch";
+import { buildPatch } from "../../utils";
 
 import PageHeader from "../../components/UI/PageHeader";
 import Section from "../../components/UI/Section";
