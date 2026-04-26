@@ -6,7 +6,7 @@ import Onboarding from "./pages/Onboarding/CommunityPlusOnboarding";
 import AuthGate from "./pages/AuthGate";
 import CommunityPlusUserProfile from "./pages/CommunityPlusUserProfile/CommunityPlusUserProfile";
 import CommunityPlusYellowPages from "./pages/YellowPages/CommunityPlusYellowPages";
-import CommunityPlusHub from "./pages/CommunityPlusHub/CommunityPlusHub";
+import CommunityPlusHub from "../../src/pages/CommunityPlusHub/CommunityPlusHub";
 import PostComposer from "./components/Layout/Sidebar/Post/PostComposer";
 import CommunityPlusAdTvPage from "./pages/CommunityPlusAdTvPage/CommunityPlusAdTvPage";
 
