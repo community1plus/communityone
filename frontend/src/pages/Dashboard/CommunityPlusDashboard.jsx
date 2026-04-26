@@ -4,7 +4,7 @@ import { useNavigate, Outlet, useLocation } from "react-router-dom";
 
 import { useAuth } from "../../context/AuthContext";
 import { MapProvider, useMap } from "../../context/MapContext";
-import useVoiceAlerts from "../../hooks/useVoiceAlerts";
+import useVoiceAlerts from "../../../hooks
 import CommunityPlusHeader from "../../components/Layout/Header/CommunityPlusHeader";
 import CommunityPlusSidebar from "../../components/Layout/Sidebar/CommunityPlusSidebar";
 import "./CommunityPlusDashboard.css";
