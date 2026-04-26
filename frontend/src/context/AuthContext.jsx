@@ -25,91 +25,42 @@ export function AuthProvider({ children }) {
   const [appUser, setAppUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const loadingRef = useRef(false);
   const mountedRef = useRef(true);
 
   /* =========================
-     LOAD USER (🔥 HARDENED)
+     LOAD USER (🔥 CLEAN)
   ========================= */
 
   const loadUser = useCallback(async () => {
-    if (!mountedRef.current || loadingRef.current) return;
-
-    loadingRef.current = true;
+    if (!mountedRef.current) return;
 
     try {
-      /* =========================
-         HYDRATION DELAY
-      ========================= */
-      await new Promise((r) => setTimeout(r, 100));
+      const session = await fetchAuthSession();
+      const tokens = session?.tokens;
 
-      let session;
-
-      /* =========================
-         SAFE SESSION FETCH
-      ========================= */
-
-      try {
-        const session = await fetchAuthSession();
-        console.log("SESSION:", session);
-        console.log("TOKENS:", session?.tokens);
-      } catch {
-        console.log("⚠️ No active session");
-
-        if (mountedRef.current) {
-          setUser(null);
-          setAppUser(null);
-        }
-        return;
-      }
-
-      let tokens = session?.tokens;
+      console.log("SESSION:", session);
+      console.log("TOKENS:", tokens);
 
       /* =========================
-         TOKEN RETRY (🔥 KEY FIX)
+         🔥 NO TOKENS → WAIT (NO RETRY)
       ========================= */
 
       if (!tokens?.idToken || !tokens?.accessToken) {
-        console.log("⚠️ Missing tokens → retry");
+        console.log("⚠️ No tokens yet (waiting for signedIn)");
 
-        await new Promise((r) => setTimeout(r, 400));
-
-        try {
-          const retrySession = await fetchAuthSession();
-          tokens = retrySession?.tokens;
-
-          if (!tokens?.idToken || !tokens?.accessToken) {
-            console.log("❌ Tokens still missing");
-
-            if (mountedRef.current) {
-              setUser(null);
-              setAppUser(null);
-            }
-            return;
-          }
-
-          session = retrySession;
-
-        } catch {
-          console.log("❌ Retry failed");
-
-          if (mountedRef.current) {
-            setUser(null);
-            setAppUser(null);
-          }
-          return;
+        if (mountedRef.current) {
+          setLoading(false); // 🔥 prevent infinite loading
         }
+
+        return;
       }
 
       /* =========================
          NORMALISE USER
       ========================= */
 
-      const idToken = tokens.idToken;
-      const accessToken = tokens.accessToken;
-
-      const idPayload = idToken.payload || {};
-      const accessPayload = accessToken.payload || {};
+      const idPayload = tokens.idToken.payload || {};
+      const accessPayload = tokens.accessToken.payload || {};
 
       const normalizedUser = {
         authenticated: true,
@@ -138,7 +89,7 @@ export function AuthProvider({ children }) {
           {
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${idToken.toString()}`,
+              Authorization: `Bearer ${tokens.idToken.toString()}`,
             },
           }
         );
@@ -166,7 +117,7 @@ export function AuthProvider({ children }) {
       }
 
     } catch (err) {
-      console.error("❌ Auth fatal error:", err);
+      console.error("❌ Auth error:", err);
 
       if (mountedRef.current) {
         setUser(null);
@@ -177,8 +128,6 @@ export function AuthProvider({ children }) {
       if (mountedRef.current) {
         setLoading(false);
       }
-
-      loadingRef.current = false;
     }
   }, []);
 
@@ -196,7 +145,7 @@ export function AuthProvider({ children }) {
   }, [loadUser]);
 
   /* =========================
-     AUTH EVENTS
+     AUTH EVENTS (🔥 CORE FIX)
   ========================= */
 
   useEffect(() => {
@@ -205,8 +154,12 @@ export function AuthProvider({ children }) {
 
       console.log("🔔 Auth event:", event);
 
-      if (event === "signedIn" || event === "tokenRefresh") {
-        setLoading(true);
+      if (event === "signedIn") {
+        setLoading(true);   // 🔥 trigger re-load
+        loadUser();         // 🔥 tokens now available
+      }
+
+      if (event === "tokenRefresh") {
         loadUser();
       }
 
@@ -223,7 +176,7 @@ export function AuthProvider({ children }) {
   }, [loadUser]);
 
   /* =========================
-     SOFT LOGOUT (🔥 FINAL)
+     LOGOUT (SOFT)
   ========================= */
 
   const logout = useCallback(async () => {
@@ -260,7 +213,7 @@ export function AuthProvider({ children }) {
 }
 
 /* =========================
-   HOOK (🔥 REQUIRED EXPORT)
+   HOOK
 ========================= */
 
 export function useAuth() {
