@@ -6,10 +6,10 @@ import { useLocationContext } from "../../context/LocationProvider";
 import { useAuth } from "../../context/AuthContext";
 import { useUI } from "../../context/UIContext";
 
-import useAPI from "../hooks/useAPI";
-import useAutosave from "../hooks/useAutosave";
-import useOptimisticUpdate from "../hooks/useOptimisticUpdate";
-import useDirtyFields from "../hooks/useDirtyFields";
+import useAPI from "../../hooks/useAPI";
+import useAutosave from "../../hooks/useAutosave";
+import useOptimisticUpdate from "../../hooks/useOptimisticUpdate";
+import useDirtyFields from "../../hooks/useDirtyFields";
 import { buildPatch } from "../utils/buildPatch";
 
 import PageHeader from "../../components/UI/PageHeader";
