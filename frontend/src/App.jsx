@@ -4,7 +4,7 @@ import { useAuth } from "./context/AuthContext";
 /* PAGES */
 import CommunityPlusLandingPage from "./pages/CommunityPlusLandingPage/CommunityPlusLandingPage";
 import CommunityPlusDashboardLayout from "../src/components/Layout/Dashboard/CommunityPlusDashboardLayout";
-import CommunityPlusDashboardHome from "./pages/CommunityPlusDashboard/CommunityPlusDashboardHome";
+import CommunityPlusDashboardHome from "./pages/CommunityPlusDashboardHome/CommunityPlusDashboardHome";
 import CommunityPlusUserProfile from "./pages/CommunityPlusUserProfile/CommunityPlusUserProfile";
 import CommunityPlusYellowPages from "./pages/YellowPages/CommunityPlusYellowPages";
 

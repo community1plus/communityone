@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "./CommunityPlusHome.css";
+import "./CommunityPlusDashboardHome.css";
 
 import { useMap } from "../../context/MapContext";
 import CommunityMap from "../../components/Map/CommunityMap";
