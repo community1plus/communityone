@@ -1,12 +1,8 @@
-// pages/CommunityPlusDashboard.jsx
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
-import CommunityMap from "../components/Map/CommunityMap";
 
 export default function CommunityPlusDashboard() {
   const navigate = useNavigate();
   const location = useLocation();
-
-  const isActive = (path) => location.pathname === path;
 
   return (
     <div className="app-shell">
@@ -29,14 +25,10 @@ export default function CommunityPlusDashboard() {
         {/* SIDEBAR */}
         <aside className="sidebar">Sidebar</aside>
 
-        {/* CONTENT */}
-        <main className="layout-content full-width">
-          {/* 🗺️ MAP (ALWAYS MOUNTED) */}
-          <CommunityMap />
-
-          {/* 🧩 OVERLAY LAYER */}
-          <div className="overlay-layer">
-            <Outlet />
+        {/* ✅ CONTENT PANE */}
+        <main className="layout-content">
+          <div className="layout-inner">
+            <Outlet />   {/* 🔥 THIS RENDERS HOME */}
           </div>
         </main>
       </div>
