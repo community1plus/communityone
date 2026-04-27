@@ -1,5 +1,4 @@
 import { useCallback } from "react";
-import { useNavigate } from "react-router-dom";
 
 import { useAuth } from "../../context/AuthContext";
 import { useUI } from "../../context/UIContext";
@@ -8,12 +7,10 @@ import useAPI from "../../../hooks/useAPI";
 import CommunityPlusUserProfile from "../CommunityPlusUserProfile/CommunityPlusUserProfile";
 
 /* =====================================================
-   ONBOARDING WRAPPER (🔥 ORCHESTRATOR)
+   ONBOARDING WRAPPER (FULLY DECLARATIVE)
 ===================================================== */
 
 export default function Onboarding() {
-  const navigate = useNavigate();
-
   const { setAppUser } = useAuth();
   const { startSaving, stopSaving } = useUI();
   const api = useAPI();
@@ -26,24 +23,30 @@ export default function Onboarding() {
     async (data) => {
       startSaving();
 
-      const res = await api.autosave(
-        "/profile",
-        data,
-        "profile-onboarding"
-      );
+      try {
+        const res = await api.autosave(
+          "/profile",
+          data,
+          "profile-onboarding"
+        );
 
-      stopSaving();
+        if (res?.profile) {
+          setAppUser((prev) => ({
+            ...(prev || {}),
+            profile: res.profile,
+            hasProfile: true,
+          }));
+        }
 
-      // 🔥 sync global auth state
-      if (res?.profile) {
-        setAppUser((prev) => ({
-          ...prev,
-          profile: res.profile,
-          hasProfile: true,
-        }));
+        return res;
+
+      } catch (err) {
+        console.error("Autosave failed:", err);
+        throw err;
+
+      } finally {
+        stopSaving();
       }
-
-      return res;
     },
     [api, startSaving, stopSaving, setAppUser]
   );
@@ -56,21 +59,27 @@ export default function Onboarding() {
     async (data) => {
       startSaving();
 
-      const res = await api.post("/profile/complete", data);
+      try {
+        const res = await api.post("/profile/complete", data);
 
-      stopSaving();
+        // 🔥 THIS is the only thing that matters
+        setAppUser((prev) => ({
+          ...(prev || {}),
+          hasProfile: true,
+          profile: res?.profile || prev?.profile || null,
+        }));
 
-      // 🔥 update global state
-      setAppUser((prev) => ({
-        ...prev,
-        hasProfile: true,
-        profile: res?.profile || prev?.profile,
-      }));
+        // ❌ NO NAVIGATION HERE
 
-      // 🔥 redirect into app
-      navigate("/home", { replace: true });
+      } catch (err) {
+        console.error("Onboarding complete failed:", err);
+        throw err;
+
+      } finally {
+        stopSaving();
+      }
     },
-    [api, startSaving, stopSaving, setAppUser, navigate]
+    [api, startSaving, stopSaving, setAppUser]
   );
 
   /* =========================
@@ -80,8 +89,8 @@ export default function Onboarding() {
   return (
     <CommunityPlusUserProfile
       mode="onboarding"
-      onSave={handleSave}        // 🔥 autosave hook
-      onComplete={handleComplete} // 🔥 finish flow
+      onSave={handleSave}
+      onComplete={handleComplete}
     />
   );
 }

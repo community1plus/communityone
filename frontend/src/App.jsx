@@ -54,7 +54,12 @@ function OnboardingGate({ children }) {
     return <div style={{ padding: 20 }}>Loading...</div>;
   }
 
-  // 🔥 Enforce onboarding
+  // 🧠 wait until backend resolves
+  if (appUser === undefined) {
+    return <div style={{ padding: 20 }}>Loading...</div>;
+  }
+
+  // 🚧 enforce onboarding
   if (appUser && !appUser.hasProfile) {
     return <Navigate to="/onboarding" replace />;
   }
