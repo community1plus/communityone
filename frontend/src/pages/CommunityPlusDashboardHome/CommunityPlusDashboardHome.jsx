@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useCallback } from "react";
+import { useEffect, useMemo, useCallback } from "react";
 import "./CommunityPlusDashboardHome.css";
 
 import { useMap } from "../../context/MapContext";
@@ -6,35 +6,31 @@ import CommunityMap from "../../components/Map/CommunityMap";
 import TwoColumnLayout from "../../components/TwoColumnLayout";
 
 /* =========================
-   MOCK DATA (MOVE TO API)
+   MOCK DATA (TEMP)
 ========================= */
 
 const FEED_ITEMS = [
   {
     id: 1,
     type: "incident",
-    isLocal: true,
     title: "🚨 Incident reported nearby",
     location: { lat: -37.8136, lng: 144.9631 },
   },
   {
     id: 2,
     type: "event",
-    isLocal: true,
     title: "📅 Community event tonight",
     location: { lat: -37.81, lng: 144.97 },
   },
   {
     id: 3,
     type: "alert",
-    isLocal: true,
     title: "📡 Beacon alert triggered",
     location: { lat: -37.82, lng: 144.95 },
   },
   {
     id: 4,
     type: "post",
-    isLocal: true,
     title: "🛍️ Local business promotion",
     location: { lat: -37.815, lng: 144.98 },
   },
@@ -59,64 +55,70 @@ function FeedItem({ item, isActive, onClick, onHover, onLeave }) {
 }
 
 /* =========================
-   FEED
+   FEED (MAP-DRIVEN)
 ========================= */
 
 function Feed() {
   const {
-    focusLocation,
-    setMapMarkers,
+    addMarkers,
+    visibleMarkers,
     selectedMarkerId,
+    focusOnMarker,
+    clearSelection,
   } = useMap();
 
   const items = useMemo(() => FEED_ITEMS, []);
 
   /* =========================
-     SYNC MARKERS → MAP
+     INGEST DATA → GLOBAL STATE
   ========================= */
 
   useEffect(() => {
-    setMapMarkers(items, "feed"); // 🔥 source-aware
-  }, [items, setMapMarkers]);
+    addMarkers(items, "feed");
+  }, [items, addMarkers]);
 
   /* =========================
-     HANDLERS (ID-BASED)
+     HANDLERS
   ========================= */
 
   const handleClick = useCallback(
     (item) => {
-      focusLocation(item.location, item.id); // 🔥 CRITICAL
+      focusOnMarker(item.location, item.id);
     },
-    [focusLocation]
+    [focusOnMarker]
   );
 
   const handleHover = useCallback(
     (item) => {
-      focusLocation(item.location);
+      focusOnMarker(item.location, item.id);
     },
-    [focusLocation]
+    [focusOnMarker]
   );
 
   const handleLeave = useCallback(
     (item) => {
       if (selectedMarkerId !== item.id) {
-        focusLocation(null);
+        clearSelection();
       }
     },
-    [selectedMarkerId, focusLocation]
+    [selectedMarkerId, clearSelection]
   );
 
   /* =========================
-     RENDER
+     RENDER (USE VISIBLE MARKERS)
   ========================= */
+
+  if (!visibleMarkers.length) {
+    return <div className="feed-empty">No activity in this area</div>;
+  }
 
   return (
     <>
-      {items.map((item) => (
+      {visibleMarkers.map((item) => (
         <FeedItem
           key={item.id}
           item={item}
-          isActive={selectedMarkerId === item.id} // 🔥 single source of truth
+          isActive={selectedMarkerId === item.id}
           onClick={() => handleClick(item)}
           onHover={() => handleHover(item)}
           onLeave={() => handleLeave(item)}
@@ -127,7 +129,7 @@ function Feed() {
 }
 
 /* =========================
-   HOME
+   HOME (MAP-FIRST)
 ========================= */
 
 export default function CommunityPlusDashboardHome() {
