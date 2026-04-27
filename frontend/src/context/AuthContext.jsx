@@ -15,7 +15,7 @@ import { Hub } from "aws-amplify/utils";
    STORAGE
 ========================= */
 
-const STORAGE_KEY = "auth_cache_v8";
+const STORAGE_KEY = "auth_cache_v9";
 
 /* =========================
    CONTEXT
@@ -29,15 +29,11 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-
-  // 🔥 backend user state
   const [appUser, setAppUser] = useState(null);
-  const [appUserStatus, setAppUserStatus] = useState("loading"); 
-  // "loading" | "ready" | "error"
+  const [appUserStatus, setAppUserStatus] = useState("loading");
 
   const [token, setToken] = useState(null);
 
-  // 🔥 auth lifecycle
   const [loading, setLoading] = useState(true);
   const [initialized, setInitialized] = useState(false);
 
@@ -45,7 +41,7 @@ export function AuthProvider({ children }) {
   const loadingRef = useRef(false);
 
   /* =========================
-     CACHE HYDRATION (FAST START)
+     CACHE HYDRATION
   ========================= */
 
   useEffect(() => {
@@ -59,7 +55,6 @@ export function AuthProvider({ children }) {
         setAppUser(parsed.appUser ?? null);
         setToken(parsed.token || null);
 
-        // cache is usable but not authoritative
         setAppUserStatus("ready");
       }
     } catch {
@@ -86,7 +81,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   /* =========================
-     LOAD USER (SOURCE OF TRUTH)
+     LOAD USER
   ========================= */
 
   const loadUser = useCallback(async () => {
@@ -98,11 +93,18 @@ export function AuthProvider({ children }) {
       const session = await fetchAuthSession();
       const tokens = session?.tokens;
 
+      console.log("🧪 SESSION TOKENS:", {
+        hasAccessToken: !!tokens?.accessToken,
+        hasIdToken: !!tokens?.idToken,
+      });
+
       /* =========================
          NO SESSION
       ========================= */
 
       if (!tokens?.accessToken) {
+        console.warn("⚠️ No access token found");
+
         if (mountedRef.current) {
           setUser(null);
           setAppUser(null);
@@ -112,7 +114,17 @@ export function AuthProvider({ children }) {
         return;
       }
 
+      /* =========================
+         🔥 TOKEN FIX + LOGGING
+      ========================= */
+
       const accessToken = tokens.accessToken.toString();
+
+      console.log(
+        "🔑 TOKEN TYPE:",
+        tokens.accessToken?.payload?.token_use
+      );
+
       const payload = tokens.idToken?.payload || {};
 
       const normalizedUser = {
@@ -126,8 +138,6 @@ export function AuthProvider({ children }) {
       if (mountedRef.current) {
         setUser(normalizedUser);
         setToken(accessToken);
-
-        // 🔥 backend fetch starting
         setAppUserStatus("loading");
       }
 
@@ -138,6 +148,8 @@ export function AuthProvider({ children }) {
       let appUserData = null;
 
       try {
+        console.log("📡 Calling /me with accessToken...");
+
         const res = await fetch(
           "https://communityone-backend.onrender.com/api/users/me",
           {
@@ -147,19 +159,22 @@ export function AuthProvider({ children }) {
           }
         );
 
-        /* 🔴 UNAUTHORIZED (MOST IMPORTANT CASE) */
+        console.log("📡 /me response status:", res.status);
+
         if (res.status === 401) {
           console.warn("⚠️ /me unauthorized");
 
           if (mountedRef.current) {
             setAppUser(null);
-            setAppUserStatus("error"); // 🔥 prevents flicker
+            setAppUserStatus("error");
           }
 
           return;
         }
 
         const data = await res.json();
+
+        console.log("✅ /me success:", data);
 
         appUserData = {
           user: data?.user || null,
@@ -173,18 +188,18 @@ export function AuthProvider({ children }) {
         }
 
       } catch (err) {
-        console.error("Backend sync failed:", err);
+        console.error("❌ Backend sync failed:", err);
 
         if (mountedRef.current) {
           setAppUser(null);
-          setAppUserStatus("error"); // 🔥 graceful fallback
+          setAppUserStatus("error");
         }
       }
 
       persistCache(normalizedUser, appUserData, accessToken);
 
     } catch (err) {
-      console.error("Auth error:", err);
+      console.error("❌ Auth error:", err);
 
       if (mountedRef.current) {
         setUser(null);
@@ -269,7 +284,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   /* =========================
-     CONTEXT VALUE
+     CONTEXT
   ========================= */
 
   const value = useMemo(
