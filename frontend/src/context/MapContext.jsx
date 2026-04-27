@@ -30,10 +30,12 @@ export function MapProvider({ children }) {
 
   const [selectedLocation, setSelectedLocation] = useState(null);
 
-  // 🔥 NEW: MULTI-SOURCE MARKERS
+  // 🔥 NEW: SELECTED MARKER (CRITICAL)
+  const [selectedMarkerId, setSelectedMarkerId] = useState(null);
+
+  // 🔥 MULTI-SOURCE MARKERS
   const [markersBySource, setMarkersBySource] = useState({});
 
-  // 🔥 ACTIVE SOURCE (optional control layer)
   const [activeSource, setActiveSource] = useState(null);
 
   /* 🔥 SYSTEM STATE */
@@ -48,13 +50,14 @@ export function MapProvider({ children }) {
      ACTIONS
   ===================================================== */
 
-  const focusLocation = useCallback((location) => {
+  // 🔥 UPGRADED: LOCATION + ID
+  const focusLocation = useCallback((location, markerId = null) => {
     setSelectedLocation(location);
+    if (markerId !== null) {
+      setSelectedMarkerId(markerId);
+    }
   }, []);
 
-  /**
-   * 🔥 MULTI-SOURCE MARKER SETTER
-   */
   const setMapMarkers = useCallback((list, source = "unknown") => {
     setMarkersBySource((prev) => ({
       ...prev,
@@ -62,9 +65,6 @@ export function MapProvider({ children }) {
     }));
   }, []);
 
-  /**
-   * 🔥 CLEAR ONE SOURCE
-   */
   const clearSource = useCallback((source) => {
     setMarkersBySource((prev) => {
       const next = { ...prev };
@@ -73,9 +73,6 @@ export function MapProvider({ children }) {
     });
   }, []);
 
-  /**
-   * 🔥 CLEAR ALL
-   */
   const clearAllMarkers = useCallback(() => {
     setMarkersBySource({});
   }, []);
@@ -86,6 +83,7 @@ export function MapProvider({ children }) {
 
   const clearSelection = useCallback(() => {
     setSelectedLocation(null);
+    setSelectedMarkerId(null); // 🔥 important
   }, []);
 
   const clearFilters = useCallback(() => {
@@ -111,19 +109,16 @@ export function MapProvider({ children }) {
   const mergedMarkers = useMemo(() => {
     let sources = Object.keys(markersBySource);
 
-    // 🔥 If activeSource is set → isolate it
     if (activeSource) {
       sources = sources.filter((s) => s === activeSource);
     }
 
-    // 🔥 Apply priority ordering
     sources.sort(
       (a, b) =>
         DEFAULT_SOURCE_PRIORITY.indexOf(a) -
         DEFAULT_SOURCE_PRIORITY.indexOf(b)
     );
 
-    // 🔥 Merge all sources
     return sources.flatMap((source) =>
       (markersBySource[source] || []).map((m) => ({
         ...m,
@@ -141,23 +136,19 @@ export function MapProvider({ children }) {
 
     let result = mergedMarkers;
 
-    /* MODE */
     const allowedTypes = MODE_FILTERS[mode];
     if (allowedTypes) {
       result = result.filter((m) => allowedTypes.includes(m.type));
     }
 
-    /* CATEGORY */
     if (category) {
       result = result.filter((m) => m.type === category);
     }
 
-    /* SCOPE */
     if (scope === "LOCAL") {
       result = result.filter((m) => m.isLocal !== false);
     }
 
-    /* PROXIMITY */
     if (userLocation) {
       result = result.map((m) => ({
         ...m,
@@ -169,6 +160,21 @@ export function MapProvider({ children }) {
   }, [mergedMarkers, mode, scope, category, userLocation, MODE_FILTERS]);
 
   /* =====================================================
+     🔥 NEW: GET MARKER BY ID (FIXES YOUR ERROR)
+  ===================================================== */
+
+  const getMarkerById = useCallback(
+    (id) => {
+      if (!id) return null;
+
+      return Object.values(markersBySource)
+        .flat()
+        .find((m) => m.id === id);
+    },
+    [markersBySource]
+  );
+
+  /* =====================================================
      CONTEXT VALUE
   ===================================================== */
 
@@ -176,6 +182,7 @@ export function MapProvider({ children }) {
     () => ({
       /* state */
       selectedLocation,
+      selectedMarkerId,
       markersBySource,
       mergedMarkers,
       filteredMarkers,
@@ -194,14 +201,19 @@ export function MapProvider({ children }) {
       updateUserLocation,
 
       focusLocation,
+      setSelectedMarkerId,
       setMapMarkers,
       clearSource,
       clearAllMarkers,
       clearSelection,
       clearFilters,
+
+      /* 🔥 CRITICAL */
+      getMarkerById,
     }),
     [
       selectedLocation,
+      selectedMarkerId,
       markersBySource,
       mergedMarkers,
       filteredMarkers,
@@ -211,12 +223,14 @@ export function MapProvider({ children }) {
       category,
       userLocation,
       focusLocation,
+      setSelectedMarkerId,
       setMapMarkers,
       clearSource,
       clearAllMarkers,
       clearSelection,
       clearFilters,
       updateUserLocation,
+      getMarkerById,
     ]
   );
 
