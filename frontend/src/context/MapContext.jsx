@@ -8,20 +8,40 @@ import {
 
 const MapContext = createContext();
 
+/* =====================================================
+   CONFIG
+===================================================== */
+
+const DEFAULT_SOURCE_PRIORITY = [
+  "alerts",
+  "feed",
+  "search",
+  "yellowpages",
+];
+
+/* =====================================================
+   PROVIDER
+===================================================== */
+
 export function MapProvider({ children }) {
   /* =====================================================
      CORE STATE
   ===================================================== */
 
   const [selectedLocation, setSelectedLocation] = useState(null);
-  const [markers, setMarkers] = useState([]);
+
+  // 🔥 NEW: MULTI-SOURCE MARKERS
+  const [markersBySource, setMarkersBySource] = useState({});
+
+  // 🔥 ACTIVE SOURCE (optional control layer)
+  const [activeSource, setActiveSource] = useState(null);
 
   /* 🔥 SYSTEM STATE */
-  const [mode, setMode] = useState("NOW");        // WHAT
-  const [scope, setScope] = useState("LOCAL");    // WHERE
-  const [category, setCategory] = useState(null); // WHICH
+  const [mode, setMode] = useState("NOW");
+  const [scope, setScope] = useState("LOCAL");
+  const [category, setCategory] = useState(null);
 
-  /* 🔥 NEW: USER LOCATION (for proximity) */
+  /* 🔥 USER LOCATION */
   const [userLocation, setUserLocation] = useState(null);
 
   /* =====================================================
@@ -32,8 +52,32 @@ export function MapProvider({ children }) {
     setSelectedLocation(location);
   }, []);
 
-  const setMapMarkers = useCallback((list) => {
-    setMarkers(list || []);
+  /**
+   * 🔥 MULTI-SOURCE MARKER SETTER
+   */
+  const setMapMarkers = useCallback((list, source = "unknown") => {
+    setMarkersBySource((prev) => ({
+      ...prev,
+      [source]: list || [],
+    }));
+  }, []);
+
+  /**
+   * 🔥 CLEAR ONE SOURCE
+   */
+  const clearSource = useCallback((source) => {
+    setMarkersBySource((prev) => {
+      const next = { ...prev };
+      delete next[source];
+      return next;
+    });
+  }, []);
+
+  /**
+   * 🔥 CLEAR ALL
+   */
+  const clearAllMarkers = useCallback(() => {
+    setMarkersBySource({});
   }, []);
 
   const updateUserLocation = useCallback((coords) => {
@@ -49,7 +93,7 @@ export function MapProvider({ children }) {
   }, []);
 
   /* =====================================================
-     FILTER CONFIG (🔥 scalable)
+     FILTER CONFIG
   ===================================================== */
 
   const MODE_FILTERS = useMemo(
@@ -61,52 +105,68 @@ export function MapProvider({ children }) {
   );
 
   /* =====================================================
-     DERIVED STATE (🔥 CORE ENGINE)
+     DERIVED: MERGED MARKERS
+  ===================================================== */
+
+  const mergedMarkers = useMemo(() => {
+    let sources = Object.keys(markersBySource);
+
+    // 🔥 If activeSource is set → isolate it
+    if (activeSource) {
+      sources = sources.filter((s) => s === activeSource);
+    }
+
+    // 🔥 Apply priority ordering
+    sources.sort(
+      (a, b) =>
+        DEFAULT_SOURCE_PRIORITY.indexOf(a) -
+        DEFAULT_SOURCE_PRIORITY.indexOf(b)
+    );
+
+    // 🔥 Merge all sources
+    return sources.flatMap((source) =>
+      (markersBySource[source] || []).map((m) => ({
+        ...m,
+        __source: source,
+      }))
+    );
+  }, [markersBySource, activeSource]);
+
+  /* =====================================================
+     DERIVED: FILTERED MARKERS
   ===================================================== */
 
   const filteredMarkers = useMemo(() => {
-    if (!markers.length) return [];
+    if (!mergedMarkers.length) return [];
 
-    let result = markers;
+    let result = mergedMarkers;
 
-    /* =========================
-       MODE (WHAT)
-    ========================= */
-
+    /* MODE */
     const allowedTypes = MODE_FILTERS[mode];
     if (allowedTypes) {
       result = result.filter((m) => allowedTypes.includes(m.type));
     }
 
-    /* =========================
-       CATEGORY (WHICH)
-    ========================= */
-
+    /* CATEGORY */
     if (category) {
       result = result.filter((m) => m.type === category);
     }
 
-    /* =========================
-       SCOPE (WHERE)
-    ========================= */
-
+    /* SCOPE */
     if (scope === "LOCAL") {
       result = result.filter((m) => m.isLocal !== false);
     }
 
-    /* =========================
-       SORT BY PROXIMITY (🔥 optional prep)
-    ========================= */
-
+    /* PROXIMITY */
     if (userLocation) {
       result = result.map((m) => ({
         ...m,
-        distance: getDistance(userLocation, m),
+        distance: getDistance(userLocation, m.location || m),
       }));
     }
 
     return result;
-  }, [markers, mode, scope, category, userLocation, MODE_FILTERS]);
+  }, [mergedMarkers, mode, scope, category, userLocation, MODE_FILTERS]);
 
   /* =====================================================
      CONTEXT VALUE
@@ -116,8 +176,10 @@ export function MapProvider({ children }) {
     () => ({
       /* state */
       selectedLocation,
-      markers,
+      markersBySource,
+      mergedMarkers,
       filteredMarkers,
+      activeSource,
 
       mode,
       scope,
@@ -128,23 +190,30 @@ export function MapProvider({ children }) {
       setMode,
       setScope,
       setCategory,
+      setActiveSource,
       updateUserLocation,
 
       focusLocation,
       setMapMarkers,
+      clearSource,
+      clearAllMarkers,
       clearSelection,
       clearFilters,
     }),
     [
       selectedLocation,
-      markers,
+      markersBySource,
+      mergedMarkers,
       filteredMarkers,
+      activeSource,
       mode,
       scope,
       category,
       userLocation,
       focusLocation,
       setMapMarkers,
+      clearSource,
+      clearAllMarkers,
       clearSelection,
       clearFilters,
       updateUserLocation,
@@ -173,7 +242,7 @@ export const useMap = () => {
 };
 
 /* =====================================================
-   UTILS (local, lightweight)
+   UTILS
 ===================================================== */
 
 function getDistance(a, b) {
@@ -187,9 +256,11 @@ function getDistance(a, b) {
 
   const x =
     Math.sin(Δφ / 2) ** 2 +
-    Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) ** 2;
+    Math.cos(φ1) *
+      Math.cos(φ2) *
+      Math.sin(Δλ / 2) ** 2;
 
   const y = 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x));
 
-  return R * y; // meters
+  return R * y;
 }
