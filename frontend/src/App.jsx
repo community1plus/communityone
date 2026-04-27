@@ -2,7 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 
 /* =========================
-   PAGES (MATCH YOUR FOLDERS)
+   PAGES
 ========================= */
 
 import CommunityPlusLandingPage from "../src/pages/CommunityPlusLandingPage/CommunityPlusLandingPage";
@@ -14,10 +14,28 @@ import CommunityPlusUserProfile from "../src/pages/CommunityPlusUserProfile/Comm
    ROUTE GUARDS
 ========================= */
 
-function ProtectedRoute({ children }) {
-  const { user, loading } = useAuth();
+/* 🔓 PUBLIC ROUTE (Landing) */
+function PublicRoute({ children }) {
+  const { user, loading, initialized } = useAuth();
 
-  if (loading) {
+  // 🚧 Block render until auth is resolved
+  if (!initialized || loading) {
+    return null; // or loader
+  }
+
+  // ✅ Already signed in → go to app
+  if (user) {
+    return <Navigate to="/app" replace />;
+  }
+
+  return children;
+}
+
+/* 🔐 PROTECTED ROUTE */
+function ProtectedRoute({ children }) {
+  const { user, loading, initialized } = useAuth();
+
+  if (!initialized || loading) {
     return <div style={{ padding: 20 }}>Loading...</div>;
   }
 
@@ -28,14 +46,15 @@ function ProtectedRoute({ children }) {
   return children;
 }
 
+/* 🧭 ONBOARDING GATE */
 function OnboardingGate({ children }) {
-  const { appUser, loading } = useAuth();
+  const { appUser, loading, initialized } = useAuth();
 
-  if (loading) {
+  if (!initialized || loading) {
     return <div style={{ padding: 20 }}>Loading...</div>;
   }
 
-  // 🔥 enforce onboarding
+  // 🔥 Enforce onboarding
   if (appUser && !appUser.hasProfile) {
     return <Navigate to="/onboarding" replace />;
   }
@@ -44,16 +63,23 @@ function OnboardingGate({ children }) {
 }
 
 /* =========================
-   APP
+   APP ROUTES
 ========================= */
 
 function App() {
   return (
     <Routes>
-      {/* PUBLIC */}
-      <Route path="/" element={<CommunityPlusLandingPage />} />
+      {/* 🌐 PUBLIC (Landing) */}
+      <Route
+        path="/"
+        element={
+          <PublicRoute>
+            <CommunityPlusLandingPage />
+          </PublicRoute>
+        }
+      />
 
-      {/* ONBOARDING */}
+      {/* 🧾 ONBOARDING */}
       <Route
         path="/onboarding"
         element={
@@ -63,7 +89,7 @@ function App() {
         }
       />
 
-      {/* PROFILE EDIT (INSIDE APP SHELL) */}
+      {/* 👤 PROFILE (inside dashboard shell) */}
       <Route
         path="/profile"
         element={
@@ -77,7 +103,7 @@ function App() {
         <Route index element={<CommunityPlusUserProfile />} />
       </Route>
 
-      {/* DASHBOARD */}
+      {/* 🗺️ MAIN APP */}
       <Route
         path="/app/*"
         element={
@@ -89,7 +115,7 @@ function App() {
         }
       />
 
-      {/* FALLBACK */}
+      {/* 🔁 FALLBACK */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
