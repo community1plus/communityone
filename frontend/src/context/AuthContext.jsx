@@ -17,10 +17,21 @@ import { Hub } from "aws-amplify/utils";
 
 const STORAGE_KEY = "auth_cache_v7";
 
+/* =========================
+   CONTEXT
+========================= */
+
+const AuthContext = createContext(null);
+
+/* =========================
+   PROVIDER
+========================= */
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [appUser, setAppUser] = useState(null);
-  const [appUserStatus, setAppUserStatus] = useState("loading");
+  const [appUserStatus, setAppUserStatus] = useState("loading"); 
+  // "loading" | "ready" | "error"
 
   const [token, setToken] = useState(null);
 
@@ -45,7 +56,7 @@ export function AuthProvider({ children }) {
         setAppUser(parsed.appUser ?? null);
         setToken(parsed.token || null);
 
-        // 🔥 important: cached data is considered "ready"
+        // cache is usable but not authoritative
         setAppUserStatus("ready");
       }
     } catch {
@@ -72,7 +83,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   /* =========================
-     LOAD USER
+     LOAD USER (SOURCE OF TRUTH)
   ========================= */
 
   const loadUser = useCallback(async () => {
@@ -83,6 +94,10 @@ export function AuthProvider({ children }) {
     try {
       const session = await fetchAuthSession();
       const tokens = session?.tokens;
+
+      /* =========================
+         NO TOKEN → FULL RESET
+      ========================= */
 
       if (!tokens?.accessToken) {
         if (mountedRef.current) {
@@ -108,11 +123,13 @@ export function AuthProvider({ children }) {
       if (mountedRef.current) {
         setUser(normalizedUser);
         setToken(accessToken);
-        setAppUserStatus("loading"); // 🔥 backend sync starting
+
+        // backend sync starting
+        setAppUserStatus("loading");
       }
 
       /* =========================
-         BACKEND SYNC
+         BACKEND SYNC (/me)
       ========================= */
 
       let appUserData = null;
@@ -132,7 +149,7 @@ export function AuthProvider({ children }) {
 
           if (mountedRef.current) {
             setAppUser(null);
-            setAppUserStatus("error"); // 🔥 KEY FIX
+            setAppUserStatus("error"); // 🔥 critical fix
           }
 
           return;
@@ -156,7 +173,7 @@ export function AuthProvider({ children }) {
 
         if (mountedRef.current) {
           setAppUser(null);
-          setAppUserStatus("error"); // 🔥 KEY FIX
+          setAppUserStatus("error"); // 🔥 critical fix
         }
       }
 
@@ -188,6 +205,7 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     mountedRef.current = true;
+
     loadUser();
 
     return () => {
@@ -202,6 +220,8 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const unsub = Hub.listen("auth", ({ payload }) => {
       const event = payload?.event;
+
+      console.log("🔔 Auth event:", event);
 
       if (event === "signedIn" || event === "tokenRefresh") {
         loadUser();
@@ -246,7 +266,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   /* =========================
-     CONTEXT
+     CONTEXT VALUE
   ========================= */
 
   const value = useMemo(
@@ -263,5 +283,23 @@ export function AuthProvider({ children }) {
     [user, appUser, appUserStatus, token, loading, initialized, logout]
   );
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+/* =========================
+   HOOK
+========================= */
+
+export function useAuth() {
+  const ctx = useContext(AuthContext);
+
+  if (!ctx) {
+    throw new Error("useAuth must be used within AuthProvider");
+  }
+
+  return ctx;
 }
