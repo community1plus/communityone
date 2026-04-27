@@ -15,21 +15,12 @@ import { Hub } from "aws-amplify/utils";
    STORAGE
 ========================= */
 
-const STORAGE_KEY = "auth_cache_v6";
-
-/* =========================
-   CONTEXT
-========================= */
-
-const AuthContext = createContext(null);
-
-/* =========================
-   PROVIDER
-========================= */
+const STORAGE_KEY = "auth_cache_v7";
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [appUser, setAppUser] = useState(undefined);
+  const [appUser, setAppUser] = useState(null);
+  const [appUserStatus, setAppUserStatus] = useState("loading");
 
   const [token, setToken] = useState(null);
 
@@ -40,7 +31,7 @@ export function AuthProvider({ children }) {
   const loadingRef = useRef(false);
 
   /* =========================
-     CACHE HYDRATION (FAST UI)
+     CACHE HYDRATION
   ========================= */
 
   useEffect(() => {
@@ -53,6 +44,9 @@ export function AuthProvider({ children }) {
         setUser(parsed.user || null);
         setAppUser(parsed.appUser ?? null);
         setToken(parsed.token || null);
+
+        // 🔥 important: cached data is considered "ready"
+        setAppUserStatus("ready");
       }
     } catch {
       console.warn("Cache parse failed");
@@ -78,7 +72,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   /* =========================
-     LOAD USER (SOURCE OF TRUTH)
+     LOAD USER
   ========================= */
 
   const loadUser = useCallback(async () => {
@@ -91,10 +85,10 @@ export function AuthProvider({ children }) {
       const tokens = session?.tokens;
 
       if (!tokens?.accessToken) {
-        // 🔥 FULL RESET (no auth)
         if (mountedRef.current) {
           setUser(null);
           setAppUser(null);
+          setAppUserStatus("ready");
           setToken(null);
         }
         return;
@@ -114,10 +108,11 @@ export function AuthProvider({ children }) {
       if (mountedRef.current) {
         setUser(normalizedUser);
         setToken(accessToken);
+        setAppUserStatus("loading"); // 🔥 backend sync starting
       }
 
       /* =========================
-         BACKEND SYNC (/me)
+         BACKEND SYNC
       ========================= */
 
       let appUserData = null;
@@ -135,26 +130,34 @@ export function AuthProvider({ children }) {
         if (res.status === 401) {
           console.warn("⚠️ /me unauthorized");
 
-          // 🔥 CRITICAL: explicitly resolved
-          appUserData = null;
-        } else {
-          const data = await res.json();
+          if (mountedRef.current) {
+            setAppUser(null);
+            setAppUserStatus("error"); // 🔥 KEY FIX
+          }
 
-          appUserData = {
-            user: data?.user || null,
-            hasProfile: data?.hasProfile ?? false,
-            profile: data?.profile || null,
-          };
+          return;
         }
+
+        const data = await res.json();
+
+        appUserData = {
+          user: data?.user || null,
+          hasProfile: data?.hasProfile ?? false,
+          profile: data?.profile || null,
+        };
+
+        if (mountedRef.current) {
+          setAppUser(appUserData);
+          setAppUserStatus("ready");
+        }
+
       } catch (err) {
         console.error("Backend sync failed:", err);
 
-        // 🔥 fail-safe: don't leave undefined
-        appUserData = null;
-      }
-
-      if (mountedRef.current) {
-        setAppUser(appUserData);
+        if (mountedRef.current) {
+          setAppUser(null);
+          setAppUserStatus("error"); // 🔥 KEY FIX
+        }
       }
 
       persistCache(normalizedUser, appUserData, accessToken);
@@ -165,13 +168,14 @@ export function AuthProvider({ children }) {
       if (mountedRef.current) {
         setUser(null);
         setAppUser(null);
+        setAppUserStatus("ready");
         setToken(null);
       }
 
     } finally {
       if (mountedRef.current) {
         setLoading(false);
-        setInitialized(true); // 🔥 ONLY HERE
+        setInitialized(true);
       }
 
       loadingRef.current = false;
@@ -179,13 +183,12 @@ export function AuthProvider({ children }) {
   }, [persistCache]);
 
   /* =========================
-     INIT (NO TIMEOUT)
+     INIT
   ========================= */
 
   useEffect(() => {
     mountedRef.current = true;
-
-    loadUser(); // 🔥 direct, no delay
+    loadUser();
 
     return () => {
       mountedRef.current = false;
@@ -200,8 +203,6 @@ export function AuthProvider({ children }) {
     const unsub = Hub.listen("auth", ({ payload }) => {
       const event = payload?.event;
 
-      console.log("🔔 Auth event:", event);
-
       if (event === "signedIn" || event === "tokenRefresh") {
         loadUser();
       }
@@ -212,6 +213,7 @@ export function AuthProvider({ children }) {
         if (mountedRef.current) {
           setUser(null);
           setAppUser(null);
+          setAppUserStatus("ready");
           setToken(null);
           setLoading(false);
           setInitialized(true);
@@ -235,6 +237,7 @@ export function AuthProvider({ children }) {
       if (mountedRef.current) {
         setUser(null);
         setAppUser(null);
+        setAppUserStatus("ready");
         setToken(null);
         setLoading(false);
         setInitialized(true);
@@ -243,39 +246,22 @@ export function AuthProvider({ children }) {
   }, []);
 
   /* =========================
-     CONTEXT VALUE
+     CONTEXT
   ========================= */
 
   const value = useMemo(
     () => ({
       user,
       appUser,
+      appUserStatus, // 🔥 NEW
       setAppUser,
       token,
       loading,
       initialized,
       logout,
     }),
-    [user, appUser, token, loading, initialized, logout]
+    [user, appUser, appUserStatus, token, loading, initialized, logout]
   );
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
-}
-
-/* =========================
-   HOOK
-========================= */
-
-export function useAuth() {
-  const ctx = useContext(AuthContext);
-
-  if (!ctx) {
-    throw new Error("useAuth must be used within AuthProvider");
-  }
-
-  return ctx;
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

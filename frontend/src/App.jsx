@@ -48,16 +48,29 @@ function ProtectedRoute({ children }) {
 
 /* 🧭 ONBOARDING GATE */
 function OnboardingGate({ children }) {
-  const { appUser, loading, initialized } = useAuth();
+  const { appUser, appUserState, loading, initialized } = useAuth();
 
   if (!initialized || loading) {
     return <div style={{ padding: 20 }}>Loading...</div>;
   }
 
-  // 🧠 wait until backend resolves
-  if (appUser === undefined) {
+  // 🔥 BLOCK while resolving backend
+  if (appUserState === "loading") {
     return <div style={{ padding: 20 }}>Loading...</div>;
   }
+
+  // 🔥 DO NOT redirect on backend failure
+  if (appUserState === "error") {
+    return children;
+  }
+
+  // ✅ Only enforce onboarding when confirmed
+  if (appUser && !appUser.hasProfile) {
+    return <Navigate to="/onboarding" replace />;
+  }
+
+  return children;
+}
 
   // 🚧 enforce onboarding
   if (appUser && !appUser.hasProfile) {
