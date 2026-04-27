@@ -1,15 +1,35 @@
-import { Routes, Route } from "react-router-dom";
-import CommunityPlusUserProfile from "../CommunityPlusUserProfile/CommunityPlusUserProfile";
+import { Outlet, useNavigate } from "react-router-dom";
 
 export default function CommunityPlusDashboard() {
+  const navigate = useNavigate();
+
   return (
     <div>
-      {/* your layout / header / map etc */}
+      {/* ===============================
+         HEADER / NAVIGATION
+      =============================== */}
 
-      <Routes>
-        <Route path="/" element={<div>Home</div>} />
-        <Route path="/profile" element={<CommunityPlusUserProfile />} />
-      </Routes>
+      <nav style={{ display: "flex", gap: "12px" }}>
+        <button onClick={() => navigate("/CommunityPlusDashboard")}>
+          Home
+        </button>
+
+        <button onClick={() => navigate("/CommunityPlusDashboard/profile")}>
+          Profile
+        </button>
+
+        <button onClick={() => navigate("/CommunityPlusDashboard/yellowpages")}>
+          Yellow Pages
+        </button>
+      </nav>
+
+      {/* ===============================
+         PAGE CONTENT (NESTED ROUTES)
+      =============================== */}
+
+      <div style={{ marginTop: "20px" }}>
+        <Outlet />
+      </div>
     </div>
   );
 }

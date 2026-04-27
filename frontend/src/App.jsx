@@ -1,46 +1,54 @@
+import { Routes, Route, Navigate } from "react-router-dom";
+import { useAuth } from "./context/AuthContext";
 
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext";
-import AuthGate from "./pages/AuthGate";
-
-/* =========================
-   PAGES (CORRECT IMPORTS)
-========================= */
-
+/* PAGES */
 import CommunityPlusLandingPage from "./pages/CommunityPlusLandingPage/CommunityPlusLandingPage";
-import CommunityPlusDashboard from "./pages/CommunityPlusDashboard/CommunityPlusDashboard";
-import CommunityPlusYellowPages from "./pages/CommunityPlusYellowPages/CommunityPlusYellowPages";
-
-/* =========================
-   APP
-========================= */
+import CommunityPlusDashboardLayout from "./pages/Dashboard/CommunityPlusDashboardLayout";
+import CommunityPlusDashboardHome from "./pages/Dashboard/CommunityPlusDashboard"; // 👈 your main map/home
+import CommunityPlusUserProfile from "./pages/CommunityPlusUserProfile/CommunityPlusUserProfile";
+import CommunityPlusYellowPages from "./pages/YellowPages/CommunityPlusYellowPages";
 
 export default function App() {
+  const { loading, isAuthenticated } = useAuth();
+
+  // 🚧 Prevent flicker / race conditions
+  if (loading) return null;
+
   return (
-    <AuthProvider>
-        <Routes>
-          {/* 🔓 PUBLIC */}
-          <Route path="/" element={<CommunityPlusLandingPage />} />
+    <Routes>
+      {/* =========================
+         PUBLIC
+      ========================= */}
+      <Route path="/" element={<CommunityPlusLandingPage />} />
 
-          {/* 🔐 PROTECTED */}
-          <Route
-            path="/CommunityPlusDashboard"
-            element={
-              <AuthGate>
-                <CommunityPlusDashboard />
-              </AuthGate>
-            }
-          />
+      {/* =========================
+         PROTECTED
+      ========================= */}
+      <Route
+        path="/CommunityPlusDashboard/*"
+        element={
+          isAuthenticated ? (
+            <CommunityPlusDashboardLayout />
+          ) : (
+            <Navigate to="/" replace />
+          )
+        }
+      >
+        {/* 🔥 DEFAULT DASHBOARD PAGE */}
+        <Route index element={<CommunityPlusDashboardHome />} />
 
-          <Route
-            path="/YellowPages"
-            element={
-              <AuthGate>
-                <CommunityPlusYellowPages />
-              </AuthGate>
-            }
-          />
-        </Routes>
-    </AuthProvider>
+        {/* 🔥 NESTED PAGES */}
+        <Route path="profile" element={<CommunityPlusUserProfile />} />
+        <Route path="yellowpages" element={<CommunityPlusYellowPages />} />
+
+        {/* 🔥 CATCH-ALL INSIDE DASHBOARD */}
+        <Route path="*" element={<Navigate to="/CommunityPlusDashboard" replace />} />
+      </Route>
+
+      {/* =========================
+         GLOBAL FALLBACK
+      ========================= */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }
