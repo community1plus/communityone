@@ -1,63 +1,43 @@
+// pages/CommunityPlusDashboard.jsx
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
-import { useMemo } from "react";
+import CommunityMap from "../components/Map/CommunityMap";
 
 export default function CommunityPlusDashboard() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  /* ===============================
-     NAV ITEMS (SCALABLE)
-  =============================== */
-  const navItems = useMemo(
-    () => [
-      { label: "Home", path: "/CommunityPlusDashboard" },
-      { label: "Profile", path: "/CommunityPlusDashboard/profile" },
-      { label: "Yellow Pages", path: "/CommunityPlusDashboard/yellowpages" },
-    ],
-    []
-  );
-
-  /* ===============================
-     ACTIVE STATE
-  =============================== */
   const isActive = (path) => location.pathname === path;
 
   return (
-    <div className="cp-dashboard">
-      {/* ===============================
-         HEADER
-      =============================== */}
+    <div className="app-shell">
+      {/* HEADER */}
       <header className="cp-header">
-        <div className="cp-logo">Community+</div>
+        <div>Community+</div>
 
-        <nav className="cp-nav">
-          {navItems.map((item) => (
-            <button
-              key={item.path}
-              className={`cp-nav-btn ${isActive(item.path) ? "active" : ""}`}
-              onClick={() => navigate(item.path)}
-            >
-              {item.label}
-            </button>
-          ))}
+        <nav>
+          <button onClick={() => navigate("/CommunityPlusDashboard")}>
+            Home
+          </button>
+          <button onClick={() => navigate("/CommunityPlusDashboard/profile")}>
+            Profile
+          </button>
         </nav>
       </header>
 
-      {/* ===============================
-         MAIN LAYOUT
-      =============================== */}
-      <div className="cp-main">
-        {/* OPTIONAL SIDEBAR (future use) */}
-        <aside className="cp-sidebar">
-          <div>Filters</div>
-          <div>Local Alerts</div>
-        </aside>
+      {/* MAIN */}
+      <div className="layout-main">
+        {/* SIDEBAR */}
+        <aside className="sidebar">Sidebar</aside>
 
-        {/* ===============================
-           CONTENT PANE (MAP LIVES HERE)
-        =============================== */}
-        <main className="cp-content">
-          <Outlet />
+        {/* CONTENT */}
+        <main className="layout-content full-width">
+          {/* 🗺️ MAP (ALWAYS MOUNTED) */}
+          <CommunityMap />
+
+          {/* 🧩 OVERLAY LAYER */}
+          <div className="overlay-layer">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>
