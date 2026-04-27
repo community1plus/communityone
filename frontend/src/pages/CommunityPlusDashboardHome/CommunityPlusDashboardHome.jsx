@@ -1,11 +1,12 @@
-import React, { useEffect, useState, useMemo, useCallback } from "react";
+import React, { useEffect, useMemo, useCallback } from "react";
 import "./CommunityPlusDashboardHome.css";
 
 import { useMap } from "../../context/MapContext";
 import CommunityMap from "../../components/Map/CommunityMap";
+import TwoColumnLayout from "../../components/Layout/TwoColumnLayout";
 
 /* =========================
-   MOCK DATA (MOVE TO API LATER)
+   MOCK DATA (MOVE TO API)
 ========================= */
 
 const FEED_ITEMS = [
@@ -47,6 +48,7 @@ function FeedItem({ item, isActive, onClick, onHover, onLeave }) {
   return (
     <div
       className={`feed-card ${isActive ? "active" : ""}`}
+      data-type={item.type}
       onClick={onClick}
       onMouseEnter={onHover}
       onMouseLeave={onLeave}
@@ -61,21 +63,29 @@ function FeedItem({ item, isActive, onClick, onHover, onLeave }) {
 ========================= */
 
 function Feed() {
-  const { focusLocation, setMapMarkers } = useMap();
-  const [activeId, setActiveId] = useState(null);
+  const {
+    focusLocation,
+    setMapMarkers,
+    selectedMarkerId,
+  } = useMap();
 
   const items = useMemo(() => FEED_ITEMS, []);
 
-  /* Sync markers to map */
+  /* =========================
+     SYNC MARKERS → MAP
+  ========================= */
+
   useEffect(() => {
-    setMapMarkers(items);
+    setMapMarkers(items, "feed"); // 🔥 source-aware
   }, [items, setMapMarkers]);
 
-  /* Handlers */
+  /* =========================
+     HANDLERS (ID-BASED)
+  ========================= */
+
   const handleClick = useCallback(
     (item) => {
-      setActiveId(item.id);
-      focusLocation(item.location);
+      focusLocation(item.location, item.id); // 🔥 CRITICAL
     },
     [focusLocation]
   );
@@ -89,12 +99,16 @@ function Feed() {
 
   const handleLeave = useCallback(
     (item) => {
-      if (activeId !== item.id) {
+      if (selectedMarkerId !== item.id) {
         focusLocation(null);
       }
     },
-    [activeId, focusLocation]
+    [selectedMarkerId, focusLocation]
   );
+
+  /* =========================
+     RENDER
+  ========================= */
 
   return (
     <>
@@ -102,7 +116,7 @@ function Feed() {
         <FeedItem
           key={item.id}
           item={item}
-          isActive={activeId === item.id}
+          isActive={selectedMarkerId === item.id} // 🔥 single source of truth
           onClick={() => handleClick(item)}
           onHover={() => handleHover(item)}
           onLeave={() => handleLeave(item)}
@@ -116,18 +130,12 @@ function Feed() {
    HOME
 ========================= */
 
-export default function Home() {
+export default function CommunityPlusDashboardHome() {
   return (
-    <div className="home-layout">
-      {/* LEFT: FEED */}
-      <div className="home-feed">
-        <Feed />
-      </div>
-
-      {/* RIGHT: MAP */}
-      <div className="home-map">
-        <CommunityMap />
-      </div>
-    </div>
+    <TwoColumnLayout
+      mode="map"
+      left={<Feed />}
+      right={<CommunityMap />}
+    />
   );
 }

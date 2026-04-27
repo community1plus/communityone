@@ -1,39 +1,83 @@
 /* =====================================================
-CONTAINER (same as profile-container / adtv-container)
+CONTAINER
 ===================================================== */
 
+/* Default (content pages like profile) */
 .two-col-container {
   width: 100%;
   max-width: 1100px;
   margin: 0 auto;
 }
 
+/* 🔥 NEW: FULL-WIDTH MODE (for map pages) */
+.two-col-container.full-width {
+  max-width: none;
+  height: 100%;
+  margin: 0;
+}
+
 /* =====================================================
-GRID LAYOUT
+LAYOUT
 ===================================================== */
 
 .two-col-layout {
   display: grid;
   grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
   gap: 20px;
-
   align-items: stretch;
 }
 
+/* 🔥 NEW: MAP MODE (feed + map split) */
+.two-col-layout.map-mode {
+  display: flex;
+  height: 100%;
+  gap: 0;
+}
+
 /* =====================================================
-LEFT / RIGHT COLUMNS
+LEFT / RIGHT
 ===================================================== */
 
 .two-col-left,
 .two-col-right {
   display: flex;
   flex-direction: column;
-  height: 100%;
   min-width: 0;
 }
 
 /* =====================================================
-CARD BASE (REUSABLE)
+MAP MODE OVERRIDES
+===================================================== */
+
+/* LEFT = FEED */
+.two-col-layout.map-mode .two-col-left {
+  width: 360px;
+  min-width: 320px;
+  max-width: 420px;
+
+  background: #f8f9fb;
+  border-right: 1px solid #eee;
+
+  overflow-y: auto;
+  padding: 16px;
+  gap: 12px;
+}
+
+/* RIGHT = MAP */
+.two-col-layout.map-mode .two-col-right {
+  flex: 1;
+  height: 100%;
+  position: relative;
+}
+
+/* Ensure map fills */
+.two-col-layout.map-mode .two-col-right > * {
+  height: 100%;
+  width: 100%;
+}
+
+/* =====================================================
+CARD BASE (unchanged for normal pages)
 ===================================================== */
 
 .two-col-card {
@@ -47,15 +91,22 @@ CARD BASE (REUSABLE)
   height: 100%;
 }
 
-/* left card */
 .two-col-card.left {
   padding: 24px;
 }
 
-/* right card */
 .two-col-card.right {
   padding: 22px 24px;
   background: #faf7f4;
+}
+
+/* 🔥 REMOVE CARD STYLING FOR MAP */
+.two-col-layout.map-mode .two-col-card {
+  background: none;
+  border: none;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0;
 }
 
 /* =====================================================
@@ -65,5 +116,19 @@ RESPONSIVE
 @media (max-width: 1000px) {
   .two-col-layout {
     grid-template-columns: 1fr;
+  }
+
+  /* 🔥 Map mode mobile */
+  .two-col-layout.map-mode {
+    flex-direction: column;
+  }
+
+  .two-col-layout.map-mode .two-col-left {
+    width: 100%;
+    max-height: 40%;
+  }
+
+  .two-col-layout.map-mode .two-col-right {
+    height: 60%;
   }
 }
