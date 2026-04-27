@@ -6,7 +6,7 @@ import CommunityPlusLandingPage from "./pages/CommunityPlusLandingPage/Community
 import CommunityPlusDashboardLayout from "../src/components/Layout/Dashboard/CommunityPlusDashboardLayout";
 import CommunityPlusDashboardHome from "./pages/CommunityPlusDashboardHome/CommunityPlusDashboardHome";
 import CommunityPlusUserProfile from "./pages/CommunityPlusUserProfile/CommunityPlusUserProfile";
-import CommunityPlusYellowPages from "./pages/YellowPages/CommunityPlusYellowPages";
+import CommunityPlusYellowPages from "./pages/CommunityPlusYellowPages/CommunityPlusYellowPages";
 
 export default function App() {
   const { loading, isAuthenticated } = useAuth();
