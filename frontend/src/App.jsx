@@ -7,9 +7,9 @@ import AuthGate from "./pages/AuthGate";
    PAGES (CORRECT IMPORTS)
 ========================= */
 
-import CommunityPlusLandingPage from "../pages/CommunityPlusLandingPage/CommunityPlusLandingPage";
-import CommunityPlusDashboard from "../pages/Dashboard/CommunityPlusDashboard";
-import CommunityPlusYellowPages from "../pages/YellowPages/CommunityPlusYellowPages";
+import CommunityPlusLandingPage from "./pages/CommunityPlusLandingPage/CommunityPlusLandingPage";
+import CommunityPlusDashboard from "./pages/CommunityPlusDashboard/CommunityPlusDashboard";
+import CommunityPlusYellowPages from "./pages/CommunityPlusYellowPages/CommunityPlusYellowPages";
 
 /* =========================
    APP
