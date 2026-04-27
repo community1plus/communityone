@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { createAPI } from "../src/services/api";
+import { apiFetch } from "../src/services/api";
 
 /* =====================================================
    API FETCH (🔥 CORE)
