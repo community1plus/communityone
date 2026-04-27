@@ -18,7 +18,6 @@ import CommunityPlusYellowPages from "./pages/CommunityPlusYellowPages/Community
 export default function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
         <Routes>
           {/* 🔓 PUBLIC */}
           <Route path="/" element={<CommunityPlusLandingPage />} />
@@ -42,7 +41,6 @@ export default function App() {
             }
           />
         </Routes>
-      </BrowserRouter>
     </AuthProvider>
   );
 }
