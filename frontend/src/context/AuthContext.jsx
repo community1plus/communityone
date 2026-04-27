@@ -15,7 +15,7 @@ import { Hub } from "aws-amplify/utils";
    STORAGE
 ========================= */
 
-const STORAGE_KEY = "auth_cache_v5";
+const STORAGE_KEY = "auth_cache_v6";
 
 /* =========================
    CONTEXT
@@ -40,7 +40,7 @@ export function AuthProvider({ children }) {
   const loadingRef = useRef(false);
 
   /* =========================
-     CACHE LOAD
+     CACHE HYDRATION (FAST UI)
   ========================= */
 
   useEffect(() => {
@@ -53,8 +53,6 @@ export function AuthProvider({ children }) {
         setUser(parsed.user || null);
         setAppUser(parsed.appUser ?? null);
         setToken(parsed.token || null);
-
-        setLoading(false);
       }
     } catch {
       console.warn("Cache parse failed");
@@ -80,7 +78,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   /* =========================
-     LOAD USER (🔥 FIXED CORE)
+     LOAD USER (SOURCE OF TRUTH)
   ========================= */
 
   const loadUser = useCallback(async () => {
@@ -92,21 +90,13 @@ export function AuthProvider({ children }) {
       const session = await fetchAuthSession();
       const tokens = session?.tokens;
 
-      /* =========================
-         🔥 HANDLE NO TOKEN (FIX)
-      ========================= */
-
       if (!tokens?.accessToken) {
-        console.warn("⚠️ No access token");
-
+        // 🔥 FULL RESET (no auth)
         if (mountedRef.current) {
           setUser(null);
           setAppUser(null);
           setToken(null);
-          setLoading(false);
-          setInitialized(true); // 🔥 CRITICAL FIX
         }
-
         return;
       }
 
@@ -127,7 +117,7 @@ export function AuthProvider({ children }) {
       }
 
       /* =========================
-         BACKEND SYNC
+         BACKEND SYNC (/me)
       ========================= */
 
       let appUserData = null;
@@ -144,6 +134,8 @@ export function AuthProvider({ children }) {
 
         if (res.status === 401) {
           console.warn("⚠️ /me unauthorized");
+
+          // 🔥 CRITICAL: explicitly resolved
           appUserData = null;
         } else {
           const data = await res.json();
@@ -156,6 +148,9 @@ export function AuthProvider({ children }) {
         }
       } catch (err) {
         console.error("Backend sync failed:", err);
+
+        // 🔥 fail-safe: don't leave undefined
+        appUserData = null;
       }
 
       if (mountedRef.current) {
@@ -176,7 +171,7 @@ export function AuthProvider({ children }) {
     } finally {
       if (mountedRef.current) {
         setLoading(false);
-        setInitialized(true);
+        setInitialized(true); // 🔥 ONLY HERE
       }
 
       loadingRef.current = false;
@@ -184,13 +179,13 @@ export function AuthProvider({ children }) {
   }, [persistCache]);
 
   /* =========================
-     INIT
+     INIT (NO TIMEOUT)
   ========================= */
 
   useEffect(() => {
     mountedRef.current = true;
 
-    setTimeout(loadUser, 50);
+    loadUser(); // 🔥 direct, no delay
 
     return () => {
       mountedRef.current = false;
