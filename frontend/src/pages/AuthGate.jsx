@@ -1,55 +1,22 @@
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-import CommunityPlusLandingPage from "../pages/CommunityPlusLandingPage/CommunityPlusLandingPage";
-import CommunityPlusDashboard from "../pages/Dashboard/CommunityPlusDashboard";
-import CommunityPlusOnboarding from "../pages/Onboarding/CommunityPlusOnboarding";
+export default function AuthGate({ children }) {
+  const { loading, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
-export default function AuthGate() {
-  const { user, appUser, appUserStatus, loading, initialized } = useAuth();
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      console.log("🚫 Not authenticated → redirect");
+      navigate("/");
+    }
+  }, [loading, isAuthenticated, navigate]);
 
-  /* =========================
-     BLOCK INITIAL LOAD
-  ========================= */
-
-  if (!initialized || loading) {
-    return null; // or splash
+  // ⛔ CRITICAL: block render until auth resolved
+  if (loading) {
+    return <div>Loading...</div>;
   }
 
-  /* =========================
-     NOT LOGGED IN
-  ========================= */
-
-  if (!user) {
-    return <CommunityPlusLandingPage />;
-  }
-
-  /* =========================
-     WAIT FOR BACKEND
-  ========================= */
-
-  if (appUserStatus === "loading") {
-    return <div style={{ padding: 20 }}>Loading...</div>;
-  }
-
-  /* =========================
-     BACKEND FAILURE
-  ========================= */
-
-  if (appUserStatus === "error") {
-    return <CommunityPlusDashboard />;
-  }
-
-  /* =========================
-     ONBOARDING
-  ========================= */
-
-  if (appUser && !appUser.hasProfile) {
-    return <CommunityPlusOnboarding />;
-  }
-
-  /* =========================
-     NORMAL FLOW
-  ========================= */
-
-  return <CommunityPlusDashboard />;
+  return children;
 }

@@ -1,323 +1,125 @@
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  useRef,
-  useCallback,
-  useMemo,
-} from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import {
+  fetchAuthSession,
+  getCurrentUser,
+  signInWithRedirect,
+  signOut,
+} from "aws-amplify/auth";
 
-import { fetchAuthSession, signOut } from "aws-amplify/auth";
-import { Hub } from "aws-amplify/utils";
-
-/* =========================
-   STORAGE
-========================= */
-
-const STORAGE_KEY = "auth_cache_v9";
-
-/* =========================
-   CONTEXT
-========================= */
-
-const AuthContext = createContext(null);
-
-/* =========================
-   PROVIDER
-========================= */
+const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [appUser, setAppUser] = useState(null);
-  const [appUserStatus, setAppUserStatus] = useState("loading");
-
-  const [token, setToken] = useState(null);
-
+  const [tokens, setTokens] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [initialized, setInitialized] = useState(false);
 
-  const mountedRef = useRef(true);
-  const loadingRef = useRef(false);
-
-  /* =========================
-     CACHE HYDRATION
-  ========================= */
-
+  /* ===============================
+     🔥 AUTH INITIALISATION (ROBUST)
+  =============================== */
   useEffect(() => {
-    try {
-      const cached = localStorage.getItem(STORAGE_KEY);
+    let mounted = true;
 
-      if (cached) {
-        const parsed = JSON.parse(cached);
-
-        setUser(parsed.user || null);
-        setAppUser(parsed.appUser ?? null);
-        setToken(parsed.token || null);
-
-        setAppUserStatus("ready");
-      }
-    } catch {
-      console.warn("Cache parse failed");
-    }
-  }, []);
-
-  /* =========================
-     CACHE SAVE
-  ========================= */
-
-  const persistCache = useCallback((userData, appUserData, token) => {
-    try {
-      localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify({
-          user: userData,
-          appUser: appUserData,
-          token,
-          ts: Date.now(),
-        })
-      );
-    } catch {}
-  }, []);
-
-  /* =========================
-     LOAD USER
-  ========================= */
-
-  const loadUser = useCallback(async () => {
-    if (!mountedRef.current || loadingRef.current) return;
-
-    loadingRef.current = true;
-
-    try {
-      const session = await fetchAuthSession();
-      const tokens = session?.tokens;
-
-      console.log("🧪 SESSION TOKENS:", {
-        hasAccessToken: !!tokens?.accessToken,
-        hasIdToken: !!tokens?.idToken,
-      });
-
-      /* =========================
-         NO SESSION
-      ========================= */
-
-      if (!tokens?.accessToken) {
-        console.warn("⚠️ No access token found");
-
-        if (mountedRef.current) {
-          setUser(null);
-          setAppUser(null);
-          setAppUserStatus("ready");
-          setToken(null);
-        }
-        return;
-      }
-
-      /* =========================
-         🔥 TOKEN FIX + LOGGING
-      ========================= */
-
-      const accessToken = tokens.accessToken.toString();
-
-      console.log(
-        "🔑 TOKEN TYPE:",
-        tokens.accessToken?.payload?.token_use
-      );
-
-      const payload = tokens.idToken?.payload || {};
-
-      const normalizedUser = {
-        authenticated: true,
-        sub: payload.sub || null,
-        email: payload.email || null,
-        username: payload["cognito:username"] || null,
-        name: payload.name || null,
-      };
-
-      if (mountedRef.current) {
-        setUser(normalizedUser);
-        setToken(accessToken);
-        setAppUserStatus("loading");
-      }
-
-      /* =========================
-         BACKEND SYNC (/me)
-      ========================= */
-
-      let appUserData = null;
-
+    async function initAuth() {
       try {
-        console.log("📡 Calling /me with accessToken...");
+        console.log("🔄 Initialising auth...");
+        console.log("🌐 URL:", window.location.href);
 
-        const res = await fetch(
-          "https://communityone-backend.onrender.com/api/users/me",
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        );
+        // 🔍 Detect OAuth redirect
+        const isRedirectFlow =
+          window.location.search.includes("code=") &&
+          window.location.search.includes("state=");
 
-        console.log("📡 /me response status:", res.status);
+        if (isRedirectFlow) {
+          console.log("🔁 OAuth redirect detected");
 
-        if (res.status === 401) {
-          console.warn("⚠️ /me unauthorized");
-
-          if (mountedRef.current) {
-            setAppUser(null);
-            setAppUserStatus("error");
-          }
-
-          return;
+          // 🔥 Give Amplify time to process redirect
+          await new Promise((res) => setTimeout(res, 300));
         }
 
-        const data = await res.json();
+        // 🔥 FIRST ATTEMPT
+        let session = await fetchAuthSession();
 
-        console.log("✅ /me success:", data);
+        // 🔁 RETRY ON EMPTY TOKENS (CRITICAL)
+        if (!session.tokens?.accessToken) {
+          console.log("⚠️ No tokens, retrying...");
 
-        appUserData = {
-          user: data?.user || null,
-          hasProfile: data?.hasProfile ?? false,
-          profile: data?.profile || null,
-        };
-
-        if (mountedRef.current) {
-          setAppUser(appUserData);
-          setAppUserStatus("ready");
+          await new Promise((res) => setTimeout(res, 500));
+          session = await fetchAuthSession();
         }
 
+        if (!mounted) return;
+
+        if (session.tokens?.accessToken) {
+          const currentUser = await getCurrentUser();
+
+          if (!mounted) return;
+
+          setUser(currentUser);
+          setTokens(session.tokens);
+
+          console.log("✅ Auth restored", {
+            hasAccessToken: true,
+          });
+
+          // 🔥 CLEAN URL (remove ?code=)
+          if (isRedirectFlow) {
+            window.history.replaceState(
+              {},
+              document.title,
+              window.location.pathname
+            );
+          }
+        } else {
+          console.log("🚫 No valid session");
+        }
       } catch (err) {
-        console.error("❌ Backend sync failed:", err);
-
-        if (mountedRef.current) {
-          setAppUser(null);
-          setAppUserStatus("error");
-        }
+        console.error("❌ Auth init failed:", err);
+      } finally {
+        if (mounted) setLoading(false);
       }
-
-      persistCache(normalizedUser, appUserData, accessToken);
-
-    } catch (err) {
-      console.error("❌ Auth error:", err);
-
-      if (mountedRef.current) {
-        setUser(null);
-        setAppUser(null);
-        setAppUserStatus("ready");
-        setToken(null);
-      }
-
-    } finally {
-      if (mountedRef.current) {
-        setLoading(false);
-        setInitialized(true);
-      }
-
-      loadingRef.current = false;
     }
-  }, [persistCache]);
 
-  /* =========================
-     INIT
-  ========================= */
-
-  useEffect(() => {
-    mountedRef.current = true;
-    loadUser();
+    initAuth();
 
     return () => {
-      mountedRef.current = false;
+      mounted = false;
     };
-  }, [loadUser]);
-
-  /* =========================
-     AUTH EVENTS
-  ========================= */
-
-  useEffect(() => {
-    const unsub = Hub.listen("auth", ({ payload }) => {
-      const event = payload?.event;
-
-      console.log("🔔 Auth event:", event);
-
-      if (event === "signedIn" || event === "tokenRefresh") {
-        loadUser();
-      }
-
-      if (event === "signedOut") {
-        localStorage.removeItem(STORAGE_KEY);
-
-        if (mountedRef.current) {
-          setUser(null);
-          setAppUser(null);
-          setAppUserStatus("ready");
-          setToken(null);
-          setLoading(false);
-          setInitialized(true);
-        }
-      }
-    });
-
-    return () => unsub();
-  }, [loadUser]);
-
-  /* =========================
-     LOGOUT
-  ========================= */
-
-  const logout = useCallback(async () => {
-    try {
-      await signOut({ global: true });
-    } finally {
-      localStorage.removeItem(STORAGE_KEY);
-
-      if (mountedRef.current) {
-        setUser(null);
-        setAppUser(null);
-        setAppUserStatus("ready");
-        setToken(null);
-        setLoading(false);
-        setInitialized(true);
-      }
-    }
   }, []);
 
-  /* =========================
-     CONTEXT
-  ========================= */
+  /* ===============================
+     🔐 LOGIN
+  =============================== */
+  const login = async () => {
+    console.log("🚀 Redirect login");
+    await signInWithRedirect();
+  };
 
-  const value = useMemo(
-    () => ({
-      user,
-      appUser,
-      appUserStatus,
-      setAppUser,
-      token,
-      loading,
-      initialized,
-      logout,
-    }),
-    [user, appUser, appUserStatus, token, loading, initialized, logout]
-  );
+  /* ===============================
+     🔓 LOGOUT
+  =============================== */
+  const logout = async () => {
+    await signOut({ global: true });
+
+    setUser(null);
+    setTokens(null);
+
+    window.location.href = "/"; // 🔥 hard reset
+  };
 
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider
+      value={{
+        user,
+        tokens,
+        loading,
+        isAuthenticated: !!tokens?.accessToken,
+        login,
+        logout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 }
 
-/* =========================
-   HOOK
-========================= */
-
-export function useAuth() {
-  const ctx = useContext(AuthContext);
-
-  if (!ctx) {
-    throw new Error("useAuth must be used within AuthProvider");
-  }
-
-  return ctx;
-}
+export const useAuth = () => useContext(AuthContext);

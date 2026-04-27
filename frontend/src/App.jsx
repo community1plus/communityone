@@ -1,12 +1,49 @@
-import { Routes, Route } from "react-router-dom";
-import AuthGate from "./pages/AuthGate";
+import "./config/amplify"; // ⚠️ MUST be first import
 
-function App() {
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "../context/AuthContext";
+import AuthGate from "../pages/AuthGate";
+
+/* =========================
+   PAGES (CORRECT IMPORTS)
+========================= */
+
+import CommunityPlusLandingPage from "../pages/CommunityPlusLandingPage/CommunityPlusLandingPage";
+import CommunityPlusDashboard from "../pages/Dashboard/CommunityPlusDashboard";
+import CommunityPlusYellowPages from "../pages/YellowPages/CommunityPlusYellowPages";
+
+/* =========================
+   APP
+========================= */
+
+export default function App() {
   return (
-    <Routes>
-      <Route path="/*" element={<AuthGate />} />
-    </Routes>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* 🔓 PUBLIC */}
+          <Route path="/" element={<CommunityPlusLandingPage />} />
+
+          {/* 🔐 PROTECTED */}
+          <Route
+            path="/CommunityPlusDashboard"
+            element={
+              <AuthGate>
+                <CommunityPlusDashboard />
+              </AuthGate>
+            }
+          />
+
+          <Route
+            path="/YellowPages"
+            element={
+              <AuthGate>
+                <CommunityPlusYellowPages />
+              </AuthGate>
+            }
+          />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
-
-export default App;
