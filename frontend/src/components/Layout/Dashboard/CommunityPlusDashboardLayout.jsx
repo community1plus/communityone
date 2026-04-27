@@ -1,11 +1,12 @@
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
+import CommunityMap from "../../Map/CommunityMap";
+import MapDetailPanel from "../../Map/MapDetailPanel";
 
 export default function CommunityPlusDashboardLayout() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const isActive = (path) =>
-    location.pathname.includes(path);
+  const isActive = (path) => location.pathname.includes(path);
 
   return (
     <div style={{ display: "flex", height: "100vh" }}>
@@ -22,6 +23,7 @@ export default function CommunityPlusDashboardLayout() {
           display: "flex",
           flexDirection: "column",
           gap: "12px",
+          zIndex: 3, // 🔥 stays above map
         }}
       >
         <h2>Community One</h2>
@@ -72,6 +74,8 @@ export default function CommunityPlusDashboardLayout() {
             display: "flex",
             alignItems: "center",
             padding: "0 20px",
+            zIndex: 3,
+            background: "#fff",
           }}
         >
           <h3>Dashboard</h3>
@@ -80,7 +84,9 @@ export default function CommunityPlusDashboardLayout() {
         {/* CONTENT AREA */}
         <div style={{ flex: 1, position: "relative" }}>
           
-          {/* 🔥 MAP (PERSISTENT) */}
+          {/* ===============================
+             MAP (BASE LAYER)
+          =============================== */}
           <div
             style={{
               position: "absolute",
@@ -88,24 +94,44 @@ export default function CommunityPlusDashboardLayout() {
               zIndex: 1,
             }}
           >
-            {/* Replace with your actual map component */}
-            <div style={{ height: "100%", background: "#e5e5e5" }}>
-              🗺️ Map goes here
-            </div>
+            <CommunityMap />
           </div>
 
-          {/* 🔥 NESTED ROUTES */}
+          {/* ===============================
+             ROUTE CONTENT (FEED, PAGES)
+          =============================== */}
           <div
             style={{
               position: "relative",
               zIndex: 2,
-              pointerEvents: "none",
+              pointerEvents: "none", // 🔥 allows map interaction
             }}
           >
             <div style={{ pointerEvents: "auto" }}>
               <Outlet />
             </div>
           </div>
+
+          {/* ===============================
+             DETAIL PANEL (TOP LAYER)
+          =============================== */}
+          <div
+            style={{
+              position: "absolute",
+              right: 0,
+              top: 0,
+              bottom: 0,
+              zIndex: 4,
+              pointerEvents: "none", // 🔥 prevents blocking map
+              display: "flex",
+              alignItems: "flex-start",
+            }}
+          >
+            <div style={{ pointerEvents: "auto" }}>
+              <MapDetailPanel />
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
