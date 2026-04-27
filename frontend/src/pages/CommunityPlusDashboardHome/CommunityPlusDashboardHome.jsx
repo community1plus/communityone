@@ -3,7 +3,7 @@ import "./CommunityPlusDashboardHome.css";
 
 import { useMap } from "../../context/MapContext";
 import CommunityMap from "../../components/Map/CommunityMap";
-import TwoColumnLayout from "../../components/UI/TwoColumnLayout";
+import TwoColumnLayout from "../../components/TwoColumnLayout";
 
 /* =========================
    MOCK DATA (MOVE TO API)
