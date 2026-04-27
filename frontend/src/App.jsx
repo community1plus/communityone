@@ -4,8 +4,8 @@ import { useAuth } from "./context/AuthContext";
 /* PAGES */
 import CommunityPlusLandingPage from "./pages/CommunityPlusLandingPage/CommunityPlusLandingPage";
 import CommunityPlusDashboardLayout from "../src/components/Layout/Dashboard/CommunityPlusDashboardLayout";
-import CommunityPlusDashboardHome from "../src/pages/CommunityPlusHome/CommunityPlusDashboardHome";
-import CommunityPlusUserProfile from "../src/pages/CommunityPlusUserProfile/CommunityPlusUserProfile";
+import CommunityPlusDashboardHome from "./pages/CommunityPlusHome/CommunityPlusDashboardHome";
+import CommunityPlusUserProfile from "./pages/CommunityPlusUserProfile/CommunityPlusUserProfile";
 import CommunityPlusYellowPages from "./pages/YellowPages/CommunityPlusYellowPages";
 
 export default function App() {
