@@ -1,7 +1,7 @@
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "../context/AuthContext";
-import AuthGate from "../pages/AuthGate";
+import { AuthProvider } from "./context/AuthContext";
+import AuthGate from "./pages/AuthGate";
 
 /* =========================
    PAGES (CORRECT IMPORTS)
