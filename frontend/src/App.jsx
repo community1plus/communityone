@@ -8,7 +8,7 @@ import { MapProvider } from "./context/MapContext";
 import CommunityPlusLandingPage from "./pages/CommunityPlusLandingPage/CommunityPlusLandingPage";
 
 /* ✅ USE THE CORRECT DASHBOARD */
-import CommunityPlusDashboard from "./pages/CommunityPlusDashboard";
+import CommunityPlusDashboard from "./pages/CommunityPlusDashboard/CommunityPlusDashboard";
 
 import CommunityPlusDashboardHome from "./pages/CommunityPlusDashboardHome/CommunityPlusDashboardHome";
 import CommunityPlusUserProfile from "./pages/CommunityPlusUserProfile/CommunityPlusUserProfile";
