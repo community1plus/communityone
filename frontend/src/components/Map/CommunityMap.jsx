@@ -65,7 +65,9 @@ export default function CommunityMap() {
 
   const handleIdle = useCallback(() => {
     if (!mapRef.current) return;
-    setBounds(mapRef.current.getBounds());
+
+    const b = mapRef.current.getBounds();
+    if (b) setBounds(b); // 🔥 guard
   }, []);
 
   /* =========================
@@ -84,28 +86,30 @@ export default function CommunityMap() {
   ========================= */
 
   const getPosition = useCallback(
-    (item) => item.location || { lat: item.lat, lng: item.lng },
+    (item) => item?.location || { lat: item?.lat, lng: item?.lng },
     []
   );
 
   /* =========================
-     SELECTED MARKER (ID-BASED)
+     SELECTED MARKER (SAFE)
   ========================= */
 
   const selectedMarker = useMemo(() => {
-    return getMarkerById?.(selectedMarkerId);
+    if (!getMarkerById || !selectedMarkerId) return null;
+    return getMarkerById(selectedMarkerId);
   }, [selectedMarkerId, getMarkerById]);
 
   /* =========================
-     VIEWPORT FILTER
+     VIEWPORT FILTER (SAFE)
   ========================= */
 
   const visibleMarkers = useMemo(() => {
-    if (!bounds) return filteredMarkers;
+    if (!bounds || !bounds.contains) return filteredMarkers;
 
-    return filteredMarkers.filter((item) =>
-      bounds.contains(getPosition(item))
-    );
+    return filteredMarkers.filter((item) => {
+      const pos = getPosition(item);
+      return pos && bounds.contains(pos);
+    });
   }, [filteredMarkers, bounds, getPosition]);
 
   /* =========================
@@ -139,9 +143,9 @@ export default function CommunityMap() {
         {(clusterer) =>
           visibleMarkers.map((item) => {
             const position = getPosition(item);
+            if (!position) return null; // 🔥 guard
 
             const isSelected = item.id === selectedMarkerId;
-
             const source = item.__source || "default";
 
             const icon = isSelected
@@ -154,7 +158,7 @@ export default function CommunityMap() {
                 position={position}
                 clusterer={clusterer}
                 icon={icon}
-                onClick={() => focusLocation(position, item.id)} // 🔥 ID-based
+                onClick={() => focusLocation(position, item.id)}
               />
             );
           })
@@ -162,15 +166,13 @@ export default function CommunityMap() {
       </MarkerClusterer>
 
       {/* =========================
-         INFOWINDOW (SYNCED)
+         INFOWINDOW (SAFE)
       ========================= */}
 
       {selectedMarker && (
         <InfoWindow
           position={getPosition(selectedMarker)}
-          onCloseClick={() => {
-            setSelectedMarkerId(null);
-          }}
+          onCloseClick={() => setSelectedMarkerId(null)}
         >
           <div style={{ minWidth: "180px" }}>
             <strong>{selectedMarker.title}</strong>
@@ -182,7 +184,7 @@ export default function CommunityMap() {
             <button
               style={{ marginTop: "8px" }}
               onClick={() => {
-                // Panel is already synced via selectedMarkerId
+                // Panel already synced via selectedMarkerId
               }}
             >
               View details
