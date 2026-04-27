@@ -1,5 +1,5 @@
 import { Routes, Route } from "react-router-dom";
-import AuthGate from "./components/AuthGate";
+import AuthGate from "./pages/AuthGate";
 
 function App() {
   return (
