@@ -12,7 +12,7 @@ export default function AuthGate() {
   ========================= */
 
   if (!initialized || loading) {
-    return null; // or splash screen
+    return null; // or splash
   }
 
   /* =========================
@@ -32,16 +32,15 @@ export default function AuthGate() {
   }
 
   /* =========================
-     BACKEND FAILURE (IMPORTANT)
+     BACKEND FAILURE
   ========================= */
 
   if (appUserStatus === "error") {
-    // 🔥 graceful fallback
     return <CommunityPlusDashboard />;
   }
 
   /* =========================
-     ONBOARDING REQUIRED
+     ONBOARDING
   ========================= */
 
   if (appUser && !appUser.hasProfile) {
@@ -49,7 +48,7 @@ export default function AuthGate() {
   }
 
   /* =========================
-     NORMAL APP
+     NORMAL FLOW
   ========================= */
 
   return <CommunityPlusDashboard />;
