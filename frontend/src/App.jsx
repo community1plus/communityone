@@ -6,7 +6,10 @@ import { MapProvider } from "./context/MapContext";
 
 /* PAGES */
 import CommunityPlusLandingPage from "./pages/CommunityPlusLandingPage/CommunityPlusLandingPage";
-import CommunityPlusDashboardLayout from "./components/Layout/Dashboard/CommunityPlusDashboardLayout";
+
+/* ✅ USE THE CORRECT DASHBOARD */
+import CommunityPlusDashboard from "./pages/CommunityPlusDashboard";
+
 import CommunityPlusDashboardHome from "./pages/CommunityPlusDashboardHome/CommunityPlusDashboardHome";
 import CommunityPlusUserProfile from "./pages/CommunityPlusUserProfile/CommunityPlusUserProfile";
 import CommunityPlusYellowPages from "./pages/CommunityPlusYellowPages/CommunityPlusYellowPages";
@@ -43,15 +46,16 @@ export default function App() {
         element={
           <ProtectedRoute isAuthenticated={isAuthenticated}>
             <MapProvider>
-              <CommunityPlusDashboardLayout />
+              {/* ✅ FIXED: correct dashboard */}
+              <CommunityPlusDashboard />
             </MapProvider>
           </ProtectedRoute>
         }
       >
-        {/* DEFAULT */}
+        {/* ✅ DEFAULT HOME (renders in Outlet) */}
         <Route index element={<CommunityPlusDashboardHome />} />
 
-        {/* NESTED */}
+        {/* NESTED ROUTES */}
         <Route path="profile" element={<CommunityPlusUserProfile />} />
         <Route path="yellowpages" element={<CommunityPlusYellowPages />} />
 
