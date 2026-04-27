@@ -1,6 +1,5 @@
 import {
   GoogleMap,
-  Marker,
   MarkerClusterer,
   InfoWindow,
   useJsApiLoader,
@@ -12,22 +11,20 @@ import { useMap } from "../../context/MapContext";
    CONFIG
 ========================= */
 
-const DEFAULT_CENTER = {
-  lat: -37.8136,
-  lng: 144.9631,
-};
+const DEFAULT_CENTER = { lat: -37.8136, lng: 144.9631 };
 
 const MAP_CONTAINER_STYLE = {
   width: "100%",
   height: "100%",
 };
 
+/* ✅ FIXED: HTTPS + cleaner mapping */
 const ICONS = {
-  feed: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png",
-  yellowpages: "http://maps.google.com/mapfiles/ms/icons/green-dot.png",
-  alerts: "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
-  default: "http://maps.google.com/mapfiles/ms/icons/yellow-dot.png",
-  selected: "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
+  feed: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+  yellowpages: "https://maps.google.com/mapfiles/ms/icons/green-dot.png",
+  alerts: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
+  default: "https://maps.google.com/mapfiles/ms/icons/yellow-dot.png",
+  selected: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
 };
 
 /* =========================
@@ -52,7 +49,7 @@ export default function CommunityMap() {
   });
 
   /* =========================
-     MAP LOAD
+     MAP LOAD (STABLE)
   ========================= */
 
   const handleLoad = useCallback((map) => {
@@ -64,47 +61,44 @@ export default function CommunityMap() {
   ========================= */
 
   const handleIdle = useCallback(() => {
-    if (!mapRef.current) return;
+    const map = mapRef.current;
+    if (!map) return;
 
-    const b = mapRef.current.getBounds();
-    if (b) setBounds(b); // 🔥 guard
+    const nextBounds = map.getBounds();
+    if (nextBounds) setBounds(nextBounds);
   }, []);
 
   /* =========================
-     PAN TO SELECTED
+     PAN TO SELECTED (SAFE)
   ========================= */
 
   useEffect(() => {
-    if (selectedLocation && mapRef.current) {
-      mapRef.current.panTo(selectedLocation);
-      mapRef.current.setZoom(14);
-    }
+    const map = mapRef.current;
+    if (!map || !selectedLocation) return;
+
+    map.panTo(selectedLocation);
+    map.setZoom(14);
   }, [selectedLocation]);
 
   /* =========================
      HELPERS
   ========================= */
 
-  const getPosition = useCallback(
-    (item) => item?.location || { lat: item?.lat, lng: item?.lng },
-    []
-  );
+  const getPosition = useCallback((item) => {
+    if (!item) return null;
+    return item.location || { lat: item.lat, lng: item.lng };
+  }, []);
 
   /* =========================
-     SELECTED MARKER (SAFE)
+     DERIVED STATE
   ========================= */
 
   const selectedMarker = useMemo(() => {
-    if (!getMarkerById || !selectedMarkerId) return null;
-    return getMarkerById(selectedMarkerId);
+    return selectedMarkerId ? getMarkerById?.(selectedMarkerId) : null;
   }, [selectedMarkerId, getMarkerById]);
 
-  /* =========================
-     VIEWPORT FILTER (SAFE)
-  ========================= */
-
   const visibleMarkers = useMemo(() => {
-    if (!bounds || !bounds.contains) return filteredMarkers;
+    if (!bounds) return filteredMarkers;
 
     return filteredMarkers.filter((item) => {
       const pos = getPosition(item);
@@ -136,14 +130,14 @@ export default function CommunityMap() {
       }}
     >
       {/* =========================
-         CLUSTERED MARKERS
+         CLUSTERS
       ========================= */}
 
       <MarkerClusterer>
         {(clusterer) =>
           visibleMarkers.map((item) => {
             const position = getPosition(item);
-            if (!position) return null; // 🔥 guard
+            if (!position) return null;
 
             const isSelected = item.id === selectedMarkerId;
             const source = item.__source || "default";
@@ -153,8 +147,8 @@ export default function CommunityMap() {
               : ICONS[source] || ICONS.default;
 
             return (
-              <Marker
-                key={`${item.__source}-${item.id}`}
+              <MapMarker
+                key={`${source}-${item.id}`}
                 position={position}
                 clusterer={clusterer}
                 icon={icon}
@@ -166,7 +160,7 @@ export default function CommunityMap() {
       </MarkerClusterer>
 
       {/* =========================
-         INFOWINDOW (SAFE)
+         INFOWINDOW
       ========================= */}
 
       {selectedMarker && (
@@ -174,19 +168,14 @@ export default function CommunityMap() {
           position={getPosition(selectedMarker)}
           onCloseClick={() => setSelectedMarkerId(null)}
         >
-          <div style={{ minWidth: "180px" }}>
+          <div style={{ minWidth: 180 }}>
             <strong>{selectedMarker.title}</strong>
 
-            <div style={{ fontSize: "12px", marginTop: "4px" }}>
+            <div style={{ fontSize: 12, marginTop: 4 }}>
               Type: {selectedMarker.type}
             </div>
 
-            <button
-              style={{ marginTop: "8px" }}
-              onClick={() => {
-                // Panel already synced via selectedMarkerId
-              }}
-            >
+            <button style={{ marginTop: 8 }}>
               View details
             </button>
           </div>
@@ -195,3 +184,20 @@ export default function CommunityMap() {
     </GoogleMap>
   );
 }
+
+/* =========================
+   MARKER COMPONENT (ISOLATED)
+========================= */
+
+import { Marker } from "@react-google-maps/api";
+
+const MapMarker = ({ position, clusterer, icon, onClick }) => {
+  return (
+    <Marker
+      position={position}
+      clusterer={clusterer}
+      icon={icon}
+      onClick={onClick}
+    />
+  );
+};

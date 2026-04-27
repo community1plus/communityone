@@ -1,5 +1,5 @@
 /* =====================================================
-ROOT VARIABLES
+   ROOT TOKENS (DESIGN SYSTEM READY)
 ===================================================== */
 
 :root {
@@ -8,12 +8,15 @@ ROOT VARIABLES
 
   --content-max-width: 1100px;
 
-  --page-padding-x: 24px;
-  --page-padding-y: 20px;
+  --space-x: 24px;
+  --space-y: 20px;
+
+  --gap: 16px;
+  --gap-lg: 20px;
 }
 
 /* =====================================================
-RESET / BASE
+   RESET
 ===================================================== */
 
 *,
@@ -34,7 +37,7 @@ body {
 }
 
 /* =====================================================
-APP SHELL
+   APP SHELL
 ===================================================== */
 
 .app-shell {
@@ -44,26 +47,32 @@ APP SHELL
 }
 
 /* =====================================================
-MAIN LAYOUT (SIDEBAR + CONTENT)
+   MAIN LAYOUT (SIDEBAR + CONTENT)
 ===================================================== */
 
 .layout-main {
   flex: 1;
   display: flex;
-  min-height: 0; /* 🔥 critical */
+  min-height: 0; /* prevents flex overflow bugs */
 }
 
 /* =====================================================
-SIDEBAR (RESPONSIVE + STABLE)
+   SIDEBAR
 ===================================================== */
 
 .sidebar {
   width: clamp(200px, 18vw, var(--sidebar-width));
   min-width: 200px;
   flex-shrink: 0;
+  transition: width 0.2s ease;
 }
 
-/* optional collapse */
+/* collapsed state (controlled via class, not media only) */
+.sidebar.collapsed {
+  width: var(--sidebar-width-collapsed);
+}
+
+/* responsive fallback */
 @media (max-width: 900px) {
   .sidebar {
     width: var(--sidebar-width-collapsed);
@@ -71,7 +80,7 @@ SIDEBAR (RESPONSIVE + STABLE)
 }
 
 /* =====================================================
-CONTENT AREA (OUTER)
+   CONTENT WRAPPER
 ===================================================== */
 
 .layout-content {
@@ -82,65 +91,94 @@ CONTENT AREA (OUTER)
   display: flex;
   flex-direction: column;
 
-  /* 🔥 key: allows vertical growth */
-  align-items: stretch;
+  padding: var(--space-y) var(--space-x);
 
-  padding: var(--page-padding-y) var(--page-padding-x);
+  overflow: hidden; /* 🔥 important for map containment */
+}
 
+/* scrollable inner layer (not the container itself) */
+.layout-scroll {
+  flex: 1;
   overflow-y: auto;
+  min-height: 0;
 }
 
 /* =====================================================
-CONTENT INNER (PRIMARY RAIL)
+   CONTENT INNER (CENTER RAIL)
 ===================================================== */
 
 .layout-inner {
-  flex: 1; /* 🔥 CRITICAL FIX */
   width: 100%;
   max-width: var(--content-max-width);
-  min-width: 0;
+  margin: 0 auto;
 
   display: flex;
   flex-direction: column;
+  gap: var(--gap);
 
-  margin: 0 auto; /* center horizontally */
-
-  gap: 16px;
+  min-height: 100%;
 }
 
 /* =====================================================
-PAGE LAYOUT (CARDS / SPLIT VIEW)
+   PAGE LAYOUT (SPLIT / GRID)
 ===================================================== */
 
 .page-layout {
-  flex: 1; /* 🔥 fills vertical space */
-
+  flex: 1;
   display: flex;
-  gap: 20px;
+  gap: var(--gap-lg);
 
-  align-items: stretch; /* 🔥 equal height columns */
+  align-items: stretch;
+  min-height: 0;
 }
 
-/* children grow evenly */
+/* equal growth */
 .page-layout > * {
   flex: 1;
   min-width: 0;
 }
 
 /* =====================================================
-FULL WIDTH MODE (MAPS / ADTV)
+   MAP / FULLSCREEN MODE
 ===================================================== */
 
+/* when map is primary surface */
 .layout-content.full-width {
-  align-items: stretch;
+  padding: 0;
 }
 
+/* remove centered constraint */
 .layout-content.full-width .layout-inner {
   max-width: none;
+  height: 100%;
+}
+
+/* map container must fill everything */
+.full-height {
+  height: 100%;
+  width: 100%;
 }
 
 /* =====================================================
-RESPONSIVE
+   OVERLAY LAYER (FOR FEED / PANELS)
+===================================================== */
+
+.overlay-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  pointer-events: none; /* allows map interaction */
+}
+
+/* re-enable interaction for children */
+.overlay-layer > * {
+  pointer-events: auto;
+}
+
+/* =====================================================
+   RESPONSIVE
 ===================================================== */
 
 @media (max-width: 1000px) {
@@ -155,6 +193,6 @@ RESPONSIVE
   }
 
   .page-layout {
-    flex-direction: column; /* 🔥 stack cards */
+    flex-direction: column;
   }
 }
