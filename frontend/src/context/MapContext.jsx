@@ -1,144 +1,224 @@
 import {
-  createContext,
-  useContext,
-  useState,
-  useCallback,
-  useMemo,
+createContext,
+useContext,
+useState,
+useCallback,
+useMemo,
 } from "react";
+
+import { resolveLocation } from "../utils/resolveLocation";
 
 const MapContext = createContext();
 
 export function MapProvider({ children }) {
-  /* =========================
-     CORE STATE
-  ========================= */
+/* =========================
+CORE STATE
+========================= */
 
-  const [markers, setMarkers] = useState([]);
-  const [selectedMarkerId, setSelectedMarkerId] = useState(null);
-  const [filters, setFilters] = useState(null);
-  const [bounds, setBounds] = useState(null); // 🔥 NEW (critical)
+const [markers, setMarkers] = useState([]);
+const [selectedMarkerId, setSelectedMarkerId] = useState(null);
+const [filters, setFilters] = useState(null);
+const [bounds, setBounds] = useState(null);
 
-  /* =========================
-     DERIVED: FILTERED
-  ========================= */
+/* =========================
+USER LOCATION
+========================= */
 
-  const filteredMarkers = useMemo(() => {
-    if (!filters) return markers;
+const [userLocation, setUserLocation] = useState(null);
+const [resolvedLocation, setResolvedLocation] = useState(null);
 
-    return markers.filter((m) => {
-      if (filters.type && m.type !== filters.type) return false;
-      return true;
-    });
-  }, [markers, filters]);
+// 🔥 derived guard (no extra state needed)
+const hasResolvedLocation = !!resolvedLocation;
 
-  /* =========================
-     DERIVED: VIEWPORT (CORE)
-  ========================= */
+/* =========================
+DERIVED: FILTERED
+========================= */
 
-  const visibleMarkers = useMemo(() => {
-    if (!bounds) return filteredMarkers;
+const filteredMarkers = useMemo(() => {
+if (!filters) return markers;
 
-    return filteredMarkers.filter((m) => {
-      const pos = m.location;
-      return pos && bounds.contains(pos);
-    });
-  }, [filteredMarkers, bounds]);
+```
+return markers.filter((m) => {
+  if (filters.type && m.type !== filters.type) return false;
+  return true;
+});
+```
 
-  /* =========================
-     DERIVED: SELECTION
-  ========================= */
+}, [markers, filters]);
 
-  const selectedMarker = useMemo(() => {
-    if (!selectedMarkerId) return null;
-    return markers.find((m) => m.id === selectedMarkerId) || null;
-  }, [selectedMarkerId, markers]);
+/* =========================
+DERIVED: VIEWPORT
+========================= */
 
-  const selectedLocation = useMemo(() => {
-    return selectedMarker?.location || null;
-  }, [selectedMarker]);
+const visibleMarkers = useMemo(() => {
+if (!bounds) return filteredMarkers;
 
-  const getMarkerById = useCallback(
-    (id) => markers.find((m) => m.id === id),
-    [markers]
-  );
+```
+return filteredMarkers.filter((m) => {
+  const pos = m.location;
+  return pos && bounds.contains(pos);
+});
+```
 
-  /* =========================
-     ACTIONS
-  ========================= */
+}, [filteredMarkers, bounds]);
 
-  const focusOnMarker = useCallback((location, id) => {
-    if (!location) return;
+/* =========================
+DERIVED: SELECTION
+========================= */
 
-    setSelectedMarkerId(id || null);
-  }, []);
+const selectedMarker = useMemo(() => {
+if (!selectedMarkerId) return null;
+return markers.find((m) => m.id === selectedMarkerId) || null;
+}, [selectedMarkerId, markers]);
 
-  const clearSelection = useCallback(() => {
-    setSelectedMarkerId(null);
-  }, []);
+const selectedLocation = useMemo(() => {
+return selectedMarker?.location || null;
+}, [selectedMarker]);
 
-  /* =========================
-     INGESTION (IMPORTANT)
-  ========================= */
+const getMarkerById = useCallback(
+(id) => markers.find((m) => m.id === id),
+[markers]
+);
 
-  const addMarkers = useCallback((incoming, source = "unknown") => {
-    if (!Array.isArray(incoming)) return;
+/* =========================
+USER LOCATION PIPELINE
+========================= */
 
-    setMarkers((prev) => {
-      const existingIds = new Set(prev.map((m) => m.id));
+const updateUserLocation = useCallback(
+async (coords) => {
+if (!coords) return;
 
-      const newItems = incoming
-        .filter((item) => item?.id && !existingIds.has(item.id))
-        .map((item) => ({
-          ...item,
-          __source: item.__source || source,
-        }));
+```
+  // 🔥 always update raw coords
+  setUserLocation(coords);
 
-      return [...prev, ...newItems];
-    });
-  }, []);
+  // 🔥 resolve only once
+  if (resolvedLocation) return;
 
-  const replaceMarkers = useCallback((incoming = []) => {
-    setMarkers(incoming);
-  }, []);
+  try {
+    const location = await resolveLocation(coords);
+    setResolvedLocation(location);
+  } catch (err) {
+    console.error("❌ Location resolution failed:", err);
+  }
+},
+[resolvedLocation]
+```
 
-  /* =========================
-     VALUE
-  ========================= */
+);
 
-  const value = {
-    /* state */
-    markers,
-    filteredMarkers,
-    visibleMarkers,
+/* =========================
+ACTIONS
+========================= */
 
-    selectedMarkerId,
-    selectedMarker,
-    selectedLocation,
+const focusOnMarker = useCallback((location, id) => {
+if (!location) return;
+setSelectedMarkerId(id || null);
+}, []);
 
-    bounds,
+const clearSelection = useCallback(() => {
+setSelectedMarkerId(null);
+}, []);
 
-    filters,
+/* =========================
+INGESTION
+========================= */
 
-    /* actions */
-    setMarkers,          // keep for flexibility
-    addMarkers,          // ✅ preferred
-    replaceMarkers,
+const addMarkers = useCallback((incoming, source = "unknown") => {
+if (!Array.isArray(incoming)) return;
 
-    setBounds,
+```
+setMarkers((prev) => {
+  const existingIds = new Set(prev.map((m) => m.id));
 
-    setSelectedMarkerId,
-    clearSelection,
+  const newItems = incoming
+    .filter((item) => item?.id && !existingIds.has(item.id))
+    .map((item) => ({
+      ...item,
+      __source: item.__source || source,
+    }));
 
-    focusOnMarker,
+  return [...prev, ...newItems];
+});
+```
 
-    getMarkerById,
+}, []);
 
-    setFilters,
-  };
+const replaceMarkers = useCallback((incoming = []) => {
+setMarkers(incoming);
+}, []);
 
-  return <MapContext.Provider value={value}>{children}</MapContext.Provider>;
+/* =========================
+VALUE
+========================= */
+
+const value = useMemo(
+() => ({
+/* state */
+markers,
+filteredMarkers,
+visibleMarkers,
+
+```
+  selectedMarkerId,
+  selectedMarker,
+  selectedLocation,
+
+  bounds,
+  filters,
+
+  userLocation,
+  resolvedLocation,
+  hasResolvedLocation,
+
+  /* actions */
+  setMarkers,
+  addMarkers,
+  replaceMarkers,
+
+  setBounds,
+
+  setSelectedMarkerId,
+  clearSelection,
+
+  focusOnMarker,
+
+  getMarkerById,
+
+  setFilters,
+
+  updateUserLocation,
+}),
+[
+  markers,
+  filteredMarkers,
+  visibleMarkers,
+  selectedMarkerId,
+  selectedMarker,
+  selectedLocation,
+  bounds,
+  filters,
+  userLocation,
+  resolvedLocation,
+  hasResolvedLocation,
+]
+```
+
+);
+
+return (
+<MapContext.Provider value={value}>
+{children}
+</MapContext.Provider>
+);
 }
 
 export function useMap() {
-  return useContext(MapContext);
+const context = useContext(MapContext);
+
+if (!context) {
+throw new Error("useMap must be used within MapProvider");
+}
+
+return context;
 }
