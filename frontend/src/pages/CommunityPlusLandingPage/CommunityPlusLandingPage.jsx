@@ -1,3 +1,4 @@
+import useAuth from "../../context/AuthContext";
 export default function CommunityPlusLandingPage() {
   const { login, loading } = useAuth();
 
