@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 import CommunityPlusHeader from "../Header/CommunityPlusHeader";
 import CommunityPlusSidebar from "../Sidebar/CommunityPlusSidebar";
@@ -8,18 +8,34 @@ import { useMap } from "../../../context/MapContext";
 
 import "./CommunityPlusDashboardLayout.css";
 
+/* ===============================
+CONFIG
+=============================== */
+
+const DEFAULT_LOCATION = {
+lat: -37.8136, // Melbourne fallback
+lng: 144.9631,
+accuracy: 1000,
+};
+
 export default function CommunityPlusDashboardLayout() {
 const { updateUserLocation, hasResolvedLocation } = useMap();
 
+const hasRequestedLocation = useRef(false); // 🔥 prevents double calls
+
 /* ===============================
-LOCATION INITIALISATION (🔥 CORE)
+LOCATION INITIALISATION
 =============================== */
 
 useEffect(() => {
 if (hasResolvedLocation) return;
+if (hasRequestedLocation.current) return;
+
+hasRequestedLocation.current = true;
 
 if (!navigator.geolocation) {
-  console.warn("Geolocation not supported");
+  console.warn("Geolocation not supported → using fallback");
+  updateUserLocation(DEFAULT_LOCATION);
   return;
 }
 
@@ -32,7 +48,8 @@ navigator.geolocation.getCurrentPosition(
     });
   },
   (err) => {
-    console.error("❌ Geolocation error:", err);
+    console.warn("⚠️ Geolocation denied → using fallback", err);
+    updateUserLocation(DEFAULT_LOCATION);
   },
   {
     enableHighAccuracy: true,
@@ -41,21 +58,20 @@ navigator.geolocation.getCurrentPosition(
   }
 );
 
-
 }, [hasResolvedLocation, updateUserLocation]);
+
+/* ===============================
+RENDER
+=============================== */
 
 return ( <div className="dashboard-root">
 
-  {/* ===============================
-     HEADER
-  =============================== */}
+  {/* HEADER */}
   <div className="dashboard-header">
     <CommunityPlusHeader />
   </div>
 
-  {/* ===============================
-     BODY
-  =============================== */}
+  {/* BODY */}
   <div className="dashboard-body">
 
     {/* SIDEBAR */}
@@ -70,6 +86,7 @@ return ( <div className="dashboard-root">
 
   </div>
 </div>
+
 
 );
 }
