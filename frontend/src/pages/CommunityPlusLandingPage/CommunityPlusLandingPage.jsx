@@ -1,13 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
-import "./CommunityPlusLandingPage.css";
-
-import { signIn } from "aws-amplify/auth";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
-
 export default function CommunityPlusLandingPage() {
-  const navigate = useNavigate();
-  const { login, isAuthenticated, loading } = useAuth();
+  const { login, loading } = useAuth();
 
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState("");
@@ -16,39 +8,19 @@ export default function CommunityPlusLandingPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const hasNavigated = useRef(false);
-
   /* ===============================
-     🔥 AUTO-REDIRECT (ALIGNED)
-  =============================== */
-  useEffect(() => {
-    if (!loading && isAuthenticated && !hasNavigated.current) {
-      hasNavigated.current = true;
-
-      console.log("✅ Authenticated → CommunityPlusDashboard");
-
-      setTimeout(() => {
-        navigate("/CommunityPlusDashboard", { replace: true });
-      }, 100);
-    }
-  }, [loading, isAuthenticated, navigate]);
-
-  /* ===============================
-     🔥 PRIMARY LOGIN
+     LOGIN
   =============================== */
   const handleEntry = async () => {
     if (authLoading) return;
-
-    console.log("🚀 LOGIN CLICKED");
 
     setAuthError("");
     setAuthLoading(true);
 
     try {
-      await login();
+      await login(); // 🔥 AuthContext will update state
     } catch (err) {
-      console.error("❌ Redirect failed:", err);
-
+      console.error(err);
       setShowFallback(true);
       setAuthError("Unable to connect. Use email login.");
       setAuthLoading(false);
@@ -56,7 +28,7 @@ export default function CommunityPlusLandingPage() {
   };
 
   /* ===============================
-     🔥 FALLBACK EMAIL LOGIN
+     FALLBACK EMAIL LOGIN
   =============================== */
   const handleEmailLogin = async () => {
     if (authLoading) return;
@@ -65,34 +37,26 @@ export default function CommunityPlusLandingPage() {
     setAuthError("");
 
     try {
-      const res = await signIn({
+      await signIn({
         username: email.trim(),
         password,
       });
 
-      console.log("✅ Email login success:", res);
-
-      // 🔥 HARD REDIRECT (aligned)
-      setTimeout(() => {
-        window.location.href = "/CommunityPlusDashboard";
-      }, 150);
-
+      // 🔥 DO NOTHING — let AuthContext update
     } catch (err) {
-      console.error("❌ Email login failed:", err);
       setAuthError(err?.message || "Login failed");
       setAuthLoading(false);
     }
   };
 
   /* ===============================
-     🚧 BLOCK UNTIL AUTH READY
+     LOADING GUARD
   =============================== */
   if (loading) return null;
 
   return (
     <div className="cpl-root">
       <main className="main-full">
-
         <div className="app-title">COMMUNITY ONE</div>
 
         <div className="headline-row">
@@ -125,9 +89,7 @@ export default function CommunityPlusLandingPage() {
         </div>
       </main>
 
-      {/* ===============================
-         🔥 FALLBACK LOGIN
-      =============================== */}
+      {/* FALLBACK LOGIN */}
       {showFallback && (
         <div className="cpl-modalOverlay">
           <div className="cpl-authModal">
@@ -147,10 +109,7 @@ export default function CommunityPlusLandingPage() {
               onChange={(e) => setPassword(e.target.value)}
             />
 
-            <button
-              onClick={handleEmailLogin}
-              disabled={authLoading}
-            >
+            <button onClick={handleEmailLogin} disabled={authLoading}>
               {authLoading ? "Signing in..." : "Sign In"}
             </button>
 
@@ -159,9 +118,7 @@ export default function CommunityPlusLandingPage() {
         </div>
       )}
 
-      {/* ===============================
-         🔥 LOADING OVERLAY
-      =============================== */}
+      {/* LOADING OVERLAY */}
       {authLoading && (
         <div className="auth-loading-overlay">
           <div className="auth-loading-box">
