@@ -1,58 +1,34 @@
-import { Outlet, useNavigate, useLocation } from "react-router-dom";
+import { Outlet } from "react-router-dom";
+import CommunityPlusHeader from "../Header/CommunityPlusHeader";
+import CommunityPlusSidebar from "../Sidebar/CommunityPlusSidebar";
+
+import "./CommunityPlusDashboardLayout.css";
 
 export default function CommunityPlusDashboardLayout() {
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  const isActive = (path) => location.pathname.includes(path);
-
   return (
     <div className="dashboard-root">
-      
-      {/* ===============================
-         SIDEBAR
-      =============================== */}
-      <aside className="dashboard-sidebar">
-        <h2>Community One</h2>
-
-        <button
-          onClick={() => navigate("/CommunityPlusDashboard")}
-          className={isActive("/CommunityPlusDashboard") ? "active" : ""}
-        >
-          Home
-        </button>
-
-        <button
-          onClick={() => navigate("/CommunityPlusDashboard/profile")}
-          className={isActive("profile") ? "active" : ""}
-        >
-          Profile
-        </button>
-
-        <button
-          onClick={() =>
-            navigate("/CommunityPlusDashboard/yellowpages")
-          }
-          className={isActive("yellowpages") ? "active" : ""}
-        >
-          Yellow Pages
-        </button>
-      </aside>
 
       {/* ===============================
-         MAIN AREA
+         HEADER (FULL WIDTH)
       =============================== */}
-      <div className="dashboard-main">
+      <div className="dashboard-header">
+        <CommunityPlusHeader />
+      </div>
 
-        {/* HEADER */}
-        <header className="dashboard-header">
-          <h3>Dashboard</h3>
-        </header>
+      {/* ===============================
+         BODY (SIDEBAR + CONTENT)
+      =============================== */}
+      <div className="dashboard-body">
+
+        {/* SIDEBAR */}
+        <aside className="dashboard-sidebar">
+          <CommunityPlusSidebar />
+        </aside>
 
         {/* CONTENT */}
-        <div className="dashboard-content">
+        <main className="dashboard-content">
           <Outlet />
-        </div>
+        </main>
 
       </div>
     </div>
