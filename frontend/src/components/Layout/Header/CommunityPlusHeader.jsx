@@ -12,8 +12,7 @@ import { useLocationContext } from "../../../context/LocationProvider";
 import { useAuth } from "../../../context/AuthContext";
 import LocationPin from "../../UI/LocationPin";
 import { resolveLocation } from "../../../services/resolveLocation";
-
-import { NAVIGATION } from "../../../config/navigation/navigationConfig"; // ✅ fixed path
+import { NAVIGATION } from "../../../config/navigation/navigationConfig";
 
 export default function CommunityPlusHeader({ user, onLogout }) {
   const navigate = useNavigate();
@@ -24,14 +23,42 @@ export default function CommunityPlusHeader({ user, onLogout }) {
 
   const [showMenu, setShowMenu] = useState(false);
   const [resolving, setResolving] = useState(false);
+  const [inputValue, setInputValue] = useState("");
 
   const inputRef = useRef(null);
   const menuRef = useRef(null);
 
-  const effectiveUser = appUser?.user || appUser || user;
+  /* ===============================
+     USER (FIXED)
+  =============================== */
+
+  const effectiveUser = appUser || user;
+
+  const username = useMemo(() => {
+    if (!effectiveUser) return "Guest";
+
+    const email =
+      effectiveUser?.email ||
+      effectiveUser?.attributes?.email ||
+      effectiveUser?.signInDetails?.loginId;
+
+    if (email) return email.split("@")[0];
+    if (effectiveUser?.username) return effectiveUser.username;
+
+    return "Member";
+  }, [effectiveUser]);
+
+  const initials = useMemo(() => {
+    return username
+      .split(/[\s._-]+/)
+      .map((p) => p[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase();
+  }, [username]);
 
   /* ===============================
-     NAV CONFIG (MEMOIZED)
+     NAV
   =============================== */
 
   const nav = useMemo(
@@ -39,86 +66,33 @@ export default function CommunityPlusHeader({ user, onLogout }) {
     []
   );
 
-  /* ===============================
-     NAV HELPERS (FIXED)
-  =============================== */
-
   const isActiveRoute = useCallback(
-    (path) => {
-      if (!path) return false;
-
-      return (
-        routeLocation.pathname === path ||
-        routeLocation.pathname.startsWith(path + "/")
-      );
-    },
+    (path) =>
+      path &&
+      (routeLocation.pathname === path ||
+        routeLocation.pathname.startsWith(path + "/")),
     [routeLocation.pathname]
   );
 
-  const isGroupActive = (children) =>
-    children?.some((child) => isActiveRoute(child.path));
-
   const go = useCallback(
     (path) => {
-      if (!path) return;
-      if (routeLocation.pathname !== path) {
-        navigate(path);
-      }
+      if (path && routeLocation.pathname !== path) navigate(path);
     },
     [navigate, routeLocation.pathname]
   );
 
   /* ===============================
-     USERNAME / INITIALS
+     LOCATION (FIXED)
   =============================== */
-
-  const username = useMemo(() => {
-    if (!effectiveUser) return "Member";
-
-    const email =
-      effectiveUser?.email ||
-      effectiveUser?.attributes?.email ||
-      effectiveUser?.signInDetails?.loginId ||
-      "";
-
-    if (email.includes("@")) return email.split("@")[0];
-    if (effectiveUser?.username) return effectiveUser.username;
-
-    return "Member";
-  }, [effectiveUser]);
-
-  const initials = useMemo(() => {
-    if (!username) return "ME";
-
-    const parts = username.split(/[\s._-]+/).filter(Boolean);
-
-    if (parts.length === 1) {
-      return parts[0].slice(0, 2).toUpperCase();
-    }
-
-    return (
-      (parts[0][0] || "") +
-      (parts[1]?.[0] || "")
-    ).toUpperCase();
-  }, [username]);
-
-  /* ===============================
-     LOCATION (UNCHANGED)
-  =============================== */
-
-  const hasLocation =
-    !!viewLocation?.lat ||
-    !!viewLocation?.suburb ||
-    !!viewLocation?.label;
 
   const locationText =
     viewLocation?.fullLabel ||
     viewLocation?.label ||
+    viewLocation?.suburb ||
     "";
 
   useEffect(() => {
-    if (!inputRef.current) return;
-    inputRef.current.value = locationText;
+    setInputValue(locationText);
   }, [locationText]);
 
   useEffect(() => {
@@ -154,7 +128,7 @@ export default function CommunityPlusHeader({ user, onLogout }) {
     }
 
     return () => clearInterval(interval);
-  }, []);
+  }, [setViewLocation]);
 
   const handleResolveLocation = async () => {
     setResolving(true);
@@ -162,8 +136,8 @@ export default function CommunityPlusHeader({ user, onLogout }) {
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
         const { latitude: lat, longitude: lng, accuracy } = pos.coords;
-
         const enriched = await resolveLocation({ lat, lng, accuracy });
+
         setViewLocation(enriched, "auto");
         setResolving(false);
       },
@@ -177,109 +151,66 @@ export default function CommunityPlusHeader({ user, onLogout }) {
   =============================== */
 
   return (
-    <header className="header panel">
+    <header className="header-root">
 
-      {/* TOP ROW */}
-      <div className="header-row">
+      {/* LEFT */}
+      <div className="header-left">
+        <img
+          src="/logo/logo.png"
+          alt="Community One"
+          className="logo"
+          onClick={() => go("/home")}
+        />
 
-        {/* LEFT */}
-        <div className="header-left">
-          <img
-            src="/logo/logo.png"
-            alt="Community One"
-            className="logo"
-            onClick={() => go("/home")}
+        <div className="location-display">
+          <LocationPin
+            resolved={!!locationText}
+            loading={resolving}
+            onClick={handleResolveLocation}
           />
 
-          <div className="location-display">
-            <LocationPin
-              resolved={hasLocation}
-              loading={resolving}
-              onClick={handleResolveLocation}
-            />
-
-            <input
-              ref={inputRef}
-              className="location-input body"
-              placeholder="Enter suburb or address"
-              autoComplete="off"
-            />
-          </div>
-        </div>
-
-        {/* CENTER */}
-        <div className="header-center">
           <input
-            className="search-input body"
-            placeholder="Search"
+            ref={inputRef}
+            className="location-input"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            placeholder="Enter suburb or address"
           />
         </div>
+      </div>
 
-        {/* RIGHT */}
-        <div className="header-right" ref={menuRef}>
-          {effectiveUser && (
-            <div className="user-block">
-              <span className="username label">{username}</span>
+      {/* CENTER */}
+      <div className="header-center">
+        <input
+          className="search-input"
+          placeholder="Search"
+        />
+      </div>
 
-              <div
-                className="avatar"
-                onClick={() => setShowMenu(!showMenu)}
-              >
-                {initials}
-              </div>
+      {/* RIGHT */}
+      <div className="header-right" ref={menuRef}>
+        <div className="user-block">
+          <span className="username">{username}</span>
 
-              {showMenu && (
-                <div className="dropdown-menu panel">
-                  <div onClick={() => go("/profile")}>Profile</div>
-                  <div onClick={() => onLogout?.()}>Logout</div>
-                </div>
-              )}
+          <div
+            className="avatar"
+            onClick={() => setShowMenu((prev) => !prev)}
+          >
+            {initials}
+          </div>
+
+          {showMenu && (
+            <div className="dropdown-menu">
+              <div onClick={() => go("/profile")}>Profile</div>
+              <div onClick={() => onLogout?.()}>Logout</div>
             </div>
           )}
         </div>
-
       </div>
 
-      {/* 🔥 NAV (REFACTORED) */}
+      {/* NAV */}
       <nav className="header-nav">
-
         {nav.items.map((item) => {
-
-          /* GROUP */
-          if (item.type === "group") {
-            const active = isGroupActive(item.children);
-
-            return (
-              <div
-                key={item.id}
-                className={`nav-group ${active ? "active" : ""}`}
-              >
-                <button className="nav-item">
-                  {item.label}
-                </button>
-
-                <div className="nav-dropdown">
-                  {item.children.map((child) => {
-                    const childActive = isActiveRoute(child.path);
-
-                    return (
-                      <div
-                        key={child.id}
-                        className={`nav-dropdown-item ${
-                          childActive ? "active" : ""
-                        }`}
-                        onClick={() => go(child.path)}
-                      >
-                        {child.label}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            );
-          }
-
-          /* ROUTE */
           const active = isActiveRoute(item.path);
 
           return (
@@ -292,7 +223,6 @@ export default function CommunityPlusHeader({ user, onLogout }) {
             </button>
           );
         })}
-
       </nav>
     </header>
   );
