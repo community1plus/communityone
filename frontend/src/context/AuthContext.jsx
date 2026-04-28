@@ -1,4 +1,12 @@
-import { createContext, useContext, useEffect, useState, useCallback, useMemo } from "react";
+import {
+createContext,
+useContext,
+useEffect,
+useState,
+useCallback,
+useMemo,
+} from "react";
+
 import {
 fetchAuthSession,
 getCurrentUser,
@@ -16,22 +24,38 @@ const AuthContext = createContext();
 HELPERS
 =============================== */
 
-function normaliseUser(amplifyUser) {
+function normaliseUser(amplifyUser, tokens) {
 if (!amplifyUser) return null;
 
-const username = amplifyUser.username || "";
-const name = username.replace(/[^a-zA-Z0-9 ]/g, "");
+const idToken = tokens?.idToken?.payload || {};
+
+const email = idToken.email || null;
+const name = idToken.name || null;
+
+const fallback =
+email?.split("@")[0] ||
+amplifyUser.username ||
+"User";
+
+const displayName = name || fallback;
+
+const initials = displayName
+.split(/[\s._-]+/)
+.map((p) => p[0])
+.join("")
+.slice(0, 2)
+.toUpperCase();
 
 return {
 id: amplifyUser.userId,
-username,
+username: amplifyUser.username,
+
+email,
 name,
-initials: name
-.split(" ")
-.map((n) => n[0])
-.join("")
-.slice(0, 2)
-.toUpperCase() || "?",
+displayName,
+
+initials,
+
 };
 }
 
@@ -45,7 +69,7 @@ const [tokens, setTokens] = useState(null);
 const [loading, setLoading] = useState(true);
 
 /* ===============================
-INIT
+INIT (STABLE)
 =============================== */
 
 useEffect(() => {
@@ -60,15 +84,11 @@ const initAuth = async () => {
       window.location.search.includes("state=");
 
     if (isRedirect) {
+      // give Amplify time to hydrate session
       await new Promise((res) => setTimeout(res, 300));
     }
 
-    let session = await fetchAuthSession();
-
-    if (!session.tokens?.accessToken) {
-      await new Promise((res) => setTimeout(res, 400));
-      session = await fetchAuthSession();
-    }
+    const session = await fetchAuthSession();
 
     if (!mounted) return;
 
@@ -77,13 +97,22 @@ const initAuth = async () => {
 
       if (!mounted) return;
 
-      setUser(normaliseUser(amplifyUser));
+      const enrichedUser = normaliseUser(amplifyUser, session.tokens);
+
+      setUser(enrichedUser);
       setTokens(session.tokens);
 
-      console.log("✅ Auth restored");
+      console.log("✅ Auth restored", {
+        user: enrichedUser.displayName,
+      });
 
+      // clean URL after OAuth redirect
       if (isRedirect) {
-        window.history.replaceState({}, document.title, window.location.pathname);
+        window.history.replaceState(
+          {},
+          document.title,
+          window.location.pathname
+        );
       }
     } else {
       setUser(null);
@@ -104,7 +133,6 @@ return () => {
   mounted = false;
 };
 
-
 }, []);
 
 /* ===============================
@@ -120,7 +148,6 @@ return;
 console.log("🚀 Redirect login");
 await signInWithRedirect();
 
-
 }, [tokens]);
 
 /* ===============================
@@ -130,11 +157,11 @@ LOGOUT
 const logout = useCallback(async () => {
 await signOut({ global: true });
 
-
 setUser(null);
 setTokens(null);
 
 window.location.href = "/";
+
 
 }, []);
 

@@ -1,9 +1,9 @@
 import React, {
-  useState,
-  useEffect,
-  useRef,
-  useMemo,
-  useCallback,
+useState,
+useEffect,
+useRef,
+useMemo,
+useCallback,
 } from "react";
 
 import { useNavigate, useLocation } from "react-router-dom";
@@ -16,208 +16,216 @@ import LocationPin from "../../UI/LocationPin";
 import { resolveLocation } from "../../../services/resolveLocation";
 import { NAVIGATION } from "../../../config/navigation/navigationConfig";
 
-export default function CommunityPlusHeader({ user, onLogout }) {
-  const navigate = useNavigate();
-  const routeLocation = useLocation();
+export default function CommunityPlusHeader({ onLogout }) {
+const navigate = useNavigate();
+const routeLocation = useLocation();
 
-  const { viewLocation, setViewLocation } = useLocationContext();
-  const { appUser, loading } = useAuth();
+const { viewLocation, setViewLocation } = useLocationContext();
+const { user, loading } = useAuth();
 
-  const [showMenu, setShowMenu] = useState(false);
-  const [resolving, setResolving] = useState(false);
-  const [inputValue, setInputValue] = useState("");
+const [showMenu, setShowMenu] = useState(false);
+const [resolving, setResolving] = useState(false);
+const [inputValue, setInputValue] = useState("");
 
-  const inputRef = useRef(null);
-  const autocompleteRef = useRef(null);
+const inputRef = useRef(null);
+const autocompleteRef = useRef(null);
 
-  /* ===============================
-     USER (ROBUST)
-  =============================== */
+/* ===============================
+USER (CLEAN)
+=============================== */
 
-  const effectiveUser = appUser || user;
+const username = user?.displayName || "Guest";
 
-  const username = useMemo(() => {
-    if (!effectiveUser) return null;
+const initials = useMemo(() => {
+if (!username || username === "Guest") return "G";
 
-    return (
-      effectiveUser?.username ||
-      effectiveUser?.name ||
-      effectiveUser?.attributes?.email?.split("@")[0] ||
-      effectiveUser?.signInDetails?.loginId?.split("@")[0] ||
-      null
-    );
-  }, [effectiveUser]);
+return username
+  .split(" ")
+  .map((w) => w[0])
+  .join("")
+  .slice(0, 2)
+  .toUpperCase();
 
-  const initials = useMemo(() => {
-    if (!username) return "G";
+}, [username]);
 
-    return username
-      .split(/[\s._-]+/)
-      .map((p) => p[0])
-      .join("")
-      .slice(0, 2)
-      .toUpperCase();
-  }, [username]);
+/* ===============================
+NAV
+=============================== */
 
-  /* ===============================
-     NAV
-  =============================== */
+const nav = useMemo(
+() => NAVIGATION.find((n) => n.group === "main") || { items: [] },
+[]
+);
 
-  const nav = useMemo(
-    () => NAVIGATION.find((n) => n.group === "main") || { items: [] },
-    []
-  );
+const isActiveRoute = useCallback(
+(path) =>
+path &&
+(routeLocation.pathname === path ||
+routeLocation.pathname.startsWith(path + "/")),
+[routeLocation.pathname]
+);
 
-  const isActiveRoute = useCallback(
-    (path) =>
-      path &&
-      (routeLocation.pathname === path ||
-        routeLocation.pathname.startsWith(path + "/")),
-    [routeLocation.pathname]
-  );
+const go = useCallback(
+(path) => {
+if (path && routeLocation.pathname !== path) navigate(path);
+},
+[navigate, routeLocation.pathname]
+);
 
-  const go = useCallback(
-    (path) => {
-      if (path && routeLocation.pathname !== path) navigate(path);
-    },
-    [navigate, routeLocation.pathname]
-  );
+/* ===============================
+LOCATION (SYNCED)
+=============================== */
 
-  /* ===============================
-     LOCATION (STABLE)
-  =============================== */
+const locationText =
+viewLocation?.label ||
+viewLocation?.suburb ||
+"";
 
-  const locationText =
-    viewLocation?.fullLabel ||
-    viewLocation?.label ||
-    viewLocation?.suburb ||
-    "";
+useEffect(() => {
+setInputValue(locationText);
+}, [locationText]);
 
-  useEffect(() => {
-    setInputValue(locationText);
-  }, [locationText]);
+/* ===============================
+GOOGLE AUTOCOMPLETE (SAFE)
+=============================== */
 
-  /* 🔥 FIXED: no polling loop */
-  useEffect(() => {
-    if (!window.google?.maps || !inputRef.current) return;
-    if (autocompleteRef.current) return; // prevent re-init
+useEffect(() => {
+if (!window.google?.maps || !inputRef.current) return;
+if (autocompleteRef.current) return;
 
-    const autocomplete =
-      new window.google.maps.places.Autocomplete(inputRef.current, {
-        types: ["geocode"],
-        componentRestrictions: { country: "au" },
-      });
+const autocomplete =
+  new window.google.maps.places.Autocomplete(inputRef.current, {
+    types: ["geocode"],
+    componentRestrictions: { country: "au" },
+  });
 
-    autocomplete.addListener("place_changed", async () => {
-      const place = autocomplete.getPlace();
-      if (!place.geometry) return;
+autocomplete.addListener("place_changed", async () => {
+  const place = autocomplete.getPlace();
+  if (!place.geometry) return;
 
-      const lat = place.geometry.location.lat();
-      const lng = place.geometry.location.lng();
+  const lat = place.geometry.location.lat();
+  const lng = place.geometry.location.lng();
 
-      const enriched = await resolveLocation({ lat, lng, accuracy: 100 });
-      setViewLocation(enriched, "manual");
-    });
+  const enriched = await resolveLocation({ lat, lng, accuracy: 100 });
+  setViewLocation(enriched, "manual");
+});
 
-    autocompleteRef.current = autocomplete;
-  }, [setViewLocation]);
+autocompleteRef.current = autocomplete;
 
-  const handleResolveLocation = useCallback(() => {
-    setResolving(true);
+}, [setViewLocation]);
 
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        const { latitude: lat, longitude: lng, accuracy } = pos.coords;
+/* ===============================
+GEOLOCATION (ONE SHOT)
+=============================== */
 
-        const enriched = await resolveLocation({ lat, lng, accuracy });
-        setViewLocation(enriched, "auto");
+const handleResolveLocation = useCallback(() => {
+setResolving(true);
 
-        setResolving(false);
-      },
-      () => setResolving(false),
-      { enableHighAccuracy: true }
-    );
-  }, [setViewLocation]);
+navigator.geolocation.getCurrentPosition(
+  async (pos) => {
+    const { latitude: lat, longitude: lng, accuracy } = pos.coords;
 
-  /* ===============================
-     RENDER
-  =============================== */
+    const enriched = await resolveLocation({ lat, lng, accuracy });
+    setViewLocation(enriched, "auto");
 
-  return (
-    <header className="header-root">
-      {/* LEFT */}
-      <div className="header-left">
-        <img
-          src="/logo/logo.png"
-          alt="Community One"
-          className="logo"
-          onClick={() => go("/home")}
+    setResolving(false);
+  },
+  () => setResolving(false),
+  { enableHighAccuracy: true }
+);
+
+}, [setViewLocation]);
+
+/* ===============================
+RENDER
+=============================== */
+
+return ( <header className="header-root">
+
+  {/* ===============================
+     ROW 1
+  =============================== */}
+  <div className="header-row">
+
+    {/* LEFT */}
+    <div className="header-left">
+      <img
+        src="/logo/logo.png"
+        alt="Community One"
+        className="logo"
+        onClick={() => go("/home")}
+      />
+
+      <div className="location-display">
+        <LocationPin
+          resolved={!!locationText}
+          loading={resolving}
+          onClick={handleResolveLocation}
         />
 
-        <div className="location-display">
-          <LocationPin
-            resolved={!!locationText}
-            loading={resolving}
-            onClick={handleResolveLocation}
-          />
-
-          <input
-            ref={inputRef}
-            className="location-input"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            placeholder="Enter suburb or address"
-          />
-        </div>
-      </div>
-
-      {/* CENTER */}
-      <div className="header-center">
         <input
-          className="search-input"
-          placeholder="Search"
+          ref={inputRef}
+          className="location-input"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          placeholder="Enter suburb or address"
         />
       </div>
+    </div>
 
-      {/* RIGHT */}
-      <div className="header-right">
-        <div className="user-block">
-          <span className="username">
-            {loading ? "..." : username || "Guest"}
-          </span>
+    {/* CENTER */}
+    <div className="header-center">
+      <input
+        className="search-input"
+        placeholder="Search"
+      />
+    </div>
 
-          <div
-            className="avatar"
-            onClick={() => setShowMenu((prev) => !prev)}
-          >
-            {initials}
-          </div>
+    {/* RIGHT */}
+    <div className="header-right">
+      <div className="user-block">
+        <span className="username">
+          {loading ? "..." : username}
+        </span>
 
-          {showMenu && (
-            <div className="dropdown-menu">
-              <div onClick={() => go("/profile")}>Profile</div>
-              <div onClick={() => onLogout?.()}>Logout</div>
-            </div>
-          )}
+        <div
+          className="avatar"
+          onClick={() => setShowMenu((prev) => !prev)}
+        >
+          {initials}
         </div>
+
+        {showMenu && (
+          <div className="dropdown-menu">
+            <div onClick={() => go("/profile")}>Profile</div>
+            <div onClick={() => onLogout?.()}>Logout</div>
+          </div>
+        )}
       </div>
+    </div>
 
-      {/* NAV */}
-      <nav className="header-nav">
-        {nav.items.map((item) => {
-          const active = isActiveRoute(item.path);
+  </div>
 
-          return (
-            <button
-              key={item.id}
-              className={`nav-item ${active ? "active" : ""}`}
-              onClick={() => go(item.path)}
-            >
-              {item.label}
-            </button>
-          );
-        })}
-      </nav>
-    </header>
-  );
+  {/* ===============================
+     ROW 2 (NAV)
+  =============================== */}
+  <nav className="header-nav">
+    {nav.items.map((item) => {
+      const active = isActiveRoute(item.path);
+
+      return (
+        <button
+          key={item.id}
+          className={`nav-item ${active ? "active" : ""}`}
+          onClick={() => go(item.path)}
+        >
+          {item.label}
+        </button>
+      );
+    })}
+  </nav>
+
+</header>
+
+);
 }
