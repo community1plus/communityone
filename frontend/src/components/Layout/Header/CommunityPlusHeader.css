@@ -8,10 +8,11 @@ HEADER CONTAINER
 
   background: #fff;
   border-bottom: 1px solid #e6dfd8;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04); /* 🔥 subtle elevation */
 }
 
 /* =====================================================
-TOP ROW (🔥 FLEX + ABSOLUTE CENTER)
+TOP ROW
 ===================================================== */
 
 .header-row {
@@ -21,8 +22,10 @@ TOP ROW (🔥 FLEX + ABSOLUTE CENTER)
   align-items: center;
   justify-content: space-between;
 
-  height: 72px; /* 🔥 more breathing room */
+  height: 80px; /* 🔥 more breathing room */
   padding: 0 var(--space-md);
+
+  gap: 12px;
 }
 
 /* =====================================================
@@ -34,11 +37,11 @@ LEFT
   align-items: center;
   gap: var(--space-md);
 
-  min-width: 240px; /* 🔥 stabilises layout */
+  min-width: 240px;
 }
 
 .logo {
-  height: 34px;
+  height: 36px;
   cursor: pointer;
 }
 
@@ -51,15 +54,19 @@ LOCATION
   align-items: center;
   gap: 6px;
 
-  padding: 6px 12px;
+  padding: 5px 10px;
   border-radius: 999px;
 
   background: rgba(0, 0, 0, 0.04);
 
-  min-width: 220px;
-  max-width: 340px;
+  min-width: 200px;
+  max-width: 280px; /* 🔥 reduced dominance */
 
-  transition: background 0.15s ease;
+  transition: all 0.15s ease;
+}
+
+.location-display:hover {
+  background: rgba(0, 0, 0, 0.06);
 }
 
 .location-input {
@@ -71,12 +78,8 @@ LOCATION
   font-size: var(--text-sm);
 }
 
-.location-display:focus-within {
-  background: rgba(0, 0, 0, 0.06);
-}
-
 /* =====================================================
-CENTER (🔥 TRUE CENTER)
+CENTER (TRUE CENTER)
 ===================================================== */
 
 .header-center {
@@ -86,15 +89,18 @@ CENTER (🔥 TRUE CENTER)
 }
 
 /* SEARCH */
+
 .search-input {
-  width: 340px;
-  padding: 10px 14px;
+  width: 360px;
+  padding: 10px 16px;
 
   border-radius: 999px;
   border: 1px solid #ddd;
 
-  background: #f8f9fb;
+  background: #f1f3f5;
   outline: none;
+
+  font-size: 14px;
 
   transition: all 0.15s ease;
 }
@@ -113,24 +119,26 @@ RIGHT (USER)
   align-items: center;
   justify-content: flex-end;
 
-  min-width: 240px; /* 🔥 balances left */
+  min-width: 240px;
 }
 
 .user-block {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
+  gap: 12px;
 }
 
 .username {
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600; /* 🔥 stronger presence */
+  color: #2c2c2c;
 }
 
 /* AVATAR */
+
 .avatar {
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
 
   border-radius: 50%;
   background: #007bff;
@@ -140,29 +148,29 @@ RIGHT (USER)
   align-items: center;
   justify-content: center;
 
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
 
   cursor: pointer;
 }
 
 /* =====================================================
-DROPDOWN (USER)
+USER DROPDOWN
 ===================================================== */
 
 .dropdown-menu {
   position: absolute;
-  top: 64px;
+  top: 70px;
   right: var(--space-md);
 
-  min-width: 160px;
+  min-width: 180px;
   z-index: 100;
 
   background: #fff;
   border: 1px solid #e6dfd8;
   border-radius: 10px;
 
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
 
   overflow: hidden;
 }
@@ -174,7 +182,7 @@ DROPDOWN (USER)
 }
 
 .menu-item:hover {
-  background: rgba(0, 0, 0, 0.04);
+  background: rgba(0, 0, 0, 0.05);
 }
 
 /* =====================================================
@@ -186,8 +194,11 @@ NAV (SECOND ROW)
   align-items: center;
   justify-content: center;
 
-  gap: 28px;
-  padding: 8px 0 12px; /* 🔥 spacing below header */
+  gap: 32px;
+
+  padding: 12px 0 14px; /* 🔥 better separation */
+
+  border-top: 1px solid rgba(0, 0, 0, 0.04); /* 🔥 subtle divider */
 }
 
 /* =====================================================
@@ -205,7 +216,7 @@ NAV ITEMS
 
   padding: 6px 4px;
 
-  transition: color 0.15s ease;
+  transition: all 0.15s ease;
 }
 
 .nav-item:hover {
@@ -255,8 +266,6 @@ NAV DROPDOWN
 .nav-group:hover .nav-dropdown {
   display: flex;
 }
-
-/* DROPDOWN ITEMS */
 
 .nav-dropdown div {
   padding: 8px 12px;

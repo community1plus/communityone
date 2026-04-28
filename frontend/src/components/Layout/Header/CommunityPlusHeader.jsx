@@ -8,8 +8,10 @@ import React, {
 
 import { useNavigate, useLocation } from "react-router-dom";
 import "./CommunityPlusHeader.css";
+
 import { useLocationContext } from "../../../context/LocationProvider";
 import { useAuth } from "../../../context/AuthContext";
+
 import LocationPin from "../../UI/LocationPin";
 import { resolveLocation } from "../../../services/resolveLocation";
 import { NAVIGATION } from "../../../config/navigation/navigationConfig";
@@ -19,36 +21,36 @@ export default function CommunityPlusHeader({ user, onLogout }) {
   const routeLocation = useLocation();
 
   const { viewLocation, setViewLocation } = useLocationContext();
-  const { appUser } = useAuth();
+  const { appUser, loading } = useAuth();
 
   const [showMenu, setShowMenu] = useState(false);
   const [resolving, setResolving] = useState(false);
   const [inputValue, setInputValue] = useState("");
 
   const inputRef = useRef(null);
-  const menuRef = useRef(null);
+  const autocompleteRef = useRef(null);
 
   /* ===============================
-     USER (FIXED)
+     USER (ROBUST)
   =============================== */
 
   const effectiveUser = appUser || user;
 
   const username = useMemo(() => {
-    if (!effectiveUser) return "Guest";
+    if (!effectiveUser) return null;
 
-    const email =
-      effectiveUser?.email ||
-      effectiveUser?.attributes?.email ||
-      effectiveUser?.signInDetails?.loginId;
-
-    if (email) return email.split("@")[0];
-    if (effectiveUser?.username) return effectiveUser.username;
-
-    return "Member";
+    return (
+      effectiveUser?.username ||
+      effectiveUser?.name ||
+      effectiveUser?.attributes?.email?.split("@")[0] ||
+      effectiveUser?.signInDetails?.loginId?.split("@")[0] ||
+      null
+    );
   }, [effectiveUser]);
 
   const initials = useMemo(() => {
+    if (!username) return "G";
+
     return username
       .split(/[\s._-]+/)
       .map((p) => p[0])
@@ -82,7 +84,7 @@ export default function CommunityPlusHeader({ user, onLogout }) {
   );
 
   /* ===============================
-     LOCATION (FIXED)
+     LOCATION (STABLE)
   =============================== */
 
   const locationText =
@@ -95,56 +97,47 @@ export default function CommunityPlusHeader({ user, onLogout }) {
     setInputValue(locationText);
   }, [locationText]);
 
+  /* 🔥 FIXED: no polling loop */
   useEffect(() => {
-    let interval;
+    if (!window.google?.maps || !inputRef.current) return;
+    if (autocompleteRef.current) return; // prevent re-init
 
-    const initAutocomplete = () => {
-      if (!window.google?.maps || !inputRef.current) return false;
-
-      const autocomplete =
-        new window.google.maps.places.Autocomplete(inputRef.current, {
-          types: ["geocode"],
-          componentRestrictions: { country: "au" },
-        });
-
-      autocomplete.addListener("place_changed", async () => {
-        const place = autocomplete.getPlace();
-        if (!place.geometry) return;
-
-        const lat = place.geometry.location.lat();
-        const lng = place.geometry.location.lng();
-
-        const enriched = await resolveLocation({ lat, lng, accuracy: 100 });
-        setViewLocation(enriched, "manual");
+    const autocomplete =
+      new window.google.maps.places.Autocomplete(inputRef.current, {
+        types: ["geocode"],
+        componentRestrictions: { country: "au" },
       });
 
-      return true;
-    };
+    autocomplete.addListener("place_changed", async () => {
+      const place = autocomplete.getPlace();
+      if (!place.geometry) return;
 
-    if (!initAutocomplete()) {
-      interval = setInterval(() => {
-        if (initAutocomplete()) clearInterval(interval);
-      }, 300);
-    }
+      const lat = place.geometry.location.lat();
+      const lng = place.geometry.location.lng();
 
-    return () => clearInterval(interval);
+      const enriched = await resolveLocation({ lat, lng, accuracy: 100 });
+      setViewLocation(enriched, "manual");
+    });
+
+    autocompleteRef.current = autocomplete;
   }, [setViewLocation]);
 
-  const handleResolveLocation = async () => {
+  const handleResolveLocation = useCallback(() => {
     setResolving(true);
 
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
         const { latitude: lat, longitude: lng, accuracy } = pos.coords;
-        const enriched = await resolveLocation({ lat, lng, accuracy });
 
+        const enriched = await resolveLocation({ lat, lng, accuracy });
         setViewLocation(enriched, "auto");
+
         setResolving(false);
       },
       () => setResolving(false),
       { enableHighAccuracy: true }
     );
-  };
+  }, [setViewLocation]);
 
   /* ===============================
      RENDER
@@ -152,7 +145,6 @@ export default function CommunityPlusHeader({ user, onLogout }) {
 
   return (
     <header className="header-root">
-
       {/* LEFT */}
       <div className="header-left">
         <img
@@ -188,9 +180,11 @@ export default function CommunityPlusHeader({ user, onLogout }) {
       </div>
 
       {/* RIGHT */}
-      <div className="header-right" ref={menuRef}>
+      <div className="header-right">
         <div className="user-block">
-          <span className="username">{username}</span>
+          <span className="username">
+            {loading ? "..." : username || "Guest"}
+          </span>
 
           <div
             className="avatar"
