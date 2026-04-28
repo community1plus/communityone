@@ -1,4 +1,8 @@
+import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
+import { signIn } from "aws-amplify/auth";
+
+
 export default function CommunityPlusLandingPage() {
   const { login, loading } = useAuth();
 
