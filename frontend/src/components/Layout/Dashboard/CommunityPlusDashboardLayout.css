@@ -1,115 +1,121 @@
 /* =========================
-   ROOT
+ROOT (APP SHELL)
 ========================= */
 
 .dashboard-root {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  width: 100%;
+display: flex;
+flex-direction: column;
+height: 100vh;
+width: 100%;
 
-  background: #faf7f4; /* 🔥 subtle app background */
+background: #faf7f4;
 }
 
 /* =========================
-   HEADER
+HEADER
 ========================= */
 
 .dashboard-header {
-  flex-shrink: 0;
-  z-index: 20;
+flex-shrink: 0;
+z-index: 20;
 
-  background: #ffffff;
+background: #ffffff;
 
-  /* 🔥 visual polish */
-  border-bottom: 1px solid #e6dfd8;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+border-bottom: 1px solid #e6dfd8;
+box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
 /* =========================
-   BODY
+BODY (MAIN SPLIT)
 ========================= */
 
 .dashboard-body {
-  display: flex;
-  flex: 1;
+display: flex;
+flex: 1;
 
-  min-height: 0; /* 🔥 prevents flex overflow bugs */
-  overflow: hidden; /* 🔥 prevents scroll bleed */
+min-height: 0;
+overflow: hidden; /* prevents double scroll */
 }
 
 /* =========================
-   SIDEBAR
+SIDEBAR
 ========================= */
 
 .dashboard-sidebar {
-  width: 240px;
-  flex-shrink: 0;
+width: 240px;
+flex-shrink: 0;
 
-  display: flex;
-  flex-direction: column;
+display: flex;
+flex-direction: column;
 
-  background: #111;
-  color: #fff;
+background: #111;
+color: #fff;
 
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
+border-right: 1px solid rgba(255, 255, 255, 0.08);
 
-  overflow-y: auto; /* 🔥 independent scroll */
+overflow-y: auto;
+
+/* 🔥 makes sidebar feel anchored */
+position: relative;
 }
 
 /* =========================
-   CONTENT
+CONTENT (MAIN AREA)
 ========================= */
 
 .dashboard-content {
-  flex: 1;
-  height: 100%;
-  min-height: 0;
+flex: 1;
+min-width: 0;     /* 🔥 prevents overflow bugs */
+min-height: 0;
 
-  display: flex;
-  flex-direction: column;
+display: flex;
+flex-direction: column;
 
-  overflow: hidden; /* 🔥 keeps map contained */
+overflow: hidden; /* critical for maps */
 }
 
 /* =========================
-   CONTENT INNER (OPTIONAL)
-========================= */
-
-.dashboard-content-inner {
-  flex: 1;
-  min-height: 0;
-
-  display: flex;
-  flex-direction: column;
-}
-
-/* =========================
-   SCROLLABLE AREAS (FEED ETC)
+SCROLL ZONE (FEEDS, ETC)
 ========================= */
 
 .scroll-container {
-  flex: 1;
-  overflow-y: auto;
+flex: 1;
+min-height: 0;
+overflow-y: auto;
+
+padding: 16px;
 }
 
 /* =========================
-   RESPONSIVE
+MAP CONTAINER (OPTIONAL)
+========================= */
+
+.map-container {
+flex: 1;
+min-height: 0;
+
+position: relative; /* ensures map fills correctly */
+}
+
+/* =========================
+RESPONSIVE
 ========================= */
 
 @media (max-width: 900px) {
-  .dashboard-sidebar {
-    width: 200px;
-  }
+.dashboard-sidebar {
+width: 200px;
+}
 }
 
 @media (max-width: 700px) {
-  .dashboard-body {
-    flex-direction: column;
-  }
+.dashboard-body {
+flex-direction: column;
+}
 
-  .dashboard-sidebar {
-    width: 100%;
-    height: auto;
-  }
+.dashboard-sidebar {
+width: 100%;
+height: auto;
+border-right: none;
+border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
 }
