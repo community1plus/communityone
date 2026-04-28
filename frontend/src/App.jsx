@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 
 /* CONTEXT */
@@ -13,21 +13,27 @@ import CommunityPlusUserProfile from "./pages/CommunityPlusUserProfile/Community
 import CommunityPlusYellowPages from "./pages/CommunityPlusYellowPages/CommunityPlusYellowPages";
 
 /* =========================
-   PROTECTED ROUTE WRAPPER
+   PROTECTED ROUTE (FIXED)
 ========================= */
 
-function ProtectedRoute({ isAuthenticated, children }) {
-  return isAuthenticated ? children : <Navigate to="/" replace />;
+function ProtectedRoute({ isAuthenticated }) {
+  if (!isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <Outlet />; // 🔥 prevents rerender loops
 }
 
 /* =========================
    DASHBOARD PROVIDERS
 ========================= */
 
-function DashboardProviders({ children }) {
+function DashboardProviders() {
   return (
     <GoogleMapsProvider>
-      <MapProvider>{children}</MapProvider>
+      <MapProvider>
+        <Outlet />
+      </MapProvider>
     </GoogleMapsProvider>
   );
 }
@@ -39,7 +45,17 @@ function DashboardProviders({ children }) {
 export default function App() {
   const { loading, isAuthenticated } = useAuth();
 
-  if (loading) return null;
+  /* =========================
+     LOADING STATE (IMPORTANT)
+  ========================= */
+
+  if (loading) {
+    return (
+      <div style={{ padding: 40 }}>
+        Initialising...
+      </div>
+    );
+  }
 
   return (
     <Routes>
@@ -49,30 +65,35 @@ export default function App() {
       <Route path="/" element={<CommunityPlusLandingPage />} />
 
       {/* =========================
-         DASHBOARD (PROTECTED)
+         PROTECTED LAYER
       ========================= */}
-      <Route
-        path="/communityplus" /* 🔥 normalize path */
-        element={
-          <ProtectedRoute isAuthenticated={isAuthenticated}>
-            <DashboardProviders>
-              <CommunityPlusDashboardLayout />
-            </DashboardProviders>
-          </ProtectedRoute>
-        }
-      >
-        {/* DEFAULT */}
-        <Route index element={<CommunityPlusDashboardHome />} />
+      <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} />}>
+        
+        {/* PROVIDERS LAYER */}
+        <Route element={<DashboardProviders />}>
+          
+          {/* DASHBOARD LAYOUT */}
+          <Route
+            path="/communityplus"
+            element={<CommunityPlusDashboardLayout />}
+          >
+            {/* DEFAULT */}
+            <Route index element={<CommunityPlusDashboardHome />} />
 
-        {/* NESTED */}
-        <Route path="profile" element={<CommunityPlusUserProfile />} />
-        <Route path="yellowpages" element={<CommunityPlusYellowPages />} />
+            {/* NESTED */}
+            <Route path="profile" element={<CommunityPlusUserProfile />} />
+            <Route path="yellowpages" element={<CommunityPlusYellowPages />} />
 
-        {/* FUTURE: FULL MAP MODE */}
-        {/* <Route path="map" element={<FullMapPage />} /> */}
+            {/* FUTURE */}
+            {/* <Route path="map" element={<FullMapPage />} /> */}
 
-        {/* CATCH-ALL */}
-        <Route path="*" element={<Navigate to="/communityplus" replace />} />
+            {/* CATCH-ALL */}
+            <Route
+              path="*"
+              element={<Navigate to="/communityplus" replace />}
+            />
+          </Route>
+        </Route>
       </Route>
 
       {/* =========================
