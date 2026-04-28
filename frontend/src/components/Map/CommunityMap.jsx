@@ -42,8 +42,9 @@ export default function CommunityMap({ mode = "embedded" }) {
   const mapRef = useRef(null);
 
   const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
-  });
+  googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+  libraries: ["places"], // 🔥 THIS FIXES IT
+});
 
   /* =========================
      HELPERS
