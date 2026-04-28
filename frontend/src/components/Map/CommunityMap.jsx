@@ -1,4 +1,3 @@
-// components/Map/CommunityMap.jsx
 import {
   GoogleMap,
   MarkerClusterer,
@@ -9,6 +8,10 @@ import {
 
 import { useEffect, useRef, useMemo, useCallback, useState } from "react";
 import { useMap } from "../../context/MapContext";
+
+/* =========================
+   CONFIG
+========================= */
 
 const DEFAULT_CENTER = { lat: -37.8136, lng: 144.9631 };
 
@@ -22,14 +25,19 @@ const ICONS = {
   selected: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
 };
 
+/* =========================
+   COMPONENT
+========================= */
+
 export default function CommunityMap() {
   const {
     filteredMarkers,
     selectedMarkerId,
     selectedLocation,
-    focusOnMarker,
+    focusLocation, // 🔥 use consistent naming
     setSelectedMarkerId,
     getMarkerById,
+    userLocation,
   } = useMap();
 
   const mapRef = useRef(null);
@@ -37,6 +45,7 @@ export default function CommunityMap() {
 
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+    libraries: ["places"], // 🔥 future-proof (header autocomplete)
   });
 
   /* =========================
@@ -56,6 +65,23 @@ export default function CommunityMap() {
   }, []);
 
   /* =========================
+     HELPERS
+  ========================= */
+
+  const getPosition = useCallback((item) => {
+    if (!item) return null;
+    return item.location || { lat: item.lat, lng: item.lng };
+  }, []);
+
+  /* =========================
+     CENTER LOGIC
+  ========================= */
+
+  const mapCenter = useMemo(() => {
+    return selectedLocation || userLocation || DEFAULT_CENTER;
+  }, [selectedLocation, userLocation]);
+
+  /* =========================
      PAN TO SELECTION
   ========================= */
 
@@ -68,27 +94,40 @@ export default function CommunityMap() {
   }, [selectedLocation]);
 
   /* =========================
-     FILTER BY VIEWPORT
+     VIEWPORT FILTER (SAFE)
   ========================= */
 
   const visibleMarkers = useMemo(() => {
-    if (!bounds) return filteredMarkers;
+    if (!bounds || !bounds.contains) return filteredMarkers;
 
     return filteredMarkers.filter((m) => {
-      const pos = m.location;
+      const pos = getPosition(m);
       return pos && bounds.contains(pos);
     });
-  }, [filteredMarkers, bounds]);
+  }, [filteredMarkers, bounds, getPosition]);
+
+  /* =========================
+     SELECTED MARKER (SAFE)
+  ========================= */
 
   const selectedMarker = useMemo(() => {
-    return selectedMarkerId ? getMarkerById(selectedMarkerId) : null;
+    if (!selectedMarkerId || !getMarkerById) return null;
+    return getMarkerById(selectedMarkerId);
   }, [selectedMarkerId, getMarkerById]);
+
+  /* =========================
+     LOAD STATE
+  ========================= */
 
   if (!isLoaded) return <div>Loading map...</div>;
 
+  /* =========================
+     RENDER
+  ========================= */
+
   return (
     <GoogleMap
-      center={DEFAULT_CENTER}
+      center={mapCenter}
       zoom={12}
       mapContainerStyle={containerStyle}
       onLoad={onLoad}
@@ -99,31 +138,46 @@ export default function CommunityMap() {
         fullscreenControl: false,
       }}
     >
+      {/* =========================
+         CLUSTERED MARKERS
+      ========================= */}
+
       <MarkerClusterer>
         {(clusterer) =>
           visibleMarkers.map((m) => {
+            const position = getPosition(m);
+            if (!position) return null;
+
             const isSelected = m.id === selectedMarkerId;
 
             return (
               <Marker
                 key={m.id}
-                position={m.location}
+                position={position}
                 clusterer={clusterer}
                 icon={isSelected ? ICONS.selected : ICONS.default}
-                onClick={() => focusOnMarker(m.location, m.id)}
+                onClick={() => focusLocation(position, m.id)}
               />
             );
           })
         }
       </MarkerClusterer>
 
+      {/* =========================
+         INFOWINDOW
+      ========================= */}
+
       {selectedMarker && (
         <InfoWindow
-          position={selectedMarker.location}
+          position={getPosition(selectedMarker)}
           onCloseClick={() => setSelectedMarkerId(null)}
         >
-          <div>
+          <div style={{ minWidth: "160px" }}>
             <strong>{selectedMarker.title}</strong>
+
+            <div style={{ fontSize: "12px", marginTop: "4px" }}>
+              Type: {selectedMarker.type}
+            </div>
           </div>
         </InfoWindow>
       )}
