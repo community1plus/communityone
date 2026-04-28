@@ -50,7 +50,6 @@ return <div style={{ padding: 40 }}>Initialising...</div>;
 
 return ( <Routes>
 
-```
   {/* =========================
      PUBLIC (SMART REDIRECT)
   ========================= */}
@@ -97,7 +96,6 @@ return ( <Routes>
 
   <Route path="*" element={<Navigate to="/" replace />} />
 </Routes>
-```
 
 );
 }
