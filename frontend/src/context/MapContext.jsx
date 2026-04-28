@@ -6,7 +6,7 @@ useCallback,
 useMemo,
 } from "react";
 
-import { resolveLocation } from "../utils/resolveLocation";
+import { resolveLocation } from "../services/resolveLocation";
 
 const MapContext = createContext();
 
