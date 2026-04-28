@@ -51,7 +51,6 @@ INIT
 useEffect(() => {
 let mounted = true;
 
-```
 const initAuth = async () => {
   try {
     console.log("🔄 Initialising auth...");
@@ -104,7 +103,7 @@ initAuth();
 return () => {
   mounted = false;
 };
-```
+
 
 }, []);
 
@@ -118,10 +117,9 @@ console.log("⚠️ Already authenticated — skipping login");
 return;
 }
 
-```
 console.log("🚀 Redirect login");
 await signInWithRedirect();
-```
+
 
 }, [tokens]);
 
@@ -132,12 +130,11 @@ LOGOUT
 const logout = useCallback(async () => {
 await signOut({ global: true });
 
-```
+
 setUser(null);
 setTokens(null);
 
 window.location.href = "/";
-```
 
 }, []);
 
