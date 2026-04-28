@@ -13,93 +13,91 @@ import CommunityPlusUserProfile from "./pages/CommunityPlusUserProfile/Community
 import CommunityPlusYellowPages from "./pages/CommunityPlusYellowPages/CommunityPlusYellowPages";
 
 /* =========================
-   PROTECTED ROUTE (FIXED)
+PROTECTED ROUTE
 ========================= */
 
 function ProtectedRoute({ isAuthenticated }) {
-  if (!isAuthenticated) {
-    return <Navigate to="/" replace />;
-  }
+if (!isAuthenticated) {
+return <Navigate to="/" replace />;
+}
 
-  return <Outlet />; // 🔥 prevents rerender loops
+return <Outlet />;
 }
 
 /* =========================
-   DASHBOARD PROVIDERS
+DASHBOARD PROVIDERS
 ========================= */
 
 function DashboardProviders() {
-  return (
-    <GoogleMapsProvider>
-      <MapProvider>
-        <Outlet />
-      </MapProvider>
-    </GoogleMapsProvider>
-  );
+return ( <GoogleMapsProvider> <MapProvider> <Outlet /> </MapProvider> </GoogleMapsProvider>
+);
 }
 
 /* =========================
-   APP
+APP
 ========================= */
 
 export default function App() {
-  const { loading, isAuthenticated } = useAuth();
+const { loading, isAuthenticated } = useAuth();
 
-  /* =========================
-     LOADING STATE (IMPORTANT)
-  ========================= */
+/* =========================
+LOADING STATE
+========================= */
 
-  if (loading) {
-    return (
-      <div style={{ padding: 40 }}>
-        Initialising...
-      </div>
-    );
-  }
+if (loading) {
+return <div style={{ padding: 40 }}>Initialising...</div>;
+}
 
-  return (
-    <Routes>
-      {/* =========================
-         PUBLIC
-      ========================= */}
-      <Route path="/" element={<CommunityPlusLandingPage />} />
+return ( <Routes>
 
-      {/* =========================
-         PROTECTED LAYER
-      ========================= */}
-      <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} />}>
-        
-        {/* PROVIDERS LAYER */}
-        <Route element={<DashboardProviders />}>
-          
-          {/* DASHBOARD LAYOUT */}
-          <Route
-            path="/communityplus"
-            element={<CommunityPlusDashboardLayout />}
-          >
-            {/* DEFAULT */}
-            <Route index element={<CommunityPlusDashboardHome />} />
+```
+  {/* =========================
+     PUBLIC (SMART REDIRECT)
+  ========================= */}
 
-            {/* NESTED */}
-            <Route path="profile" element={<CommunityPlusUserProfile />} />
-            <Route path="yellowpages" element={<CommunityPlusYellowPages />} />
+  <Route
+    path="/"
+    element={
+      isAuthenticated
+        ? <Navigate to="/communityplus" replace />
+        : <CommunityPlusLandingPage />
+    }
+  />
 
-            {/* FUTURE */}
-            {/* <Route path="map" element={<FullMapPage />} /> */}
+  {/* =========================
+     PROTECTED LAYER
+  ========================= */}
 
-            {/* CATCH-ALL */}
-            <Route
-              path="*"
-              element={<Navigate to="/communityplus" replace />}
-            />
-          </Route>
-        </Route>
+  <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} />}>
+
+    {/* PROVIDERS */}
+    <Route element={<DashboardProviders />}>
+
+      {/* DASHBOARD */}
+      <Route
+        path="/communityplus"
+        element={<CommunityPlusDashboardLayout />}
+      >
+        <Route index element={<CommunityPlusDashboardHome />} />
+        <Route path="profile" element={<CommunityPlusUserProfile />} />
+        <Route path="yellowpages" element={<CommunityPlusYellowPages />} />
+
+        <Route
+          path="*"
+          element={<Navigate to="/communityplus" replace />}
+        />
       </Route>
 
-      {/* =========================
-         GLOBAL FALLBACK
-      ========================= */}
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
-  );
+    </Route>
+  </Route>
+
+  {/* =========================
+     GLOBAL FALLBACK
+  ========================= */}
+
+  <Route path="*" element={<Navigate to="/" replace />} />
+</Routes>
+```
+
+);
 }
