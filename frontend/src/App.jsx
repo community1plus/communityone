@@ -4,7 +4,7 @@ import { useAuth } from "./context/AuthContext";
 /* CONTEXT */
 import { GoogleMapsProvider } from "./context/GoogleMapsProvider";
 import { MapProvider } from "./context/MapContext";
-import { SessionProvider } from "./context/SessionContext";
+import { SessionProvider } from "./context/sessionContext";
 
 /* PAGES */
 import CommunityPlusLandingPage from "./pages/CommunityPlusLandingPage/CommunityPlusLandingPage";
