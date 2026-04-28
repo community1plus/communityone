@@ -3,12 +3,12 @@ HEADER CONTAINER
 ===================================================== */
 
 .header {
-  display: flex;
-  flex-direction: column;
+display: flex;
+flex-direction: column;
 
-  background: #fff;
-  border-bottom: 1px solid #e6dfd8;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04); /* 🔥 subtle elevation */
+background: #fff;
+border-bottom: 1px solid #e6dfd8;
+box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 /* =====================================================
@@ -16,16 +16,16 @@ TOP ROW
 ===================================================== */
 
 .header-row {
-  position: relative;
+position: relative;
 
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+display: flex;
+align-items: center;
+justify-content: space-between;
 
-  height: 80px; /* 🔥 more breathing room */
-  padding: 0 var(--space-md);
+height: 84px;
+padding: 0 var(--space-md);
 
-  gap: 12px;
+gap: 12px;
 }
 
 /* =====================================================
@@ -33,16 +33,16 @@ LEFT
 ===================================================== */
 
 .header-left {
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
+display: flex;
+align-items: center;
+gap: var(--space-md);
 
-  min-width: 240px;
+min-width: 240px;
 }
 
 .logo {
-  height: 36px;
-  cursor: pointer;
+height: 36px;
+cursor: pointer;
 }
 
 /* =====================================================
@@ -50,64 +50,55 @@ LOCATION
 ===================================================== */
 
 .location-display {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+display: flex;
+align-items: center;
+gap: 6px;
 
-  padding: 5px 10px;
-  border-radius: 999px;
+padding: 6px 12px;
+border-radius: 999px;
 
-  background: rgba(0, 0, 0, 0.04);
+background: rgba(0, 0, 0, 0.04);
 
-  min-width: 200px;
-  max-width: 280px; /* 🔥 reduced dominance */
+min-width: 200px;
+max-width: 280px;
 
-  transition: all 0.15s ease;
+font-size: 13px;
+
+transition: all 0.15s ease;
 }
 
 .location-display:hover {
-  background: rgba(0, 0, 0, 0.06);
-}
-
-.location-input {
-  width: 100%;
-  border: none;
-  background: transparent;
-  outline: none;
-
-  font-size: var(--text-sm);
+background: rgba(0, 0, 0, 0.06);
 }
 
 /* =====================================================
-CENTER (TRUE CENTER)
+CENTER (SEARCH)
 ===================================================== */
 
 .header-center {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+position: absolute;
+left: 50%;
+transform: translateX(-50%);
 }
 
-/* SEARCH */
-
 .search-input {
-  width: 360px;
-  padding: 10px 16px;
+width: 380px;
+padding: 11px 16px;
 
-  border-radius: 999px;
-  border: 1px solid #ddd;
+border-radius: 999px;
+border: 1px solid #ddd;
 
-  background: #f1f3f5;
-  outline: none;
+background: #f1f3f5;
+outline: none;
 
-  font-size: 14px;
+font-size: 14px;
 
-  transition: all 0.15s ease;
+transition: all 0.15s ease;
 }
 
 .search-input:focus {
-  background: #fff;
-  border-color: #007bff;
+background: #fff;
+border-color: #b11226; /* 🔥 brand accent */
 }
 
 /* =====================================================
@@ -115,43 +106,55 @@ RIGHT (USER)
 ===================================================== */
 
 .header-right {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
+display: flex;
+align-items: center;
+justify-content: flex-end;
 
-  min-width: 240px;
+min-width: 240px;
 }
 
 .user-block {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+display: flex;
+align-items: center;
+gap: 12px;
 }
 
 .username {
-  font-size: 14px;
-  font-weight: 600; /* 🔥 stronger presence */
-  color: #2c2c2c;
+font-size: 14px;
+font-weight: 600;
+color: #2c2c2c;
 }
 
-/* AVATAR */
+/* =====================================================
+AVATAR (🔥 BRAND FIX)
+===================================================== */
 
 .avatar {
-  width: 36px;
-  height: 36px;
+width: 36px;
+height: 36px;
 
-  border-radius: 50%;
-  background: #007bff;
-  color: white;
+border-radius: 50%;
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+background: #5a0f1c; /* 🔥 oxblood red */
+color: #ffffff;
 
-  font-size: 14px;
-  font-weight: 600;
+display: flex;
+align-items: center;
+justify-content: center;
 
-  cursor: pointer;
+font-size: 13px;
+font-weight: 700;
+
+letter-spacing: 0.5px;
+
+cursor: pointer;
+
+transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.avatar:hover {
+transform: translateY(-1px);
+box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
 }
 
 /* =====================================================
@@ -159,30 +162,30 @@ USER DROPDOWN
 ===================================================== */
 
 .dropdown-menu {
-  position: absolute;
-  top: 70px;
-  right: var(--space-md);
+position: absolute;
+top: 72px;
+right: var(--space-md);
 
-  min-width: 180px;
-  z-index: 100;
+min-width: 180px;
+z-index: 100;
 
-  background: #fff;
-  border: 1px solid #e6dfd8;
-  border-radius: 10px;
+background: #fff;
+border: 1px solid #e6dfd8;
+border-radius: 10px;
 
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
 
-  overflow: hidden;
+overflow: hidden;
 }
 
 .menu-item {
-  padding: 10px 14px;
-  cursor: pointer;
-  font-size: 13px;
+padding: 10px 14px;
+cursor: pointer;
+font-size: 13px;
 }
 
 .menu-item:hover {
-  background: rgba(0, 0, 0, 0.05);
+background: rgba(0, 0, 0, 0.05);
 }
 
 /* =====================================================
@@ -190,15 +193,15 @@ NAV (SECOND ROW)
 ===================================================== */
 
 .header-nav {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+display: flex;
+align-items: center;
+justify-content: center;
 
-  gap: 32px;
+gap: 36px;
 
-  padding: 12px 0 14px; /* 🔥 better separation */
+padding: 14px 0;
 
-  border-top: 1px solid rgba(0, 0, 0, 0.04); /* 🔥 subtle divider */
+border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 /* =====================================================
@@ -206,81 +209,24 @@ NAV ITEMS
 ===================================================== */
 
 .nav-item {
-  font-size: 14px;
-  font-weight: 600;
-  color: #6f675f;
+font-size: 14px;
+font-weight: 600;
+color: #6f675f;
 
-  background: transparent;
-  border: none;
-  cursor: pointer;
+background: transparent;
+border: none;
+cursor: pointer;
 
-  padding: 6px 4px;
+padding: 6px 4px;
 
-  transition: all 0.15s ease;
+transition: all 0.15s ease;
 }
 
 .nav-item:hover {
-  color: #000;
+color: #000;
 }
 
 .nav-item.active {
-  color: #000;
-  font-weight: 700;
-}
-
-/* =====================================================
-NAV GROUP (DROPDOWN)
-===================================================== */
-
-.nav-group {
-  position: relative;
-}
-
-.nav-group.active .nav-item {
-  color: #000;
-  font-weight: 700;
-}
-
-/* =====================================================
-NAV DROPDOWN
-===================================================== */
-
-.nav-dropdown {
-  position: absolute;
-  top: 120%;
-  left: 0;
-
-  background: #ffffff;
-  border: 1px solid #e6dfd8;
-  border-radius: 10px;
-
-  padding: 6px 0;
-  min-width: 160px;
-
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
-
-  display: none;
-  flex-direction: column;
-}
-
-.nav-group:hover .nav-dropdown {
-  display: flex;
-}
-
-.nav-dropdown div {
-  padding: 8px 12px;
-  font-size: 13px;
-  color: #2c2c2c;
-  cursor: pointer;
-
-  transition: background 0.15s ease;
-}
-
-.nav-dropdown div:hover {
-  background: rgba(0, 0, 0, 0.05);
-}
-
-.nav-dropdown .active {
-  background: rgba(0, 0, 0, 0.08);
-  font-weight: 600;
+color: #000;
+font-weight: 700;
 }

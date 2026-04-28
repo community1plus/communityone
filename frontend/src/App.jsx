@@ -2,8 +2,9 @@ import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 
 /* CONTEXT */
-import { MapProvider } from "./context/MapContext";
 import { GoogleMapsProvider } from "./context/GoogleMapsProvider";
+import { MapProvider } from "./context/MapContext";
+import { SessionProvider } from "./context/SessionContext";
 
 /* PAGES */
 import CommunityPlusLandingPage from "./pages/CommunityPlusLandingPage/CommunityPlusLandingPage";
@@ -29,7 +30,7 @@ DASHBOARD PROVIDERS
 ========================= */
 
 function DashboardProviders() {
-return ( <GoogleMapsProvider> <MapProvider> <Outlet /> </MapProvider> </GoogleMapsProvider>
+return ( <GoogleMapsProvider> <MapProvider> <SessionProvider> <Outlet /> </SessionProvider> </MapProvider> </GoogleMapsProvider>
 );
 }
 

@@ -1,125 +1,181 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useCallback, useMemo } from "react";
 import {
-  fetchAuthSession,
-  getCurrentUser,
-  signInWithRedirect,
-  signOut,
+fetchAuthSession,
+getCurrentUser,
+signInWithRedirect,
+signOut,
 } from "aws-amplify/auth";
+
+/* ===============================
+CONTEXT
+=============================== */
 
 const AuthContext = createContext();
 
-export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [tokens, setTokens] = useState(null);
-  const [loading, setLoading] = useState(true);
+/* ===============================
+HELPERS
+=============================== */
 
-  /* ===============================
-     🔥 AUTH INITIALISATION (ROBUST)
-  =============================== */
-  useEffect(() => {
-    let mounted = true;
+function normaliseUser(amplifyUser) {
+if (!amplifyUser) return null;
 
-    async function initAuth() {
-      try {
-        console.log("🔄 Initialising auth...");
-        console.log("🌐 URL:", window.location.href);
+const username = amplifyUser.username || "";
+const name = username.replace(/[^a-zA-Z0-9 ]/g, "");
 
-        // 🔍 Detect OAuth redirect
-        const isRedirectFlow =
-          window.location.search.includes("code=") &&
-          window.location.search.includes("state=");
-
-        if (isRedirectFlow) {
-          console.log("🔁 OAuth redirect detected");
-
-          // 🔥 Give Amplify time to process redirect
-          await new Promise((res) => setTimeout(res, 300));
-        }
-
-        // 🔥 FIRST ATTEMPT
-        let session = await fetchAuthSession();
-
-        // 🔁 RETRY ON EMPTY TOKENS (CRITICAL)
-        if (!session.tokens?.accessToken) {
-          console.log("⚠️ No tokens, retrying...");
-
-          await new Promise((res) => setTimeout(res, 500));
-          session = await fetchAuthSession();
-        }
-
-        if (!mounted) return;
-
-        if (session.tokens?.accessToken) {
-          const currentUser = await getCurrentUser();
-
-          if (!mounted) return;
-
-          setUser(currentUser);
-          setTokens(session.tokens);
-
-          console.log("✅ Auth restored", {
-            hasAccessToken: true,
-          });
-
-          // 🔥 CLEAN URL (remove ?code=)
-          if (isRedirectFlow) {
-            window.history.replaceState(
-              {},
-              document.title,
-              window.location.pathname
-            );
-          }
-        } else {
-          console.log("🚫 No valid session");
-        }
-      } catch (err) {
-        console.error("❌ Auth init failed:", err);
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    }
-
-    initAuth();
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  /* ===============================
-     🔐 LOGIN
-  =============================== */
-  const login = async () => {
-    console.log("🚀 Redirect login");
-    await signInWithRedirect();
-  };
-
-  /* ===============================
-     🔓 LOGOUT
-  =============================== */
-  const logout = async () => {
-    await signOut({ global: true });
-
-    setUser(null);
-    setTokens(null);
-
-    window.location.href = "/"; // 🔥 hard reset
-  };
-
-  return (
-    <AuthContext.Provider
-      value={{
-        user,
-        tokens,
-        loading,
-        isAuthenticated: !!tokens?.accessToken,
-        login,
-        logout,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
+return {
+id: amplifyUser.userId,
+username,
+name,
+initials: name
+.split(" ")
+.map((n) => n[0])
+.join("")
+.slice(0, 2)
+.toUpperCase() || "?",
+};
 }
 
-export const useAuth = () => useContext(AuthContext);
+/* ===============================
+PROVIDER
+=============================== */
+
+export function AuthProvider({ children }) {
+const [user, setUser] = useState(null);
+const [tokens, setTokens] = useState(null);
+const [loading, setLoading] = useState(true);
+
+/* ===============================
+INIT
+=============================== */
+
+useEffect(() => {
+let mounted = true;
+
+```
+const initAuth = async () => {
+  try {
+    console.log("🔄 Initialising auth...");
+
+    const isRedirect =
+      window.location.search.includes("code=") &&
+      window.location.search.includes("state=");
+
+    if (isRedirect) {
+      await new Promise((res) => setTimeout(res, 300));
+    }
+
+    let session = await fetchAuthSession();
+
+    if (!session.tokens?.accessToken) {
+      await new Promise((res) => setTimeout(res, 400));
+      session = await fetchAuthSession();
+    }
+
+    if (!mounted) return;
+
+    if (session.tokens?.accessToken) {
+      const amplifyUser = await getCurrentUser();
+
+      if (!mounted) return;
+
+      setUser(normaliseUser(amplifyUser));
+      setTokens(session.tokens);
+
+      console.log("✅ Auth restored");
+
+      if (isRedirect) {
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    } else {
+      setUser(null);
+      setTokens(null);
+    }
+  } catch (err) {
+    console.error("❌ Auth init failed:", err);
+    setUser(null);
+    setTokens(null);
+  } finally {
+    if (mounted) setLoading(false);
+  }
+};
+
+initAuth();
+
+return () => {
+  mounted = false;
+};
+```
+
+}, []);
+
+/* ===============================
+LOGIN (SAFE)
+=============================== */
+
+const login = useCallback(async () => {
+if (tokens?.accessToken) {
+console.log("⚠️ Already authenticated — skipping login");
+return;
+}
+
+```
+console.log("🚀 Redirect login");
+await signInWithRedirect();
+```
+
+}, [tokens]);
+
+/* ===============================
+LOGOUT
+=============================== */
+
+const logout = useCallback(async () => {
+await signOut({ global: true });
+
+```
+setUser(null);
+setTokens(null);
+
+window.location.href = "/";
+```
+
+}, []);
+
+/* ===============================
+DERIVED
+=============================== */
+
+const isAuthenticated = !!tokens?.accessToken;
+
+/* ===============================
+VALUE
+=============================== */
+
+const value = useMemo(
+() => ({
+user,
+tokens,
+loading,
+isAuthenticated,
+login,
+logout,
+}),
+[user, tokens, loading, isAuthenticated, login, logout]
+);
+
+return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
+
+/* ===============================
+HOOK
+=============================== */
+
+export const useAuth = () => {
+const context = useContext(AuthContext);
+
+if (!context) {
+throw new Error("useAuth must be used within AuthProvider");
+}
+
+return context;
+};

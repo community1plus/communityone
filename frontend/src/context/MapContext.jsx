@@ -37,12 +37,11 @@ DERIVED: FILTERED
 const filteredMarkers = useMemo(() => {
 if (!filters) return markers;
 
-```
 return markers.filter((m) => {
   if (filters.type && m.type !== filters.type) return false;
   return true;
 });
-```
+
 
 }, [markers, filters]);
 
@@ -53,12 +52,11 @@ DERIVED: VIEWPORT
 const visibleMarkers = useMemo(() => {
 if (!bounds) return filteredMarkers;
 
-```
 return filteredMarkers.filter((m) => {
   const pos = m.location;
   return pos && bounds.contains(pos);
 });
-```
+
 
 }, [filteredMarkers, bounds]);
 
@@ -88,7 +86,6 @@ const updateUserLocation = useCallback(
 async (coords) => {
 if (!coords) return;
 
-```
   // 🔥 always update raw coords
   setUserLocation(coords);
 
@@ -103,7 +100,7 @@ if (!coords) return;
   }
 },
 [resolvedLocation]
-```
+
 
 );
 
@@ -127,7 +124,6 @@ INGESTION
 const addMarkers = useCallback((incoming, source = "unknown") => {
 if (!Array.isArray(incoming)) return;
 
-```
 setMarkers((prev) => {
   const existingIds = new Set(prev.map((m) => m.id));
 
@@ -140,7 +136,6 @@ setMarkers((prev) => {
 
   return [...prev, ...newItems];
 });
-```
 
 }, []);
 
@@ -159,7 +154,6 @@ markers,
 filteredMarkers,
 visibleMarkers,
 
-```
   selectedMarkerId,
   selectedMarker,
   selectedLocation,
@@ -202,7 +196,6 @@ visibleMarkers,
   resolvedLocation,
   hasResolvedLocation,
 ]
-```
 
 );
 
