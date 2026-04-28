@@ -1,12 +1,34 @@
-// src/context/GoogleMapsProvider.jsx
+import { createContext, useContext } from "react";
 import { useJsApiLoader } from "@react-google-maps/api";
 
-const LIBRARIES = ["places"];
+const GoogleMapsContext = createContext();
 
-export function useGoogleMaps() {
-  return useJsApiLoader({
+export function GoogleMapsProvider({ children }) {
+  const { isLoaded, loadError } = useJsApiLoader({
     id: "google-map-script",
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
-    libraries: LIBRARIES,
+    libraries: ["places"], // 🔥 critical
   });
+
+  const value = {
+    isLoaded,
+    loadError,
+    google: window.google, // optional access
+  };
+
+  return (
+    <GoogleMapsContext.Provider value={value}>
+      {children}
+    </GoogleMapsContext.Provider>
+  );
 }
+
+export const useGoogleMaps = () => {
+  const context = useContext(GoogleMapsContext);
+
+  if (!context) {
+    throw new Error("useGoogleMaps must be used within GoogleMapsProvider");
+  }
+
+  return context;
+};

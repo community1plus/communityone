@@ -3,23 +3,33 @@ import { useAuth } from "./context/AuthContext";
 
 /* CONTEXT */
 import { MapProvider } from "./context/MapContext";
+import { GoogleMapsProvider } from "./context/GoogleMapsProvider";
 
 /* PAGES */
 import CommunityPlusLandingPage from "./pages/CommunityPlusLandingPage/CommunityPlusLandingPage";
-
-/* ✅ USE LAYOUT (NOT PAGE) */
 import CommunityPlusDashboardLayout from "./components/Layout/Dashboard/CommunityPlusDashboardLayout";
-
 import CommunityPlusDashboardHome from "./pages/CommunityPlusDashboardHome/CommunityPlusDashboardHome";
 import CommunityPlusUserProfile from "./pages/CommunityPlusUserProfile/CommunityPlusUserProfile";
 import CommunityPlusYellowPages from "./pages/CommunityPlusYellowPages/CommunityPlusYellowPages";
 
 /* =========================
-   PROTECTED ROUTE
+   PROTECTED ROUTE WRAPPER
 ========================= */
 
 function ProtectedRoute({ isAuthenticated, children }) {
   return isAuthenticated ? children : <Navigate to="/" replace />;
+}
+
+/* =========================
+   DASHBOARD PROVIDERS
+========================= */
+
+function DashboardProviders({ children }) {
+  return (
+    <GoogleMapsProvider>
+      <MapProvider>{children}</MapProvider>
+    </GoogleMapsProvider>
+  );
 }
 
 /* =========================
@@ -33,17 +43,21 @@ export default function App() {
 
   return (
     <Routes>
-      {/* PUBLIC */}
+      {/* =========================
+         PUBLIC
+      ========================= */}
       <Route path="/" element={<CommunityPlusLandingPage />} />
 
-      {/* 🔥 DASHBOARD (LAYOUT WRAPS EVERYTHING) */}
+      {/* =========================
+         DASHBOARD (PROTECTED)
+      ========================= */}
       <Route
-        path="/CommunityPlusDashboard"
+        path="/communityplus" /* 🔥 normalize path */
         element={
           <ProtectedRoute isAuthenticated={isAuthenticated}>
-            <MapProvider>
-              <CommunityPlusDashboardLayout /> {/* ✅ THIS IS THE FIX */}
-            </MapProvider>
+            <DashboardProviders>
+              <CommunityPlusDashboardLayout />
+            </DashboardProviders>
           </ProtectedRoute>
         }
       >
@@ -54,14 +68,16 @@ export default function App() {
         <Route path="profile" element={<CommunityPlusUserProfile />} />
         <Route path="yellowpages" element={<CommunityPlusYellowPages />} />
 
+        {/* FUTURE: FULL MAP MODE */}
+        {/* <Route path="map" element={<FullMapPage />} /> */}
+
         {/* CATCH-ALL */}
-        <Route
-          path="*"
-          element={<Navigate to="/CommunityPlusDashboard" replace />}
-        />
+        <Route path="*" element={<Navigate to="/communityplus" replace />} />
       </Route>
 
-      {/* FALLBACK */}
+      {/* =========================
+         GLOBAL FALLBACK
+      ========================= */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
