@@ -87,39 +87,55 @@ export default function CommunityPlusHeader({ onLogout }) {
   );
 
   /* ===============================
-     DISPLAY SYNC
+     DISPLAY VALUE (FIXED)
   =============================== */
 
-  const locationText = useMemo(
-    () => formatLocationDisplay(viewLocation),
-    [viewLocation]
-  );
+  const displayValue = useMemo(() => {
+    if (inputValue) return inputValue;
 
-  useEffect(() => {
-    if (locationText) setInputValue(locationText);
-  }, [locationText]);
+    if (resolving) return "Detecting location...";
+
+    if (viewLocation?.suburb) {
+      return `${viewLocation.suburb}, ${viewLocation.state}`;
+    }
+
+    return "Enable location";
+  }, [inputValue, resolving, viewLocation]);
 
   /* ===============================
-     LOCATION SERVICE (REAL-TIME)
+     SYNC LOCATION → INPUT
+  =============================== */
+
+  useEffect(() => {
+    if (!viewLocation) return;
+
+    const formatted = formatLocationDisplay(viewLocation);
+
+    setInputValue((prev) => prev || formatted);
+  }, [viewLocation]);
+
+  /* ===============================
+     LOCATION SERVICE (FIXED)
   =============================== */
 
   useEffect(() => {
     if (!navigator.geolocation) return;
 
-    setResolving(true);
-
-    locationService.start(resolveLocation);
+    // 🔥 prevent duplicate starts
+    if (!locationService.isRunning) {
+      setResolving(true);
+      locationService.start(resolveLocation);
+    }
 
     const unsubscribe = locationService.subscribe((event) => {
       if (event.type === "location") {
         const loc = {
           ...event.data,
           street: null,
-          label: formatLocationDisplay(event.data), // enforce suburb display
+          label: formatLocationDisplay(event.data),
         };
 
         setViewLocation(loc, "auto");
-        setInputValue(formatLocationDisplay(loc));
         setResolving(false);
       }
 
@@ -128,24 +144,23 @@ export default function CommunityPlusHeader({ onLogout }) {
       }
     });
 
-    return () => {
-      unsubscribe();
-      locationService.stop(); // 🔥 important cleanup
-    };
+    return () => unsubscribe(); // ❌ DO NOT stop service
   }, [setViewLocation]);
 
   /* ===============================
-     PIN CLICK (FORCE REFRESH)
+     PIN CLICK (NO RESTART)
   =============================== */
 
   const handleResolveLocation = useCallback(() => {
     setResolving(true);
-    locationService.stop();
-    locationService.start(resolveLocation);
+
+    if (locationService.resolveNow) {
+      locationService.resolveNow();
+    }
   }, []);
 
   /* ===============================
-     AUTOCOMPLETE (MODERN API)
+     AUTOCOMPLETE (SAFE OVERLAY)
   =============================== */
 
   useEffect(() => {
@@ -160,13 +175,15 @@ export default function CommunityPlusHeader({ onLogout }) {
         componentRestrictions: { country: "au" },
       });
 
-      el.style.width = "100%";
-      el.style.border = "none";
-      el.style.outline = "none";
-      el.style.background = "transparent";
-      el.style.font = "inherit";
+      // overlay instead of replace
+      el.style.position = "absolute";
+      el.style.inset = "0";
+      el.style.opacity = "0";
 
-      inputRef.current.replaceWith(el);
+      const container = inputRef.current.parentElement;
+      container.style.position = "relative";
+      container.appendChild(el);
+
       autocompleteRef.current = el;
 
       const handleSelect = async (e) => {
@@ -232,7 +249,7 @@ export default function CommunityPlusHeader({ onLogout }) {
 
           <div className="location-display">
             <LocationPin
-              resolved={!!locationText}
+              resolved={!!viewLocation}
               loading={resolving}
               onClick={handleResolveLocation}
             />
@@ -240,7 +257,7 @@ export default function CommunityPlusHeader({ onLogout }) {
             <input
               ref={inputRef}
               className="location-input"
-              value={inputValue}
+              value={displayValue}
               onChange={(e) => setInputValue(e.target.value)}
               placeholder="Enter suburb"
             />
@@ -249,10 +266,7 @@ export default function CommunityPlusHeader({ onLogout }) {
 
         {/* CENTER */}
         <div className="header-center">
-          <input
-            className="search-input"
-            placeholder="Search"
-          />
+          <input className="search-input" placeholder="Search" />
         </div>
 
         {/* RIGHT */}
