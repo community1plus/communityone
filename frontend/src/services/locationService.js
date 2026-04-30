@@ -9,6 +9,12 @@ const MAX_ACCURACY = 50;       // ignore bad GPS
 const RESOLVE_DISTANCE = 100;  // meters before re-geocode
 const SMOOTHING = 0.3;         // movement smoothing
 
+const GEO_OPTIONS = {
+  enableHighAccuracy: true,
+  maximumAge: 2000,
+  timeout: 15000, // 🔥 increased (fix TIMEOUT issue)
+};
+
 /* ===============================
    HELPERS
 =============================== */
@@ -52,6 +58,7 @@ const smooth = (prev, next) => {
 class LocationService {
   constructor() {
     this.watchId = null;
+    this.isRunning = false;
 
     this.current = null;
     this.lastResolved = null;
@@ -61,23 +68,27 @@ class LocationService {
   }
 
   /* ===============================
-     INIT
+     START / STOP
   =============================== */
 
   start(resolveLocationFn) {
-    if (this.watchId) return;
+    if (this.isRunning) return;
+
+    if (!navigator.geolocation) {
+      console.error("❌ Geolocation not supported");
+      return;
+    }
 
     this.resolveFn = resolveLocationFn;
+    this.isRunning = true;
 
     this.watchId = navigator.geolocation.watchPosition(
       this.handlePosition,
       this.handleError,
-      {
-        enableHighAccuracy: true,
-        maximumAge: 1000,
-        timeout: 5000,
-      }
+      GEO_OPTIONS
     );
+
+    console.log("📡 LocationService started");
   }
 
   stop() {
@@ -85,6 +96,9 @@ class LocationService {
       navigator.geolocation.clearWatch(this.watchId);
       this.watchId = null;
     }
+
+    this.isRunning = false;
+    console.log("🛑 LocationService stopped");
   }
 
   /* ===============================
@@ -93,11 +107,20 @@ class LocationService {
 
   subscribe(callback) {
     this.subscribers.add(callback);
-    return () => this.subscribers.delete(callback);
+
+    return () => {
+      this.subscribers.delete(callback);
+    };
   }
 
-  emit(data) {
-    this.subscribers.forEach((cb) => cb(data));
+  emit(event) {
+    this.subscribers.forEach((cb) => {
+      try {
+        cb(event);
+      } catch (err) {
+        console.error("Subscriber error:", err);
+      }
+    });
   }
 
   /* ===============================
@@ -105,55 +128,84 @@ class LocationService {
   =============================== */
 
   handlePosition = async (pos) => {
-    const next = {
-      lat: pos.coords.latitude,
-      lng: pos.coords.longitude,
-      accuracy: pos.coords.accuracy,
-      timestamp: Date.now(),
-    };
+    try {
+      const next = {
+        lat: pos.coords.latitude,
+        lng: pos.coords.longitude,
+        accuracy: pos.coords.accuracy,
+        timestamp: Date.now(),
+      };
 
-    // 🚫 ignore poor accuracy
-    if (next.accuracy > MAX_ACCURACY) return;
+      // 🚫 ignore bad GPS
+      if (next.accuracy > MAX_ACCURACY) return;
 
-    // 🚫 ignore tiny movements
-    if (this.current && getDistance(this.current, next) < MIN_DISTANCE) {
-      return;
-    }
-
-    // 🎯 smooth movement
-    const smoothed = smooth(this.current, next);
-    this.current = smoothed;
-
-    // 🚀 emit real-time position
-    this.emit({
-      type: "position",
-      data: smoothed,
-    });
-
-    // 🧠 resolve only when needed
-    if (
-      !this.lastResolved ||
-      getDistance(this.lastResolved, smoothed) > RESOLVE_DISTANCE
-    ) {
-      this.lastResolved = smoothed;
-
-      if (this.resolveFn) {
-        const location = await this.resolveFn({
-          lat: smoothed.lat,
-          lng: smoothed.lng,
-          accuracy: smoothed.accuracy,
-        });
-
-        this.emit({
-          type: "location",
-          data: location,
-        });
+      // 🚫 ignore jitter
+      if (this.current && getDistance(this.current, next) < MIN_DISTANCE) {
+        return;
       }
+
+      // 🎯 smooth movement
+      const smoothed = smooth(this.current, next);
+      this.current = smoothed;
+
+      // 🚀 emit real-time position
+      this.emit({
+        type: "position",
+        data: smoothed,
+      });
+
+      // 🧠 resolve only when needed
+      if (
+        !this.lastResolved ||
+        getDistance(this.lastResolved, smoothed) > RESOLVE_DISTANCE
+      ) {
+        this.lastResolved = smoothed;
+
+        if (this.resolveFn) {
+          try {
+            const location = await this.resolveFn({
+              lat: smoothed.lat,
+              lng: smoothed.lng,
+              accuracy: smoothed.accuracy,
+            });
+
+            if (location) {
+              this.emit({
+                type: "location",
+                data: location,
+              });
+            }
+          } catch (err) {
+            console.error("❌ resolveLocation failed:", err);
+
+            this.emit({
+              type: "error",
+              data: err,
+            });
+          }
+        }
+      }
+    } catch (err) {
+      console.error("❌ Position handler error:", err);
+
+      this.emit({
+        type: "error",
+        data: err,
+      });
     }
   };
 
+  /* ===============================
+     ERROR HANDLER
+  =============================== */
+
   handleError = (err) => {
-    console.error("Location error:", err);
+    console.error("❌ Geolocation error:", err);
+
+    this.emit({
+      type: "error",
+      data: err,
+    });
   };
 }
 
