@@ -49,7 +49,7 @@ const smooth = (prev, next) => {
    SERVICE
 =============================== */
 
-class locationService {
+class LocationService {
   constructor() {
     this.watchId = null;
 
