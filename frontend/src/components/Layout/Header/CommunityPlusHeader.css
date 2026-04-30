@@ -24,7 +24,7 @@ ROW 1 (COMPACT)
 
   align-items: center;
 
-  height: 64px; /* 🔥 reduced from 84 */
+  height: 64px;
   padding: 0 16px;
 
   gap: 10px;
@@ -44,12 +44,12 @@ LEFT
 }
 
 .logo {
-  height: 28px; /* 🔥 smaller */
+  height: 28px;
   cursor: pointer;
 }
 
 /* =====================================================
-LOCATION (TIGHTER)
+LOCATION
 ===================================================== */
 
 .location-display {
@@ -57,7 +57,7 @@ LOCATION (TIGHTER)
   align-items: center;
   gap: 6px;
 
-  padding: 4px 10px; /* 🔥 tighter */
+  padding: 4px 10px;
   border-radius: 999px;
 
   background: rgba(0, 0, 0, 0.04);
@@ -84,17 +84,17 @@ LOCATION (TIGHTER)
 }
 
 /* =====================================================
-CENTER (SEARCH — FULL WIDTH)
+CENTER (SEARCH)
 ===================================================== */
 
 .header-center {
   width: 100%;
-  max-width: 520px; /* 🔥 controlled expansion */
+  max-width: 520px;
   justify-self: center;
 }
 
 .search-input {
-  width: 100%; /* 🔥 fills container */
+  width: 100%;
   padding: 10px 16px;
 
   border-radius: 999px;
@@ -114,7 +114,7 @@ CENTER (SEARCH — FULL WIDTH)
 }
 
 /* =====================================================
-RIGHT (USER)
+RIGHT
 ===================================================== */
 
 .header-right {
@@ -136,7 +136,7 @@ RIGHT (USER)
 }
 
 /* =====================================================
-AVATAR (Oxblood — refined)
+AVATAR (Oxblood)
 ===================================================== */
 
 .avatar {
@@ -145,7 +145,7 @@ AVATAR (Oxblood — refined)
 
   border-radius: 50%;
 
-  background: #4a0f0f; /* 🔥 richer oxblood */
+  background: #4a0f0f;
   color: #fff;
 
   display: flex;
@@ -168,12 +168,12 @@ AVATAR (Oxblood — refined)
 }
 
 /* =====================================================
-DROPDOWN (ADJUSTED POSITION)
+DROPDOWN
 ===================================================== */
 
 .dropdown-menu {
   position: absolute;
-  top: 56px; /* 🔥 aligned with compact header */
+  top: 56px;
   right: 16px;
 
   min-width: 180px;
@@ -199,7 +199,7 @@ DROPDOWN (ADJUSTED POSITION)
 }
 
 /* =====================================================
-ROW 2 (NAV — COMPACT)
+ROW 2 (NAV — OXBLOOD)
 ===================================================== */
 
 .header-nav {
@@ -207,20 +207,22 @@ ROW 2 (NAV — COMPACT)
   align-items: center;
   justify-content: center;
 
-  gap: 28px; /* 🔥 reduced from 36 */
-  padding: 8px 0; /* 🔥 reduced from 14 */
+  gap: 28px;
+  padding: 8px 0;
 
-  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  background: #4a0f0f; /* 🔥 OXBLOOD */
+  border-top: none; /* remove light border */
 }
 
 /* =====================================================
-NAV ITEMS
+NAV ITEMS (DARK THEME)
 ===================================================== */
 
 .nav-item {
   font-size: 13px;
   font-weight: 600;
-  color: #6f675f;
+
+  color: rgba(255, 255, 255, 0.7); /* 🔥 soft white */
 
   background: transparent;
   border: none;
@@ -232,10 +234,21 @@ NAV ITEMS
 }
 
 .nav-item:hover {
-  color: #000;
+  color: #ffffff;
 }
 
+/* ACTIVE STATE (CLEAN + PREMIUM) */
 .nav-item.active {
-  color: #000;
+  color: #ffffff;
   font-weight: 700;
+}
+
+/* OPTIONAL: subtle underline indicator */
+.nav-item.active::after {
+  content: "";
+  display: block;
+  height: 2px;
+  margin-top: 4px;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 2px;
 }
