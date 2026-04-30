@@ -18,6 +18,34 @@ import { resolveLocation } from "../../../services/resolveLocation";
 import { NAVIGATION } from "../../../config/navigation/navigationConfig";
 
 /* ===============================
+OSM FALLBACK
+=============================== */
+
+async function resolveWithOSM(lat, lng) {
+try {
+const res = await fetch(
+`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
+);
+
+
+const data = await res.json();
+
+return {
+  lat,
+  lng,
+  suburb: data.address?.suburb || data.address?.city,
+  state: data.address?.state,
+  label: data.display_name,
+  source: "osm",
+};
+
+
+} catch {
+return null;
+}
+}
+
+/* ===============================
 COMPONENT
 =============================== */
 
@@ -46,12 +74,14 @@ const username = user?.displayName || "Guest";
 const initials = useMemo(() => {
 if (!username || username === "Guest") return "G";
 
+
 return username
   .split(" ")
   .map((w) => w[0])
   .join("")
   .slice(0, 2)
   .toUpperCase();
+
 
 }, [username]);
 
@@ -80,25 +110,37 @@ if (path && routeLocation.pathname !== path) navigate(path);
 );
 
 /* ===============================
-LOCATION TEXT
+LOCATION DISPLAY (🔥 FIXED)
 =============================== */
 
-const locationText =
-viewLocation?.label ||
-viewLocation?.suburb ||
-"";
+const locationText = useMemo(() => {
+if (!viewLocation) return "";
 
-/* keep input in sync */
+
+const suburb = viewLocation.suburb;
+const state = viewLocation.state;
+
+if (suburb && state) return `${suburb}, ${state}`;
+if (suburb) return suburb;
+
+return "";
+
+
+}, [viewLocation]);
+
 useEffect(() => {
+if (locationText) {
 setInputValue(locationText);
+}
 }, [locationText]);
 
 /* ===============================
-GEOLOCATION (AUTO + MANUAL)
+GEOLOCATION
 =============================== */
 
 const handleResolveLocation = useCallback(() => {
 if (!navigator.geolocation) return;
+
 
 setResolving(true);
 
@@ -106,58 +148,39 @@ navigator.geolocation.getCurrentPosition(
   async (pos) => {
     const { latitude: lat, longitude: lng, accuracy } = pos.coords;
 
-    try {
-      const enriched = await resolveLocation({ lat, lng, accuracy });
+    const enriched =
+      (await resolveLocation({ lat, lng, accuracy })) ||
+      (await resolveWithOSM(lat, lng));
 
-      setViewLocation(
-        {
-          ...enriched,
-          label:
-            enriched?.label ||
-            enriched?.suburb ||
-            "Current location",
-          lat,
-          lng,
-        },
-        "auto"
-      );
+    if (enriched) {
+      setViewLocation(enriched, "auto");
 
       setInputValue(
-        enriched?.label || enriched?.suburb || "Current location"
+        [enriched.suburb, enriched.state]
+          .filter(Boolean)
+          .join(", ")
       );
-    } catch {
-      // fallback if resolve fails
-      setViewLocation(
-        {
-          lat,
-          lng,
-          label: "Current location",
-        },
-        "fallback"
-      );
-
-      setInputValue("Current location");
     }
 
     setResolving(false);
   },
-  () => {
-    setResolving(false);
-  },
+  () => setResolving(false),
   { enableHighAccuracy: true }
 );
 
 
 }, [setViewLocation]);
 
-/* AUTO LOAD LOCATION (ONCE) */
+/* AUTO LOAD */
 
 useEffect(() => {
 if (hasAutoResolved.current) return;
 if (viewLocation) return;
 
+
 hasAutoResolved.current = true;
 handleResolveLocation();
+
 
 }, [viewLocation, handleResolveLocation]);
 
@@ -170,6 +193,7 @@ if (!isLoaded) return;
 if (!window.google?.maps?.places) return;
 if (!inputRef.current) return;
 if (autocompleteRef.current) return;
+
 
 const autocomplete = new window.google.maps.places.Autocomplete(
   inputRef.current,
@@ -186,33 +210,24 @@ const listener = autocomplete.addListener("place_changed", async () => {
   const lat = place.geometry.location.lat();
   const lng = place.geometry.location.lng();
 
-  const address = place.formatted_address;
+  const enriched =
+    (await resolveLocation({
+      lat,
+      lng,
+      accuracy: 100,
+      placeId: place.place_id,
+    })) ||
+    (await resolveWithOSM(lat, lng));
 
-  // update input immediately
-  setInputValue(address);
+  if (!enriched) return;
 
-  try {
-    const enriched = await resolveLocation({ lat, lng, accuracy: 100 });
+  setViewLocation(enriched, "manual");
 
-    setViewLocation(
-      {
-        ...enriched,
-        label: enriched?.label || address,
-        lat,
-        lng,
-      },
-      "manual"
-    );
-  } catch {
-    setViewLocation(
-      {
-        lat,
-        lng,
-        label: address,
-      },
-      "manual"
-    );
-  }
+  setInputValue(
+    [enriched.suburb, enriched.state]
+      .filter(Boolean)
+      .join(", ")
+  );
 });
 
 autocompleteRef.current = autocomplete;
@@ -229,10 +244,8 @@ return () => {
 RENDER
 =============================== */
 
-return ( <header className="header-root">
+return ( <header className="header-root"> <div className="header-row">
 
-  {/* ROW */}
-  <div className="header-row">
 
     {/* LEFT */}
     <div className="header-left">
@@ -255,7 +268,7 @@ return ( <header className="header-root">
           className="location-input"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
-          placeholder="Enter suburb or address"
+          placeholder="Enter suburb"
         />
       </div>
     </div>
@@ -290,7 +303,6 @@ return ( <header className="header-root">
         )}
       </div>
     </div>
-
   </div>
 
   {/* NAV */}
@@ -310,6 +322,7 @@ return ( <header className="header-root">
     })}
   </nav>
 </header>
+
 
 );
 }
