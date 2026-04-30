@@ -38,7 +38,7 @@ const isMajorRoad = (street = "") =>
   /highway|hwy|freeway|fwy|road|rd/i.test(street);
 
 /* ===============================
-   🔥 DISTANCE (NEW)
+   DISTANCE
 =============================== */
 
 const getDistance = (a, b) => {
@@ -59,7 +59,7 @@ const getDistance = (a, b) => {
 };
 
 /* ===============================
-   🔥 RESULT SELECTION (UPGRADED)
+   RESULT SELECTION (SMART)
 =============================== */
 
 const TYPE_SCORE = {
@@ -122,7 +122,7 @@ const getConfidence = (accuracy) => {
 };
 
 /* ===============================
-   🚀 ROAD SNAP
+   ROAD SNAP
 =============================== */
 
 const snapCache = new Map();
@@ -209,10 +209,7 @@ export async function resolveLocation({
     const cached = getCached(cacheKey);
     if (cached) return cached;
 
-    /* ===============================
-       SMART SNAP
-    =============================== */
-
+    /* SNAP */
     if (accuracy > 30 && accuracy < 200) {
       const snapped = await snapToRoad(lat, lng);
 
@@ -230,10 +227,7 @@ export async function resolveLocation({
 
     let result;
 
-    /* ===============================
-       PLACE DETAILS
-    =============================== */
-
+    /* PLACE DETAILS */
     if (placeId) {
       const res = await fetch(
         `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&key=${GOOGLE_API_KEY}`
@@ -251,10 +245,7 @@ export async function resolveLocation({
       }
     }
 
-    /* ===============================
-       GEOCODE
-    =============================== */
-
+    /* GEOCODE */
     if (!result) {
       const res = await fetch(
         `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${GOOGLE_API_KEY}`
@@ -270,10 +261,6 @@ export async function resolveLocation({
     }
 
     const components = result.address_components;
-
-    /* ===============================
-       EXTRACT
-    =============================== */
 
     const streetNumber = getComponent(components, ["street_number"]);
     const street = getComponent(components, ["route"]);
@@ -295,25 +282,24 @@ export async function resolveLocation({
         ? `${streetNumber} ${street}`
         : street;
 
-    /* ===============================
-       PRECISION
-    =============================== */
-
     const hasStreet = !!fullStreet;
     const precisionLevel = getPrecisionLevel(accuracy, hasStreet);
     const confidence = getConfidence(accuracy);
 
-    /* ===============================
-       LABEL
-    =============================== */
+    /* 🔥 CRITICAL FIX */
+    let safeStreet = fullStreet;
+
+    if (precisionLevel < 4 || confidence === "low") {
+      safeStreet = null;
+    }
 
     let label;
     let hint = null;
 
     if (precisionLevel >= 5 && confidence === "high") {
       label = result.formatted_address;
-    } else if (precisionLevel >= 4) {
-      label = `${fullStreet}, ${finalSuburb}`;
+    } else if (precisionLevel >= 4 && safeStreet) {
+      label = `${safeStreet}, ${finalSuburb}`;
     } else {
       label = `${finalSuburb || "Unknown"}, ${state || ""}`;
 
@@ -327,7 +313,7 @@ export async function resolveLocation({
       lng,
       accuracy,
 
-      street: fullStreet,
+      street: safeStreet,
       suburb: finalSuburb,
       city,
       state,
