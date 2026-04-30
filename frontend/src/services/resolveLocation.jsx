@@ -7,7 +7,7 @@ useCallback,
 } from "react";
 
 import { useNavigate, useLocation } from "react-router-dom";
-import "./CommunityPlusHeader.css";
+import "../components/Layout/Header/CommunityPlusHeader.css";
 
 import { useLocationContext } from "../../../context/LocationProvider";
 import { useAuth } from "../../../context/AuthContext";
