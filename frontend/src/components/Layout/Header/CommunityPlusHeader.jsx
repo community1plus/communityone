@@ -1,9 +1,9 @@
 import React, {
-useState,
-useEffect,
-useRef,
-useMemo,
-useCallback,
+  useState,
+  useEffect,
+  useRef,
+  useMemo,
+  useCallback,
 } from "react";
 
 import { useNavigate, useLocation } from "react-router-dom";
@@ -19,290 +19,282 @@ import { locationService } from "../../../services/locationService";
 import { NAVIGATION } from "../../../config/navigation/navigationConfig";
 
 /* ===============================
-FORMAT DISPLAY
+   HELPERS
 =============================== */
 
 const formatLocationDisplay = (loc) => {
-if (!loc) return "";
-return [loc.suburb, loc.state].filter(Boolean).join(", ");
+  if (!loc) return "";
+  return [loc.suburb, loc.state].filter(Boolean).join(", ");
 };
 
 /* ===============================
-COMPONENT
+   COMPONENT
 =============================== */
 
 export default function CommunityPlusHeader({ onLogout }) {
-const navigate = useNavigate();
-const routeLocation = useLocation();
+  const navigate = useNavigate();
+  const routeLocation = useLocation();
 
-const { viewLocation, setViewLocation } = useLocationContext();
-const { user, loading } = useAuth();
-const { isLoaded } = useGoogleMaps();
+  const { viewLocation, setViewLocation } = useLocationContext();
+  const { user, loading } = useAuth();
+  const { isLoaded } = useGoogleMaps();
 
-const [showMenu, setShowMenu] = useState(false);
-const [resolving, setResolving] = useState(false);
-const [inputValue, setInputValue] = useState("");
+  const [showMenu, setShowMenu] = useState(false);
+  const [resolving, setResolving] = useState(false);
+  const [inputValue, setInputValue] = useState("");
 
-const inputRef = useRef(null);
-const autocompleteElRef = useRef(null);
+  const inputRef = useRef(null);
+  const autocompleteRef = useRef(null);
 
-/* ===============================
-USER
-=============================== */
+  /* ===============================
+     USER
+  =============================== */
 
-const username = user?.displayName || "Guest";
+  const username = user?.displayName || "Guest";
 
-const initials = useMemo(() => {
-if (!username || username === "Guest") return "G";
+  const initials = useMemo(() => {
+    if (!username || username === "Guest") return "G";
+    return username
+      .split(" ")
+      .map((w) => w[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase();
+  }, [username]);
 
+  /* ===============================
+     NAV
+  =============================== */
 
-return username
-  .split(" ")
-  .map((w) => w[0])
-  .join("")
-  .slice(0, 2)
-  .toUpperCase();
+  const nav = useMemo(
+    () => NAVIGATION.find((n) => n.group === "main") || { items: [] },
+    []
+  );
 
+  const isActiveRoute = useCallback(
+    (path) =>
+      path &&
+      (routeLocation.pathname === path ||
+        routeLocation.pathname.startsWith(path + "/")),
+    [routeLocation.pathname]
+  );
 
-}, [username]);
+  const go = useCallback(
+    (path) => {
+      if (path && routeLocation.pathname !== path) navigate(path);
+    },
+    [navigate, routeLocation.pathname]
+  );
 
-/* ===============================
-NAV
-=============================== */
+  /* ===============================
+     DISPLAY SYNC
+  =============================== */
 
-const nav = useMemo(
-() => NAVIGATION.find((n) => n.group === "main") || { items: [] },
-[]
-);
+  const locationText = useMemo(
+    () => formatLocationDisplay(viewLocation),
+    [viewLocation]
+  );
 
-const isActiveRoute = useCallback(
-(path) =>
-path &&
-(routeLocation.pathname === path ||
-routeLocation.pathname.startsWith(path + "/")),
-[routeLocation.pathname]
-);
+  useEffect(() => {
+    if (locationText) setInputValue(locationText);
+  }, [locationText]);
 
-const go = useCallback(
-(path) => {
-if (path && routeLocation.pathname !== path) navigate(path);
-},
-[navigate, routeLocation.pathname]
-);
+  /* ===============================
+     LOCATION SERVICE (REAL-TIME)
+  =============================== */
 
-/* ===============================
-DISPLAY
-=============================== */
+  useEffect(() => {
+    if (!navigator.geolocation) return;
 
-const locationText = useMemo(() => {
-return formatLocationDisplay(viewLocation);
-}, [viewLocation]);
+    setResolving(true);
 
-useEffect(() => {
-if (locationText) {
-setInputValue(locationText);
-}
-}, [locationText]);
+    locationService.start(resolveLocation);
 
-/* ===============================
-LOCATION SERVICE
-=============================== */
+    const unsubscribe = locationService.subscribe((event) => {
+      if (event.type === "location") {
+        const loc = {
+          ...event.data,
+          street: null,
+          label: formatLocationDisplay(event.data), // enforce suburb display
+        };
 
-useEffect(() => {
-setResolving(true);
+        setViewLocation(loc, "auto");
+        setInputValue(formatLocationDisplay(loc));
+        setResolving(false);
+      }
 
+      if (event.type === "error") {
+        setResolving(false);
+      }
+    });
 
-locationService.start(resolveLocation);
-
-const unsubscribe = locationService.subscribe((event) => {
-  if (event.type === "location") {
-    const loc = {
-      ...event.data,
-      street: null,
-      label: formatLocationDisplay(event.data),
+    return () => {
+      unsubscribe();
+      locationService.stop(); // 🔥 important cleanup
     };
+  }, [setViewLocation]);
 
-    setViewLocation(loc, "auto");
-    setInputValue(formatLocationDisplay(loc));
-    setResolving(false);
-  }
+  /* ===============================
+     PIN CLICK (FORCE REFRESH)
+  =============================== */
 
-  if (event.type === "error") {
-    setResolving(false);
-  }
-});
+  const handleResolveLocation = useCallback(() => {
+    setResolving(true);
+    locationService.stop();
+    locationService.start(resolveLocation);
+  }, []);
 
-return () => {
-  unsubscribe();
-};
+  /* ===============================
+     AUTOCOMPLETE (MODERN API)
+  =============================== */
 
+  useEffect(() => {
+    if (!isLoaded) return;
+    if (!window.google?.maps?.places) return;
+    if (!inputRef.current) return;
+    if (autocompleteRef.current) return;
 
-}, [setViewLocation]);
+    try {
+      const el = new window.google.maps.places.PlaceAutocompleteElement({
+        types: ["geocode"],
+        componentRestrictions: { country: "au" },
+      });
 
-/* ===============================
-PIN CLICK
-=============================== */
+      el.style.width = "100%";
+      el.style.border = "none";
+      el.style.outline = "none";
+      el.style.background = "transparent";
+      el.style.font = "inherit";
 
-const handleResolveLocation = useCallback(() => {
-setResolving(true);
+      inputRef.current.replaceWith(el);
+      autocompleteRef.current = el;
 
-locationService.stop();
-locationService.start(resolveLocation);
+      const handleSelect = async (e) => {
+        try {
+          const place = e.placePrediction?.toPlace();
+          if (!place) return;
 
+          await place.fetchFields({
+            fields: ["location", "id"],
+          });
 
-}, []);
+          const lat = place.location?.lat();
+          const lng = place.location?.lng();
+          if (!lat || !lng) return;
 
-/* ===============================
-🚀 NEW AUTOCOMPLETE (MODERN)
-=============================== */
+          const enriched = await resolveLocation({
+            lat,
+            lng,
+            accuracy: 100,
+            placeId: place.id,
+          });
 
-useEffect(() => {
-if (!isLoaded) return;
-if (!window.google?.maps?.places) return;
-if (!inputRef.current) return;
-if (autocompleteElRef.current) return;
+          if (!enriched) return;
 
+          const clean = {
+            ...enriched,
+            street: null,
+            label: formatLocationDisplay(enriched),
+          };
 
-// Create wrapper container
-const container = document.createElement("div");
-container.className = "location-autocomplete-wrapper";
+          setViewLocation(clean, "manual");
+          setInputValue(formatLocationDisplay(clean));
+        } catch (err) {
+          console.error("Autocomplete select error:", err);
+        }
+      };
 
-// Create new autocomplete element
-const el = new window.google.maps.places.PlaceAutocompleteElement({
-  types: ["geocode"],
-  componentRestrictions: { country: "au" },
-});
+      el.addEventListener("gmp-placeselect", handleSelect);
 
-// Style it to match your UI
-el.style.width = "100%";
-el.style.border = "none";
-el.style.outline = "none";
-el.style.background = "transparent";
-el.style.font = "inherit";
+      return () => {
+        el.removeEventListener("gmp-placeselect", handleSelect);
+      };
+    } catch (err) {
+      console.error("Autocomplete init failed:", err);
+    }
+  }, [isLoaded, setViewLocation]);
 
-container.appendChild(el);
+  /* ===============================
+     RENDER
+  =============================== */
 
-// Replace input with new element
-inputRef.current.replaceWith(container);
+  return (
+    <header className="header-root">
+      <div className="header-row">
+        {/* LEFT */}
+        <div className="header-left">
+          <img
+            src="/logo/logo.png"
+            alt="Community One"
+            className="logo"
+            onClick={() => go("/home")}
+          />
 
-autocompleteElRef.current = el;
+          <div className="location-display">
+            <LocationPin
+              resolved={!!locationText}
+              loading={resolving}
+              onClick={handleResolveLocation}
+            />
 
-const handleSelect = async (e) => {
-  try {
-    const place = e.placePrediction?.toPlace();
-    if (!place) return;
-
-    await place.fetchFields({
-      fields: ["location", "displayName", "id"],
-    });
-
-    const lat = place.location?.lat();
-    const lng = place.location?.lng();
-
-    if (!lat || !lng) return;
-
-    const enriched = await resolveLocation({
-      lat,
-      lng,
-      accuracy: 100,
-      placeId: place.id,
-    });
-
-    if (!enriched) return;
-
-    setViewLocation(enriched, "manual");
-    setInputValue(formatLocationDisplay(enriched));
-  } catch (err) {
-    console.error("Autocomplete error:", err);
-  }
-};
-
-el.addEventListener("gmp-placeselect", handleSelect);
-
-return () => {
-  el.removeEventListener("gmp-placeselect", handleSelect);
-};
-
-
-}, [isLoaded, setViewLocation]);
-
-/* ===============================
-RENDER
-=============================== */
-
-return ( <header className="header-root"> <div className="header-row">
-
-
-    <div className="header-left">
-      <img
-        src="/logo/logo.png"
-        alt="Community One"
-        className="logo"
-        onClick={() => go("/home")}
-      />
-
-      <div className="location-display">
-        <LocationPin
-          resolved={!!locationText}
-          loading={resolving}
-          onClick={handleResolveLocation}
-        />
-
-        {/* 🔥 This gets replaced by PlaceAutocompleteElement */}
-        <input
-          ref={inputRef}
-          className="location-input"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          placeholder="Enter suburb"
-        />
-      </div>
-    </div>
-
-    <div className="header-center">
-      <input className="search-input" placeholder="Search" />
-    </div>
-
-    <div className="header-right">
-      <div className="user-block">
-        <span className="username">
-          {loading ? "..." : username}
-        </span>
-
-        <div
-          className="avatar"
-          onClick={() => setShowMenu((prev) => !prev)}
-        >
-          {initials}
+            <input
+              ref={inputRef}
+              className="location-input"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              placeholder="Enter suburb"
+            />
+          </div>
         </div>
 
-        {showMenu && (
-          <div className="dropdown-menu">
-            <div onClick={() => go("/profile")}>Profile</div>
-            <div onClick={() => onLogout?.()}>Logout</div>
+        {/* CENTER */}
+        <div className="header-center">
+          <input
+            className="search-input"
+            placeholder="Search"
+          />
+        </div>
+
+        {/* RIGHT */}
+        <div className="header-right">
+          <div className="user-block">
+            <span className="username">
+              {loading ? "..." : username}
+            </span>
+
+            <div
+              className="avatar"
+              onClick={() => setShowMenu((prev) => !prev)}
+            >
+              {initials}
+            </div>
+
+            {showMenu && (
+              <div className="dropdown-menu">
+                <div onClick={() => go("/profile")}>Profile</div>
+                <div onClick={() => onLogout?.()}>Logout</div>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
-    </div>
-  </div>
 
-  <nav className="header-nav">
-    {nav.items.map((item) => {
-      const active = isActiveRoute(item.path);
+      {/* NAV */}
+      <nav className="header-nav">
+        {nav.items.map((item) => {
+          const active = isActiveRoute(item.path);
 
-      return (
-        <button
-          key={item.id}
-          className={`nav-item ${active ? "active" : ""}`}
-          onClick={() => go(item.path)}
-        >
-          {item.label}
-        </button>
-      );
-    })}
-  </nav>
-</header>
-
-
-);
+          return (
+            <button
+              key={item.id}
+              className={`nav-item ${active ? "active" : ""}`}
+              onClick={() => go(item.path)}
+            >
+              {item.label}
+            </button>
+          );
+        })}
+      </nav>
+    </header>
+  );
 }
