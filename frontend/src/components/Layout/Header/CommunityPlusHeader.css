@@ -1,5 +1,5 @@
 /* =====================================================
-GLOBAL FONT (CHATGPT-LIKE)
+GLOBAL FONT
 ===================================================== */
 
 .header-root {
@@ -23,10 +23,9 @@ ROW 1 (COMPACT)
   grid-template-columns: 1fr 1.2fr 1fr;
 
   align-items: center;
-
   height: 64px;
-  padding: 0 16px;
 
+  padding: 0 16px;
   gap: 10px;
 }
 
@@ -38,9 +37,6 @@ LEFT
   display: flex;
   align-items: center;
   gap: 10px;
-
-  justify-self: start;
-  min-width: 0;
 }
 
 .logo {
@@ -66,12 +62,6 @@ LOCATION
   max-width: 260px;
 
   font-size: 12.5px;
-
-  transition: all 0.15s ease;
-}
-
-.location-display:hover {
-  background: rgba(0, 0, 0, 0.06);
 }
 
 .location-input {
@@ -84,13 +74,12 @@ LOCATION
 }
 
 /* =====================================================
-CENTER (SEARCH)
+SEARCH
 ===================================================== */
 
 .header-center {
   width: 100%;
   max-width: 520px;
-  justify-self: center;
 }
 
 .search-input {
@@ -104,13 +93,11 @@ CENTER (SEARCH)
   outline: none;
 
   font-size: 13.5px;
-
-  transition: all 0.15s ease;
 }
 
 .search-input:focus {
   background: #fff;
-  border-color: #5a0f1c;
+  border-color: #b11226;
 }
 
 /* =====================================================
@@ -120,7 +107,7 @@ RIGHT
 .header-right {
   display: flex;
   align-items: center;
-  justify-self: end;
+  justify-content: flex-end;
 }
 
 .user-block {
@@ -136,7 +123,7 @@ RIGHT
 }
 
 /* =====================================================
-AVATAR (Oxblood)
+🔥 AVATAR (OXBLOOD RED)
 ===================================================== */
 
 .avatar {
@@ -145,7 +132,7 @@ AVATAR (Oxblood)
 
   border-radius: 50%;
 
-  background: #4a0f0f;
+  background: #b11226; /* 🔥 red */
   color: #fff;
 
   display: flex;
@@ -155,16 +142,13 @@ AVATAR (Oxblood)
   font-size: 12px;
   font-weight: 700;
 
-  letter-spacing: 0.4px;
-
   cursor: pointer;
-
   transition: all 0.15s ease;
 }
 
 .avatar:hover {
   transform: translateY(-1px);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 10px rgba(177, 18, 38, 0.3);
 }
 
 /* =====================================================
@@ -184,8 +168,6 @@ DROPDOWN
   border-radius: 10px;
 
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
-
-  overflow: hidden;
 }
 
 .menu-item {
@@ -199,7 +181,7 @@ DROPDOWN
 }
 
 /* =====================================================
-ROW 2 (NAV — OXBLOOD)
+🔥 ROW 2 NAV (OXBLOOD RED)
 ===================================================== */
 
 .header-nav {
@@ -210,19 +192,18 @@ ROW 2 (NAV — OXBLOOD)
   gap: 28px;
   padding: 8px 0;
 
-  background: #4a0f0f; /* 🔥 OXBLOOD */
-  border-top: none; /* remove light border */
+  background: #b11226; /* 🔥 RED */
 }
 
 /* =====================================================
-NAV ITEMS (DARK THEME)
+NAV ITEMS (LIGHT ON DARK)
 ===================================================== */
 
 .nav-item {
   font-size: 13px;
   font-weight: 600;
 
-  color: rgba(255, 255, 255, 0.7); /* 🔥 soft white */
+  color: rgba(255, 255, 255, 0.75);
 
   background: transparent;
   border: none;
@@ -234,21 +215,22 @@ NAV ITEMS (DARK THEME)
 }
 
 .nav-item:hover {
-  color: #ffffff;
+  color: #fff;
 }
 
-/* ACTIVE STATE (CLEAN + PREMIUM) */
+/* ACTIVE STATE */
+
 .nav-item.active {
-  color: #ffffff;
+  color: #fff;
   font-weight: 700;
 }
 
-/* OPTIONAL: subtle underline indicator */
 .nav-item.active::after {
   content: "";
   display: block;
   height: 2px;
   margin-top: 4px;
-  background: rgba(255, 255, 255, 0.85);
+
+  background: #fff;
   border-radius: 2px;
 }

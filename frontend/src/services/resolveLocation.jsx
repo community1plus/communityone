@@ -1,7 +1,7 @@
 const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
 /* ===============================
-   CACHE (with TTL)
+   CACHE
 =============================== */
 
 const cache = new Map();
@@ -42,6 +42,8 @@ const isMajorRoad = (street = "") =>
 =============================== */
 
 const getDistance = (a, b) => {
+  if (!a || !b) return Infinity;
+
   const R = 6371000;
   const dLat = ((b.lat - a.lat) * Math.PI) / 180;
   const dLng = ((b.lng - a.lng) * Math.PI) / 180;
@@ -59,52 +61,69 @@ const getDistance = (a, b) => {
 };
 
 /* ===============================
-   RESULT SELECTION (SMART)
+   🚀 RESULT SELECTION (FIXED)
 =============================== */
 
-const TYPE_SCORE = {
-  street_address: 100,
-  premise: 90,
-  subpremise: 80,
-  route: 50,
-  locality: 20,
-};
+const GOOD_TYPES = [
+  "street_address",
+  "premise",
+  "subpremise",
+];
 
-const isBadRoad = (formatted = "") =>
-  /service\s?road|service\s?rd/i.test(formatted);
+const BAD_KEYWORDS = [
+  "service road",
+  "service rd",
+  "highway",
+  "hwy",
+  "freeway",
+  "fwy",
+];
+
+const isBadAddress = (formatted = "") =>
+  BAD_KEYWORDS.some((k) =>
+    formatted.toLowerCase().includes(k)
+  );
 
 const pickBestResult = (results, origin) => {
   if (!results?.length) return null;
 
-  const scored = results.map((r) => {
-    const typeScore =
-      Math.max(...r.types.map((t) => TYPE_SCORE[t] || 0), 0) || 0;
+  const cleaned = results.filter(
+    (r) => !isBadAddress(r.formatted_address)
+  );
 
+  const good = cleaned.filter((r) =>
+    GOOD_TYPES.some((t) => r.types.includes(t))
+  );
+
+  const pool =
+    good.length > 0
+      ? good
+      : cleaned.length > 0
+      ? cleaned
+      : results;
+
+  const ranked = pool.map((r) => {
     const loc = r.geometry?.location;
 
     const point = {
-      lat: typeof loc.lat === "function" ? loc.lat() : loc.lat,
-      lng: typeof loc.lng === "function" ? loc.lng() : loc.lng,
+      lat:
+        typeof loc.lat === "function" ? loc.lat() : loc.lat,
+      lng:
+        typeof loc.lng === "function" ? loc.lng() : loc.lng,
     };
 
     const dist = origin ? getDistance(origin, point) : 0;
 
-    const distancePenalty = Math.min(dist, 200);
-    const roadPenalty = isBadRoad(r.formatted_address) ? 30 : 0;
-
-    const score =
-      typeScore - distancePenalty * 0.3 - roadPenalty;
-
-    return { r, score };
+    return { r, dist };
   });
 
-  scored.sort((a, b) => b.score - a.score);
+  ranked.sort((a, b) => a.dist - b.dist);
 
-  return scored[0].r;
+  return ranked[0].r;
 };
 
 /* ===============================
-   PRECISION + CONFIDENCE
+   PRECISION
 =============================== */
 
 const getPrecisionLevel = (accuracy, hasStreet) => {
@@ -125,20 +144,7 @@ const getConfidence = (accuracy) => {
    ROAD SNAP
 =============================== */
 
-const snapCache = new Map();
-const SNAP_TTL = 60 * 1000;
-
-const getSnapKey = (lat, lng) =>
-  `${lat.toFixed(5)},${lng.toFixed(5)}`;
-
 const snapToRoad = async (lat, lng) => {
-  const key = getSnapKey(lat, lng);
-  const cached = snapCache.get(key);
-
-  if (cached && Date.now() - cached.ts < SNAP_TTL) {
-    return cached.value;
-  }
-
   try {
     const res = await fetch(
       `https://roads.googleapis.com/v1/nearestRoads?points=${lat},${lng}&key=${GOOGLE_API_KEY}`
@@ -149,17 +155,13 @@ const snapToRoad = async (lat, lng) => {
     if (data.snappedPoints?.length) {
       const p = data.snappedPoints[0].location;
 
-      const snapped = {
+      return {
         lat: p.latitude,
         lng: p.longitude,
       };
-
-      snapCache.set(key, { value: snapped, ts: Date.now() });
-
-      return snapped;
     }
   } catch (err) {
-    console.warn("⚠️ snapToRoad failed:", err);
+    console.warn("snapToRoad failed:", err);
   }
 
   return { lat, lng };
@@ -213,13 +215,12 @@ export async function resolveLocation({
     if (accuracy > 30 && accuracy < 200) {
       const snapped = await snapToRoad(lat, lng);
 
-      const distanceMoved =
-        Math.sqrt(
-          Math.pow((snapped.lat - lat) * 111000, 2) +
-          Math.pow((snapped.lng - lng) * 111000, 2)
-        );
+      const moved = getDistance(
+        { lat, lng },
+        snapped
+      );
 
-      if (distanceMoved < 50) {
+      if (moved < 50) {
         lat = snapped.lat;
         lng = snapped.lng;
       }
