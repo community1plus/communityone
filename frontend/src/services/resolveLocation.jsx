@@ -5,7 +5,7 @@ const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 =============================== */
 
 const cache = new Map();
-const CACHE_TTL = 60 * 1000; // 1 min
+const CACHE_TTL = 60 * 1000;
 
 const getCacheKey = (lat, lng) =>
   `${lat.toFixed(4)},${lng.toFixed(4)}`;
@@ -38,7 +38,7 @@ const isMajorRoad = (street = "") =>
   /highway|hwy|freeway|fwy|road|rd/i.test(street);
 
 /* ===============================
-   RESULT SELECTION (STRONGER)
+   RESULT SELECTION
 =============================== */
 
 const pickBestResult = (results) => {
@@ -52,7 +52,7 @@ const pickBestResult = (results) => {
 };
 
 /* ===============================
-   PRECISION (ACCURACY FIRST)
+   PRECISION + CONFIDENCE
 =============================== */
 
 const getPrecisionLevel = (accuracy, hasStreet) => {
@@ -70,11 +70,46 @@ const getConfidence = (accuracy) => {
 };
 
 /* ===============================
-   OPTIONAL: ROAD SNAP (plug in later)
+   🚀 ROAD SNAP (REAL IMPLEMENTATION)
 =============================== */
 
-const maybeSnapToRoad = async (lat, lng) => {
-  // keep simple for now — plug Roads API here if needed
+const snapCache = new Map();
+const SNAP_TTL = 60 * 1000;
+
+const getSnapKey = (lat, lng) =>
+  `${lat.toFixed(5)},${lng.toFixed(5)}`;
+
+const snapToRoad = async (lat, lng) => {
+  const key = getSnapKey(lat, lng);
+  const cached = snapCache.get(key);
+
+  if (cached && Date.now() - cached.ts < SNAP_TTL) {
+    return cached.value;
+  }
+
+  try {
+    const res = await fetch(
+      `https://roads.googleapis.com/v1/nearestRoads?points=${lat},${lng}&key=${GOOGLE_API_KEY}`
+    );
+
+    const data = await res.json();
+
+    if (data.snappedPoints?.length) {
+      const p = data.snappedPoints[0].location;
+
+      const snapped = {
+        lat: p.latitude,
+        lng: p.longitude,
+      };
+
+      snapCache.set(key, { value: snapped, ts: Date.now() });
+
+      return snapped;
+    }
+  } catch (err) {
+    console.warn("⚠️ snapToRoad failed:", err);
+  }
+
   return { lat, lng };
 };
 
@@ -120,21 +155,31 @@ export async function resolveLocation({
   try {
     const cacheKey = getCacheKey(lat, lng);
     const cached = getCached(cacheKey);
-
     if (cached) return cached;
 
     /* ===============================
-       SNAP TO ROAD (optional)
+       SMART ROAD SNAP
     =============================== */
 
-    const snapped = await maybeSnapToRoad(lat, lng);
-    lat = snapped.lat;
-    lng = snapped.lng;
+    if (accuracy > 30 && accuracy < 200) {
+      const snapped = await snapToRoad(lat, lng);
+
+      const distanceMoved =
+        Math.sqrt(
+          Math.pow((snapped.lat - lat) * 111000, 2) +
+          Math.pow((snapped.lng - lng) * 111000, 2)
+        );
+
+      if (distanceMoved < 50) {
+        lat = snapped.lat;
+        lng = snapped.lng;
+      }
+    }
 
     let result;
 
     /* ===============================
-       PLACE DETAILS (BEST)
+       PLACE DETAILS
     =============================== */
 
     if (placeId) {
@@ -175,7 +220,7 @@ export async function resolveLocation({
     const components = result.address_components;
 
     /* ===============================
-       EXTRACT FIELDS
+       EXTRACT
     =============================== */
 
     const streetNumber = getComponent(components, ["street_number"]);
@@ -203,7 +248,7 @@ export async function resolveLocation({
         : street;
 
     /* ===============================
-       PRECISION (FIXED)
+       PRECISION
     =============================== */
 
     const hasStreet = !!fullStreet;
@@ -211,7 +256,7 @@ export async function resolveLocation({
     const confidence = getConfidence(accuracy);
 
     /* ===============================
-       LABEL STRATEGY (TRUST ACCURACY)
+       LABEL STRATEGY
     =============================== */
 
     let label;
