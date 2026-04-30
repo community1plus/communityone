@@ -9,10 +9,9 @@ useCallback,
 import { useNavigate, useLocation } from "react-router-dom";
 import "./CommunityPlusHeader.css";
 
-import { locationService } from "../../../services/locationService";
+import { LocationProvider } from "../../../context/LocationProvider";
 import { useAuth } from "../../../context/AuthContext";
 import { useGoogleMaps } from "../../../context/GoogleMapsProvider";
-
 
 import LocationPin from "../../UI/LocationPin";
 import { resolveLocation } from "../../../services/resolveLocation";
