@@ -9,7 +9,7 @@ useCallback,
 import { useNavigate, useLocation } from "react-router-dom";
 import "./CommunityPlusHeader.css";
 
-import { LocationProvider } from "../../../context/LocationProvider";
+import { useLocationContext } from "../../../context/LocationProvider"; // ✅ FIX
 import { useAuth } from "../../../context/AuthContext";
 import { useGoogleMaps } from "../../../context/GoogleMapsProvider";
 
