@@ -15,42 +15,15 @@ import { useGoogleMaps } from "../../../context/GoogleMapsProvider";
 
 import LocationPin from "../../UI/LocationPin";
 import { resolveLocation } from "../../../services/resolveLocation";
+import { locationService } from "../../../services/LocationService"; // 🔥 NEW
 import { NAVIGATION } from "../../../config/navigation/navigationConfig";
 
 /* ===============================
-OSM FALLBACK
-=============================== */
-
-async function resolveWithOSM(lat, lng) {
-try {
-const res = await fetch(
-`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
-);
-
-const data = await res.json();
-
-return {
-  lat,
-  lng,
-  suburb: data.address?.suburb || data.address?.city,
-  state: data.address?.state,
-  label: data.display_name,
-  source: "osm",
-};
-
-
-} catch {
-return null;
-}
-}
-
-/* ===============================
-FORMAT DISPLAY (🔥 SINGLE SOURCE)
+FORMAT DISPLAY
 =============================== */
 
 const formatLocationDisplay = (loc) => {
 if (!loc) return "";
-
 return [loc.suburb, loc.state].filter(Boolean).join(", ");
 };
 
@@ -72,7 +45,6 @@ const [inputValue, setInputValue] = useState("");
 
 const inputRef = useRef(null);
 const autocompleteRef = useRef(null);
-const hasAutoResolved = useRef(false);
 
 /* ===============================
 USER
@@ -133,60 +105,52 @@ setInputValue(locationText);
 }, [locationText]);
 
 /* ===============================
-GEOLOCATION (🔥 FIXED)
+🔥 REAL-TIME LOCATION SERVICE
 =============================== */
 
-const handleResolveLocation = useCallback(() => {
-if (!navigator.geolocation) return;
-
-
+useEffect(() => {
 setResolving(true);
 
-navigator.geolocation.getCurrentPosition(
-  async (pos) => {
-    const { latitude: lat, longitude: lng, accuracy } = pos.coords;
 
-    let enriched =
-      (await resolveLocation({ lat, lng, accuracy })) ||
-      (await resolveWithOSM(lat, lng));
+// start tracking
+locationService.start(resolveLocation);
 
-    if (!enriched) {
-      setResolving(false);
-      return;
-    }
-
-    /* 🔥 FORCE SUBURB-LEVEL (KEY FIX) */
-    enriched = {
-      ...enriched,
-      street: null,
-      label: formatLocationDisplay(enriched),
+const unsubscribe = locationService.subscribe((event) => {
+  if (event.type === "location") {
+    const loc = {
+      ...event.data,
+      street: null, // 🔥 force suburb-level
+      label: formatLocationDisplay(event.data),
     };
 
-    setViewLocation(enriched, "auto");
-
-    setInputValue(formatLocationDisplay(enriched));
-
+    setViewLocation(loc, "auto");
+    setInputValue(formatLocationDisplay(loc));
     setResolving(false);
-  },
-  () => setResolving(false),
-  { enableHighAccuracy: true }
-);
+  }
+});
+
+return () => {
+  unsubscribe();
+  locationService.stop();
+};
 
 
 }, [setViewLocation]);
 
-/* AUTO LOAD */
+/* ===============================
+PIN CLICK (FORCE REFRESH)
+=============================== */
 
-useEffect(() => {
-if (hasAutoResolved.current) return;
-if (viewLocation) return;
-
-
-hasAutoResolved.current = true;
-handleResolveLocation();
+const handleResolveLocation = useCallback(() => {
+setResolving(true);
 
 
-}, [viewLocation, handleResolveLocation]);
+// restart tracking to force fresh GPS lock
+locationService.stop();
+locationService.start(resolveLocation);
+
+
+}, []);
 
 /* ===============================
 AUTOCOMPLETE
@@ -214,19 +178,16 @@ const listener = autocomplete.addListener("place_changed", async () => {
   const lat = place.geometry.location.lat();
   const lng = place.geometry.location.lng();
 
-  const enriched =
-    (await resolveLocation({
-      lat,
-      lng,
-      accuracy: 100,
-      placeId: place.place_id,
-    })) ||
-    (await resolveWithOSM(lat, lng));
+  const enriched = await resolveLocation({
+    lat,
+    lng,
+    accuracy: 100,
+    placeId: place.place_id,
+  });
 
   if (!enriched) return;
 
   setViewLocation(enriched, "manual");
-
   setInputValue(formatLocationDisplay(enriched));
 });
 
