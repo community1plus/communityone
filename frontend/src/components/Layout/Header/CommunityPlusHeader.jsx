@@ -11,10 +11,15 @@ import "./CommunityPlusHeader.css";
 
 import { useLocationContext } from "../../../context/LocationProvider";
 import { useAuth } from "../../../context/AuthContext";
+import { useGoogleMaps } from "../../../context/GoogleMapsProvider";
 
 import LocationPin from "../../UI/LocationPin";
 import { resolveLocation } from "../../../services/resolveLocation";
 import { NAVIGATION } from "../../../config/navigation/navigationConfig";
+
+/* ===============================
+COMPONENT
+=============================== */
 
 export default function CommunityPlusHeader({ onLogout }) {
 const navigate = useNavigate();
@@ -22,6 +27,7 @@ const routeLocation = useLocation();
 
 const { viewLocation, setViewLocation } = useLocationContext();
 const { user, loading } = useAuth();
+const { isLoaded } = useGoogleMaps();
 
 const [showMenu, setShowMenu] = useState(false);
 const [resolving, setResolving] = useState(false);
@@ -29,9 +35,10 @@ const [inputValue, setInputValue] = useState("");
 
 const inputRef = useRef(null);
 const autocompleteRef = useRef(null);
+const hasAutoResolved = useRef(false);
 
 /* ===============================
-USER (CLEAN)
+USER
 =============================== */
 
 const username = user?.displayName || "Guest";
@@ -73,7 +80,7 @@ if (path && routeLocation.pathname !== path) navigate(path);
 );
 
 /* ===============================
-LOCATION (SYNCED)
+LOCATION TEXT
 =============================== */
 
 const locationText =
@@ -81,60 +88,142 @@ viewLocation?.label ||
 viewLocation?.suburb ||
 "";
 
+/* keep input in sync */
 useEffect(() => {
 setInputValue(locationText);
 }, [locationText]);
 
 /* ===============================
-GOOGLE AUTOCOMPLETE (SAFE)
-=============================== */
-
-useEffect(() => {
-if (!window.google?.maps || !inputRef.current) return;
-if (autocompleteRef.current) return;
-
-const autocomplete =
-  new window.google.maps.places.Autocomplete(inputRef.current, {
-    types: ["geocode"],
-    componentRestrictions: { country: "au" },
-  });
-
-autocomplete.addListener("place_changed", async () => {
-  const place = autocomplete.getPlace();
-  if (!place.geometry) return;
-
-  const lat = place.geometry.location.lat();
-  const lng = place.geometry.location.lng();
-
-  const enriched = await resolveLocation({ lat, lng, accuracy: 100 });
-  setViewLocation(enriched, "manual");
-});
-
-autocompleteRef.current = autocomplete;
-
-}, [setViewLocation]);
-
-/* ===============================
-GEOLOCATION (ONE SHOT)
+GEOLOCATION (AUTO + MANUAL)
 =============================== */
 
 const handleResolveLocation = useCallback(() => {
+if (!navigator.geolocation) return;
+
 setResolving(true);
 
 navigator.geolocation.getCurrentPosition(
   async (pos) => {
     const { latitude: lat, longitude: lng, accuracy } = pos.coords;
 
-    const enriched = await resolveLocation({ lat, lng, accuracy });
-    setViewLocation(enriched, "auto");
+    try {
+      const enriched = await resolveLocation({ lat, lng, accuracy });
+
+      setViewLocation(
+        {
+          ...enriched,
+          label:
+            enriched?.label ||
+            enriched?.suburb ||
+            "Current location",
+          lat,
+          lng,
+        },
+        "auto"
+      );
+
+      setInputValue(
+        enriched?.label || enriched?.suburb || "Current location"
+      );
+    } catch {
+      // fallback if resolve fails
+      setViewLocation(
+        {
+          lat,
+          lng,
+          label: "Current location",
+        },
+        "fallback"
+      );
+
+      setInputValue("Current location");
+    }
 
     setResolving(false);
   },
-  () => setResolving(false),
+  () => {
+    setResolving(false);
+  },
   { enableHighAccuracy: true }
 );
 
+
 }, [setViewLocation]);
+
+/* AUTO LOAD LOCATION (ONCE) */
+
+useEffect(() => {
+if (hasAutoResolved.current) return;
+if (viewLocation) return;
+
+hasAutoResolved.current = true;
+handleResolveLocation();
+
+}, [viewLocation, handleResolveLocation]);
+
+/* ===============================
+GOOGLE AUTOCOMPLETE
+=============================== */
+
+useEffect(() => {
+if (!isLoaded) return;
+if (!window.google?.maps?.places) return;
+if (!inputRef.current) return;
+if (autocompleteRef.current) return;
+
+const autocomplete = new window.google.maps.places.Autocomplete(
+  inputRef.current,
+  {
+    types: ["geocode"],
+    componentRestrictions: { country: "au" },
+  }
+);
+
+const listener = autocomplete.addListener("place_changed", async () => {
+  const place = autocomplete.getPlace();
+  if (!place.geometry) return;
+
+  const lat = place.geometry.location.lat();
+  const lng = place.geometry.location.lng();
+
+  const address = place.formatted_address;
+
+  // update input immediately
+  setInputValue(address);
+
+  try {
+    const enriched = await resolveLocation({ lat, lng, accuracy: 100 });
+
+    setViewLocation(
+      {
+        ...enriched,
+        label: enriched?.label || address,
+        lat,
+        lng,
+      },
+      "manual"
+    );
+  } catch {
+    setViewLocation(
+      {
+        lat,
+        lng,
+        label: address,
+      },
+      "manual"
+    );
+  }
+});
+
+autocompleteRef.current = autocomplete;
+
+return () => {
+  if (listener) listener.remove();
+  autocompleteRef.current = null;
+};
+
+
+}, [isLoaded, setViewLocation]);
 
 /* ===============================
 RENDER
@@ -142,9 +231,7 @@ RENDER
 
 return ( <header className="header-root">
 
-  {/* ===============================
-     ROW 1
-  =============================== */}
+  {/* ROW */}
   <div className="header-row">
 
     {/* LEFT */}
@@ -206,9 +293,7 @@ return ( <header className="header-root">
 
   </div>
 
-  {/* ===============================
-     ROW 2 (NAV)
-  =============================== */}
+  {/* NAV */}
   <nav className="header-nav">
     {nav.items.map((item) => {
       const active = isActiveRoute(item.path);
@@ -224,7 +309,6 @@ return ( <header className="header-root">
       );
     })}
   </nav>
-
 </header>
 
 );
