@@ -9,7 +9,7 @@ useCallback,
 import { useNavigate, useLocation } from "react-router-dom";
 import "./CommunityPlusHeader.css";
 
-import { useLocationContext } from "../../../context/LocationProvider"; // ✅ FIX
+import { useLocationContext } from "../../../context/LocationProvider";
 import { useAuth } from "../../../context/AuthContext";
 import { useGoogleMaps } from "../../../context/GoogleMapsProvider";
 
@@ -44,7 +44,7 @@ const [resolving, setResolving] = useState(false);
 const [inputValue, setInputValue] = useState("");
 
 const inputRef = useRef(null);
-const autocompleteRef = useRef(null);
+const autocompleteElRef = useRef(null);
 
 /* ===============================
 USER
@@ -105,21 +105,20 @@ setInputValue(locationText);
 }, [locationText]);
 
 /* ===============================
-🔥 REAL-TIME LOCATION SERVICE
+LOCATION SERVICE
 =============================== */
 
 useEffect(() => {
 setResolving(true);
 
 
-// start tracking
 locationService.start(resolveLocation);
 
 const unsubscribe = locationService.subscribe((event) => {
   if (event.type === "location") {
     const loc = {
       ...event.data,
-      street: null, // 🔥 force suburb-level
+      street: null,
       label: formatLocationDisplay(event.data),
     };
 
@@ -127,25 +126,26 @@ const unsubscribe = locationService.subscribe((event) => {
     setInputValue(formatLocationDisplay(loc));
     setResolving(false);
   }
+
+  if (event.type === "error") {
+    setResolving(false);
+  }
 });
 
 return () => {
   unsubscribe();
-  locationService.stop();
 };
 
 
 }, [setViewLocation]);
 
 /* ===============================
-PIN CLICK (FORCE REFRESH)
+PIN CLICK
 =============================== */
 
 const handleResolveLocation = useCallback(() => {
 setResolving(true);
 
-
-// restart tracking to force fresh GPS lock
 locationService.stop();
 locationService.start(resolveLocation);
 
@@ -153,49 +153,74 @@ locationService.start(resolveLocation);
 }, []);
 
 /* ===============================
-AUTOCOMPLETE
+🚀 NEW AUTOCOMPLETE (MODERN)
 =============================== */
 
 useEffect(() => {
 if (!isLoaded) return;
 if (!window.google?.maps?.places) return;
 if (!inputRef.current) return;
-if (autocompleteRef.current) return;
+if (autocompleteElRef.current) return;
 
 
-const autocomplete = new window.google.maps.places.Autocomplete(
-  inputRef.current,
-  {
-    types: ["geocode"],
-    componentRestrictions: { country: "au" },
-  }
-);
+// Create wrapper container
+const container = document.createElement("div");
+container.className = "location-autocomplete-wrapper";
 
-const listener = autocomplete.addListener("place_changed", async () => {
-  const place = autocomplete.getPlace();
-  if (!place.geometry) return;
-
-  const lat = place.geometry.location.lat();
-  const lng = place.geometry.location.lng();
-
-  const enriched = await resolveLocation({
-    lat,
-    lng,
-    accuracy: 100,
-    placeId: place.place_id,
-  });
-
-  if (!enriched) return;
-
-  setViewLocation(enriched, "manual");
-  setInputValue(formatLocationDisplay(enriched));
+// Create new autocomplete element
+const el = new window.google.maps.places.PlaceAutocompleteElement({
+  types: ["geocode"],
+  componentRestrictions: { country: "au" },
 });
 
-autocompleteRef.current = autocomplete;
+// Style it to match your UI
+el.style.width = "100%";
+el.style.border = "none";
+el.style.outline = "none";
+el.style.background = "transparent";
+el.style.font = "inherit";
+
+container.appendChild(el);
+
+// Replace input with new element
+inputRef.current.replaceWith(container);
+
+autocompleteElRef.current = el;
+
+const handleSelect = async (e) => {
+  try {
+    const place = e.placePrediction?.toPlace();
+    if (!place) return;
+
+    await place.fetchFields({
+      fields: ["location", "displayName", "id"],
+    });
+
+    const lat = place.location?.lat();
+    const lng = place.location?.lng();
+
+    if (!lat || !lng) return;
+
+    const enriched = await resolveLocation({
+      lat,
+      lng,
+      accuracy: 100,
+      placeId: place.id,
+    });
+
+    if (!enriched) return;
+
+    setViewLocation(enriched, "manual");
+    setInputValue(formatLocationDisplay(enriched));
+  } catch (err) {
+    console.error("Autocomplete error:", err);
+  }
+};
+
+el.addEventListener("gmp-placeselect", handleSelect);
 
 return () => {
-  if (listener) listener.remove();
-  autocompleteRef.current = null;
+  el.removeEventListener("gmp-placeselect", handleSelect);
 };
 
 
@@ -223,6 +248,7 @@ return ( <header className="header-root"> <div className="header-row">
           onClick={handleResolveLocation}
         />
 
+        {/* 🔥 This gets replaced by PlaceAutocompleteElement */}
         <input
           ref={inputRef}
           className="location-input"
