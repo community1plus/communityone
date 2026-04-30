@@ -38,17 +38,69 @@ const isMajorRoad = (street = "") =>
   /highway|hwy|freeway|fwy|road|rd/i.test(street);
 
 /* ===============================
-   RESULT SELECTION
+   🔥 DISTANCE (NEW)
 =============================== */
 
-const pickBestResult = (results) => {
-  return (
-    results.find((r) => r.types.includes("street_address")) ||
-    results.find((r) => r.types.includes("premise")) ||
-    results.find((r) => r.types.includes("route")) ||
-    results.find((r) => r.types.includes("locality")) ||
-    results[0]
-  );
+const getDistance = (a, b) => {
+  const R = 6371000;
+  const dLat = ((b.lat - a.lat) * Math.PI) / 180;
+  const dLng = ((b.lng - a.lng) * Math.PI) / 180;
+
+  const lat1 = (a.lat * Math.PI) / 180;
+  const lat2 = (b.lat * Math.PI) / 180;
+
+  const x =
+    Math.sin(dLat / 2) ** 2 +
+    Math.sin(dLng / 2) ** 2 *
+      Math.cos(lat1) *
+      Math.cos(lat2);
+
+  return 2 * R * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x));
+};
+
+/* ===============================
+   🔥 RESULT SELECTION (UPGRADED)
+=============================== */
+
+const TYPE_SCORE = {
+  street_address: 100,
+  premise: 90,
+  subpremise: 80,
+  route: 50,
+  locality: 20,
+};
+
+const isBadRoad = (formatted = "") =>
+  /service\s?road|service\s?rd/i.test(formatted);
+
+const pickBestResult = (results, origin) => {
+  if (!results?.length) return null;
+
+  const scored = results.map((r) => {
+    const typeScore =
+      Math.max(...r.types.map((t) => TYPE_SCORE[t] || 0), 0) || 0;
+
+    const loc = r.geometry?.location;
+
+    const point = {
+      lat: typeof loc.lat === "function" ? loc.lat() : loc.lat,
+      lng: typeof loc.lng === "function" ? loc.lng() : loc.lng,
+    };
+
+    const dist = origin ? getDistance(origin, point) : 0;
+
+    const distancePenalty = Math.min(dist, 200);
+    const roadPenalty = isBadRoad(r.formatted_address) ? 30 : 0;
+
+    const score =
+      typeScore - distancePenalty * 0.3 - roadPenalty;
+
+    return { r, score };
+  });
+
+  scored.sort((a, b) => b.score - a.score);
+
+  return scored[0].r;
 };
 
 /* ===============================
@@ -70,7 +122,7 @@ const getConfidence = (accuracy) => {
 };
 
 /* ===============================
-   🚀 ROAD SNAP (REAL IMPLEMENTATION)
+   🚀 ROAD SNAP
 =============================== */
 
 const snapCache = new Map();
@@ -158,7 +210,7 @@ export async function resolveLocation({
     if (cached) return cached;
 
     /* ===============================
-       SMART ROAD SNAP
+       SMART SNAP
     =============================== */
 
     if (accuracy > 30 && accuracy < 200) {
@@ -200,7 +252,7 @@ export async function resolveLocation({
     }
 
     /* ===============================
-       GEOCODE FALLBACK
+       GEOCODE
     =============================== */
 
     if (!result) {
@@ -214,7 +266,7 @@ export async function resolveLocation({
         throw new Error("Geocode failed");
       }
 
-      result = pickBestResult(data.results);
+      result = pickBestResult(data.results, { lat, lng });
     }
 
     const components = result.address_components;
@@ -233,11 +285,7 @@ export async function resolveLocation({
     ]);
 
     const city = getComponent(components, ["locality"]);
-
-    const state = getComponent(components, [
-      "administrative_area_level_1",
-    ]);
-
+    const state = getComponent(components, ["administrative_area_level_1"]);
     const postcode = getComponent(components, ["postal_code"]);
 
     const finalSuburb = suburb || city || state;
@@ -256,7 +304,7 @@ export async function resolveLocation({
     const confidence = getConfidence(accuracy);
 
     /* ===============================
-       LABEL STRATEGY
+       LABEL
     =============================== */
 
     let label;
@@ -273,10 +321,6 @@ export async function resolveLocation({
         hint = `near ${street}`;
       }
     }
-
-    /* ===============================
-       FINAL OBJECT
-    =============================== */
 
     const location = {
       lat,
