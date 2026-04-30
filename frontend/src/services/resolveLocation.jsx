@@ -1,13 +1,26 @@
 const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
 /* ===============================
-   CACHE (performance)
+   CACHE (with TTL)
 =============================== */
 
 const cache = new Map();
+const CACHE_TTL = 60 * 1000; // 1 min
 
 const getCacheKey = (lat, lng) =>
   `${lat.toFixed(4)},${lng.toFixed(4)}`;
+
+const getCached = (key) => {
+  const entry = cache.get(key);
+  if (!entry) return null;
+
+  if (Date.now() - entry.timestamp > CACHE_TTL) {
+    cache.delete(key);
+    return null;
+  }
+
+  return entry.value;
+};
 
 /* ===============================
    HELPERS
@@ -25,39 +38,44 @@ const isMajorRoad = (street = "") =>
   /highway|hwy|freeway|fwy|road|rd/i.test(street);
 
 /* ===============================
-   RESULT SELECTION (CRITICAL FIX)
+   RESULT SELECTION (STRONGER)
 =============================== */
 
 const pickBestResult = (results) => {
-  const priority = [
-    "street_address",
-    "premise",
-    "subpremise",
-    "route",
-    "intersection",
-    "locality",
-    "postal_code",
-    "administrative_area_level_2",
-  ];
-
-  for (let type of priority) {
-    const match = results.find((r) => r.types.includes(type));
-    if (match) return match;
-  }
-
-  return results[0];
+  return (
+    results.find((r) => r.types.includes("street_address")) ||
+    results.find((r) => r.types.includes("premise")) ||
+    results.find((r) => r.types.includes("route")) ||
+    results.find((r) => r.types.includes("locality")) ||
+    results[0]
+  );
 };
 
 /* ===============================
-   PRECISION LEVEL (1–5)
+   PRECISION (ACCURACY FIRST)
 =============================== */
 
-const getPrecisionLevel = (result) => {
-  if (result.types.includes("street_address")) return 5;
-  if (result.types.includes("route")) return 4;
-  if (result.types.includes("locality")) return 3;
-  if (result.types.includes("administrative_area_level_1")) return 2;
+const getPrecisionLevel = (accuracy, hasStreet) => {
+  if (accuracy <= 20 && hasStreet) return 5;
+  if (accuracy <= 50 && hasStreet) return 4;
+  if (accuracy <= 200) return 3;
+  if (accuracy <= 1000) return 2;
   return 1;
+};
+
+const getConfidence = (accuracy) => {
+  if (accuracy <= 20) return "high";
+  if (accuracy <= 100) return "medium";
+  return "low";
+};
+
+/* ===============================
+   OPTIONAL: ROAD SNAP (plug in later)
+=============================== */
+
+const maybeSnapToRoad = async (lat, lng) => {
+  // keep simple for now — plug Roads API here if needed
+  return { lat, lng };
 };
 
 /* ===============================
@@ -97,19 +115,26 @@ export async function resolveLocation({
   lat,
   lng,
   accuracy = 999,
-  placeId = null, // 🔥 from autocomplete
+  placeId = null,
 }) {
   try {
     const cacheKey = getCacheKey(lat, lng);
+    const cached = getCached(cacheKey);
 
-    if (cache.has(cacheKey)) {
-      return cache.get(cacheKey);
-    }
+    if (cached) return cached;
+
+    /* ===============================
+       SNAP TO ROAD (optional)
+    =============================== */
+
+    const snapped = await maybeSnapToRoad(lat, lng);
+    lat = snapped.lat;
+    lng = snapped.lng;
 
     let result;
 
     /* ===============================
-       PLACE DETAILS (BEST PRECISION)
+       PLACE DETAILS (BEST)
     =============================== */
 
     if (placeId) {
@@ -130,7 +155,7 @@ export async function resolveLocation({
     }
 
     /* ===============================
-       FALLBACK → GEOCODE
+       GEOCODE FALLBACK
     =============================== */
 
     if (!result) {
@@ -178,44 +203,30 @@ export async function resolveLocation({
         : street;
 
     /* ===============================
-       PRECISION + CONFIDENCE
+       PRECISION (FIXED)
     =============================== */
 
-    const rawLevel = getPrecisionLevel(result);
-
-    const effectiveLevel =
-      accuracy > 200
-        ? Math.min(rawLevel, 3)
-        : accuracy > 100
-        ? Math.min(rawLevel, 4)
-        : rawLevel;
-
-    const confidence =
-      accuracy <= 50
-        ? "high"
-        : accuracy <= 200
-        ? "medium"
-        : "low";
+    const hasStreet = !!fullStreet;
+    const precisionLevel = getPrecisionLevel(accuracy, hasStreet);
+    const confidence = getConfidence(accuracy);
 
     /* ===============================
-       LABEL STRATEGY
+       LABEL STRATEGY (TRUST ACCURACY)
     =============================== */
 
     let label;
     let hint = null;
 
-    if (effectiveLevel >= 5 && confidence === "high") {
+    if (precisionLevel >= 5 && confidence === "high") {
       label = result.formatted_address;
-    } else if (effectiveLevel === 4) {
+    } else if (precisionLevel >= 4) {
       label = `${fullStreet}, ${finalSuburb}`;
-    } else if (effectiveLevel >= 3) {
+    } else {
       label = `${finalSuburb || "Unknown"}, ${state || ""}`;
 
       if (street && !isMajorRoad(street)) {
         hint = `near ${street}`;
       }
-    } else {
-      label = `${state || "Unknown location"}`;
     }
 
     /* ===============================
@@ -233,18 +244,21 @@ export async function resolveLocation({
       state,
       postcode,
 
-      label,              // smart label
-      fullLabel: result.formatted_address, // full address
+      label,
+      fullLabel: result.formatted_address,
       hint,
 
-      precisionLevel: effectiveLevel, // 🔥 1–5
+      precisionLevel,
       confidence,
       source: placeId ? "places" : "google",
 
       updatedAt: Date.now(),
     };
 
-    cache.set(cacheKey, location);
+    cache.set(cacheKey, {
+      value: location,
+      timestamp: Date.now(),
+    });
 
     console.log("📍 Resolved location:", location);
 
@@ -253,30 +267,21 @@ export async function resolveLocation({
   } catch (err) {
     console.error("❌ resolveLocation failed:", err);
 
-    /* ===============================
-       OSM FALLBACK
-    =============================== */
-
     const fallback = await resolveWithOSM(lat, lng);
-
     if (fallback) return fallback;
 
     return {
       lat,
       lng,
       accuracy,
-
       suburb: null,
       state: null,
-
       label: "Unknown location",
       fullLabel: null,
       hint: null,
-
       precisionLevel: 1,
       confidence: "low",
       source: "fallback",
-
       updatedAt: Date.now(),
     };
   }
