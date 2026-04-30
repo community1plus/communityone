@@ -1,328 +1,283 @@
-import React, {
-useState,
-useEffect,
-useRef,
-useMemo,
-useCallback,
-} from "react";
-
-import { useNavigate, useLocation } from "react-router-dom";
-import "../components/Layout/Header/CommunityPlusHeader.css";
-
-import { useLocationContext } from "../../../context/LocationProvider";
-import { useAuth } from "../../../context/AuthContext";
-import { useGoogleMaps } from "../../../context/GoogleMapsProvider";
-
-import LocationPin from "../../UI/LocationPin";
-import { resolveLocation } from "../../../services/resolveLocation";
-import { NAVIGATION } from "../../../config/navigation/navigationConfig";
+const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
 /* ===============================
-OSM FALLBACK
+   CACHE (performance)
+=============================== */
+
+const cache = new Map();
+
+const getCacheKey = (lat, lng) =>
+  `${lat.toFixed(4)},${lng.toFixed(4)}`;
+
+/* ===============================
+   HELPERS
+=============================== */
+
+const getComponent = (components, types) => {
+  for (let type of types) {
+    const match = components.find((c) => c.types.includes(type));
+    if (match) return match.long_name;
+  }
+  return null;
+};
+
+const isMajorRoad = (street = "") =>
+  /highway|hwy|freeway|fwy|road|rd/i.test(street);
+
+/* ===============================
+   RESULT SELECTION (CRITICAL FIX)
+=============================== */
+
+const pickBestResult = (results) => {
+  const priority = [
+    "street_address",
+    "premise",
+    "subpremise",
+    "route",
+    "intersection",
+    "locality",
+    "postal_code",
+    "administrative_area_level_2",
+  ];
+
+  for (let type of priority) {
+    const match = results.find((r) => r.types.includes(type));
+    if (match) return match;
+  }
+
+  return results[0];
+};
+
+/* ===============================
+   PRECISION LEVEL (1–5)
+=============================== */
+
+const getPrecisionLevel = (result) => {
+  if (result.types.includes("street_address")) return 5;
+  if (result.types.includes("route")) return 4;
+  if (result.types.includes("locality")) return 3;
+  if (result.types.includes("administrative_area_level_1")) return 2;
+  return 1;
+};
+
+/* ===============================
+   OSM FALLBACK
 =============================== */
 
 async function resolveWithOSM(lat, lng) {
-try {
-const res = await fetch(
-`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
-);
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
+    );
 
+    const data = await res.json();
 
-const data = await res.json();
-
-return {
-  lat,
-  lng,
-  suburb: data.address?.suburb || data.address?.city,
-  state: data.address?.state,
-  label: data.display_name,
-  source: "osm",
-};
-
-
-} catch {
-return null;
-}
-}
-
-/* ===============================
-COMPONENT
-=============================== */
-
-export default function CommunityPlusHeader({ onLogout }) {
-const navigate = useNavigate();
-const routeLocation = useLocation();
-
-const { viewLocation, setViewLocation } = useLocationContext();
-const { user, loading } = useAuth();
-const { isLoaded } = useGoogleMaps();
-
-const [showMenu, setShowMenu] = useState(false);
-const [resolving, setResolving] = useState(false);
-const [inputValue, setInputValue] = useState("");
-
-const inputRef = useRef(null);
-const autocompleteRef = useRef(null);
-const hasAutoResolved = useRef(false);
-
-/* ===============================
-USER
-=============================== */
-
-const username = user?.displayName || "Guest";
-
-const initials = useMemo(() => {
-if (!username || username === "Guest") return "G";
-
-
-return username
-  .split(" ")
-  .map((w) => w[0])
-  .join("")
-  .slice(0, 2)
-  .toUpperCase();
-
-
-}, [username]);
-
-/* ===============================
-NAV
-=============================== */
-
-const nav = useMemo(
-() => NAVIGATION.find((n) => n.group === "main") || { items: [] },
-[]
-);
-
-const isActiveRoute = useCallback(
-(path) =>
-path &&
-(routeLocation.pathname === path ||
-routeLocation.pathname.startsWith(path + "/")),
-[routeLocation.pathname]
-);
-
-const go = useCallback(
-(path) => {
-if (path && routeLocation.pathname !== path) navigate(path);
-},
-[navigate, routeLocation.pathname]
-);
-
-/* ===============================
-LOCATION DISPLAY (🔥 FIXED)
-=============================== */
-
-const locationText = useMemo(() => {
-if (!viewLocation) return "";
-
-
-const suburb = viewLocation.suburb;
-const state = viewLocation.state;
-
-if (suburb && state) return `${suburb}, ${state}`;
-if (suburb) return suburb;
-
-return "";
-
-
-}, [viewLocation]);
-
-useEffect(() => {
-if (locationText) {
-setInputValue(locationText);
-}
-}, [locationText]);
-
-/* ===============================
-GEOLOCATION
-=============================== */
-
-const handleResolveLocation = useCallback(() => {
-if (!navigator.geolocation) return;
-
-
-setResolving(true);
-
-navigator.geolocation.getCurrentPosition(
-  async (pos) => {
-    const { latitude: lat, longitude: lng, accuracy } = pos.coords;
-
-    const enriched =
-      (await resolveLocation({ lat, lng, accuracy })) ||
-      (await resolveWithOSM(lat, lng));
-
-    if (enriched) {
-      setViewLocation(enriched, "auto");
-
-      setInputValue(
-        [enriched.suburb, enriched.state]
-          .filter(Boolean)
-          .join(", ")
-      );
-    }
-
-    setResolving(false);
-  },
-  () => setResolving(false),
-  { enableHighAccuracy: true }
-);
-
-
-}, [setViewLocation]);
-
-/* AUTO LOAD */
-
-useEffect(() => {
-if (hasAutoResolved.current) return;
-if (viewLocation) return;
-
-
-hasAutoResolved.current = true;
-handleResolveLocation();
-
-
-}, [viewLocation, handleResolveLocation]);
-
-/* ===============================
-GOOGLE AUTOCOMPLETE
-=============================== */
-
-useEffect(() => {
-if (!isLoaded) return;
-if (!window.google?.maps?.places) return;
-if (!inputRef.current) return;
-if (autocompleteRef.current) return;
-
-
-const autocomplete = new window.google.maps.places.Autocomplete(
-  inputRef.current,
-  {
-    types: ["geocode"],
-    componentRestrictions: { country: "au" },
-  }
-);
-
-const listener = autocomplete.addListener("place_changed", async () => {
-  const place = autocomplete.getPlace();
-  if (!place.geometry) return;
-
-  const lat = place.geometry.location.lat();
-  const lng = place.geometry.location.lng();
-
-  const enriched =
-    (await resolveLocation({
+    return {
       lat,
       lng,
-      accuracy: 100,
-      placeId: place.place_id,
-    })) ||
-    (await resolveWithOSM(lat, lng));
-
-  if (!enriched) return;
-
-  setViewLocation(enriched, "manual");
-
-  setInputValue(
-    [enriched.suburb, enriched.state]
-      .filter(Boolean)
-      .join(", ")
-  );
-});
-
-autocompleteRef.current = autocomplete;
-
-return () => {
-  if (listener) listener.remove();
-  autocompleteRef.current = null;
-};
-
-
-}, [isLoaded, setViewLocation]);
+      suburb: data.address?.suburb || data.address?.city,
+      state: data.address?.state,
+      label: data.display_name,
+      fullLabel: data.display_name,
+      precisionLevel: 3,
+      confidence: "low",
+      source: "osm",
+      updatedAt: Date.now(),
+    };
+  } catch {
+    return null;
+  }
+}
 
 /* ===============================
-RENDER
+   MAIN RESOLVER
 =============================== */
 
-return ( <header className="header-root"> <div className="header-row">
+export async function resolveLocation({
+  lat,
+  lng,
+  accuracy = 999,
+  placeId = null, // 🔥 from autocomplete
+}) {
+  try {
+    const cacheKey = getCacheKey(lat, lng);
 
-```
-    {/* LEFT */}
-    <div className="header-left">
-      <img
-        src="/logo/logo.png"
-        alt="Community One"
-        className="logo"
-        onClick={() => go("/home")}
-      />
+    if (cache.has(cacheKey)) {
+      return cache.get(cacheKey);
+    }
 
-      <div className="location-display">
-        <LocationPin
-          resolved={!!locationText}
-          loading={resolving}
-          onClick={handleResolveLocation}
-        />
+    let result;
 
-        <input
-          ref={inputRef}
-          className="location-input"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          placeholder="Enter suburb"
-        />
-      </div>
-    </div>
+    /* ===============================
+       PLACE DETAILS (BEST PRECISION)
+    =============================== */
 
-    {/* CENTER */}
-    <div className="header-center">
-      <input
-        className="search-input"
-        placeholder="Search"
-      />
-    </div>
-
-    {/* RIGHT */}
-    <div className="header-right">
-      <div className="user-block">
-        <span className="username">
-          {loading ? "..." : username}
-        </span>
-
-        <div
-          className="avatar"
-          onClick={() => setShowMenu((prev) => !prev)}
-        >
-          {initials}
-        </div>
-
-        {showMenu && (
-          <div className="dropdown-menu">
-            <div onClick={() => go("/profile")}>Profile</div>
-            <div onClick={() => onLogout?.()}>Logout</div>
-          </div>
-        )}
-      </div>
-    </div>
-  </div>
-
-  {/* NAV */}
-  <nav className="header-nav">
-    {nav.items.map((item) => {
-      const active = isActiveRoute(item.path);
-
-      return (
-        <button
-          key={item.id}
-          className={`nav-item ${active ? "active" : ""}`}
-          onClick={() => go(item.path)}
-        >
-          {item.label}
-        </button>
+    if (placeId) {
+      const res = await fetch(
+        `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&key=${GOOGLE_API_KEY}`
       );
-    })}
-  </nav>
-</header>
 
+      const data = await res.json();
 
-);
+      if (data.status === "OK") {
+        result = {
+          ...data.result,
+          address_components: data.result.address_components,
+          formatted_address: data.result.formatted_address,
+          types: ["street_address"],
+        };
+      }
+    }
+
+    /* ===============================
+       FALLBACK → GEOCODE
+    =============================== */
+
+    if (!result) {
+      const res = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${GOOGLE_API_KEY}`
+      );
+
+      const data = await res.json();
+
+      if (data.status !== "OK" || !data.results?.length) {
+        throw new Error("Geocode failed");
+      }
+
+      result = pickBestResult(data.results);
+    }
+
+    const components = result.address_components;
+
+    /* ===============================
+       EXTRACT FIELDS
+    =============================== */
+
+    const streetNumber = getComponent(components, ["street_number"]);
+    const street = getComponent(components, ["route"]);
+
+    const suburb = getComponent(components, [
+      "locality",
+      "sublocality",
+      "administrative_area_level_2",
+    ]);
+
+    const city = getComponent(components, ["locality"]);
+
+    const state = getComponent(components, [
+      "administrative_area_level_1",
+    ]);
+
+    const postcode = getComponent(components, ["postal_code"]);
+
+    const finalSuburb = suburb || city || state;
+
+    const fullStreet =
+      streetNumber && street
+        ? `${streetNumber} ${street}`
+        : street;
+
+    /* ===============================
+       PRECISION + CONFIDENCE
+    =============================== */
+
+    const rawLevel = getPrecisionLevel(result);
+
+    const effectiveLevel =
+      accuracy > 200
+        ? Math.min(rawLevel, 3)
+        : accuracy > 100
+        ? Math.min(rawLevel, 4)
+        : rawLevel;
+
+    const confidence =
+      accuracy <= 50
+        ? "high"
+        : accuracy <= 200
+        ? "medium"
+        : "low";
+
+    /* ===============================
+       LABEL STRATEGY
+    =============================== */
+
+    let label;
+    let hint = null;
+
+    if (effectiveLevel >= 5 && confidence === "high") {
+      label = result.formatted_address;
+    } else if (effectiveLevel === 4) {
+      label = `${fullStreet}, ${finalSuburb}`;
+    } else if (effectiveLevel >= 3) {
+      label = `${finalSuburb || "Unknown"}, ${state || ""}`;
+
+      if (street && !isMajorRoad(street)) {
+        hint = `near ${street}`;
+      }
+    } else {
+      label = `${state || "Unknown location"}`;
+    }
+
+    /* ===============================
+       FINAL OBJECT
+    =============================== */
+
+    const location = {
+      lat,
+      lng,
+      accuracy,
+
+      street: fullStreet,
+      suburb: finalSuburb,
+      city,
+      state,
+      postcode,
+
+      label,              // smart label
+      fullLabel: result.formatted_address, // full address
+      hint,
+
+      precisionLevel: effectiveLevel, // 🔥 1–5
+      confidence,
+      source: placeId ? "places" : "google",
+
+      updatedAt: Date.now(),
+    };
+
+    cache.set(cacheKey, location);
+
+    console.log("📍 Resolved location:", location);
+
+    return location;
+
+  } catch (err) {
+    console.error("❌ resolveLocation failed:", err);
+
+    /* ===============================
+       OSM FALLBACK
+    =============================== */
+
+    const fallback = await resolveWithOSM(lat, lng);
+
+    if (fallback) return fallback;
+
+    return {
+      lat,
+      lng,
+      accuracy,
+
+      suburb: null,
+      state: null,
+
+      label: "Unknown location",
+      fullLabel: null,
+      hint: null,
+
+      precisionLevel: 1,
+      confidence: "low",
+      source: "fallback",
+
+      updatedAt: Date.now(),
+    };
+  }
 }
