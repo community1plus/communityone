@@ -15,7 +15,7 @@ import { useGoogleMaps } from "../../../context/GoogleMapsProvider";
 
 import LocationPin from "../../UI/LocationPin";
 import { resolveLocation } from "../../../services/resolveLocation";
-import { locationService } from "../../../services/LocationService"; // 🔥 NEW
+import { locationService } from "../../../services/locationService";
 import { NAVIGATION } from "../../../config/navigation/navigationConfig";
 
 /* ===============================
