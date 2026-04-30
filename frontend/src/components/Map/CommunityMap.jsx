@@ -1,4 +1,4 @@
-import { GoogleMap, Marker } from "@react-google-maps/api";
+import { GoogleMap } from "@react-google-maps/api";
 import { useEffect, useRef, useMemo, useCallback } from "react";
 
 import { useMap } from "../../context/MapContext";
@@ -18,12 +18,6 @@ const MAP_CONTAINER_STYLE = {
   height: "100%",
 };
 
-const ICONS = {
-  default: "https://maps.google.com/mapfiles/ms/icons/yellow-dot.png",
-  selected: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
-  user: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
-};
-
 /* =========================
    COMPONENT
 ========================= */
@@ -37,8 +31,10 @@ export default function CommunityMap({ mode = "embedded" }) {
     userLocation,
   } = useMap();
 
-  const { isLoaded } = useGoogleMaps(); // 🔥 shared loader
+  const { isLoaded } = useGoogleMaps();
+
   const mapRef = useRef(null);
+  const markersRef = useRef([]);
 
   /* =========================
      HELPERS
@@ -50,7 +46,7 @@ export default function CommunityMap({ mode = "embedded" }) {
   }, []);
 
   /* =========================
-     CENTER LOGIC
+     CENTER
   ========================= */
 
   const center = useMemo(() => {
@@ -58,15 +54,10 @@ export default function CommunityMap({ mode = "embedded" }) {
   }, [selectedLocation, userLocation]);
 
   /* =========================
-     PAN TO SELECTED
+     ZOOM
   ========================= */
 
-  useEffect(() => {
-    if (!mapRef.current || !selectedLocation) return;
-
-    mapRef.current.panTo(selectedLocation);
-    mapRef.current.setZoom(14);
-  }, [selectedLocation]);
+  const zoom = mode === "full" ? 14 : 12;
 
   /* =========================
      MAP OPTIONS
@@ -84,10 +75,99 @@ export default function CommunityMap({ mode = "embedded" }) {
   );
 
   /* =========================
-     ZOOM
+     PAN TO SELECTED
   ========================= */
 
-  const zoom = mode === "full" ? 14 : 12;
+  useEffect(() => {
+    if (!mapRef.current || !selectedLocation) return;
+
+    mapRef.current.panTo(selectedLocation);
+    mapRef.current.setZoom(14);
+  }, [selectedLocation]);
+
+  /* =========================
+     CLEAR MARKERS
+  ========================= */
+
+  const clearMarkers = () => {
+    markersRef.current.forEach((m) => (m.map = null));
+    markersRef.current = [];
+  };
+
+  /* =========================
+     CREATE MARKER
+  ========================= */
+
+  const createMarker = (item, map) => {
+    const position = getPosition(item);
+    if (!position) return null;
+
+    const isSelected = item.id === selectedMarkerId;
+
+    const el = document.createElement("div");
+
+    el.style.width = "14px";
+    el.style.height = "14px";
+    el.style.borderRadius = "50%";
+    el.style.background = isSelected ? "#b11226" : "#f59e0b";
+    el.style.boxShadow = "0 2px 6px rgba(0,0,0,0.3)";
+    el.style.cursor = "pointer";
+
+    el.addEventListener("click", () =>
+      focusLocation(position, item.id)
+    );
+
+    return new window.google.maps.marker.AdvancedMarkerElement({
+      map,
+      position,
+      content: el,
+    });
+  };
+
+  /* =========================
+     UPDATE MARKERS
+  ========================= */
+
+  useEffect(() => {
+    if (!mapRef.current) return;
+    if (!window.google?.maps?.marker) return;
+
+    clearMarkers();
+
+    const map = mapRef.current;
+
+    const newMarkers = filteredMarkers
+      .map((item) => createMarker(item, map))
+      .filter(Boolean);
+
+    /* USER LOCATION MARKER */
+    if (userLocation) {
+      const userEl = document.createElement("div");
+
+      userEl.style.width = "16px";
+      userEl.style.height = "16px";
+      userEl.style.borderRadius = "50%";
+      userEl.style.background = "#2563eb";
+      userEl.style.boxShadow = "0 2px 6px rgba(0,0,0,0.3)";
+      userEl.style.border = "2px solid white";
+
+      const userMarker =
+        new window.google.maps.marker.AdvancedMarkerElement({
+          map,
+          position: userLocation,
+          content: userEl,
+        });
+
+      newMarkers.push(userMarker);
+    }
+
+    markersRef.current = newMarkers;
+
+    return () => {
+      clearMarkers(); // 🔥 prevents leaks
+    };
+
+  }, [filteredMarkers, selectedMarkerId, userLocation]);
 
   /* =========================
      LOAD STATE
@@ -108,28 +188,6 @@ export default function CommunityMap({ mode = "embedded" }) {
       mapContainerStyle={MAP_CONTAINER_STYLE}
       onLoad={(map) => (mapRef.current = map)}
       options={mapOptions}
-    >
-      {/* USER LOCATION */}
-      {userLocation && (
-        <Marker position={userLocation} icon={ICONS.user} />
-      )}
-
-      {/* FEED MARKERS */}
-      {filteredMarkers.map((item) => {
-        const position = getPosition(item);
-        if (!position) return null;
-
-        const isSelected = item.id === selectedMarkerId;
-
-        return (
-          <Marker
-            key={item.id}
-            position={position}
-            icon={isSelected ? ICONS.selected : ICONS.default}
-            onClick={() => focusLocation(position, item.id)}
-          />
-        );
-      })}
-    </GoogleMap>
+    />
   );
 }
