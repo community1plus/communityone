@@ -1,4 +1,4 @@
-// LocationService.js
+// locationService.js
 
 /* ===============================
    CONFIG
@@ -49,7 +49,7 @@ const smooth = (prev, next) => {
    SERVICE
 =============================== */
 
-class LocationService {
+class locationService {
   constructor() {
     this.watchId = null;
 
