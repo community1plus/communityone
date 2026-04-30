@@ -1,18 +1,18 @@
 /* =====================================================
-FEED COLUMN — FINAL (STRUCTURAL + OPTICAL ALIGNMENT)
+FEED COLUMN — STRUCTURAL (LET PARENT CONTROL WIDTH)
 ===================================================== */
 
 .feed-column {
-width: 100%;
-max-width: 420px;
+  flex: 1;              /* 👈 controls width ratio */
+  min-width: 0;         /* prevents overflow bugs */
 
-display: flex;
-flex-direction: column;
+  display: flex;
+  flex-direction: column;
 
-align-self: start;
-overflow: visible;
+  align-self: stretch;  /* more consistent than start */
+  overflow: hidden;     /* prevent layout leaks */
 
-transform: translateY(-2px); /* 🔥 optical alignment */
+  transform: translateY(-2px); /* optical alignment */
 }
 
 /* =====================================================
@@ -20,16 +20,12 @@ STACK
 ===================================================== */
 
 .feed-stack {
-display: flex;
-flex-direction: column;
-gap: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
 
-flex: none;
-overflow: visible;
-}
-
-.feed-stack > *:first-child {
-margin-top: 0;
+  overflow-y: auto;     /* 👈 enable scroll */
+  padding-right: 4px;   /* avoid scrollbar clipping */
 }
 
 /* =====================================================
@@ -37,27 +33,26 @@ CARD
 ===================================================== */
 
 .feed-card {
-border: 1px solid var(--line);
-background: rgba(255, 255, 255, 0.62);
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.62);
 
-border-radius: 20px;
-padding: var(--space-3);
+  border-radius: 20px;
+  padding: var(--space-3);
 
-box-shadow: var(--shadow-sm);
-transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 
-overflow: hidden;
-margin-top: 0;
+  overflow: hidden;
 }
 
 /* subtle optical tightening */
 .feed-card:first-child {
-margin-top: -1px; /* 🔥 fine-tune */
+  margin-top: -1px;
 }
 
 .feed-card:hover {
-transform: translateY(-3px);
-box-shadow: var(--shadow-md);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
 }
 
 /* =====================================================
@@ -65,39 +60,39 @@ HEADER
 ===================================================== */
 
 .feed-card-header {
-display: flex;
-align-items: center;
-margin-bottom: var(--space-2);
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--space-2);
 }
 
 .feed-avatar {
-width: 38px;
-height: 38px;
-border-radius: 50%;
-object-fit: cover;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
 
-margin-right: var(--space-2);
+  margin-right: var(--space-2);
 
-border: 1px solid var(--line);
-background: #fff;
-box-shadow: var(--shadow-sm);
+  border: 1px solid var(--line);
+  background: #fff;
+  box-shadow: var(--shadow-sm);
 }
 
 .feed-meta {
-display: flex;
-flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .feed-name {
-font-size: var(--text-lg);
-font-weight: var(--fw-bold);
-color: var(--ink);
+  font-size: var(--text-lg);
+  font-weight: var(--fw-bold);
+  color: var(--ink);
 }
 
 .feed-time {
-font-size: var(--text-xs);
-color: var(--muted);
-margin-top: 2px;
+  font-size: var(--text-xs);
+  color: var(--muted);
+  margin-top: 2px;
 }
 
 /* =====================================================
@@ -105,11 +100,11 @@ TEXT
 ===================================================== */
 
 .feed-text {
-font-size: var(--text-md);
-color: var(--ink);
-line-height: var(--lh-relaxed);
+  font-size: var(--text-md);
+  color: var(--ink);
+  line-height: var(--lh-relaxed);
 
-margin: var(--space-2) 0 var(--space-3);
+  margin: var(--space-2) 0 var(--space-3);
 }
 
 /* =====================================================
@@ -117,26 +112,32 @@ IMAGE
 ===================================================== */
 
 .feed-image {
-width: 100%;
-border-radius: 14px;
-box-shadow: var(--shadow-sm);
-margin-top: var(--space-2);
+  width: 100%;
+  border-radius: 14px;
+  box-shadow: var(--shadow-sm);
+  margin-top: var(--space-2);
 }
 
 /* =====================================================
-MAP COLUMN (OPTICAL BALANCE)
+MAP COLUMN (BALANCE)
 ===================================================== */
 
 .map-column {
-transform: translateY(-1px); /* 🔥 subtle counter-balance */
+  flex: 2;             /* 👈 ensures map is wider */
+  min-width: 0;
+
+  transform: translateY(-1px);
 }
+
+/* =====================================================
+STATE + TYPES
+===================================================== */
 
 .feed-card.active {
   border: 2px solid #4a0f0f;
   background: rgba(74, 15, 15, 0.05);
 }
 
-/* type styling */
 .feed-card.type-incident {
   border-left: 4px solid #d92d20;
 }
