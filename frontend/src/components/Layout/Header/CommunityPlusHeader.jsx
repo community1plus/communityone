@@ -12,7 +12,6 @@ import "./CommunityPlusHeader.css";
 import { locationService } from "../../../services/locationService";
 import { useAuth } from "../../../context/AuthContext";
 import { useGoogleMaps } from "../../../context/GoogleMapsProvider";
-import { useAuth } from "../../../context/AuthContext";
 import { useGoogleMaps } from "../../../context/GoogleMapsProvider";
 
 import LocationPin from "../../UI/LocationPin";
