@@ -27,7 +27,6 @@ const res = await fetch(
 `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
 );
 
-
 const data = await res.json();
 
 return {
@@ -44,6 +43,16 @@ return {
 return null;
 }
 }
+
+/* ===============================
+FORMAT DISPLAY (🔥 SINGLE SOURCE)
+=============================== */
+
+const formatLocationDisplay = (loc) => {
+if (!loc) return "";
+
+return [loc.suburb, loc.state].filter(Boolean).join(", ");
+};
 
 /* ===============================
 COMPONENT
@@ -110,22 +119,11 @@ if (path && routeLocation.pathname !== path) navigate(path);
 );
 
 /* ===============================
-LOCATION DISPLAY (🔥 FIXED)
+DISPLAY
 =============================== */
 
 const locationText = useMemo(() => {
-if (!viewLocation) return "";
-
-
-const suburb = viewLocation.suburb;
-const state = viewLocation.state;
-
-if (suburb && state) return `${suburb}, ${state}`;
-if (suburb) return suburb;
-
-return "";
-
-
+return formatLocationDisplay(viewLocation);
 }, [viewLocation]);
 
 useEffect(() => {
@@ -135,7 +133,7 @@ setInputValue(locationText);
 }, [locationText]);
 
 /* ===============================
-GEOLOCATION
+GEOLOCATION (🔥 FIXED)
 =============================== */
 
 const handleResolveLocation = useCallback(() => {
@@ -148,19 +146,25 @@ navigator.geolocation.getCurrentPosition(
   async (pos) => {
     const { latitude: lat, longitude: lng, accuracy } = pos.coords;
 
-    const enriched =
+    let enriched =
       (await resolveLocation({ lat, lng, accuracy })) ||
       (await resolveWithOSM(lat, lng));
 
-    if (enriched) {
-      setViewLocation(enriched, "auto");
-
-      setInputValue(
-        [enriched.suburb, enriched.state]
-          .filter(Boolean)
-          .join(", ")
-      );
+    if (!enriched) {
+      setResolving(false);
+      return;
     }
+
+    /* 🔥 FORCE SUBURB-LEVEL (KEY FIX) */
+    enriched = {
+      ...enriched,
+      street: null,
+      label: formatLocationDisplay(enriched),
+    };
+
+    setViewLocation(enriched, "auto");
+
+    setInputValue(formatLocationDisplay(enriched));
 
     setResolving(false);
   },
@@ -185,7 +189,7 @@ handleResolveLocation();
 }, [viewLocation, handleResolveLocation]);
 
 /* ===============================
-GOOGLE AUTOCOMPLETE
+AUTOCOMPLETE
 =============================== */
 
 useEffect(() => {
@@ -223,11 +227,7 @@ const listener = autocomplete.addListener("place_changed", async () => {
 
   setViewLocation(enriched, "manual");
 
-  setInputValue(
-    [enriched.suburb, enriched.state]
-      .filter(Boolean)
-      .join(", ")
-  );
+  setInputValue(formatLocationDisplay(enriched));
 });
 
 autocompleteRef.current = autocomplete;
@@ -247,7 +247,6 @@ RENDER
 return ( <header className="header-root"> <div className="header-row">
 
 
-    {/* LEFT */}
     <div className="header-left">
       <img
         src="/logo/logo.png"
@@ -273,15 +272,10 @@ return ( <header className="header-root"> <div className="header-row">
       </div>
     </div>
 
-    {/* CENTER */}
     <div className="header-center">
-      <input
-        className="search-input"
-        placeholder="Search"
-      />
+      <input className="search-input" placeholder="Search" />
     </div>
 
-    {/* RIGHT */}
     <div className="header-right">
       <div className="user-block">
         <span className="username">
@@ -305,7 +299,6 @@ return ( <header className="header-root"> <div className="header-row">
     </div>
   </div>
 
-  {/* NAV */}
   <nav className="header-nav">
     {nav.items.map((item) => {
       const active = isActiveRoute(item.path);
