@@ -1,9 +1,7 @@
-// HeaderTopRow.jsx
 import { useNavigate } from "react-router-dom";
 
-import LocationDisplay from "./LocationDisplay";
 import SearchBar from "./SearchBar";
-import UserMenu from "./UserMenu";
+import UserMenu from "./UserMenu.jsx";
 
 export default function HeaderTopRow() {
   const navigate = useNavigate();
@@ -11,14 +9,17 @@ export default function HeaderTopRow() {
   return (
     <div className="header-row">
       <div className="header-left">
-        { /*<img
-          src="/logo/logo.png"
-          alt="Logo"
-          className="logo"
-          onClick={() => navigate("/communityplus")}
-        />*/ }
+        <div className="brand" onClick={() => navigate("/communityplus")}>
+          <div className="brand-mark">
+            <span className="brand-c"></span>
+            <span className="brand-o"></span>
+          </div>
 
-        <LocationDisplay />
+          <div className="brand-wordmark">
+            <span>COMMUNITY</span>
+            <span>ONE</span>
+          </div>
+        </div>
       </div>
 
       <div className="header-center">

@@ -1,4 +1,3 @@
-// Header.jsx
 import HeaderTopRow from "./HeaderTopRow";
 import HeaderNav from "./HeaderNav";
 import "./Header.css";
