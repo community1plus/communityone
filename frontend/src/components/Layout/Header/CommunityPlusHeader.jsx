@@ -19,13 +19,39 @@ import { locationService } from "../../../services/locationService";
 import { NAVIGATION } from "../../../config/navigation/navigationConfig";
 
 /* ===============================
+   CACHE HELPERS
+=============================== */
+
+const STORAGE_KEY = "user_location";
+const TTL = 5 * 60 * 1000;
+
+const loadCachedLocation = () => {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+
+    const parsed = JSON.parse(raw);
+
+    if (Date.now() - parsed.updatedAt > TTL) return null;
+
+    return parsed;
+  } catch {
+    return null;
+  }
+};
+
+const saveLocation = (loc) => {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(loc));
+  } catch {}
+};
+
+/* ===============================
    HELPERS
 =============================== */
 
-const formatLocationDisplay = (loc) => {
-  if (!loc) return "";
-  return [loc.suburb, loc.state].filter(Boolean).join(", ");
-};
+const formatLocationDisplay = (loc) =>
+  [loc?.suburb, loc?.state].filter(Boolean).join(", ");
 
 /* ===============================
    COMPONENT
@@ -41,6 +67,7 @@ export default function CommunityPlusHeader({ onLogout }) {
 
   const [showMenu, setShowMenu] = useState(false);
   const [resolving, setResolving] = useState(false);
+  const [hasResolvedOnce, setHasResolvedOnce] = useState(false);
   const [inputValue, setInputValue] = useState("");
 
   const inputRef = useRef(null);
@@ -88,20 +115,42 @@ export default function CommunityPlusHeader({ onLogout }) {
   );
 
   /* ===============================
-     DISPLAY VALUE
+     DISPLAY VALUE (FIXED)
   =============================== */
 
   const displayValue = useMemo(() => {
     if (inputValue) return inputValue;
 
-    if (resolving) return "Detecting location...";
-
+    // 🔥 instant cached display
     if (viewLocation?.suburb) {
       return formatLocationDisplay(viewLocation);
     }
 
+    // 🔥 first load only
+    if (!hasResolvedOnce) {
+      return "Detecting location...";
+    }
+
+    if (resolving) {
+      return "Updating location...";
+    }
+
     return "Set location";
-  }, [inputValue, resolving, viewLocation]);
+  }, [inputValue, resolving, viewLocation, hasResolvedOnce]);
+
+  /* ===============================
+     LOAD CACHE (INSTANT UX)
+  =============================== */
+
+  useEffect(() => {
+    const cached = loadCachedLocation();
+
+    if (cached) {
+      setViewLocation(cached, "cache");
+      setHasResolvedOnce(true);
+      setResolving(false);
+    }
+  }, [setViewLocation]);
 
   /* ===============================
      SYNC LOCATION → INPUT
@@ -116,7 +165,7 @@ export default function CommunityPlusHeader({ onLogout }) {
   }, [viewLocation]);
 
   /* ===============================
-     LOCATION SERVICE (STABLE)
+     LOCATION SERVICE
   =============================== */
 
   useEffect(() => {
@@ -124,9 +173,9 @@ export default function CommunityPlusHeader({ onLogout }) {
 
     setResolving(true);
 
-    // 🔥 HARD TIMEOUT (fix spinner issue)
     resolveTimeoutRef.current = setTimeout(() => {
       setResolving(false);
+      setHasResolvedOnce(true);
     }, 8000);
 
     locationService.start(resolveLocation);
@@ -142,12 +191,16 @@ export default function CommunityPlusHeader({ onLogout }) {
         };
 
         setViewLocation(clean, "auto");
+        saveLocation(clean);
+
         setResolving(false);
+        setHasResolvedOnce(true);
       }
 
       if (event.type === "error") {
         clearTimeout(resolveTimeoutRef.current);
         setResolving(false);
+        setHasResolvedOnce(true);
       }
     });
 
@@ -170,72 +223,64 @@ export default function CommunityPlusHeader({ onLogout }) {
   }, []);
 
   /* ===============================
-     AUTOCOMPLETE (SAFE)
+     AUTOCOMPLETE
   =============================== */
 
   useEffect(() => {
     if (!isLoaded) return;
     if (!window.google?.maps?.places) return;
-    if (!inputRef.current) return;
-    if (autocompleteRef.current) return;
+    if (!inputRef.current || autocompleteRef.current) return;
 
-    try {
-      const el = new window.google.maps.places.PlaceAutocompleteElement({
-        types: ["geocode"],
-        componentRestrictions: { country: "au" },
+    const el = new window.google.maps.places.PlaceAutocompleteElement({
+      types: ["geocode"],
+      componentRestrictions: { country: "au" },
+    });
+
+    el.style.position = "absolute";
+    el.style.inset = "0";
+    el.style.opacity = "0";
+
+    const container = inputRef.current.parentElement;
+    container.style.position = "relative";
+    container.appendChild(el);
+
+    autocompleteRef.current = el;
+
+    const handleSelect = async (e) => {
+      const place = e.placePrediction?.toPlace();
+      if (!place) return;
+
+      await place.fetchFields({
+        fields: ["location", "id"],
       });
 
-      el.style.position = "absolute";
-      el.style.inset = "0";
-      el.style.opacity = "0";
+      const lat = place.location?.lat();
+      const lng = place.location?.lng();
+      if (!lat || !lng) return;
 
-      const container = inputRef.current.parentElement;
-      container.style.position = "relative";
-      container.appendChild(el);
+      const enriched = await resolveLocation({
+        lat,
+        lng,
+        accuracy: 50,
+        placeId: place.id,
+      });
 
-      autocompleteRef.current = el;
-
-      const handleSelect = async (e) => {
-        try {
-          const place = e.placePrediction?.toPlace();
-          if (!place) return;
-
-          await place.fetchFields({
-            fields: ["location", "id"],
-          });
-
-          const lat = place.location?.lat();
-          const lng = place.location?.lng();
-          if (!lat || !lng) return;
-
-          const enriched = await resolveLocation({
-            lat,
-            lng,
-            accuracy: 50,
-            placeId: place.id,
-          });
-
-          const clean = {
-            ...enriched,
-            street: null,
-            label: formatLocationDisplay(enriched),
-          };
-
-          setViewLocation(clean, "manual");
-          setInputValue(formatLocationDisplay(clean));
-        } catch (err) {
-          console.error("Autocomplete error:", err);
-        }
+      const clean = {
+        ...enriched,
+        street: null,
+        label: formatLocationDisplay(enriched),
       };
 
-      el.addEventListener("gmp-placeselect", handleSelect);
+      setViewLocation(clean, "manual");
+      setInputValue(formatLocationDisplay(clean));
+      saveLocation(clean);
+    };
 
-      return () => {
-        el.removeEventListener("gmp-placeselect", handleSelect);
-      };
-    } catch (err) {
-      console.error("Autocomplete init failed:", err);
-    }
+    el.addEventListener("gmp-placeselect", handleSelect);
+
+    return () => {
+      el.removeEventListener("gmp-placeselect", handleSelect);
+    };
   }, [isLoaded, setViewLocation]);
 
   /* ===============================
@@ -245,7 +290,6 @@ export default function CommunityPlusHeader({ onLogout }) {
   return (
     <header className="header-root">
       <div className="header-row">
-        {/* LEFT */}
         <div className="header-left">
           <img
             src="/logo/logo.png"
@@ -271,12 +315,10 @@ export default function CommunityPlusHeader({ onLogout }) {
           </div>
         </div>
 
-        {/* CENTER */}
         <div className="header-center">
           <input className="search-input" placeholder="Search" />
         </div>
 
-        {/* RIGHT */}
         <div className="header-right">
           <div className="user-block">
             <span className="username">
@@ -285,7 +327,7 @@ export default function CommunityPlusHeader({ onLogout }) {
 
             <div
               className="avatar"
-              onClick={() => setShowMenu((prev) => !prev)}
+              onClick={() => setShowMenu((p) => !p)}
             >
               {initials}
             </div>
@@ -300,7 +342,6 @@ export default function CommunityPlusHeader({ onLogout }) {
         </div>
       </div>
 
-      {/* NAV */}
       <nav className="header-nav">
         {nav.items.map((item) => {
           const active = isActiveRoute(item.path);
