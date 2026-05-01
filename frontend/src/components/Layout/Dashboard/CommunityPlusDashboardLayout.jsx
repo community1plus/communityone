@@ -1,92 +1,34 @@
 import { Outlet } from "react-router-dom";
-import { useEffect, useRef } from "react";
 
-import CommunityPlusHeader from "../Header/CommunityPlusHeader";
+import Header from "../Header/Header";
 import CommunityPlusSidebar from "../Sidebar/CommunityPlusSidebar";
-
-import { useMap } from "../../../context/MapContext";
 
 import "./CommunityPlusDashboardLayout.css";
 
-/* ===============================
-CONFIG
-=============================== */
-
-const DEFAULT_LOCATION = {
-lat: -37.8136, // Melbourne fallback
-lng: 144.9631,
-accuracy: 1000,
-};
-
 export default function CommunityPlusDashboardLayout() {
-const { updateUserLocation, hasResolvedLocation } = useMap();
+  return (
+    <div className="dashboard-root">
 
-const hasRequestedLocation = useRef(false); // 🔥 prevents double calls
+      {/* ================= HEADER ================= */}
+      <header className="dashboard-header">
+        <Header />
+      </header>
 
-/* ===============================
-LOCATION INITIALISATION
-=============================== */
+      {/* ================= BODY ================= */}
+      <div className="dashboard-body">
 
-useEffect(() => {
-if (hasResolvedLocation) return;
-if (hasRequestedLocation.current) return;
+        {/* SIDEBAR */}
+        <aside className="dashboard-sidebar">
+          <CommunityPlusSidebar />
+        </aside>
 
-hasRequestedLocation.current = true;
+        {/* CONTENT */}
+        <main className="dashboard-content">
+          <Outlet />
+        </main>
 
-if (!navigator.geolocation) {
-  console.warn("Geolocation not supported → using fallback");
-  updateUserLocation(DEFAULT_LOCATION);
-  return;
-}
+      </div>
 
-navigator.geolocation.getCurrentPosition(
-  (pos) => {
-    updateUserLocation({
-      lat: pos.coords.latitude,
-      lng: pos.coords.longitude,
-      accuracy: pos.coords.accuracy,
-    });
-  },
-  (err) => {
-    console.warn("⚠️ Geolocation denied → using fallback", err);
-    updateUserLocation(DEFAULT_LOCATION);
-  },
-  {
-    enableHighAccuracy: true,
-    timeout: 10000,
-    maximumAge: 30000,
-  }
-);
-
-}, [hasResolvedLocation, updateUserLocation]);
-
-/* ===============================
-RENDER
-=============================== */
-
-return ( <div className="dashboard-root">
-
-  {/* HEADER */}
-  <div className="dashboard-header">
-    <CommunityPlusHeader />
-  </div>
-
-  {/* BODY */}
-  <div className="dashboard-body">
-
-    {/* SIDEBAR */}
-    <aside className="dashboard-sidebar">
-      <CommunityPlusSidebar />
-    </aside>
-
-    {/* CONTENT */}
-    <main className="dashboard-content">
-      <Outlet />
-    </main>
-
-  </div>
-</div>
-
-
-);
+    </div>
+  );
 }
