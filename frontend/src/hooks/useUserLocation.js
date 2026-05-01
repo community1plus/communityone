@@ -1,68 +1,36 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { resolveLocation } from "../services/resolveLocation";
 
-/* ===============================
-   CONFIG
-=============================== */
-
 const CACHE_KEY = "user_location_cache";
-const CACHE_TTL = 1000 * 60 * 10; // 10 mins
+const CACHE_TTL = 1000 * 60 * 10;
 
-/* ===============================
-   GLOBAL STATE (🔥 KEY FIX)
-=============================== */
+export function useUserLocation() {
+  const [location, setLocation] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-// persists across re-renders + remounts
-let locationPromise = null;
-let resolvedCache = null;
+  const hasFetched = useRef(false);
 
-/* ===============================
-   HELPERS
-=============================== */
+  const fetchLocation = useCallback(() => {
+    if (hasFetched.current) return;
+    hasFetched.current = true;
 
-const loadCache = () => {
-  try {
-    const cached = JSON.parse(localStorage.getItem(CACHE_KEY));
-    if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-      return cached.data;
+    /* CACHE */
+    try {
+      const cached = JSON.parse(localStorage.getItem(CACHE_KEY));
+      if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+        setLocation(cached.data);
+        setLoading(false);
+        return;
+      }
+    } catch (e) {
+      console.warn("Cache read failed", e);
     }
-  } catch {}
-  return null;
-};
 
-const saveCache = (data) => {
-  try {
-    localStorage.setItem(
-      CACHE_KEY,
-      JSON.stringify({
-        data,
-        timestamp: Date.now(),
-      })
-    );
-  } catch {}
-};
-
-/* ===============================
-   CORE FETCH (DEDUPED)
-=============================== */
-
-const fetchLocation = async () => {
-  // 1. in-memory cache
-  if (resolvedCache) return resolvedCache;
-
-  // 2. localStorage cache
-  const cached = loadCache();
-  if (cached) {
-    resolvedCache = cached;
-    return cached;
-  }
-
-  // 3. dedupe concurrent calls
-  if (locationPromise) return locationPromise;
-
-  locationPromise = new Promise((resolve, reject) => {
+    /* GEO */
     if (!navigator.geolocation) {
-      reject(new Error("Geolocation not supported"));
+      setError("Geolocation not supported");
+      setLoading(false);
       return;
     }
 
@@ -77,62 +45,50 @@ const fetchLocation = async () => {
 
           const resolved = await resolveLocation(coords);
 
-          resolvedCache = resolved;
-          saveCache(resolved);
+          if (!resolved) {
+            throw new Error("No location returned");
+          }
 
-          resolve(resolved);
+          setLocation(resolved);
+
+          localStorage.setItem(
+            CACHE_KEY,
+            JSON.stringify({
+              data: resolved,
+              timestamp: Date.now(),
+            })
+          );
         } catch (err) {
-          reject(err);
+          console.error("Resolve failed:", err);
+          setError("Location resolution failed");
+        } finally {
+          setLoading(false);
         }
       },
-      (err) => reject(err),
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 30000,
+      (err) => {
+        console.error("Geolocation error:", err);
+        setError(err.message || "Permission denied");
+        setLoading(false);
       }
     );
-  });
-
-  return locationPromise;
-};
-
-/* ===============================
-   HOOK
-=============================== */
-
-export function useUserLocation() {
-  const [location, setLocation] = useState(resolvedCache || null);
-  const [loading, setLoading] = useState(!resolvedCache);
-  const [error, setError] = useState(null);
+  }, []);
 
   useEffect(() => {
-    let mounted = true;
+    fetchLocation();
+  }, [fetchLocation]);
 
-    fetchLocation()
-      .then((loc) => {
-        if (mounted) {
-          setLocation(loc);
-          setLoading(false);
-        }
-      })
-      .catch((err) => {
-        if (mounted) {
-          console.error("Location error:", err);
-          setError(err.message || "Location failed");
-          setLoading(false);
-        }
-      });
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
+  /* SAFE REFETCH */
+  const refetch = () => {
+    hasFetched.current = false;
+    setLoading(true);
+    setError(null);
+    fetchLocation();
+  };
 
   return {
     location,
     loading,
     error,
-    hasLocation: !!location,
+    refetch,
   };
 }
