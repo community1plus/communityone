@@ -176,13 +176,6 @@ export const NAVIGATION = [
         title: "ACCOUNT",
         items: [
           {
-            id: "profile",
-            label: "Profile",
-            icon: "👤",
-            type: "route",
-            path: "/profile",
-          },
-          {
             id: "logout",
             label: "Logout",
             icon: "🚪",
