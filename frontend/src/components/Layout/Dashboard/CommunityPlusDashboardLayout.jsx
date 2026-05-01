@@ -11,7 +11,7 @@ export default function CommunityPlusDashboardLayout() {
 
       {/* ================= HEADER ================= */}
       <header className="dashboard-header">
-        { /* <Header /> */ }
+        <Header /> 
       </header>
 
       {/* ================= BODY ================= */}

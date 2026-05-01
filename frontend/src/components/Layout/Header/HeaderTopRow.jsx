@@ -18,7 +18,7 @@ export default function HeaderTopRow() {
           onClick={() => navigate("/communityplus")}
         />
 
-        <LocationDisplay />
+        ( /*<LocationDisplay /> */ }
       </div>
 
       <div className="header-center">
@@ -26,7 +26,7 @@ export default function HeaderTopRow() {
       </div>
 
       <div className="header-right">
-        <userMenu />
+        ( /*<userMenu />*/ }
       </div>
     </div>
   );
