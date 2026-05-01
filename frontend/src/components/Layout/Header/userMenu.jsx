@@ -3,7 +3,7 @@ import { useAuth } from "../../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect, useMemo } from "react";
 
-export default function UserMenu() {
+export function UserMenu() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
