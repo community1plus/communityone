@@ -26,7 +26,7 @@ export default function HeaderTopRow() {
       </div>
 
       <div className="header-right">
-        ( /*<userMenu />*/ }
+        { /*<userMenu />*/ }
       </div>
     </div>
   );
