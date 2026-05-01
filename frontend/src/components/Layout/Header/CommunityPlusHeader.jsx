@@ -19,7 +19,7 @@ import { locationService } from "../../../services/locationService";
 import { NAVIGATION } from "../../../config/navigation/navigationConfig";
 
 /* ===============================
-   CACHE HELPERS
+   CACHE
 =============================== */
 
 const STORAGE_KEY = "user_location";
@@ -31,7 +31,6 @@ const loadCachedLocation = () => {
     if (!raw) return null;
 
     const parsed = JSON.parse(raw);
-
     if (Date.now() - parsed.updatedAt > TTL) return null;
 
     return parsed;
@@ -65,10 +64,19 @@ export default function CommunityPlusHeader({ onLogout }) {
   const { user, loading } = useAuth();
   const { isLoaded } = useGoogleMaps();
 
+  // 🔥 PRELOAD CACHE BEFORE RENDER
+  const cachedLocationRef = useRef(loadCachedLocation());
+
   const [showMenu, setShowMenu] = useState(false);
-  const [resolving, setResolving] = useState(false);
-  const [hasResolvedOnce, setHasResolvedOnce] = useState(false);
   const [inputValue, setInputValue] = useState("");
+
+  const [hasResolvedOnce, setHasResolvedOnce] = useState(
+    !!cachedLocationRef.current
+  );
+
+  const [resolving, setResolving] = useState(
+    !cachedLocationRef.current
+  );
 
   const inputRef = useRef(null);
   const autocompleteRef = useRef(null);
@@ -115,18 +123,26 @@ export default function CommunityPlusHeader({ onLogout }) {
   );
 
   /* ===============================
-     DISPLAY VALUE (FIXED)
+     HYDRATE CACHE (NO FLICKER)
+  =============================== */
+
+  useEffect(() => {
+    if (cachedLocationRef.current) {
+      setViewLocation(cachedLocationRef.current, "cache");
+    }
+  }, [setViewLocation]);
+
+  /* ===============================
+     DISPLAY VALUE (FINAL)
   =============================== */
 
   const displayValue = useMemo(() => {
     if (inputValue) return inputValue;
 
-    // 🔥 instant cached display
     if (viewLocation?.suburb) {
       return formatLocationDisplay(viewLocation);
     }
 
-    // 🔥 first load only
     if (!hasResolvedOnce) {
       return "Detecting location...";
     }
@@ -139,20 +155,6 @@ export default function CommunityPlusHeader({ onLogout }) {
   }, [inputValue, resolving, viewLocation, hasResolvedOnce]);
 
   /* ===============================
-     LOAD CACHE (INSTANT UX)
-  =============================== */
-
-  useEffect(() => {
-    const cached = loadCachedLocation();
-
-    if (cached) {
-      setViewLocation(cached, "cache");
-      setHasResolvedOnce(true);
-      setResolving(false);
-    }
-  }, [setViewLocation]);
-
-  /* ===============================
      SYNC LOCATION → INPUT
   =============================== */
 
@@ -160,7 +162,6 @@ export default function CommunityPlusHeader({ onLogout }) {
     if (!viewLocation) return;
 
     const formatted = formatLocationDisplay(viewLocation);
-
     setInputValue((prev) => prev || formatted);
   }, [viewLocation]);
 
@@ -170,8 +171,6 @@ export default function CommunityPlusHeader({ onLogout }) {
 
   useEffect(() => {
     if (!navigator.geolocation) return;
-
-    setResolving(true);
 
     resolveTimeoutRef.current = setTimeout(() => {
       setResolving(false);
@@ -216,10 +215,7 @@ export default function CommunityPlusHeader({ onLogout }) {
 
   const handleResolveLocation = useCallback(() => {
     setResolving(true);
-
-    if (locationService.resolveNow) {
-      locationService.resolveNow();
-    }
+    locationService.resolveNow?.();
   }, []);
 
   /* ===============================
