@@ -26,9 +26,11 @@ const getCached = (key) => {
    HELPERS
 =============================== */
 
-const getComponent = (components, types) => {
+const getComponent = (components = [], types = []) => {
   for (let type of types) {
-    const match = components.find((c) => c.types.includes(type));
+    const match = components.find((c) =>
+      c?.types?.includes(type)
+    );
     if (match) return match.long_name;
   }
   return null;
@@ -61,7 +63,7 @@ const getDistance = (a, b) => {
 };
 
 /* ===============================
-   🚀 RESULT SELECTION (FIXED)
+   RESULT FILTERING
 =============================== */
 
 const GOOD_TYPES = [
@@ -88,11 +90,11 @@ const pickBestResult = (results, origin) => {
   if (!results?.length) return null;
 
   const cleaned = results.filter(
-    (r) => !isBadAddress(r.formatted_address)
+    (r) => !isBadAddress(r?.formatted_address || "")
   );
 
   const good = cleaned.filter((r) =>
-    GOOD_TYPES.some((t) => r.types.includes(t))
+    GOOD_TYPES.some((t) => r.types?.includes(t))
   );
 
   const pool =
@@ -107,9 +109,9 @@ const pickBestResult = (results, origin) => {
 
     const point = {
       lat:
-        typeof loc.lat === "function" ? loc.lat() : loc.lat,
+        typeof loc?.lat === "function" ? loc.lat() : loc?.lat,
       lng:
-        typeof loc.lng === "function" ? loc.lng() : loc.lng,
+        typeof loc?.lng === "function" ? loc.lng() : loc?.lng,
     };
 
     const dist = origin ? getDistance(origin, point) : 0;
@@ -119,7 +121,7 @@ const pickBestResult = (results, origin) => {
 
   ranked.sort((a, b) => a.dist - b.dist);
 
-  return ranked[0].r;
+  return ranked[0]?.r || null;
 };
 
 /* ===============================
@@ -141,7 +143,7 @@ const getConfidence = (accuracy) => {
 };
 
 /* ===============================
-   ROAD SNAP
+   SNAP TO ROAD (SAFE)
 =============================== */
 
 const snapToRoad = async (lat, lng) => {
@@ -152,7 +154,7 @@ const snapToRoad = async (lat, lng) => {
 
     const data = await res.json();
 
-    if (data.snappedPoints?.length) {
+    if (data?.snappedPoints?.length) {
       const p = data.snappedPoints[0].location;
 
       return {
@@ -161,7 +163,7 @@ const snapToRoad = async (lat, lng) => {
       };
     }
   } catch (err) {
-    console.warn("snapToRoad failed:", err);
+    console.warn("⚠️ snapToRoad failed:", err);
   }
 
   return { lat, lng };
@@ -182,22 +184,23 @@ async function resolveWithOSM(lat, lng) {
     return {
       lat,
       lng,
-      suburb: data.address?.suburb || data.address?.city,
-      state: data.address?.state,
-      label: data.display_name,
-      fullLabel: data.display_name,
+      suburb: data?.address?.suburb || data?.address?.city,
+      state: data?.address?.state,
+      label: data?.display_name || "Unknown location",
+      fullLabel: data?.display_name,
       precisionLevel: 3,
       confidence: "low",
       source: "osm",
       updatedAt: Date.now(),
     };
-  } catch {
+  } catch (e) {
+    console.error("❌ OSM fallback failed", e);
     return null;
   }
 }
 
 /* ===============================
-   MAIN RESOLVER
+   MAIN RESOLVER (SAFE)
 =============================== */
 
 export async function resolveLocation({
@@ -209,16 +212,17 @@ export async function resolveLocation({
   try {
     const cacheKey = getCacheKey(lat, lng);
     const cached = getCached(cacheKey);
-    if (cached) return cached;
+
+    if (cached) {
+      console.log("📦 Using cached location");
+      return cached;
+    }
 
     /* SNAP */
     if (accuracy > 30 && accuracy < 200) {
       const snapped = await snapToRoad(lat, lng);
 
-      const moved = getDistance(
-        { lat, lng },
-        snapped
-      );
+      const moved = getDistance({ lat, lng }, snapped);
 
       if (moved < 50) {
         lat = snapped.lat;
@@ -226,39 +230,50 @@ export async function resolveLocation({
       }
     }
 
-    let result;
+    let result = null;
 
     /* PLACE DETAILS */
     if (placeId) {
-      const res = await fetch(
-        `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&key=${GOOGLE_API_KEY}`
-      );
+      try {
+        const res = await fetch(
+          `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&key=${GOOGLE_API_KEY}`
+        );
 
-      const data = await res.json();
+        const data = await res.json();
 
-      if (data.status === "OK") {
-        result = {
-          ...data.result,
-          address_components: data.result.address_components,
-          formatted_address: data.result.formatted_address,
-          types: ["street_address"],
-        };
+        if (data?.status === "OK" && data?.result) {
+          result = {
+            ...data.result,
+            address_components: data.result.address_components || [],
+            formatted_address: data.result.formatted_address || "",
+            types: ["street_address"],
+          };
+        }
+      } catch (e) {
+        console.warn("⚠️ place details failed", e);
       }
     }
 
     /* GEOCODE */
     if (!result) {
-      const res = await fetch(
-        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${GOOGLE_API_KEY}`
-      );
+      try {
+        const res = await fetch(
+          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${GOOGLE_API_KEY}`
+        );
 
-      const data = await res.json();
+        const data = await res.json();
 
-      if (data.status !== "OK" || !data.results?.length) {
-        throw new Error("Geocode failed");
+        if (data?.status === "OK" && data?.results?.length) {
+          result = pickBestResult(data.results, { lat, lng });
+        }
+      } catch (e) {
+        console.warn("⚠️ geocode failed", e);
       }
+    }
 
-      result = pickBestResult(data.results, { lat, lng });
+    /* HARD SAFETY */
+    if (!result || !result.address_components) {
+      throw new Error("No valid geocode result");
     }
 
     const components = result.address_components;
@@ -287,7 +302,6 @@ export async function resolveLocation({
     const precisionLevel = getPrecisionLevel(accuracy, hasStreet);
     const confidence = getConfidence(accuracy);
 
-    /* 🔥 CRITICAL FIX */
     let safeStreet = fullStreet;
 
     if (precisionLevel < 4 || confidence === "low") {
@@ -298,7 +312,7 @@ export async function resolveLocation({
     let hint = null;
 
     if (precisionLevel >= 5 && confidence === "high") {
-      label = result.formatted_address;
+      label = result.formatted_address || "Unknown location";
     } else if (precisionLevel >= 4 && safeStreet) {
       label = `${safeStreet}, ${finalSuburb}`;
     } else {
@@ -313,21 +327,17 @@ export async function resolveLocation({
       lat,
       lng,
       accuracy,
-
       street: safeStreet,
       suburb: finalSuburb,
       city,
       state,
       postcode,
-
       label,
-      fullLabel: result.formatted_address,
+      fullLabel: result.formatted_address || label,
       hint,
-
       precisionLevel,
       confidence,
       source: placeId ? "places" : "google",
-
       updatedAt: Date.now(),
     };
 
@@ -341,7 +351,7 @@ export async function resolveLocation({
     return location;
 
   } catch (err) {
-    console.error("❌ resolveLocation failed:", err);
+    console.error("❌ resolveLocation failed safely:", err);
 
     const fallback = await resolveWithOSM(lat, lng);
     if (fallback) return fallback;
