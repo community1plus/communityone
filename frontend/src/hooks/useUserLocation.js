@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { resolveLocation } from "../utils/resolveLocation";
+import { resolveLocation } from "../services/resolveLocation";
 
 /* ===============================
    CONFIG
