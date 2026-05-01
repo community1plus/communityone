@@ -45,6 +45,7 @@ export default function CommunityPlusHeader({ onLogout }) {
 
   const inputRef = useRef(null);
   const autocompleteRef = useRef(null);
+  const resolveTimeoutRef = useRef(null);
 
   /* ===============================
      USER
@@ -87,7 +88,7 @@ export default function CommunityPlusHeader({ onLogout }) {
   );
 
   /* ===============================
-     DISPLAY VALUE (FIXED)
+     DISPLAY VALUE
   =============================== */
 
   const displayValue = useMemo(() => {
@@ -96,10 +97,10 @@ export default function CommunityPlusHeader({ onLogout }) {
     if (resolving) return "Detecting location...";
 
     if (viewLocation?.suburb) {
-      return `${viewLocation.suburb}, ${viewLocation.state}`;
+      return formatLocationDisplay(viewLocation);
     }
 
-    return "Enable location";
+    return "Set location";
   }, [inputValue, resolving, viewLocation]);
 
   /* ===============================
@@ -115,40 +116,49 @@ export default function CommunityPlusHeader({ onLogout }) {
   }, [viewLocation]);
 
   /* ===============================
-     LOCATION SERVICE (FIXED)
+     LOCATION SERVICE (STABLE)
   =============================== */
 
   useEffect(() => {
     if (!navigator.geolocation) return;
 
-    // 🔥 prevent duplicate starts
-    if (!locationService.isRunning) {
-      setResolving(true);
-      locationService.start(resolveLocation);
-    }
+    setResolving(true);
+
+    // 🔥 HARD TIMEOUT (fix spinner issue)
+    resolveTimeoutRef.current = setTimeout(() => {
+      setResolving(false);
+    }, 8000);
+
+    locationService.start(resolveLocation);
 
     const unsubscribe = locationService.subscribe((event) => {
       if (event.type === "location") {
-        const loc = {
+        clearTimeout(resolveTimeoutRef.current);
+
+        const clean = {
           ...event.data,
           street: null,
           label: formatLocationDisplay(event.data),
         };
 
-        setViewLocation(loc, "auto");
+        setViewLocation(clean, "auto");
         setResolving(false);
       }
 
       if (event.type === "error") {
+        clearTimeout(resolveTimeoutRef.current);
         setResolving(false);
       }
     });
 
-    return () => unsubscribe(); // ❌ DO NOT stop service
+    return () => {
+      unsubscribe();
+      clearTimeout(resolveTimeoutRef.current);
+    };
   }, [setViewLocation]);
 
   /* ===============================
-     PIN CLICK (NO RESTART)
+     PIN CLICK
   =============================== */
 
   const handleResolveLocation = useCallback(() => {
@@ -160,7 +170,7 @@ export default function CommunityPlusHeader({ onLogout }) {
   }, []);
 
   /* ===============================
-     AUTOCOMPLETE (SAFE OVERLAY)
+     AUTOCOMPLETE (SAFE)
   =============================== */
 
   useEffect(() => {
@@ -175,7 +185,6 @@ export default function CommunityPlusHeader({ onLogout }) {
         componentRestrictions: { country: "au" },
       });
 
-      // overlay instead of replace
       el.style.position = "absolute";
       el.style.inset = "0";
       el.style.opacity = "0";
@@ -202,11 +211,9 @@ export default function CommunityPlusHeader({ onLogout }) {
           const enriched = await resolveLocation({
             lat,
             lng,
-            accuracy: 100,
+            accuracy: 50,
             placeId: place.id,
           });
-
-          if (!enriched) return;
 
           const clean = {
             ...enriched,
@@ -217,7 +224,7 @@ export default function CommunityPlusHeader({ onLogout }) {
           setViewLocation(clean, "manual");
           setInputValue(formatLocationDisplay(clean));
         } catch (err) {
-          console.error("Autocomplete select error:", err);
+          console.error("Autocomplete error:", err);
         }
       };
 
