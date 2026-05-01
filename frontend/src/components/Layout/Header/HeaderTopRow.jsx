@@ -11,12 +11,12 @@ export default function HeaderTopRow() {
   return (
     <div className="header-row">
       <div className="header-left">
-        <img
+        { /*<img
           src="/logo/logo.png"
           alt="Logo"
           className="logo"
           onClick={() => navigate("/communityplus")}
-        />
+        />*/ }
 
         <LocationDisplay />
       </div>
