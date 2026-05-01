@@ -6,7 +6,7 @@ import HeaderNav from "./HeaderNav";
 export default function Header() {
   return (
     <header className="header">
-      <HeaderTopRow />
+      { /* <HeaderTopRow /> */ }
       <HeaderNav />
     </header>
   );
