@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import LocationDisplay from "./LocationDisplay";
 import SearchBar from "./SearchBar";
-import { UserMenu } from  "./UserMenu";
+import userMenu from  "./userMenu";
 
 export default function HeaderTopRow() {
   const navigate = useNavigate();
