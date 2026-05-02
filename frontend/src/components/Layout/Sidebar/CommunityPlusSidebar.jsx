@@ -1,7 +1,6 @@
 import { useMemo, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { NAVIGATION } from "../../../config/navigation/navigationConfig";
-import { useMap } from "../../../context/MapContext";
 
 import "./CommunityPlusSidebar.css";
 
@@ -9,65 +8,27 @@ export default function CommunityPlusSidebar() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  const { mode, setMode, scope, setScope } = useMap();
-
   const sidebar = useMemo(
     () => NAVIGATION.find((n) => n.group === "sidebar") || { sections: [] },
     []
   );
 
-  const goHome = useCallback(() => {
-    if (pathname !== "/communityplus") {
-      navigate("/communityplus");
-    }
-  }, [pathname, navigate]);
-
   const isActive = useCallback(
     (item) => {
-      if (item.id === "now") {
-        return pathname === "/communityplus/now";
-      }
+      if (!item.path) return false;
 
-      switch (item.type) {
-        case "route":
-          return (
-            item.path &&
-            (pathname === item.path || pathname.startsWith(item.path + "/"))
-          );
-
-        case "mode":
-          return item.value === mode && pathname === "/communityplus";
-
-        case "scope":
-          return item.value === scope && pathname === "/communityplus";
-
-        default:
-          return false;
-      }
+      return pathname === item.path || pathname.startsWith(item.path + "/");
     },
-    [pathname, mode, scope]
+    [pathname]
   );
 
   const handleClick = useCallback(
     (item) => {
-      if (item.id === "now") {
-        navigate("/communityplus/now");
-        return;
-      }
-
       switch (item.type) {
         case "route":
-          if (item.path) navigate(item.path);
-          return;
-
-        case "mode":
-          setMode(item.value);
-          goHome();
-          return;
-
-        case "scope":
-          setScope(item.value);
-          goHome();
+          if (item.path) {
+            navigate(item.path);
+          }
           return;
 
         case "action":
@@ -80,7 +41,7 @@ export default function CommunityPlusSidebar() {
           return;
       }
     },
-    [navigate, setMode, setScope, goHome]
+    [navigate]
   );
 
   return (
