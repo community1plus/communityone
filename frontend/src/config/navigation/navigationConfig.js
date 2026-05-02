@@ -138,13 +138,6 @@ export const NAVIGATION = [
         title: "PLATFORM",
         items: [
           {
-            id: "home",
-            label: "Home",
-            icon: "🏠",
-            type: "route",
-            path: "/home",
-          },
-          {
             id: "yellowpages",
             label: "Yellow Pages",
             icon: "📒",
