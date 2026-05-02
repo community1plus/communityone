@@ -219,6 +219,15 @@
   white-space: nowrap;
 }
 
+.location-edit:focus-within {
+  opacity: 1;
+}
+
+.location-edit {
+  opacity: 0.8;
+  transition: opacity 0.15s ease;
+}
+
 /* NAV LINKS */
 .nav-links {
   display: flex;

@@ -134,13 +134,6 @@ export const NAVIGATION = [
         title: "PLATFORM",
         items: [
           {
-            id: "community",
-            label: "Community+",
-            icon: "🌐",
-            type: "route",
-            path: "/communityplus",
-          },
-          {
             id: "yellowpages",
             label: "Yellow Pages",
             icon: "📒",
@@ -171,14 +164,7 @@ export const NAVIGATION = [
         id: "account",
         title: "ACCOUNT",
         items: [
-          {
-            id: "profile",
-            label: "Profile",
-            icon: "👤",
-            type: "route",
-            path: "/profile",
-          },
-          {
+         {
             id: "logout",
             label: "Logout",
             icon: "🚪",

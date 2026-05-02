@@ -65,12 +65,20 @@ LOCATION
 }
 
 .location-input {
-  border: none;
-  background: transparent;
-  outline: none;
+  width: 180px;
 
-  font-size: 12.5px;
-  width: 100%;
+  padding: 0;
+  margin: 0;
+
+  border: none;
+  outline: none;
+  background: transparent;
+
+  font-size: 14px;
+  font-weight: 600;
+  color: #4f4943;
+
+  font-family: inherit;
 }
 
 /* =====================================================
