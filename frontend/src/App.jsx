@@ -14,91 +14,81 @@ import CommunityPlusYellowPages from "./pages/CommunityPlusYellowPages/Community
 import CommunityPlusUserProfile from "./pages/CommunityPlusUserProfile/CommunityPlusUserProfile";
 import CommunityPlusNowPostView from "./pages/CommunityPlusNowPostView";
 
-/* =========================
-PROTECTED ROUTE
-========================= */
+/* TEMP PLACEHOLDER */
+function Placeholder({ title }) {
+  return (
+    <div className="dashboard-view">
+      <h1>{title}</h1>
+      <p>{title} page coming soon.</p>
+    </div>
+  );
+}
 
 function ProtectedRoute({ isAuthenticated }) {
-if (!isAuthenticated) {
-return <Navigate to="/" replace />;
-}
+  if (!isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
 
-return <Outlet />;
+  return <Outlet />;
 }
-
-/* =========================
-DASHBOARD PROVIDERS
-========================= */
 
 function DashboardProviders() {
-return ( <GoogleMapsProvider> <MapProvider> <SessionProvider> <Outlet /> </SessionProvider> </MapProvider> </GoogleMapsProvider>
-);
+  return (
+    <GoogleMapsProvider>
+      <MapProvider>
+        <SessionProvider>
+          <Outlet />
+        </SessionProvider>
+      </MapProvider>
+    </GoogleMapsProvider>
+  );
 }
-
-/* =========================
-APP
-========================= */
 
 export default function App() {
-const { loading, isAuthenticated } = useAuth();
+  const { loading, isAuthenticated } = useAuth();
 
-/* =========================
-LOADING STATE
-========================= */
+  if (loading) {
+    return <div style={{ padding: 40 }}>Initialising...</div>;
+  }
 
-if (loading) {
-return <div style={{ padding: 40 }}>Initialising...</div>;
-}
-
-return ( <Routes>
-
-  {/* =========================
-     PUBLIC (SMART REDIRECT)
-  ========================= */}
-
-  <Route
-    path="/"
-    element={
-      isAuthenticated
-        ? <Navigate to="/communityplus" replace />
-        : <CommunityPlusLandingPage />
-    }
-  />
-
-  {/* =========================
-     PROTECTED LAYER
-  ========================= */}
-
-  <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} />}>
-
-    {/* PROVIDERS */}
-    <Route element={<DashboardProviders />}>
-
-      {/* DASHBOARD */}
+  return (
+    <Routes>
       <Route
-        path="/communityplus"
-        element={<CommunityPlusDashboardLayout />}
-      >
-        <Route index element={<CommunityPlusDashboardHome />} />
-        <Route path="profile" element={<CommunityPlusUserProfile />} />
-        <Route path="yellowpages" element={<CommunityPlusYellowPages />} />
-        <Route path="/communityplus/now" element={<CommunityPlusNowPostView />} />
+        path="/"
+        element={
+          isAuthenticated ? (
+            <Navigate to="/communityplus" replace />
+          ) : (
+            <CommunityPlusLandingPage />
+          )
+        }
+      />
 
-        <Route
-          path="*"
-          element={<Navigate to="/communityplus" replace />}
-        />
+      <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} />}>
+        <Route element={<DashboardProviders />}>
+          <Route
+            path="/communityplus"
+            element={<CommunityPlusDashboardLayout />}
+          >
+            <Route index element={<CommunityPlusDashboardHome />} />
+
+            <Route path="now" element={<CommunityPlusNowPostView />} />
+            <Route path="profile" element={<CommunityPlusUserProfile />} />
+            <Route path="yellowpages" element={<CommunityPlusYellowPages />} />
+
+            <Route path="account" element={<Placeholder title="Account" />} />
+            <Route path="inbox" element={<Placeholder title="Inbox" />} />
+            <Route path="help" element={<Placeholder title="Help" />} />
+
+            <Route
+              path="*"
+              element={<Navigate to="/communityplus" replace />}
+            />
+          </Route>
+        </Route>
       </Route>
 
-    </Route>
-  </Route>
-
-  {/* =========================
-     GLOBAL FALLBACK
-  ========================= */}
-
-  <Route path="*" element={<Navigate to="/" replace />} />
-</Routes>
-
-);
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
 }
