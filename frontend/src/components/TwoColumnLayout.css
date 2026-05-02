@@ -57,15 +57,17 @@ LEFT / RIGHT
 
 .two-col-layout.map-mode .two-col-right {
   position: relative;
-  z-index: 1;
   overflow: hidden;
+
+  display: flex;
 }
 
-
-
 .two-col-layout.map-mode .two-col-right .map-wrapper {
-  position: absolute;
-  inset: 0;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+
+  position: relative;
 }
 
 
