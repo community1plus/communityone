@@ -1,5 +1,5 @@
 import TwoColumnLayout from "../components/TwoColumnLayout";
-import FormBuilder from "../components/FormBuilder/FormBuilder";
+import FormBuilder from "../components/UI/FormBuilder";
 
 export default function CommunityNowNowPostView() {
   return (
