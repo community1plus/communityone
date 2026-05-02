@@ -11,38 +11,11 @@ export const NAVIGATION = [
         type: "route",
         path: "/home",
       },
-
-      {
-        id: "feed",
-        label: "Feed",
-        children: [
-          { id: "feed-all", label: "All", path: "/communityplus" },
-          { id: "feed-incidents", label: "Incidents", path: "/incident" },
-          { id: "feed-alerts", label: "Alerts", path: "/alerts" },
-          { id: "feed-beacons", label: "Beacons", path: "/beacon" },
-        ],
-      },
-
-      {
-        id: "posts",
-        label: "Posts",
-        type: "route",
-        path: "/post",
-      },
-
       {
         id: "yellowpages",
         label: "Yellow Pages",
         type: "route",
         path: "/yellowpages",
-      },
-
-      {
-        id: "dashboard",
-        label: "Dashboard",
-        children: [
-          { id: "categories", label: "Categories", path: "/dashboard" },
-        ],
       },
     ],
   },
