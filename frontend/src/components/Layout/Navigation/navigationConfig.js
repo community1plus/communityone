@@ -1,7 +1,4 @@
 export const NAVIGATION = [
-  /* =====================================================
-     HEADER NAV
-  ===================================================== */
   {
     group: "main",
     items: [
@@ -9,48 +6,20 @@ export const NAVIGATION = [
         id: "home",
         label: "Home",
         type: "route",
-        path: "/home",
+        path: "/communityplus",
       },
       {
         id: "yellowpages",
         label: "Yellow Pages",
         type: "route",
-        path: "/yellowpages",
+        path: "/communityplus/yellowpages",
       },
     ],
   },
 
-  /* =====================================================
-     SIDEBAR NAV
-  ===================================================== */
   {
     group: "sidebar",
-
     sections: [
-      /* 🔥 SCOPE (NEW) */
-      {
-        id: "scope",
-        title: "SCOPE",
-        variant: "scope",
-        items: [
-          {
-            id: "scope-local",
-            label: "Local",
-            icon: "📍",
-            type: "scope",
-            value: "LOCAL",
-          },
-          {
-            id: "scope-global",
-            label: "Global",
-            icon: "🌍",
-            type: "scope",
-            value: "GLOBAL",
-          },
-        ],
-      },
-
-      /* 🔥 MODES */
       {
         id: "modes",
         title: "MODES",
@@ -61,18 +30,17 @@ export const NAVIGATION = [
             icon: "⚡",
             type: "route",
             path: "/communityplus/now",
-},
+          },
           {
-            id: "mode-blob",
+            id: "blob",
             label: "BLOB",
             icon: "🧠",
-            type: "mode",
-            value: "BLOB",
+            type: "route",
+            path: "/communityplus/blob",
           },
         ],
       },
 
-      /* ACTIONS */
       {
         id: "actions",
         title: "ACTIONS",
@@ -82,26 +50,25 @@ export const NAVIGATION = [
             label: "Event",
             icon: "📅",
             type: "route",
-            path: "/event",
+            path: "/communityplus/event",
           },
           {
             id: "incident",
             label: "Incident",
             icon: "🚨",
             type: "route",
-            path: "/incident",
+            path: "/communityplus/incident",
           },
           {
             id: "beacon",
             label: "Beacon",
             icon: "📡",
             type: "route",
-            path: "/beacon",
+            path: "/communityplus/beacon",
           },
         ],
       },
 
-      /* PLATFORM */
       {
         id: "platform",
         title: "PLATFORM",
@@ -111,33 +78,30 @@ export const NAVIGATION = [
             label: "Yellow Pages",
             icon: "📒",
             type: "route",
-            path: "/yellowpages",
+            path: "/communityplus/yellowpages",
           },
           {
             id: "channels",
             label: "Channels",
             icon: "📺",
             type: "route",
-            path: "/channels",
+            path: "/communityplus/channels",
           },
-
-          /* 🔥 NEW */
           {
             id: "helpdesk",
             label: "Helpdesk",
             icon: "🛠️",
             type: "route",
-            path: "/helpdesk",
+            path: "/communityplus/helpdesk",
           },
         ],
       },
 
-      /* ACCOUNT */
       {
         id: "account",
         title: "ACCOUNT",
         items: [
-         {
+          {
             id: "logout",
             label: "Logout",
             icon: "🚪",
