@@ -145,13 +145,6 @@ export const NAVIGATION = [
             path: "/home",
           },
           {
-            id: "community",
-            label: "Community+",
-            icon: "🌐",
-            type: "route",
-            path: "/communityplus",
-          },
-          {
             id: "yellowpages",
             label: "Yellow Pages",
             icon: "📒",
