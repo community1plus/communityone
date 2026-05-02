@@ -5,7 +5,7 @@ import { apiFetch } from "../src/services/api";
    API FETCH (🔥 CORE)
 ===================================================== */
 import { useAuth } from "../src/context/AuthContext";
-import { useUI } from "../src/context/UIContext";
+
 
 /* =====================================================
    API HOOK (🔥 CENTRALIZED)
