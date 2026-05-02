@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import TwoColumnLayout from "../components/Layout/TwoColumnLayout/TwoColumnLayout";
-import FormBuilder from "../components/FormBuilder/FormBuilder";
+import TwoColumnLayout from "../components/TwoColumnLayout";
+import FormBuilder from "../components/UI/Form/FormBuilder";
 
 const steps = [
   {
