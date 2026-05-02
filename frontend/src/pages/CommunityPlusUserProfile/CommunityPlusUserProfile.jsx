@@ -5,7 +5,6 @@ import { Autocomplete, useJsApiLoader } from "@react-google-maps/api";
 import { useLocationContext } from "../../context/LocationProvider";
 import { useAuth } from "../../context/AuthContext";
 
-
 import useAPI from "../../../hooks/useAPI";
 import useAutosave from "../../../hooks/useAutosave";
 import useOptimisticUpdate from "../../hooks/useOptimisticUpdate";
@@ -28,15 +27,13 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
   const autoRef = useRef(null);
 
   const { appUser, setAppUser } = useAuth();
-  const { homeLocation, setHome } = useLocationContext();
-  const { startSaving, stopSaving } = useUI();
+  const { homeLocation, setViewLocation } = useLocationContext();
 
   const api = useAPI();
   const optimistic = useOptimisticUpdate();
 
-  /* =========================
-     FORM
-  ========================= */
+  const startSaving = () => {};
+  const stopSaving = () => {};
 
   const form = useForm({
     initialValues: {
@@ -51,22 +48,13 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
 
   const { values, validateAll, setValue, isFormValidating, clearStorage } = form;
 
-  /* =========================
-     DIRTY TRACKING (MEMO SAFE)
-  ========================= */
-
   const trackedValues = useMemo(
     () => ({ ...values, homeLocation }),
     [values, homeLocation]
   );
 
   const { dirtyFields, resetDirty } = useDirtyFields(trackedValues);
-
   const hasDirty = Object.keys(dirtyFields).length > 0;
-
-  /* =========================
-     STEP
-  ========================= */
 
   const [currentStep, setCurrentStep] = useState(0);
 
@@ -79,20 +67,12 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
     localStorage.setItem("profile-step", currentStep);
   }, [currentStep]);
 
-  /* =========================
-     PREFILL
-  ========================= */
-
   useEffect(() => {
     if (!appUser?.user?.email) return;
 
     const prefix = appUser.user.email.split("@")[0];
     setValue("username", (prev) => prev || prefix);
   }, [appUser?.user?.email, setValue]);
-
-  /* =========================
-     GOOGLE
-  ========================= */
 
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
@@ -103,16 +83,16 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
     const place = autoRef.current?.getPlace();
     if (!place?.geometry) return;
 
-    setHome({
-      label: place.formatted_address,
-      lat: place.geometry.location.lat(),
-      lng: place.geometry.location.lng(),
-    });
-  }, [setHome]);
-
-  /* =========================
-     🔥 AUTOSAVE (VERSION SAFE)
-  ========================= */
+    setViewLocation(
+      {
+        label: place.formatted_address,
+        lat: place.geometry.location.lat(),
+        lng: place.geometry.location.lng(),
+        type: "home",
+      },
+      "auto"
+    );
+  }, [setViewLocation]);
 
   useAutosave({
     data: dirtyFields,
@@ -127,7 +107,6 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
 
         const patch = buildPatch(dirtyFields);
 
-        /* 🔥 OPTIMISTIC */
         const { nextState, opId: id } = optimistic.applyOptimistic(
           key,
           appUser,
@@ -143,7 +122,6 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
         opId = id;
         setAppUser(nextState);
 
-        /* 🔥 VERSIONED PATCH */
         const res = await api.patch("/profile", patch, {
           version: appUser?.profile?.version,
           dedupeKey: key,
@@ -160,12 +138,8 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
         }
 
         resetDirty();
-
       } catch (err) {
-        /* 🔥 CONFLICT HANDLING */
         if (err?.status === 409) {
-          console.warn("⚠️ Version conflict");
-
           const serverProfile = err.data?.serverProfile;
 
           if (serverProfile) {
@@ -179,21 +153,15 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
           return;
         }
 
-        /* 🔥 ROLLBACK */
         if (opId) {
           const prev = optimistic.rollback(key, opId);
           if (prev) setAppUser(prev);
         }
-
       } finally {
         stopSaving();
       }
     },
   });
-
-  /* =========================
-     COMPLETE
-  ========================= */
 
   const handleComplete = useCallback(async () => {
     const valid = await validateAll();
@@ -234,40 +202,38 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
       }));
 
       if (mode === "onboarding") {
-        navigate("/home", { replace: true });
+        navigate("/communityplus", { replace: true });
       }
 
       onComplete?.(res);
-
     } catch (err) {
       if (opId) {
         const prev = optimistic.rollback(key, opId);
         if (prev) setAppUser(prev);
       }
-
     } finally {
       stopSaving();
     }
-  }, [values, homeLocation, validateAll, appUser]);
+  }, [
+    validateAll,
+    optimistic,
+    appUser,
+    setAppUser,
+    api,
+    values,
+    homeLocation,
+    clearStorage,
+    mode,
+    navigate,
+    onComplete,
+  ]);
 
-  /* =========================
-     NAVIGATION
-  ========================= */
-
-  const nextStep = () =>
-    setCurrentStep((s) => Math.min(3, s + 1));
-
-  const prevStep = () =>
-    setCurrentStep((s) => Math.max(0, s - 1));
-
-  /* =========================
-     RENDER
-  ========================= */
+  const nextStep = () => setCurrentStep((step) => Math.min(3, step + 1));
+  const prevStep = () => setCurrentStep((step) => Math.max(0, step - 1));
 
   return (
     <div className="profile-container">
       <div className="profile-layout">
-
         <div className="profile-left">
           <div className="profile-page-header">
             <PageHeader
@@ -289,7 +255,7 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
           </Section>
 
           <div className="form-navigation">
-            <Button variant="ghost" onClick={() => navigate("/home")}>
+            <Button variant="ghost" onClick={() => navigate("/communityplus")}>
               Close
             </Button>
 
@@ -316,7 +282,6 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
             meta="Complete all steps to unlock features"
           />
         </div>
-
       </div>
     </div>
   );

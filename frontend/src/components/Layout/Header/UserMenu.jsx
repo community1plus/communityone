@@ -34,20 +34,13 @@ export default function UserMenu() {
 
     return username
       .split(/[\s.-]+/)
-      .map((w) => w[0])
+      .map((word) => word[0])
       .join("")
       .slice(0, 2)
       .toUpperCase();
   }, [username]);
 
-  const menuItems = [
-    { id: "profile", label: "Profile", path: "/communityplus/profile" },
-    { id: "account", label: "Account", path: "/communityplus/account" },
-    { id: "inbox", label: "Inbox", path: "/communityplus/inbox" },
-    { id: "help", label: "Help", path: "/communityplus/help" },
-  ];
-
-  const handleNavigate = (path) => {
+  const goTo = (path) => {
     setOpen(false);
     navigate(path);
   };
@@ -73,17 +66,37 @@ export default function UserMenu() {
 
       {open && (
         <div className="dropdown-menu" role="menu">
-          {menuItems.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              className="menu-item"
-              onClick={() => handleNavigate(item.path)}
-              role="menuitem"
-            >
-              {item.label}
-            </button>
-          ))}
+          <button
+            type="button"
+            className="menu-item"
+            onClick={() => goTo("/communityplus/profile")}
+          >
+            Profile
+          </button>
+
+          <button
+            type="button"
+            className="menu-item"
+            onClick={() => goTo("/communityplus/account")}
+          >
+            Account
+          </button>
+
+          <button
+            type="button"
+            className="menu-item"
+            onClick={() => goTo("/communityplus/inbox")}
+          >
+            Inbox
+          </button>
+
+          <button
+            type="button"
+            className="menu-item"
+            onClick={() => goTo("/communityplus/help")}
+          >
+            Help
+          </button>
 
           <div className="menu-divider" />
 
@@ -91,7 +104,6 @@ export default function UserMenu() {
             type="button"
             className="menu-item danger"
             onClick={handleLogout}
-            role="menuitem"
           >
             Logout
           </button>
