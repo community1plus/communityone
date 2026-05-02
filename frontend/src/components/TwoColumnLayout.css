@@ -35,8 +35,10 @@ LAYOUT
 
 /* MAP MODE: LEFT = MAP, RIGHT = FEED */
 .two-col-layout.map-mode {
+  display: grid;
   grid-template-columns: clamp(340px, 24vw, 420px) minmax(0, 1fr);
-  gap: 0;
+  height: 100%;
+  overflow: hidden;
 }
 
 /* =====================================================
@@ -47,28 +49,22 @@ LEFT / RIGHT
 .two-col-right {
   min-width: 0;
   min-height: 0;
-
   display: flex;
   flex-direction: column;
 }
 
 /* LEFT = MAP */
 .two-col-layout.map-mode .two-col-left {
-  width: 100%;
-  height: 100%;
   position: relative;
   z-index: 2;
-  padding: 16px;
-  gap: 12px;
+  overflow-y: auto;
   background: #faf7f4;
   border-right: 1px solid #e6dfd8;
-  overflow-y: auto;
-  overflow-x: hidden;
 }
 
-/* RIGHT = FEED */
 .two-col-layout.map-mode .two-col-right {
   position: relative;
+  z-index: 1;
   overflow: hidden;
 }
 
@@ -90,15 +86,12 @@ MAP WRAPPER FIX
   width: 100% !important;
   height: 100% !important;
 }
+
 .two-col-layout.map-mode .two-col-right .map-wrapper {
   position: absolute;
   inset: 0;
 }
 
-.two-col-layout.map-mode .two-col-right .map-wrapper > div {
-  width: 100% !important;
-  height: 100% !important;
-}
 
 /* =====================================================
 CARD BASE
