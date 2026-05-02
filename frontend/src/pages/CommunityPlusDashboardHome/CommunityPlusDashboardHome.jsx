@@ -136,8 +136,8 @@ export default function CommunityPlusDashboardHome() {
   return (
     <TwoColumnLayout
       mode="map"
-      left={<Feed />}
-      right={<CommunityMap />}
+      left={<CommunityMap />}
+      right={<Feed />}
     />
   );
 }
