@@ -15,10 +15,39 @@ const LOCATION_STATUS = {
   },
 };
 
+function getAddressComponent(place, type) {
+  return (
+    place?.address_components?.find((component) =>
+      component.types.includes(type)
+    )?.long_name || ""
+  );
+}
+
+function extractLocationFromPlace(place) {
+  const suburb =
+    getAddressComponent(place, "locality") ||
+    getAddressComponent(place, "postal_town") ||
+    getAddressComponent(place, "sublocality") ||
+    getAddressComponent(place, "administrative_area_level_2") ||
+    place?.name ||
+    "Selected location";
+
+  const state =
+    getAddressComponent(place, "administrative_area_level_1") || "";
+
+  return {
+    suburb,
+    state,
+    accuracy: "MANUAL",
+  };
+}
+
 export default function LocationDisplay({ location, onManualSet }) {
   const [editing, setEditing] = useState(false);
   const [inputValue, setInputValue] = useState("");
+
   const inputRef = useRef(null);
+  const autocompleteRef = useRef(null);
 
   const safeLocation = location || {
     suburb: "Enter location",
@@ -30,10 +59,42 @@ export default function LocationDisplay({ location, onManualSet }) {
     LOCATION_STATUS[safeLocation.accuracy] || LOCATION_STATUS.LEVEL_3;
 
   useEffect(() => {
-    if (editing && inputRef.current) {
-      inputRef.current.focus();
+    if (!editing || !inputRef.current) return;
+
+    inputRef.current.focus();
+
+    if (!window.google?.maps?.places) {
+      console.warn("Google Places library is not loaded.");
+      return;
     }
-  }, [editing]);
+
+    autocompleteRef.current = new window.google.maps.places.Autocomplete(
+      inputRef.current,
+      {
+        types: ["geocode"],
+        componentRestrictions: { country: "au" },
+        fields: ["address_components", "formatted_address", "name", "types"],
+      }
+    );
+
+    const listener = autocompleteRef.current.addListener(
+      "place_changed",
+      () => {
+        const place = autocompleteRef.current.getPlace();
+        const selectedLocation = extractLocationFromPlace(place);
+
+        onManualSet(selectedLocation);
+        setInputValue("");
+        setEditing(false);
+      }
+    );
+
+    return () => {
+      if (listener) {
+        window.google.maps.event.removeListener(listener);
+      }
+    };
+  }, [editing, onManualSet]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -61,9 +122,12 @@ export default function LocationDisplay({ location, onManualSet }) {
           className="location-input"
           value={inputValue}
           placeholder="Enter location"
+          autoComplete="off"
           onChange={(e) => setInputValue(e.target.value)}
           onBlur={() => {
-            if (!inputValue.trim()) setEditing(false);
+            setTimeout(() => {
+              if (!inputValue.trim()) setEditing(false);
+            }, 150);
           }}
         />
       </form>
