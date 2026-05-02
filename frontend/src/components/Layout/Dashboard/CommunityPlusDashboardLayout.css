@@ -60,12 +60,12 @@ SIDEBAR
   display: flex;
   flex-direction: column;
 
-  background: #111;
-  color: #fff;
+  background: #fbf9f7;
+  overflow: hidden;
+  
 
   border-right: 1px solid rgba(255, 255, 255, 0.08);
 
-  overflow: hidden;
 }
 
 /* =========================

@@ -206,9 +206,17 @@
   min-width: 0;
 }
 
+.location-edit {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  opacity: 0.85;
+  transition: opacity 0.15s ease;
+}
+
 .location-input {
   width: 180px;
-  padding: 0;
+  padding: 0 0 0 4px;
   margin: 0;
 
   border: none;
@@ -219,11 +227,6 @@
   font-size: 14px;
   font-weight: 600;
   color: #4f4943;
-}
-
-.location-edit {
-  opacity: 0.85;
-  transition: opacity 0.15s ease;
 }
 
 .location-edit:focus-within {

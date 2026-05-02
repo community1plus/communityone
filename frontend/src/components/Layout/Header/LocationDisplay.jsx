@@ -35,9 +35,13 @@ function extractLocationFromPlace(place) {
   const state =
     getAddressComponent(place, "administrative_area_level_1") || "";
 
+  const label = [suburb, state].filter(Boolean).join(", ");
+
   return {
     suburb,
     state,
+    label,
+    type: "manual",
     accuracy: "MANUAL",
   };
 }
@@ -52,11 +56,24 @@ export default function LocationDisplay({ location, onManualSet }) {
   const safeLocation = location || {
     suburb: "Enter location",
     state: "",
+    label: "Enter location",
+    type: "auto",
     accuracy: "LEVEL_3",
   };
 
   const status =
     LOCATION_STATUS[safeLocation.accuracy] || LOCATION_STATUS.LEVEL_3;
+
+  const isManual = safeLocation.type === "manual";
+
+  const toggleTitle = isManual
+    ? "Switch to auto location"
+    : "Switch to manual location";
+
+  const displayLabel =
+    safeLocation.label ||
+    [safeLocation.suburb, safeLocation.state].filter(Boolean).join(", ") ||
+    "Enter location";
 
   useEffect(() => {
     if (!editing || !inputRef.current) return;
@@ -105,6 +122,8 @@ export default function LocationDisplay({ location, onManualSet }) {
     onManualSet({
       suburb: value,
       state: "",
+      label: value,
+      type: "manual",
       accuracy: "MANUAL",
     });
 
@@ -140,15 +159,12 @@ export default function LocationDisplay({ location, onManualSet }) {
         type="button"
         className={`location-pin-button ${status.className}`}
         onClick={() => setEditing(true)}
-        title="Manually set location"
+        title={toggleTitle}
       >
         ●
       </button>
 
-      <span className="location-text">
-        {safeLocation.suburb}
-        {safeLocation.state ? `, ${safeLocation.state}` : ""}
-      </span>
+      <span className="location-text">{displayLabel}</span>
     </div>
   );
 }
