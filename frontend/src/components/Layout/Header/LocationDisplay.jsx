@@ -1,59 +1,36 @@
-import { useState } from "react";
-import { useUserLocation } from "../../../hooks/useUserLocation";
+const LOCATION_STATUS = {
+  LEVEL_4: {
+    label: "Accurate to Level 4",
+    className: "location-green",
+  },
+  LEVEL_3: {
+    label: "Accurate to Level 3",
+    className: "location-amber",
+  },
+  MANUAL: {
+    label: "Manually fixed",
+    className: "location-red",
+  },
+};
 
-export default function LocationDisplay() {
-  const { location, loading, error, refetch } = useUserLocation();
-
-  const [mode, setMode] = useState("auto");
-  const [input, setInput] = useState("");
-
-  const toggleMode = () => {
-    if (mode === "auto") {
-      setMode("manual");
-    } else {
-      setMode("auto");
-      refetch();
-    }
+export default function LocationDisplay({ location }) {
+  const safeLocation = location || {
+    suburb: "Set location",
+    state: "",
+    accuracy: "LEVEL_3",
   };
 
-  /* SAFE LABEL */
-  const label = loading
-    ? "Detecting..."
-    : location?.label || "Set location";
-
-  const pinColor = loading
-    ? "#999"
-    : location
-    ? "#2ecc71"
-    : "#e74c3c";
+  const status =
+    LOCATION_STATUS[safeLocation.accuracy] || LOCATION_STATUS.LEVEL_3;
 
   return (
-    <div className="location-display">
+    <div className="location-display" title={status.label}>
+      <span className={`location-pin ${status.className}`}>●</span>
 
-      <span
-        onClick={toggleMode}
-        style={{ color: pinColor, cursor: "pointer" }}
-      >
-        📍
+      <span className="location-text">
+        {safeLocation.suburb}
+        {safeLocation.state ? `, ${safeLocation.state}` : ""}
       </span>
-
-      {mode === "auto" ? (
-        <span>{label}</span>
-      ) : (
-        <input
-          placeholder="Enter location..."
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-        />
-      )}
-
-      {/* DEBUG SAFETY */}
-      {error && (
-        <span style={{ color: "red", fontSize: 10 }}>
-          {error}
-        </span>
-      )}
-
     </div>
   );
 }

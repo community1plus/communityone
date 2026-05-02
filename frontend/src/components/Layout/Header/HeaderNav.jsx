@@ -1,4 +1,4 @@
-// HeaderNav.jsx
+import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 import LocationDisplay from "./LocationDisplay";
@@ -6,17 +6,39 @@ import { NAVIGATION } from "../../../config/navigation/navigationConfig";
 
 export default function HeaderNav() {
   const navigate = useNavigate();
-  const location = useLocation();
+  const routeLocation = useLocation();
+
+  const [currentLocation, setCurrentLocation] = useState({
+    suburb: "Wheelers Hill",
+    state: "Victoria",
+    accuracy: "LEVEL_4",
+  });
 
   const nav = NAVIGATION.find((n) => n.group === "main")?.items || [];
 
   const isActive = (path) =>
-    location.pathname === path || location.pathname.startsWith(path + "/");
+    routeLocation.pathname === path ||
+    routeLocation.pathname.startsWith(path + "/");
+
+  const handleManualLocationFix = () => {
+    setCurrentLocation({
+      suburb: "Wheelers Hill",
+      state: "Victoria",
+      accuracy: "MANUAL",
+    });
+  };
 
   return (
     <nav className="header-nav" aria-label="Primary navigation">
       <div className="nav-left">
-        <LocationDisplay />
+        <button
+          type="button"
+          className="location-button"
+          onClick={handleManualLocationFix}
+          title="Click to manually fix location"
+        >
+          <LocationDisplay location={currentLocation} />
+        </button>
       </div>
 
       <div className="nav-links">

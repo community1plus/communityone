@@ -347,3 +347,37 @@
     white-space: nowrap;
   }
 }
+
+.location-display {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+
+  font-size: 14px;
+  font-weight: 600;
+  color: #4f4943;
+
+  white-space: nowrap;
+}
+
+.location-pin {
+  font-size: 13px;
+  line-height: 1;
+}
+
+.location-green {
+  color: #1f9d55;
+}
+
+.location-amber {
+  color: #f59e0b;
+}
+
+.location-red {
+  color: #dc2626;
+}
+
+.location-text {
+  color: #4f4943;
+}
+
