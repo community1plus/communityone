@@ -15,7 +15,7 @@ import outputs from "./amplify_outputs.json";
 ========================= */
 
 import { AuthProvider } from "./context/AuthContext";
-import { UIProvider } from "./context/UIContext";
+{ /*import { UIProvider } from "./context/UIContext"; */ }
 import { LocationProvider } from "./context/LocationProvider.jsx";
 
 /* =========================
