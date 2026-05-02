@@ -61,24 +61,7 @@ LEFT / RIGHT
   overflow: hidden;
 }
 
-/* =====================================================
-MAP WRAPPER FIX
-===================================================== */
 
-.map-wrapper {
-  position: absolute;
-  inset: 0;
-
-  width: 100%;
-  height: 100%;
-
-  overflow: hidden;
-}
-
-.map-wrapper > div {
-  width: 100% !important;
-  height: 100% !important;
-}
 
 .two-col-layout.map-mode .two-col-right .map-wrapper {
   position: absolute;
