@@ -2,7 +2,7 @@ import { useMemo, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { signOut } from "aws-amplify/auth";
 
-import { NAVIGATION } from "../../../config/navigation/navigationConfig";
+import { NAVIGATION } from "../Navigation/navigationConfig";
 import "./CommunityPlusSidebar.css";
 
 export default function CommunityPlusSidebar() {
