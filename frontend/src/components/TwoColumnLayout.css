@@ -2,18 +2,18 @@
 CONTAINER
 ===================================================== */
 
-/* Default (content pages like profile) */
 .two-col-container {
   width: 100%;
   max-width: 1100px;
   margin: 0 auto;
+  min-height: 0;
 }
 
-/* 🔥 NEW: FULL-WIDTH MODE (for map pages) */
 .two-col-container.full-width {
   max-width: none;
   height: 100%;
   margin: 0;
+  overflow: hidden;
 }
 
 /* =====================================================
@@ -25,13 +25,15 @@ LAYOUT
   grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
   gap: 20px;
   align-items: stretch;
+  min-height: 0;
 }
 
-/* 🔥 NEW: MAP MODE (feed + map split) */
 .two-col-layout.map-mode {
-  display: flex;
   height: 100%;
+  display: grid;
+  grid-template-columns: 1fr 3fr;
   gap: 0;
+  overflow: hidden;
 }
 
 /* =====================================================
@@ -43,41 +45,42 @@ LEFT / RIGHT
   display: flex;
   flex-direction: column;
   min-width: 0;
+  min-height: 0;
 }
-
-/* =====================================================
-MAP MODE OVERRIDES
-===================================================== */
 
 /* LEFT = FEED */
 .two-col-layout.map-mode .two-col-left {
-  width: 360px;
-  min-width: 320px;
-  max-width: 420px;
+  height: 100%;
+  min-width: 0;
+  max-width: none;
+
+  padding: 16px;
+  gap: 12px;
 
   background: #f8f9fb;
   border-right: 1px solid #eee;
 
   overflow-y: auto;
-  padding: 16px;
-  gap: 12px;
+  overflow-x: hidden;
 }
 
 /* RIGHT = MAP */
 .two-col-layout.map-mode .two-col-right {
-  flex: 1;
   height: 100%;
+  min-width: 0;
+
   position: relative;
+  overflow: hidden;
 }
 
 /* Ensure map fills */
 .two-col-layout.map-mode .two-col-right > * {
-  height: 100%;
   width: 100%;
+  height: 100%;
 }
 
 /* =====================================================
-CARD BASE (unchanged for normal pages)
+CARD BASE
 ===================================================== */
 
 .two-col-card {
@@ -89,6 +92,7 @@ CARD BASE (unchanged for normal pages)
   display: flex;
   flex-direction: column;
   height: 100%;
+  min-height: 0;
 }
 
 .two-col-card.left {
@@ -100,7 +104,7 @@ CARD BASE (unchanged for normal pages)
   background: #faf7f4;
 }
 
-/* 🔥 REMOVE CARD STYLING FOR MAP */
+/* REMOVE CARD STYLING FOR MAP */
 .two-col-layout.map-mode .two-col-card {
   background: none;
   border: none;
@@ -118,17 +122,17 @@ RESPONSIVE
     grid-template-columns: 1fr;
   }
 
-  /* 🔥 Map mode mobile */
   .two-col-layout.map-mode {
-    flex-direction: column;
+    grid-template-columns: 1fr;
+    grid-template-rows: 40% 60%;
   }
 
   .two-col-layout.map-mode .two-col-left {
-    width: 100%;
-    max-height: 40%;
+    height: 100%;
+    max-height: none;
   }
 
   .two-col-layout.map-mode .two-col-right {
-    height: 60%;
+    height: 100%;
   }
 }
