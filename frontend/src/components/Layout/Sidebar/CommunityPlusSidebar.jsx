@@ -1,7 +1,8 @@
 import { useMemo, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { NAVIGATION } from "../../../config/navigation/navigationConfig";
+import { signOut } from "aws-amplify/auth";
 
+import { NAVIGATION } from "../../../config/navigation/navigationConfig";
 import "./CommunityPlusSidebar.css";
 
 export default function CommunityPlusSidebar() {
@@ -22,26 +23,31 @@ export default function CommunityPlusSidebar() {
     [pathname]
   );
 
+  const handleLogout = useCallback(async () => {
+    try {
+      await signOut();
+      navigate("/", { replace: true });
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  }, [navigate]);
+
   const handleClick = useCallback(
-    (item) => {
-      switch (item.type) {
-        case "route":
-          if (item.path) {
-            navigate(item.path);
-          }
-          return;
+    async (item) => {
+      if (item.type === "route" && item.path) {
+        navigate(item.path);
+        return;
+      }
 
-        case "action":
-          if (item.action === "logout") {
-            console.log("logout");
-          }
-          return;
+      if (item.type === "action") {
+        if (item.action === "logout") {
+          await handleLogout();
+        }
 
-        default:
-          return;
+        return;
       }
     },
-    [navigate]
+    [navigate, handleLogout]
   );
 
   return (

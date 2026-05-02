@@ -56,12 +56,12 @@ export const NAVIGATION = [
         title: "MODES",
         items: [
           {
-            id: "mode-now",
+            id: "now",
             label: "NOW",
             icon: "⚡",
-            type: "mode",
-            value: "NOW",
-          },
+            type: "route",
+            path: "/communityplus/now",
+},
           {
             id: "mode-blob",
             label: "BLOB",
