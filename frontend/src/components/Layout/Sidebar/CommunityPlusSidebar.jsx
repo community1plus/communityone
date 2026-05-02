@@ -9,10 +9,15 @@ export default function CommunityPlusSidebar() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  const sidebar = useMemo(
-    () => NAVIGATION.find((n) => n.group === "sidebar") || { sections: [] },
-    []
-  );
+  const sidebar = useMemo(() => {
+    const config = NAVIGATION.find((n) => n.group === "sidebar") || {
+      sections: [],
+    };
+
+    console.log("SIDEBAR CONFIG:", config);
+
+    return config;
+  }, []);
 
   const isActive = useCallback(
     (item) => {
@@ -24,6 +29,8 @@ export default function CommunityPlusSidebar() {
   );
 
   const handleLogout = useCallback(async () => {
+    console.log("LOGOUT CLICKED");
+
     try {
       await signOut();
       navigate("/", { replace: true });
@@ -34,18 +41,37 @@ export default function CommunityPlusSidebar() {
 
   const handleClick = useCallback(
     async (item) => {
-      if (item.type === "route" && item.path) {
+      console.log("SIDEBAR ITEM CLICKED:", item);
+
+      if (!item) {
+        console.warn("No sidebar item received");
+        return;
+      }
+
+      if (item.type === "route") {
+        if (!item.path) {
+          console.warn("Route item missing path:", item);
+          return;
+        }
+
+        console.log("NAVIGATING TO:", item.path);
         navigate(item.path);
         return;
       }
 
       if (item.type === "action") {
+        console.log("ACTION TRIGGERED:", item.action);
+
         if (item.action === "logout") {
           await handleLogout();
+          return;
         }
 
+        console.warn("Unhandled action:", item.action);
         return;
       }
+
+      console.warn("Unhandled sidebar item type:", item.type, item);
     },
     [navigate, handleLogout]
   );
@@ -74,7 +100,10 @@ export default function CommunityPlusSidebar() {
                 ]
                   .filter(Boolean)
                   .join(" ")}
-                onClick={() => handleClick(item)}
+                onClick={() => {
+                  console.log("BUTTON ONCLICK FIRED:", item.label);
+                  handleClick(item);
+                }}
                 aria-current={active ? "page" : undefined}
               >
                 <span className="icon">{item.icon}</span>
