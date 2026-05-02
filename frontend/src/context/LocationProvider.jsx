@@ -1,19 +1,49 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { resolveLocation } from "../services/resolveLocation";
+import { enrichLocation } from "../services/resolveLocation";
 
 const LocationContext = createContext();
 export const useLocationContext = () => useContext(LocationContext);
 
-export function LocationProvider({ children }) {
-  /* ===============================
-     STATE
-  =============================== */
+const normalizeLocation = (loc = {}) => {
+  const type = loc.type || "auto";
+  const accuracyMeters = loc.accuracyMeters ?? loc.accuracy ?? null;
 
+  return {
+    lat: loc.lat ?? null,
+    lng: loc.lng ?? null,
+    suburb: loc.suburb || loc.city || "",
+    city: loc.city || loc.suburb || "",
+    state: loc.state || "",
+    label:
+      loc.label ||
+      [loc.suburb || loc.city, loc.state].filter(Boolean).join(", ") ||
+      "Enter location",
+    type,
+    accuracy:
+      type === "manual"
+        ? "MANUAL"
+        : accuracyMeters && accuracyMeters <= 100
+        ? "LEVEL_4"
+        : "LEVEL_3",
+    accuracyMeters,
+    updatedAt: loc.updatedAt || Date.now(),
+  };
+};
+
+const chooseViewLocation = ({ mode, manual, home, live }) => {
+  if (mode === "manual" && manual) return manual;
+  if (home) return home;
+  if (live) return live;
+  return null;
+};
+
+export function LocationProvider({ children }) {
   const [homeLocation, setHomeLocation] = useState(null);
   const [liveLocation, setLiveLocation] = useState(null);
   const [ipLocation, setIpLocation] = useState(null);
+  const [manualLocation, setManualLocation] = useState(null);
+  const [locationMode, setLocationMode] = useState("auto");
 
-  // 🔥 FIX: prevent restoring IP as active location
   const [viewLocation, setViewLocationState] = useState(() => {
     const saved = localStorage.getItem("viewLocation");
 
@@ -22,46 +52,122 @@ export function LocationProvider({ children }) {
     try {
       const parsed = JSON.parse(saved);
 
-      // 🚨 BLOCK IP RESTORE
       if (parsed?.type === "ip") {
-        console.log("🚫 Ignoring stored IP location");
+        localStorage.removeItem("viewLocation");
         return null;
       }
 
-      return parsed;
+      return normalizeLocation(parsed);
     } catch {
+      localStorage.removeItem("viewLocation");
       return null;
     }
   });
 
-  const [manualLocation, setManualLocation] = useState(null);
-  const [locationMode, setLocationMode] = useState("auto");
-
-  /* ===============================
-     SAFE SETTER
-  =============================== */
-
   const setViewLocation = (loc, mode = "manual") => {
     if (!loc) return;
 
-    const newLoc = {
+    const normalized = normalizeLocation({
       ...loc,
-      updatedAt: Date.now(),
-    };
-
-    console.log("📍 setViewLocation:", newLoc, "mode:", mode);
+      type: mode === "manual" ? "manual" : loc.type || "auto",
+    });
 
     if (mode === "manual") {
-      setManualLocation(newLoc);
+      setManualLocation(normalized);
       setLocationMode("manual");
     }
 
-    setViewLocationState(newLoc);
+    setViewLocationState(normalized);
   };
 
-  /* ===============================
-     PERSIST
-  =============================== */
+  const enableLiveLocation = async () => {
+    if (!navigator.geolocation) return null;
+
+    return new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          try {
+            const enriched = await enrichLocation({
+              lat: pos.coords.latitude,
+              lng: pos.coords.longitude,
+              accuracyMeters: pos.coords.accuracy,
+            });
+
+            const loc = normalizeLocation({
+              ...enriched,
+              type: "live",
+              accuracyMeters: pos.coords.accuracy,
+            });
+
+            setLiveLocation(loc);
+
+            if (locationMode !== "manual") {
+              setViewLocation(loc, "auto");
+            }
+
+            resolve(loc);
+          } catch (err) {
+            console.error("Location enrichment failed:", err);
+            reject(err);
+          }
+        },
+        (err) => {
+          console.warn("Live location unavailable:", err);
+          reject(err);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 8000,
+          maximumAge: 60000,
+        }
+      );
+    });
+  };
+
+  const enableHomeLocation = async () => {
+    if (!navigator.geolocation) return null;
+
+    return new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          try {
+            const enriched = await enrichLocation({
+              lat: pos.coords.latitude,
+              lng: pos.coords.longitude,
+              accuracyMeters: pos.coords.accuracy,
+            });
+
+            const loc = normalizeLocation({
+              ...enriched,
+              type: "home",
+              accuracyMeters: pos.coords.accuracy,
+            });
+
+            setHomeLocation(loc);
+            localStorage.setItem("homeLocation", JSON.stringify(loc));
+
+            if (locationMode !== "manual") {
+              setViewLocation(loc, "auto");
+            }
+
+            resolve(loc);
+          } catch (err) {
+            console.error("Home location failed:", err);
+            reject(err);
+          }
+        },
+        (err) => {
+          console.warn("Home location unavailable:", err);
+          reject(err);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 8000,
+          maximumAge: 60000,
+        }
+      );
+    });
+  };
 
   useEffect(() => {
     if (viewLocation) {
@@ -69,174 +175,82 @@ export function LocationProvider({ children }) {
     }
   }, [viewLocation]);
 
-  /* ===============================
-     CLEANUP OLD IP (ONE-TIME)
-  =============================== */
-
-  useEffect(() => {
-    const saved = localStorage.getItem("viewLocation");
-
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-
-        if (parsed?.type === "ip") {
-          localStorage.removeItem("viewLocation");
-          console.log("🧹 Cleared old IP location");
-        }
-      } catch {}
-    }
-  }, []);
-
-  /* ===============================
-     RESOLUTION LOGIC (NO IP)
-  =============================== */
-
-  const resolveLocation = ({ mode, manual, home, live }) => {
-    if (mode === "manual" && manual) return manual;
-    if (home) return home;
-    if (live) return live;
-    return null; // 🚨 IP NEVER USED
-  };
-
-  /* ===============================
-     INIT
-  =============================== */
-
   useEffect(() => {
     const init = async () => {
-      // 🚨 DO NOT override manual
       if (locationMode === "manual") return;
 
       let home = null;
 
-      // 1. Load home location
       const savedHome = localStorage.getItem("homeLocation");
+
       if (savedHome) {
-        home = JSON.parse(savedHome);
-        setHomeLocation(home);
+        try {
+          home = normalizeLocation(JSON.parse(savedHome));
+          setHomeLocation(home);
+        } catch {
+          localStorage.removeItem("homeLocation");
+        }
       }
 
-      // 2. Fetch IP (HINT ONLY)
       try {
         const res = await fetch("https://ipapi.co/json/");
         const data = await res.json();
 
-        const ip = {
+        const ip = normalizeLocation({
           lat: data.latitude,
           lng: data.longitude,
           city: data.city,
           state: data.region_code,
           label: `${data.city}, ${data.region_code}`,
           type: "ip",
-        };
+        });
 
-        setIpLocation(ip); // ✅ DO NOT set as viewLocation
-      } catch (err) {
+        setIpLocation(ip);
+      } catch {
         console.warn("IP location failed");
       }
 
-      // 3. Resolve trusted sources only
-      const resolved = resolveLocation({
+      let resolved = chooseViewLocation({
         mode: locationMode,
         manual: manualLocation,
         home,
-        live: null,
+        live: liveLocation,
       });
 
       if (resolved) {
         setViewLocation(resolved, "auto");
+        return;
+      }
+
+      try {
+        const live = await enableLiveLocation();
+
+        if (live) {
+          setViewLocation(live, "auto");
+        }
+      } catch {
+        console.warn("Live location unavailable. Waiting for manual input.");
       }
     };
 
     init();
   }, []);
 
-  /* ===============================
-     LIVE LOCATION (GPS + ENRICHED)
-  =============================== */
+  const resetManualLocation = () => {
+    setManualLocation(null);
+    setLocationMode("auto");
 
-  const enableLiveLocation = async () => {
-    if (!navigator.geolocation) return;
-
-    return new Promise((resolve, reject) => {
-      navigator.geolocation.getCurrentPosition(
-        async (pos) => {
-          try {
-            const lat = pos.coords.latitude;
-            const lng = pos.coords.longitude;
-            const accuracy = pos.coords.accuracy;
-
-            console.log("📡 GPS:", { lat, lng, accuracy });
-
-            const enriched = await enrichLocation({
-              lat,
-              lng,
-              accuracy,
-            });
-
-            setLiveLocation(enriched);
-
-            if (locationMode !== "manual") {
-              setViewLocation(enriched, "auto");
-            }
-
-            resolve(enriched);
-          } catch (err) {
-            console.error("❌ Enrichment failed:", err);
-            reject(err);
-          }
-        },
-        (err) => {
-          console.error("❌ Geolocation error:", err);
-          reject(err);
-        },
-        { enableHighAccuracy: true }
-      );
+    const resolved = chooseViewLocation({
+      mode: "auto",
+      manual: null,
+      home: homeLocation,
+      live: liveLocation,
     });
+
+    if (resolved) {
+      setViewLocation(resolved, "auto");
+    }
   };
-
-  /* ===============================
-     SET HOME LOCATION
-  =============================== */
-
-  const enableHomeLocation = async () => {
-    if (!navigator.geolocation) return;
-
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        try {
-          const enriched = await enrichLocation({
-            lat: pos.coords.latitude,
-            lng: pos.coords.longitude,
-            accuracy: pos.coords.accuracy,
-          });
-
-          const loc = {
-            ...enriched,
-            type: "home",
-          };
-
-          setHomeLocation(loc);
-          localStorage.setItem("homeLocation", JSON.stringify(loc));
-
-          console.log("🏠 Home location set:", loc);
-
-          if (locationMode !== "manual") {
-            setViewLocation(loc, "auto");
-          }
-        } catch (err) {
-          console.error(err);
-        }
-      },
-      (err) => console.error(err),
-      { enableHighAccuracy: true }
-    );
-  };
-
-  /* ===============================
-     EXPORT
-  =============================== */
 
   return (
     <LocationContext.Provider
@@ -247,9 +261,12 @@ export function LocationProvider({ children }) {
         homeLocation,
         liveLocation,
         ipLocation,
+        manualLocation,
+        locationMode,
 
         enableLiveLocation,
         enableHomeLocation,
+        resetManualLocation,
       }}
     >
       {children}
