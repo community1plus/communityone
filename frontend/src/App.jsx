@@ -12,6 +12,7 @@ import CommunityPlusDashboardLayout from "./components/Layout/Dashboard/Communit
 import CommunityPlusDashboardHome from "./pages/CommunityPlusDashboardHome/CommunityPlusDashboardHome";
 import CommunityPlusYellowPages from "./pages/CommunityPlusYellowPages/CommunityPlusYellowPages";
 import CommunityPlusUserProfile from "./pages/CommunityPlusUserProfile/CommunityPlusUserProfile";
+import CommunityPlusNowPostView from "./pages/CommunityPlusNowPostView";
 
 /* =========================
 PROTECTED ROUTE
@@ -81,6 +82,7 @@ return ( <Routes>
         <Route index element={<CommunityPlusDashboardHome />} />
         <Route path="profile" element={<CommunityPlusUserProfile />} />
         <Route path="yellowpages" element={<CommunityPlusYellowPages />} />
+        <Route path="/communityplus/now" element={<CommunityPlusNowPostView />} />
 
         <Route
           path="*"

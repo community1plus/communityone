@@ -9,26 +9,14 @@ export default function CommunityPlusSidebar() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  /* =========================
-     GLOBAL STATE
-  ========================= */
-
   const { mode, setMode, scope, setScope } = useMap();
-
-  /* =========================
-     NAV CONFIG
-  ========================= */
 
   const sidebar = useMemo(
     () => NAVIGATION.find((n) => n.group === "sidebar") || { sections: [] },
     []
   );
 
-  /* =========================
-     HELPERS
-  ========================= */
-
-  const goToFeed = useCallback(() => {
+  const goHome = useCallback(() => {
     if (pathname !== "/communityplus") {
       navigate("/communityplus");
     }
@@ -36,19 +24,22 @@ export default function CommunityPlusSidebar() {
 
   const isActive = useCallback(
     (item) => {
+      if (item.id === "now") {
+        return pathname === "/communityplus/now";
+      }
+
       switch (item.type) {
         case "route":
           return (
             item.path &&
-            (pathname === item.path ||
-              pathname.startsWith(item.path + "/"))
+            (pathname === item.path || pathname.startsWith(item.path + "/"))
           );
 
         case "mode":
-          return item.value === mode;
+          return item.value === mode && pathname === "/communityplus";
 
         case "scope":
-          return item.value === scope;
+          return item.value === scope && pathname === "/communityplus";
 
         default:
           return false;
@@ -57,15 +48,26 @@ export default function CommunityPlusSidebar() {
     [pathname, mode, scope]
   );
 
-  /* =========================
-     CLICK HANDLER
-  ========================= */
-
   const handleClick = useCallback(
     (item) => {
+      if (item.id === "now") {
+        navigate("/communityplus/now");
+        return;
+      }
+
       switch (item.type) {
         case "route":
-          item.path && navigate(item.path);
+          if (item.path) navigate(item.path);
+          return;
+
+        case "mode":
+          setMode(item.value);
+          goHome();
+          return;
+
+        case "scope":
+          setScope(item.value);
+          goHome();
           return;
 
         case "action":
@@ -74,26 +76,12 @@ export default function CommunityPlusSidebar() {
           }
           return;
 
-        case "mode":
-          setMode(item.value);
-          goToFeed();
-          return;
-
-        case "scope":
-          setScope(item.value);
-          goToFeed();
-          return;
-
         default:
           return;
       }
     },
-    [navigate, setMode, setScope, goToFeed]
+    [navigate, setMode, setScope, goHome]
   );
-
-  /* =========================
-     RENDER
-  ========================= */
 
   return (
     <aside className="sidebar">
@@ -110,6 +98,7 @@ export default function CommunityPlusSidebar() {
             return (
               <button
                 key={item.id}
+                type="button"
                 className={[
                   "sidebar-link",
                   active && "active",
