@@ -1,4 +1,5 @@
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
+import "./CommunityPlusDashboard.css";
 
 export default function CommunityPlusDashboard() {
   const navigate = useNavigate();
