@@ -1,49 +1,59 @@
-import { useMemo, createAPI } from "react";
-import { apiFetch } from "../src/services/api";
-import { useUI } from "../src/context/UIContext";
+import { useMemo } from "react";
 
-
-/* =====================================================
-   API FETCH (🔥 CORE)
-===================================================== */
 import { useAuth } from "../src/context/AuthContext";
-
-
-/* =====================================================
-   API HOOK (🔥 CENTRALIZED)
-===================================================== */
+import { useUI } from "../src/context/UIContext";
+import { apiFetch } from "../src/services/api";
 
 export default function useAPI() {
   const { token, appUser } = useAuth();
-  const ui = useUI();
 
-  /* =========================
-     TOKEN GETTER
-  ========================= */
+  // Safe fallback if UIContext is not fully wired yet
+  let ui = {};
+  try {
+    ui = useUI();
+  } catch {
+    ui = {};
+  }
 
   const getToken = () => token;
 
-  /* =========================
-     API INSTANCE
-  ========================= */
-
   const api = useMemo(() => {
-    return createAPI({
-      getToken,
-      ui,
-    });
-  }, [token, ui]);
+    const request = (method) => async (path, body, options = {}) => {
+      ui?.startSaving?.();
 
-  /* =========================
-     HELPERS (OPTIONAL)
-  ========================= */
+      try {
+        return await apiFetch(path, {
+          method,
+          body,
+          token: getToken(),
+          ...options,
+        });
+      } finally {
+        ui?.stopSaving?.();
+      }
+    };
+
+    return {
+      get: async (path, options = {}) => {
+        return apiFetch(path, {
+          method: "GET",
+          token: getToken(),
+          ...options,
+        });
+      },
+
+      post: request("POST"),
+      patch: request("PATCH"),
+      put: request("PUT"),
+      delete: request("DELETE"),
+    };
+  }, [token, ui]);
 
   const version = appUser?.profile?.version;
 
   return {
     ...api,
 
-    // 🔥 version-aware patch helper
     patchProfile: (path, body, options = {}) =>
       api.patch(path, body, {
         version,
