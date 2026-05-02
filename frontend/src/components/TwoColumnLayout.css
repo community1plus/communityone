@@ -35,7 +35,7 @@ LAYOUT
 
 /* MAP MODE: LEFT = MAP, RIGHT = FEED */
 .two-col-layout.map-mode {
-  grid-template-columns: minmax(0, 1fr) clamp(320px, 24vw, 420px);
+  grid-template-columns: clamp(340px, 24vw, 420px) minmax(0, 1fr);
   gap: 0;
 }
 
@@ -56,33 +56,34 @@ LEFT / RIGHT
 .two-col-layout.map-mode .two-col-left {
   width: 100%;
   height: 100%;
-
   min-width: 0;
   min-height: 0;
 
-  padding: 0;
-  gap: 0;
-
   position: relative;
-  overflow: hidden;
+  z-index: 2;
 
-  background: transparent;
-  border-right: none;
+  padding: 16px;
+  gap: 12px;
+
+  background: #faf7f4;
+  border-right: 1px solid #e6dfd8;
+
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 /* RIGHT = FEED */
 .two-col-layout.map-mode .two-col-right {
   width: 100%;
   height: 100%;
-
   min-width: 0;
   min-height: 0;
 
   position: relative;
-  overflow: hidden;
+  z-index: 1;
 
-  display: block; /* 🔥 CRITICAL */
-  padding: 0;     /* 🔥 remove any inherited spacing */
+  display: block;
+  overflow: hidden;
 }
 
 /* =====================================================
@@ -97,11 +98,6 @@ MAP WRAPPER FIX
   height: 100%;
 
   overflow: hidden;
-}
-
-.map-wrapper > div {
-  width: 100% !important;
-  height: 100% !important;
 }
 
 .map-wrapper > div {
