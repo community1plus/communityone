@@ -206,6 +206,30 @@
   min-width: 0;
 }
 
+.location-input {
+  width: 180px;
+  padding: 0;
+  margin: 0;
+
+  border: none;
+  outline: none;
+  background: transparent;
+
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: #4f4943;
+}
+
+.location-edit {
+  opacity: 0.85;
+  transition: opacity 0.15s ease;
+}
+
+.location-edit:focus-within {
+  opacity: 1;
+}
+
 /* LOCATION */
 .location-display {
   display: flex;

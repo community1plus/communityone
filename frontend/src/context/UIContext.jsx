@@ -1,63 +1,282 @@
-import { createContext, useContext, useState, useCallback } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { enrichLocation } from "../services/resolveLocation";
 
-const UIContext = createContext(null);
+const LocationContext = createContext();
 
-export function UIProvider({ children }) {
-  const [loadingCount, setLoadingCount] = useState(0);
-  const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
+export const useLocationContext = () => useContext(LocationContext);
 
-  /* =========================
-     LOADING CONTROL
-  ========================= */
+const normalizeLocation = (loc = {}) => {
+  const type = loc.type || "auto";
+  const accuracyMeters = loc.accuracyMeters ?? loc.accuracy ?? null;
 
-  const startLoading = useCallback(() => {
-    setLoadingCount((c) => c + 1);
+  return {
+    lat: loc.lat ?? null,
+    lng: loc.lng ?? null,
+
+    suburb: loc.suburb || loc.city || "",
+    city: loc.city || loc.suburb || "",
+    state: loc.state || "",
+
+    label:
+      loc.label ||
+      [loc.suburb || loc.city, loc.state].filter(Boolean).join(", ") ||
+      "Enter location",
+
+    type,
+
+    accuracy:
+      type === "manual"
+        ? "MANUAL"
+        : accuracyMeters && accuracyMeters <= 100
+        ? "LEVEL_4"
+        : "LEVEL_3",
+
+    accuracyMeters,
+    updatedAt: loc.updatedAt || Date.now(),
+  };
+};
+
+const chooseViewLocation = ({ mode, manual, home, live }) => {
+  if (mode === "manual" && manual) return manual;
+  if (home) return home;
+  if (live) return live;
+  return null;
+};
+
+export function LocationProvider({ children }) {
+  const [homeLocation, setHomeLocation] = useState(null);
+  const [liveLocation, setLiveLocation] = useState(null);
+  const [ipLocation, setIpLocation] = useState(null);
+  const [manualLocation, setManualLocation] = useState(null);
+  const [locationMode, setLocationMode] = useState("auto");
+
+  const [viewLocation, setViewLocationState] = useState(() => {
+    const saved = localStorage.getItem("viewLocation");
+
+    if (!saved) return null;
+
+    try {
+      const parsed = JSON.parse(saved);
+
+      if (parsed?.type === "ip") {
+        console.log("🚫 Ignoring stored IP location");
+        return null;
+      }
+
+      return normalizeLocation(parsed);
+    } catch {
+      return null;
+    }
+  });
+
+  const setViewLocation = (loc, mode = "manual") => {
+    if (!loc) return;
+
+    const normalized = normalizeLocation({
+      ...loc,
+      type: mode === "manual" ? "manual" : loc.type || "auto",
+    });
+
+    console.log("📍 setViewLocation:", normalized, "mode:", mode);
+
+    if (mode === "manual") {
+      setManualLocation(normalized);
+      setLocationMode("manual");
+    }
+
+    setViewLocationState(normalized);
+  };
+
+  useEffect(() => {
+    if (viewLocation) {
+      localStorage.setItem("viewLocation", JSON.stringify(viewLocation));
+    }
+  }, [viewLocation]);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("viewLocation");
+
+    if (!saved) return;
+
+    try {
+      const parsed = JSON.parse(saved);
+
+      if (parsed?.type === "ip") {
+        localStorage.removeItem("viewLocation");
+        console.log("🧹 Cleared old IP location");
+      }
+    } catch {
+      localStorage.removeItem("viewLocation");
+    }
   }, []);
 
-  const stopLoading = useCallback(() => {
-    setLoadingCount((c) => Math.max(0, c - 1));
+  useEffect(() => {
+    const init = async () => {
+      if (locationMode === "manual") return;
+
+      let home = null;
+
+      const savedHome = localStorage.getItem("homeLocation");
+
+      if (savedHome) {
+        try {
+          home = normalizeLocation(JSON.parse(savedHome));
+          setHomeLocation(home);
+        } catch {
+          localStorage.removeItem("homeLocation");
+        }
+      }
+
+      try {
+        const res = await fetch("https://ipapi.co/json/");
+        const data = await res.json();
+
+        const ip = normalizeLocation({
+          lat: data.latitude,
+          lng: data.longitude,
+          city: data.city,
+          state: data.region_code,
+          label: `${data.city}, ${data.region_code}`,
+          type: "ip",
+        });
+
+        setIpLocation(ip);
+      } catch {
+        console.warn("IP location failed");
+      }
+
+      const resolved = chooseViewLocation({
+        mode: locationMode,
+        manual: manualLocation,
+        home,
+        live: null,
+      });
+
+      if (resolved) {
+        setViewLocation(resolved, "auto");
+      }
+    };
+
+    init();
   }, []);
 
-  /* =========================
-     SAVING CONTROL
-  ========================= */
+  const enableLiveLocation = async () => {
+    if (!navigator.geolocation) return null;
 
-  const startSaving = useCallback(() => {
-    setSaving(true);
-    setSaved(false);
-  }, []);
+    return new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          try {
+            const enriched = await enrichLocation({
+              lat: pos.coords.latitude,
+              lng: pos.coords.longitude,
+              accuracyMeters: pos.coords.accuracy,
+            });
 
-  const stopSaving = useCallback(() => {
-    setSaving(false);
-    setSaved(true);
+            const loc = normalizeLocation({
+              ...enriched,
+              type: "live",
+              accuracyMeters: pos.coords.accuracy,
+            });
 
-    // auto hide "Saved"
-    setTimeout(() => {
-      setSaved(false);
-    }, 2000);
-  }, []);
+            setLiveLocation(loc);
+
+            if (locationMode !== "manual") {
+              setViewLocation(loc, "auto");
+            }
+
+            resolve(loc);
+          } catch (err) {
+            console.error("❌ Enrichment failed:", err);
+            reject(err);
+          }
+        },
+        (err) => {
+          console.error("❌ Geolocation error:", err);
+          reject(err);
+        },
+        { enableHighAccuracy: true }
+      );
+    });
+  };
+
+  const enableHomeLocation = async () => {
+    if (!navigator.geolocation) return null;
+
+    return new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          try {
+            const enriched = await enrichLocation({
+              lat: pos.coords.latitude,
+              lng: pos.coords.longitude,
+              accuracyMeters: pos.coords.accuracy,
+            });
+
+            const loc = normalizeLocation({
+              ...enriched,
+              type: "home",
+              accuracyMeters: pos.coords.accuracy,
+            });
+
+            setHomeLocation(loc);
+            localStorage.setItem("homeLocation", JSON.stringify(loc));
+
+            console.log("🏠 Home location set:", loc);
+
+            if (locationMode !== "manual") {
+              setViewLocation(loc, "auto");
+            }
+
+            resolve(loc);
+          } catch (err) {
+            console.error(err);
+            reject(err);
+          }
+        },
+        (err) => {
+          console.error(err);
+          reject(err);
+        },
+        { enableHighAccuracy: true }
+      );
+    });
+  };
+
+  const resetManualLocation = () => {
+    setManualLocation(null);
+    setLocationMode("auto");
+
+    const resolved = chooseViewLocation({
+      mode: "auto",
+      manual: null,
+      home: homeLocation,
+      live: liveLocation,
+    });
+
+    if (resolved) {
+      setViewLocation(resolved, "auto");
+    }
+  };
 
   return (
-    <UIContext.Provider
+    <LocationContext.Provider
       value={{
-        isLoading: loadingCount > 0,
-        startLoading,
-        stopLoading,
+        viewLocation,
+        setViewLocation,
 
-        saving,
-        saved,
-        startSaving,
-        stopSaving,
+        homeLocation,
+        liveLocation,
+        ipLocation,
+        manualLocation,
+        locationMode,
+
+        enableLiveLocation,
+        enableHomeLocation,
+        resetManualLocation,
       }}
     >
       {children}
-    </UIContext.Provider>
+    </LocationContext.Provider>
   );
-}
-
-export function useUI() {
-  const ctx = useContext(UIContext);
-  if (!ctx) throw new Error("useUI must be used within UIProvider");
-  return ctx;
 }

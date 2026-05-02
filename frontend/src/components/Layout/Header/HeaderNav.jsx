@@ -1,28 +1,14 @@
-import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 import LocationDisplay from "./LocationDisplay";
+import { useLocationContext } from "../../../context/LocationProvider";
 import { NAVIGATION } from "../../../config/navigation/navigationConfig";
 
 export default function HeaderNav() {
   const navigate = useNavigate();
   const routeLocation = useLocation();
 
-  const [currentLocation, setCurrentLocation] = useState({
-    suburb: "Resolving location...",
-    state: "",
-    accuracy: "LEVEL_3",
-  });
-
-  useEffect(() => {
-    // TEMP initial resolver.
-    // Replace this later with real geolocation / Google Places result.
-    setCurrentLocation({
-      suburb: "Wheelers Hill",
-      state: "Victoria",
-      accuracy: "LEVEL_4", // use LEVEL_3 if only suburb/postcode accuracy
-    });
-  }, []);
+  const { viewLocation, setViewLocation } = useLocationContext();
 
   const nav = NAVIGATION.find((n) => n.group === "main")?.items || [];
 
@@ -31,14 +17,14 @@ export default function HeaderNav() {
     routeLocation.pathname.startsWith(path + "/");
 
   const handleManualLocationSet = (manualLocation) => {
-    setCurrentLocation(manualLocation);
+    setViewLocation(manualLocation, "manual");
   };
 
   return (
     <nav className="header-nav" aria-label="Primary navigation">
       <div className="nav-left">
         <LocationDisplay
-          location={currentLocation}
+          location={viewLocation}
           onManualSet={handleManualLocationSet}
         />
       </div>
