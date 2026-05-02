@@ -1,7 +1,7 @@
 import TwoColumnLayout from "../components/TwoColumnLayout";
 import FormBuilder from "../components/UI/Form/FormBuilder";
 
-export default function CommunityNowNowPostView() {
+export default function CommunityNowPostView() {
   return (
     <TwoColumnLayout
       left={
