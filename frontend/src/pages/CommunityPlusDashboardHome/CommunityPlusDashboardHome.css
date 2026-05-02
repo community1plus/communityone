@@ -1,119 +1,27 @@
 /* =========================
-   LAYOUT
+   DASHBOARD HOME LAYOUT
 ========================= */
 
-.home-layout {
-  position: relative;
-  height: 100%;
+.dashboard-home {
   width: 100%;
-}
-
-/* =========================
-   FEED CONTAINER (FLOATING)
-========================= */
-
-.home-feed {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  bottom: 20px;
-  width: 340px;
-
-  z-index: 2;
-
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-
-  overflow-y: auto;
-
-  padding-right: 4px;
-}
-
-/* Scrollbar (clean minimal) */
-.home-feed::-webkit-scrollbar {
-  width: 6px;
-}
-
-.home-feed::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 3px;
-}
-
-/* =========================
-   FEED CARD
-========================= */
-
-.feed-card {
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 14px 16px;
-
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-
-  font-size: 14px;
-  font-weight: 500;
-
-  cursor: pointer;
-
-  transition: all 0.2s ease;
-
-  border: 1px solid transparent;
-}
-
-/* Hover */
-.feed-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
-}
-
-/* Active (selected marker) */
-.feed-card.active {
-  border: 1px solid #007bff;
-  background: #f0f7ff;
-  box-shadow: 0 6px 18px rgba(0, 123, 255, 0.2);
-}
-
-/* =========================
-   TYPE VARIANTS (OPTIONAL)
-========================= */
-
-.feed-card[data-type="incident"] {
-  border-left: 4px solid #ff3b30;
-}
-
-.feed-card[data-type="alert"] {
-  border-left: 4px solid #ff9500;
-}
-
-.feed-card[data-type="event"] {
-  border-left: 4px solid #007bff;
-}
-
-.feed-card[data-type="post"] {
-  border-left: 4px solid #34c759;
-}
-
-/* =========================
-   MAP LAYER (OPTIONAL HOOK)
-========================= */
-
-.home-map {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-}
-
-/* =========================
-   PANEL (if you want local control)
-========================= */
-
-.map-detail-panel {
-  width: 320px;
   height: 100%;
 
-  background: #ffffff;
-  box-shadow: -2px 0 16px rgba(0, 0, 0, 0.12);
+  min-width: 0;
+  min-height: 0;
+
+  display: grid;
+  grid-template-columns: 380px minmax(0, 1fr);
+
+  overflow: hidden;
+}
+
+/* =========================
+   FEED RAIL
+========================= */
+
+.dashboard-home-feed {
+  min-width: 0;
+  min-height: 0;
 
   padding: 16px;
 
@@ -121,11 +29,113 @@
   flex-direction: column;
   gap: 12px;
 
+  background: #faf7f4;
+  border-right: 1px solid #e6dfd8;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.dashboard-home-feed::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dashboard-home-feed::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.18);
+  border-radius: 999px;
+}
+
+/* =========================
+   MAP WORKSPACE
+========================= */
+
+.dashboard-home-map {
+  min-width: 0;
+  min-height: 0;
+
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboard-home-map > * {
+  width: 100%;
+  height: 100%;
+}
+
+/* =========================
+   FEED CARD
+========================= */
+
+.feed-card {
+  padding: 14px 16px;
+
+  background: #ffffff;
+  border: 1px solid transparent;
+  border-radius: 12px;
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+
+  font-size: 14px;
+  font-weight: 600;
+  color: #4f4943;
+
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.feed-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+.feed-card.active {
+  border-color: #b11226;
+  background: #fff5f5;
+  box-shadow: 0 6px 18px rgba(177, 18, 38, 0.14);
+}
+
+/* =========================
+   FEED CARD TYPES
+========================= */
+
+.feed-card[data-type="incident"] {
+  border-left: 4px solid #d92d20;
+}
+
+.feed-card[data-type="alert"] {
+  border-left: 4px solid #f59e0b;
+}
+
+.feed-card[data-type="event"] {
+  border-left: 4px solid #2563eb;
+}
+
+.feed-card[data-type="post"] {
+  border-left: 4px solid #16a34a;
+}
+
+/* =========================
+   DETAIL PANEL
+========================= */
+
+.map-detail-panel {
+  width: 320px;
+  height: 100%;
+
+  padding: 16px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  background: #ffffff;
+  box-shadow: -2px 0 16px rgba(0, 0, 0, 0.12);
+
   animation: slideIn 0.25s ease;
 }
 
 /* =========================
-   PANEL ANIMATION
+   ANIMATION
 ========================= */
 
 @keyframes slideIn {
@@ -133,6 +143,7 @@
     transform: translateX(100%);
     opacity: 0;
   }
+
   to {
     transform: translateX(0);
     opacity: 1;
@@ -140,46 +151,26 @@
 }
 
 /* =========================
-   MOBILE (IMPORTANT)
+   RESPONSIVE
 ========================= */
 
 @media (max-width: 768px) {
-  .home-feed {
-    width: 90%;
-    left: 50%;
-    transform: translateX(-50%);
-    top: auto;
-    bottom: 10px;
-    max-height: 40%;
+  .dashboard-home {
+    grid-template-columns: 1fr;
+    grid-template-rows: 40% 60%;
+  }
+
+  .dashboard-home-feed {
+    border-right: none;
+    border-bottom: 1px solid #e6dfd8;
   }
 
   .map-detail-panel {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+
     width: 100%;
     height: 50%;
-    position: absolute;
-    bottom: 0;
-    right: 0;
   }
-}
-
-.two-column-layout {
-  display: grid;
-  grid-template-columns: 380px 1fr;
-  height: 100%;
-  min-height: 0;
-}
-
-.two-column-left {
-  overflow-y: auto;
-  border-right: 1px solid #eee;
-}
-
-.two-column-right {
-  position: relative;
-}
-
-/* 🔥 critical for map */
-.two-column-right > * {
-  width: 100%;
-  height: 100%;
 }

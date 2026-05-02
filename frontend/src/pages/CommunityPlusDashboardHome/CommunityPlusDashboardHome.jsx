@@ -134,10 +134,14 @@ function Feed() {
 
 export default function CommunityPlusDashboardHome() {
   return (
-    <TwoColumnLayout
-      mode="map"
-      left={<Feed />}
-      right={<CommunityMap />}
-    />
+    <div className="dashboard-home">
+      <section className="dashboard-home-feed">
+        <Feed />
+      </section>
+
+      <section className="dashboard-home-map">
+        <CommunityMap />
+      </section>
+    </div>
   );
 }
