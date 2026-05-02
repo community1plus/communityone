@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { enrichLocation } from "../services/resolveLocation";
+import { resolveLocation } from "../services/resolveLocation";
 
 const LocationContext = createContext();
+
 export const useLocationContext = () => useContext(LocationContext);
 
 const normalizeLocation = (loc = {}) => {
@@ -11,20 +12,25 @@ const normalizeLocation = (loc = {}) => {
   return {
     lat: loc.lat ?? null,
     lng: loc.lng ?? null,
+
     suburb: loc.suburb || loc.city || "",
     city: loc.city || loc.suburb || "",
     state: loc.state || "",
+
     label:
       loc.label ||
       [loc.suburb || loc.city, loc.state].filter(Boolean).join(", ") ||
       "Enter location",
+
     type,
+
     accuracy:
       type === "manual"
         ? "MANUAL"
         : accuracyMeters && accuracyMeters <= 100
         ? "LEVEL_4"
         : "LEVEL_3",
+
     accuracyMeters,
     updatedAt: loc.updatedAt || Date.now(),
   };
@@ -87,10 +93,10 @@ export function LocationProvider({ children }) {
       navigator.geolocation.getCurrentPosition(
         async (pos) => {
           try {
-            const enriched = await enrichLocation({
+            const enriched = await resolveLocation({
               lat: pos.coords.latitude,
               lng: pos.coords.longitude,
-              accuracyMeters: pos.coords.accuracy,
+              accuracy: pos.coords.accuracy,
             });
 
             const loc = normalizeLocation({
@@ -107,7 +113,7 @@ export function LocationProvider({ children }) {
 
             resolve(loc);
           } catch (err) {
-            console.error("Location enrichment failed:", err);
+            console.error("Location resolution failed:", err);
             reject(err);
           }
         },
@@ -131,10 +137,10 @@ export function LocationProvider({ children }) {
       navigator.geolocation.getCurrentPosition(
         async (pos) => {
           try {
-            const enriched = await enrichLocation({
+            const enriched = await resolveLocation({
               lat: pos.coords.latitude,
               lng: pos.coords.longitude,
-              accuracyMeters: pos.coords.accuracy,
+              accuracy: pos.coords.accuracy,
             });
 
             const loc = normalizeLocation({
@@ -210,7 +216,7 @@ export function LocationProvider({ children }) {
         console.warn("IP location failed");
       }
 
-      let resolved = chooseViewLocation({
+      const resolved = chooseViewLocation({
         mode: locationMode,
         manual: manualLocation,
         home,
@@ -223,11 +229,7 @@ export function LocationProvider({ children }) {
       }
 
       try {
-        const live = await enableLiveLocation();
-
-        if (live) {
-          setViewLocation(live, "auto");
-        }
+        await enableLiveLocation();
       } catch {
         console.warn("Live location unavailable. Waiting for manual input.");
       }
