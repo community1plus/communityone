@@ -96,7 +96,7 @@
   width: min(100%, 540px);
   padding: 11px 18px;
   border-radius: 999px;
-  border: 1px solid #ded8d2;
+  border: none;
   background: #f8f8f8;
   font-size: 14px;
   outline: none;
@@ -214,7 +214,7 @@
 
   font-size: 14px;
   font-weight: 600;
-  color: #4f4943;
+  color: #1566d7;
 
   white-space: nowrap;
 }

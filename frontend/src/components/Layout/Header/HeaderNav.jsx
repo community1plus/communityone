@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 import LocationDisplay from "./LocationDisplay";
@@ -9,10 +9,20 @@ export default function HeaderNav() {
   const routeLocation = useLocation();
 
   const [currentLocation, setCurrentLocation] = useState({
-    suburb: "Wheelers Hill",
-    state: "Victoria",
-    accuracy: "LEVEL_4",
+    suburb: "Resolving location...",
+    state: "",
+    accuracy: "LEVEL_3",
   });
+
+  useEffect(() => {
+    // TEMP initial resolver.
+    // Replace this later with real geolocation / Google Places result.
+    setCurrentLocation({
+      suburb: "Wheelers Hill",
+      state: "Victoria",
+      accuracy: "LEVEL_4", // use LEVEL_3 if only suburb/postcode accuracy
+    });
+  }, []);
 
   const nav = NAVIGATION.find((n) => n.group === "main")?.items || [];
 
@@ -20,25 +30,17 @@ export default function HeaderNav() {
     routeLocation.pathname === path ||
     routeLocation.pathname.startsWith(path + "/");
 
-  const handleManualLocationFix = () => {
-    setCurrentLocation({
-      suburb: "Wheelers Hill",
-      state: "Victoria",
-      accuracy: "MANUAL",
-    });
+  const handleManualLocationSet = (manualLocation) => {
+    setCurrentLocation(manualLocation);
   };
 
   return (
     <nav className="header-nav" aria-label="Primary navigation">
       <div className="nav-left">
-        <button
-          type="button"
-          className="location-button"
-          onClick={handleManualLocationFix}
-          title="Click to manually fix location"
-        >
-          <LocationDisplay location={currentLocation} />
-        </button>
+        <LocationDisplay
+          location={currentLocation}
+          onManualSet={handleManualLocationSet}
+        />
       </div>
 
       <div className="nav-links">
