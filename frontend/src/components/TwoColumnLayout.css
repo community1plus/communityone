@@ -1,87 +1,82 @@
 /* =====================================================
-TWO COLUMN LAYOUT
-Default: normal content pages
-Map mode: left feed rail, right map workspace
+CONTAINER
 ===================================================== */
 
-/* CONTAINER */
 .two-col-container {
   width: 100%;
   height: 100%;
-
   min-width: 0;
   min-height: 0;
-
   margin: 0;
-  overflow: hidden;
 }
 
 .two-col-container.full-width {
   max-width: none;
+  overflow: hidden;
 }
 
-/* BASE LAYOUT */
+/* =====================================================
+LAYOUT
+===================================================== */
+
 .two-col-layout {
   width: 100%;
   height: 100%;
-
   min-width: 0;
   min-height: 0;
 
   display: grid;
   grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
   gap: 20px;
+  align-items: stretch;
 
   overflow: hidden;
 }
 
-/* MAP MODE: LEFT = FEED, RIGHT = MAP */
+/* MAP MODE: LEFT = MAP, RIGHT = FEED */
 .two-col-layout.map-mode {
   grid-template-columns: clamp(340px, 24vw, 420px) minmax(0, 1fr);
   gap: 0;
 }
 
-/* COLUMNS */
+/* =====================================================
+LEFT / RIGHT
+===================================================== */
+
 .two-col-left,
 .two-col-right {
   min-width: 0;
   min-height: 0;
-  height: 100%;
-}
-
-/* LEFT FEED RAIL */
-.two-col-layout.map-mode .two-col-left {
-  position: relative;
-  z-index: 2;
 
   display: flex;
   flex-direction: column;
-  gap: 12px;
+}
 
+/* LEFT = MAP */
+.two-col-layout.map-mode .two-col-left {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  z-index: 2;
   padding: 16px;
-
+  gap: 12px;
   background: #faf7f4;
   border-right: 1px solid #e6dfd8;
-
   overflow-y: auto;
   overflow-x: hidden;
 }
 
-/* RIGHT MAP PANE */
+/* RIGHT = FEED */
 .two-col-layout.map-mode .two-col-right {
   position: relative;
-  z-index: 1;
-
-  display: block;
-
-  width: 100%;
-  height: 100%;
-
   overflow: hidden;
 }
 
-/* MAP WRAPPER — scoped to right pane only */
-.two-col-layout.map-mode .two-col-right .map-wrapper {
+/* =====================================================
+MAP WRAPPER FIX
+===================================================== */
+
+.map-wrapper {
   position: absolute;
   inset: 0;
 
@@ -91,16 +86,27 @@ Map mode: left feed rail, right map workspace
   overflow: hidden;
 }
 
+.map-wrapper > div {
+  width: 100% !important;
+  height: 100% !important;
+}
+.two-col-layout.map-mode .two-col-right .map-wrapper {
+  position: absolute;
+  inset: 0;
+}
+
 .two-col-layout.map-mode .two-col-right .map-wrapper > div {
   width: 100% !important;
   height: 100% !important;
 }
 
-/* CARD BASE */
+/* =====================================================
+CARD BASE
+===================================================== */
+
 .two-col-card {
   width: 100%;
   height: 100%;
-
   min-width: 0;
   min-height: 0;
 
@@ -122,7 +128,7 @@ Map mode: left feed rail, right map workspace
   background: #faf7f4;
 }
 
-/* REMOVE CARD STYLING IN MAP MODE */
+/* REMOVE CARD STYLING FOR MAP */
 .two-col-layout.map-mode .two-col-card {
   padding: 0;
 
@@ -132,7 +138,10 @@ Map mode: left feed rail, right map workspace
   box-shadow: none;
 }
 
-/* RESPONSIVE */
+/* =====================================================
+RESPONSIVE
+===================================================== */
+
 @media (max-width: 1000px) {
   .two-col-layout {
     grid-template-columns: 1fr;
@@ -140,15 +149,16 @@ Map mode: left feed rail, right map workspace
 
   .two-col-layout.map-mode {
     grid-template-columns: 1fr;
-    grid-template-rows: 40% 60%;
+    grid-template-rows: 60% 40%;
   }
 
-  .two-col-layout.map-mode .two-col-left {
-    border-right: none;
-    border-bottom: 1px solid #e6dfd8;
+  .two-col-layout.map-mode .two-col-left,
+  .two-col-layout.map-mode .two-col-right {
+    height: 100%;
   }
 
   .two-col-layout.map-mode .two-col-right {
-    height: 100%;
+    border-left: none;
+    border-top: 1px solid #eee;
   }
 }
