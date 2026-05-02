@@ -21,18 +21,27 @@ LAYOUT
 ===================================================== */
 
 .two-col-layout {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+
   display: grid;
   grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
   gap: 20px;
   align-items: stretch;
-  min-height: 0;
+
+  overflow: hidden;
 }
 
 .two-col-layout.map-mode {
+  width: 100%;
   height: 100%;
+  min-height: 0;
+
   display: grid;
-  grid-template-columns: 1fr 3fr;
+  grid-template-columns: minmax(280px, 1fr) minmax(0, 3fr);
   gap: 0;
+
   overflow: hidden;
 }
 
@@ -67,14 +76,17 @@ LEFT / RIGHT
 /* RIGHT = MAP */
 .two-col-layout.map-mode .two-col-right {
   height: 100%;
+  min-height: 0;
   min-width: 0;
 
   position: relative;
   overflow: hidden;
 }
 
-/* Ensure map fills */
 .two-col-layout.map-mode .two-col-right > * {
+  position: absolute;
+  inset: 0;
+
   width: 100%;
   height: 100%;
 }
