@@ -182,6 +182,7 @@ export default function CommunityMap({ mode = "embedded" }) {
   ========================= */
 
   return (
+  <div className="map-wrapper">
     <GoogleMap
       center={center}
       zoom={zoom}
@@ -189,5 +190,6 @@ export default function CommunityMap({ mode = "embedded" }) {
       onLoad={(map) => (mapRef.current = map)}
       options={mapOptions}
     />
-  );
+  </div>
+);
 }
