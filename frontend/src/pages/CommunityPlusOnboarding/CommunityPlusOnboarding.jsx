@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 
 import { useAuth } from "../../context/AuthContext";
-import { useUI } from "../../context/UIContext";
+import { useUI } from "../../../hooks/useAPI";
 import useAPI from "../../../hooks/useAPI";
 
 import CommunityPlusUserProfile from "../CommunityPlusUserProfile/CommunityPlusUserProfile";
