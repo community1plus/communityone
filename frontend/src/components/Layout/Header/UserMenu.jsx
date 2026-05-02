@@ -1,4 +1,3 @@
-
 import { useAuth } from "../../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect, useMemo } from "react";
@@ -25,10 +24,33 @@ export default function UserMenu() {
   }, []);
 
   /* ===============================
-     USER
+     USERNAME (cleaned)
   =============================== */
 
-  const username = user?.name || user?.username || "Guest";
+  const username = useMemo(() => {
+    if (!user) return "Guest";
+
+    // Priority order
+    if (user.name) return user.name;
+
+    if (user.username && !user.username.includes("@")) {
+      return user.username;
+    }
+
+    if (user.email) {
+      return user.email.split("@")[0]; // 🔥 key change
+    }
+
+    if (user.username) {
+      return user.username.split("@")[0];
+    }
+
+    return "Guest";
+  }, [user]);
+
+  /* ===============================
+     INITIALS
+  =============================== */
 
   const initials = useMemo(() => {
     if (!username || username === "Guest") return "G";
