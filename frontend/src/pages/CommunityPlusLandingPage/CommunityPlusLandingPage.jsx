@@ -1,65 +1,30 @@
 import { useState } from "react";
-import { signIn } from "aws-amplify/auth";
-
 import { useAuth } from "../../context/AuthContext";
+
+import CommunityPlusAuthModal from "../../components/Auth/CommunityPlusAuthModal";
+
 import "./CommunityPlusLandingPage.css";
 
-const AUTH_UI_ENABLED = false;
-
 export default function CommunityPlusLandingPage() {
-  const { login, loading } = useAuth();
+  const { loading } = useAuth();
 
-  const [authLoading, setAuthLoading] = useState(false);
-  const [authError, setAuthError] = useState("");
-  const [showFallback, setShowFallback] = useState(false);
+  const [showAuth, setShowAuth] = useState(false);
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
-  const handleEntry = async () => {
-    if (!AUTH_UI_ENABLED || authLoading) return;
-
-    setAuthError("");
-    setAuthLoading(true);
-
-    try {
-      await login();
-    } catch (err) {
-      console.error(err);
-      setShowFallback(true);
-      setAuthError("Unable to connect. Use email login.");
-      setAuthLoading(false);
-    }
-  };
-
-  const handleEmailLogin = async (event) => {
-    event.preventDefault();
-
-    if (!AUTH_UI_ENABLED || authLoading) return;
-
-    setAuthLoading(true);
-    setAuthError("");
-
-    try {
-      await signIn({
-        username: email.trim(),
-        password,
-      });
-    } catch (err) {
-      setAuthError(err?.message || "Login failed");
-      setAuthLoading(false);
-    }
+  const handleEntry = () => {
+    setShowAuth(true);
   };
 
   if (loading) return null;
 
   return (
     <div className="cpl-root">
+      {/* VISUAL LAYER */}
       <div className="landing-visual-layer" aria-hidden="true">
         <div className="landing-hero-tint" />
         <div className="landing-hero-focus" />
       </div>
 
+      {/* MAIN CONTENT */}
       <main className="landing-container">
         <section className="landing-hero" aria-label="Community.One landing">
           <h1 className="brand-title">Community.One</h1>
@@ -70,84 +35,40 @@ export default function CommunityPlusLandingPage() {
             </h2>
 
             <p className="landing-sub">
-              local signal + local economy
+              A map-first platform connecting local signal, stories, and services.
             </p>
           </div>
 
           <div className="landing-actions">
-            {AUTH_UI_ENABLED ? (
-              <button
-                type="button"
-                className="btn primary hero-cta"
-                onClick={handleEntry}
-                disabled={authLoading}
-              >
-                {authLoading ? "Connecting..." : "Enter your community"}
-              </button>
-            ) : (
-              <>
-                <button
-                  type="button"
-                  className="btn ghost hero-cta"
-                  disabled
-                >
-                  Login coming soon
-                </button>
+            <button
+              type="button"
+              className="btn primary hero-cta"
+              onClick={handleEntry}
+            >
+              Enter your community
+            </button>
 
-                <p className="auth-maintenance-note">
-                  We’re updating the sign-in experience. Please check back soon.
-                </p>
-              </>
-            )}
+            <p className="auth-maintenance-note">
+              Sign-in experience currently being upgraded.
+            </p>
           </div>
         </section>
       </main>
 
+      {/* FLOATING LOGIN BUTTON */}
       <button
         type="button"
         className="landing-login-thumb"
         onClick={handleEntry}
-        disabled={!AUTH_UI_ENABLED || authLoading}
         aria-label="Login"
-        title={AUTH_UI_ENABLED ? "Login" : "Login temporarily unavailable"}
+        title="Login"
       >
         <img src="/logo/echo.png" alt="" />
       </button>
 
-      {AUTH_UI_ENABLED && showFallback && (
-        <div className="cpl-modalOverlay">
-          <form className="cpl-authModal" onSubmit={handleEmailLogin}>
-            <h2>Sign In</h2>
-
-            <input
-              type="email"
-              placeholder="Email"
-              value={email}
-              autoComplete="email"
-              onChange={(event) => setEmail(event.target.value)}
-            />
-
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              autoComplete="current-password"
-              onChange={(event) => setPassword(event.target.value)}
-            />
-
-            <button type="submit" disabled={authLoading}>
-              {authLoading ? "Signing in..." : "Sign In"}
-            </button>
-
-            {authError && <div className="error">{authError}</div>}
-          </form>
-        </div>
-      )}
-
-      {AUTH_UI_ENABLED && authLoading && (
-        <div className="auth-loading-overlay">
-          <div className="auth-loading-box">Redirecting to secure login…</div>
-        </div>
+      {/* AUTH MODAL */}
+      {showAuth && (
+        <CommunityPlusAuthModal onClose={() => setShowAuth(false)} />
       )}
     </div>
   );
