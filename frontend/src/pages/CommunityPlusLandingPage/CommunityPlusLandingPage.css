@@ -1,37 +1,76 @@
-<div className="cpl-root">
-  <main className="landing-container">
-    
-    {/* BRAND */}
-    <div className="landing-brand">
-      <h1 className="brand-title">COMMUNITY ONE</h1>
-    </div>
+/* =========================
+ROOT
+========================= */
 
-    {/* LOGO */}
-    <div className="landing-logo">
-      <img src="/logo/echo.png" alt="Community One" />
-    </div>
+.cpl-root {
+  height: 100vh;
+  width: 100%;
+  background: #f8f6f3;
+}
 
-    {/* TAGLINE */}
-    <div className="landing-text">
-      <h2 className="landing-tagline">
-        Real People. <span className="accent">Real News.</span> Real Time
-      </h2>
+/* =========================
+CENTER LAYOUT
+========================= */
 
-      <p className="landing-sub">
-        A map-first local feed that prioritises what’s happening <b>here</b>.
-      </p>
-    </div>
+.landing-container {
+  height: 100%;
 
-    {/* CTA */}
-    <div className="landing-actions">
-      <button className="btn primary" disabled>
-        Login temporarily unavailable
-      </button>
+  display: flex;
+  flex-direction: column;
 
-      <p className="auth-maintenance-note">
-        We’re updating the sign-in experience. Please check back soon.
-      </p>
-    </div>
+  align-items: center;     /* horizontal */
+  justify-content: center; /* vertical */
 
-  </main>
-</div>
+  gap: 28px;
+
+  text-align: center;
+
+  /* 🔥 clean system font (matches header/sidebar) */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* =========================
+TITLE
+========================= */
+
+.brand-title {
+  margin: 0;
+
+  font-size: 26px;
+  font-weight: 700;
+
+  letter-spacing: 0.06em;
+  color: #b11226;
+
+  text-transform: none; /* 👈 allows Community.One */
+}
+
+/* =========================
+LOGO
+========================= */
+
+.landing-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.landing-logo img {
+  width: 280px;   /* 🔥 controlled size */
+  height: 280px;
+
+  object-fit: contain;
+
+  /* 🔥 force circular crop visually */
+  clip-path: circle(50% at 50% 50%);
+
+  /* subtle polish */
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+
+  transition: transform 0.3s ease;
+}
+
+.landing-logo img:hover {
+  transform: scale(1.03);
+}

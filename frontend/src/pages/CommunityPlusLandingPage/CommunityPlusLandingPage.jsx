@@ -53,45 +53,30 @@ export default function CommunityPlusLandingPage() {
   return (
     <div className="cpl-root">
       <main className="landing-container">
-        <div className="landing-brand">
-          <h1 className="brand-title">COMMUNITY ONE</h1>
-        </div>
+        <h1 className="brand-title">Community.One</h1>
 
         <div className="landing-logo">
-          <img src="/logo/echo.png" alt="Community One Echo" />
+          <img src="/logo/echo.png" alt="Community.One" />
         </div>
 
-        <div className="landing-text">
-          <h2 className="landing-tagline">
-            Real People. <span className="accent">Real News.</span> Real Time
-          </h2>
+        {AUTH_UI_ENABLED && (
+          <div className="landing-actions">
+            <button
+              type="button"
+              className="btn primary"
+              onClick={handleEntry}
+              disabled={authLoading}
+            >
+              {authLoading ? "Connecting..." : "Explore your local area"}
+            </button>
+          </div>
+        )}
 
-          <p className="landing-sub">
-            A map-first local feed that prioritises what’s happening{" "}
-            <strong>here</strong>.
+        {!AUTH_UI_ENABLED && (
+          <p className="auth-maintenance-note">
+            We’re updating the sign-in experience. Please check back soon.
           </p>
-        </div>
-
-        <div className="landing-actions">
-          <button
-            type="button"
-            className="btn primary"
-            onClick={handleEntry}
-            disabled={!AUTH_UI_ENABLED || authLoading}
-          >
-            {AUTH_UI_ENABLED
-              ? authLoading
-                ? "Connecting..."
-                : "Explore your local area"
-              : "Login temporarily unavailable"}
-          </button>
-
-          {!AUTH_UI_ENABLED && (
-            <p className="auth-maintenance-note">
-              We’re updating the sign-in experience. Please check back soon.
-            </p>
-          )}
-        </div>
+        )}
       </main>
 
       {AUTH_UI_ENABLED && showFallback && (
@@ -113,7 +98,11 @@ export default function CommunityPlusLandingPage() {
               onChange={(event) => setPassword(event.target.value)}
             />
 
-            <button type="button" onClick={handleEmailLogin} disabled={authLoading}>
+            <button
+              type="button"
+              onClick={handleEmailLogin}
+              disabled={authLoading}
+            >
               {authLoading ? "Signing in..." : "Sign In"}
             </button>
 
