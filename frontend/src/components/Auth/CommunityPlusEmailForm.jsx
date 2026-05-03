@@ -1,29 +1,38 @@
 import { useState } from "react";
 import { signIn } from "aws-amplify/auth";
+import { useNavigate } from "react-router-dom";
+
+import { useAuth } from "../../context/AuthContext";
 
 export default function CommunityPlusEmailForm() {
+  const navigate = useNavigate();
+  const { refreshAuth } = useAuth();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [authLoading, setAuthLoading] = useState(false);
+  const [authError, setAuthError] = useState("");
 
   const handleEmailLogin = async (event) => {
     event.preventDefault();
 
-    if (loading) return;
+    if (authLoading) return;
 
-    setLoading(true);
-    setError("");
+    setAuthLoading(true);
+    setAuthError("");
 
     try {
       await signIn({
         username: email.trim(),
         password,
       });
+
+      await refreshAuth({ forceRefresh: true });
+
+      navigate("/communityplus", { replace: true });
     } catch (err) {
-      setError(err?.message || "Login failed");
-      setLoading(false);
+      setAuthError(err?.message || "Login failed");
+      setAuthLoading(false);
     }
   };
 
@@ -34,7 +43,7 @@ export default function CommunityPlusEmailForm() {
         placeholder="Email"
         value={email}
         autoComplete="email"
-        onChange={(e) => setEmail(e.target.value)}
+        onChange={(event) => setEmail(event.target.value)}
       />
 
       <input
@@ -42,14 +51,14 @@ export default function CommunityPlusEmailForm() {
         placeholder="Password"
         value={password}
         autoComplete="current-password"
-        onChange={(e) => setPassword(e.target.value)}
+        onChange={(event) => setPassword(event.target.value)}
       />
 
-      <button type="submit" disabled={loading}>
-        {loading ? "Signing in..." : "Sign in"}
+      <button type="submit" disabled={authLoading}>
+        {authLoading ? "Signing in..." : "Sign in"}
       </button>
 
-      {error && <div className="error">{error}</div>}
+      {authError && <div className="error">{authError}</div>}
     </form>
   );
 }
