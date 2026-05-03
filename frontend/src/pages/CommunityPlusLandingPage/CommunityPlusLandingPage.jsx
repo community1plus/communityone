@@ -55,7 +55,7 @@ export default function CommunityPlusLandingPage() {
 
   return (
     <div className="cpl-root">
-      <div className="landing-hero-bg" aria-hidden="true">
+      <div>
        { /* <img src="/logo/echo2.png" alt="" className="landing-bg-image" /> */ }
         <img src="/logo/echo.png" alt="" className="landing-bg-logo" />
 
