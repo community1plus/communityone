@@ -358,3 +358,36 @@ RESPONSIVE
     white-space: normal;
   }
 }
+
+.landing-login-thumb {
+  position: fixed;
+  right: 28px;
+  bottom: 28px;
+  z-index: 50;
+
+  width: 76px;
+  height: 76px;
+
+  border: 0;
+  border-radius: 50%;
+  background: #000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+}
+
+.landing-login-thumb img {
+  width: 58%;
+  height: 58%;
+  object-fit: contain;
+  filter: contrast(1.12) saturate(1.08);
+}
+
+.landing-login-thumb:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
