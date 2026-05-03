@@ -1,3 +1,45 @@
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+.profile-container {
+  font-family: 
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
+}
+
+.profile-left h1 {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.profile-left label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #5c5147;
+}
+
+.profile-left input {
+  font-size: 14px;
+}
+
+.profile-left {
+  background: #fff;
+  border: 1px solid #e6dfd8;
+}
+
+.profile-guide {
+  background: #faf7f4;
+}
 /* =====================================================
 PROFILE PAGE — COMPACT REFINEMENT
 ===================================================== */
@@ -38,12 +80,27 @@ PROFILE PAGE — COMPACT REFINEMENT
 .profile-left {
   background: #fff;
   padding: 18px 20px;
-
   display: flex;
   flex-direction: column;
   gap: 12px;
-
   justify-content: flex-start;
+  overflow: hidden; /* 🔥 contains borders */
+  padding: 20px;
+}
+
+.profile-left form,
+.profile-left .section,
+.profile-left .field {
+  width: 100%;
+  max-width: 100%;
+}
+
+.profile-left input,
+.profile-left select,
+.profile-left textarea {
+  width: 100%;
+  max-width: 100%;
+  display: block;
 }
 
 /* header */
