@@ -1,30 +1,41 @@
-import { useState } from "react";
-import { useAuth } from "../../context/AuthContext";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
+import { useAuth } from "../../context/AuthContext";
 import CommunityPlusAuthModal from "../../components/Auth/CommunityPlusAuthModal";
 
 import "./CommunityPlusLandingPage.css";
 
 export default function CommunityPlusLandingPage() {
-  const { loading } = useAuth();
+  const navigate = useNavigate();
+
+  const { loading, isAuthenticated } = useAuth();
 
   const [showAuth, setShowAuth] = useState(false);
 
-  const handleEntry = () => {
+  useEffect(() => {
+    if (!loading && isAuthenticated) {
+      navigate("/communityplus", { replace: true });
+    }
+  }, [loading, isAuthenticated, navigate]);
+
+  const openAuth = () => {
     setShowAuth(true);
+  };
+
+  const closeAuth = () => {
+    setShowAuth(false);
   };
 
   if (loading) return null;
 
   return (
     <div className="cpl-root">
-      {/* VISUAL LAYER */}
       <div className="landing-visual-layer" aria-hidden="true">
         <div className="landing-hero-tint" />
         <div className="landing-hero-focus" />
       </div>
 
-      {/* MAIN CONTENT */}
       <main className="landing-container">
         <section className="landing-hero" aria-label="Community.One landing">
           <h1 className="brand-title">Community.One</h1>
@@ -35,7 +46,8 @@ export default function CommunityPlusLandingPage() {
             </h2>
 
             <p className="landing-sub">
-              A map-first platform connecting local signal, stories, and services.
+              A map-first platform connecting local signal, stories, and
+              services.
             </p>
           </div>
 
@@ -43,7 +55,7 @@ export default function CommunityPlusLandingPage() {
             <button
               type="button"
               className="btn primary hero-cta"
-              onClick={handleEntry}
+              onClick={openAuth}
             >
               Enter your community
             </button>
@@ -55,22 +67,21 @@ export default function CommunityPlusLandingPage() {
         </section>
       </main>
 
-      {/* FLOATING LOGIN BUTTON */}
       <button
         type="button"
         className="landing-login-thumb"
-        onClick={handleEntry}
+        onClick={openAuth}
         aria-label="Login"
         title="Login"
       >
-      <div className="auth-brand">
-         <img src="/logo/echo.png" alt="" />
-      </div>
+        <img src="/logo/echo.png" alt="" />
       </button>
 
-      {/* AUTH MODAL */}
       {showAuth && (
-        <CommunityPlusAuthModal onClose={() => setShowAuth(false)} />
+        <CommunityPlusAuthModal
+          onClose={closeAuth}
+          onSuccess={closeAuth}
+        />
       )}
     </div>
   );

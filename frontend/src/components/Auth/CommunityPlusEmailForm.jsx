@@ -4,12 +4,13 @@ import { useNavigate } from "react-router-dom";
 
 import { useAuth } from "../../context/AuthContext";
 
-export default function CommunityPlusEmailForm() {
+export default function CommunityPlusEmailForm({ onSuccess }) {
   const navigate = useNavigate();
   const { refreshAuth } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState("");
 
@@ -29,6 +30,8 @@ export default function CommunityPlusEmailForm() {
 
       await refreshAuth({ forceRefresh: true });
 
+      onSuccess?.();
+
       navigate("/communityplus", { replace: true });
     } catch (err) {
       setAuthError(err?.message || "Login failed");
@@ -43,6 +46,7 @@ export default function CommunityPlusEmailForm() {
         placeholder="Email"
         value={email}
         autoComplete="email"
+        disabled={authLoading}
         onChange={(event) => setEmail(event.target.value)}
       />
 
@@ -51,12 +55,19 @@ export default function CommunityPlusEmailForm() {
         placeholder="Password"
         value={password}
         autoComplete="current-password"
+        disabled={authLoading}
         onChange={(event) => setPassword(event.target.value)}
       />
 
       <button type="submit" disabled={authLoading}>
         {authLoading ? "Signing in..." : "Sign in"}
       </button>
+
+      {authLoading && (
+        <div className="auth-inline-loading">
+          Signing you in…
+        </div>
+      )}
 
       {authError && <div className="error">{authError}</div>}
     </form>

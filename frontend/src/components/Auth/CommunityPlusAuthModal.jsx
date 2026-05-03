@@ -6,7 +6,7 @@ export default function CommunityPlusAuthModal({ onClose }) {
       <div className="cpl-authModal" onClick={(e) => e.stopPropagation()}>
         <h2>Sign in to Community.One</h2>
 
-        <CommunityPlusEmailForm />
+        <CommunityPlusEmailForm onSuccess={onSuccess}/>
 
         <div className="auth-divider">or</div>
 

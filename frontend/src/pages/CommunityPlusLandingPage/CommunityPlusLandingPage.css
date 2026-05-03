@@ -340,6 +340,11 @@ AUTH MODAL
     Arial, sans-serif;
 }
 
+.cpl-authModal input:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
 .cpl-authModal {
   display: flex;
   flex-direction: column;
@@ -450,7 +455,14 @@ AUTH MODAL
 }
 
 .error {
+  margin-top: 4px;
+  padding: 10px 12px;
+
+  border-radius: 10px;
+  background: rgba(177, 18, 38, 0.08);
+
   font-size: 13px;
+  font-weight: 650;
   color: #b11226;
 }
 
