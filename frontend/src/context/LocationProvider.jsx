@@ -17,7 +17,6 @@ export const useLocationContext = () => useContext(LocationContext);
 const MODE_KEY = "communityplus_location_mode";
 const AUTO_LOCATION_KEY = "communityplus_auto_location";
 const MANUAL_LOCATION_KEY = "communityplus_manual_location";
-const VIEW_LOCATION_KEY = "communityplus_view_location";
 
 const CACHE_TTL = 1000 * 60 * 10;
 
@@ -27,12 +26,12 @@ const readStorage = (key, respectTTL = false) => {
     if (!raw) return null;
 
     const parsed = JSON.parse(raw);
-
     if (!parsed?.data) return null;
 
     if (!respectTTL) return parsed.data;
 
-    return Date.now() - parsed.timestamp < CACHE_TTL ? parsed.data : null;
+    const isFresh = Date.now() - parsed.timestamp < CACHE_TTL;
+    return isFresh ? parsed.data : null;
   } catch {
     localStorage.removeItem(key);
     return null;
@@ -61,7 +60,7 @@ const normalizeLocation = (loc = {}, fallbackType = "auto") => {
   const city = loc.city || loc.suburb || "";
   const state = loc.state || loc.region || loc.region_code || "";
 
-  const type = loc.type || fallbackType;
+  const type = fallbackType;
   const accuracyMeters = loc.accuracyMeters ?? loc.accuracy ?? null;
 
   const label =
@@ -76,6 +75,7 @@ const normalizeLocation = (loc = {}, fallbackType = "auto") => {
     city,
     state,
     label,
+    fullAddress: loc.fullAddress || loc.formatted_address || "",
     type,
     accuracyMeters,
     accuracy:
@@ -97,12 +97,8 @@ export function LocationProvider({ children }) {
     readStorage(AUTO_LOCATION_KEY, true)
   );
 
-  const [manualLocationState, setManualLocationState] = useState(() =>
+  const [manualLocation, setManualLocationState] = useState(() =>
     readStorage(MANUAL_LOCATION_KEY, false)
-  );
-
-  const [viewLocation, setViewLocationState] = useState(() =>
-    readStorage(VIEW_LOCATION_KEY, false)
   );
 
   const [locationLoading, setLocationLoading] = useState(
@@ -113,41 +109,62 @@ export function LocationProvider({ children }) {
 
   const requestIdRef = useRef(0);
 
+  const viewLocation = useMemo(() => {
+    if (locationMode === "manual") {
+      return manualLocation;
+    }
+
+    if (locationMode === "auto") {
+      return autoLocation;
+    }
+
+    return null;
+  }, [locationMode, manualLocation, autoLocation]);
+
+  const displayLocation = useMemo(() => {
+    if (locationMode === "manual") {
+      return manualLocation;
+    }
+
+    if (locationMode === "auto") {
+      return autoLocation || manualLocation;
+    }
+
+    return null;
+  }, [locationMode, autoLocation, manualLocation]);
+
   const persistMode = useCallback((mode) => {
     localStorage.setItem(MODE_KEY, mode);
     setLocationMode(mode);
   }, []);
 
-  const setAutoLocationSafe = useCallback((loc) => {
-    if (!loc) return;
+  const saveAutoLocation = useCallback((loc) => {
+    if (!loc) return null;
 
     const normalized = normalizeLocation(loc, "auto");
 
     setAutoLocation(normalized);
-    setViewLocationState(normalized);
-
     writeStorage(AUTO_LOCATION_KEY, normalized);
-    writeStorage(VIEW_LOCATION_KEY, normalized);
+
+    return normalized;
   }, []);
 
   const setManualLocation = useCallback(
     (loc) => {
-      if (!loc) return;
+      if (!loc) return null;
 
       requestIdRef.current += 1;
 
       const normalized = normalizeLocation(loc, "manual");
 
       persistMode("manual");
-
       setManualLocationState(normalized);
-      setViewLocationState(normalized);
-
       writeStorage(MANUAL_LOCATION_KEY, normalized);
-      writeStorage(VIEW_LOCATION_KEY, normalized);
 
       setLocationLoading(false);
       setLocationError(null);
+
+      return normalized;
     },
     [persistMode]
   );
@@ -172,10 +189,14 @@ export function LocationProvider({ children }) {
             const coords = {
               lat: pos.coords.latitude,
               lng: pos.coords.longitude,
-              accuracy: pos.coords.accuracy,
+              accuracyMeters: pos.coords.accuracy,
             };
 
-            const resolved = await resolveLocation(coords);
+            const resolved = await resolveLocation({
+              lat: coords.lat,
+              lng: coords.lng,
+              accuracy: coords.accuracyMeters,
+            });
 
             if (!resolved) {
               throw new Error("No location returned");
@@ -183,18 +204,11 @@ export function LocationProvider({ children }) {
 
             if (requestId !== requestIdRef.current) return;
 
-            const normalized = normalizeLocation(
-              {
-                ...resolved,
-                lat: coords.lat,
-                lng: coords.lng,
-                accuracyMeters: coords.accuracy,
-                type: "auto",
-              },
-              "auto"
-            );
+            const normalized = saveAutoLocation({
+              ...resolved,
+              ...coords,
+            });
 
-            setAutoLocationSafe(normalized);
             resolve(normalized);
           } catch (err) {
             console.error("Auto location failed:", err);
@@ -225,7 +239,7 @@ export function LocationProvider({ children }) {
         }
       );
     });
-  }, [persistMode, setAutoLocationSafe]);
+  }, [persistMode, saveAutoLocation]);
 
   useEffect(() => {
     if (locationMode !== "auto") return;
@@ -233,15 +247,13 @@ export function LocationProvider({ children }) {
     const cachedAuto = readStorage(AUTO_LOCATION_KEY, true);
 
     if (cachedAuto) {
-      const normalized = normalizeLocation(cachedAuto, "auto");
-      setAutoLocation(normalized);
-      setViewLocationState(normalized);
+      saveAutoLocation(cachedAuto);
       setLocationLoading(false);
       return;
     }
 
     useAutoLocation();
-  }, [locationMode, useAutoLocation]);
+  }, [locationMode, saveAutoLocation, useAutoLocation]);
 
   const resetManualLocation = useCallback(() => {
     localStorage.removeItem(MANUAL_LOCATION_KEY);
@@ -252,29 +264,60 @@ export function LocationProvider({ children }) {
   const setViewLocation = useCallback(
     (loc, mode = "manual") => {
       if (mode === "manual") {
-        setManualLocation(loc);
-        return;
+        return setManualLocation(loc);
       }
 
       persistMode("auto");
-      setAutoLocationSafe(loc);
+      return saveAutoLocation(loc);
     },
-    [setManualLocation, persistMode, setAutoLocationSafe]
+    [setManualLocation, persistMode, saveAutoLocation]
   );
 
   const value = useMemo(
     () => ({
       viewLocation,
+      displayLocation,
 
       locationMode,
       locationLoading,
       locationError,
 
       autoLocation,
-      manualLocation: manualLocationState,
+      manualLocation,
 
       setManualLocation,
       useAutoLocation,
+      resetManualLocation,
+
+      // backwards compatibility
+      setViewLocation,
+      enableLiveLocation: useAutoLocation,
+      enableHomeLocation: useAutoLocation,
+      homeLocation: null,
+      liveLocation: autoLocation,
+      ipLocation: null,
+    }),
+    [
+      viewLocation,
+      displayLocation,
+      locationMode,
+      locationLoading,
+      locationError,
+      autoLocation,
+      manualLocation,
+      setManualLocation,
+      useAutoLocation,
+      resetManualLocation,
+      setViewLocation,
+    ]
+  );
+
+  return (
+    <LocationContext.Provider value={value}>
+      {children}
+    </LocationContext.Provider>
+  );
+}     useAutoLocation,
       resetManualLocation,
 
       // backwards compatibility
