@@ -463,3 +463,26 @@ RESPONSIVE
 .landing-login-thumb:hover::after {
   opacity: 1;
 }
+
+.landing-login-thumb::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+
+  border-radius: 50%;
+
+  background: radial-gradient(
+    circle,
+    rgba(177, 18, 38, 0.32),
+    transparent 68%
+  );
+
+  opacity: 0;
+  transition: opacity 0.25s ease;
+
+  pointer-events: none;
+}
+
+.landing-login-thumb:hover::after {
+  opacity: 1;
+}
