@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { signIn } from "aws-amplify/auth";
 import "./CommunityPlusLandingPage.css";
+
 import { useAuth } from "../../context/AuthContext";
 
 const AUTH_UI_ENABLED = false;
@@ -52,17 +53,18 @@ export default function CommunityPlusLandingPage() {
 
   return (
     <div className="cpl-root">
+      <div className="landing-hero-bg">
+        <img src="/images/echo 2.png" alt="" />
+        <div className="landing-hero-tint" />
+      </div>
+
       <main className="landing-container">
-        
-        {/* TITLE */}
         <h1 className="brand-title">Community.One</h1>
 
-        {/* LOGO */}
         <div className="landing-logo">
           <img src="/logo/echo.png" alt="Community.One" />
         </div>
 
-        {/* OPTIONAL TEXT (keeps layout balanced) */}
         <div className="landing-text">
           <h2 className="landing-tagline">
             Real People. <span className="accent">Real News.</span> Real Time
@@ -74,7 +76,6 @@ export default function CommunityPlusLandingPage() {
           </p>
         </div>
 
-        {/* CTA / STATUS */}
         <div className="landing-actions">
           {AUTH_UI_ENABLED ? (
             <button
@@ -91,10 +92,8 @@ export default function CommunityPlusLandingPage() {
             </p>
           )}
         </div>
-
       </main>
 
-      {/* FALLBACK LOGIN */}
       {AUTH_UI_ENABLED && showFallback && (
         <div className="cpl-modalOverlay">
           <div className="cpl-authModal">
@@ -127,12 +126,9 @@ export default function CommunityPlusLandingPage() {
         </div>
       )}
 
-      {/* LOADING */}
       {AUTH_UI_ENABLED && authLoading && (
         <div className="auth-loading-overlay">
-          <div className="auth-loading-box">
-            Redirecting to secure login…
-          </div>
+          <div className="auth-loading-box">Redirecting to secure login…</div>
         </div>
       )}
     </div>
