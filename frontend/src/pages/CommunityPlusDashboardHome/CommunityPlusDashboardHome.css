@@ -1,58 +1,40 @@
 /* =========================
-   DASHBOARD HOME LAYOUT
+   DASHBOARD HOME PAGE
 ========================= */
 
-.dashboard-home {
+.dashboard-home-page {
   width: 100%;
   height: 100%;
-
   min-width: 0;
   min-height: 0;
 
   display: grid;
-  grid-template-columns: 420px minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
 
   background: #f8f6f3;
   overflow: hidden;
 }
 
 /* =========================
-   FEED RAIL
+   FILTER BAR
 ========================= */
 
-.dashboard-home-feed {
-  width: 100%;
-  min-width: 0;
-  min-height: 0;
+.dashboard-home-filterbar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
-  padding: 20px 16px;
+  padding: 16px 20px 10px;
 
   background: #f8f6f3;
-  border-right: 1px solid #e2dbd3;
-
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-
-  overflow-y: auto;
 }
-
-.dashboard-home-feed::-webkit-scrollbar {
-  width: 6px;
-}
-
-.dashboard-home-feed::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.18);
-  border-radius: 999px;
-}
-
-/* =========================
-   FEED FILTERS
-========================= */
 
 .feed-filters {
   display: flex;
+  justify-content: center;
+  align-items: center;
   flex-wrap: wrap;
+
   gap: 8px;
 }
 
@@ -61,7 +43,7 @@
   background: #ffffff;
 
   border-radius: 999px;
-  padding: 7px 13px;
+  padding: 7px 14px;
 
   font: inherit;
   font-size: 13px;
@@ -84,6 +66,51 @@
 }
 
 /* =========================
+   TWO COLUMN LAYOUT
+========================= */
+
+.dashboard-home {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+
+  display: grid;
+  grid-template-columns: 420px minmax(0, 1fr);
+
+  background: #f8f6f3;
+  overflow: hidden;
+}
+
+/* =========================
+   FEED RAIL
+========================= */
+
+.dashboard-home-feed {
+  min-width: 0;
+  min-height: 0;
+
+  padding: 10px 16px 20px;
+
+  background: #f8f6f3;
+  border-right: 1px solid #e2dbd3;
+
+  display: flex;
+  flex-direction: column;
+
+  overflow-y: auto;
+}
+
+.dashboard-home-feed::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dashboard-home-feed::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.18);
+  border-radius: 999px;
+}
+
+/* =========================
    FEED LIST
 ========================= */
 
@@ -101,7 +128,7 @@
   min-width: 0;
   min-height: 0;
 
-  padding: 20px 16px;
+  padding: 10px 16px 20px;
 
   background: #f8f6f3;
 
@@ -165,7 +192,8 @@
   border-left-color: #d92d20;
 }
 
-.feed-card[data-type="beacon"] {
+.feed-card[data-type="beacon"],
+.feed-card[data-type="alert"] {
   border-left-color: #f59e0b;
 }
 
@@ -173,14 +201,7 @@
   border-left-color: #2563eb;
 }
 
-.feed-card[data-type="blob"] {
-  border-left-color: #16a34a;
-}
-
-.feed-card[data-type="alert"] {
-  border-left-color: #f59e0b;
-}
-
+.feed-card[data-type="blob"],
 .feed-card[data-type="post"] {
   border-left-color: #16a34a;
 }
@@ -242,6 +263,14 @@
 ========================= */
 
 @media (max-width: 768px) {
+  .dashboard-home-page {
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .dashboard-home-filterbar {
+    padding: 12px 14px 8px;
+  }
+
   .dashboard-home {
     grid-template-columns: 1fr;
     grid-template-rows: 42% 58%;
@@ -250,7 +279,7 @@
   .dashboard-home-feed {
     border-right: 0;
     border-bottom: 1px solid #e2dbd3;
-    padding: 14px;
+    padding: 10px 14px 14px;
   }
 
   .dashboard-home-map {

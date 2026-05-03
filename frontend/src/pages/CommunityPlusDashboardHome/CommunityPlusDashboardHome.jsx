@@ -132,8 +132,8 @@ export default function CommunityPlusDashboardHome() {
   const [activeFilter, setActiveFilter] = useState("all");
 
   return (
-    <div className="dashboard-home">
-      <section className="dashboard-home-feed">
+    <div className="dashboard-home-page">
+      <header className="dashboard-home-filterbar">
         <div className="feed-filters" aria-label="Feed filters">
           {FILTERS.map((filter) => (
             <button
@@ -148,15 +148,19 @@ export default function CommunityPlusDashboardHome() {
             </button>
           ))}
         </div>
+      </header>
 
-        <div className="feed-list">
-          <Feed activeFilter={activeFilter} />
-        </div>
-      </section>
+      <div className="dashboard-home">
+        <section className="dashboard-home-feed">
+          <div className="feed-list">
+            <Feed activeFilter={activeFilter} />
+          </div>
+        </section>
 
-      <section className="dashboard-home-map">
-        <CommunityMap />
-      </section>
+        <section className="dashboard-home-map">
+          <CommunityMap />
+        </section>
+      </div>
     </div>
   );
 }
