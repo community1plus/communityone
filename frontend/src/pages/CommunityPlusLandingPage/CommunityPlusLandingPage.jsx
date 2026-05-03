@@ -63,7 +63,9 @@ export default function CommunityPlusLandingPage() {
         aria-label="Login"
         title="Login"
       >
-        <img src="/logo/echo.png" alt="" />
+      <div className="auth-brand">
+         <img src="/logo/echo.png" alt="" />
+      </div>
       </button>
 
       {/* AUTH MODAL */}
