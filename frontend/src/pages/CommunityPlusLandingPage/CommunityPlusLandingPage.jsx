@@ -79,30 +79,40 @@ export default function CommunityPlusLandingPage() {
             {AUTH_UI_ENABLED ? (
               <button
                 type="button"
-                className="btn primary"
+                className="btn primary hero-cta"
                 onClick={handleEntry}
                 disabled={authLoading}
               >
-                {authLoading ? "Connecting..." : "Explore your local area"}
+                {authLoading ? "Connecting..." : "Enter your community"}
               </button>
             ) : (
-              <p className="auth-maintenance-note">
-                We’re updating the sign-in experience. Please check back soon.
-              </p>
+              <>
+                <button
+                  type="button"
+                  className="btn ghost hero-cta"
+                  disabled
+                >
+                  Login coming soon
+                </button>
+
+                <p className="auth-maintenance-note">
+                  We’re updating the sign-in experience. Please check back soon.
+                </p>
+              </>
             )}
           </div>
         </section>
       </main>
 
       <button
-          type="button"
-          className="landing-login-thumb"
-          onClick={handleEntry}
-          disabled={!AUTH_UI_ENABLED || authLoading}
-          aria-label="Login"
-          title={AUTH_UI_ENABLED ? "Login" : "Login temporarily unavailable"}
->
-          <img src="/logo/echo.png" alt="" />
+        type="button"
+        className="landing-login-thumb"
+        onClick={handleEntry}
+        disabled={!AUTH_UI_ENABLED || authLoading}
+        aria-label="Login"
+        title={AUTH_UI_ENABLED ? "Login" : "Login temporarily unavailable"}
+      >
+        <img src="/logo/echo.png" alt="" />
       </button>
 
       {AUTH_UI_ENABLED && showFallback && (

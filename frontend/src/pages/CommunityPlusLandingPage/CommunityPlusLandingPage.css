@@ -417,3 +417,33 @@ RESPONSIVE
   opacity: 0.45;
   cursor: not-allowed;
 }
+
+.hero-cta {
+  margin-top: 14px;
+
+  min-width: 220px;
+  height: 46px;
+
+  font-size: 15px;
+  font-weight: 700;
+
+  border-radius: 12px;
+
+  background: #b11226;
+  color: #fff;
+
+  box-shadow: 0 8px 20px rgba(177, 18, 38, 0.25);
+
+  transition: all 0.2s ease;
+}
+
+.hero-cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 26px rgba(177, 18, 38, 0.35);
+}
+
+.btn.ghost {
+  background: transparent;
+  color: #b11226;
+  border: 1px solid #b11226;
+}
