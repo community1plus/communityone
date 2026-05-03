@@ -1,146 +1,278 @@
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-.profile-container {
-  font-family: 
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    Roboto,
-    Helvetica,
-    Arial,
-    sans-serif;
-}
-
-.profile-left h1 {
-  font-size: 18px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-}
-
-.profile-left label {
-  font-size: 13px;
-  font-weight: 500;
-  color: #5c5147;
-}
-
-.profile-left input {
-  font-size: 14px;
-}
-
-.profile-left {
-  background: #fff;
-  border: 1px solid #e6dfd8;
-}
-
-.profile-guide {
-  background: #faf7f4;
-}
 /* =====================================================
-PROFILE PAGE — COMPACT REFINEMENT
+PROFILE PAGE
 ===================================================== */
 
 .profile-container {
-  flex: 1;
+  width: 100%;
   min-height: 100%;
-  padding: 16px 20px;
+
+  padding: 20px 24px;
   box-sizing: border-box;
 
-  font-family: inherit;
-  color: #241f1c;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+
+  color: #2f2925;
+  background: #f8f6f3;
 }
 
 .profile-layout {
   width: 100%;
-  min-height: calc(100vh - 120px);
+  min-height: calc(100vh - 165px);
 
   display: grid;
-  grid-template-columns: minmax(0, 1.6fr) minmax(280px, 0.8fr);
-  gap: 16px;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 20px;
   align-items: stretch;
 }
 
 .profile-layout > * {
   min-width: 0;
+  box-sizing: border-box;
 }
 
-/* shared cards */
+/* =====================================================
+CARDS
+===================================================== */
+
 .profile-left,
 .profile-guide {
-  border-radius: 16px;
-  border: 1px solid #e6dfd8;
-  box-shadow: 0 6px 18px rgba(20, 20, 20, 0.045);
+  background: #fff;
+  border: 1px solid #e2dbd3;
+  border-radius: 18px;
+  box-shadow: 0 8px 24px rgba(20, 20, 20, 0.045);
 }
 
-/* left card */
 .profile-left {
-  background: #fff;
-  padding: 18px 20px;
+  padding: 22px 24px;
+
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  justify-content: flex-start;
-  overflow: hidden; /* 🔥 contains borders */
-  padding: 20px;
+  gap: 18px;
+
+  overflow: hidden;
 }
 
-.profile-left form,
-.profile-left .section,
-.profile-left .field {
-  width: 100%;
-  max-width: 100%;
+.profile-guide {
+  padding: 22px 24px;
 }
 
-.profile-left input,
-.profile-left select,
-.profile-left textarea {
-  width: 100%;
-  max-width: 100%;
-  display: block;
-}
+/* =====================================================
+HEADER
+===================================================== */
 
-/* header */
 .profile-page-header {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 14px;
 }
 
 .profile-page-header h1,
 .profile-page-header .page-title {
   margin: 0;
+
   font-size: 20px;
   line-height: 1.2;
   font-weight: 700;
   letter-spacing: -0.02em;
+
+  color: #241f1c;
 }
 
-/* form */
+/* =====================================================
+COMPLETION
+===================================================== */
+
+.profile-completion {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.profile-completion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  font-size: 13px;
+  font-weight: 700;
+  color: #403832;
+}
+
+.profile-completion-track {
+  height: 8px;
+  width: 100%;
+
+  background: #eee7e0;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.profile-completion-fill {
+  height: 100%;
+
+  background: #4a0f0f;
+  border-radius: 999px;
+
+  transition: width 0.28s ease;
+}
+
+/* =====================================================
+SECTION TABS
+===================================================== */
+
+.profile-section-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.profile-section-tab {
+  min-height: 34px;
+
+  border: 1px solid #e2dbd3;
+  background: #fff;
+
+  border-radius: 999px;
+  padding: 7px 13px;
+
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+
+  color: #403832;
+  cursor: pointer;
+
+  transition: all 0.18s ease;
+}
+
+.profile-section-tab:hover {
+  background: #faf7f4;
+}
+
+.profile-section-tab.active {
+  background: #4a0f0f;
+  border-color: #4a0f0f;
+  color: #fff;
+}
+
+.profile-section-tab.complete {
+  background: rgba(74, 15, 15, 0.08);
+  color: #4a0f0f;
+}
+
+/* =====================================================
+FORM SECTION
+===================================================== */
+
+.profile-left .section {
+  width: 100%;
+  max-width: 100%;
+
+  min-height: 390px;
+
+  padding: 18px;
+  box-sizing: border-box;
+
+  border: 1px solid #eee2d8;
+  border-radius: 16px;
+
+  background: #fffdfb;
+
+  animation: profileSectionIn 0.22s ease both;
+}
+
+.profile-left .section h2,
+.profile-left .section-title {
+  margin: 0 0 14px;
+
+  font-size: 17px;
+  line-height: 1.25;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+
+  color: #241f1c;
+}
+
+/* animation target if FormBuilder is inside section */
+.profile-left .section > * {
+  animation: profileContentFade 0.24s ease both;
+}
+
+/* =====================================================
+FIELDS
+===================================================== */
+
+.profile-left form,
 .profile-left .field {
-  margin-bottom: 4px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.profile-left .field {
+  margin-bottom: 14px;
 }
 
 .profile-left label {
+  display: block;
+  margin-bottom: 6px;
+
   font-size: 13px;
-  font-weight: 600;
+  line-height: 1.2;
+  font-weight: 650;
+
   color: #403832;
 }
 
 .profile-left input,
 .profile-left select,
 .profile-left textarea {
-  min-height: 38px;
+  width: 100%;
+  max-width: 100%;
+
+  min-height: 42px;
+  height: 42px;
+
+  padding: 9px 12px;
+  box-sizing: border-box;
+
+  border: 1px solid #ddd4ca;
+  border-radius: 12px;
+
+  background: #fff;
+
+  font: inherit;
   font-size: 14px;
+  line-height: 1.2;
+  color: #241f1c;
+
+  outline: none;
+
+  transition: border-color 0.16s ease, box-shadow 0.16s ease,
+    background 0.16s ease;
 }
 
-/* navigation */
+.profile-left textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.profile-left input:focus,
+.profile-left select:focus,
+.profile-left textarea:focus {
+  border-color: #4a0f0f;
+  box-shadow: 0 0 0 3px rgba(74, 15, 15, 0.08);
+}
+
+/* =====================================================
+NAVIGATION
+===================================================== */
+
 .form-navigation {
-  margin-top: 6px;
-  padding-top: 12px;
+  margin-top: auto;
+  padding-top: 16px;
 
   display: flex;
   justify-content: space-between;
@@ -151,45 +283,65 @@ PROFILE PAGE — COMPACT REFINEMENT
 
 .form-actions {
   display: flex;
-  gap: 8px;
+  gap: 10px;
 }
 
-/* right panel */
-.profile-guide {
-  background: #faf7f4;
-  padding: 18px 20px;
-
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-
-  align-self: stretch;
-}
+/* =====================================================
+GUIDE PANEL
+===================================================== */
 
 .profile-guide h2,
 .profile-guide .section-title {
-  margin: 0;
-  font-size: 16px;
+  margin: 0 0 8px;
+
+  font-size: 17px;
   line-height: 1.25;
   font-weight: 700;
+
+  color: #241f1c;
 }
 
 .profile-guide p,
 .profile-guide .section-meta {
   margin: 0;
+
   font-size: 13px;
   line-height: 1.45;
   color: #6f6259;
 }
 
-/* responsive */
-@media (max-width: 900px) {
-  .profile-container {
-    padding: 14px;
+/* =====================================================
+ANIMATION
+===================================================== */
+
+@keyframes profileSectionIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
   }
 
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes profileContentFade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* =====================================================
+RESPONSIVE
+===================================================== */
+
+@media (max-width: 1000px) {
   .profile-layout {
-    min-height: auto;
     grid-template-columns: 1fr;
   }
 
@@ -198,21 +350,38 @@ PROFILE PAGE — COMPACT REFINEMENT
   }
 }
 
-.profile-left {
-  overflow: hidden;
-}
+@media (max-width: 700px) {
+  .profile-container {
+    padding: 14px;
+  }
 
-.profile-left * {
-  box-sizing: border-box;
-}
+  .profile-left,
+  .profile-guide {
+    padding: 18px;
+    border-radius: 16px;
+  }
 
-.profile-left form,
-.profile-left section,
-.profile-left .section,
-.profile-left .field,
-.profile-left input,
-.profile-left select,
-.profile-left textarea {
-  max-width: 100%;
-  width: 100%;
+  .profile-left .section {
+    min-height: 340px;
+    padding: 16px;
+  }
+
+  .profile-section-tabs {
+    gap: 6px;
+  }
+
+  .profile-section-tab {
+    font-size: 11px;
+    padding: 7px 10px;
+  }
+
+  .form-navigation {
+    gap: 12px;
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .form-actions {
+    justify-content: flex-end;
+  }
 }
