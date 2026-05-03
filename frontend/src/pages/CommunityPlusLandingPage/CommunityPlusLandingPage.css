@@ -1,31 +1,100 @@
+/* =========================
+ROOT
+========================= */
+
 .cpl-root {
   position: relative;
   min-height: 100vh;
   overflow: hidden;
+  background: #f8f6f3;
 }
+
+/* =========================
+BACKGROUND IMAGE
+========================= */
 
 .landing-hero-bg {
   position: absolute;
   inset: 0;
   z-index: 0;
+  overflow: hidden;
 }
 
 .landing-hero-bg img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: grayscale(1) contrast(1.05) brightness(0.9);
+
+  /* 🔥 cleaner tone control */
+  filter:
+    grayscale(1)
+    contrast(1.08)
+    brightness(0.88);
+
+  transform: scale(1.02); /* subtle zoom = less edge exposure */
 }
+
+/* =========================
+PRIMARY OVERLAY (LIGHT FADE)
+========================= */
 
 .landing-hero-tint {
   position: absolute;
   inset: 0;
+
+  /* 🔥 balanced readability + depth */
   background:
-    radial-gradient(circle at center, rgba(248, 246, 243, 0.82), rgba(248, 246, 243, 0.55)),
-    rgba(177, 18, 38, 0.04);
+    radial-gradient(
+      circle at 50% 40%,
+      rgba(248, 246, 243, 0.82),
+      rgba(248, 246, 243, 0.55) 40%,
+      rgba(248, 246, 243, 0.25) 70%,
+      rgba(248, 246, 243, 0.1)
+    );
 }
+
+/* =========================
+SUBTLE BRAND TONE
+========================= */
+
+.landing-hero-tint::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  /* 🔥 adds identity without overpowering */
+  background: rgba(177, 18, 38, 0.035);
+
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+/* =========================
+FOCUS GRADIENT (KEY UPGRADE)
+========================= */
+
+.landing-hero-focus {
+  position: absolute;
+  inset: 0;
+
+  background:
+    radial-gradient(
+      circle at center,
+      transparent 35%,
+      rgba(0, 0, 0, 0.25)
+    );
+
+  z-index: 0;
+}
+
+/* =========================
+CONTENT LAYER
+========================= */
 
 .landing-container {
   position: relative;
-  z-index: 1;
+  z-index: 2;
+
+  /* optional: soft elevation */
+  backdrop-filter: blur(2px);
 }
