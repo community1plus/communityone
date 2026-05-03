@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { signIn } from "aws-amplify/auth";
-import "./CommunityPlusLandingPage.css";
 
 import { useAuth } from "../../context/AuthContext";
+import "./CommunityPlusLandingPage.css";
 
 const AUTH_UI_ENABLED = false;
 
@@ -32,7 +32,9 @@ export default function CommunityPlusLandingPage() {
     }
   };
 
-  const handleEmailLogin = async () => {
+  const handleEmailLogin = async (event) => {
+    event?.preventDefault();
+
     if (!AUTH_UI_ENABLED || authLoading) return;
 
     setAuthLoading(true);
@@ -53,76 +55,76 @@ export default function CommunityPlusLandingPage() {
 
   return (
     <div className="cpl-root">
-      <div className="landing-hero-bg">
+      <div className="landing-hero-bg" aria-hidden="true">
         <img src="/images/echo 2.png" alt="" />
         <div className="landing-hero-tint" />
       </div>
 
       <main className="landing-container">
-        <h1 className="brand-title">Community.One</h1>
+        <section className="landing-hero" aria-label="Community.One landing">
+          <h1 className="brand-title">Community.One</h1>
 
-        <div className="landing-logo">
-          <img src="/logo/echo.png" alt="Community.One" />
-        </div>
+          <div className="landing-logo" aria-hidden="true">
+            <img src="/logo/echo.png" alt="" />
+          </div>
 
-        <div className="landing-text">
-          <h2 className="landing-tagline">
-            Real People. <span className="accent">Real News.</span> Real Time
-          </h2>
+          <div className="landing-text">
+            <h2 className="landing-tagline">
+              Real People. <span className="accent">Real News.</span> Real Time
+            </h2>
 
-          <p className="landing-sub">
-            A map-first local feed that prioritises what’s happening{" "}
-            <strong>here</strong>.
-          </p>
-        </div>
-
-        <div className="landing-actions">
-          {AUTH_UI_ENABLED ? (
-            <button
-              type="button"
-              className="btn primary"
-              onClick={handleEntry}
-              disabled={authLoading}
-            >
-              {authLoading ? "Connecting..." : "Explore your local area"}
-            </button>
-          ) : (
-            <p className="auth-maintenance-note">
-              We’re updating the sign-in experience. Please check back soon.
+            <p className="landing-sub">
+              A map-first local feed that prioritises what’s happening{" "}
+              <strong>here</strong>.
             </p>
-          )}
-        </div>
+          </div>
+
+          <div className="landing-actions">
+            {AUTH_UI_ENABLED ? (
+              <button
+                type="button"
+                className="btn primary"
+                onClick={handleEntry}
+                disabled={authLoading}
+              >
+                {authLoading ? "Connecting..." : "Explore your local area"}
+              </button>
+            ) : (
+              <p className="auth-maintenance-note">
+                We’re updating the sign-in experience. Please check back soon.
+              </p>
+            )}
+          </div>
+        </section>
       </main>
 
       {AUTH_UI_ENABLED && showFallback && (
         <div className="cpl-modalOverlay">
-          <div className="cpl-authModal">
+          <form className="cpl-authModal" onSubmit={handleEmailLogin}>
             <h2>Sign In</h2>
 
             <input
               type="email"
               placeholder="Email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
+              onChange={(event) => setEmail(event.target.value)}
             />
 
             <input
               type="password"
               placeholder="Password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="current-password"
+              onChange={(event) => setPassword(event.target.value)}
             />
 
-            <button
-              type="button"
-              onClick={handleEmailLogin}
-              disabled={authLoading}
-            >
+            <button type="submit" disabled={authLoading}>
               {authLoading ? "Signing in..." : "Sign In"}
             </button>
 
             {authError && <div className="error">{authError}</div>}
-          </div>
+          </form>
         </div>
       )}
 
