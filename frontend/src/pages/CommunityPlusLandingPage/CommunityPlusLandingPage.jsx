@@ -70,7 +70,7 @@ export default function CommunityPlusLandingPage() {
             </h2>
 
             <p className="landing-sub">
-              A map-first local feed that prioritises what’s happening{" "}
+              local signal + local economy
               <strong>here</strong>.
             </p>
           </div>
