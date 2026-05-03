@@ -1,27 +1,22 @@
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import LocationDisplay from "./LocationDisplay";
 import { useLocationContext } from "../../../context/LocationProvider";
-import { useUserLocation } from "../../../hooks/useUserLocation";
 import { NAVIGATION } from "../../../config/navigation/navigationConfig";
 
 export default function HeaderNav() {
   const navigate = useNavigate();
   const routeLocation = useLocation();
 
-  const { viewLocation, setViewLocation } = useLocationContext();
-
   const {
-    autoLocation,
-    manualLocation,
-    displayLocation,
-    mode,
-    loading,
-    error,
-    setAutoMode,
-    setManualMode,
-  } = useUserLocation();
+    viewLocation,
+    locationMode,
+    locationLoading,
+    locationError,
+    setManualLocation,
+    useAutoLocation,
+  } = useLocationContext();
 
   const navItems = useMemo(
     () => NAVIGATION.find((item) => item.group === "main")?.items || [],
@@ -46,52 +41,26 @@ export default function HeaderNav() {
     [navigate, routeLocation.pathname]
   );
 
-  /*
-    AUTO TRIGGER:
-    On load, if the hook is in auto mode but has not resolved yet,
-    explicitly start auto geolocation.
-  */
-  useEffect(() => {
-    if (mode !== "auto") return;
-    if (autoLocation) return;
-    if (loading) return;
-
-    setAutoMode();
-  }, [mode, autoLocation, loading, setAutoMode]);
-
-  /*
-    SYNC DISPLAY LOCATION INTO GLOBAL VIEW LOCATION
-  */
-  useEffect(() => {
-    if (!displayLocation) return;
-
-    setViewLocation(displayLocation, mode);
-  }, [displayLocation, mode, setViewLocation]);
-
   const handleManualLocationSet = useCallback(
     (nextManualLocation) => {
       if (!nextManualLocation) return;
-
-      setManualMode(nextManualLocation);
-      setViewLocation(nextManualLocation, "manual");
+      setManualLocation(nextManualLocation);
     },
-    [setManualMode, setViewLocation]
+    [setManualLocation]
   );
 
   const handleAutoLocationSet = useCallback(() => {
-    setAutoMode();
-  }, [setAutoMode]);
-
-  const locationForDisplay = displayLocation || viewLocation;
+    useAutoLocation();
+  }, [useAutoLocation]);
 
   return (
     <nav className="header-nav" aria-label="Primary navigation">
       <div className="nav-left">
         <LocationDisplay
-          location={locationForDisplay}
-          mode={mode}
-          loading={loading}
-          error={error}
+          location={viewLocation}
+          mode={locationMode}
+          loading={locationLoading}
+          error={locationError}
           onManualSet={handleManualLocationSet}
           onAutoSet={handleAutoLocationSet}
         />

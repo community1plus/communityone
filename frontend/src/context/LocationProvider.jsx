@@ -1,276 +1,306 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+
 import { resolveLocation } from "../services/resolveLocation";
 
-const LocationContext = createContext();
+const LocationContext = createContext(null);
 
 export const useLocationContext = () => useContext(LocationContext);
 
-const normalizeLocation = (loc = {}) => {
-  const type = loc.type || "auto";
+const MODE_KEY = "communityplus_location_mode";
+const AUTO_LOCATION_KEY = "communityplus_auto_location";
+const MANUAL_LOCATION_KEY = "communityplus_manual_location";
+const VIEW_LOCATION_KEY = "communityplus_view_location";
+
+const CACHE_TTL = 1000 * 60 * 10;
+
+const readStorage = (key, respectTTL = false) => {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return null;
+
+    const parsed = JSON.parse(raw);
+
+    if (!parsed?.data) return null;
+
+    if (!respectTTL) return parsed.data;
+
+    return Date.now() - parsed.timestamp < CACHE_TTL ? parsed.data : null;
+  } catch {
+    localStorage.removeItem(key);
+    return null;
+  }
+};
+
+const writeStorage = (key, data) => {
+  try {
+    localStorage.setItem(
+      key,
+      JSON.stringify({
+        data,
+        timestamp: Date.now(),
+      })
+    );
+  } catch {
+    // ignore storage failure
+  }
+};
+
+const normalizeLocation = (loc = {}, fallbackType = "auto") => {
+  const lat = loc.lat ?? loc.latitude ?? null;
+  const lng = loc.lng ?? loc.longitude ?? null;
+
+  const suburb = loc.suburb || loc.city || "";
+  const city = loc.city || loc.suburb || "";
+  const state = loc.state || loc.region || loc.region_code || "";
+
+  const type = loc.type || fallbackType;
   const accuracyMeters = loc.accuracyMeters ?? loc.accuracy ?? null;
 
+  const label =
+    loc.label ||
+    [suburb || city, state].filter(Boolean).join(", ") ||
+    "Enter location";
+
   return {
-    lat: loc.lat ?? null,
-    lng: loc.lng ?? null,
-
-    suburb: loc.suburb || loc.city || "",
-    city: loc.city || loc.suburb || "",
-    state: loc.state || "",
-
-    label:
-      loc.label ||
-      [loc.suburb || loc.city, loc.state].filter(Boolean).join(", ") ||
-      "Enter location",
-
+    lat,
+    lng,
+    suburb,
+    city,
+    state,
+    label,
     type,
-
+    accuracyMeters,
     accuracy:
       type === "manual"
         ? "MANUAL"
         : accuracyMeters && accuracyMeters <= 100
         ? "LEVEL_4"
         : "LEVEL_3",
-
-    accuracyMeters,
-    updatedAt: loc.updatedAt || Date.now(),
+    updatedAt: Date.now(),
   };
-};
-
-const chooseViewLocation = ({ mode, manual, home, live }) => {
-  if (mode === "manual" && manual) return manual;
-  if (home) return home;
-  if (live) return live;
-  return null;
 };
 
 export function LocationProvider({ children }) {
-  const [homeLocation, setHomeLocation] = useState(null);
-  const [liveLocation, setLiveLocation] = useState(null);
-  const [ipLocation, setIpLocation] = useState(null);
-  const [manualLocation, setManualLocation] = useState(null);
-  const [locationMode, setLocationMode] = useState("auto");
+  const initialMode = localStorage.getItem(MODE_KEY) || "auto";
 
-  const [viewLocation, setViewLocationState] = useState(() => {
-    const saved = localStorage.getItem("viewLocation");
+  const [locationMode, setLocationMode] = useState(initialMode);
 
-    if (!saved) return null;
+  const [autoLocation, setAutoLocation] = useState(() =>
+    readStorage(AUTO_LOCATION_KEY, true)
+  );
 
-    try {
-      const parsed = JSON.parse(saved);
+  const [manualLocationState, setManualLocationState] = useState(() =>
+    readStorage(MANUAL_LOCATION_KEY, false)
+  );
 
-      if (parsed?.type === "ip") {
-        localStorage.removeItem("viewLocation");
-        return null;
-      }
+  const [viewLocation, setViewLocationState] = useState(() =>
+    readStorage(VIEW_LOCATION_KEY, false)
+  );
 
-      return normalizeLocation(parsed);
-    } catch {
-      localStorage.removeItem("viewLocation");
-      return null;
-    }
-  });
+  const [locationLoading, setLocationLoading] = useState(
+    initialMode === "auto" && !readStorage(AUTO_LOCATION_KEY, true)
+  );
 
-  const setViewLocation = (loc, mode = "manual") => {
+  const [locationError, setLocationError] = useState(null);
+
+  const requestIdRef = useRef(0);
+
+  const persistMode = useCallback((mode) => {
+    localStorage.setItem(MODE_KEY, mode);
+    setLocationMode(mode);
+  }, []);
+
+  const setAutoLocationSafe = useCallback((loc) => {
     if (!loc) return;
 
-    const normalized = normalizeLocation({
-      ...loc,
-      type: mode === "manual" ? "manual" : loc.type || "auto",
-    });
+    const normalized = normalizeLocation(loc, "auto");
 
-    if (mode === "manual") {
-      setManualLocation(normalized);
-      setLocationMode("manual");
-    }
-
+    setAutoLocation(normalized);
     setViewLocationState(normalized);
-  };
 
-  const enableLiveLocation = async () => {
-    if (!navigator.geolocation) return null;
+    writeStorage(AUTO_LOCATION_KEY, normalized);
+    writeStorage(VIEW_LOCATION_KEY, normalized);
+  }, []);
 
-    return new Promise((resolve, reject) => {
-      navigator.geolocation.getCurrentPosition(
-        async (pos) => {
-          try {
-            const enriched = await resolveLocation({
-              lat: pos.coords.latitude,
-              lng: pos.coords.longitude,
-              accuracy: pos.coords.accuracy,
-            });
+  const setManualLocation = useCallback(
+    (loc) => {
+      if (!loc) return;
 
-            const loc = normalizeLocation({
-              ...enriched,
-              type: "live",
-              accuracyMeters: pos.coords.accuracy,
-            });
+      requestIdRef.current += 1;
 
-            setLiveLocation(loc);
+      const normalized = normalizeLocation(loc, "manual");
 
-            if (locationMode !== "manual") {
-              setViewLocation(loc, "auto");
-            }
+      persistMode("manual");
 
-            resolve(loc);
-          } catch (err) {
-            console.error("Location resolution failed:", err);
-            reject(err);
-          }
-        },
-        (err) => {
-          console.warn("Live location unavailable:", err);
-          reject(err);
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 8000,
-          maximumAge: 60000,
-        }
-      );
-    });
-  };
+      setManualLocationState(normalized);
+      setViewLocationState(normalized);
 
-  const enableHomeLocation = async () => {
-    if (!navigator.geolocation) return null;
+      writeStorage(MANUAL_LOCATION_KEY, normalized);
+      writeStorage(VIEW_LOCATION_KEY, normalized);
 
-    return new Promise((resolve, reject) => {
-      navigator.geolocation.getCurrentPosition(
-        async (pos) => {
-          try {
-            const enriched = await resolveLocation({
-              lat: pos.coords.latitude,
-              lng: pos.coords.longitude,
-              accuracy: pos.coords.accuracy,
-            });
+      setLocationLoading(false);
+      setLocationError(null);
+    },
+    [persistMode]
+  );
 
-            const loc = normalizeLocation({
-              ...enriched,
-              type: "home",
-              accuracyMeters: pos.coords.accuracy,
-            });
+  const useAutoLocation = useCallback(async () => {
+    const requestId = ++requestIdRef.current;
 
-            setHomeLocation(loc);
-            localStorage.setItem("homeLocation", JSON.stringify(loc));
+    persistMode("auto");
+    setLocationLoading(true);
+    setLocationError(null);
 
-            if (locationMode !== "manual") {
-              setViewLocation(loc, "auto");
-            }
-
-            resolve(loc);
-          } catch (err) {
-            console.error("Home location failed:", err);
-            reject(err);
-          }
-        },
-        (err) => {
-          console.warn("Home location unavailable:", err);
-          reject(err);
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 8000,
-          maximumAge: 60000,
-        }
-      );
-    });
-  };
-
-  useEffect(() => {
-    if (viewLocation) {
-      localStorage.setItem("viewLocation", JSON.stringify(viewLocation));
+    if (!navigator.geolocation) {
+      setLocationError("Geolocation not supported");
+      setLocationLoading(false);
+      return null;
     }
-  }, [viewLocation]);
+
+    return new Promise((resolve) => {
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          try {
+            const coords = {
+              lat: pos.coords.latitude,
+              lng: pos.coords.longitude,
+              accuracy: pos.coords.accuracy,
+            };
+
+            const resolved = await resolveLocation(coords);
+
+            if (!resolved) {
+              throw new Error("No location returned");
+            }
+
+            if (requestId !== requestIdRef.current) return;
+
+            const normalized = normalizeLocation(
+              {
+                ...resolved,
+                lat: coords.lat,
+                lng: coords.lng,
+                accuracyMeters: coords.accuracy,
+                type: "auto",
+              },
+              "auto"
+            );
+
+            setAutoLocationSafe(normalized);
+            resolve(normalized);
+          } catch (err) {
+            console.error("Auto location failed:", err);
+
+            if (requestId !== requestIdRef.current) return;
+
+            setLocationError("Location resolution failed");
+            resolve(null);
+          } finally {
+            if (requestId === requestIdRef.current) {
+              setLocationLoading(false);
+            }
+          }
+        },
+        (err) => {
+          if (requestId !== requestIdRef.current) return;
+
+          console.warn("Geolocation unavailable:", err);
+
+          setLocationError(err.message || "Permission denied");
+          setLocationLoading(false);
+          resolve(null);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0,
+        }
+      );
+    });
+  }, [persistMode, setAutoLocationSafe]);
 
   useEffect(() => {
-    const init = async () => {
-      if (locationMode === "manual") return;
+    if (locationMode !== "auto") return;
 
-      let home = null;
+    const cachedAuto = readStorage(AUTO_LOCATION_KEY, true);
 
-      const savedHome = localStorage.getItem("homeLocation");
+    if (cachedAuto) {
+      const normalized = normalizeLocation(cachedAuto, "auto");
+      setAutoLocation(normalized);
+      setViewLocationState(normalized);
+      setLocationLoading(false);
+      return;
+    }
 
-      if (savedHome) {
-        try {
-          home = normalizeLocation(JSON.parse(savedHome));
-          setHomeLocation(home);
-        } catch {
-          localStorage.removeItem("homeLocation");
-        }
-      }
+    useAutoLocation();
+  }, [locationMode, useAutoLocation]);
 
-      try {
-        const res = await fetch("https://ipapi.co/json/");
-        const data = await res.json();
+  const resetManualLocation = useCallback(() => {
+    localStorage.removeItem(MANUAL_LOCATION_KEY);
+    setManualLocationState(null);
+    useAutoLocation();
+  }, [useAutoLocation]);
 
-        const ip = normalizeLocation({
-          lat: data.latitude,
-          lng: data.longitude,
-          city: data.city,
-          state: data.region_code,
-          label: `${data.city}, ${data.region_code}`,
-          type: "ip",
-        });
-
-        setIpLocation(ip);
-      } catch {
-        console.warn("IP location failed");
-      }
-
-      const resolved = chooseViewLocation({
-        mode: locationMode,
-        manual: manualLocation,
-        home,
-        live: liveLocation,
-      });
-
-      if (resolved) {
-        setViewLocation(resolved, "auto");
+  const setViewLocation = useCallback(
+    (loc, mode = "manual") => {
+      if (mode === "manual") {
+        setManualLocation(loc);
         return;
       }
 
-      try {
-        await enableLiveLocation();
-      } catch {
-        console.warn("Live location unavailable. Waiting for manual input.");
-      }
-    };
+      persistMode("auto");
+      setAutoLocationSafe(loc);
+    },
+    [setManualLocation, persistMode, setAutoLocationSafe]
+  );
 
-    init();
-  }, []);
+  const value = useMemo(
+    () => ({
+      viewLocation,
 
-  const resetManualLocation = () => {
-    setManualLocation(null);
-    setLocationMode("auto");
+      locationMode,
+      locationLoading,
+      locationError,
 
-    const resolved = chooseViewLocation({
-      mode: "auto",
-      manual: null,
-      home: homeLocation,
-      live: liveLocation,
-    });
+      autoLocation,
+      manualLocation: manualLocationState,
 
-    if (resolved) {
-      setViewLocation(resolved, "auto");
-    }
-  };
+      setManualLocation,
+      useAutoLocation,
+      resetManualLocation,
+
+      // backwards compatibility
+      setViewLocation,
+      enableLiveLocation: useAutoLocation,
+      enableHomeLocation: useAutoLocation,
+      homeLocation: null,
+      liveLocation: autoLocation,
+      ipLocation: null,
+    }),
+    [
+      viewLocation,
+      locationMode,
+      locationLoading,
+      locationError,
+      autoLocation,
+      manualLocationState,
+      setManualLocation,
+      useAutoLocation,
+      resetManualLocation,
+      setViewLocation,
+    ]
+  );
 
   return (
-    <LocationContext.Provider
-      value={{
-        viewLocation,
-        setViewLocation,
-
-        homeLocation,
-        liveLocation,
-        ipLocation,
-        manualLocation,
-        locationMode,
-
-        enableLiveLocation,
-        enableHomeLocation,
-        resetManualLocation,
-      }}
-    >
+    <LocationContext.Provider value={value}>
       {children}
     </LocationContext.Provider>
   );

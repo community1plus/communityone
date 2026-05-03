@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 const LOCATION_STATUS = {
   LEVEL_4: {
@@ -24,6 +24,9 @@ function getAddressComponent(place, type) {
 }
 
 function extractLocationFromPlace(place) {
+  const lat = place?.geometry?.location?.lat?.() ?? null;
+  const lng = place?.geometry?.location?.lng?.() ?? null;
+
   const suburb =
     getAddressComponent(place, "locality") ||
     getAddressComponent(place, "postal_town") ||
@@ -35,45 +38,90 @@ function extractLocationFromPlace(place) {
   const state =
     getAddressComponent(place, "administrative_area_level_1") || "";
 
-  const label = [suburb, state].filter(Boolean).join(", ");
+  const label =
+    place?.formatted_address ||
+    [suburb, state].filter(Boolean).join(", ") ||
+    suburb;
 
   return {
+    lat,
+    lng,
     suburb,
+    city: suburb,
     state,
     label,
     type: "manual",
     accuracy: "MANUAL",
+    updatedAt: Date.now(),
   };
 }
 
-export default function LocationDisplay({ location, onManualSet }) {
+export default function LocationDisplay({
+  location,
+  mode = "auto",
+  loading = false,
+  error = null,
+  onManualSet,
+  onAutoSet,
+}) {
   const [editing, setEditing] = useState(false);
   const [inputValue, setInputValue] = useState("");
 
   const inputRef = useRef(null);
   const autocompleteRef = useRef(null);
 
-  const safeLocation = location || {
-    suburb: "Enter location",
-    state: "",
-    label: "Enter location",
-    type: "auto",
-    accuracy: "LEVEL_3",
-  };
+  const isManualMode = mode === "manual";
+
+  const safeLocation = useMemo(
+    () =>
+      location || {
+        suburb: "",
+        city: "",
+        state: "",
+        label: loading ? "Resolving location..." : "Enter location",
+        type: mode,
+        accuracy: isManualMode ? "MANUAL" : "LEVEL_3",
+      },
+    [location, loading, mode, isManualMode]
+  );
 
   const status =
-    LOCATION_STATUS[safeLocation.accuracy] || LOCATION_STATUS.LEVEL_3;
+    LOCATION_STATUS[safeLocation.accuracy] ||
+    LOCATION_STATUS[isManualMode ? "MANUAL" : "LEVEL_3"];
 
-  const isManual = safeLocation.type === "manual";
+  const displayLabel = useMemo(() => {
+    if (loading && !location) return "Resolving location...";
+    if (error && !location) return "Enter location";
 
-  const toggleTitle = isManual
-    ? "Switch to auto location"
-    : "Switch to manual location";
+    return (
+      safeLocation.label ||
+      [safeLocation.suburb, safeLocation.state].filter(Boolean).join(", ") ||
+      "Enter location"
+    );
+  }, [loading, error, location, safeLocation]);
 
-  const displayLabel =
-    safeLocation.label ||
-    [safeLocation.suburb, safeLocation.state].filter(Boolean).join(", ") ||
-    "Enter location";
+  const handlePinClick = useCallback(() => {
+    if (editing) return;
+
+    if (isManualMode) {
+      onAutoSet?.();
+      return;
+    }
+
+    setEditing(true);
+    setInputValue("");
+  }, [editing, isManualMode, onAutoSet]);
+
+  const handleManualSubmit = useCallback(
+    (nextLocation) => {
+      if (!nextLocation) return;
+
+      onManualSet?.(nextLocation);
+      setInputValue("");
+      setEditing(false);
+    },
+    [onManualSet]
+  );
 
   useEffect(() => {
     if (!editing || !inputRef.current) return;
@@ -90,7 +138,13 @@ export default function LocationDisplay({ location, onManualSet }) {
       {
         types: ["geocode"],
         componentRestrictions: { country: "au" },
-        fields: ["address_components", "formatted_address", "name", "types"],
+        fields: [
+          "address_components",
+          "formatted_address",
+          "geometry",
+          "name",
+          "types",
+        ],
       }
     );
 
@@ -98,43 +152,68 @@ export default function LocationDisplay({ location, onManualSet }) {
       "place_changed",
       () => {
         const place = autocompleteRef.current.getPlace();
-        const selectedLocation = extractLocationFromPlace(place);
 
-        onManualSet(selectedLocation);
-        setInputValue("");
-        setEditing(false);
+        if (!place) return;
+
+        handleManualSubmit(extractLocationFromPlace(place));
       }
     );
 
     return () => {
-      if (listener) {
+      if (listener && window.google?.maps?.event) {
         window.google.maps.event.removeListener(listener);
       }
+
+      autocompleteRef.current = null;
     };
-  }, [editing, onManualSet]);
+  }, [editing, handleManualSubmit]);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = useCallback(
+    (event) => {
+      event.preventDefault();
 
-    const value = inputValue.trim();
-    if (!value) return;
+      const value = inputValue.trim();
+      if (!value) return;
 
-    onManualSet({
-      suburb: value,
-      state: "",
-      label: value,
-      type: "manual",
-      accuracy: "MANUAL",
-    });
+      handleManualSubmit({
+        lat: null,
+        lng: null,
+        suburb: value,
+        city: value,
+        state: "",
+        label: value,
+        type: "manual",
+        accuracy: "MANUAL",
+        updatedAt: Date.now(),
+      });
+    },
+    [inputValue, handleManualSubmit]
+  );
 
-    setInputValue("");
-    setEditing(false);
-  };
+  const handleBlur = useCallback(() => {
+    setTimeout(() => {
+      if (!inputValue.trim()) {
+        setEditing(false);
+      }
+    }, 150);
+  }, [inputValue]);
 
   if (editing) {
     return (
       <form className="location-edit" onSubmit={handleSubmit}>
-        <span className="location-pin location-red">●</span>
+        <button
+          type="button"
+          className="location-pin-button location-red"
+          title="Use auto location"
+          onMouseDown={(event) => event.preventDefault()}
+          onClick={() => {
+            setEditing(false);
+            setInputValue("");
+            onAutoSet?.();
+          }}
+        >
+          ●
+        </button>
 
         <input
           ref={inputRef}
@@ -142,24 +221,23 @@ export default function LocationDisplay({ location, onManualSet }) {
           value={inputValue}
           placeholder="Enter location"
           autoComplete="off"
-          onChange={(e) => setInputValue(e.target.value)}
-          onBlur={() => {
-            setTimeout(() => {
-              if (!inputValue.trim()) setEditing(false);
-            }, 150);
-          }}
+          onChange={(event) => setInputValue(event.target.value)}
+          onBlur={handleBlur}
         />
       </form>
     );
   }
 
   return (
-    <div className="location-display" title={status.label}>
+    <div className="location-display" title={error || status.label}>
       <button
         type="button"
         className={`location-pin-button ${status.className}`}
-        onClick={() => setEditing(true)}
-        title={toggleTitle}
+        onClick={handlePinClick}
+        title={isManualMode ? "Switch to auto location" : "Switch to manual location"}
+        aria-label={
+          isManualMode ? "Switch to auto location" : "Switch to manual location"
+        }
       >
         ●
       </button>
