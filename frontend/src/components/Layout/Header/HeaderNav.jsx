@@ -1,4 +1,5 @@
-import { useNavigate, useLocation } from "react-router-dom";
+import { useCallback, useMemo } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import LocationDisplay from "./LocationDisplay";
 import { useLocationContext } from "../../../context/LocationProvider";
@@ -10,18 +11,57 @@ export default function HeaderNav() {
 
   const { viewLocation, setViewLocation } = useLocationContext();
 
-  const nav = NAVIGATION.find((n) => n.group === "main")?.items || [];
+  /* ===============================
+     NAV CONFIG
+  =============================== */
 
-  const isActive = (path) =>
-    routeLocation.pathname === path ||
-    routeLocation.pathname.startsWith(path + "/");
+  const navItems = useMemo(
+    () => NAVIGATION.find((n) => n.group === "main")?.items || [],
+    []
+  );
 
-  const handleManualLocationSet = (manualLocation) => {
-    setViewLocation(manualLocation, "manual");
-  };
+  /* ===============================
+     ROUTING
+  =============================== */
+
+  const isActive = useCallback(
+    (path) =>
+      Boolean(
+        path &&
+          (routeLocation.pathname === path ||
+            routeLocation.pathname.startsWith(`${path}/`))
+      ),
+    [routeLocation.pathname]
+  );
+
+  const go = useCallback(
+    (path) => {
+      if (!path || routeLocation.pathname === path) return;
+      navigate(path);
+    },
+    [navigate, routeLocation.pathname]
+  );
+
+  /* ===============================
+     LOCATION HANDLING
+  =============================== */
+
+  const handleManualLocationSet = useCallback(
+    (manualLocation) => {
+      if (!manualLocation) return;
+
+      setViewLocation(manualLocation, "manual");
+    },
+    [setViewLocation]
+  );
+
+  /* ===============================
+     RENDER
+  =============================== */
 
   return (
     <nav className="header-nav" aria-label="Primary navigation">
+      {/* LEFT: LOCATION */}
       <div className="nav-left">
         <LocationDisplay
           location={viewLocation}
@@ -29,19 +69,25 @@ export default function HeaderNav() {
         />
       </div>
 
+      {/* CENTER: NAV LINKS */}
       <div className="nav-links">
-        {nav.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            className={`nav-item ${isActive(item.path) ? "active" : ""}`}
-            onClick={() => navigate(item.path)}
-          >
-            {item.label}
-          </button>
-        ))}
+        {navItems.map((item) => {
+          const active = isActive(item.path);
+
+          return (
+            <button
+              key={item.id}
+              type="button"
+              className={`nav-item ${active ? "active" : ""}`}
+              onClick={() => go(item.path)}
+            >
+              {item.label}
+            </button>
+          );
+        })}
       </div>
 
+      {/* RIGHT: RESERVED */}
       <div className="nav-right" />
     </nav>
   );
