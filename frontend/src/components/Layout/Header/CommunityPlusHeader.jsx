@@ -28,7 +28,7 @@ export default function CommunityPlusHeader({ onLogout }) {
   const { user, loading } = useAuth();
   const { isLoaded } = useGoogleMaps();
 
-  const { location, loading: locationLoading } = useUserLocation();
+  const { location, loading: locationLoading, mode,setAutoMode } = useUserLocation();
 
   const [showMenu, setShowMenu] = useState(false);
 
@@ -102,10 +102,13 @@ export default function CommunityPlusHeader({ onLogout }) {
             onClick={() => go("/communityplus")}
           />
 
-          <div className="location-display">
+          <div
+            className="location-display"
+            onClick={setAutoMode}
+            title={mode === "manual" ? "Use current location" : "Refresh location"}
+        >
             <LocationPin loading={locationLoading} />
             <span>{locationLabel}</span>
-          </div>
         </div>
 
         {/* CENTER */}

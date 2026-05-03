@@ -4,11 +4,13 @@ CONTAINER
 
 .profile-container {
   flex: 1;
-  min-height: 0;
+  min-height: 100vh;
 
   display: flex;
   flex-direction: column;
-  gap: 20px;
+
+  padding: 20px;
+  box-sizing: border-box;
 }
 
 /* =====================================================
@@ -17,15 +19,32 @@ LAYOUT
 
 .profile-layout {
   flex: 1;
-  min-height: 0;
+  min-height: calc(100vh - 40px);
 
   display: grid;
   grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
   gap: 20px;
+  align-items: stretch;
 }
 
 .profile-layout > * {
-  min-width: 0; /* 🔥 prevents overflow bugs */
+  min-width: 0;
+}
+
+/* =====================================================
+SHARED COLUMN CARD
+===================================================== */
+
+.profile-left,
+.profile-guide {
+  min-height: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  border-radius: 18px;
+  border: 1px solid #e6dfd8;
+  box-shadow: 0 8px 24px rgba(20, 20, 20, 0.06);
 }
 
 /* =====================================================
@@ -33,18 +52,17 @@ LEFT COLUMN
 ===================================================== */
 
 .profile-left {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-
   background: #fff;
   padding: 24px;
+  gap: 16px;
 
-  border-radius: 18px;
-  border: 1px solid #e6dfd8;
-  box-shadow: 0 8px 24px rgba(20, 20, 20, 0.06);
+  justify-content: center;
+}
 
-  justify-content: space-between; /* 🔥 pushes nav down */
+/* keeps the form stack centred, but nav still sits below */
+.profile-left > section,
+.profile-left > .section {
+  width: 100%;
 }
 
 /* =====================================================
@@ -58,7 +76,7 @@ HEADER
 }
 
 /* =====================================================
-🔥 STEPPER (CONNECTED SYSTEM)
+STEPPER
 ===================================================== */
 
 .profile-stepper {
@@ -69,7 +87,6 @@ HEADER
   gap: 16px;
 }
 
-/* progress track */
 .progress-bar {
   position: absolute;
   top: 50%;
@@ -83,14 +100,12 @@ HEADER
   z-index: 0;
 }
 
-/* progress fill */
 .progress-fill {
   height: 100%;
   background: #4a0f0f;
   transition: width 0.25s ease;
 }
 
-/* steps container */
 .profile-page-steps {
   display: flex;
   justify-content: space-between;
@@ -120,30 +135,25 @@ STEP
   color: #8c837a;
 
   cursor: pointer;
-
   transition: all 0.2s ease;
 
   white-space: nowrap;
 }
 
-/* hover */
 .step:hover {
   background: rgba(0, 0, 0, 0.05);
 }
 
-/* active */
 .step.active {
   background: #4a0f0f;
   color: #fff;
 }
 
-/* completed */
 .step.complete {
   background: rgba(74, 15, 15, 0.08);
   color: #4a0f0f;
 }
 
-/* checkmark */
 .step.complete::after {
   content: "✓";
   margin-left: 6px;
@@ -163,7 +173,6 @@ NAVIGATION
 ===================================================== */
 
 .form-navigation {
-  margin-top: auto;
   padding-top: 16px;
 
   display: flex;
@@ -171,7 +180,6 @@ NAVIGATION
   align-items: center;
 }
 
-/* action group */
 .form-actions {
   display: flex;
   gap: 10px;
@@ -182,21 +190,11 @@ RIGHT PANEL
 ===================================================== */
 
 .profile-guide {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-
   background: #faf7f4;
   padding: 22px 24px;
+  gap: 10px;
 
-  border-radius: 18px;
-  border: 1px solid #e6dfd8;
-
-  box-shadow: 0 8px 24px rgba(20, 20, 20, 0.06);
-
-  position: sticky;
-  top: 20px;
-  height: fit-content;
+  justify-content: center;
 }
 
 /* =====================================================
@@ -204,12 +202,18 @@ RESPONSIVE
 ===================================================== */
 
 @media (max-width: 900px) {
+  .profile-container {
+    padding: 16px;
+  }
+
   .profile-layout {
+    min-height: auto;
     grid-template-columns: 1fr;
   }
 
+  .profile-left,
   .profile-guide {
-    position: static;
+    min-height: auto;
   }
 
   .profile-page-steps {
