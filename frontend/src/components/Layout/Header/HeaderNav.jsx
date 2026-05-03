@@ -15,6 +15,7 @@ export default function HeaderNav() {
   const {
     autoLocation,
     manualLocation,
+    displayLocation,
     mode,
     loading,
     error,
@@ -45,24 +46,34 @@ export default function HeaderNav() {
     [navigate, routeLocation.pathname]
   );
 
+  /*
+    AUTO TRIGGER:
+    On load, if the hook is in auto mode but has not resolved yet,
+    explicitly start auto geolocation.
+  */
   useEffect(() => {
-    if (mode === "auto" && autoLocation) {
-      setViewLocation(autoLocation, "auto");
-    }
-  }, [mode, autoLocation, setViewLocation]);
+    if (mode !== "auto") return;
+    if (autoLocation) return;
+    if (loading) return;
 
+    setAutoMode();
+  }, [mode, autoLocation, loading, setAutoMode]);
+
+  /*
+    SYNC DISPLAY LOCATION INTO GLOBAL VIEW LOCATION
+  */
   useEffect(() => {
-    if (mode === "manual" && manualLocation) {
-      setViewLocation(manualLocation, "manual");
-    }
-  }, [mode, manualLocation, setViewLocation]);
+    if (!displayLocation) return;
+
+    setViewLocation(displayLocation, mode);
+  }, [displayLocation, mode, setViewLocation]);
 
   const handleManualLocationSet = useCallback(
-    (manualLocation) => {
-      if (!manualLocation) return;
+    (nextManualLocation) => {
+      if (!nextManualLocation) return;
 
-      setManualMode(manualLocation);
-      setViewLocation(manualLocation, "manual");
+      setManualMode(nextManualLocation);
+      setViewLocation(nextManualLocation, "manual");
     },
     [setManualMode, setViewLocation]
   );
@@ -71,11 +82,13 @@ export default function HeaderNav() {
     setAutoMode();
   }, [setAutoMode]);
 
+  const locationForDisplay = displayLocation || viewLocation;
+
   return (
     <nav className="header-nav" aria-label="Primary navigation">
       <div className="nav-left">
         <LocationDisplay
-          location={viewLocation}
+          location={locationForDisplay}
           mode={mode}
           loading={loading}
           error={error}
