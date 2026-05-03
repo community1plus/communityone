@@ -447,3 +447,19 @@ RESPONSIVE
   color: #b11226;
   border: 1px solid #b11226;
 }
+
+.landing-login-thumb::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+
+  box-shadow: 0 0 18px rgba(177, 18, 38, 0.25);
+
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.landing-login-thumb:hover::after {
+  opacity: 1;
+}
