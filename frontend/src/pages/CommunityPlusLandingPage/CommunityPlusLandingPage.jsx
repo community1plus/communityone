@@ -16,8 +16,7 @@ export default function CommunityPlusLandingPage() {
   const [password, setPassword] = useState("");
 
   const handleEntry = async () => {
-    if (!AUTH_UI_ENABLED) return;
-    if (authLoading) return;
+    if (!AUTH_UI_ENABLED || authLoading) return;
 
     setAuthError("");
     setAuthLoading(true);
@@ -33,8 +32,7 @@ export default function CommunityPlusLandingPage() {
   };
 
   const handleEmailLogin = async () => {
-    if (!AUTH_UI_ENABLED) return;
-    if (authLoading) return;
+    if (!AUTH_UI_ENABLED || authLoading) return;
 
     setAuthLoading(true);
     setAuthError("");
@@ -54,47 +52,45 @@ export default function CommunityPlusLandingPage() {
 
   return (
     <div className="cpl-root">
-      <main className="main-full">
-        <div className="app-title">COMMUNITY ONE</div>
+      <main className="landing-container">
+        <div className="landing-brand">
+          <h1 className="brand-title">COMMUNITY ONE</h1>
+        </div>
 
-        <div className="headline-row">
-          <div className="headline-text">
-            <h1 className="tagline">
-              Real People. <span className="accent">Real News.</span> Real Time
-            </h1>
+        <div className="landing-logo">
+          <img src="/logo/echo.png" alt="Community One Echo" />
+        </div>
 
-            <p className="sub">
-              A map-first local feed that prioritises what’s happening{" "}
-              <b>here</b>.
-            </p>
+        <div className="landing-text">
+          <h2 className="landing-tagline">
+            Real People. <span className="accent">Real News.</span> Real Time
+          </h2>
 
-            <button
-              className="btn primary"
-              onClick={handleEntry}
-              disabled={!AUTH_UI_ENABLED || authLoading}
-            >
-              {AUTH_UI_ENABLED
-                ? authLoading
-                  ? "Connecting..."
-                  : "Explore your local area"
-                : "Login temporarily unavailable"}
-            </button>
+          <p className="landing-sub">
+            A map-first local feed that prioritises what’s happening{" "}
+            <strong>here</strong>.
+          </p>
+        </div>
 
-            {!AUTH_UI_ENABLED && (
-              <p className="auth-maintenance-note">
-                We’re updating the sign-in experience. Please check back soon.
-              </p>
-            )}
-          </div>
-
-          <div
-            className={`echo-inline ${!AUTH_UI_ENABLED ? "disabled" : ""}`}
+        <div className="landing-actions">
+          <button
+            type="button"
+            className="btn primary"
             onClick={handleEntry}
-            aria-disabled={!AUTH_UI_ENABLED}
+            disabled={!AUTH_UI_ENABLED || authLoading}
           >
-            <img src="/logo/echo.png" alt="Echo" />
-            <div className="echo-pulse"></div>
-          </div>
+            {AUTH_UI_ENABLED
+              ? authLoading
+                ? "Connecting..."
+                : "Explore your local area"
+              : "Login temporarily unavailable"}
+          </button>
+
+          {!AUTH_UI_ENABLED && (
+            <p className="auth-maintenance-note">
+              We’re updating the sign-in experience. Please check back soon.
+            </p>
+          )}
         </div>
       </main>
 
@@ -107,17 +103,17 @@ export default function CommunityPlusLandingPage() {
               type="email"
               placeholder="Email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(event) => setEmail(event.target.value)}
             />
 
             <input
               type="password"
               placeholder="Password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(event) => setPassword(event.target.value)}
             />
 
-            <button onClick={handleEmailLogin} disabled={authLoading}>
+            <button type="button" onClick={handleEmailLogin} disabled={authLoading}>
               {authLoading ? "Signing in..." : "Sign In"}
             </button>
 
