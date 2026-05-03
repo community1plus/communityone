@@ -23,6 +23,22 @@ function getAddressComponent(place, type) {
   );
 }
 
+function buildDisplayLabel({ suburb, city, state }) {
+  if (suburb && state) return `${suburb}, ${state}`;
+  if (city && state) return `${city}, ${state}`;
+  if (suburb) return suburb;
+  if (city) return city;
+  if (state) return state;
+
+  return "Selected location";
+}
+
+const label = buildDisplayLabel({
+  suburb,
+  city: suburb,
+  state,
+});
+
 function extractLocationFromPlace(place) {
   const lat = place?.geometry?.location?.lat?.() ?? null;
   const lng = place?.geometry?.location?.lng?.() ?? null;
@@ -38,22 +54,20 @@ function extractLocationFromPlace(place) {
   const state =
     getAddressComponent(place, "administrative_area_level_1") || "";
 
-  const label =
-    place?.formatted_address ||
-    [suburb, state].filter(Boolean).join(", ") ||
-    suburb;
-
   return {
-    lat,
-    lng,
-    suburb,
-    city: suburb,
-    state,
-    label,
-    type: "manual",
-    accuracy: "MANUAL",
-    updatedAt: Date.now(),
-  };
+  lat,
+  lng,
+  suburb,
+  city: suburb,
+  state,
+
+  label,
+  fullAddress: place?.formatted_address || "",
+
+  type: "manual",
+  accuracy: "MANUAL",
+  updatedAt: Date.now(),
+};
 }
 
 export default function LocationDisplay({
