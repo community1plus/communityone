@@ -55,13 +55,17 @@ export default function CommunityPlusLandingPage() {
 
   return (
     <div className="cpl-root">
+      <div className="landing-hero-bg" aria-hidden="true">
+        <img
+          src="/logo/echo.png"
+          alt=""
+          className="landing-bg-logo"
+        />
+      </div>
+
       <main className="landing-container">
         <section className="landing-hero" aria-label="Community.One landing">
           <h1 className="brand-title">Community.One</h1>
-
-          <div className="landing-logo" aria-hidden="true">
-            <img src="/logo/echo.png" alt="" />
-          </div>
 
           <div className="landing-text">
             <h2 className="landing-tagline">
