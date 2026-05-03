@@ -20,6 +20,18 @@ const MANUAL_LOCATION_KEY = "communityplus_manual_location";
 
 const CACHE_TTL = 1000 * 60 * 10;
 
+const buildDisplayLabel = ({ suburb, city, region, state }) => {
+  if (suburb && state) return `${suburb}, ${state}`;
+  if (city && state) return `${city}, ${state}`;
+  if (region && state) return `${region}, ${state}`;
+  if (suburb) return suburb;
+  if (city) return city;
+  if (region) return region;
+  if (state) return state;
+
+  return "Enter location";
+};
+
 const readStorage = (key, respectTTL = false) => {
   try {
     const raw = localStorage.getItem(key);
@@ -30,8 +42,7 @@ const readStorage = (key, respectTTL = false) => {
 
     if (!respectTTL) return parsed.data;
 
-    const isFresh = Date.now() - parsed.timestamp < CACHE_TTL;
-    return isFresh ? parsed.data : null;
+    return Date.now() - parsed.timestamp < CACHE_TTL ? parsed.data : null;
   } catch {
     localStorage.removeItem(key);
     return null;
@@ -56,23 +67,37 @@ const normalizeLocation = (loc = {}, fallbackType = "auto") => {
   const lat = loc.lat ?? loc.latitude ?? null;
   const lng = loc.lng ?? loc.longitude ?? null;
 
-  const suburb = loc.suburb || loc.city || "";
+  const suburb = loc.suburb || "";
   const city = loc.city || loc.suburb || "";
-  const state = loc.state || loc.region || loc.region_code || "";
+  const region =
+    loc.region ||
+    loc.region_code ||
+    loc.administrative_area_level_2 ||
+    "";
+  const state =
+    loc.state ||
+    loc.administrative_area_level_1 ||
+    loc.region_code ||
+    "";
 
   const type = fallbackType;
   const accuracyMeters = loc.accuracyMeters ?? loc.accuracy ?? null;
 
   const label =
     loc.label ||
-    [suburb || city, state].filter(Boolean).join(", ") ||
-    "Enter location";
+    buildDisplayLabel({
+      suburb,
+      city,
+      region,
+      state,
+    });
 
   return {
     lat,
     lng,
     suburb,
     city,
+    region,
     state,
     label,
     fullAddress: loc.fullAddress || loc.formatted_address || "",
@@ -110,26 +135,14 @@ export function LocationProvider({ children }) {
   const requestIdRef = useRef(0);
 
   const viewLocation = useMemo(() => {
-    if (locationMode === "manual") {
-      return manualLocation;
-    }
-
-    if (locationMode === "auto") {
-      return autoLocation;
-    }
-
+    if (locationMode === "manual") return manualLocation;
+    if (locationMode === "auto") return autoLocation;
     return null;
   }, [locationMode, manualLocation, autoLocation]);
 
   const displayLocation = useMemo(() => {
-    if (locationMode === "manual") {
-      return manualLocation;
-    }
-
-    if (locationMode === "auto") {
-      return autoLocation || manualLocation;
-    }
-
+    if (locationMode === "manual") return manualLocation;
+    if (locationMode === "auto") return autoLocation || manualLocation;
     return null;
   }, [locationMode, autoLocation, manualLocation]);
 
@@ -263,9 +276,7 @@ export function LocationProvider({ children }) {
 
   const setViewLocation = useCallback(
     (loc, mode = "manual") => {
-      if (mode === "manual") {
-        return setManualLocation(loc);
-      }
+      if (mode === "manual") return setManualLocation(loc);
 
       persistMode("auto");
       return saveAutoLocation(loc);
@@ -289,7 +300,6 @@ export function LocationProvider({ children }) {
       useAutoLocation,
       resetManualLocation,
 
-      // backwards compatibility
       setViewLocation,
       enableLiveLocation: useAutoLocation,
       enableHomeLocation: useAutoLocation,
