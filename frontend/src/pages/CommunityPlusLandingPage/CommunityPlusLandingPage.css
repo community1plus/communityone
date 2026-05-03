@@ -3,29 +3,34 @@ ROOT
 ========================= */
 
 .cpl-root {
-  height: 100vh;
+  min-height: 100vh;
   width: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   background: #f8f6f3;
 }
 
 /* =========================
-CENTER LAYOUT
+LAYOUT
 ========================= */
 
 .landing-container {
-  height: 100%;
+  width: 100%;
+  max-width: 520px;
 
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
 
-  align-items: center;     /* horizontal */
-  justify-content: center; /* vertical */
-
-  gap: 28px;
+  gap: 24px;
+  padding: 20px;
 
   text-align: center;
 
-  /* 🔥 clean system font (matches header/sidebar) */
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
     Roboto, Helvetica, Arial, sans-serif;
 }
@@ -37,40 +42,83 @@ TITLE
 .brand-title {
   margin: 0;
 
-  font-size: 26px;
+  width: 100%;
+
+  font-size: clamp(22px, 4vw, 32px);
   font-weight: 700;
 
-  letter-spacing: 0.06em;
-  color: #b11226;
+  letter-spacing: 0.08em;
 
-  text-transform: none; /* 👈 allows Community.One */
+  color: #b11226; /* 🔥 RED */
 }
 
 /* =========================
-LOGO
+LOGO WRAPPER (CIRCLE)
 ========================= */
 
 .landing-logo {
+  width: 100%;
+  max-width: 360px;
+  aspect-ratio: 1 / 1;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
+  background: #000; /* 🔥 black circle */
+  border-radius: 50%;
+
+  overflow: hidden;
+
+  /* subtle premium depth */
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
 }
 
+/* =========================
+IMAGE
+========================= */
+
 .landing-logo img {
-  width: 280px;   /* 🔥 controlled size */
-  height: 280px;
+  width: 85%;
+  height: 85%;
 
   object-fit: contain;
 
-  /* 🔥 force circular crop visually */
-  clip-path: circle(50% at 50% 50%);
+  /* 🔥 clean up tones */
+  filter: contrast(1.1) saturate(1.05);
 
-  /* subtle polish */
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
-
-  transition: transform 0.3s ease;
+  transition: transform 0.35s ease;
 }
 
 .landing-logo img:hover {
-  transform: scale(1.03);
+  transform: scale(1.04);
+}
+
+/* =========================
+TEXT (if re-added later)
+========================= */
+
+.landing-text {
+  width: 100%;
+  color: #b11226;
+}
+
+.landing-tagline {
+  font-size: clamp(20px, 3.5vw, 28px);
+  font-weight: 700;
+  margin: 0;
+}
+
+.landing-sub {
+  font-size: 14px;
+  color: #8a7f77;
+}
+
+/* =========================
+NOTE
+========================= */
+
+.auth-maintenance-note {
+  font-size: 13px;
+  color: #8a7f77;
 }
