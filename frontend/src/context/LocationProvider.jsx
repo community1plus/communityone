@@ -317,34 +317,4 @@ export function LocationProvider({ children }) {
       {children}
     </LocationContext.Provider>
   );
-}     useAutoLocation,
-      resetManualLocation,
-
-      // backwards compatibility
-      setViewLocation,
-      enableLiveLocation: useAutoLocation,
-      enableHomeLocation: useAutoLocation,
-      homeLocation: null,
-      liveLocation: autoLocation,
-      ipLocation: null,
-    }),
-    [
-      viewLocation,
-      locationMode,
-      locationLoading,
-      locationError,
-      autoLocation,
-      manualLocationState,
-      setManualLocation,
-      useAutoLocation,
-      resetManualLocation,
-      setViewLocation,
-    ]
-  );
-
-  return (
-    <LocationContext.Provider value={value}>
-      {children}
-    </LocationContext.Provider>
-  );
 }
