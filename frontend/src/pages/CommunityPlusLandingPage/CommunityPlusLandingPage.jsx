@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { signIn } from "aws-amplify/auth";
-impotr "./CommunityPlusLandingPage.css";
+import "./CommunityPlusLandingPage.css";
 import { useAuth } from "../../context/AuthContext";
 
 const AUTH_UI_ENABLED = false;
