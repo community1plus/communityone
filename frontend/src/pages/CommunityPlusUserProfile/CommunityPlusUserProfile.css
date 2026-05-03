@@ -1,29 +1,24 @@
 /* =====================================================
-CONTAINER
+PROFILE PAGE — COMPACT REFINEMENT
 ===================================================== */
 
 .profile-container {
   flex: 1;
-  min-height: 100vh;
-
-  display: flex;
-  flex-direction: column;
-
-  padding: 20px;
+  min-height: 100%;
+  padding: 16px 20px;
   box-sizing: border-box;
+
+  font-family: inherit;
+  color: #241f1c;
 }
 
-/* =====================================================
-LAYOUT
-===================================================== */
-
 .profile-layout {
-  flex: 1;
-  min-height: calc(100vh - 40px);
+  width: 100%;
+  min-height: calc(100vh - 120px);
 
   display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
-  gap: 20px;
+  grid-template-columns: minmax(0, 1.6fr) minmax(280px, 0.8fr);
+  gap: 16px;
   align-items: stretch;
 }
 
@@ -31,179 +26,109 @@ LAYOUT
   min-width: 0;
 }
 
-/* =====================================================
-SHARED COLUMN CARD
-===================================================== */
-
+/* shared cards */
 .profile-left,
 .profile-guide {
-  min-height: 100%;
+  border-radius: 16px;
+  border: 1px solid #e6dfd8;
+  box-shadow: 0 6px 18px rgba(20, 20, 20, 0.045);
+}
+
+/* left card */
+.profile-left {
+  background: #fff;
+  padding: 18px 20px;
 
   display: flex;
   flex-direction: column;
+  gap: 12px;
 
-  border-radius: 18px;
-  border: 1px solid #e6dfd8;
-  box-shadow: 0 8px 24px rgba(20, 20, 20, 0.06);
+  justify-content: flex-start;
 }
 
-/* =====================================================
-LEFT COLUMN
-===================================================== */
-
-.profile-left {
-  background: #fff;
-  padding: 24px;
-  gap: 16px;
-
-  justify-content: center;
-}
-
-/* keeps the form stack centred, but nav still sits below */
-.profile-left > section,
-.profile-left > .section {
-  width: 100%;
-}
-
-/* =====================================================
-HEADER
-===================================================== */
-
+/* header */
 .profile-page-header {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 8px;
 }
 
-/* =====================================================
-STEPPER
-===================================================== */
-
-.profile-stepper {
-  position: relative;
-
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+.profile-page-header h1,
+.profile-page-header .page-title {
+  margin: 0;
+  font-size: 20px;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
-.progress-bar {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-
-  height: 2px;
-  background: #eee;
-
-  transform: translateY(-50%);
-  z-index: 0;
+/* form */
+.profile-left .field {
+  margin-bottom: 4px;
 }
 
-.progress-fill {
-  height: 100%;
-  background: #4a0f0f;
-  transition: width 0.25s ease;
-}
-
-.profile-page-steps {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  gap: 12px;
-  position: relative;
-  z-index: 1;
-}
-
-/* =====================================================
-STEP
-===================================================== */
-
-.step {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 10px 14px;
-  border-radius: 12px;
-
+.profile-left label {
   font-size: 13px;
   font-weight: 600;
-
-  background: #fff;
-  color: #8c837a;
-
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  white-space: nowrap;
+  color: #403832;
 }
 
-.step:hover {
-  background: rgba(0, 0, 0, 0.05);
+.profile-left input,
+.profile-left select,
+.profile-left textarea {
+  min-height: 38px;
+  font-size: 14px;
 }
 
-.step.active {
-  background: #4a0f0f;
-  color: #fff;
-}
-
-.step.complete {
-  background: rgba(74, 15, 15, 0.08);
-  color: #4a0f0f;
-}
-
-.step.complete::after {
-  content: "✓";
-  margin-left: 6px;
-  font-size: 11px;
-}
-
-/* =====================================================
-FORM
-===================================================== */
-
-.profile-left .field {
-  margin-bottom: 6px;
-}
-
-/* =====================================================
-NAVIGATION
-===================================================== */
-
+/* navigation */
 .form-navigation {
-  padding-top: 16px;
+  margin-top: 6px;
+  padding-top: 12px;
 
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  border-top: 1px solid #eee7e0;
 }
 
 .form-actions {
   display: flex;
-  gap: 10px;
+  gap: 8px;
 }
 
-/* =====================================================
-RIGHT PANEL
-===================================================== */
-
+/* right panel */
 .profile-guide {
   background: #faf7f4;
-  padding: 22px 24px;
-  gap: 10px;
+  padding: 18px 20px;
 
-  justify-content: center;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  align-self: stretch;
 }
 
-/* =====================================================
-RESPONSIVE
-===================================================== */
+.profile-guide h2,
+.profile-guide .section-title {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.25;
+  font-weight: 700;
+}
 
+.profile-guide p,
+.profile-guide .section-meta {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #6f6259;
+}
+
+/* responsive */
 @media (max-width: 900px) {
   .profile-container {
-    padding: 16px;
+    padding: 14px;
   }
 
   .profile-layout {
@@ -211,13 +136,7 @@ RESPONSIVE
     grid-template-columns: 1fr;
   }
 
-  .profile-left,
   .profile-guide {
     min-height: auto;
-  }
-
-  .profile-page-steps {
-    flex-wrap: wrap;
-    justify-content: center;
   }
 }
