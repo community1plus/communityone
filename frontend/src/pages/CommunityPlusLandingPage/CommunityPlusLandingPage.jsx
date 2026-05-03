@@ -95,19 +95,15 @@ export default function CommunityPlusLandingPage() {
       </main>
 
       <button
-        type="button"
-        className="landing-login-thumb"
-        onClick={handleEntry}
-        disabled={!AUTH_UI_ENABLED || authLoading}
-        aria-label="Login"
-        title={
-          AUTH_UI_ENABLED
-            ? "Login"
-            : "Login temporarily unavailable"
-        }
-      >
-        <img src="/logo/echo.png" alt="" />
-      </button>
+  type="button"
+  className="landing-login-thumb"
+  onClick={handleEntry}
+  disabled={!AUTH_UI_ENABLED || authLoading}
+  aria-label="Login"
+  title={AUTH_UI_ENABLED ? "Login" : "Login temporarily unavailable"}
+>
+  <img src="/logo/echo.png" alt="" />
+</button>
 
       {AUTH_UI_ENABLED && showFallback && (
         <div className="cpl-modalOverlay">

@@ -347,3 +347,14 @@ RESPONSIVE
     font-size: 14px;
   }
 }
+
+.landing-tagline {
+  max-width: 900px;
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .landing-tagline {
+    white-space: normal;
+  }
+}
