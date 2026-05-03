@@ -35,28 +35,40 @@ const writeCache = (key, data) => {
 };
 
 export function useUserLocation() {
-  const [mode, setMode] = useState(
-    () => localStorage.getItem(MODE_KEY) || "auto"
-  );
+  const initialMode = localStorage.getItem(MODE_KEY) || "auto";
 
+  const [mode, setMode] = useState(initialMode);
   const [autoLocation, setAutoLocation] = useState(() =>
     readCache(AUTO_CACHE_KEY)
   );
-
   const [manualLocation, setManualLocation] = useState(() =>
     readCache(MANUAL_CACHE_KEY, false)
   );
 
-  const [loading, setLoading] = useState(mode === "auto" && !autoLocation);
+  const [loading, setLoading] = useState(
+    initialMode === "auto" && !readCache(AUTO_CACHE_KEY)
+  );
+
   const [error, setError] = useState(null);
 
   const requestIdRef = useRef(0);
+  const hasFetchedOnLoadRef = useRef(false);
 
   const location = useMemo(() => {
-    return mode === "manual" ? manualLocation : autoLocation;
+    if (mode === "manual") return manualLocation;
+
+    return autoLocation;
   }, [mode, manualLocation, autoLocation]);
 
-  const fetchAutoLocation = useCallback(async ({ force = false } = {}) => {
+  const displayLocation = useMemo(() => {
+    if (mode === "auto") {
+      return autoLocation || manualLocation;
+    }
+
+    return manualLocation;
+  }, [mode, autoLocation, manualLocation]);
+
+  const fetchAutoLocation = useCallback(({ force = false } = {}) => {
     const requestId = ++requestIdRef.current;
 
     setLoading(true);
@@ -68,14 +80,14 @@ export function useUserLocation() {
       if (cachedAuto) {
         setAutoLocation(cachedAuto);
         setLoading(false);
-        return cachedAuto;
+        return;
       }
     }
 
     if (!navigator.geolocation) {
       setError("Geolocation not supported");
       setLoading(false);
-      return null;
+      return;
     }
 
     navigator.geolocation.getCurrentPosition(
@@ -122,12 +134,15 @@ export function useUserLocation() {
         maximumAge: 0,
       }
     );
-
-    return null;
   }, []);
 
   useEffect(() => {
     localStorage.setItem(MODE_KEY, mode);
+  }, [mode]);
+
+  useEffect(() => {
+    if (hasFetchedOnLoadRef.current) return;
+    hasFetchedOnLoadRef.current = true;
 
     if (mode === "auto") {
       fetchAutoLocation({ force: !autoLocation });
@@ -135,10 +150,12 @@ export function useUserLocation() {
   }, [mode, autoLocation, fetchAutoLocation]);
 
   const setAutoMode = useCallback(() => {
-    setMode("auto");
+    requestIdRef.current += 1;
 
-    // Important: do NOT clear autoLocation.
-    // Important: do NOT read manual cache.
+    setMode("auto");
+    setLoading(true);
+    setError(null);
+
     fetchAutoLocation({ force: true });
   }, [fetchAutoLocation]);
 
@@ -154,11 +171,17 @@ export function useUserLocation() {
   }, []);
 
   const refetch = useCallback(() => {
+    if (mode !== "auto") {
+      setAutoMode();
+      return;
+    }
+
     fetchAutoLocation({ force: true });
-  }, [fetchAutoLocation]);
+  }, [mode, setAutoMode, fetchAutoLocation]);
 
   return {
     location,
+    displayLocation,
     autoLocation,
     manualLocation,
     mode,
