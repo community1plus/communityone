@@ -1,142 +1,166 @@
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { resolveLocation } from "../services/resolveLocation";
 
-const CACHE_KEY = "user_location_cache";
 const MODE_KEY = "user_location_mode";
+const AUTO_CACHE_KEY = "user_auto_location_cache";
+const MANUAL_CACHE_KEY = "user_manual_location_cache";
+
 const CACHE_TTL = 1000 * 60 * 10;
 
+const readCache = (key, respectTTL = true) => {
+  try {
+    const cached = JSON.parse(localStorage.getItem(key));
+    if (!cached?.data) return null;
+
+    if (!respectTTL) return cached.data;
+
+    return Date.now() - cached.timestamp < CACHE_TTL ? cached.data : null;
+  } catch {
+    return null;
+  }
+};
+
+const writeCache = (key, data) => {
+  try {
+    localStorage.setItem(
+      key,
+      JSON.stringify({
+        data,
+        timestamp: Date.now(),
+      })
+    );
+  } catch {
+    // ignore storage failure
+  }
+};
+
 export function useUserLocation() {
-  const [location, setLocation] = useState(null);
   const [mode, setMode] = useState(
     () => localStorage.getItem(MODE_KEY) || "auto"
   );
-  const [loading, setLoading] = useState(mode === "auto");
+
+  const [autoLocation, setAutoLocation] = useState(() =>
+    readCache(AUTO_CACHE_KEY)
+  );
+
+  const [manualLocation, setManualLocation] = useState(() =>
+    readCache(MANUAL_CACHE_KEY, false)
+  );
+
+  const [loading, setLoading] = useState(mode === "auto" && !autoLocation);
   const [error, setError] = useState(null);
 
-  const hasFetched = useRef(false);
+  const requestIdRef = useRef(0);
 
-  const readCache = useCallback(() => {
-    try {
-      const cached = JSON.parse(localStorage.getItem(CACHE_KEY));
+  const location = useMemo(() => {
+    return mode === "manual" ? manualLocation : autoLocation;
+  }, [mode, manualLocation, autoLocation]);
 
-      if (!cached) return null;
+  const fetchAutoLocation = useCallback(async ({ force = false } = {}) => {
+    const requestId = ++requestIdRef.current;
 
-      const isFresh = Date.now() - cached.timestamp < CACHE_TTL;
+    setLoading(true);
+    setError(null);
 
-      return isFresh ? cached.data : null;
-    } catch (err) {
-      console.warn("Location cache read failed", err);
+    if (!force) {
+      const cachedAuto = readCache(AUTO_CACHE_KEY);
+
+      if (cachedAuto) {
+        setAutoLocation(cachedAuto);
+        setLoading(false);
+        return cachedAuto;
+      }
+    }
+
+    if (!navigator.geolocation) {
+      setError("Geolocation not supported");
+      setLoading(false);
       return null;
     }
-  }, []);
 
-  const writeCache = useCallback((data) => {
-    try {
-      localStorage.setItem(
-        CACHE_KEY,
-        JSON.stringify({
-          data,
-          timestamp: Date.now(),
-        })
-      );
-    } catch (err) {
-      console.warn("Location cache write failed", err);
-    }
-  }, []);
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        try {
+          const coords = {
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude,
+            accuracy: pos.coords.accuracy,
+          };
 
-  const fetchAutoLocation = useCallback(
-    ({ force = false } = {}) => {
-      if (hasFetched.current && !force) return;
+          const resolved = await resolveLocation(coords);
 
-      hasFetched.current = true;
-      setLoading(true);
-      setError(null);
+          if (!resolved) {
+            throw new Error("No location returned");
+          }
 
-      if (!force) {
-        const cached = readCache();
+          if (requestId !== requestIdRef.current) return;
 
-        if (cached) {
-          setLocation(cached);
-          setLoading(false);
-          return;
-        }
-      }
+          setAutoLocation(resolved);
+          writeCache(AUTO_CACHE_KEY, resolved);
+        } catch (err) {
+          console.error("Auto location resolve failed:", err);
 
-      if (!navigator.geolocation) {
-        setError("Geolocation not supported");
-        setLoading(false);
-        return;
-      }
+          if (requestId !== requestIdRef.current) return;
 
-      navigator.geolocation.getCurrentPosition(
-        async (pos) => {
-          try {
-            const coords = {
-              lat: pos.coords.latitude,
-              lng: pos.coords.longitude,
-              accuracy: pos.coords.accuracy,
-            };
-
-            const resolved = await resolveLocation(coords);
-
-            if (!resolved) {
-              throw new Error("No location returned");
-            }
-
-            setLocation(resolved);
-            writeCache(resolved);
-          } catch (err) {
-            console.error("Resolve failed:", err);
-            setError("Location resolution failed");
-          } finally {
+          setError("Location resolution failed");
+        } finally {
+          if (requestId === requestIdRef.current) {
             setLoading(false);
           }
-        },
-        (err) => {
-          console.error("Geolocation error:", err);
-          setError(err.message || "Permission denied");
-          setLoading(false);
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 0,
         }
-      );
-    },
-    [readCache, writeCache]
-  );
+      },
+      (err) => {
+        if (requestId !== requestIdRef.current) return;
+
+        console.error("Geolocation error:", err);
+        setError(err.message || "Permission denied");
+        setLoading(false);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0,
+      }
+    );
+
+    return null;
+  }, []);
 
   useEffect(() => {
     localStorage.setItem(MODE_KEY, mode);
 
     if (mode === "auto") {
-      fetchAutoLocation();
-    } else {
-      setLoading(false);
+      fetchAutoLocation({ force: !autoLocation });
     }
-  }, [mode, fetchAutoLocation]);
+  }, [mode, autoLocation, fetchAutoLocation]);
 
   const setAutoMode = useCallback(() => {
     setMode("auto");
-    hasFetched.current = false;
+
+    // Important: do NOT clear autoLocation.
+    // Important: do NOT read manual cache.
     fetchAutoLocation({ force: true });
   }, [fetchAutoLocation]);
 
-  const setManualMode = useCallback((manualLocation) => {
+  const setManualMode = useCallback((nextManualLocation) => {
+    requestIdRef.current += 1;
+
     setMode("manual");
-    setLocation(manualLocation);
+    setManualLocation(nextManualLocation);
+    writeCache(MANUAL_CACHE_KEY, nextManualLocation);
+
     setLoading(false);
     setError(null);
   }, []);
 
   const refetch = useCallback(() => {
-    hasFetched.current = false;
     fetchAutoLocation({ force: true });
   }, [fetchAutoLocation]);
 
   return {
     location,
+    autoLocation,
+    manualLocation,
     mode,
     loading,
     error,
