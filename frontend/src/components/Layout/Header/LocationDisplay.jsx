@@ -33,11 +33,7 @@ function buildDisplayLabel({ suburb, city, state }) {
   return "Selected location";
 }
 
-const label = buildDisplayLabel({
-  suburb,
-  city: suburb,
-  state,
-});
+
 
 function extractLocationFromPlace(place) {
   const lat = place?.geometry?.location?.lat?.() ?? null;
@@ -53,6 +49,12 @@ function extractLocationFromPlace(place) {
 
   const state =
     getAddressComponent(place, "administrative_area_level_1") || "";
+
+    const label = buildDisplayLabel({
+  suburb,
+  city: suburb,
+  state,
+});
 
   return {
   lat,
