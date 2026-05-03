@@ -1,13 +1,8 @@
-import { useEffect, useMemo, useCallback } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import "./CommunityPlusDashboardHome.css";
 
 import { useMap } from "../../context/MapContext";
 import CommunityMap from "../../components/Map/CommunityMap";
-import TwoColumnLayout from "../../components/TwoColumnLayout";
-
-/* =========================
-   MOCK DATA (TEMP)
-========================= */
 
 const FEED_ITEMS = [
   {
@@ -24,21 +19,26 @@ const FEED_ITEMS = [
   },
   {
     id: 3,
-    type: "alert",
+    type: "beacon",
     title: "📡 Beacon alert triggered",
     location: { lat: -37.82, lng: 144.95 },
   },
   {
     id: 4,
-    type: "post",
+    type: "blob",
     title: "🛍️ Local business promotion",
     location: { lat: -37.815, lng: 144.98 },
   },
 ];
 
-/* =========================
-   FEED ITEM
-========================= */
+const FILTERS = [
+  { id: "all", label: "All" },
+  { id: "now", label: "Now" },
+  { id: "blob", label: "Blobs" },
+  { id: "incident", label: "Incidents" },
+  { id: "event", label: "Events" },
+  { id: "beacon", label: "Beacons" },
+];
 
 function FeedItem({ item, isActive, onClick, onHover, onLeave }) {
   return (
@@ -54,11 +54,7 @@ function FeedItem({ item, isActive, onClick, onHover, onLeave }) {
   );
 }
 
-/* =========================
-   FEED (MAP-DRIVEN)
-========================= */
-
-function Feed() {
+function Feed({ activeFilter }) {
   const {
     addMarkers,
     visibleMarkers,
@@ -67,19 +63,29 @@ function Feed() {
     clearSelection,
   } = useMap();
 
-  const items = useMemo(() => FEED_ITEMS, []);
+  const filteredItems = useMemo(() => {
+    if (activeFilter === "all") return FEED_ITEMS;
 
-  /* =========================
-     INGEST DATA → GLOBAL STATE
-  ========================= */
+    if (activeFilter === "now") {
+      return FEED_ITEMS.filter((item) =>
+        ["incident", "event", "beacon"].includes(item.type)
+      );
+    }
+
+    return FEED_ITEMS.filter((item) => item.type === activeFilter);
+  }, [activeFilter]);
 
   useEffect(() => {
-    addMarkers(items, "feed");
-  }, [items, addMarkers]);
+    addMarkers(filteredItems, "feed");
+  }, [filteredItems, addMarkers]);
 
-  /* =========================
-     HANDLERS
-  ========================= */
+  const itemsToRender = useMemo(() => {
+    if (!visibleMarkers.length) return filteredItems;
+
+    return visibleMarkers.filter((marker) =>
+      filteredItems.some((item) => item.id === marker.id)
+    );
+  }, [visibleMarkers, filteredItems]);
 
   const handleClick = useCallback(
     (item) => {
@@ -97,24 +103,18 @@ function Feed() {
 
   const handleLeave = useCallback(
     (item) => {
-      if (selectedMarkerId !== item.id) {
-        clearSelection();
-      }
+      if (selectedMarkerId !== item.id) clearSelection();
     },
     [selectedMarkerId, clearSelection]
   );
 
-  /* =========================
-     RENDER (USE VISIBLE MARKERS)
-  ========================= */
-
-  if (!visibleMarkers.length) {
+  if (!itemsToRender.length) {
     return <div className="feed-empty">No activity in this area</div>;
   }
 
   return (
     <>
-      {visibleMarkers.map((item) => (
+      {itemsToRender.map((item) => (
         <FeedItem
           key={item.id}
           item={item}
@@ -128,15 +128,30 @@ function Feed() {
   );
 }
 
-/* =========================
-   HOME (MAP-FIRST)
-========================= */
-
 export default function CommunityPlusDashboardHome() {
+  const [activeFilter, setActiveFilter] = useState("all");
+
   return (
     <div className="dashboard-home">
       <section className="dashboard-home-feed">
-        <Feed />
+        <div className="feed-filters" aria-label="Feed filters">
+          {FILTERS.map((filter) => (
+            <button
+              key={filter.id}
+              type="button"
+              className={`feed-filter ${
+                activeFilter === filter.id ? "active" : ""
+              }`}
+              onClick={() => setActiveFilter(filter.id)}
+            >
+              {filter.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="feed-list">
+          <Feed activeFilter={activeFilter} />
+        </div>
       </section>
 
       <section className="dashboard-home-map">
