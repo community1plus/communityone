@@ -53,14 +53,30 @@ export default function CommunityPlusLandingPage() {
   return (
     <div className="cpl-root">
       <main className="landing-container">
+        
+        {/* TITLE */}
         <h1 className="brand-title">Community.One</h1>
 
+        {/* LOGO */}
         <div className="landing-logo">
           <img src="/logo/echo.png" alt="Community.One" />
         </div>
 
-        {AUTH_UI_ENABLED && (
-          <div className="landing-actions">
+        {/* OPTIONAL TEXT (keeps layout balanced) */}
+        <div className="landing-text">
+          <h2 className="landing-tagline">
+            Real People. <span className="accent">Real News.</span> Real Time
+          </h2>
+
+          <p className="landing-sub">
+            A map-first local feed that prioritises what’s happening{" "}
+            <strong>here</strong>.
+          </p>
+        </div>
+
+        {/* CTA / STATUS */}
+        <div className="landing-actions">
+          {AUTH_UI_ENABLED ? (
             <button
               type="button"
               className="btn primary"
@@ -69,16 +85,16 @@ export default function CommunityPlusLandingPage() {
             >
               {authLoading ? "Connecting..." : "Explore your local area"}
             </button>
-          </div>
-        )}
+          ) : (
+            <p className="auth-maintenance-note">
+              We’re updating the sign-in experience. Please check back soon.
+            </p>
+          )}
+        </div>
 
-        {!AUTH_UI_ENABLED && (
-          <p className="auth-maintenance-note">
-            We’re updating the sign-in experience. Please check back soon.
-          </p>
-        )}
       </main>
 
+      {/* FALLBACK LOGIN */}
       {AUTH_UI_ENABLED && showFallback && (
         <div className="cpl-modalOverlay">
           <div className="cpl-authModal">
@@ -88,14 +104,14 @@ export default function CommunityPlusLandingPage() {
               type="email"
               placeholder="Email"
               value={email}
-              onChange={(event) => setEmail(event.target.value)}
+              onChange={(e) => setEmail(e.target.value)}
             />
 
             <input
               type="password"
               placeholder="Password"
               value={password}
-              onChange={(event) => setPassword(event.target.value)}
+              onChange={(e) => setPassword(e.target.value)}
             />
 
             <button
@@ -111,9 +127,12 @@ export default function CommunityPlusLandingPage() {
         </div>
       )}
 
+      {/* LOADING */}
       {AUTH_UI_ENABLED && authLoading && (
         <div className="auth-loading-overlay">
-          <div className="auth-loading-box">Redirecting to secure login…</div>
+          <div className="auth-loading-box">
+            Redirecting to secure login…
+          </div>
         </div>
       )}
     </div>
