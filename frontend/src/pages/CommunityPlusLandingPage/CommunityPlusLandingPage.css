@@ -330,3 +330,20 @@ font-size: 34px;
 margin: 0 auto;
 }
 }
+
+.auth-maintenance-note {
+  margin-top: 10px;
+  font-size: 13px;
+  color: #6f6259;
+}
+
+.echo-inline.disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.btn.primary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}

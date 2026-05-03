@@ -1,7 +1,9 @@
 import { useState } from "react";
-import { useAuth } from "../../context/AuthContext";
 import { signIn } from "aws-amplify/auth";
 
+import { useAuth } from "../../context/AuthContext";
+
+const AUTH_UI_ENABLED = false;
 
 export default function CommunityPlusLandingPage() {
   const { login, loading } = useAuth();
@@ -13,17 +15,15 @@ export default function CommunityPlusLandingPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  /* ===============================
-     LOGIN
-  =============================== */
   const handleEntry = async () => {
+    if (!AUTH_UI_ENABLED) return;
     if (authLoading) return;
 
     setAuthError("");
     setAuthLoading(true);
 
     try {
-      await login(); // 🔥 AuthContext will update state
+      await login();
     } catch (err) {
       console.error(err);
       setShowFallback(true);
@@ -32,10 +32,8 @@ export default function CommunityPlusLandingPage() {
     }
   };
 
-  /* ===============================
-     FALLBACK EMAIL LOGIN
-  =============================== */
   const handleEmailLogin = async () => {
+    if (!AUTH_UI_ENABLED) return;
     if (authLoading) return;
 
     setAuthLoading(true);
@@ -46,17 +44,12 @@ export default function CommunityPlusLandingPage() {
         username: email.trim(),
         password,
       });
-
-      // 🔥 DO NOTHING — let AuthContext update
     } catch (err) {
       setAuthError(err?.message || "Login failed");
       setAuthLoading(false);
     }
   };
 
-  /* ===============================
-     LOADING GUARD
-  =============================== */
   if (loading) return null;
 
   return (
@@ -71,22 +64,33 @@ export default function CommunityPlusLandingPage() {
             </h1>
 
             <p className="sub">
-              A map-first local feed that prioritises what’s happening <b>here</b>.
+              A map-first local feed that prioritises what’s happening{" "}
+              <b>here</b>.
             </p>
 
             <button
               className="btn primary"
               onClick={handleEntry}
-              disabled={authLoading}
+              disabled={!AUTH_UI_ENABLED || authLoading}
             >
-              {authLoading ? "Connecting..." : "Explore your local area"}
+              {AUTH_UI_ENABLED
+                ? authLoading
+                  ? "Connecting..."
+                  : "Explore your local area"
+                : "Login temporarily unavailable"}
             </button>
+
+            {!AUTH_UI_ENABLED && (
+              <p className="auth-maintenance-note">
+                We’re updating the sign-in experience. Please check back soon.
+              </p>
+            )}
           </div>
 
           <div
-            className="echo-inline"
+            className={`echo-inline ${!AUTH_UI_ENABLED ? "disabled" : ""}`}
             onClick={handleEntry}
-            style={{ cursor: "pointer" }}
+            aria-disabled={!AUTH_UI_ENABLED}
           >
             <img src="/logo/echo.png" alt="Echo" />
             <div className="echo-pulse"></div>
@@ -94,8 +98,7 @@ export default function CommunityPlusLandingPage() {
         </div>
       </main>
 
-      {/* FALLBACK LOGIN */}
-      {showFallback && (
+      {AUTH_UI_ENABLED && showFallback && (
         <div className="cpl-modalOverlay">
           <div className="cpl-authModal">
             <h2>Sign In</h2>
@@ -123,12 +126,9 @@ export default function CommunityPlusLandingPage() {
         </div>
       )}
 
-      {/* LOADING OVERLAY */}
-      {authLoading && (
+      {AUTH_UI_ENABLED && authLoading && (
         <div className="auth-loading-overlay">
-          <div className="auth-loading-box">
-            Redirecting to secure login…
-          </div>
+          <div className="auth-loading-box">Redirecting to secure login…</div>
         </div>
       )}
     </div>
