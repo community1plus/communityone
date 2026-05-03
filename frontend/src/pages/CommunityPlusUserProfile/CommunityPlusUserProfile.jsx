@@ -21,13 +21,98 @@ import useForm from "../../hooks/useForm";
 import "../../styles/system.css";
 import "./CommunityPlusUserProfile.css";
 
+const getNestedValue = (obj, path) =>
+  path.split(".").reduce((acc, key) => acc?.[key], obj);
+
+const profileSteps = [
+  {
+    id: "user",
+    title: "USER",
+    fields: [
+      { name: "username", label: "Username", type: "text", required: true },
+      {
+        name: "display_name",
+        label: "Display Name",
+        type: "text",
+        required: true,
+      },
+      {
+        name: "userType",
+        label: "User Type",
+        type: "select",
+        required: true,
+        options: [
+          { value: "PERSONAL", label: "Personal" },
+          { value: "BUSINESS", label: "Business" },
+          { value: "GOVT", label: "Government" },
+          {
+            value: "COMMUNITY_SERVICES",
+            label: "Community Services",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "home-address",
+    title: "HOME ADDRESS",
+    fields: [
+      {
+        name: "homeLocation",
+        label: "Home Address",
+        type: "location",
+        required: true,
+      },
+    ],
+  },
+  {
+    id: "contact",
+    title: "CONTACT",
+    fields: [
+      {
+        name: "phone",
+        label: "Phone Number",
+        type: "text",
+        required: true,
+      },
+    ],
+  },
+  {
+    id: "social",
+    title: "SOCIAL",
+    fields: [
+      { name: "social.twitter", label: "Twitter / X", type: "text" },
+      { name: "social.facebook", label: "Facebook", type: "text" },
+      { name: "social.instagram", label: "Instagram", type: "text" },
+      { name: "social.youtube", label: "YouTube", type: "text" },
+    ],
+  },
+  {
+    id: "payment",
+    title: "PAYMENT DETAILS",
+    fields: [
+      {
+        name: "payment.cardName",
+        label: "Name on Card",
+        type: "text",
+      },
+      {
+        name: "payment.last4",
+        label: "Card Last 4 Digits",
+        type: "text",
+      },
+    ],
+  },
+];
+
 export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) {
   const navigate = useNavigate();
   const autoRef = useRef(null);
 
   const { isLoaded } = useGoogleMaps();
   const { appUser, setAppUser } = useAuth();
-  const { homeLocation, setViewLocation } = useLocationContext();
+  const { viewLocation: homeLocation, setManualLocation } =
+    useLocationContext();
 
   const api = useAPI();
   const optimistic = useOptimisticUpdate();
@@ -41,12 +126,27 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
       display_name: "",
       userType: "PERSONAL",
       phone: "",
-      social: { instagram: "" },
+      social: {
+        twitter: "",
+        facebook: "",
+        instagram: "",
+        youtube: "",
+      },
+      payment: {
+        cardName: "",
+        last4: "",
+      },
     },
     persistKey: "profile-form",
   });
 
-  const { values, validateAll, setValue, isFormValidating, clearStorage } = form;
+  const { values, validateAll, setValue, isFormValidating, clearStorage } =
+    form;
+
+  const [currentStep, setCurrentStep] = useState(0);
+
+  const currentStepConfig = profileSteps[currentStep];
+  const isLastStep = currentStep === profileSteps.length - 1;
 
   const trackedValues = useMemo(
     () => ({ ...values, homeLocation }),
@@ -56,11 +156,33 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
   const { dirtyFields, resetDirty } = useDirtyFields(trackedValues);
   const hasDirty = Object.keys(dirtyFields).length > 0;
 
-  const [currentStep, setCurrentStep] = useState(0);
+  const profileCompletion = useMemo(() => {
+    const requiredFields = profileSteps.flatMap((step) =>
+      step.fields.filter((field) => field.required)
+    );
+
+    if (!requiredFields.length) return 100;
+
+    const completed = requiredFields.filter((field) => {
+      if (field.name === "homeLocation") {
+        return Boolean(homeLocation?.lat && homeLocation?.lng);
+      }
+
+      const value = getNestedValue(values, field.name);
+      return Boolean(String(value || "").trim());
+    }).length;
+
+    return Math.round((completed / requiredFields.length) * 100);
+  }, [values, homeLocation]);
 
   useEffect(() => {
     const saved = localStorage.getItem("profile-step");
-    if (saved) setCurrentStep(Number(saved));
+    if (saved) {
+      const parsed = Number(saved);
+      if (!Number.isNaN(parsed)) {
+        setCurrentStep(Math.min(parsed, profileSteps.length - 1));
+      }
+    }
   }, []);
 
   useEffect(() => {
@@ -78,20 +200,21 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
     const place = autoRef.current?.getPlace();
     if (!place?.geometry) return;
 
-    setViewLocation(
-      {
-        label: place.formatted_address,
-        lat: place.geometry.location.lat(),
-        lng: place.geometry.location.lng(),
-        type: "home",
-      },
-      "auto"
-    );
-  }, [setViewLocation]);
+    const manualLocation = {
+      label: place.formatted_address,
+      fullAddress: place.formatted_address,
+      lat: place.geometry.location.lat(),
+      lng: place.geometry.location.lng(),
+      type: "manual",
+      accuracy: "MANUAL",
+    };
+
+    setManualLocation(manualLocation);
+  }, [setManualLocation]);
 
   useAutosave({
     data: dirtyFields,
-    enabled: !!homeLocation && hasDirty,
+    enabled: hasDirty,
 
     onSave: async () => {
       const key = "profile-autosave";
@@ -223,57 +346,52 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
     onComplete,
   ]);
 
-  const profileSteps = [
-  {
-    id: "basic",
-    fields: [
-      { name: "username", label: "Username", type: "text" },
-      { name: "display_name", label: "Display Name", type: "text" },
-    ],
-  },
-  {
-    id: "account",
-    fields: [
-      {
-        name: "userType",
-        label: "Account Type",
-        type: "select",
-        options: [
-          { value: "PERSONAL", label: "Personal" },
-          { value: "BUSINESS", label: "Business" },
-        ],
-      },
-      { name: "phone", label: "Phone", type: "text" },
-    ],
-  },
-  {
-    id: "social",
-    fields: [
-      { name: "social.instagram", label: "Instagram", type: "text" },
-    ],
-  },
-  {
-    id: "location",
-    fields: [
-      { name: "homeLocation", label: "Home Location", type: "location" },
-    ],
-  },
-];
-  const nextStep = () => setCurrentStep((step) => Math.min(3, step + 1));
-  const prevStep = () => setCurrentStep((step) => Math.max(0, step - 1));
+  const nextStep = useCallback(() => {
+    setCurrentStep((step) => Math.min(profileSteps.length - 1, step + 1));
+  }, []);
+
+  const prevStep = useCallback(() => {
+    setCurrentStep((step) => Math.max(0, step - 1));
+  }, []);
 
   return (
     <div className="profile-container">
       <div className="profile-layout">
         <div className="profile-left">
           <div className="profile-page-header">
-            <PageHeader
-              title={mode === "onboarding" ? "Set Up Profile" : "Edit Profile"}
-            />
+            <PageHeader title="USER PROFILE" />
+
+            <div className="profile-completion">
+              <div className="profile-completion-header">
+                <span>Profile completion</span>
+                <strong>{profileCompletion}%</strong>
+              </div>
+
+              <div className="profile-completion-track">
+                <div
+                  className="profile-completion-fill"
+                  style={{ width: `${profileCompletion}%` }}
+                />
+              </div>
+            </div>
+
+            <div className="profile-section-tabs">
+              {profileSteps.map((step, index) => (
+                <button
+                  key={step.id}
+                  type="button"
+                  className={`profile-section-tab ${
+                    currentStep === index ? "active" : ""
+                  } ${index < currentStep ? "complete" : ""}`}
+                  onClick={() => setCurrentStep(index)}
+                >
+                  {step.title}
+                </button>
+              ))}
+            </div>
           </div>
 
-          <Section>
- 
+          <Section title={currentStepConfig?.title}>
             <FormBuilder
               steps={profileSteps}
               currentStep={currentStep}
@@ -300,10 +418,10 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
               )}
 
               <Button
-                onClick={currentStep < 3 ? nextStep : handleComplete}
+                onClick={isLastStep ? handleComplete : nextStep}
                 disabled={isFormValidating}
               >
-                {currentStep < 3 ? "Next" : "Finish"}
+                {isLastStep ? "Finish" : "Next"}
               </Button>
             </div>
           </div>
@@ -312,7 +430,7 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
         <div className="profile-guide">
           <Section
             title="Profile Guide"
-            meta="Complete all steps to unlock features"
+            meta="Complete each section to unlock more Community+ features."
           />
         </div>
       </div>
