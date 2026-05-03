@@ -55,10 +55,7 @@ export default function CommunityPlusLandingPage() {
 
   return (
     <div className="cpl-root">
-      <div>
-       { /* <img src="/logo/echo2.png" alt="" className="landing-bg-image" /> */ }
-        <img src="/logo/echo.png" alt="" className="landing-bg-logo" />
-
+      <div className="landing-visual-layer" aria-hidden="true">
         <div className="landing-hero-tint" />
         <div className="landing-hero-focus" />
       </div>
@@ -96,6 +93,21 @@ export default function CommunityPlusLandingPage() {
           </div>
         </section>
       </main>
+
+      <button
+        type="button"
+        className="landing-login-thumb"
+        onClick={handleEntry}
+        disabled={!AUTH_UI_ENABLED || authLoading}
+        aria-label="Login"
+        title={
+          AUTH_UI_ENABLED
+            ? "Login"
+            : "Login temporarily unavailable"
+        }
+      >
+        <img src="/logo/echo.png" alt="" />
+      </button>
 
       {AUTH_UI_ENABLED && showFallback && (
         <div className="cpl-modalOverlay">
