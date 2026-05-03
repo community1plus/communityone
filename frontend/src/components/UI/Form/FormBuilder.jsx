@@ -22,6 +22,7 @@ export default function FormBuilder({
   ========================= */
 
   const step = steps[currentStep];
+  console.log("FORM BUILDER:", { steps, currentStep });
 
   if (!step || !Array.isArray(step.fields)) {
     console.warn("FormBuilder: invalid step config", {
