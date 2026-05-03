@@ -1,6 +1,6 @@
 import CommunityPlusEmailForm from "./CommunityPlusEmailForm";
 
-export default function CommunityPlusAuthModal({ onClose }) {
+export default function CommunityPlusAuthModal({ onClose, onSuccess }) {
   return (
     <div className="cpl-modalOverlay" onClick={onClose}>
       <div className="cpl-authModal" onClick={(e) => e.stopPropagation()}>

@@ -68,7 +68,7 @@ export default function CommunityPlusEmailForm({ onSuccess }) {
           Signing you in…
         </div>
       )}
-
+      console.log("onSuccess:", onSuccess);  
       {authError && <div className="error">{authError}</div>}
     </form>
   );
