@@ -223,6 +223,42 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
     onComplete,
   ]);
 
+  const profileSteps = [
+  {
+    id: "basic",
+    fields: [
+      { name: "username", label: "Username", type: "text" },
+      { name: "display_name", label: "Display Name", type: "text" },
+    ],
+  },
+  {
+    id: "account",
+    fields: [
+      {
+        name: "userType",
+        label: "Account Type",
+        type: "select",
+        options: [
+          { value: "PERSONAL", label: "Personal" },
+          { value: "BUSINESS", label: "Business" },
+        ],
+      },
+      { name: "phone", label: "Phone", type: "text" },
+    ],
+  },
+  {
+    id: "social",
+    fields: [
+      { name: "social.instagram", label: "Instagram", type: "text" },
+    ],
+  },
+  {
+    id: "location",
+    fields: [
+      { name: "homeLocation", label: "Home Location", type: "location" },
+    ],
+  },
+];
   const nextStep = () => setCurrentStep((step) => Math.min(3, step + 1));
   const prevStep = () => setCurrentStep((step) => Math.max(0, step - 1));
 

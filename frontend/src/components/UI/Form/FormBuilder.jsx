@@ -3,8 +3,8 @@ import Select from "./Select";
 import Field from "./Field";
 
 export default function FormBuilder({
-  steps,
-  currentStep,
+  steps = [],
+  currentStep = 0,
   form,
   extra = {},
 }) {
@@ -17,100 +17,131 @@ export default function FormBuilder({
     isFieldValid,
   } = form;
 
-  const renderField = (field) => {
-    const { name, label, type, readOnly, options } = field;
+  /* =========================
+     SAFETY GUARD
+  ========================= */
 
-    /* =========================
-       COMMON FIELD STATE
-    ========================= */
+  const step = steps[currentStep];
 
-    const error = getError(name);
-    const loading = isValidating(name);
-    const success = isFieldValid(name);
+  if (!step || !Array.isArray(step.fields)) {
+    console.warn("FormBuilder: invalid step config", {
+      currentStep,
+      steps,
+    });
+    return null;
+  }
 
-    /* =========================
-       LOCATION FIELD
-    ========================= */
+  /* =========================
+     FIELD WRAPPER
+  ========================= */
 
-    if (type === "location") {
-      const {
-        Autocomplete,
-        autoRef,
-        manualAddress,
-        setManualAddress,
-        onPlaceChanged,
-      } = extra;
-
-      return (
-        <Field
-          key={name}
-          label={label}
-          error={error}
-          loading={loading}
-          success={success}
-        >
-          <Autocomplete
-            onLoad={(auto) => (autoRef.current = auto)}
-            onPlaceChanged={onPlaceChanged}
-          >
-            <Input
-              value={manualAddress}
-              onChange={(e) => setManualAddress(e.target.value)}
-            />
-          </Autocomplete>
-        </Field>
-      );
-    }
-
-    /* =========================
-       SELECT FIELD
-    ========================= */
-
-    if (type === "select") {
-      return (
-        <Field
-          key={name}
-          label={label}
-          error={error}
-          loading={loading}
-          success={success}
-        >
-          <Select
-            value={getValue(name)}
-            onChange={handleChange(name, field)}
-            onBlur={handleBlur(name, field)}
-          >
-            {options.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </Select>
-        </Field>
-      );
-    }
-
-    /* =========================
-       DEFAULT INPUT
-    ========================= */
+  const renderFieldWrapper = (field, input) => {
+    const { name, label } = field;
 
     return (
       <Field
         key={name}
         label={label}
-        error={error}
-        loading={loading}
-        success={success}
+        error={getError(name)}
+        loading={isValidating(name)}
+        success={isFieldValid(name)}
       >
-        <Input
-          value={getValue(name)}
-          onChange={handleChange(name, field)}
-          onBlur={handleBlur(name, field)}
-          readOnly={readOnly}
-        />
+        {input}
       </Field>
     );
   };
 
-  return <>{steps[currentStep].fields.map(renderField)}</>;
+  /* =========================
+     FIELD TYPES
+  ========================= */
+
+  const renderInput = (field) => {
+    const { name, readOnly } = field;
+
+    return (
+      <Input
+        value={getValue(name)}
+        onChange={handleChange(name, field)}
+        onBlur={handleBlur(name, field)}
+        readOnly={readOnly}
+      />
+    );
+  };
+
+  const renderSelect = (field) => {
+    const { name, options = [] } = field;
+
+    return (
+      <Select
+        value={getValue(name)}
+        onChange={handleChange(name, field)}
+        onBlur={handleBlur(name, field)}
+      >
+        {options.map((opt) => (
+          <option key={opt.value} value={opt.value}>
+            {opt.label}
+          </option>
+        ))}
+      </Select>
+    );
+  };
+
+  const renderLocation = (field) => {
+    const { name } = field;
+
+    const {
+      Autocomplete,
+      autoRef,
+      onPlaceChanged,
+      isLoaded,
+    } = extra;
+
+    if (!isLoaded || !Autocomplete) {
+      return renderInput(field); // fallback
+    }
+
+    return (
+      <Autocomplete
+        onLoad={(auto) => (autoRef.current = auto)}
+        onPlaceChanged={onPlaceChanged}
+      >
+        <Input
+          value={getValue(name)?.label || ""}
+          onChange={() => {}} // controlled by Google
+          placeholder="Search for a location..."
+        />
+      </Autocomplete>
+    );
+  };
+
+  /* =========================
+     FIELD SWITCH
+  ========================= */
+
+  const renderField = (field) => {
+    let input;
+
+    switch (field.type) {
+      case "select":
+        input = renderSelect(field);
+        break;
+
+      case "location":
+        input = renderLocation(field);
+        break;
+
+      case "text":
+      default:
+        input = renderInput(field);
+        break;
+    }
+
+    return renderFieldWrapper(field, input);
+  };
+
+  /* =========================
+     RENDER
+  ========================= */
+
+  return <>{step.fields.map(renderField)}</>;
 }
