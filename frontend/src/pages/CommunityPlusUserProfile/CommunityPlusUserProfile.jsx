@@ -273,7 +273,9 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
           </div>
 
           <Section>
+ 
             <FormBuilder
+              steps={profileSteps}
               currentStep={currentStep}
               form={form}
               extra={{
