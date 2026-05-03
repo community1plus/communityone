@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Autocomplete, useJsApiLoader } from "@react-google-maps/api";
+import { Autocomplete } from "@react-google-maps/api";
 
+import { useGoogleMaps } from "../../context/GoogleMapsProvider";
 import { useLocationContext } from "../../context/LocationProvider";
 import { useAuth } from "../../context/AuthContext";
 
@@ -20,12 +21,11 @@ import useForm from "../../hooks/useForm";
 import "../../styles/system.css";
 import "./CommunityPlusUserProfile.css";
 
-const GOOGLE_LIBRARIES = ["places"];
-
 export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) {
   const navigate = useNavigate();
   const autoRef = useRef(null);
 
+  const { isLoaded } = useGoogleMaps();
   const { appUser, setAppUser } = useAuth();
   const { homeLocation, setViewLocation } = useLocationContext();
 
@@ -73,11 +73,6 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
     const prefix = appUser.user.email.split("@")[0];
     setValue("username", (prev) => prev || prefix);
   }, [appUser?.user?.email, setValue]);
-
-  const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
-    libraries: GOOGLE_LIBRARIES,
-  });
 
   const onPlaceChanged = useCallback(() => {
     const place = autoRef.current?.getPlace();
