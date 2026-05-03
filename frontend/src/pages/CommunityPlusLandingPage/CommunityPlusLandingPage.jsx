@@ -53,50 +53,27 @@ export default function CommunityPlusLandingPage() {
 
   if (loading) return null;
 
-  return (
-    <div className="cpl-root">
-      <div className="landing-hero-bg" aria-hidden="true">
-        <img src="/images/echo 2.png" alt="" />
-        <div className="landing-hero-tint" />
+return (
+  <div className="cpl-root">
+    <div className="landing-hero-bg">
+      <img src="/images/echo 2.png" alt="" />
+      <div className="landing-hero-tint" />
+      <div className="landing-hero-focus" />
+    </div>
+
+    <main className="landing-container">
+      
+      {/* TITLE */}
+      <h1 className="brand-title">Community.One</h1>
+
+      {/* LOGO */}
+      <div className="landing-logo">
+        <img src="/logo/echo.png" alt="Community.One" />
       </div>
 
-      <main className="landing-container">
-        <section className="landing-hero" aria-label="Community.One landing">
-          <h1 className="brand-title">Community.One</h1>
-
-          <div className="landing-logo" aria-hidden="true">
-            <img src="/logo/echo.png" alt="" />
-          </div>
-
-          <div className="landing-text">
-            <h2 className="landing-tagline">
-              Real People. <span className="accent">Real News.</span> Real Time
-            </h2>
-
-            <p className="landing-sub">
-              A map-first local feed that prioritises what’s happening{" "}
-              <strong>here</strong>.
-            </p>
-          </div>
-
-          <div className="landing-actions">
-            {AUTH_UI_ENABLED ? (
-              <button
-                type="button"
-                className="btn primary"
-                onClick={handleEntry}
-                disabled={authLoading}
-              >
-                {authLoading ? "Connecting..." : "Explore your local area"}
-              </button>
-            ) : (
-              <p className="auth-maintenance-note">
-                We’re updating the sign-in experience. Please check back soon.
-              </p>
-            )}
-          </div>
-        </section>
-      </main>
+    </main>
+  </div>
+);
 
       {AUTH_UI_ENABLED && showFallback && (
         <div className="cpl-modalOverlay">

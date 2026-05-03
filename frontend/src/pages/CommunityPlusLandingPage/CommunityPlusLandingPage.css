@@ -4,97 +4,83 @@ ROOT
 
 .cpl-root {
   position: relative;
-  min-height: 100vh;
+  height: 100vh;
+  width: 100%;
   overflow: hidden;
   background: #f8f6f3;
 }
 
 /* =========================
-BACKGROUND IMAGE
-========================= */
-
-.landing-hero-bg {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  overflow: hidden;
-}
-
-.landing-hero-bg img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-
-  /* 🔥 cleaner tone control */
-  filter:
-    grayscale(1)
-    contrast(1.08)
-    brightness(0.88);
-
-  transform: scale(1.02); /* subtle zoom = less edge exposure */
-}
-
-/* =========================
-PRIMARY OVERLAY (LIGHT FADE)
-========================= */
-
-.landing-hero-tint {
-  position: absolute;
-  inset: 0;
-
-  /* 🔥 balanced readability + depth */
-  background:
-    radial-gradient(
-      circle at 50% 40%,
-      rgba(248, 246, 243, 0.82),
-      rgba(248, 246, 243, 0.55) 40%,
-      rgba(248, 246, 243, 0.25) 70%,
-      rgba(248, 246, 243, 0.1)
-    );
-}
-
-/* =========================
-SUBTLE BRAND TONE
-========================= */
-
-.landing-hero-tint::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-
-  /* 🔥 adds identity without overpowering */
-  background: rgba(177, 18, 38, 0.035);
-
-  mix-blend-mode: multiply;
-  pointer-events: none;
-}
-
-/* =========================
-FOCUS GRADIENT (KEY UPGRADE)
-========================= */
-
-.landing-hero-focus {
-  position: absolute;
-  inset: 0;
-
-  background:
-    radial-gradient(
-      circle at center,
-      transparent 35%,
-      rgba(0, 0, 0, 0.25)
-    );
-
-  z-index: 0;
-}
-
-/* =========================
-CONTENT LAYER
+CENTER EVERYTHING (FIX)
 ========================= */
 
 .landing-container {
   position: relative;
   z-index: 2;
 
-  /* optional: soft elevation */
-  backdrop-filter: blur(2px);
+  height: 100%;
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;   /* horizontal center */
+  justify-content: center; /* vertical center */
+
+  gap: 32px;
+  text-align: center;
+
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* =========================
+TITLE (FIX ALIGNMENT)
+========================= */
+
+.brand-title {
+  margin: 0;
+
+  font-size: clamp(28px, 4vw, 42px);
+  font-weight: 700;
+
+  letter-spacing: 0.08em;
+  color: #b11226;
+
+  text-align: center; /* 🔥 force center */
+}
+
+/* =========================
+LOGO CONTAINER (FIX SIZE)
+========================= */
+
+.landing-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: min(60vw, 420px);
+  aspect-ratio: 1 / 1;
+}
+
+/* =========================
+LOGO IMAGE (FIX SCALE)
+========================= */
+
+.landing-logo img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;
+
+  border-radius: 50%;
+  background: black;
+
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+
+  transition: transform 0.3s ease;
+}
+
+.landing-logo img:hover {
+  transform: scale(1.04);
 }
