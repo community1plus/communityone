@@ -19,6 +19,8 @@ export default function CommunityPlusHeader({ onLogout }) {
 
   const {
     location,
+    autoLocation,
+    manualLocation,
     loading: locationLoading,
     mode,
     setAutoMode,
@@ -65,16 +67,35 @@ export default function CommunityPlusHeader({ onLogout }) {
   );
 
   const handleLocationClick = useCallback(() => {
-    setAutoMode();
+    setAutoMode({ force: true });
   }, [setAutoMode]);
 
+  const displayLocation = useMemo(() => {
+    if (mode === "auto") {
+      return autoLocation || location;
+    }
+
+    return manualLocation || location;
+  }, [mode, autoLocation, manualLocation, location]);
+
   const locationLabel = useMemo(() => {
-    if (locationLoading && location) return formatLocation(location);
-    if (locationLoading) return "Detecting location...";
-    if (location) return formatLocation(location);
+    if (locationLoading && displayLocation) {
+      return formatLocation(displayLocation);
+    }
+
+    if (locationLoading) {
+      return "Detecting location...";
+    }
+
+    if (displayLocation) {
+      return formatLocation(displayLocation);
+    }
 
     return "Set location";
-  }, [location, locationLoading]);
+  }, [displayLocation, locationLoading]);
+
+  const locationTitle =
+    mode === "manual" ? "Use current location" : "Refresh current location";
 
   return (
     <header className="header">
@@ -89,11 +110,14 @@ export default function CommunityPlusHeader({ onLogout }) {
 
           <button
             type="button"
-            className={`location-display ${mode === "auto" ? "auto" : "manual"}`}
+            className={`location-display ${
+              mode === "auto" ? "auto" : "manual"
+            }`}
             onClick={handleLocationClick}
-            title={mode === "manual" ? "Use current location" : "Refresh location"}
+            title={locationTitle}
+            aria-label={locationTitle}
           >
-            <LocationPin loading={locationLoading} />
+            <LocationPin loading={locationLoading} active={mode === "auto"} />
             <span>{locationLabel}</span>
           </button>
         </div>
@@ -110,13 +134,17 @@ export default function CommunityPlusHeader({ onLogout }) {
               type="button"
               className="avatar"
               onClick={() => setShowMenu((prev) => !prev)}
+              aria-label="Open user menu"
             >
               {initials}
             </button>
 
             {showMenu && (
               <div className="dropdown-menu">
-                <button type="button" onClick={() => go("/communityplus/profile")}>
+                <button
+                  type="button"
+                  onClick={() => go("/communityplus/profile")}
+                >
                   Profile
                 </button>
 
