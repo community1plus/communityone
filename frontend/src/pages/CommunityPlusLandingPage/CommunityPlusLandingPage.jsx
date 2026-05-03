@@ -71,7 +71,6 @@ export default function CommunityPlusLandingPage() {
 
             <p className="landing-sub">
               local signal + local economy
-              <strong>here</strong>.
             </p>
           </div>
 
