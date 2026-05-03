@@ -140,3 +140,22 @@ PROFILE PAGE — COMPACT REFINEMENT
     min-height: auto;
   }
 }
+
+.profile-left {
+  overflow: hidden;
+}
+
+.profile-left * {
+  box-sizing: border-box;
+}
+
+.profile-left form,
+.profile-left section,
+.profile-left .section,
+.profile-left .field,
+.profile-left input,
+.profile-left select,
+.profile-left textarea {
+  max-width: 100%;
+  width: 100%;
+}
