@@ -24,7 +24,12 @@ const profileSteps = [
     title: "USER",
     fields: [
       { name: "username", label: "Username", type: "text", required: true },
-      { name: "display_name", label: "Display Name", type: "text", required: true },
+      {
+        name: "display_name",
+        label: "Display Name",
+        type: "text",
+        required: true,
+      },
       {
         name: "userType",
         label: "User Type",
@@ -34,7 +39,10 @@ const profileSteps = [
           { value: "PERSONAL", label: "Personal" },
           { value: "BUSINESS", label: "Business" },
           { value: "GOVT", label: "Government" },
-          { value: "COMMUNITY_SERVICES", label: "Community Services" },
+          {
+            value: "COMMUNITY_SERVICES",
+            label: "Community Services",
+          },
         ],
       },
     ],
@@ -55,7 +63,12 @@ const profileSteps = [
     id: "contact",
     title: "CONTACT",
     fields: [
-      { name: "phone", label: "Phone Number", type: "text", required: true },
+      {
+        name: "phone",
+        label: "Phone Number",
+        type: "text",
+        required: true,
+      },
     ],
   },
   {
@@ -73,12 +86,16 @@ const profileSteps = [
     title: "PAYMENT DETAILS",
     fields: [
       { name: "payment.cardName", label: "Name on Card", type: "text" },
-      { name: "payment.last4", label: "Card Last 4 Digits", type: "text" },
+      {
+        name: "payment.last4",
+        label: "Card Last 4 Digits",
+        type: "text",
+      },
     ],
   },
 ];
 
-export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) {
+export default function CommunityPlusUserProfile({ onComplete }) {
   const navigate = useNavigate();
   const autoRef = useRef(null);
 
@@ -90,11 +107,11 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
 
   const {
     profile,
+    profileReady,
     completionPercent,
     hasProfile,
     saveProfile,
     patchProfile,
-    loadProfile,
   } = useProfile();
 
   const form = useForm({
@@ -103,6 +120,7 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
       display_name: profile?.display_name || user?.displayName || "",
       userType: profile?.userType || "PERSONAL",
       phone: profile?.phone || "",
+      homeLocation: profile?.homeLocation || homeLocation || null,
       social: {
         twitter: profile?.social?.twitter || "",
         facebook: profile?.social?.facebook || "",
@@ -126,21 +144,25 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
   const currentStepConfig = profileSteps[currentStep];
   const isLastStep = currentStep === profileSteps.length - 1;
 
+  const displayCompletion = useMemo(
+    () => completionPercent || 0,
+    [completionPercent]
+  );
+
   const { autosaveStatus, autosaveError } = useProfileAutosave({
     values,
     homeLocation,
     patchProfile,
-    enabled: Boolean(profile),
+    enabled: Boolean(profileReady && profile),
     delay: 900,
   });
-
-  const displayCompletion = useMemo(() => completionPercent || 0, [completionPercent]);
 
   useEffect(() => {
     const saved = localStorage.getItem("profile-step");
     if (!saved) return;
 
     const parsed = Number(saved);
+
     if (!Number.isNaN(parsed)) {
       setCurrentStep(Math.min(parsed, profileSteps.length - 1));
     }
@@ -156,9 +178,11 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
     const prefix = user.email.split("@")[0];
 
     setValue("username", (prev) => prev || profile?.username || prefix);
+
     setValue(
       "display_name",
-      (prev) => prev || profile?.display_name || user.displayName || prefix
+      (prev) =>
+        prev || profile?.display_name || user.displayName || prefix
     );
   }, [
     user?.email,
@@ -167,6 +191,12 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
     profile?.display_name,
     setValue,
   ]);
+
+  useEffect(() => {
+    if (!homeLocation) return;
+
+    setValue("homeLocation", homeLocation);
+  }, [homeLocation, setValue]);
 
   const onPlaceChanged = useCallback(() => {
     const place = autoRef.current?.getPlace();
@@ -182,7 +212,8 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
     };
 
     setManualLocation(manualLocation);
-  }, [setManualLocation]);
+    setValue("homeLocation", manualLocation);
+  }, [setManualLocation, setValue]);
 
   const buildProfilePayload = useCallback(
     () => ({
@@ -190,7 +221,7 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
       display_name: values.display_name,
       userType: values.userType,
       phone: values.phone,
-      homeLocation,
+      homeLocation: values.homeLocation || homeLocation,
       social: values.social,
       payment: values.payment,
     }),
@@ -203,7 +234,6 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
 
     try {
       const nextProfile = await saveProfile(buildProfilePayload());
-      await loadProfile();
 
       clearStorage();
       localStorage.removeItem("profile-step");
@@ -220,7 +250,6 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
   }, [
     saveProfile,
     buildProfilePayload,
-    loadProfile,
     clearStorage,
     onComplete,
     navigate,
@@ -242,13 +271,19 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
   }, []);
 
   const closeProfile = useCallback(() => {
+    if (!profileReady) return;
+
     if (!hasProfile) {
       navigate("/communityplus/profile", { replace: true });
       return;
     }
 
     navigate("/communityplus", { replace: true });
-  }, [hasProfile, navigate]);
+  }, [profileReady, hasProfile, navigate]);
+
+  if (!profileReady) {
+    return <div style={{ padding: 40 }}>Loading profile...</div>;
+  }
 
   return (
     <div className="profile-container">
