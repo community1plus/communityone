@@ -5,12 +5,7 @@ import { Autocomplete } from "@react-google-maps/api";
 import { useGoogleMaps } from "../../context/GoogleMapsProvider";
 import { useLocationContext } from "../../context/LocationProvider";
 import { useAuth } from "../../context/AuthContext";
-
-import useAPI from "../../../hooks/useAPI";
-import useAutosave from "../../../hooks/useAutosave";
-import useOptimisticUpdate from "../../hooks/useOptimisticUpdate";
-import useDirtyFields from "../../../hooks/useDirtyFields";
-import { buildPatch } from "../../utils/buildPatch";
+import { useProfile } from "../../context/ProfileContext";
 
 import PageHeader from "../../components/UI/PageHeader";
 import Section from "../../components/UI/Section";
@@ -20,9 +15,6 @@ import useForm from "../../hooks/useForm";
 
 import "../../styles/system.css";
 import "./CommunityPlusUserProfile.css";
-
-const getNestedValue = (obj, path) =>
-  path.split(".").reduce((acc, key) => acc?.[key], obj);
 
 const profileSteps = [
   {
@@ -45,10 +37,7 @@ const profileSteps = [
           { value: "PERSONAL", label: "Personal" },
           { value: "BUSINESS", label: "Business" },
           { value: "GOVT", label: "Government" },
-          {
-            value: "COMMUNITY_SERVICES",
-            label: "Community Services",
-          },
+          { value: "COMMUNITY_SERVICES", label: "Community Services" },
         ],
       },
     ],
@@ -91,16 +80,8 @@ const profileSteps = [
     id: "payment",
     title: "PAYMENT DETAILS",
     fields: [
-      {
-        name: "payment.cardName",
-        label: "Name on Card",
-        type: "text",
-      },
-      {
-        name: "payment.last4",
-        label: "Card Last 4 Digits",
-        type: "text",
-      },
+      { name: "payment.cardName", label: "Name on Card", type: "text" },
+      { name: "payment.last4", label: "Card Last 4 Digits", type: "text" },
     ],
   },
 ];
@@ -110,31 +91,34 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
   const autoRef = useRef(null);
 
   const { isLoaded } = useGoogleMaps();
-  const { appUser, setAppUser } = useAuth();
+  const { user } = useAuth();
+
   const { viewLocation: homeLocation, setManualLocation } =
     useLocationContext();
 
-  const api = useAPI();
-  const optimistic = useOptimisticUpdate();
-
-  const startSaving = () => {};
-  const stopSaving = () => {};
+  const {
+    profile,
+    completionPercent,
+    hasProfile,
+    saveProfile,
+    loadProfile,
+  } = useProfile();
 
   const form = useForm({
     initialValues: {
-      username: "",
-      display_name: "",
-      userType: "PERSONAL",
-      phone: "",
+      username: profile?.username || "",
+      display_name: profile?.display_name || user?.displayName || "",
+      userType: profile?.userType || "PERSONAL",
+      phone: profile?.phone || "",
       social: {
-        twitter: "",
-        facebook: "",
-        instagram: "",
-        youtube: "",
+        twitter: profile?.social?.twitter || "",
+        facebook: profile?.social?.facebook || "",
+        instagram: profile?.social?.instagram || "",
+        youtube: profile?.social?.youtube || "",
       },
       payment: {
-        cardName: "",
-        last4: "",
+        cardName: profile?.payment?.cardName || "",
+        last4: profile?.payment?.last4 || "",
       },
     },
     persistKey: "profile-form",
@@ -144,57 +128,43 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
     form;
 
   const [currentStep, setCurrentStep] = useState(0);
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [profileError, setProfileError] = useState("");
 
   const currentStepConfig = profileSteps[currentStep];
   const isLastStep = currentStep === profileSteps.length - 1;
 
-  const trackedValues = useMemo(
-    () => ({ ...values, homeLocation }),
-    [values, homeLocation]
-  );
-
-  const { dirtyFields, resetDirty } = useDirtyFields(trackedValues);
-  const hasDirty = Object.keys(dirtyFields).length > 0;
-
-  const profileCompletion = useMemo(() => {
-    const requiredFields = profileSteps.flatMap((step) =>
-      step.fields.filter((field) => field.required)
-    );
-
-    if (!requiredFields.length) return 100;
-
-    const completed = requiredFields.filter((field) => {
-      if (field.name === "homeLocation") {
-        return Boolean(homeLocation?.lat && homeLocation?.lng);
-      }
-
-      const value = getNestedValue(values, field.name);
-      return Boolean(String(value || "").trim());
-    }).length;
-
-    return Math.round((completed / requiredFields.length) * 100);
-  }, [values, homeLocation]);
+  const displayCompletion = useMemo(() => {
+    return completionPercent || 0;
+  }, [completionPercent]);
 
   useEffect(() => {
     const saved = localStorage.getItem("profile-step");
-    if (saved) {
-      const parsed = Number(saved);
-      if (!Number.isNaN(parsed)) {
-        setCurrentStep(Math.min(parsed, profileSteps.length - 1));
-      }
+
+    if (!saved) return;
+
+    const parsed = Number(saved);
+
+    if (!Number.isNaN(parsed)) {
+      setCurrentStep(Math.min(parsed, profileSteps.length - 1));
     }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("profile-step", currentStep);
+    localStorage.setItem("profile-step", String(currentStep));
   }, [currentStep]);
 
   useEffect(() => {
-    if (!appUser?.user?.email) return;
+    if (!user?.email) return;
 
-    const prefix = appUser.user.email.split("@")[0];
-    setValue("username", (prev) => prev || prefix);
-  }, [appUser?.user?.email, setValue]);
+    const prefix = user.email.split("@")[0];
+
+    setValue("username", (prev) => prev || profile?.username || prefix);
+    setValue(
+      "display_name",
+      (prev) => prev || profile?.display_name || user.displayName || prefix
+    );
+  }, [user?.email, user?.displayName, profile?.username, profile?.display_name, setValue]);
 
   const onPlaceChanged = useCallback(() => {
     const place = autoRef.current?.getPlace();
@@ -212,139 +182,57 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
     setManualLocation(manualLocation);
   }, [setManualLocation]);
 
-  useAutosave({
-    data: dirtyFields,
-    enabled: hasDirty,
+  const buildProfilePayload = useCallback(
+    () => ({
+      username: values.username,
+      display_name: values.display_name,
+      userType: values.userType,
+      phone: values.phone,
+      homeLocation,
+      social: values.social,
+      payment: values.payment,
+    }),
+    [values, homeLocation]
+  );
 
-    onSave: async () => {
-      const key = "profile-autosave";
-      let opId = null;
+  const handleSaveProfile = useCallback(async () => {
+    setSavingProfile(true);
+    setProfileError("");
 
-      try {
-        startSaving();
+    try {
+      const nextProfile = await saveProfile(buildProfilePayload());
+      await loadProfile();
 
-        const patch = buildPatch(dirtyFields);
+      clearStorage();
+      localStorage.removeItem("profile-step");
 
-        const { nextState, opId: id } = optimistic.applyOptimistic(
-          key,
-          appUser,
-          (prev) => ({
-            ...prev,
-            profile: {
-              ...prev?.profile,
-              ...patch,
-            },
-          })
-        );
+      onComplete?.(nextProfile);
 
-        opId = id;
-        setAppUser(nextState);
-
-        const res = await api.patch("/profile", patch, {
-          version: appUser?.profile?.version,
-          dedupeKey: key,
-          silent: true,
-        });
-
-        optimistic.commit(key, opId);
-
-        if (res?.profile) {
-          setAppUser((prev) => ({
-            ...prev,
-            profile: res.profile,
-          }));
-        }
-
-        resetDirty();
-      } catch (err) {
-        if (err?.status === 409) {
-          const serverProfile = err.data?.serverProfile;
-
-          if (serverProfile) {
-            setAppUser((prev) => ({
-              ...prev,
-              profile: serverProfile,
-            }));
-          }
-
-          resetDirty();
-          return;
-        }
-
-        if (opId) {
-          const prev = optimistic.rollback(key, opId);
-          if (prev) setAppUser(prev);
-        }
-      } finally {
-        stopSaving();
+      if (mode === "onboarding" || nextProfile) {
+        navigate("/communityplus", { replace: true });
       }
-    },
-  });
+    } catch (err) {
+      console.error("Profile save failed:", err);
+      setProfileError(err?.message || "Profile save failed");
+    } finally {
+      setSavingProfile(false);
+    }
+  }, [
+    saveProfile,
+    buildProfilePayload,
+    loadProfile,
+    clearStorage,
+    onComplete,
+    mode,
+    navigate,
+  ]);
 
   const handleComplete = useCallback(async () => {
     const valid = await validateAll();
     if (!valid) return;
 
-    const key = "profile-complete";
-    let opId = null;
-
-    try {
-      startSaving();
-
-      const { nextState, opId: id } = optimistic.applyOptimistic(
-        key,
-        appUser,
-        (prev) => ({
-          ...prev,
-          hasProfile: true,
-        })
-      );
-
-      opId = id;
-      setAppUser(nextState);
-
-      const res = await api.post("/profile/complete", {
-        ...values,
-        homeLocation,
-      });
-
-      optimistic.commit(key, opId);
-
-      clearStorage();
-      localStorage.removeItem("profile-step");
-
-      setAppUser((prev) => ({
-        ...prev,
-        hasProfile: true,
-        profile: res?.profile || prev?.profile,
-      }));
-
-      if (mode === "onboarding") {
-        navigate("/communityplus", { replace: true });
-      }
-
-      onComplete?.(res);
-    } catch (err) {
-      if (opId) {
-        const prev = optimistic.rollback(key, opId);
-        if (prev) setAppUser(prev);
-      }
-    } finally {
-      stopSaving();
-    }
-  }, [
-    validateAll,
-    optimistic,
-    appUser,
-    setAppUser,
-    api,
-    values,
-    homeLocation,
-    clearStorage,
-    mode,
-    navigate,
-    onComplete,
-  ]);
+    await handleSaveProfile();
+  }, [validateAll, handleSaveProfile]);
 
   const nextStep = useCallback(() => {
     setCurrentStep((step) => Math.min(profileSteps.length - 1, step + 1));
@@ -353,6 +241,15 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
   const prevStep = useCallback(() => {
     setCurrentStep((step) => Math.max(0, step - 1));
   }, []);
+
+  const closeProfile = useCallback(() => {
+    if (!hasProfile) {
+      navigate("/communityplus/profile", { replace: true });
+      return;
+    }
+
+    navigate("/communityplus", { replace: true });
+  }, [hasProfile, navigate]);
 
   return (
     <div className="profile-container">
@@ -364,13 +261,13 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
             <div className="profile-completion">
               <div className="profile-completion-header">
                 <span>Profile completion</span>
-                <strong>{profileCompletion}%</strong>
+                <strong>{displayCompletion}%</strong>
               </div>
 
               <div className="profile-completion-track">
                 <div
                   className="profile-completion-fill"
-                  style={{ width: `${profileCompletion}%` }}
+                  style={{ width: `${displayCompletion}%` }}
                 />
               </div>
             </div>
@@ -405,8 +302,10 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
             />
           </Section>
 
+          {profileError && <div className="error">{profileError}</div>}
+
           <div className="form-navigation">
-            <Button variant="ghost" onClick={() => navigate("/communityplus")}>
+            <Button variant="ghost" onClick={closeProfile}>
               Close
             </Button>
 
@@ -419,9 +318,13 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
 
               <Button
                 onClick={isLastStep ? handleComplete : nextStep}
-                disabled={isFormValidating}
+                disabled={isFormValidating || savingProfile}
               >
-                {isLastStep ? "Finish" : "Next"}
+                {savingProfile
+                  ? "Saving..."
+                  : isLastStep
+                  ? "Finish"
+                  : "Next"}
               </Button>
             </div>
           </div>
@@ -430,7 +333,7 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
         <div className="profile-guide">
           <Section
             title="Profile Guide"
-            meta="Complete each section to unlock more Community+ features."
+            meta="Complete each required section to unlock Community.One features."
           />
         </div>
       </div>

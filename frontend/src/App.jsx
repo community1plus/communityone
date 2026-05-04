@@ -1,5 +1,6 @@
-import { Routes, Route, Navigate, Outlet } from "react-router-dom";
+import { Routes, Route, Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
+import { ProfileProvider, useProfile } from "./context/ProfileContext";
 
 /* CONTEXT */
 import { GoogleMapsProvider } from "./context/GoogleMapsProvider";
@@ -14,7 +15,6 @@ import CommunityPlusYellowPages from "./pages/CommunityPlusYellowPages/Community
 import CommunityPlusUserProfile from "./pages/CommunityPlusUserProfile/CommunityPlusUserProfile";
 import CommunityPlusNowPostView from "./pages/CommunityPlusNowPostView";
 
-/* TEMP PLACEHOLDER */
 function Placeholder({ title }) {
   return (
     <div className="dashboard-view">
@@ -24,28 +24,72 @@ function Placeholder({ title }) {
   );
 }
 
-function ProtectedRoute({ isAuthenticated }) {
-  if (!isAuthenticated) {
-    return <Navigate to="/" replace />;
+/* ===============================
+   ROUTE GUARDS
+=============================== */
+
+function PublicOnlyRoute() {
+  const { isAuthenticated } = useAuth();
+
+  if (isAuthenticated) {
+    return <Navigate to="/communityplus" replace />;
   }
 
   return <Outlet />;
 }
+
+function ProtectedRoute() {
+  const location = useLocation();
+  const { isAuthenticated } = useAuth();
+
+  if (!isAuthenticated) {
+    return <Navigate to="/" replace state={{ from: location }} />;
+  }
+
+  return <Outlet />;
+}
+
+function ProfileGate() {
+  const location = useLocation();
+  const { profileLoading, hasProfile } = useProfile();
+
+  const isProfilePage = location.pathname === "/communityplus/profile";
+
+  if (profileLoading) {
+    return <div style={{ padding: 40 }}>Loading profile...</div>;
+  }
+
+  if (!hasProfile && !isProfilePage) {
+    return <Navigate to="/communityplus/profile" replace />;
+  }
+
+  return <Outlet />;
+}
+
+/* ===============================
+   DASHBOARD PROVIDERS
+=============================== */
 
 function DashboardProviders() {
   return (
     <GoogleMapsProvider>
       <MapProvider>
         <SessionProvider>
-          <Outlet />
+          <ProfileProvider>
+            <Outlet />
+          </ProfileProvider>
         </SessionProvider>
       </MapProvider>
     </GoogleMapsProvider>
   );
 }
 
+/* ===============================
+   APP
+=============================== */
+
 export default function App() {
-  const { loading, isAuthenticated } = useAuth();
+  const { loading } = useAuth();
 
   if (loading) {
     return <div style={{ padding: 40 }}>Initialising...</div>;
@@ -53,41 +97,33 @@ export default function App() {
 
   return (
     <Routes>
-      <Route
-        path="/"
-        element={
-          isAuthenticated ? (
-            <Navigate to="/communityplus" replace />
-          ) : (
-            <CommunityPlusLandingPage />
-          )
-        }
-      />
+      {/* PUBLIC ONLY */}
+      <Route element={<PublicOnlyRoute />}>
+        <Route path="/" element={<CommunityPlusLandingPage />} />
+      </Route>
 
-      <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} />}>
+      {/* PROTECTED APP */}
+      <Route element={<ProtectedRoute />}>
         <Route element={<DashboardProviders />}>
-          <Route
-            path="/communityplus"
-            element={<CommunityPlusDashboardLayout />}
-          >
-            <Route index element={<CommunityPlusDashboardHome />} />
+          <Route element={<ProfileGate />}>
+            <Route path="/communityplus" element={<CommunityPlusDashboardLayout />}>
+              <Route index element={<CommunityPlusDashboardHome />} />
 
-            <Route path="now" element={<CommunityPlusNowPostView />} />
-            <Route path="profile" element={<CommunityPlusUserProfile />} />
-            <Route path="yellowpages" element={<CommunityPlusYellowPages />} />
+              <Route path="now" element={<CommunityPlusNowPostView />} />
+              <Route path="profile" element={<CommunityPlusUserProfile />} />
+              <Route path="yellowpages" element={<CommunityPlusYellowPages />} />
 
-            <Route path="account" element={<Placeholder title="Account" />} />
-            <Route path="inbox" element={<Placeholder title="Inbox" />} />
-            <Route path="help" element={<Placeholder title="Help" />} />
+              <Route path="account" element={<Placeholder title="Account" />} />
+              <Route path="inbox" element={<Placeholder title="Inbox" />} />
+              <Route path="help" element={<Placeholder title="Help" />} />
 
-            <Route
-              path="*"
-              element={<Navigate to="/communityplus" replace />}
-            />
+              <Route path="*" element={<Navigate to="/communityplus" replace />} />
+            </Route>
           </Route>
         </Route>
       </Route>
 
+      {/* FALLBACK */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
