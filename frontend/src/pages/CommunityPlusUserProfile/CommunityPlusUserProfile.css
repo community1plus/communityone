@@ -337,3 +337,23 @@ RESPONSIVE
     justify-content: flex-end;
   }
 }
+
+.profile-save-status {
+  min-height: 18px;
+
+  font-size: 12px;
+  font-weight: 650;
+  color: #6f6259;
+}
+
+.profile-save-status.saving {
+  color: #6f6259;
+}
+
+.profile-save-status.saved {
+  color: #16794c;
+}
+
+.profile-save-status.error {
+  color: #b11226;
+}

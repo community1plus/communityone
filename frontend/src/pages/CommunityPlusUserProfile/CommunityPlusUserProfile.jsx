@@ -7,6 +7,8 @@ import { useLocationContext } from "../../context/LocationProvider";
 import { useAuth } from "../../context/AuthContext";
 import { useProfile } from "../../context/ProfileContext";
 
+import useProfileAutosave from "../../hooks/useProfileAutosave";
+
 import PageHeader from "../../components/UI/PageHeader";
 import Section from "../../components/UI/Section";
 import Button from "../../components/UI/Button";
@@ -22,12 +24,7 @@ const profileSteps = [
     title: "USER",
     fields: [
       { name: "username", label: "Username", type: "text", required: true },
-      {
-        name: "display_name",
-        label: "Display Name",
-        type: "text",
-        required: true,
-      },
+      { name: "display_name", label: "Display Name", type: "text", required: true },
       {
         name: "userType",
         label: "User Type",
@@ -58,12 +55,7 @@ const profileSteps = [
     id: "contact",
     title: "CONTACT",
     fields: [
-      {
-        name: "phone",
-        label: "Phone Number",
-        type: "text",
-        required: true,
-      },
+      { name: "phone", label: "Phone Number", type: "text", required: true },
     ],
   },
   {
@@ -101,6 +93,7 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
     completionPercent,
     hasProfile,
     saveProfile,
+    patchProfile,
     loadProfile,
   } = useProfile();
 
@@ -124,8 +117,7 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
     persistKey: "profile-form",
   });
 
-  const { values, validateAll, setValue, isFormValidating, clearStorage } =
-    form;
+  const { values, validateAll, setValue, isFormValidating, clearStorage } = form;
 
   const [currentStep, setCurrentStep] = useState(0);
   const [savingProfile, setSavingProfile] = useState(false);
@@ -134,17 +126,21 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
   const currentStepConfig = profileSteps[currentStep];
   const isLastStep = currentStep === profileSteps.length - 1;
 
-  const displayCompletion = useMemo(() => {
-    return completionPercent || 0;
-  }, [completionPercent]);
+  const { autosaveStatus, autosaveError } = useProfileAutosave({
+    values,
+    homeLocation,
+    patchProfile,
+    enabled: Boolean(profile),
+    delay: 900,
+  });
+
+  const displayCompletion = useMemo(() => completionPercent || 0, [completionPercent]);
 
   useEffect(() => {
     const saved = localStorage.getItem("profile-step");
-
     if (!saved) return;
 
     const parsed = Number(saved);
-
     if (!Number.isNaN(parsed)) {
       setCurrentStep(Math.min(parsed, profileSteps.length - 1));
     }
@@ -164,7 +160,13 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
       "display_name",
       (prev) => prev || profile?.display_name || user.displayName || prefix
     );
-  }, [user?.email, user?.displayName, profile?.username, profile?.display_name, setValue]);
+  }, [
+    user?.email,
+    user?.displayName,
+    profile?.username,
+    profile?.display_name,
+    setValue,
+  ]);
 
   const onPlaceChanged = useCallback(() => {
     const place = autoRef.current?.getPlace();
@@ -208,9 +210,7 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
 
       onComplete?.(nextProfile);
 
-      if (mode === "onboarding" || nextProfile) {
-        navigate("/communityplus", { replace: true });
-      }
+      navigate("/communityplus", { replace: true });
     } catch (err) {
       console.error("Profile save failed:", err);
       setProfileError(err?.message || "Profile save failed");
@@ -223,7 +223,6 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
     loadProfile,
     clearStorage,
     onComplete,
-    mode,
     navigate,
   ]);
 
@@ -272,6 +271,13 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
               </div>
             </div>
 
+            <div className={`profile-save-status ${autosaveStatus}`}>
+              {autosaveStatus === "saving" && "Saving..."}
+              {autosaveStatus === "saved" && "Saved"}
+              {autosaveStatus === "error" &&
+                (autosaveError || "Autosave failed")}
+            </div>
+
             <div className="profile-section-tabs">
               {profileSteps.map((step, index) => (
                 <button
@@ -302,7 +308,11 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
             />
           </Section>
 
-          {profileError && <div className="error">{profileError}</div>}
+          {(profileError || autosaveStatus === "error") && (
+            <div className="error">
+              {profileError || autosaveError || "Profile save failed"}
+            </div>
+          )}
 
           <div className="form-navigation">
             <Button variant="ghost" onClick={closeProfile}>
@@ -320,11 +330,7 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
                 onClick={isLastStep ? handleComplete : nextStep}
                 disabled={isFormValidating || savingProfile}
               >
-                {savingProfile
-                  ? "Saving..."
-                  : isLastStep
-                  ? "Finish"
-                  : "Next"}
+                {savingProfile ? "Saving..." : isLastStep ? "Finish" : "Next"}
               </Button>
             </div>
           </div>
@@ -333,7 +339,7 @@ export default function CommunityPlusUserProfile({ mode = "edit", onComplete }) 
         <div className="profile-guide">
           <Section
             title="Profile Guide"
-            meta="Complete each required section to unlock Community.One features."
+            meta="Complete each required section to unlock Community.One features. Changes are saved automatically."
           />
         </div>
       </div>

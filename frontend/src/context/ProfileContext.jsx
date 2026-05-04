@@ -12,12 +12,20 @@ import useAPI from "../../hooks/useAPI";
 
 const ProfileContext = createContext(null);
 
+/* =========================
+   CONFIG
+========================= */
+
 const REQUIRED_PROFILE_FIELDS = [
   "userType",
   "display_name",
   "homeLocation",
   "phone",
 ];
+
+/* =========================
+   HELPERS
+========================= */
 
 function getValue(obj, path) {
   return path.split(".").reduce((acc, key) => acc?.[key], obj);
@@ -39,6 +47,10 @@ function calculateCompletion(profile) {
   return Math.round((completed / REQUIRED_PROFILE_FIELDS.length) * 100);
 }
 
+/* =========================
+   CONTEXT
+========================= */
+
 export function ProfileProvider({ children }) {
   const api = useAPI();
   const { user, isAuthenticated } = useAuth();
@@ -47,6 +59,10 @@ export function ProfileProvider({ children }) {
   const [profileLoading, setProfileLoading] = useState(false);
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileError, setProfileError] = useState(null);
+
+  /* =========================
+     LOAD
+  ========================= */
 
   const loadProfile = useCallback(async () => {
     if (!isAuthenticated || !user?.id) {
@@ -59,7 +75,6 @@ export function ProfileProvider({ children }) {
 
     try {
       const res = await api.get("/profile");
-
       const nextProfile = res?.profile || null;
 
       setProfile(nextProfile);
@@ -80,6 +95,10 @@ export function ProfileProvider({ children }) {
     }
   }, [api, isAuthenticated, user?.id]);
 
+  /* =========================
+     SAVE (PUT)
+  ========================= */
+
   const saveProfile = useCallback(
     async (nextProfile) => {
       if (!isAuthenticated || !user?.id) {
@@ -89,8 +108,10 @@ export function ProfileProvider({ children }) {
       setProfileSaving(true);
       setProfileError(null);
 
+      const previousProfile = profile;
+
       const optimisticProfile = {
-        ...profile,
+        ...previousProfile,
         ...nextProfile,
         updatedAt: Date.now(),
       };
@@ -98,7 +119,11 @@ export function ProfileProvider({ children }) {
       setProfile(optimisticProfile);
 
       try {
-        const res = await api.put("/profile", optimisticProfile);
+        const res = await api.put("/profile", optimisticProfile, {
+          headers: {
+            "x-version": previousProfile?.version,
+          },
+        });
 
         const savedProfile = res?.profile || optimisticProfile;
 
@@ -106,7 +131,18 @@ export function ProfileProvider({ children }) {
         return savedProfile;
       } catch (err) {
         console.error("Profile save failed:", err);
-        setProfile(profile);
+
+        /* 🔥 VERSION CONFLICT HANDLING */
+        if (err?.response?.status === 409) {
+          const serverProfile = err.response.data?.serverProfile;
+
+          if (serverProfile) {
+            setProfile(serverProfile);
+            return serverProfile;
+          }
+        }
+
+        setProfile(previousProfile);
         setProfileError(err?.message || "Profile save failed");
 
         throw err;
@@ -117,6 +153,10 @@ export function ProfileProvider({ children }) {
     [api, isAuthenticated, user?.id, profile]
   );
 
+  /* =========================
+     PATCH
+  ========================= */
+
   const patchProfile = useCallback(
     async (patch) => {
       if (!isAuthenticated || !user?.id) {
@@ -126,8 +166,10 @@ export function ProfileProvider({ children }) {
       setProfileSaving(true);
       setProfileError(null);
 
+      const previousProfile = profile;
+
       const optimisticProfile = {
-        ...profile,
+        ...previousProfile,
         ...patch,
         updatedAt: Date.now(),
       };
@@ -135,7 +177,11 @@ export function ProfileProvider({ children }) {
       setProfile(optimisticProfile);
 
       try {
-        const res = await api.patch("/profile", patch);
+        const res = await api.patch("/profile", patch, {
+          headers: {
+            "x-version": previousProfile?.version,
+          },
+        });
 
         const savedProfile = res?.profile || optimisticProfile;
 
@@ -143,7 +189,18 @@ export function ProfileProvider({ children }) {
         return savedProfile;
       } catch (err) {
         console.error("Profile patch failed:", err);
-        setProfile(profile);
+
+        /* 🔥 VERSION CONFLICT HANDLING */
+        if (err?.response?.status === 409) {
+          const serverProfile = err.response.data?.serverProfile;
+
+          if (serverProfile) {
+            setProfile(serverProfile);
+            return serverProfile;
+          }
+        }
+
+        setProfile(previousProfile);
         setProfileError(err?.message || "Profile patch failed");
 
         throw err;
@@ -154,16 +211,29 @@ export function ProfileProvider({ children }) {
     [api, isAuthenticated, user?.id, profile]
   );
 
+  /* =========================
+     INIT
+  ========================= */
+
   useEffect(() => {
     loadProfile();
   }, [loadProfile]);
+
+  /* =========================
+     DERIVED
+  ========================= */
 
   const completionPercent = useMemo(
     () => calculateCompletion(profile),
     [profile]
   );
 
-  const hasProfile = completionPercent === 100;
+  /* 🔥 more flexible than strict 100% */
+  const hasProfile = Boolean(profile) && completionPercent >= 80;
+
+  /* =========================
+     VALUE
+  ========================= */
 
   const value = useMemo(
     () => ({
@@ -199,6 +269,10 @@ export function ProfileProvider({ children }) {
     </ProfileContext.Provider>
   );
 }
+
+/* =========================
+   HOOK
+========================= */
 
 export function useProfile() {
   const context = useContext(ProfileContext);
