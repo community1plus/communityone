@@ -56,7 +56,10 @@ export function ProfileProvider({ children }) {
   const { user, isAuthenticated } = useAuth();
 
   const [profile, setProfile] = useState(null);
-  const [profileLoading, setProfileLoading] = useState(false);
+
+  // Important: true by default so refresh does not redirect too early
+  const [profileLoading, setProfileLoading] = useState(true);
+
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileError, setProfileError] = useState(null);
 
@@ -65,13 +68,14 @@ export function ProfileProvider({ children }) {
   ========================= */
 
   const loadProfile = useCallback(async () => {
-    if (!isAuthenticated || !user?.id) {
-      setProfile(null);
-      return null;
-    }
-
     setProfileLoading(true);
     setProfileError(null);
+
+    if (!isAuthenticated || !user?.id) {
+      setProfile(null);
+      setProfileLoading(false);
+      return null;
+    }
 
     try {
       const res = await api.get("/profile");
@@ -80,7 +84,9 @@ export function ProfileProvider({ children }) {
       setProfile(nextProfile);
       return nextProfile;
     } catch (err) {
-      if (err?.status === 404) {
+      const status = err?.response?.status || err?.status;
+
+      if (status === 404) {
         setProfile(null);
         return null;
       }
@@ -96,7 +102,7 @@ export function ProfileProvider({ children }) {
   }, [api, isAuthenticated, user?.id]);
 
   /* =========================
-     SAVE (PUT)
+     SAVE — PUT
   ========================= */
 
   const saveProfile = useCallback(
@@ -132,9 +138,10 @@ export function ProfileProvider({ children }) {
       } catch (err) {
         console.error("Profile save failed:", err);
 
-        /* 🔥 VERSION CONFLICT HANDLING */
-        if (err?.response?.status === 409) {
-          const serverProfile = err.response.data?.serverProfile;
+        const status = err?.response?.status || err?.status;
+
+        if (status === 409) {
+          const serverProfile = err?.response?.data?.serverProfile;
 
           if (serverProfile) {
             setProfile(serverProfile);
@@ -190,9 +197,10 @@ export function ProfileProvider({ children }) {
       } catch (err) {
         console.error("Profile patch failed:", err);
 
-        /* 🔥 VERSION CONFLICT HANDLING */
-        if (err?.response?.status === 409) {
-          const serverProfile = err.response.data?.serverProfile;
+        const status = err?.response?.status || err?.status;
+
+        if (status === 409) {
+          const serverProfile = err?.response?.data?.serverProfile;
 
           if (serverProfile) {
             setProfile(serverProfile);
@@ -220,7 +228,7 @@ export function ProfileProvider({ children }) {
   }, [loadProfile]);
 
   /* =========================
-     DERIVED
+     DERIVED STATE
   ========================= */
 
   const completionPercent = useMemo(
@@ -228,8 +236,14 @@ export function ProfileProvider({ children }) {
     [profile]
   );
 
-  /* 🔥 more flexible than strict 100% */
-  const hasProfile = Boolean(profile) && completionPercent >= 80;
+  // Loading has finished. Safe to make redirect decisions.
+  const profileReady = !profileLoading;
+
+  // Profile exists at all.
+  const hasProfile = Boolean(profile);
+
+  // Profile exists and meets your completion rule.
+  const isProfileComplete = hasProfile && completionPercent >= 80;
 
   /* =========================
      VALUE
@@ -238,25 +252,30 @@ export function ProfileProvider({ children }) {
   const value = useMemo(
     () => ({
       profile,
+      setProfile,
+
       profileLoading,
+      profileReady,
       profileSaving,
       profileError,
 
       completionPercent,
       hasProfile,
+      isProfileComplete,
 
       loadProfile,
       saveProfile,
       patchProfile,
-      setProfile,
     }),
     [
       profile,
       profileLoading,
+      profileReady,
       profileSaving,
       profileError,
       completionPercent,
       hasProfile,
+      isProfileComplete,
       loadProfile,
       saveProfile,
       patchProfile,
