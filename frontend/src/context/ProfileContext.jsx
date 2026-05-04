@@ -4,6 +4,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 
@@ -12,20 +13,12 @@ import useAPI from "../../hooks/useAPI";
 
 const ProfileContext = createContext(null);
 
-/* =========================
-   CONFIG
-========================= */
-
 const REQUIRED_PROFILE_FIELDS = [
   "userType",
   "display_name",
   "homeLocation",
   "phone",
 ];
-
-/* =========================
-   HELPERS
-========================= */
 
 function getValue(obj, path) {
   return path.split(".").reduce((acc, key) => acc?.[key], obj);
@@ -47,53 +40,49 @@ function calculateCompletion(profile) {
   return Math.round((completed / REQUIRED_PROFILE_FIELDS.length) * 100);
 }
 
-/* =========================
-   CONTEXT
-========================= */
-
 export function ProfileProvider({ children }) {
   const api = useAPI();
   const { user, isAuthenticated } = useAuth();
 
+  const hasLoadedRef = useRef(false);
+
   const [profile, setProfile] = useState(null);
-
-  // Important: true by default so refresh does not redirect too early
   const [profileLoading, setProfileLoading] = useState(true);
-
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileError, setProfileError] = useState(null);
 
-  /* =========================
-     LOAD
-  ========================= */
-
   const loadProfile = useCallback(async () => {
-    setProfileLoading(true);
-    setProfileError(null);
-
     if (!isAuthenticated || !user?.id) {
+      hasLoadedRef.current = false;
       setProfile(null);
       setProfileLoading(false);
       return null;
     }
+
+    setProfileLoading(true);
+    setProfileError(null);
 
     try {
       const res = await api.get("/profile");
       const nextProfile = res?.profile || null;
 
       setProfile(nextProfile);
+      hasLoadedRef.current = true;
+
       return nextProfile;
     } catch (err) {
       const status = err?.response?.status || err?.status;
 
       if (status === 404) {
         setProfile(null);
+        hasLoadedRef.current = true;
         return null;
       }
 
       console.error("Profile load failed:", err);
-      setProfileError(err?.message || "Profile load failed");
       setProfile(null);
+      setProfileError(err?.message || "Profile load failed");
+      hasLoadedRef.current = true;
 
       return null;
     } finally {
@@ -101,9 +90,11 @@ export function ProfileProvider({ children }) {
     }
   }, [api, isAuthenticated, user?.id]);
 
-  /* =========================
-     SAVE — PUT
-  ========================= */
+  useEffect(() => {
+    if (hasLoadedRef.current && profile) return;
+
+    loadProfile();
+  }, [loadProfile, profile]);
 
   const saveProfile = useCallback(
     async (nextProfile) => {
@@ -132,12 +123,10 @@ export function ProfileProvider({ children }) {
         });
 
         const savedProfile = res?.profile || optimisticProfile;
-
         setProfile(savedProfile);
+
         return savedProfile;
       } catch (err) {
-        console.error("Profile save failed:", err);
-
         const status = err?.response?.status || err?.status;
 
         if (status === 409) {
@@ -149,6 +138,7 @@ export function ProfileProvider({ children }) {
           }
         }
 
+        console.error("Profile save failed:", err);
         setProfile(previousProfile);
         setProfileError(err?.message || "Profile save failed");
 
@@ -159,10 +149,6 @@ export function ProfileProvider({ children }) {
     },
     [api, isAuthenticated, user?.id, profile]
   );
-
-  /* =========================
-     PATCH
-  ========================= */
 
   const patchProfile = useCallback(
     async (patch) => {
@@ -191,12 +177,10 @@ export function ProfileProvider({ children }) {
         });
 
         const savedProfile = res?.profile || optimisticProfile;
-
         setProfile(savedProfile);
+
         return savedProfile;
       } catch (err) {
-        console.error("Profile patch failed:", err);
-
         const status = err?.response?.status || err?.status;
 
         if (status === 409) {
@@ -208,6 +192,7 @@ export function ProfileProvider({ children }) {
           }
         }
 
+        console.error("Profile patch failed:", err);
         setProfile(previousProfile);
         setProfileError(err?.message || "Profile patch failed");
 
@@ -219,35 +204,14 @@ export function ProfileProvider({ children }) {
     [api, isAuthenticated, user?.id, profile]
   );
 
-  /* =========================
-     INIT
-  ========================= */
-
-  useEffect(() => {
-    loadProfile();
-  }, [loadProfile]);
-
-  /* =========================
-     DERIVED STATE
-  ========================= */
-
   const completionPercent = useMemo(
     () => calculateCompletion(profile),
     [profile]
   );
 
-  // Loading has finished. Safe to make redirect decisions.
   const profileReady = !profileLoading;
-
-  // Profile exists at all.
   const hasProfile = Boolean(profile);
-
-  // Profile exists and meets your completion rule.
   const isProfileComplete = hasProfile && completionPercent >= 80;
-
-  /* =========================
-     VALUE
-  ========================= */
 
   const value = useMemo(
     () => ({
@@ -288,10 +252,6 @@ export function ProfileProvider({ children }) {
     </ProfileContext.Provider>
   );
 }
-
-/* =========================
-   HOOK
-========================= */
 
 export function useProfile() {
   const context = useContext(ProfileContext);

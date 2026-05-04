@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate, Outlet, useLocation } from "react-router-dom";
+
 import { useAuth } from "./context/AuthContext";
 import { ProfileProvider, useProfile } from "./context/ProfileContext";
 
@@ -14,6 +15,10 @@ import CommunityPlusDashboardHome from "./pages/CommunityPlusDashboardHome/Commu
 import CommunityPlusYellowPages from "./pages/CommunityPlusYellowPages/CommunityPlusYellowPages";
 import CommunityPlusUserProfile from "./pages/CommunityPlusUserProfile/CommunityPlusUserProfile";
 import CommunityPlusNowPostView from "./pages/CommunityPlusNowPostView";
+
+/* ===============================
+   TEMP PLACEHOLDER
+=============================== */
 
 function Placeholder({ title }) {
   return (
@@ -51,11 +56,11 @@ function ProtectedRoute() {
 
 function ProfileGate() {
   const location = useLocation();
-  const { profileLoading, hasProfile } = useProfile();
+  const { profileReady, hasProfile } = useProfile();
 
   const isProfilePage = location.pathname === "/communityplus/profile";
 
-  if (profileLoading) {
+  if (!profileReady) {
     return <div style={{ padding: 40 }}>Loading profile...</div>;
   }
 
@@ -67,7 +72,7 @@ function ProfileGate() {
 }
 
 /* ===============================
-   DASHBOARD PROVIDERS
+   PROVIDERS
 =============================== */
 
 function DashboardProviders() {
@@ -97,27 +102,33 @@ export default function App() {
 
   return (
     <Routes>
-      {/* PUBLIC ONLY */}
+      {/* PUBLIC */}
       <Route element={<PublicOnlyRoute />}>
         <Route path="/" element={<CommunityPlusLandingPage />} />
       </Route>
 
-      {/* PROTECTED APP */}
+      {/* PROTECTED */}
       <Route element={<ProtectedRoute />}>
         <Route element={<DashboardProviders />}>
           <Route element={<ProfileGate />}>
-            <Route path="/communityplus" element={<CommunityPlusDashboardLayout />}>
+            <Route
+              path="/communityplus"
+              element={<CommunityPlusDashboardLayout />}
+            >
               <Route index element={<CommunityPlusDashboardHome />} />
 
-              <Route path="now" element={<CommunityPlusNowPostView />} />
               <Route path="profile" element={<CommunityPlusUserProfile />} />
+              <Route path="now" element={<CommunityPlusNowPostView />} />
               <Route path="yellowpages" element={<CommunityPlusYellowPages />} />
 
               <Route path="account" element={<Placeholder title="Account" />} />
               <Route path="inbox" element={<Placeholder title="Inbox" />} />
               <Route path="help" element={<Placeholder title="Help" />} />
 
-              <Route path="*" element={<Navigate to="/communityplus" replace />} />
+              <Route
+                path="*"
+                element={<Navigate to="/communityplus/profile" replace />}
+              />
             </Route>
           </Route>
         </Route>
