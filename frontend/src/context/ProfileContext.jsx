@@ -44,26 +44,35 @@ export function ProfileProvider({ children }) {
   const api = useAPI();
   const { user, isAuthenticated } = useAuth();
 
+  const apiRef = useRef(api);
   const hasLoadedRef = useRef(false);
+  const loadingRef = useRef(false);
 
   const [profile, setProfile] = useState(null);
   const [profileLoading, setProfileLoading] = useState(true);
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileError, setProfileError] = useState(null);
 
+  useEffect(() => {
+    apiRef.current = api;
+  }, [api]);
+
   const loadProfile = useCallback(async () => {
+    if (loadingRef.current) return null;
+
     if (!isAuthenticated || !user?.id) {
-      hasLoadedRef.current = false;
+      hasLoadedRef.current = true;
       setProfile(null);
       setProfileLoading(false);
       return null;
     }
 
+    loadingRef.current = true;
     setProfileLoading(true);
     setProfileError(null);
 
     try {
-      const res = await api.get("/profile");
+      const res = await apiRef.current.get("/profile");
       const nextProfile = res?.profile || null;
 
       setProfile(nextProfile);
@@ -86,15 +95,20 @@ export function ProfileProvider({ children }) {
 
       return null;
     } finally {
+      loadingRef.current = false;
       setProfileLoading(false);
     }
-  }, [api, isAuthenticated, user?.id]);
+  }, [isAuthenticated, user?.id]);
 
   useEffect(() => {
-    if (hasLoadedRef.current && profile) return;
+    hasLoadedRef.current = false;
+    setProfileLoading(true);
+  }, [isAuthenticated, user?.id]);
 
+  useEffect(() => {
+    if (hasLoadedRef.current) return;
     loadProfile();
-  }, [loadProfile, profile]);
+  }, [loadProfile]);
 
   const saveProfile = useCallback(
     async (nextProfile) => {
@@ -116,14 +130,16 @@ export function ProfileProvider({ children }) {
       setProfile(optimisticProfile);
 
       try {
-        const res = await api.put("/profile", optimisticProfile, {
+        const res = await apiRef.current.put("/profile", optimisticProfile, {
           headers: {
             "x-version": previousProfile?.version,
           },
         });
 
         const savedProfile = res?.profile || optimisticProfile;
+
         setProfile(savedProfile);
+        hasLoadedRef.current = true;
 
         return savedProfile;
       } catch (err) {
@@ -134,6 +150,7 @@ export function ProfileProvider({ children }) {
 
           if (serverProfile) {
             setProfile(serverProfile);
+            hasLoadedRef.current = true;
             return serverProfile;
           }
         }
@@ -147,7 +164,7 @@ export function ProfileProvider({ children }) {
         setProfileSaving(false);
       }
     },
-    [api, isAuthenticated, user?.id, profile]
+    [isAuthenticated, user?.id, profile]
   );
 
   const patchProfile = useCallback(
@@ -170,14 +187,16 @@ export function ProfileProvider({ children }) {
       setProfile(optimisticProfile);
 
       try {
-        const res = await api.patch("/profile", patch, {
+        const res = await apiRef.current.patch("/profile", patch, {
           headers: {
             "x-version": previousProfile?.version,
           },
         });
 
         const savedProfile = res?.profile || optimisticProfile;
+
         setProfile(savedProfile);
+        hasLoadedRef.current = true;
 
         return savedProfile;
       } catch (err) {
@@ -188,6 +207,7 @@ export function ProfileProvider({ children }) {
 
           if (serverProfile) {
             setProfile(serverProfile);
+            hasLoadedRef.current = true;
             return serverProfile;
           }
         }
@@ -201,7 +221,7 @@ export function ProfileProvider({ children }) {
         setProfileSaving(false);
       }
     },
-    [api, isAuthenticated, user?.id, profile]
+    [isAuthenticated, user?.id, profile]
   );
 
   const completionPercent = useMemo(
