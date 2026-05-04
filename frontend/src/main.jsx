@@ -6,7 +6,7 @@ import App from "./App.jsx";
 
 import { Amplify } from "aws-amplify";
 import { Hub } from "aws-amplify/utils";
-import { getCurrentUser, fetchAuthSession } from "aws-amplify/auth";
+/* import { getCurrentUser, fetchAuthSession } from "aws-amplify/auth"; */
 
 import outputs from "./amplify_outputs.json";
 
@@ -79,11 +79,7 @@ Hub.listen("auth", async ({ payload }) => {
         const user = await getCurrentUser();
         const session = await fetchAuthSession();
 
-        console.log("👤 User:", user);
-        console.log("🧪 Tokens:", {
-          hasAccessToken: !!session.tokens?.accessToken,
-          hasIdToken: !!session.tokens?.idToken,
-        });
+       
       } catch (err) {
         console.error("❌ Post-login fetch failed:", err);
       }
