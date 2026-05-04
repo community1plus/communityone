@@ -8,7 +8,6 @@ import {
 } from "react";
 
 import {
-  fetchAuthSession,
   getCurrentUser,
   signInWithRedirect,
   signOut,
@@ -16,16 +15,13 @@ import {
 
 const AuthContext = createContext(null);
 
-function normaliseUser(amplifyUser, tokens) {
+function normaliseUser(amplifyUser) {
   if (!amplifyUser) return null;
 
-  const idToken = tokens?.idToken?.payload || {};
+  const username = amplifyUser.username || "";
+  const fallback = username.split("@")[0] || "User";
 
-  const email = idToken.email || null;
-  const name = idToken.name || null;
-
-  const fallback = email?.split("@")[0] || amplifyUser.username || "User";
-  const displayName = name || fallback;
+  const displayName = fallback;
 
   const initials = displayName
     .split(/[\s._-]+/)
@@ -37,9 +33,9 @@ function normaliseUser(amplifyUser, tokens) {
 
   return {
     id: amplifyUser.userId,
-    username: amplifyUser.username,
-    email,
-    name,
+    username,
+    email: username.includes("@") ? username : null,
+    name: null,
     displayName,
     initials,
   };
@@ -47,35 +43,21 @@ function normaliseUser(amplifyUser, tokens) {
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [tokens, setTokens] = useState(null);
   const [loading, setLoading] = useState(true);
   const [hydrating, setHydrating] = useState(false);
 
-  const refreshAuth = useCallback(async ({ forceRefresh = false } = {}) => {
+  const refreshAuth = useCallback(async () => {
     setHydrating(true);
 
     try {
-      const session = await fetchAuthSession({ forceRefresh });
-
-      if (!session.tokens?.accessToken) {
-        setUser(null);
-        setTokens(null);
-        return null;
-      }
-
       const amplifyUser = await getCurrentUser();
-      const enrichedUser = normaliseUser(amplifyUser, session.tokens);
+      const normalisedUser = normaliseUser(amplifyUser);
 
-      setUser(enrichedUser);
-      setTokens(session.tokens);
+      setUser(normalisedUser);
 
-      return enrichedUser;
+      return normalisedUser;
     } catch (err) {
-      console.error("❌ Auth refresh failed:", err);
-
       setUser(null);
-      setTokens(null);
-
       return null;
     } finally {
       setHydrating(false);
@@ -85,43 +67,27 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     let mounted = true;
 
-    const initAuth = async () => {
+    async function initAuth() {
       try {
-        console.log("🔄 Initialising auth...");
-
-        const isRedirect =
-          window.location.search.includes("code=") &&
-          window.location.search.includes("state=");
-
-        if (isRedirect) {
-          await new Promise((resolve) => setTimeout(resolve, 300));
-        }
+        const currentUser = await refreshAuth();
 
         if (!mounted) return;
 
-        const refreshedUser = await refreshAuth();
-
-        if (!mounted) return;
-
-        if (refreshedUser) {
-          console.log("✅ Auth restored", {
-            user: refreshedUser.displayName,
-          });
-        }
-
-        if (isRedirect) {
-          window.history.replaceState(
-            {},
-            document.title,
-            window.location.pathname
-          );
+        if (currentUser) {
+          console.log("✅ Auth restored:", currentUser.displayName);
         }
       } catch (err) {
         console.error("❌ Auth init failed:", err);
+
+        if (mounted) {
+          setUser(null);
+        }
       } finally {
-        if (mounted) setLoading(false);
+        if (mounted) {
+          setLoading(false);
+        }
       }
-    };
+    }
 
     initAuth();
 
@@ -131,30 +97,23 @@ export function AuthProvider({ children }) {
   }, [refreshAuth]);
 
   const login = useCallback(async () => {
-    if (tokens?.accessToken) {
-      console.log("⚠️ Already authenticated — skipping login");
-      return;
-    }
-
-    console.log("🚀 Redirect login");
     await signInWithRedirect();
-  }, [tokens]);
-
-  const logout = useCallback(async () => {
-    await signOut({ global: true });
-
-    setUser(null);
-    setTokens(null);
-
-    window.location.href = "/";
   }, []);
 
-  const isAuthenticated = Boolean(tokens?.accessToken);
+  const logout = useCallback(async () => {
+    try {
+      await signOut({ global: true });
+    } finally {
+      setUser(null);
+      window.location.replace("/");
+    }
+  }, []);
+
+  const isAuthenticated = Boolean(user);
 
   const value = useMemo(
     () => ({
       user,
-      tokens,
       loading,
       hydrating,
       isAuthenticated,
@@ -163,22 +122,13 @@ export function AuthProvider({ children }) {
       logout,
       refreshAuth,
     }),
-    [
-      user,
-      tokens,
-      loading,
-      hydrating,
-      isAuthenticated,
-      login,
-      logout,
-      refreshAuth,
-    ]
+    [user, loading, hydrating, isAuthenticated, login, logout, refreshAuth]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-export const useAuth = () => {
+export function useAuth() {
   const context = useContext(AuthContext);
 
   if (!context) {
@@ -186,4 +136,4 @@ export const useAuth = () => {
   }
 
   return context;
-};
+}
