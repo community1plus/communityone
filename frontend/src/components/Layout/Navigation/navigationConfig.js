@@ -1,6 +1,6 @@
 export const NAVIGATION = [
   /* =====================================================
-     HEADER NAV (TOP BAR)
+     HEADER
   ===================================================== */
   {
     group: "main",
@@ -11,19 +11,11 @@ export const NAVIGATION = [
         type: "route",
         path: "/",
       },
-
       {
         id: "iview",
         label: "iVIEW",
         type: "route",
         path: "/communityplus",
-      },
-
-      {
-        id: "yellowpages",
-        label: "Yellow Pages",
-        type: "route",
-        path: "/communityplus/yellowpages",
       },
     ],
   },
@@ -35,49 +27,52 @@ export const NAVIGATION = [
     group: "sidebar",
     sections: [
       /* =========================
-         MAIN
+         iVIEW (MODES ONLY)
       ========================= */
       {
-        id: "main",
-        title: "MAIN",
+        id: "iview",
+        title: "iVIEW",
+        variant: "modes",
         items: [
           {
-            id: "iview",
-            label: "iVIEW",
-            icon: "👁️",
-            type: "route",
+            id: "iview-now",
+            label: "NOW",
+            icon: "⚡",
+            type: "mode",
             path: "/communityplus",
-          },
-        ],
-      },
-
-      /* =========================
-         ACTIONS
-      ========================= */
-      {
-        id: "actions",
-        title: "ACTIONS",
-        items: [
-          {
-            id: "event",
-            label: "Event",
-            icon: "📅",
-            type: "route",
-            path: "/communityplus/event",
+            mode: "NOW",
           },
           {
-            id: "incident",
-            label: "Incident",
+            id: "iview-blob",
+            label: "BLOB",
+            icon: "🧠",
+            type: "mode",
+            path: "/communityplus",
+            mode: "BLOB",
+          },
+          {
+            id: "iview-incidents",
+            label: "Incidents",
             icon: "🚨",
-            type: "route",
-            path: "/communityplus/incident",
+            type: "mode",
+            path: "/communityplus",
+            mode: "INCIDENTS",
           },
           {
-            id: "beacon",
+            id: "iview-events",
+            label: "Events",
+            icon: "📅",
+            type: "mode",
+            path: "/communityplus",
+            mode: "EVENTS",
+          },
+          {
+            id: "iview-beacon",
             label: "Beacon",
             icon: "📡",
-            type: "route",
-            path: "/communityplus/beacon",
+            type: "mode",
+            path: "/communityplus",
+            mode: "BEACON",
           },
         ],
       },
@@ -96,44 +91,30 @@ export const NAVIGATION = [
             type: "route",
             path: "/communityplus/yellowpages",
           },
+          {
+            id: "channels",
+            label: "Channels",
+            icon: "📺",
+            type: "route",
+            path: "/communityplus/channels",
+          },
+          {
+            id: "helpdesk",
+            label: "Helpdesk",
+            icon: "🛠️",
+            type: "route",
+            path: "/communityplus/help",
+          },
         ],
       },
 
       /* =========================
-         ACCOUNT
+         ACCOUNT (MINIMAL)
       ========================= */
       {
         id: "account",
         title: "ACCOUNT",
         items: [
-          {
-            id: "profile",
-            label: "Profile",
-            icon: "👤",
-            type: "route",
-            path: "/communityplus/profile",
-          },
-          {
-            id: "account",
-            label: "Account",
-            icon: "⚙️",
-            type: "route",
-            path: "/communityplus/account",
-          },
-          {
-            id: "inbox",
-            label: "Inbox",
-            icon: "✉️",
-            type: "route",
-            path: "/communityplus/inbox",
-          },
-          {
-            id: "help",
-            label: "Help",
-            icon: "❓",
-            type: "route",
-            path: "/communityplus/help",
-          },
           {
             id: "logout",
             label: "Logout",
