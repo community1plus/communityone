@@ -56,7 +56,7 @@ export function ProfileProvider({ children }) {
 
     try {
       // Replace this with your real API call later.
-      const stored = localStorage.getItem(`profile:${user.id}`);
+      const stored = await api.get("/profile");
       const parsed = stored ? JSON.parse(stored) : null;
 
       setProfile(parsed);
@@ -98,7 +98,7 @@ export function ProfileProvider({ children }) {
     [profile]
   );
 
-  const hasProfile = completionPercent === 100;
+  const hasProfile = completionPercent >= 80;
 
   const value = useMemo(
     () => ({
