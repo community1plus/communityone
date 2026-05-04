@@ -8,6 +8,27 @@ export default function FormBuilder({
   form,
   extra = {},
 }) {
+  if (!Array.isArray(steps)) {
+    console.warn("FormBuilder expected steps array but received:", steps);
+    return null;
+  }
+
+  if (!steps.length) {
+    console.warn("FormBuilder: empty steps array");
+    return null;
+  }
+
+  const step = steps[currentStep];
+
+  if (!step || !Array.isArray(step.fields)) {
+    console.warn("FormBuilder: invalid step config", {
+      currentStep,
+      steps,
+      step,
+    });
+    return null;
+  }
+
   const {
     getValue,
     handleChange,
@@ -17,132 +38,100 @@ export default function FormBuilder({
     isFieldValid,
   } = form;
 
-  /* =========================
-     SAFETY GUARD
-  ========================= */
+  const renderField = (field) => {
+    const {
+      name,
+      label,
+      type = "text",
+      readOnly = false,
+      options = [],
+      required = false,
+    } = field;
 
-  const step = steps[currentStep];
-  console.log("FORM BUILDER:", { steps, currentStep });
+    const value = getValue(name) ?? "";
+    const error = getError(name);
+    const valid = isFieldValid?.(name);
 
-  if (!step || !Array.isArray(step.fields)) {
-    console.warn("FormBuilder: invalid step config", {
-      currentStep,
-      steps,
-    });
-    return null;
-  }
+    if (type === "select") {
+      return (
+        <Field
+          key={name}
+          label={label}
+          error={error}
+          required={required}
+          valid={valid}
+        >
+          <Select
+            name={name}
+            value={value}
+            options={options}
+            disabled={readOnly || isValidating}
+            onChange={(e) => handleChange(name, e.target.value)}
+            onBlur={() => handleBlur(name)}
+          />
+        </Field>
+      );
+    }
 
-  /* =========================
-     FIELD WRAPPER
-  ========================= */
+    if (type === "location") {
+      const { Autocomplete, autoRef, onPlaceChanged, isLoaded } = extra;
 
-  const renderFieldWrapper = (field, input) => {
-    const { name, label } = field;
+      return (
+        <Field
+          key={name}
+          label={label}
+          error={error}
+          required={required}
+          valid={valid}
+        >
+          {isLoaded && Autocomplete ? (
+            <Autocomplete
+              onLoad={(ref) => {
+                autoRef.current = ref;
+              }}
+              onPlaceChanged={onPlaceChanged}
+            >
+              <Input
+                name={name}
+                value={value?.label || value?.fullAddress || ""}
+                placeholder="Enter your home address"
+                disabled={readOnly || isValidating}
+                onChange={(e) => handleChange(name, e.target.value)}
+                onBlur={() => handleBlur(name)}
+              />
+            </Autocomplete>
+          ) : (
+            <Input
+              name={name}
+              value={value?.label || value?.fullAddress || ""}
+              placeholder="Loading address search..."
+              disabled
+            />
+          )}
+        </Field>
+      );
+    }
 
     return (
       <Field
         key={name}
         label={label}
-        error={getError(name)}
-        loading={isValidating(name)}
-        success={isFieldValid(name)}
+        error={error}
+        required={required}
+        valid={valid}
       >
-        {input}
+        <Input
+          name={name}
+          type={type}
+          value={value}
+          readOnly={readOnly}
+          disabled={readOnly || isValidating}
+          onChange={(e) => handleChange(name, e.target.value)}
+          onBlur={() => handleBlur(name)}
+        />
       </Field>
     );
   };
 
-  /* =========================
-     FIELD TYPES
-  ========================= */
-
-  const renderInput = (field) => {
-    const { name, readOnly } = field;
-
-    return (
-      <Input
-        value={getValue(name)}
-        onChange={handleChange(name, field)}
-        onBlur={handleBlur(name, field)}
-        readOnly={readOnly}
-      />
-    );
-  };
-
-  const renderSelect = (field) => {
-    const { name, options = [] } = field;
-
-    return (
-      <Select
-        value={getValue(name)}
-        onChange={handleChange(name, field)}
-        onBlur={handleBlur(name, field)}
-      >
-        {options.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </Select>
-    );
-  };
-
-  const renderLocation = (field) => {
-    const { name } = field;
-
-    const {
-      Autocomplete,
-      autoRef,
-      onPlaceChanged,
-      isLoaded,
-    } = extra;
-
-    if (!isLoaded || !Autocomplete) {
-      return renderInput(field); // fallback
-    }
-
-    return (
-      <Autocomplete
-        onLoad={(auto) => (autoRef.current = auto)}
-        onPlaceChanged={onPlaceChanged}
-      >
-        <Input
-          value={getValue(name)?.label || ""}
-          onChange={() => {}} // controlled by Google
-          placeholder="Search for a location..."
-        />
-      </Autocomplete>
-    );
-  };
-
-  /* =========================
-     FIELD SWITCH
-  ========================= */
-
-  const renderField = (field) => {
-    let input;
-
-    switch (field.type) {
-      case "select":
-        input = renderSelect(field);
-        break;
-
-      case "location":
-        input = renderLocation(field);
-        break;
-
-      case "text":
-      default:
-        input = renderInput(field);
-        break;
-    }
-
-    return renderFieldWrapper(field, input);
-  };
-
-  /* =========================
-     RENDER
-  ========================= */
-
-  return <>{step.fields.map(renderField)}</>;
+  return <div className="form-builder">{step.fields.map(renderField)}</div>;
 }
