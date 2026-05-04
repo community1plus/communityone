@@ -88,6 +88,15 @@ const profileSteps = [
   },
 ];
 
+function normalisePhone(phone = "") {
+  return phone.replace(/\s+/g, "").replace(/[()-]/g, "");
+}
+
+function isValidPhone(phone = "") {
+  const cleaned = normalisePhone(phone);
+  return /^\+?\d{8,15}$/.test(cleaned);
+}
+
 export default function CommunityPlusUserProfile({ onComplete }) {
   const navigate = useNavigate();
   const autoRef = useRef(null);
@@ -148,6 +157,8 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     [completionPercent]
   );
 
+  const canContinueFromContact = !isContactStep || values.phoneVerified;
+
   const { autosaveStatus, autosaveError } = useProfileAutosave({
     values,
     homeLocation,
@@ -196,16 +207,26 @@ export default function CommunityPlusUserProfile({ onComplete }) {
   useEffect(() => {
     if (!values.phone) return;
 
-    if (profile?.phone && values.phone !== profile.phone) {
+    const originalPhone = profile?.phone || "";
+
+    if (originalPhone && values.phone !== originalPhone) {
       setValue("phoneVerified", false);
       setValue("phoneVerificationCode", "");
       setPhoneStatus("idle");
+      setPhoneError("");
     }
   }, [values.phone, profile?.phone, setValue]);
 
   const sendPhoneCode = useCallback(async () => {
-    if (!values.phone) {
-      setPhoneError("Enter a phone number first.");
+    const cleanedPhone = normalisePhone(values.phone);
+
+    if (!cleanedPhone) {
+      setPhoneError("Enter your phone number first.");
+      return;
+    }
+
+    if (!isValidPhone(cleanedPhone)) {
+      setPhoneError("Enter a valid phone number. Include your country code if needed.");
       return;
     }
 
@@ -213,10 +234,10 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     setPhoneError("");
 
     try {
-      // TODO backend:
-      // await api.post("/profile/phone/send-code", { phone: values.phone });
+      // Backend later:
+      // await api.post("/profile/phone/send-code", { phone: cleanedPhone });
 
-      console.log("Send phone verification code to:", values.phone);
+      console.log("Send verification code to:", cleanedPhone);
 
       setPhoneStatus("sent");
     } catch (err) {
@@ -235,23 +256,23 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     setPhoneError("");
 
     try {
-      // TODO backend:
+      // Backend later:
       // await api.post("/profile/phone/verify-code", {
-      //   phone: values.phone,
+      //   phone: normalisePhone(values.phone),
       //   code: values.phoneVerificationCode,
       // });
 
       console.log("Verify phone code:", {
-        phone: values.phone,
+        phone: normalisePhone(values.phone),
         code: values.phoneVerificationCode,
       });
 
       setValue("phoneVerified", true);
       setPhoneStatus("verified");
     } catch (err) {
+      setValue("phoneVerified", false);
       setPhoneStatus("error");
       setPhoneError(err?.message || "Invalid verification code");
-      setValue("phoneVerified", false);
     }
   }, [values.phone, values.phoneVerificationCode, setValue]);
 
@@ -277,7 +298,7 @@ export default function CommunityPlusUserProfile({ onComplete }) {
       username: values.username,
       display_name: values.display_name,
       userType: values.userType,
-      phone: values.phone,
+      phone: normalisePhone(values.phone),
       phoneVerified: values.phoneVerified,
       homeLocation: values.homeLocation || homeLocation,
       social: values.social,
@@ -315,8 +336,13 @@ export default function CommunityPlusUserProfile({ onComplete }) {
   }, [validateAll, handleSaveProfile]);
 
   const nextStep = useCallback(() => {
+    if (isContactStep && !values.phoneVerified) {
+      setPhoneError("Verify your phone number before continuing.");
+      return;
+    }
+
     setCurrentStep((step) => Math.min(profileSteps.length - 1, step + 1));
-  }, []);
+  }, [isContactStep, values.phoneVerified]);
 
   const prevStep = useCallback(() => {
     setCurrentStep((step) => Math.max(0, step - 1));
@@ -397,15 +423,23 @@ export default function CommunityPlusUserProfile({ onComplete }) {
 
           {isContactStep && (
             <div className="phone-verification">
-              <div className="form-actions">
+              {!values.phone && (
+                <div className="hint">
+                  Enter your phone number to receive a verification code.
+                </div>
+              )}
+
+              {values.phone && !values.phoneVerified && (
+                <div className="hint">
+                  Phone verification is required before continuing.
+                </div>
+              )}
+
+              <div className="phone-verification-row">
                 <Button
                   variant="ghost"
                   onClick={sendPhoneCode}
-                  disabled={
-                    !values.phone ||
-                    phoneStatus === "sending" ||
-                    values.phoneVerified
-                  }
+                  disabled={phoneStatus === "sending" || values.phoneVerified}
                 >
                   {phoneStatus === "sending"
                     ? "Sending..."
@@ -414,11 +448,7 @@ export default function CommunityPlusUserProfile({ onComplete }) {
 
                 <Button
                   onClick={verifyPhoneCode}
-                  disabled={
-                    !values.phoneVerificationCode ||
-                    phoneStatus === "verifying" ||
-                    values.phoneVerified
-                  }
+                  disabled={phoneStatus === "verifying" || values.phoneVerified}
                 >
                   {phoneStatus === "verifying" ? "Verifying..." : "Verify"}
                 </Button>
@@ -458,7 +488,11 @@ export default function CommunityPlusUserProfile({ onComplete }) {
 
               <Button
                 onClick={isLastStep ? handleComplete : nextStep}
-                disabled={isFormValidating || savingProfile}
+                disabled={
+                  isFormValidating ||
+                  savingProfile ||
+                  (isContactStep && !canContinueFromContact)
+                }
               >
                 {savingProfile ? "Saving..." : isLastStep ? "Finish" : "Next"}
               </Button>

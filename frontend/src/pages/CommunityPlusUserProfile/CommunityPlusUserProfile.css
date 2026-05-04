@@ -357,3 +357,26 @@ RESPONSIVE
 .profile-save-status.error {
   color: #b11226;
 }
+
+.phone-verification {
+  margin-top: 16px;
+}
+
+.phone-verification-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+  align-items: center;
+}
+
+.hint {
+  margin-top: 8px;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.success {
+  margin-top: 10px;
+  color: #146c2e;
+  font-weight: 600;
+}
