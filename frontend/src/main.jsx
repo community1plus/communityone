@@ -6,21 +6,12 @@ import App from "./App.jsx";
 
 import { Amplify } from "aws-amplify";
 import { Hub } from "aws-amplify/utils";
-/* import { getCurrentUser, fetchAuthSession } from "aws-amplify/auth"; */
 
 import outputs from "./amplify_outputs.json";
 
-/* =========================
-   CONTEXTS
-========================= */
-
 import { AuthProvider } from "./context/AuthContext";
-import { UIProvider } from "./context/UIContext"; 
+import { UIProvider } from "./context/UIContext";
 import { LocationProvider } from "./context/LocationProvider.jsx";
-
-/* =========================
-   NORMALISE CONFIG
-========================= */
 
 const oauth = outputs.auth?.oauth ?? {};
 
@@ -32,26 +23,17 @@ const redirectSignOut = Array.isArray(oauth.redirect_sign_out_uri)
   ? oauth.redirect_sign_out_uri
   : [oauth.redirect_sign_out_uri].filter(Boolean);
 
-/* =========================
-   AMPLIFY CONFIG
-========================= */
-
 Amplify.configure({
   Auth: {
     Cognito: {
       userPoolId: outputs.auth.user_pool_id,
       userPoolClientId: outputs.auth.user_pool_client_id,
-      identityPoolId: outputs.auth.identity_pool_id, // ✅ add this
+
       loginWith: {
         email: true,
-
         oauth: {
           domain: oauth.domain,
-          scopes: [
-            "openid",
-            "email",
-            "profile",
-          ],
+          scopes: oauth.scopes ?? ["openid", "email", "profile"],
           redirectSignIn,
           redirectSignOut,
           responseType: oauth.response_type ?? "code",
@@ -62,11 +44,7 @@ Amplify.configure({
   },
 });
 
-/* =========================
-   🔥 HANDLE OAUTH REDIRECT
-========================= */
-
-Hub.listen("auth", async ({ payload }) => {
+Hub.listen("auth", ({ payload }) => {
   switch (payload.event) {
     case "signInWithRedirect":
       console.log("🔄 Redirecting to Cognito...");
@@ -74,16 +52,6 @@ Hub.listen("auth", async ({ payload }) => {
 
     case "signedIn":
       console.log("✅ Signed in via redirect");
-
-      try {
-        const user = await getCurrentUser();
-        const session = await fetchAuthSession();
-
-       
-      } catch (err) {
-        console.error("❌ Post-login fetch failed:", err);
-      }
-
       break;
 
     case "signInWithRedirect_failure":
@@ -95,14 +63,8 @@ Hub.listen("auth", async ({ payload }) => {
   }
 });
 
-/* =========================
-   ROOT APP WRAPPER
-========================= */
-
 function Root() {
   return (
-    // ⚠️ Disable StrictMode if debugging auth loops
-    // <React.StrictMode>
     <AuthProvider>
       <UIProvider>
         <LocationProvider>
@@ -112,14 +74,7 @@ function Root() {
         </LocationProvider>
       </UIProvider>
     </AuthProvider>
-    // </React.StrictMode>
   );
 }
 
-/* =========================
-   RENDER
-========================= */
-
-ReactDOM.createRoot(document.getElementById("root")).render(
-  <Root />
-);
+ReactDOM.createRoot(document.getElementById("root")).render(<Root />);
