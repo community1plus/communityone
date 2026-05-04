@@ -8,6 +8,7 @@ import {
 } from "react";
 
 import {
+  fetchAuthSession,
   getCurrentUser,
   signInWithRedirect,
   signOut,
@@ -15,13 +16,16 @@ import {
 
 const AuthContext = createContext(null);
 
-function normaliseUser(amplifyUser) {
+function normaliseUser(amplifyUser, tokens) {
   if (!amplifyUser) return null;
 
-  const username = amplifyUser.username || "";
-  const fallback = username.split("@")[0] || "User";
+  const idPayload = tokens?.idToken?.payload || {};
 
-  const displayName = fallback;
+  const email = idPayload.email || amplifyUser.signInDetails?.loginId || "";
+  const name = idPayload.name || "";
+  const username = amplifyUser.username || email || "";
+  const fallback = email?.split("@")[0] || username || "User";
+  const displayName = name || fallback;
 
   const initials = displayName
     .split(/[\s._-]+/)
@@ -34,8 +38,8 @@ function normaliseUser(amplifyUser) {
   return {
     id: amplifyUser.userId,
     username,
-    email: username.includes("@") ? username : null,
-    name: null,
+    email,
+    name,
     displayName,
     initials,
   };
@@ -43,26 +47,46 @@ function normaliseUser(amplifyUser) {
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
+  const [tokens, setTokens] = useState(null);
   const [loading, setLoading] = useState(true);
   const [hydrating, setHydrating] = useState(false);
 
-  const refreshAuth = useCallback(async () => {
+  const clearAuth = useCallback(() => {
+    setUser(null);
+    setToken(null);
+    setTokens(null);
+  }, []);
+
+  const refreshAuth = useCallback(async ({ forceRefresh = false } = {}) => {
     setHydrating(true);
 
     try {
       const amplifyUser = await getCurrentUser();
-      const normalisedUser = normaliseUser(amplifyUser);
+
+      const session = await fetchAuthSession({ forceRefresh });
+      const accessToken = session.tokens?.accessToken?.toString();
+
+      if (!accessToken) {
+        clearAuth();
+        return null;
+      }
+
+      const normalisedUser = normaliseUser(amplifyUser, session.tokens);
 
       setUser(normalisedUser);
+      setToken(accessToken);
+      setTokens(session.tokens);
 
       return normalisedUser;
     } catch (err) {
-      setUser(null);
+      console.error("❌ Auth refresh failed:", err);
+      clearAuth();
       return null;
     } finally {
       setHydrating(false);
     }
-  }, []);
+  }, [clearAuth]);
 
   useEffect(() => {
     let mounted = true;
@@ -80,7 +104,7 @@ export function AuthProvider({ children }) {
         console.error("❌ Auth init failed:", err);
 
         if (mounted) {
-          setUser(null);
+          clearAuth();
         }
       } finally {
         if (mounted) {
@@ -94,7 +118,7 @@ export function AuthProvider({ children }) {
     return () => {
       mounted = false;
     };
-  }, [refreshAuth]);
+  }, [refreshAuth, clearAuth]);
 
   const login = useCallback(async () => {
     await signInWithRedirect();
@@ -104,16 +128,19 @@ export function AuthProvider({ children }) {
     try {
       await signOut({ global: true });
     } finally {
-      setUser(null);
+      clearAuth();
       window.location.replace("/");
     }
-  }, []);
+  }, [clearAuth]);
 
-  const isAuthenticated = Boolean(user);
+  const isAuthenticated = Boolean(user && token);
 
   const value = useMemo(
     () => ({
       user,
+      token,
+      tokens,
+
       loading,
       hydrating,
       isAuthenticated,
@@ -122,7 +149,17 @@ export function AuthProvider({ children }) {
       logout,
       refreshAuth,
     }),
-    [user, loading, hydrating, isAuthenticated, login, logout, refreshAuth]
+    [
+      user,
+      token,
+      tokens,
+      loading,
+      hydrating,
+      isAuthenticated,
+      login,
+      logout,
+      refreshAuth,
+    ]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
