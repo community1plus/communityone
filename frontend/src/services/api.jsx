@@ -1,22 +1,22 @@
-import { fetchAuthSession } from "aws-amplify/auth";
-
 export async function apiFetch(url, options = {}) {
-  const session = await fetchAuthSession({
-    forceRefresh: false,
-  });
-
-  const token = session.tokens?.accessToken?.toString();
+  const { token, body, headers, ...fetchOptions } = options;
 
   if (!token) {
     throw new Error("No access token");
   }
 
-  const isFormData = options.body instanceof FormData;
+  const isFormData = body instanceof FormData;
+  const hasBody = body !== null && body !== undefined;
 
   return fetch(url, {
-    ...options,
+    ...fetchOptions,
+    body: hasBody
+      ? isFormData || typeof body === "string"
+        ? body
+        : JSON.stringify(body)
+      : undefined,
     headers: {
-      ...(options.headers || {}),
+      ...(headers || {}),
       Authorization: `Bearer ${token}`,
       ...(isFormData ? {} : { "Content-Type": "application/json" }),
     },
