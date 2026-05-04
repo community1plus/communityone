@@ -8,6 +8,7 @@ import {
 } from "react";
 
 import { useAuth } from "./AuthContext";
+import useAPI from "../../hooks/useAPI";
 
 const ProfileContext = createContext(null);
 
@@ -39,10 +40,12 @@ function calculateCompletion(profile) {
 }
 
 export function ProfileProvider({ children }) {
+  const api = useAPI();
   const { user, isAuthenticated } = useAuth();
 
   const [profile, setProfile] = useState(null);
   const [profileLoading, setProfileLoading] = useState(false);
+  const [profileSaving, setProfileSaving] = useState(false);
   const [profileError, setProfileError] = useState(null);
 
   const loadProfile = useCallback(async () => {
@@ -55,38 +58,100 @@ export function ProfileProvider({ children }) {
     setProfileError(null);
 
     try {
-      // Replace this with your real API call later.
-      const stored = await api.get("/profile");
-      const parsed = stored ? JSON.parse(stored) : null;
+      const res = await api.get("/profile");
 
-      setProfile(parsed);
-      return parsed;
+      const nextProfile = res?.profile || null;
+
+      setProfile(nextProfile);
+      return nextProfile;
     } catch (err) {
+      if (err?.status === 404) {
+        setProfile(null);
+        return null;
+      }
+
       console.error("Profile load failed:", err);
-      setProfileError("Profile load failed");
+      setProfileError(err?.message || "Profile load failed");
       setProfile(null);
+
       return null;
     } finally {
       setProfileLoading(false);
     }
-  }, [isAuthenticated, user?.id]);
+  }, [api, isAuthenticated, user?.id]);
 
   const saveProfile = useCallback(
     async (nextProfile) => {
-      if (!user?.id) return null;
+      if (!isAuthenticated || !user?.id) {
+        throw new Error("User is not authenticated");
+      }
 
-      const merged = {
+      setProfileSaving(true);
+      setProfileError(null);
+
+      const optimisticProfile = {
         ...profile,
         ...nextProfile,
         updatedAt: Date.now(),
       };
 
-      localStorage.setItem(`profile:${user.id}`, JSON.stringify(merged));
-      setProfile(merged);
+      setProfile(optimisticProfile);
 
-      return merged;
+      try {
+        const res = await api.put("/profile", optimisticProfile);
+
+        const savedProfile = res?.profile || optimisticProfile;
+
+        setProfile(savedProfile);
+        return savedProfile;
+      } catch (err) {
+        console.error("Profile save failed:", err);
+        setProfile(profile);
+        setProfileError(err?.message || "Profile save failed");
+
+        throw err;
+      } finally {
+        setProfileSaving(false);
+      }
     },
-    [user?.id, profile]
+    [api, isAuthenticated, user?.id, profile]
+  );
+
+  const patchProfile = useCallback(
+    async (patch) => {
+      if (!isAuthenticated || !user?.id) {
+        throw new Error("User is not authenticated");
+      }
+
+      setProfileSaving(true);
+      setProfileError(null);
+
+      const optimisticProfile = {
+        ...profile,
+        ...patch,
+        updatedAt: Date.now(),
+      };
+
+      setProfile(optimisticProfile);
+
+      try {
+        const res = await api.patch("/profile", patch);
+
+        const savedProfile = res?.profile || optimisticProfile;
+
+        setProfile(savedProfile);
+        return savedProfile;
+      } catch (err) {
+        console.error("Profile patch failed:", err);
+        setProfile(profile);
+        setProfileError(err?.message || "Profile patch failed");
+
+        throw err;
+      } finally {
+        setProfileSaving(false);
+      }
+    },
+    [api, isAuthenticated, user?.id, profile]
   );
 
   useEffect(() => {
@@ -98,28 +163,33 @@ export function ProfileProvider({ children }) {
     [profile]
   );
 
-  const hasProfile = completionPercent >= 80;
+  const hasProfile = completionPercent === 100;
 
   const value = useMemo(
     () => ({
       profile,
       profileLoading,
+      profileSaving,
       profileError,
+
       completionPercent,
       hasProfile,
 
       loadProfile,
       saveProfile,
+      patchProfile,
       setProfile,
     }),
     [
       profile,
       profileLoading,
+      profileSaving,
       profileError,
       completionPercent,
       hasProfile,
       loadProfile,
       saveProfile,
+      patchProfile,
     ]
   );
 
