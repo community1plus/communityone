@@ -157,13 +157,9 @@ function formatLocalPhone(phone = "", countryCode = DEFAULT_PHONE_COUNTRY) {
 
 function toE164Phone(phone = "", countryCode = DEFAULT_PHONE_COUNTRY) {
   const country = getPhoneCountry(countryCode);
-  let digits = stripDialCode(phone, countryCode);
+  const digits = stripDialCode(phone, countryCode);
 
   if (!digits) return "";
-
-  if (country.code === "AU" && digits.startsWith("0")) {
-    digits = digits.slice(1);
-  }
 
   return `${country.dialCode}${digits}`;
 }
@@ -181,6 +177,7 @@ function isValidInternationalPhone(phone = "", countryCode = DEFAULT_PHONE_COUNT
 export default function CommunityPlusUserProfile({ onComplete }) {
   const navigate = useNavigate();
   const autoRef = useRef(null);
+  const formattingPhoneRef = useRef(false);
 
   const { isLoaded } = useGoogleMaps();
   const { user } = useAuth();
@@ -235,9 +232,21 @@ export default function CommunityPlusUserProfile({ onComplete }) {
   const isLastStep = currentStep === profileSteps.length - 1;
   const isContactStep = currentStepConfig?.id === "contact";
 
-  const selectedPhoneCountry = getPhoneCountry(values.phoneCountry);
-  const phoneE164 = toE164Phone(values.phone, values.phoneCountry);
-  const phoneIsValid = isValidInternationalPhone(values.phone, values.phoneCountry);
+  const selectedPhoneCountry = useMemo(
+    () => getPhoneCountry(values.phoneCountry),
+    [values.phoneCountry]
+  );
+
+  const phoneE164 = useMemo(
+    () => toE164Phone(values.phone, values.phoneCountry),
+    [values.phone, values.phoneCountry]
+  );
+
+  const phoneIsValid = useMemo(
+    () => isValidInternationalPhone(values.phone, values.phoneCountry),
+    [values.phone, values.phoneCountry]
+  );
+
   const canContinueFromContact = !isContactStep || values.phoneVerified;
 
   const displayCompletion = useMemo(
@@ -245,8 +254,33 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     [completionPercent]
   );
 
+  const autosaveValues = useMemo(
+    () => ({
+      username: values.username,
+      display_name: values.display_name,
+      userType: values.userType,
+      phone: values.phone,
+      phoneE164: values.phoneE164,
+      phoneCountry: values.phoneCountry,
+      phoneVerified: values.phoneVerified,
+      social: values.social,
+      payment: values.payment,
+    }),
+    [
+      values.username,
+      values.display_name,
+      values.userType,
+      values.phone,
+      values.phoneE164,
+      values.phoneCountry,
+      values.phoneVerified,
+      values.social,
+      values.payment,
+    ]
+  );
+
   const { autosaveStatus, autosaveError } = useProfileAutosave({
-    values,
+    values: autosaveValues,
     homeLocation,
     patchProfile,
     enabled: Boolean(profileReady && profile),
@@ -291,17 +325,30 @@ export default function CommunityPlusUserProfile({ onComplete }) {
   }, [homeLocation, setValue]);
 
   useEffect(() => {
-    const formatted = formatLocalPhone(values.phone, values.phoneCountry);
-    const e164 = toE164Phone(formatted, values.phoneCountry);
+    if (formattingPhoneRef.current) return;
 
-    if (formatted && formatted !== values.phone) {
+    const formatted = formatLocalPhone(values.phone, values.phoneCountry);
+    const nextE164 = toE164Phone(formatted, values.phoneCountry);
+
+    const shouldUpdatePhone = Boolean(formatted) && formatted !== values.phone;
+    const shouldUpdateE164 = nextE164 !== values.phoneE164;
+
+    if (!shouldUpdatePhone && !shouldUpdateE164) return;
+
+    formattingPhoneRef.current = true;
+
+    if (shouldUpdatePhone) {
       setValue("phone", formatted);
     }
 
-    if (e164 !== values.phoneE164) {
-      setValue("phoneE164", e164);
+    if (shouldUpdateE164) {
+      setValue("phoneE164", nextE164);
     }
-  }, [values.phone, values.phoneCountry, values.phoneE164, setValue]);
+
+    window.setTimeout(() => {
+      formattingPhoneRef.current = false;
+    }, 0);
+  }, [values.phone, values.phoneCountry, setValue]);
 
   useEffect(() => {
     if (!values.phone) return;
@@ -336,14 +383,7 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     setValue("phoneVerificationCode", "");
 
     try {
-      // Backend later:
-      // await api.post("/profile/phone/send-code", {
-      //   phone: cleanPhone,
-      //   country: values.phoneCountry,
-      // });
-
       console.log("Send verification code to:", cleanPhone);
-
       setPhoneStatus("sent");
     } catch (err) {
       setPhoneStatus("error");
@@ -366,12 +406,6 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     setPhoneError("");
 
     try {
-      // Backend later:
-      // await api.post("/profile/phone/verify-code", {
-      //   phone: toE164Phone(values.phone, values.phoneCountry),
-      //   code: values.phoneVerificationCode,
-      // });
-
       console.log("Verify phone code:", {
         phone: toE164Phone(values.phone, values.phoneCountry),
         code: values.phoneVerificationCode,
@@ -396,11 +430,11 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     (event) => {
       const nextCountry = event.target.value;
       const formatted = formatLocalPhone(values.phone, nextCountry);
-      const e164 = toE164Phone(formatted, nextCountry);
+      const nextE164 = toE164Phone(formatted, nextCountry);
 
       setValue("phoneCountry", nextCountry);
       setValue("phone", formatted);
-      setValue("phoneE164", e164);
+      setValue("phoneE164", nextE164);
       setValue("phoneVerified", false);
       setValue("phoneVerificationCode", "");
       setPhoneStatus("idle");
