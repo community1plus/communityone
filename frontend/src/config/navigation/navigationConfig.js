@@ -1,33 +1,33 @@
 export const NAVIGATION = [
   {
-    group: "main",
-    items: [
-      {
-        id: "home",
-        label: "Home",
-        type: "route",
-        path: "/",
-      },
-      {
-        id: "dashboard",
-        label: "Dashboard",
-        type: "route",
-        path: "/communityplus",
-      },
-      {
-        id: "now",
-        label: "NOW",
-        type: "route",
-        path: "/communityplus/now",
-      },
-      {
-        id: "yellowpages",
-        label: "Yellow Pages",
-        type: "route",
-        path: "/communityplus/yellowpages",
-      },
-    ],
-  },
+  group: "main",
+  items: [
+    {
+      id: "home",
+      label: "Home",
+      type: "route",
+      path: "/",
+    },
+    {
+      id: "iview",
+      label: "iVIEW",
+      type: "route",
+      path: "/communityplus",
+    },
+    {
+      id: "yellowpages",
+      label: "Yellow Pages",
+      type: "route",
+      path: "/communityplus/yellowpages",
+    },
+    {
+      id: "channels",
+      label: "Channels",
+      type: "route",
+      path: "/communityplus/channels",
+    },
+  ],
+},
 
   {
     group: "sidebar",
