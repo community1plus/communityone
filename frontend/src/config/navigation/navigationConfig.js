@@ -1,7 +1,4 @@
 export const NAVIGATION = [
-  /* =====================================================
-     HEADER NAV (TOP BAR)
-  ===================================================== */
   {
     group: "main",
     items: [
@@ -9,99 +6,60 @@ export const NAVIGATION = [
         id: "home",
         label: "Home",
         type: "route",
-        path: "/home",
+        path: "/",
       },
-
       {
-        id: "feed",
-        label: "Feed",
-        type: "group",
-        children: [
-          {
-            id: "feed-all",
-            label: "All",
-            type: "route",
-            path: "/communityplus",
-          },
-          {
-            id: "feed-incidents",
-            label: "Incidents",
-            type: "route",
-            path: "/incident",
-          },
-          {
-            id: "feed-alerts",
-            label: "Alerts",
-            type: "route",
-            path: "/beacon",
-          },
-        ],
-      },
-
-      {
-        id: "posts",
-        label: "Posts",
+        id: "dashboard",
+        label: "Dashboard",
         type: "route",
-        path: "/post",
+        path: "/communityplus",
       },
-
+      {
+        id: "now",
+        label: "NOW",
+        type: "route",
+        path: "/communityplus/now",
+      },
       {
         id: "yellowpages",
         label: "Yellow Pages",
         type: "route",
-        path: "/yellowpages",
-      },
-
-      {
-        id: "dashboard",
-        label: "Dashboard",
-        type: "group",
-        children: [
-          {
-            id: "channels",
-            label: "Channels",
-            type: "route",
-            path: "/channels",
-          },
-        ],
+        path: "/communityplus/yellowpages",
       },
     ],
   },
 
-  /* =====================================================
-     SIDEBAR
-  ===================================================== */
   {
     group: "sidebar",
     sections: [
-      /* =========================
-         MODES (MAP BEHAVIOUR)
-      ========================= */
       {
-        id: "modes",
-        title: "MODES",
-        variant: "modes",
+        id: "main",
+        title: "MAIN",
         items: [
           {
-            id: "mode-now",
-            label: "NOW",
-            icon: "⚡",
-            type: "mode",
-            value: "NOW",
+            id: "dashboard",
+            label: "Dashboard",
+            icon: "🏠",
+            type: "route",
+            path: "/communityplus",
           },
           {
-            id: "mode-blob",
-            label: "BLOB",
-            icon: "🧠",
-            type: "mode",
-            value: "BLOB",
+            id: "now",
+            label: "NOW",
+            icon: "⚡",
+            type: "route",
+            path: "/communityplus/now",
+          },
+          {
+            id: "yellowpages",
+            label: "Yellow Pages",
+            icon: "📒",
+            type: "route",
+            path: "/communityplus/yellowpages",
           },
         ],
       },
 
-      /* =========================
-         ACTIONS
-      ========================= */
       {
         id: "actions",
         title: "ACTIONS",
@@ -111,56 +69,57 @@ export const NAVIGATION = [
             label: "Event",
             icon: "📅",
             type: "route",
-            path: "/event",
+            path: "/communityplus/event",
           },
           {
             id: "incident",
             label: "Incident",
             icon: "🚨",
             type: "route",
-            path: "/incident",
+            path: "/communityplus/incident",
           },
           {
             id: "beacon",
             label: "Beacon",
             icon: "📡",
             type: "route",
-            path: "/beacon",
+            path: "/communityplus/beacon",
           },
         ],
       },
 
-      /* =========================
-         PLATFORM
-      ========================= */
-      {
-        id: "platform",
-        title: "PLATFORM",
-        items: [
-          {
-            id: "yellowpages",
-            label: "Yellow Pages",
-            icon: "📒",
-            type: "route",
-            path: "/yellowpages",
-          },
-          {
-            id: "channels",
-            label: "Channels",
-            icon: "📺",
-            type: "route",
-            path: "/channels",
-          },
-        ],
-      },
-
-      /* =========================
-         ACCOUNT
-      ========================= */
       {
         id: "account",
         title: "ACCOUNT",
         items: [
+          {
+            id: "profile",
+            label: "Profile",
+            icon: "👤",
+            type: "route",
+            path: "/communityplus/profile",
+          },
+          {
+            id: "account",
+            label: "Account",
+            icon: "⚙️",
+            type: "route",
+            path: "/communityplus/account",
+          },
+          {
+            id: "inbox",
+            label: "Inbox",
+            icon: "✉️",
+            type: "route",
+            path: "/communityplus/inbox",
+          },
+          {
+            id: "help",
+            label: "Help",
+            icon: "❓",
+            type: "route",
+            path: "/communityplus/help",
+          },
           {
             id: "logout",
             label: "Logout",
