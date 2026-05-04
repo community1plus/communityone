@@ -10,27 +10,23 @@ export default function CommunityPlusSidebar() {
   const { pathname } = useLocation();
 
   const sidebar = useMemo(() => {
-    const config = NAVIGATION.find((n) => n.group === "sidebar") || {
-      sections: [],
-    };
-
-    console.log("SIDEBAR CONFIG:", config);
-
-    return config;
+    return (
+      NAVIGATION.find((item) => item.group === "sidebar") || {
+        group: "sidebar",
+        sections: [],
+      }
+    );
   }, []);
 
   const isActive = useCallback(
     (item) => {
-      if (!item.path) return false;
-
-      return pathname === item.path || pathname.startsWith(item.path + "/");
+      if (!item?.path) return false;
+      return pathname === item.path || pathname.startsWith(`${item.path}/`);
     },
     [pathname]
   );
 
   const handleLogout = useCallback(async () => {
-    console.log("LOGOUT CLICKED");
-
     try {
       await signOut();
       navigate("/", { replace: true });
@@ -41,37 +37,16 @@ export default function CommunityPlusSidebar() {
 
   const handleClick = useCallback(
     async (item) => {
-      console.log("SIDEBAR ITEM CLICKED:", item);
+      if (!item) return;
 
-      if (!item) {
-        console.warn("No sidebar item received");
-        return;
-      }
-
-      if (item.type === "route") {
-        if (!item.path) {
-          console.warn("Route item missing path:", item);
-          return;
-        }
-
-        console.log("NAVIGATING TO:", item.path);
+      if (item.type === "route" && item.path) {
         navigate(item.path);
         return;
       }
 
-      if (item.type === "action") {
-        console.log("ACTION TRIGGERED:", item.action);
-
-        if (item.action === "logout") {
-          await handleLogout();
-          return;
-        }
-
-        console.warn("Unhandled action:", item.action);
-        return;
+      if (item.type === "action" && item.action === "logout") {
+        await handleLogout();
       }
-
-      console.warn("Unhandled sidebar item type:", item.type, item);
     },
     [navigate, handleLogout]
   );
@@ -100,10 +75,7 @@ export default function CommunityPlusSidebar() {
                 ]
                   .filter(Boolean)
                   .join(" ")}
-                onClick={() => {
-                  console.log("BUTTON ONCLICK FIRED:", item.label);
-                  handleClick(item);
-                }}
+                onClick={() => handleClick(item)}
                 aria-current={active ? "page" : undefined}
               >
                 <span className="icon">{item.icon}</span>
