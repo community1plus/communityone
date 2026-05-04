@@ -18,6 +18,19 @@ import useForm from "../../hooks/useForm";
 import "../../styles/system.css";
 import "./CommunityPlusUserProfile.css";
 
+const PHONE_COUNTRIES = [
+  { code: "AU", label: "Australia", dialCode: "+61", min: 9, max: 9 },
+  { code: "NZ", label: "New Zealand", dialCode: "+64", min: 8, max: 10 },
+  { code: "US", label: "United States", dialCode: "+1", min: 10, max: 10 },
+  { code: "GB", label: "United Kingdom", dialCode: "+44", min: 10, max: 10 },
+  { code: "CA", label: "Canada", dialCode: "+1", min: 10, max: 10 },
+  { code: "NG", label: "Nigeria", dialCode: "+234", min: 10, max: 10 },
+  { code: "ZA", label: "South Africa", dialCode: "+27", min: 9, max: 9 },
+  { code: "IN", label: "India", dialCode: "+91", min: 10, max: 10 },
+];
+
+const DEFAULT_PHONE_COUNTRY = "AU";
+
 const profileSteps = [
   {
     id: "user",
@@ -88,13 +101,81 @@ const profileSteps = [
   },
 ];
 
-function normalisePhone(phone = "") {
-  return phone.replace(/\s+/g, "").replace(/[()-]/g, "");
+function digitsOnly(value = "") {
+  return String(value).replace(/\D/g, "");
 }
 
-function isValidPhone(phone = "") {
-  const cleaned = normalisePhone(phone);
-  return /^\+?\d{8,15}$/.test(cleaned);
+function getPhoneCountry(code = DEFAULT_PHONE_COUNTRY) {
+  return (
+    PHONE_COUNTRIES.find((country) => country.code === code) ||
+    PHONE_COUNTRIES[0]
+  );
+}
+
+function stripDialCode(phone = "", countryCode = DEFAULT_PHONE_COUNTRY) {
+  const country = getPhoneCountry(countryCode);
+  let digits = digitsOnly(phone);
+  const dialDigits = digitsOnly(country.dialCode);
+
+  if (digits.startsWith(dialDigits)) {
+    digits = digits.slice(dialDigits.length);
+  }
+
+  if (country.code === "AU" && digits.startsWith("0")) {
+    digits = digits.slice(1);
+  }
+
+  return digits;
+}
+
+function formatLocalPhone(phone = "", countryCode = DEFAULT_PHONE_COUNTRY) {
+  const country = getPhoneCountry(countryCode);
+  const digits = stripDialCode(phone, countryCode);
+
+  if (!digits) return "";
+
+  if (country.code === "AU") {
+    const local = digits.startsWith("4") ? `0${digits}` : digits;
+
+    return local
+      .slice(0, 10)
+      .replace(/(\d{4})(\d{3})(\d{0,3})/, (_, a, b, c) =>
+        c ? `${a} ${b} ${c}` : `${a} ${b}`
+      );
+  }
+
+  if (country.code === "US" || country.code === "CA") {
+    return digits
+      .slice(0, 10)
+      .replace(/(\d{3})(\d{3})(\d{0,4})/, (_, a, b, c) =>
+        c ? `${a} ${b} ${c}` : `${a} ${b}`
+      );
+  }
+
+  return digits.replace(/(\d{3})(?=\d)/g, "$1 ").trim();
+}
+
+function toE164Phone(phone = "", countryCode = DEFAULT_PHONE_COUNTRY) {
+  const country = getPhoneCountry(countryCode);
+  let digits = stripDialCode(phone, countryCode);
+
+  if (!digits) return "";
+
+  if (country.code === "AU" && digits.startsWith("0")) {
+    digits = digits.slice(1);
+  }
+
+  return `${country.dialCode}${digits}`;
+}
+
+function isValidInternationalPhone(phone = "", countryCode = DEFAULT_PHONE_COUNTRY) {
+  const country = getPhoneCountry(countryCode);
+  const nationalDigits = stripDialCode(phone, countryCode);
+
+  return (
+    nationalDigits.length >= country.min &&
+    nationalDigits.length <= country.max
+  );
 }
 
 export default function CommunityPlusUserProfile({ onComplete }) {
@@ -121,7 +202,9 @@ export default function CommunityPlusUserProfile({ onComplete }) {
       username: profile?.username || "",
       display_name: profile?.display_name || user?.displayName || "",
       userType: profile?.userType || "PERSONAL",
-      phone: profile?.phone || "",
+      phoneCountry: profile?.phoneCountry || DEFAULT_PHONE_COUNTRY,
+      phone: profile?.phoneDisplay || profile?.phone || "",
+      phoneE164: profile?.phoneE164 || profile?.phone || "",
       phoneVerified: profile?.phoneVerified || false,
       phoneVerificationCode: "",
       homeLocation: profile?.homeLocation || homeLocation || null,
@@ -152,12 +235,15 @@ export default function CommunityPlusUserProfile({ onComplete }) {
   const isLastStep = currentStep === profileSteps.length - 1;
   const isContactStep = currentStepConfig?.id === "contact";
 
+  const selectedPhoneCountry = getPhoneCountry(values.phoneCountry);
+  const phoneE164 = toE164Phone(values.phone, values.phoneCountry);
+  const phoneIsValid = isValidInternationalPhone(values.phone, values.phoneCountry);
+  const canContinueFromContact = !isContactStep || values.phoneVerified;
+
   const displayCompletion = useMemo(
     () => completionPercent || 0,
     [completionPercent]
   );
-
-  const canContinueFromContact = !isContactStep || values.phoneVerified;
 
   const { autosaveStatus, autosaveError } = useProfileAutosave({
     values,
@@ -205,48 +291,72 @@ export default function CommunityPlusUserProfile({ onComplete }) {
   }, [homeLocation, setValue]);
 
   useEffect(() => {
+    const formatted = formatLocalPhone(values.phone, values.phoneCountry);
+    const e164 = toE164Phone(formatted, values.phoneCountry);
+
+    if (formatted && formatted !== values.phone) {
+      setValue("phone", formatted);
+    }
+
+    if (e164 !== values.phoneE164) {
+      setValue("phoneE164", e164);
+    }
+  }, [values.phone, values.phoneCountry, values.phoneE164, setValue]);
+
+  useEffect(() => {
     if (!values.phone) return;
 
-    const originalPhone = profile?.phone || "";
+    const originalPhone = profile?.phoneE164 || profile?.phone || "";
 
-    if (originalPhone && values.phone !== originalPhone) {
+    if (originalPhone && phoneE164 && phoneE164 !== originalPhone) {
       setValue("phoneVerified", false);
       setValue("phoneVerificationCode", "");
       setPhoneStatus("idle");
       setPhoneError("");
     }
-  }, [values.phone, profile?.phone, setValue]);
+  }, [values.phone, phoneE164, profile?.phoneE164, profile?.phone, setValue]);
 
   const sendPhoneCode = useCallback(async () => {
-    const cleanedPhone = normalisePhone(values.phone);
+    const cleanPhone = toE164Phone(values.phone, values.phoneCountry);
 
-    if (!cleanedPhone) {
+    if (!cleanPhone) {
       setPhoneError("Enter your phone number first.");
       return;
     }
 
-    if (!isValidPhone(cleanedPhone)) {
-      setPhoneError("Enter a valid phone number. Include your country code if needed.");
+    if (!isValidInternationalPhone(values.phone, values.phoneCountry)) {
+      setPhoneError(
+        `Enter a valid phone number for ${selectedPhoneCountry.label}.`
+      );
       return;
     }
 
     setPhoneStatus("sending");
     setPhoneError("");
+    setValue("phoneVerificationCode", "");
 
     try {
       // Backend later:
-      // await api.post("/profile/phone/send-code", { phone: cleanedPhone });
+      // await api.post("/profile/phone/send-code", {
+      //   phone: cleanPhone,
+      //   country: values.phoneCountry,
+      // });
 
-      console.log("Send verification code to:", cleanedPhone);
+      console.log("Send verification code to:", cleanPhone);
 
       setPhoneStatus("sent");
     } catch (err) {
       setPhoneStatus("error");
       setPhoneError(err?.message || "Could not send verification code");
     }
-  }, [values.phone]);
+  }, [values.phone, values.phoneCountry, selectedPhoneCountry.label, setValue]);
 
   const verifyPhoneCode = useCallback(async () => {
+    if (phoneStatus !== "sent") {
+      setPhoneError("Send a verification code first.");
+      return;
+    }
+
     if (!values.phoneVerificationCode) {
       setPhoneError("Enter the verification code.");
       return;
@@ -258,12 +368,12 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     try {
       // Backend later:
       // await api.post("/profile/phone/verify-code", {
-      //   phone: normalisePhone(values.phone),
+      //   phone: toE164Phone(values.phone, values.phoneCountry),
       //   code: values.phoneVerificationCode,
       // });
 
       console.log("Verify phone code:", {
-        phone: normalisePhone(values.phone),
+        phone: toE164Phone(values.phone, values.phoneCountry),
         code: values.phoneVerificationCode,
       });
 
@@ -274,7 +384,30 @@ export default function CommunityPlusUserProfile({ onComplete }) {
       setPhoneStatus("error");
       setPhoneError(err?.message || "Invalid verification code");
     }
-  }, [values.phone, values.phoneVerificationCode, setValue]);
+  }, [
+    phoneStatus,
+    values.phone,
+    values.phoneCountry,
+    values.phoneVerificationCode,
+    setValue,
+  ]);
+
+  const handlePhoneCountryChange = useCallback(
+    (event) => {
+      const nextCountry = event.target.value;
+      const formatted = formatLocalPhone(values.phone, nextCountry);
+      const e164 = toE164Phone(formatted, nextCountry);
+
+      setValue("phoneCountry", nextCountry);
+      setValue("phone", formatted);
+      setValue("phoneE164", e164);
+      setValue("phoneVerified", false);
+      setValue("phoneVerificationCode", "");
+      setPhoneStatus("idle");
+      setPhoneError("");
+    },
+    [values.phone, setValue]
+  );
 
   const onPlaceChanged = useCallback(() => {
     const place = autoRef.current?.getPlace();
@@ -298,13 +431,16 @@ export default function CommunityPlusUserProfile({ onComplete }) {
       username: values.username,
       display_name: values.display_name,
       userType: values.userType,
-      phone: normalisePhone(values.phone),
+      phone: phoneE164,
+      phoneE164,
+      phoneDisplay: values.phone,
+      phoneCountry: values.phoneCountry,
       phoneVerified: values.phoneVerified,
       homeLocation: values.homeLocation || homeLocation,
       social: values.social,
       payment: values.payment,
     }),
-    [values, homeLocation]
+    [values, phoneE164, homeLocation]
   );
 
   const handleSaveProfile = useCallback(async () => {
@@ -408,6 +544,27 @@ export default function CommunityPlusUserProfile({ onComplete }) {
           </div>
 
           <Section title={currentStepConfig?.title}>
+            {isContactStep && (
+              <div className="phone-country-row">
+                <label className="phone-country-label" htmlFor="phoneCountry">
+                  Country
+                </label>
+
+                <select
+                  id="phoneCountry"
+                  className="phone-country-select"
+                  value={values.phoneCountry}
+                  onChange={handlePhoneCountryChange}
+                >
+                  {PHONE_COUNTRIES.map((country) => (
+                    <option key={country.code} value={country.code}>
+                      {country.label} {country.dialCode}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
             <FormBuilder
               steps={profileSteps}
               currentStep={currentStep}
@@ -423,16 +580,25 @@ export default function CommunityPlusUserProfile({ onComplete }) {
 
           {isContactStep && (
             <div className="phone-verification">
-              {!values.phone && (
-                <div className="hint">
-                  Enter your phone number to receive a verification code.
+              <div className="hint">
+                Selected country: {selectedPhoneCountry.label}. Verification
+                number: {phoneE164 || selectedPhoneCountry.dialCode}
+              </div>
+
+              {values.phone && !phoneIsValid && (
+                <div className="error">
+                  Enter a valid phone number for {selectedPhoneCountry.label}.
                 </div>
               )}
 
-              {values.phone && !values.phoneVerified && (
+              {phoneStatus === "idle" && (
                 <div className="hint">
-                  Phone verification is required before continuing.
+                  Enter your phone number and request a verification code.
                 </div>
+              )}
+
+              {phoneStatus === "sent" && !values.phoneVerified && (
+                <div className="hint">Enter the code sent to your phone.</div>
               )}
 
               <div className="phone-verification-row">
@@ -448,7 +614,7 @@ export default function CommunityPlusUserProfile({ onComplete }) {
 
                 <Button
                   onClick={verifyPhoneCode}
-                  disabled={phoneStatus === "verifying" || values.phoneVerified}
+                  disabled={phoneStatus !== "sent" || values.phoneVerified}
                 >
                   {phoneStatus === "verifying" ? "Verifying..." : "Verify"}
                 </Button>
