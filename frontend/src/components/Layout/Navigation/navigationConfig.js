@@ -1,4 +1,7 @@
 export const NAVIGATION = [
+  /* =====================================================
+     HEADER NAV (TOP BAR)
+  ===================================================== */
   {
     group: "main",
     items: [
@@ -6,8 +9,16 @@ export const NAVIGATION = [
         id: "home",
         label: "Home",
         type: "route",
+        path: "/",
+      },
+
+      {
+        id: "iview",
+        label: "iVIEW",
+        type: "route",
         path: "/communityplus",
       },
+
       {
         id: "yellowpages",
         label: "Yellow Pages",
@@ -17,30 +28,32 @@ export const NAVIGATION = [
     ],
   },
 
+  /* =====================================================
+     SIDEBAR
+  ===================================================== */
   {
     group: "sidebar",
     sections: [
+      /* =========================
+         MAIN
+      ========================= */
       {
-        id: "modes",
-        title: "MODES",
+        id: "main",
+        title: "MAIN",
         items: [
           {
-            id: "now",
-            label: "NOW",
-            icon: "⚡",
+            id: "iview",
+            label: "iVIEW",
+            icon: "👁️",
             type: "route",
-            path: "/communityplus/now",
-          },
-          {
-            id: "blob",
-            label: "BLOB",
-            icon: "🧠",
-            type: "route",
-            path: "/communityplus/blob",
+            path: "/communityplus",
           },
         ],
       },
 
+      /* =========================
+         ACTIONS
+      ========================= */
       {
         id: "actions",
         title: "ACTIONS",
@@ -69,6 +82,9 @@ export const NAVIGATION = [
         ],
       },
 
+      /* =========================
+         PLATFORM
+      ========================= */
       {
         id: "platform",
         title: "PLATFORM",
@@ -80,27 +96,44 @@ export const NAVIGATION = [
             type: "route",
             path: "/communityplus/yellowpages",
           },
-          {
-            id: "channels",
-            label: "Channels",
-            icon: "📺",
-            type: "route",
-            path: "/communityplus/channels",
-          },
-          {
-            id: "helpdesk",
-            label: "Helpdesk",
-            icon: "🛠️",
-            type: "route",
-            path: "/communityplus/helpdesk",
-          },
         ],
       },
 
+      /* =========================
+         ACCOUNT
+      ========================= */
       {
         id: "account",
         title: "ACCOUNT",
         items: [
+          {
+            id: "profile",
+            label: "Profile",
+            icon: "👤",
+            type: "route",
+            path: "/communityplus/profile",
+          },
+          {
+            id: "account",
+            label: "Account",
+            icon: "⚙️",
+            type: "route",
+            path: "/communityplus/account",
+          },
+          {
+            id: "inbox",
+            label: "Inbox",
+            icon: "✉️",
+            type: "route",
+            path: "/communityplus/inbox",
+          },
+          {
+            id: "help",
+            label: "Help",
+            icon: "❓",
+            type: "route",
+            path: "/communityplus/help",
+          },
           {
             id: "logout",
             label: "Logout",
