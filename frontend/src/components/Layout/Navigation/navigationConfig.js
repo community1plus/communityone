@@ -75,7 +75,7 @@ export const NAVIGATION = [
             mode: "BEACON",
           },
         ],
-      }
+      },
 
       /* =========================
          PLATFORM

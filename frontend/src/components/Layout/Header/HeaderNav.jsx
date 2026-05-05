@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+
 import LocationDisplay from "./LocationDisplay";
 import { useLocationContext } from "../../../context/LocationProvider";
 import { NAVIGATION } from "../../../config/navigation/navigationConfig";
@@ -17,18 +18,25 @@ export default function HeaderNav() {
     useAutoLocation,
   } = useLocationContext();
 
-  const navItems = useMemo(
-    () => NAVIGATION.find((item) => item.group === "main")?.items || [],
-    []
-  );
+  const navItems = useMemo(() => {
+    return (
+      NAVIGATION.find((item) => item.group === "main")?.items || []
+    ).filter((item) => item.type === "route" && item.path);
+  }, []);
 
   const isActive = useCallback(
-    (path) =>
-      Boolean(
-        path &&
-          (routeLocation.pathname === path ||
-            routeLocation.pathname.startsWith(`${path}/`))
-      ),
+    (path) => {
+      if (!path) return false;
+
+      if (path === "/") {
+        return routeLocation.pathname === "/";
+      }
+
+      return (
+        routeLocation.pathname === path ||
+        routeLocation.pathname.startsWith(`${path}/`)
+      );
+    },
     [routeLocation.pathname]
   );
 
