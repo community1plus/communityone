@@ -33,6 +33,10 @@ export default function CommunityPlusSidebar() {
         return pathname === item.path && currentMode === item.mode;
       }
 
+      if (item.type === "compose") {
+        return pathname === item.path;
+      }
+
       return pathname === item.path || pathname.startsWith(`${item.path}/`);
     },
     [pathname, currentMode]
@@ -51,9 +55,20 @@ export default function CommunityPlusSidebar() {
     async (item) => {
       if (!item) return;
 
+      if (item.type === "compose" && item.path) {
+        navigate(item.path, {
+          state: {
+            mode: item.mode,
+          },
+        });
+        return;
+      }
+
       if (item.type === "mode" && item.path && item.mode) {
         navigate(`${item.path}?mode=${item.mode}`, {
-          state: { mode: item.mode },
+          state: {
+            mode: item.mode,
+          },
         });
         return;
       }
@@ -90,6 +105,7 @@ export default function CommunityPlusSidebar() {
                   "sidebar-link",
                   active && "active",
                   item.type === "mode" && "mode",
+                  item.type === "compose" && "compose",
                   item.type === "action" && "action",
                   item.action === "logout" && "logout",
                 ]

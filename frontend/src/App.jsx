@@ -14,11 +14,7 @@ import CommunityPlusDashboardLayout from "./components/Layout/Dashboard/Communit
 import CommunityPlusDashboardHome from "./pages/CommunityPlusDashboardHome/CommunityPlusDashboardHome";
 import CommunityPlusYellowPages from "./pages/CommunityPlusYellowPages/CommunityPlusYellowPages";
 import CommunityPlusUserProfile from "./pages/CommunityPlusUserProfile/CommunityPlusUserProfile";
-import CommunityPlusNowPostView from "./pages/CommunityPlusNowPostView/CommunityPlusNowPostView";
-
-/* ===============================
-   TEMP PLACEHOLDER
-=============================== */
+import PostComposer from "./components/PostComposer/PostComposer";
 
 function Placeholder({ title }) {
   return (
@@ -28,10 +24,6 @@ function Placeholder({ title }) {
     </div>
   );
 }
-
-/* ===============================
-   ROUTE GUARDS
-=============================== */
 
 function PublicOnlyRoute() {
   const { isAuthenticated } = useAuth();
@@ -71,10 +63,6 @@ function ProfileGate() {
   return <Outlet />;
 }
 
-/* ===============================
-   PROVIDERS
-=============================== */
-
 function DashboardProviders() {
   return (
     <GoogleMapsProvider>
@@ -89,10 +77,6 @@ function DashboardProviders() {
   );
 }
 
-/* ===============================
-   APP
-=============================== */
-
 export default function App() {
   const { loading } = useAuth();
 
@@ -102,12 +86,10 @@ export default function App() {
 
   return (
     <Routes>
-      {/* PUBLIC */}
       <Route element={<PublicOnlyRoute />}>
         <Route path="/" element={<CommunityPlusLandingPage />} />
       </Route>
 
-      {/* PROTECTED */}
       <Route element={<ProtectedRoute />}>
         <Route element={<DashboardProviders />}>
           <Route element={<ProfileGate />}>
@@ -118,24 +100,36 @@ export default function App() {
               <Route index element={<CommunityPlusDashboardHome />} />
 
               <Route path="profile" element={<CommunityPlusUserProfile />} />
-              <Route path="now" element={<CommunityPlusNowPostView />} />
-              <Route path="yellowpages" element={<CommunityPlusYellowPages />} />
 
+              <Route path="compose/now" element={<PostComposer mode="now" />} />
+              <Route path="compose/news" element={<PostComposer mode="news" />} />
+              <Route path="compose/blob" element={<PostComposer mode="blob" />} />
+              <Route path="compose/event" element={<PostComposer mode="event" />} />
+              <Route
+                path="compose/beacon"
+                element={<PostComposer mode="beacon" />}
+              />
+
+              <Route
+                path="yellowpages"
+                element={<CommunityPlusYellowPages />}
+              />
+
+              <Route path="channels" element={<Placeholder title="Channels" />} />
               <Route path="account" element={<Placeholder title="Account" />} />
               <Route path="inbox" element={<Placeholder title="Inbox" />} />
               <Route path="help" element={<Placeholder title="Help" />} />
 
               <Route
                 path="*"
-                element={<Navigate to="/communityplus/profile" replace />}
+                element={<Navigate to="/communityplus" replace />}
               />
             </Route>
           </Route>
         </Route>
       </Route>
 
-      {/* FALLBACK */}
-      <Route path="*" element={<Navigate to="/communityplus" replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
