@@ -7,7 +7,9 @@ import "./CommunityPlusSidebar.css";
 
 export default function CommunityPlusSidebar() {
   const navigate = useNavigate();
-  const { pathname } = useLocation();
+  const location = useLocation();
+
+  const { pathname, search } = location;
 
   const sidebar = useMemo(() => {
     return (
@@ -18,12 +20,22 @@ export default function CommunityPlusSidebar() {
     );
   }, []);
 
+  const currentMode = useMemo(() => {
+    const params = new URLSearchParams(search);
+    return params.get("mode")?.toUpperCase() || "NOW";
+  }, [search]);
+
   const isActive = useCallback(
     (item) => {
       if (!item?.path) return false;
+
+      if (item.type === "mode") {
+        return pathname === item.path && currentMode === item.mode;
+      }
+
       return pathname === item.path || pathname.startsWith(`${item.path}/`);
     },
-    [pathname]
+    [pathname, currentMode]
   );
 
   const handleLogout = useCallback(async () => {
@@ -38,6 +50,13 @@ export default function CommunityPlusSidebar() {
   const handleClick = useCallback(
     async (item) => {
       if (!item) return;
+
+      if (item.type === "mode" && item.path && item.mode) {
+        navigate(`${item.path}?mode=${item.mode}`, {
+          state: { mode: item.mode },
+        });
+        return;
+      }
 
       if (item.type === "route" && item.path) {
         navigate(item.path);
@@ -70,6 +89,7 @@ export default function CommunityPlusSidebar() {
                 className={[
                   "sidebar-link",
                   active && "active",
+                  item.type === "mode" && "mode",
                   item.type === "action" && "action",
                   item.action === "logout" && "logout",
                 ]
