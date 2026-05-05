@@ -14,7 +14,7 @@ import CommunityPlusDashboardLayout from "./components/Layout/Dashboard/Communit
 import CommunityPlusDashboardHome from "./pages/CommunityPlusDashboardHome/CommunityPlusDashboardHome";
 import CommunityPlusYellowPages from "./pages/CommunityPlusYellowPages/CommunityPlusYellowPages";
 import CommunityPlusUserProfile from "./pages/CommunityPlusUserProfile/CommunityPlusUserProfile";
-import PostComposer from "./components/PostComposer/PostComposer";
+import PostComposer from "./components/Layout/Sidebar/Post/PostComposer";
 
 function Placeholder({ title }) {
   return (
