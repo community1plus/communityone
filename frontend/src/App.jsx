@@ -10,6 +10,7 @@ import { SessionProvider } from "./context/sessionContext";
 
 /* PAGES */
 import CommunityPlusLandingPage from "./pages/CommunityPlusLandingPage/CommunityPlusLandingPage";
+import CommunityPlusAboutPage from "./pages/CommunityPlusAboutPage/CommunityPlusAboutPage";
 import CommunityPlusDashboardLayout from "./components/Layout/Dashboard/CommunityPlusDashboardLayout";
 import CommunityPlusDashboardHome from "./pages/CommunityPlusDashboardHome/CommunityPlusDashboardHome";
 import CommunityPlusYellowPages from "./pages/CommunityPlusYellowPages/CommunityPlusYellowPages";
@@ -86,10 +87,15 @@ export default function App() {
 
   return (
     <Routes>
+      {/* Public routes */}
       <Route element={<PublicOnlyRoute />}>
         <Route path="/" element={<CommunityPlusLandingPage />} />
       </Route>
 
+      {/* Public page available to everyone */}
+      <Route path="/about" element={<CommunityPlusAboutPage />} />
+
+      {/* Protected app routes */}
       <Route element={<ProtectedRoute />}>
         <Route element={<DashboardProviders />}>
           <Route element={<ProfileGate />}>
@@ -101,29 +107,22 @@ export default function App() {
 
               <Route path="profile" element={<CommunityPlusUserProfile />} />
 
-              <Route path="compose/now" element={<PostComposer mode="now" />} />
-              <Route path="compose/news" element={<PostComposer mode="news" />} />
-              <Route path="compose/blob" element={<PostComposer mode="blob" />} />
-              <Route path="compose/event" element={<PostComposer mode="event" />} />
-              <Route
-                path="compose/beacon"
-                element={<PostComposer mode="beacon" />}
-              />
+              <Route path="compose">
+                <Route path="now" element={<PostComposer mode="now" />} />
+                <Route path="news" element={<PostComposer mode="news" />} />
+                <Route path="blob" element={<PostComposer mode="blob" />} />
+                <Route path="event" element={<PostComposer mode="event" />} />
+                <Route path="beacon" element={<PostComposer mode="beacon" />} />
+              </Route>
 
-              <Route
-                path="yellowpages"
-                element={<CommunityPlusYellowPages />}
-              />
+              <Route path="yellowpages" element={<CommunityPlusYellowPages />} />
 
               <Route path="channels" element={<Placeholder title="Channels" />} />
               <Route path="account" element={<Placeholder title="Account" />} />
               <Route path="inbox" element={<Placeholder title="Inbox" />} />
               <Route path="help" element={<Placeholder title="Help" />} />
 
-              <Route
-                path="*"
-                element={<Navigate to="/communityplus" replace />}
-              />
+              <Route path="*" element={<Navigate to="/communityplus" replace />} />
             </Route>
           </Route>
         </Route>

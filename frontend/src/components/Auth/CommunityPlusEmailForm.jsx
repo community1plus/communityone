@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { signIn } from "aws-amplify/auth";
 import { useNavigate } from "react-router-dom";
 
@@ -8,34 +8,58 @@ export default function CommunityPlusEmailForm({ onSuccess }) {
   const navigate = useNavigate();
   const { refreshAuth } = useAuth();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const isMountedRef = useRef(true);
+  const submittingRef = useRef(false);
+
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
 
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState("");
 
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
+  const updateField = (field, value) => {
+    setFormData((current) => ({
+      ...current,
+      [field]: value,
+    }));
+  };
+
   const handleEmailLogin = async (event) => {
     event.preventDefault();
 
-    if (authLoading) return;
+    if (submittingRef.current) return;
 
+    submittingRef.current = true;
     setAuthLoading(true);
     setAuthError("");
 
     try {
+      const username = formData.email.trim();
+
       await signIn({
-        username: email.trim(),
-        password,
+        username,
+        password: formData.password,
       });
 
-      await refreshAuth({ forceRefresh: true });
+      await refreshAuth();
 
       onSuccess?.();
 
       navigate("/communityplus", { replace: true });
     } catch (err) {
+      if (!isMountedRef.current) return;
+
       setAuthError(err?.message || "Login failed");
       setAuthLoading(false);
+      submittingRef.current = false;
     }
   };
 
@@ -44,19 +68,19 @@ export default function CommunityPlusEmailForm({ onSuccess }) {
       <input
         type="email"
         placeholder="Email"
-        value={email}
+        value={formData.email}
         autoComplete="email"
         disabled={authLoading}
-        onChange={(event) => setEmail(event.target.value)}
+        onChange={(event) => updateField("email", event.target.value)}
       />
 
       <input
         type="password"
         placeholder="Password"
-        value={password}
+        value={formData.password}
         autoComplete="current-password"
         disabled={authLoading}
-        onChange={(event) => setPassword(event.target.value)}
+        onChange={(event) => updateField("password", event.target.value)}
       />
 
       <button type="submit" disabled={authLoading}>
@@ -64,11 +88,9 @@ export default function CommunityPlusEmailForm({ onSuccess }) {
       </button>
 
       {authLoading && (
-        <div className="auth-inline-loading">
-          Signing you in…
-        </div>
+        <div className="auth-inline-loading">Signing you in…</div>
       )}
-      console.log("onSuccess:", onSuccess);  
+
       {authError && <div className="error">{authError}</div>}
     </form>
   );
