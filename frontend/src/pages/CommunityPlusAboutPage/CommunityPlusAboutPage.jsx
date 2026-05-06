@@ -1,4 +1,4 @@
-import "./communityplus-about.css";
+import "./CommunityPlusAboutPage.css";
 
 export default function CommunityPlusAboutPage() {
   return (
