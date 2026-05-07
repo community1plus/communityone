@@ -15,12 +15,6 @@ import CommunityPlusYellowPages from "./pages/CommunityPlusYellowPages/Community
 import CommunityPlusUserProfile from "./pages/CommunityPlusUserProfile/CommunityPlusUserProfile";
 import PostComposer from "./components/Layout/Sidebar/Post/PostComposer";
 
-const PROFILE_BYPASS_ROUTES = [
-  "/communityplus/profile",
-  "/communityplus/about",
-  "/communityplus/help",
-];
-
 function Placeholder({ title }) {
   return (
     <div className="dashboard-view">
@@ -28,10 +22,6 @@ function Placeholder({ title }) {
       <p>{title} page coming soon.</p>
     </div>
   );
-}
-
-function PublicRoute() {
-  return <Outlet />;
 }
 
 function ProtectedRoute() {
@@ -50,16 +40,13 @@ function ProtectedRoute() {
 }
 
 function ProfileGate() {
-  const location = useLocation();
   const { profileReady, hasProfile } = useProfile();
-
-  const canBypassProfile = PROFILE_BYPASS_ROUTES.includes(location.pathname);
 
   if (!profileReady) {
     return <div style={{ padding: 40 }}>Loading profile...</div>;
   }
 
-  if (!hasProfile && !canBypassProfile) {
+  if (!hasProfile) {
     return <Navigate to="/communityplus/profile" replace />;
   }
 
@@ -83,22 +70,19 @@ function DashboardProviders() {
 export default function App() {
   return (
     <Routes>
-      {/* PUBLIC */}
-      <Route element={<PublicRoute />}>
-        <Route path="/" element={<CommunityPlusLandingPage />} />
-      </Route>
+      <Route path="/" element={<CommunityPlusLandingPage />} />
 
-      {/* PROTECTED DASHBOARD */}
       <Route element={<ProtectedRoute />}>
         <Route element={<DashboardProviders />}>
-          <Route element={<ProfileGate />}>
-            <Route
-              path="/communityplus"
-              element={<CommunityPlusDashboardLayout />}
-            >
+          <Route
+            path="/communityplus"
+            element={<CommunityPlusDashboardLayout />}
+          >
+            <Route path="about" element={<CommunityPlusAboutPage />} />
+            <Route path="profile" element={<CommunityPlusUserProfile />} />
+
+            <Route element={<ProfileGate />}>
               <Route index element={<CommunityPlusDashboardHome />} />
-              <Route path="about" element={<CommunityPlusAboutPage />} />
-              <Route path="profile" element={<CommunityPlusUserProfile />} />
               <Route path="yellowpages" element={<CommunityPlusYellowPages />} />
 
               <Route path="compose">
@@ -113,9 +97,9 @@ export default function App() {
               <Route path="account" element={<Placeholder title="Account" />} />
               <Route path="inbox" element={<Placeholder title="Inbox" />} />
               <Route path="help" element={<Placeholder title="Help" />} />
-
-              <Route path="*" element={<Navigate to="/communityplus" replace />} />
             </Route>
+
+            <Route path="*" element={<Navigate to="/communityplus" replace />} />
           </Route>
         </Route>
       </Route>
