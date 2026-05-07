@@ -19,10 +19,11 @@ export default function HeaderNav() {
   } = useLocationContext();
 
   const navItems = useMemo(() => {
-    const items =
-      NAVIGATION.find((item) => item.group === "main")?.items || [];
+    const mainNav = NAVIGATION.find((item) => item.group === "main");
 
-    return items.filter((item) => item.type === "route" && item.path);
+    return (mainNav?.items || []).filter(
+      (item) => item.type === "route" && item.path
+    );
   }, []);
 
   const isActive = useCallback(
@@ -31,6 +32,10 @@ export default function HeaderNav() {
 
       if (path === "/") {
         return routeLocation.pathname === "/";
+      }
+
+      if (path === "/communityplus") {
+        return routeLocation.pathname === "/communityplus";
       }
 
       return (

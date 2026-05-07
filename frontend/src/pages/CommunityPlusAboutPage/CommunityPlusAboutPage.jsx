@@ -23,28 +23,28 @@ export default function CommunityPlusAboutPage() {
           </h1>
 
           <p className="cp-about-lead">
-            Community One is a local-first digital platform designed to bring
-            people, businesses, creators, and communities together in one shared
-            space.
+            Community One is a local-first, global-second digital platform designed to bring
+            people, businesses, creators, and communities together in one shared space.
           </p>
 
           <p className="cp-about-body">
-            We believe the most important stories are often the ones happening
-            closest to home — local news, neighbourhood events, conversations,
-            businesses, creators, and everyday moments that shape community
+            The most important stories are often the ones happening
+            closest to home and shaping the global narrative - news, 
+            neighbourhood events, conversations, businesses, creators.
+            and everyday moments that shape our positions.
             life.
           </p>
 
           <p className="cp-about-body">
             Community One combines real-time updates, local discovery, media,
             business visibility, and community engagement into a single
-            experience built around people rather than algorithms.
+            experience built around people. 
           </p>
 
           <p className="cp-about-body">
-            Our goal is simple: create a platform where communities can connect,
+            The goal is simple: create a platform where communities can connect,
             share information, support local activity, and build stronger
-            digital spaces together.
+            digital spaces.
           </p>
         </div>
       </section>
