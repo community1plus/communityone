@@ -17,6 +17,12 @@ import CommunityPlusYellowPages from "./pages/CommunityPlusYellowPages/Community
 import CommunityPlusUserProfile from "./pages/CommunityPlusUserProfile/CommunityPlusUserProfile";
 import PostComposer from "./components/Layout/Sidebar/Post/PostComposer";
 
+const PUBLIC_DASHBOARD_ROUTES = [
+  "/communityplus/profile",
+  "/communityplus/about",
+  "/communityplus/help",
+];
+
 function Placeholder({ title }) {
   return (
     <div className="dashboard-view">
@@ -51,12 +57,7 @@ function ProfileGate() {
   const location = useLocation();
   const { profileReady, hasProfile } = useProfile();
 
-  const allowedWithoutProfile = [
-    "/communityplus/profile",
-    "/communityplus/about",
-  ];
-
-  const canAccessWithoutProfile = allowedWithoutProfile.includes(
+  const canAccessWithoutProfile = PUBLIC_DASHBOARD_ROUTES.includes(
     location.pathname
   );
 
@@ -108,8 +109,10 @@ export default function App() {
               element={<CommunityPlusDashboardLayout />}
             >
               <Route index element={<CommunityPlusDashboardHome />} />
+
               <Route path="about" element={<CommunityPlusAboutPage />} />
               <Route path="profile" element={<CommunityPlusUserProfile />} />
+              <Route path="yellowpages" element={<CommunityPlusYellowPages />} />
 
               <Route path="compose">
                 <Route path="now" element={<PostComposer mode="now" />} />
@@ -119,7 +122,6 @@ export default function App() {
                 <Route path="beacon" element={<PostComposer mode="beacon" />} />
               </Route>
 
-              <Route path="yellowpages" element={<CommunityPlusYellowPages />} />
               <Route path="channels" element={<Placeholder title="Channels" />} />
               <Route path="account" element={<Placeholder title="Account" />} />
               <Route path="inbox" element={<Placeholder title="Inbox" />} />
