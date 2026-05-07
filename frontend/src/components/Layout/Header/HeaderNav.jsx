@@ -25,8 +25,6 @@ export default function HeaderNav() {
     return items.filter((item) => item.type === "route" && item.path);
   }, []);
 
-  console.log("HEADER NAV ITEMS:", navItems);
-
   const isActive = useCallback(
     (path) => {
       if (!path) return false;
@@ -43,20 +41,11 @@ export default function HeaderNav() {
     [routeLocation.pathname]
   );
 
-  const go = useCallback(
+  const handleNavigation = useCallback(
     (path) => {
-      console.log("HEADER NAV CLICK:", {
-        currentPath: routeLocation.pathname,
-        targetPath: path,
-      });
-
-      if (!path) {
-        console.warn("Navigation blocked: missing path");
-        return;
-      }
+      if (!path) return;
 
       if (routeLocation.pathname === path) {
-        console.warn("Navigation blocked: already on route");
         return;
       }
 
@@ -68,16 +57,12 @@ export default function HeaderNav() {
   const handleManualLocationSet = useCallback(
     (nextManualLocation) => {
       if (!nextManualLocation) return;
-
-      console.log("MANUAL LOCATION SET:", nextManualLocation);
-
       setManualLocation(nextManualLocation);
     },
     [setManualLocation]
   );
 
   const handleAutoLocationSet = useCallback(() => {
-    console.log("AUTO LOCATION REQUESTED");
     useAutoLocation();
   }, [useAutoLocation]);
 
@@ -100,7 +85,7 @@ export default function HeaderNav() {
             key={item.id}
             type="button"
             className={`nav-item ${isActive(item.path) ? "active" : ""}`}
-            onClick={() => go(item.path)}
+            onClick={() => handleNavigation(item.path)}
           >
             {item.label}
           </button>

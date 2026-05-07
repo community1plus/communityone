@@ -51,13 +51,20 @@ function ProfileGate() {
   const location = useLocation();
   const { profileReady, hasProfile } = useProfile();
 
-  const isProfilePage = location.pathname === "/communityplus/profile";
+  const allowedWithoutProfile = [
+    "/communityplus/profile",
+    "/communityplus/about",
+  ];
+
+  const canAccessWithoutProfile = allowedWithoutProfile.includes(
+    location.pathname
+  );
 
   if (!profileReady) {
     return <div style={{ padding: 40 }}>Loading profile...</div>;
   }
 
-  if (!hasProfile && !isProfilePage) {
+  if (!hasProfile && !canAccessWithoutProfile) {
     return <Navigate to="/communityplus/profile" replace />;
   }
 
@@ -87,15 +94,12 @@ export default function App() {
 
   return (
     <Routes>
-      {/* Public routes */}
       <Route element={<PublicOnlyRoute />}>
         <Route path="/" element={<CommunityPlusLandingPage />} />
       </Route>
 
-      {/* Optional public About page */}
       <Route path="/about" element={<CommunityPlusAboutPage />} />
 
-      {/* Protected app routes */}
       <Route element={<ProtectedRoute />}>
         <Route element={<DashboardProviders />}>
           <Route element={<ProfileGate />}>
@@ -104,9 +108,7 @@ export default function App() {
               element={<CommunityPlusDashboardLayout />}
             >
               <Route index element={<CommunityPlusDashboardHome />} />
-
               <Route path="about" element={<CommunityPlusAboutPage />} />
-
               <Route path="profile" element={<CommunityPlusUserProfile />} />
 
               <Route path="compose">
@@ -118,7 +120,6 @@ export default function App() {
               </Route>
 
               <Route path="yellowpages" element={<CommunityPlusYellowPages />} />
-
               <Route path="channels" element={<Placeholder title="Channels" />} />
               <Route path="account" element={<Placeholder title="Account" />} />
               <Route path="inbox" element={<Placeholder title="Inbox" />} />
