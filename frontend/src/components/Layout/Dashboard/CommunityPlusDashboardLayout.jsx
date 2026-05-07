@@ -1,4 +1,4 @@
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 
 import Header from "../Header/Header";
 import CommunityPlusSidebar from "../Sidebar/CommunityPlusSidebar";
@@ -6,8 +6,6 @@ import CommunityPlusSidebar from "../Sidebar/CommunityPlusSidebar";
 import "./CommunityPlusDashboardLayout.css";
 
 export default function CommunityPlusDashboardLayout() {
-  const location = useLocation();
-
   return (
     <div className="dashboard-root">
       <header className="dashboard-header">
@@ -20,7 +18,7 @@ export default function CommunityPlusDashboardLayout() {
         </aside>
 
         <main className="dashboard-content">
-          <Outlet key={`${location.pathname}-${location.key}`} />
+          <Outlet />
         </main>
       </div>
     </div>

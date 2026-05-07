@@ -17,6 +17,12 @@ export const NAVIGATION = [
         type: "route",
         path: "/communityplus",
       },
+      {
+        id: "about",
+        label: "About Us",
+        type: "route",
+        path: "/about",
+      },
     ],
   },
 
@@ -26,9 +32,6 @@ export const NAVIGATION = [
   {
     group: "sidebar",
     sections: [
-      /* =========================
-         iVIEW (MODES ONLY)
-      ========================= */
       {
         id: "iview",
         title: "iVIEW",
@@ -77,9 +80,6 @@ export const NAVIGATION = [
         ],
       },
 
-      /* =========================
-         PLATFORM
-      ========================= */
       {
         id: "platform",
         title: "PLATFORM",
@@ -108,9 +108,6 @@ export const NAVIGATION = [
         ],
       },
 
-      /* =========================
-         ACCOUNT (MINIMAL)
-      ========================= */
       {
         id: "account",
         title: "ACCOUNT",
