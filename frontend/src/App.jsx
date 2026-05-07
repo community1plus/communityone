@@ -92,7 +92,7 @@ export default function App() {
         <Route path="/" element={<CommunityPlusLandingPage />} />
       </Route>
 
-      {/* Public page available to everyone */}
+      {/* Optional public About page */}
       <Route path="/about" element={<CommunityPlusAboutPage />} />
 
       {/* Protected app routes */}
@@ -104,6 +104,8 @@ export default function App() {
               element={<CommunityPlusDashboardLayout />}
             >
               <Route index element={<CommunityPlusDashboardHome />} />
+
+              <Route path="about" element={<CommunityPlusAboutPage />} />
 
               <Route path="profile" element={<CommunityPlusUserProfile />} />
 

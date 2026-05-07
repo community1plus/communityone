@@ -24,7 +24,7 @@ export const NAVIGATION = [
         id: "about",
         label: "About Us",
         type: "route",
-        path: "/about",
+        path: "/communityplus/about",
       },
     ],
   },
