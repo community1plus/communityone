@@ -1,53 +1,173 @@
-import "./CommunityPlusAboutPage.css";
-import aboutUsImage from "../../assets/images/branding/about_us.png";
+import { Routes, Route, Navigate, Outlet, useLocation } from "react-router-dom";
 
-export default function CommunityPlusAboutPage() {
+import { useAuth } from "./context/AuthContext";
+import { ProfileProvider, useProfile } from "./context/ProfileContext";
+
+/* CONTEXT */
+import { GoogleMapsProvider } from "./context/GoogleMapsProvider";
+import { MapProvider } from "./context/MapContext";
+import { SessionProvider } from "./context/sessionContext";
+
+/* PAGES */
+import CommunityPlusLandingPage from "./pages/CommunityPlusLandingPage/CommunityPlusLandingPage";
+import CommunityPlusAboutPage from "./pages/CommunityPlusAboutPage/CommunityPlusAboutPage";
+import CommunityPlusDashboardLayout from "./components/Layout/Dashboard/CommunityPlusDashboardLayout";
+import CommunityPlusDashboardHome from "./pages/CommunityPlusDashboardHome/CommunityPlusDashboardHome";
+import CommunityPlusYellowPages from "./pages/CommunityPlusYellowPages/CommunityPlusYellowPages";
+import CommunityPlusUserProfile from "./pages/CommunityPlusUserProfile/CommunityPlusUserProfile";
+import PostComposer from "./components/Layout/Sidebar/Post/PostComposer";
+
+const PUBLIC_DASHBOARD_ROUTES = [
+  "/communityplus/profile",
+  "/communityplus/about",
+  "/communityplus/help",
+];
+
+function Placeholder({ title }) {
   return (
-    <main className="cp-about-page">
-      <section className="cp-about-hero">
-        <div className="cp-about-imageWrap">
-          <img
-            src={aboutUsImage}
-            alt="Community One community gathering"
-            className="cp-about-image"
-          />
-        </div>
+    <div className="dashboard-view">
+      <h1>{title}</h1>
+      <p>{title} page coming soon.</p>
+    </div>
+  );
+}
 
-        <div className="cp-about-content">
-          <p className="cp-about-kicker">About Community One</p>
+function PublicOnlyRoute() {
+  const { isAuthenticated } = useAuth();
 
-          <h1>
-            Built for communities.
-            <br />
-            Powered by people.
-          </h1>
+  if (isAuthenticated) {
+    return <Navigate to="/communityplus" replace />;
+  }
 
-          <p className="cp-about-lead">
-            Community One is a local-first digital platform designed to bring
-            people, businesses, creators, and communities together in one shared
-            space.
-          </p>
+  return <Outlet />;
+}
 
-          <p className="cp-about-body">
-            We believe the most important stories are often the ones happening
-            closest to home — local news, neighbourhood events, conversations,
-            businesses, creators, and everyday moments that shape community
-            life.
-          </p>
+function ProtectedRoute() {
+  const location = useLocation();
+  const { isAuthenticated } = useAuth();
 
-          <p className="cp-about-body">
-            Community One combines real-time updates, local discovery, media,
-            business visibility, and community engagement into a single
-            experience built around people rather than algorithms.
-          </p>
+  if (!isAuthenticated) {
+    return <Navigate to="/" replace state={{ from: location }} />;
+  }
 
-          <p className="cp-about-body">
-            Our goal is simple: create a platform where communities can connect,
-            share information, support local activity, and build stronger
-            digital spaces together.
-          </p>
-        </div>
-      </section>
-    </main>
+  return <Outlet />;
+}
+
+function ProfileGate() {
+  const location = useLocation();
+  const { profileReady, hasProfile } = useProfile();
+
+  const canAccessWithoutProfile = PUBLIC_DASHBOARD_ROUTES.includes(
+    location.pathname
+  );
+
+  if (!profileReady) {
+    return <div style={{ padding: 40 }}>Loading profile...</div>;
+  }
+
+  if (!hasProfile && !canAccessWithoutProfile) {
+    return <Navigate to="/communityplus/profile" replace />;
+  }
+
+  return <Outlet />;
+}
+
+function DashboardProviders() {
+  return (
+    <GoogleMapsProvider>
+      <MapProvider>
+        <SessionProvider>
+          <ProfileProvider>
+            <Outlet />
+          </ProfileProvider>
+        </SessionProvider>
+      </MapProvider>
+    </GoogleMapsProvider>
+  );
+}
+
+export default function App() {
+  const { loading } = useAuth();
+
+  if (loading) {
+    return <div style={{ padding: 40 }}>Initialising...</div>;
+  }
+
+  return (
+    <Routes>
+      {/* PUBLIC */}
+      <Route element={<PublicOnlyRoute />}>
+        <Route path="/" element={<CommunityPlusLandingPage />} />
+      </Route>
+
+      {/* PROTECTED */}
+      <Route element={<ProtectedRoute />}>
+        <Route element={<DashboardProviders />}>
+          <Route element={<ProfileGate />}>
+            <Route
+              path="/communityplus"
+              element={<CommunityPlusDashboardLayout />}
+            >
+              {/* DASHBOARD HOME */}
+              <Route index element={<CommunityPlusDashboardHome />} />
+
+              {/* ABOUT */}
+              <Route path="about" element={<CommunityPlusAboutPage />} />
+
+              {/* PROFILE */}
+              <Route
+                path="profile"
+                element={<CommunityPlusUserProfile />}
+              />
+
+              {/* YELLOW PAGES */}
+              <Route
+                path="yellowpages"
+                element={<CommunityPlusYellowPages />}
+              />
+
+              {/* COMPOSER */}
+              <Route path="compose">
+                <Route path="now" element={<PostComposer mode="now" />} />
+                <Route path="news" element={<PostComposer mode="news" />} />
+                <Route path="blob" element={<PostComposer mode="blob" />} />
+                <Route path="event" element={<PostComposer mode="event" />} />
+                <Route path="beacon" element={<PostComposer mode="beacon" />} />
+              </Route>
+
+              {/* PLACEHOLDERS */}
+              <Route
+                path="channels"
+                element={<Placeholder title="Channels" />}
+              />
+
+              <Route
+                path="account"
+                element={<Placeholder title="Account" />}
+              />
+
+              <Route
+                path="inbox"
+                element={<Placeholder title="Inbox" />}
+              />
+
+              <Route
+                path="help"
+                element={<Placeholder title="Help" />}
+              />
+
+              {/* FALLBACK */}
+              <Route
+                path="*"
+                element={<Navigate to="/communityplus" replace />}
+              />
+            </Route>
+          </Route>
+        </Route>
+      </Route>
+
+      {/* GLOBAL FALLBACK */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }
