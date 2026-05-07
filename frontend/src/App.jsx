@@ -95,12 +95,12 @@ export default function App() {
 
   return (
     <Routes>
+      {/* PUBLIC */}
       <Route element={<PublicOnlyRoute />}>
         <Route path="/" element={<CommunityPlusLandingPage />} />
       </Route>
 
-      <Route path="/about" element={<CommunityPlusAboutPage />} />
-
+      {/* PROTECTED */}
       <Route element={<ProtectedRoute />}>
         <Route element={<DashboardProviders />}>
           <Route element={<ProfileGate />}>
@@ -108,11 +108,25 @@ export default function App() {
               path="/communityplus"
               element={<CommunityPlusDashboardLayout />}
             >
+              {/* DASHBOARD HOME */}
               <Route index element={<CommunityPlusDashboardHome />} />
 
-              <Route path="profile" element={<CommunityPlusUserProfile />} />
-              <Route path="yellowpages" element={<CommunityPlusYellowPages />} />
+              {/* ABOUT */}
+              <Route path="about" element={<CommunityPlusAboutPage />} />
 
+              {/* PROFILE */}
+              <Route
+                path="profile"
+                element={<CommunityPlusUserProfile />}
+              />
+
+              {/* YELLOW PAGES */}
+              <Route
+                path="yellowpages"
+                element={<CommunityPlusYellowPages />}
+              />
+
+              {/* COMPOSER */}
               <Route path="compose">
                 <Route path="now" element={<PostComposer mode="now" />} />
                 <Route path="news" element={<PostComposer mode="news" />} />
@@ -121,17 +135,38 @@ export default function App() {
                 <Route path="beacon" element={<PostComposer mode="beacon" />} />
               </Route>
 
-              <Route path="channels" element={<Placeholder title="Channels" />} />
-              <Route path="account" element={<Placeholder title="Account" />} />
-              <Route path="inbox" element={<Placeholder title="Inbox" />} />
-              <Route path="help" element={<Placeholder title="Help" />} />
+              {/* PLACEHOLDERS */}
+              <Route
+                path="channels"
+                element={<Placeholder title="Channels" />}
+              />
 
-              <Route path="*" element={<Navigate to="/communityplus" replace />} />
+              <Route
+                path="account"
+                element={<Placeholder title="Account" />}
+              />
+
+              <Route
+                path="inbox"
+                element={<Placeholder title="Inbox" />}
+              />
+
+              <Route
+                path="help"
+                element={<Placeholder title="Help" />}
+              />
+
+              {/* FALLBACK */}
+              <Route
+                path="*"
+                element={<Navigate to="/communityplus" replace />}
+              />
             </Route>
           </Route>
         </Route>
       </Route>
 
+      {/* GLOBAL FALLBACK */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
