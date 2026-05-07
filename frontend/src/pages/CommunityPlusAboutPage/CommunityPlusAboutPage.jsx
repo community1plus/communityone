@@ -32,7 +32,6 @@ export default function CommunityPlusAboutPage() {
             closest to home and shaping the global narrative - news, 
             neighbourhood events, conversations, businesses, creators.
             and everyday moments that shape our positions.
-            life.
           </p>
 
           <p className="cp-about-body">
