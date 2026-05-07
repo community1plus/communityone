@@ -1,6 +1,7 @@
 export const NAVIGATION = [
   {
     group: "main",
+
     items: [
       {
         id: "home",
@@ -8,18 +9,21 @@ export const NAVIGATION = [
         type: "route",
         path: "/",
       },
+
       {
         id: "iview",
         label: "iVIEW",
         type: "route",
         path: "/communityplus",
       },
+
       {
         id: "yellowpages",
         label: "Yellow Pages",
         type: "route",
         path: "/communityplus/yellowpages",
       },
+
       {
         id: "about",
         label: "About Us",
@@ -31,58 +35,68 @@ export const NAVIGATION = [
 
   {
     group: "sidebar",
+
     sections: [
       {
         id: "iview",
+
         title: "iVIEW",
+
         variant: "modes",
+
         items: [
           {
             id: "compose-now",
             label: "NOW",
             icon: "⚡",
             type: "compose",
-            path: "/communityplus/compose/now",
             mode: "now",
+            path: "/communityplus/compose/now",
           },
+
           {
             id: "compose-news",
             label: "News",
             icon: "📰",
             type: "compose",
-            path: "/communityplus/compose/news",
             mode: "news",
+            path: "/communityplus/compose/news",
           },
+
           {
             id: "compose-blob",
             label: "BLOB",
             icon: "🧠",
             type: "compose",
-            path: "/communityplus/compose/blob",
             mode: "blob",
+            path: "/communityplus/compose/blob",
           },
+
           {
             id: "compose-event",
             label: "Events",
             icon: "📅",
             type: "compose",
-            path: "/communityplus/compose/event",
             mode: "event",
+            path: "/communityplus/compose/event",
           },
+
           {
             id: "compose-beacon",
             label: "Beacon",
             icon: "📡",
             type: "compose",
-            path: "/communityplus/compose/beacon",
             mode: "beacon",
+            path: "/communityplus/compose/beacon",
           },
         ],
       },
 
       {
         id: "platform",
+
         title: "PLATFORM",
+
         items: [
           {
             id: "yellowpages",
@@ -91,6 +105,7 @@ export const NAVIGATION = [
             type: "route",
             path: "/communityplus/yellowpages",
           },
+
           {
             id: "channels",
             label: "Channels",
@@ -98,6 +113,7 @@ export const NAVIGATION = [
             type: "route",
             path: "/communityplus/channels",
           },
+
           {
             id: "helpdesk",
             label: "Helpdesk",
@@ -105,12 +121,22 @@ export const NAVIGATION = [
             type: "route",
             path: "/communityplus/help",
           },
+
+          {
+            id: "about-platform",
+            label: "About Community One",
+            icon: "ℹ️",
+            type: "route",
+            path: "/communityplus/about",
+          },
         ],
       },
 
       {
         id: "account",
+
         title: "ACCOUNT",
+
         items: [
           {
             id: "logout",
