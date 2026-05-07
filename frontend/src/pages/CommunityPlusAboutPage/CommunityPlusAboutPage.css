@@ -1,10 +1,19 @@
 .cp-about-page {
   min-height: 100%;
   padding: 32px;
+
   background: #f5f7fa;
   color: #111827;
-  font-family: inherit;
+
   overflow: hidden;
+
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
 }
 
 .cp-about-page * {
@@ -16,77 +25,108 @@
   width: 100%;
   max-width: 1320px;
   height: calc(100vh - 220px);
+
   margin: 0 auto;
+
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(380px, 0.85fr);
   gap: 48px;
+
   align-items: center;
 }
 
 .cp-about-imageWrap {
   width: 100%;
   height: 520px;
+
   overflow: hidden;
+
   border-radius: 24px;
   background: #ffffff;
+
   box-shadow: 0 18px 44px rgba(15, 23, 42, 0.1);
 }
 
 .cp-about-image {
   width: 100%;
   height: 100%;
+
   display: block;
+
   object-fit: cover;
 }
 
 .cp-about-content {
   width: 100%;
   max-width: 560px;
+
   display: flex;
   flex-direction: column;
+  justify-content: center;
+
   z-index: 2;
 }
 
 .cp-about-kicker {
-  margin: 0 0 12px;
+  margin: 0 0 14px;
+
   font-size: 0.78rem;
   font-weight: 800;
-  letter-spacing: 0.16em;
+
+  letter-spacing: 0.18em;
   text-transform: uppercase;
+
   color: #c62828;
 }
 
+.cp-community-one {
+  color: #d32f2f;
+  font-weight: 700;
+}
+
 .cp-about-content h1 {
-  margin: 0 0 20px;
-  font-size: clamp(2.5rem, 4vw, 4.4rem);
-  line-height: 0.98;
+  margin: 0 0 24px;
+
+  font-size: clamp(2.8rem, 4vw, 4.8rem);
+  line-height: 0.96;
+
   font-weight: 800;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.05em;
+
   color: #111827;
 }
 
 .cp-about-lead {
-  margin: 0 0 16px;
-  font-size: 1.05rem;
-  line-height: 1.65;
-  color: #1f2937;
+  margin: 0 0 18px;
+
+  font-size: 1.06rem;
+  line-height: 1.75;
+
+  font-weight: 500;
+  color: #374151;
 }
 
 .cp-about-body {
-  margin: 0 0 12px;
-  font-size: 0.95rem;
-  line-height: 1.65;
+  margin: 0 0 14px;
+
+  font-size: 0.98rem;
+  line-height: 1.8;
+
+  font-weight: 400;
   color: #4b5563;
 }
 
 @media (max-width: 1100px) {
   .cp-about-page {
     overflow: auto;
+    padding: 24px;
   }
 
   .cp-about-hero {
     height: auto;
+
     grid-template-columns: 1fr;
+    gap: 32px;
   }
 
   .cp-about-imageWrap {
@@ -95,5 +135,29 @@
 
   .cp-about-content {
     max-width: 760px;
+  }
+
+  .cp-about-content h1 {
+    font-size: clamp(2.4rem, 8vw, 4rem);
+  }
+}
+
+@media (max-width: 640px) {
+  .cp-about-page {
+    padding: 18px;
+  }
+
+  .cp-about-imageWrap {
+    height: 320px;
+    border-radius: 18px;
+  }
+
+  .cp-about-content h1 {
+    line-height: 1;
+  }
+
+  .cp-about-lead,
+  .cp-about-body {
+    font-size: 0.95rem;
   }
 }
