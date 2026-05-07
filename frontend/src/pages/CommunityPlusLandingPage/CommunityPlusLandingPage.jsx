@@ -1,5 +1,5 @@
 import "./CommunityPlusLandingPage.css";  
-import echoImage from "../../assets/images/branding/echo.jpg";
+import echoImage from "../../assets/
 
 export default function CommunityPlusAboutPage() {
   return (
