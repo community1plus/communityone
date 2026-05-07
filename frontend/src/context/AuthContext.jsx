@@ -47,7 +47,7 @@ function normaliseUser(amplifyUser, tokens) {
 }
 
 export function AuthProvider({ children }) {
-  const mountedRef = useRef(true);
+  const mountedRef = useRef(false);
 
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
@@ -70,7 +70,7 @@ export function AuthProvider({ children }) {
       }
 
       try {
-        let amplifyUser = null;
+        let amplifyUser;
 
         try {
           amplifyUser = await getCurrentUser();
@@ -89,7 +89,9 @@ export function AuthProvider({ children }) {
 
         const normalisedUser = normaliseUser(amplifyUser, session.tokens);
 
-        if (!mountedRef.current) return normalisedUser;
+        if (!mountedRef.current) {
+          return normalisedUser;
+        }
 
         setUser(normalisedUser);
         setToken(accessToken);
@@ -97,7 +99,10 @@ export function AuthProvider({ children }) {
 
         return normalisedUser;
       } catch (err) {
-        console.warn("Auth refresh skipped:", err?.name || err?.message || err);
+        if (err?.name !== "UserUnAuthenticatedException") {
+          console.warn("Auth refresh skipped:", err?.name || err?.message || err);
+        }
+
         clearAuth();
         return null;
       } finally {
@@ -114,7 +119,7 @@ export function AuthProvider({ children }) {
 
     async function initAuth() {
       try {
-        const currentUser = await refreshAuth({ forceRefresh: false });
+        const currentUser = await refreshAuth();
 
         if (currentUser) {
           console.log("✅ Auth restored:", currentUser.displayName);
@@ -163,6 +168,7 @@ export function AuthProvider({ children }) {
       login,
       logout,
       refreshAuth,
+      clearAuth,
     }),
     [
       user,
@@ -174,6 +180,7 @@ export function AuthProvider({ children }) {
       login,
       logout,
       refreshAuth,
+      clearAuth,
     ]
   );
 
