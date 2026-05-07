@@ -20,7 +20,7 @@ export default function CommunityPlusDashboardLayout() {
         </aside>
 
         <main className="dashboard-content">
-          <Outlet key={location.pathname} />
+          <Outlet key={`${location.pathname}-${location.key}`} />
         </main>
       </div>
     </div>
