@@ -1,5 +1,5 @@
 import "./CommunityPlusAboutPage.css";
-import aboutUsImage from "../../assets/images/branding/about_us.png";
+import aboutUsImage from "../../assets/images/branding/about-us.png";
 
 export default function CommunityPlusAboutPage() {
   return (
