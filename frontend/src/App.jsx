@@ -110,7 +110,6 @@ export default function App() {
             >
               <Route index element={<CommunityPlusDashboardHome />} />
 
-              <Route path="about" element={<CommunityPlusAboutPage />} />
               <Route path="profile" element={<CommunityPlusUserProfile />} />
               <Route path="yellowpages" element={<CommunityPlusYellowPages />} />
 
