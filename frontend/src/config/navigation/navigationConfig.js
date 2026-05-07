@@ -20,6 +20,12 @@ export const NAVIGATION = [
         type: "route",
         path: "/communityplus/yellowpages",
       },
+      {
+        id: "about",
+        label: "About Us",
+        type: "route",
+        path: "/about",
+      },
     ],
   },
 
