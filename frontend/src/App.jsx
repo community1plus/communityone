@@ -1,7 +1,6 @@
-import { Routes, Route, Navigate, Outlet, useLocation } from "react-router-dom";
+import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 
-import { useAuth } from "./context/AuthContext";
-import { ProfileProvider, useProfile } from "./context/ProfileContext";
+import { ProfileProvider } from "./context/ProfileContext";
 
 import { GoogleMapsProvider } from "./context/GoogleMapsProvider";
 import { MapProvider } from "./context/MapContext";
@@ -24,35 +23,6 @@ function Placeholder({ title }) {
   );
 }
 
-function ProtectedRoute() {
-  const location = useLocation();
-  const { isAuthenticated, loading } = useAuth();
-
-  if (loading) {
-    return <div style={{ padding: 40 }}>Checking session...</div>;
-  }
-
-  if (!isAuthenticated) {
-    return <Navigate to="/" replace state={{ from: location }} />;
-  }
-
-  return <Outlet />;
-}
-
-function ProfileGate() {
-  const { profileReady, hasProfile } = useProfile();
-
-  if (!profileReady) {
-    return <div style={{ padding: 40 }}>Loading profile...</div>;
-  }
-
-  if (!hasProfile) {
-    return <Navigate to="/communityplus/profile" replace />;
-  }
-
-  return <Outlet />;
-}
-
 function DashboardProviders() {
   return (
     <GoogleMapsProvider>
@@ -72,42 +42,33 @@ export default function App() {
     <Routes>
       <Route path="/" element={<CommunityPlusLandingPage />} />
 
-      <Route element={<ProtectedRoute />}>
-        <Route element={<DashboardProviders />}>
-          <Route
-            path="/communityplus"
-            element={<CommunityPlusDashboardLayout />}
-          >
-            <Route
-  path="about"
-  element={
-    <div style={{ padding: 40 }}>
-      <h1>About test route loaded</h1>
-    </div>
-  }
-/>
-            <Route path="profile" element={<CommunityPlusUserProfile />} />
+      <Route element={<DashboardProviders />}>
+        <Route
+          path="/communityplus"
+          element={<CommunityPlusDashboardLayout />}
+        >
+          <Route index element={<CommunityPlusDashboardHome />} />
 
-            <Route element={<ProfileGate />}>
-              <Route index element={<CommunityPlusDashboardHome />} />
-              <Route path="yellowpages" element={<CommunityPlusYellowPages />} />
+          <Route path="about" element={<CommunityPlusAboutPage />} />
 
-              <Route path="compose">
-                <Route path="now" element={<PostComposer mode="now" />} />
-                <Route path="news" element={<PostComposer mode="news" />} />
-                <Route path="blob" element={<PostComposer mode="blob" />} />
-                <Route path="event" element={<PostComposer mode="event" />} />
-                <Route path="beacon" element={<PostComposer mode="beacon" />} />
-              </Route>
+          <Route path="profile" element={<CommunityPlusUserProfile />} />
 
-              <Route path="channels" element={<Placeholder title="Channels" />} />
-              <Route path="account" element={<Placeholder title="Account" />} />
-              <Route path="inbox" element={<Placeholder title="Inbox" />} />
-              <Route path="help" element={<Placeholder title="Help" />} />
-            </Route>
+          <Route path="yellowpages" element={<CommunityPlusYellowPages />} />
 
-            <Route path="*" element={<Navigate to="/communityplus" replace />} />
+          <Route path="compose">
+            <Route path="now" element={<PostComposer mode="now" />} />
+            <Route path="news" element={<PostComposer mode="news" />} />
+            <Route path="blob" element={<PostComposer mode="blob" />} />
+            <Route path="event" element={<PostComposer mode="event" />} />
+            <Route path="beacon" element={<PostComposer mode="beacon" />} />
           </Route>
+
+          <Route path="channels" element={<Placeholder title="Channels" />} />
+          <Route path="account" element={<Placeholder title="Account" />} />
+          <Route path="inbox" element={<Placeholder title="Inbox" />} />
+          <Route path="help" element={<Placeholder title="Help" />} />
+
+          <Route path="*" element={<Navigate to="/communityplus" replace />} />
         </Route>
       </Route>
 
