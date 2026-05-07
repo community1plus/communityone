@@ -78,7 +78,14 @@ export default function App() {
             path="/communityplus"
             element={<CommunityPlusDashboardLayout />}
           >
-            <Route path="about" element={<CommunityPlusAboutPage />} />
+            <Route
+  path="about"
+  element={
+    <div style={{ padding: 40 }}>
+      <h1>About test route loaded</h1>
+    </div>
+  }
+/>
             <Route path="profile" element={<CommunityPlusUserProfile />} />
 
             <Route element={<ProfileGate />}>
