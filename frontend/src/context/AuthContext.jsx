@@ -5,6 +5,7 @@ import {
   useState,
   useCallback,
   useMemo,
+  useRef,
 } from "react";
 
 import {
@@ -46,6 +47,8 @@ function normaliseUser(amplifyUser, tokens) {
 }
 
 export function AuthProvider({ children }) {
+  const mountedRef = useRef(true);
+
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [tokens, setTokens] = useState(null);
@@ -53,61 +56,71 @@ export function AuthProvider({ children }) {
   const [hydrating, setHydrating] = useState(false);
 
   const clearAuth = useCallback(() => {
+    if (!mountedRef.current) return;
+
     setUser(null);
     setToken(null);
     setTokens(null);
   }, []);
 
-  const refreshAuth = useCallback(async ({ forceRefresh = false } = {}) => {
-    setHydrating(true);
-
-    try {
-      const amplifyUser = await getCurrentUser();
-
-      const session = await fetchAuthSession({ forceRefresh });
-      const accessToken = session.tokens?.accessToken?.toString();
-
-      if (!accessToken) {
-        clearAuth();
-        return null;
+  const refreshAuth = useCallback(
+    async ({ forceRefresh = false } = {}) => {
+      if (mountedRef.current) {
+        setHydrating(true);
       }
 
-      const normalisedUser = normaliseUser(amplifyUser, session.tokens);
+      try {
+        let amplifyUser = null;
 
-      setUser(normalisedUser);
-      setToken(accessToken);
-      setTokens(session.tokens);
+        try {
+          amplifyUser = await getCurrentUser();
+        } catch {
+          clearAuth();
+          return null;
+        }
 
-      return normalisedUser;
-    } catch (err) {
-      console.error("❌ Auth refresh failed:", err);
-      clearAuth();
-      return null;
-    } finally {
-      setHydrating(false);
-    }
-  }, [clearAuth]);
+        const session = await fetchAuthSession({ forceRefresh });
+        const accessToken = session.tokens?.accessToken?.toString();
+
+        if (!accessToken) {
+          clearAuth();
+          return null;
+        }
+
+        const normalisedUser = normaliseUser(amplifyUser, session.tokens);
+
+        if (!mountedRef.current) return normalisedUser;
+
+        setUser(normalisedUser);
+        setToken(accessToken);
+        setTokens(session.tokens);
+
+        return normalisedUser;
+      } catch (err) {
+        console.warn("Auth refresh skipped:", err?.name || err?.message || err);
+        clearAuth();
+        return null;
+      } finally {
+        if (mountedRef.current) {
+          setHydrating(false);
+        }
+      }
+    },
+    [clearAuth]
+  );
 
   useEffect(() => {
-    let mounted = true;
+    mountedRef.current = true;
 
     async function initAuth() {
       try {
-        const currentUser = await refreshAuth();
-
-        if (!mounted) return;
+        const currentUser = await refreshAuth({ forceRefresh: false });
 
         if (currentUser) {
           console.log("✅ Auth restored:", currentUser.displayName);
         }
-      } catch (err) {
-        console.error("❌ Auth init failed:", err);
-
-        if (mounted) {
-          clearAuth();
-        }
       } finally {
-        if (mounted) {
+        if (mountedRef.current) {
           setLoading(false);
         }
       }
@@ -116,9 +129,9 @@ export function AuthProvider({ children }) {
     initAuth();
 
     return () => {
-      mounted = false;
+      mountedRef.current = false;
     };
-  }, [refreshAuth, clearAuth]);
+  }, [refreshAuth]);
 
   const login = useCallback(async () => {
     await signInWithRedirect();
@@ -127,9 +140,11 @@ export function AuthProvider({ children }) {
   const logout = useCallback(async () => {
     try {
       await signOut({ global: true });
+    } catch (err) {
+      console.warn("Logout warning:", err?.message || err);
     } finally {
       clearAuth();
-      window.location.replace("/");
+      window.location.assign("/");
     }
   }, [clearAuth]);
 
