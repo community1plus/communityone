@@ -1,4 +1,10 @@
-import React, { useMemo, useState, useCallback, useRef } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { GoogleMap, Marker } from "@react-google-maps/api";
 
 import { useMap } from "../../context/MapContext";
@@ -35,52 +41,138 @@ const CATEGORIES = [
   { id: "store", label: "Shops" },
 ];
 
-const MARKET_TICKER = [
+const DEFAULT_MARKET_TICKER = [
   {
     symbol: "ASX 200",
     label: "Australia",
-    value: "+0.42%",
+    price: "—",
+    change: "+0.42%",
     direction: "up",
   },
   {
-    symbol: "Retail",
-    label: "Local sector",
-    value: "+0.18%",
+    symbol: "CBA.AX",
+    label: "CBA",
+    price: "—",
+    change: "+0.31%",
     direction: "up",
   },
   {
-    symbol: "Hospitality",
-    label: "Local sector",
-    value: "-0.11%",
+    symbol: "BHP.AX",
+    label: "BHP",
+    price: "—",
+    change: "-0.22%",
     direction: "down",
   },
   {
     symbol: "AUD/USD",
-    label: "Currency",
-    value: "+0.09%",
+    label: "AUD/USD",
+    price: "—",
+    change: "+0.09%",
     direction: "up",
   },
   {
-    symbol: "Local Activity",
-    label: "Community One",
-    value: "LIVE",
+    symbol: "BTC/USD",
+    label: "Bitcoin",
+    price: "—",
+    change: "LIVE",
     direction: "neutral",
   },
 ];
 
+const TWELVE_DATA_SYMBOLS = ["AAPL", "MSFT", "AUD/USD", "BTC/USD"];
+
+function formatTickerItem(item) {
+  const percentChange = Number(item?.percent_change ?? 0);
+  const direction = percentChange > 0 ? "up" : percentChange < 0 ? "down" : "neutral";
+
+  return {
+    symbol: item?.symbol || "UNKNOWN",
+    label: item?.name || item?.symbol || "Market",
+    price: item?.close || item?.price || "—",
+    change:
+      Number.isFinite(percentChange) && item?.percent_change !== undefined
+        ? `${percentChange >= 0 ? "+" : ""}${percentChange.toFixed(2)}%`
+        : "—",
+    direction,
+  };
+}
+
+async function fetchLiveTicker() {
+  const apiKey = import.meta.env.VITE_TWELVEDATA_API_KEY;
+
+  if (!apiKey) {
+    return [];
+  }
+
+  const requests = TWELVE_DATA_SYMBOLS.map(async (symbol) => {
+    const url = `https://api.twelvedata.com/quote?symbol=${encodeURIComponent(
+      symbol
+    )}&apikey=${apiKey}`;
+
+    const res = await fetch(url);
+
+    if (!res.ok) {
+      throw new Error(`Ticker request failed for ${symbol}`);
+    }
+
+    return res.json();
+  });
+
+  const results = await Promise.all(requests);
+
+  return results
+    .filter((item) => !item?.code && !item?.message)
+    .map(formatTickerItem);
+}
+
 function MarketTicker({ businessCount }) {
-  const tickerItems = useMemo(
-    () => [
-      ...MARKET_TICKER,
+  const [liveTicker, setLiveTicker] = useState([]);
+  const [tickerError, setTickerError] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadTicker() {
+      try {
+        const data = await fetchLiveTicker();
+
+        if (!cancelled && data.length) {
+          setLiveTicker(data);
+          setTickerError(false);
+        }
+      } catch (err) {
+        console.warn("Market ticker fallback:", err?.message || err);
+
+        if (!cancelled) {
+          setTickerError(true);
+        }
+      }
+    }
+
+    loadTicker();
+
+    const intervalId = window.setInterval(loadTicker, 60_000);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(intervalId);
+    };
+  }, []);
+
+  const tickerItems = useMemo(() => {
+    const source = liveTicker.length ? liveTicker : DEFAULT_MARKET_TICKER;
+
+    return [
+      ...source,
       {
         symbol: "Businesses",
         label: "Nearby",
-        value: businessCount,
+        price: businessCount,
+        change: tickerError ? "DELAYED" : "LIVE",
         direction: "neutral",
       },
-    ],
-    [businessCount]
-  );
+    ];
+  }, [businessCount, liveTicker, tickerError]);
 
   return (
     <section className="yp-stock-ticker" aria-label="Market ticker">
@@ -88,11 +180,11 @@ function MarketTicker({ businessCount }) {
         {[...tickerItems, ...tickerItems].map((item, index) => (
           <span
             className="yp-stock-item"
-            key={`${item.symbol}-${item.value}-${index}`}
+            key={`${item.symbol}-${item.change}-${index}`}
           >
-            <strong>{item.symbol}</strong>
-            <small>{item.label}</small>
-            <em className={item.direction}>{item.value}</em>
+            <strong>{item.label}</strong>
+            <small>{item.price}</small>
+            <em className={item.direction}>{item.change}</em>
           </span>
         ))}
       </div>
