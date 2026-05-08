@@ -1,4 +1,14 @@
 .yellowpages-page {
+  --yp-font:
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Arial,
+    sans-serif;
+
   height: 100%;
   min-height: 0;
   display: flex;
@@ -6,64 +16,84 @@
   overflow: hidden;
   background: #f5f7fa;
   color: #111827;
-  font-family: inherit;
+  font-family: var(--yp-font) !important;
 }
 
 .yellowpages-page * {
   box-sizing: border-box;
-  font-family: inherit;
+  font-family: var(--yp-font) !important;
 }
 
 /* =========================
-   STOCK TICKER
+   YAHOO-STYLE STOCK TICKER
 ========================= */
 
 .yp-stock-ticker,
 .yellowpages-ticker {
-  height: 42px;
+  height: 40px;
   flex-shrink: 0;
   overflow: hidden;
   display: flex;
   align-items: center;
-  background: #111827;
+  background: #240046;
   color: #ffffff;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .yp-stock-track,
 .ticker-track {
   display: flex;
+  align-items: center;
   width: max-content;
-  animation: ypTickerScroll 32s linear infinite;
+  animation: ypTickerScroll 36s linear infinite;
 }
 
+.yp-stock-item,
 .yp-stock-track span,
 .ticker-item {
   display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 0 26px;
+  align-items: baseline;
+  gap: 7px;
+  padding: 0 22px;
   white-space: nowrap;
-  font-size: 0.86rem;
-  font-weight: 800;
+  font-size: 0.84rem;
+  line-height: 1;
+  font-weight: 700;
 }
 
-.ticker-item strong,
+.yp-stock-item strong,
+.ticker-item strong {
+  font-size: 0.84rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.yp-stock-item small {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.yp-stock-item em,
 .ticker-item em {
-  font-weight: 800;
+  font-size: 0.8rem;
   font-style: normal;
+  font-weight: 800;
 }
 
+.yp-stock-item em.up,
 .ticker-item .up {
-  color: #4ade80;
+  color: #00c853;
 }
 
+.yp-stock-item em.down,
 .ticker-item .down {
-  color: #f87171;
+  color: #ff5252;
 }
 
+.yp-stock-item em.neutral,
 .ticker-item .neutral {
-  color: #facc15;
+  color: #ffd54f;
 }
 
 @keyframes ypTickerScroll {
@@ -84,7 +114,7 @@
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: minmax(360px, 460px) minmax(0, 1fr);
+  grid-template-columns: minmax(360px, 440px) minmax(0, 1fr);
 }
 
 /* =========================
@@ -94,7 +124,7 @@
 .yellowpages-feed {
   min-height: 0;
   overflow-y: auto;
-  padding: 24px;
+  padding: 22px;
   background: #ffffff;
   border-right: 1px solid #e5e7eb;
 }
@@ -111,17 +141,17 @@
 .yp-kicker,
 .feed-kicker {
   margin: 0 0 6px;
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: 800;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #d71920;
+  color: #5f01d1;
 }
 
 .yp-feed-header h1,
 .feed-header h1 {
   margin: 0 0 6px;
-  font-size: 1.55rem;
+  font-size: 1.5rem;
   line-height: 1.1;
   font-weight: 800;
   color: #111827;
@@ -130,21 +160,21 @@
 .yp-feed-header p,
 .feed-header p {
   margin: 0;
-  font-size: 0.94rem;
+  font-size: 0.92rem;
   line-height: 1.5;
   color: #6b7280;
 }
 
 .yp-count,
 .business-count {
-  min-width: 42px;
-  height: 42px;
+  min-width: 40px;
+  height: 40px;
   border-radius: 999px;
   display: grid;
   place-items: center;
-  background: #d71920;
+  background: #5f01d1;
   color: #ffffff;
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   font-weight: 800;
 }
 
@@ -155,7 +185,7 @@
 .business-filters {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 9px;
   margin-bottom: 18px;
 }
 
@@ -163,9 +193,9 @@
   border: 1px solid #e5e7eb;
   background: #ffffff;
   color: #111827;
-  padding: 9px 13px;
+  padding: 8px 12px;
   border-radius: 999px;
-  font-size: 0.88rem;
+  font-size: 0.84rem;
   font-weight: 800;
   cursor: pointer;
   transition:
@@ -176,13 +206,13 @@
 }
 
 .business-filters button:hover {
-  border-color: #d71920;
-  color: #d71920;
+  border-color: #5f01d1;
+  color: #5f01d1;
 }
 
 .business-filters button.active {
-  background: #d71920;
-  border-color: #d71920;
+  background: #5f01d1;
+  border-color: #5f01d1;
   color: #ffffff;
 }
 
@@ -199,7 +229,7 @@
   padding: 14px;
   border-radius: 14px;
   margin-bottom: 14px;
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   font-weight: 800;
 }
 
@@ -220,12 +250,12 @@
 .business-feed {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 13px;
 }
 
 .business-card {
-  padding: 16px;
-  border-radius: 18px;
+  padding: 15px;
+  border-radius: 16px;
   border: 1px solid #e5e7eb;
   background: #ffffff;
   cursor: pointer;
@@ -237,8 +267,8 @@
 
 .business-card:hover,
 .business-card.active {
-  border-color: #d71920;
-  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
+  border-color: #5f01d1;
+  box-shadow: 0 14px 34px rgba(95, 1, 209, 0.08);
   transform: translateY(-1px);
 }
 
@@ -251,7 +281,7 @@
 
 .business-card h3 {
   margin: 0 0 8px;
-  font-size: 1rem;
+  font-size: 0.98rem;
   line-height: 1.25;
   font-weight: 800;
   color: #111827;
@@ -260,7 +290,7 @@
 .business-card p,
 .business-address {
   margin: 0 0 10px;
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   line-height: 1.5;
   color: #4b5563;
 }
@@ -268,9 +298,9 @@
 .business-card strong,
 .business-rating {
   white-space: nowrap;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   font-weight: 800;
-  color: #92400e;
+  color: #5f01d1;
 }
 
 .business-actions {
@@ -286,15 +316,15 @@
   color: #111827;
   border-radius: 12px;
   padding: 8px 12px;
-  font-size: 0.86rem;
+  font-size: 0.84rem;
   font-weight: 800;
   cursor: pointer;
 }
 
 .business-actions button:hover,
 .detail-actions button:hover {
-  border-color: #d71920;
-  color: #d71920;
+  border-color: #5f01d1;
+  color: #5f01d1;
 }
 
 /* =========================
@@ -317,7 +347,7 @@
   height: 100%;
   display: grid;
   place-items: center;
-  font-size: 0.95rem;
+  font-size: 0.94rem;
   font-weight: 800;
   color: #374151;
 }
@@ -349,7 +379,7 @@
 
 .detail-header h2 {
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 1.08rem;
   line-height: 1.2;
   font-weight: 800;
   color: #111827;
@@ -373,7 +403,7 @@
 .detail-body p {
   margin: 0 0 12px;
   color: #374151;
-  font-size: 0.94rem;
+  font-size: 0.92rem;
   line-height: 1.5;
 }
 
@@ -407,7 +437,7 @@
 @media (max-width: 640px) {
   .yp-stock-ticker,
   .yellowpages-ticker {
-    height: 40px;
+    height: 38px;
   }
 
   .yellowpages-feed {
@@ -416,7 +446,7 @@
 
   .yp-feed-header h1,
   .feed-header h1 {
-    font-size: 1.35rem;
+    font-size: 1.3rem;
   }
 
   .business-detail {
