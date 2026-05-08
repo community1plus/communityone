@@ -455,3 +455,108 @@
     width: calc(100vw - 32px);
   }
 }
+
+/* =========================================
+   FEED HEADER
+========================================= */
+
+.yp-feed-header {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.yp-feed-titleRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  position: relative;
+}
+
+.yp-feed-titleRow h1 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #0f172a;
+}
+
+/* =========================================
+   MENU BUTTON
+========================================= */
+
+.yp-menuButton {
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #7c3aed;
+  font-size: 1.6rem;
+  font-weight: 700;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.yp-menuButton:hover {
+  background: #f3f4f6;
+  transform: translateY(-1px);
+}
+
+/* =========================================
+   DROPDOWN MENU
+========================================= */
+
+.yp-dropdownMenu {
+  position: absolute;
+  top: 54px;
+  left: 0;
+
+  width: 220px;
+
+  display: flex;
+  flex-direction: column;
+
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+
+  overflow: hidden;
+
+  box-shadow: 0 16px 38px rgba(15, 23, 42, 0.12);
+
+  z-index: 100;
+}
+
+.yp-dropdownMenu button {
+  border: none;
+  background: transparent;
+
+  padding: 14px 18px;
+
+  text-align: left;
+
+  font-size: 0.95rem;
+  font-weight: 600;
+
+  color: #111827;
+
+  cursor: pointer;
+
+  transition: background 0.2s ease;
+}
+
+.yp-dropdownMenu button:hover {
+  background: #f8fafc;
+}

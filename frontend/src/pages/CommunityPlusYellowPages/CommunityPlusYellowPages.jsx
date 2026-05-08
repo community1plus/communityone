@@ -83,7 +83,9 @@ const TWELVE_DATA_SYMBOLS = ["AAPL", "MSFT", "AUD/USD", "BTC/USD"];
 
 function formatTickerItem(item) {
   const percentChange = Number(item?.percent_change ?? 0);
-  const direction = percentChange > 0 ? "up" : percentChange < 0 ? "down" : "neutral";
+
+  const direction =
+    percentChange > 0 ? "up" : percentChange < 0 ? "down" : "neutral";
 
   return {
     symbol: item?.symbol || "UNKNOWN",
@@ -100,9 +102,7 @@ function formatTickerItem(item) {
 async function fetchLiveTicker() {
   const apiKey = import.meta.env.VITE_TWELVEDATA_API_KEY;
 
-  if (!apiKey) {
-    return [];
-  }
+  if (!apiKey) return [];
 
   const requests = TWELVE_DATA_SYMBOLS.map(async (symbol) => {
     const url = `https://api.twelvedata.com/quote?symbol=${encodeURIComponent(
@@ -200,6 +200,7 @@ export default function CommunityPlusYellowPages() {
 
   const [selectedId, setSelectedId] = useState(null);
   const [category, setCategory] = useState("all");
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const isLoaded = Boolean(window.google?.maps);
 
@@ -269,9 +270,29 @@ export default function CommunityPlusYellowPages() {
       <section className="yellowpages-grid">
         <aside className="yellowpages-feed">
           <div className="yp-feed-header">
-            <div>
-              <p className="yp-kicker">Yellow Pages</p>
-              <h1>Local Businesses</h1>
+            <div className="yp-feed-titleArea">
+              <div className="yp-feed-titleRow">
+                <button
+                  type="button"
+                  className="yp-menuButton"
+                  aria-label="Business actions"
+                  onClick={() => setMenuOpen((prev) => !prev)}
+                >
+                  ⋮
+                </button>
+
+                <h1>Local Businesses</h1>
+
+                {menuOpen && (
+                  <div className="yp-dropdownMenu">
+                    <button type="button">Add Business</button>
+                    <button type="button">Claim Business</button>
+                    <button type="button">Release Business</button>
+                    <button type="button">Search</button>
+                  </div>
+                )}
+              </div>
+
               <p>
                 Discover businesses around{" "}
                 {resolvedLocation?.suburb ||
