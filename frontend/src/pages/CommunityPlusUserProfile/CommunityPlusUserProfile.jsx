@@ -397,12 +397,7 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     window.setTimeout(() => {
       formattingPhoneRef.current = false;
     }, 0);
-  }, [
-    values.phone,
-    values.phoneCountry,
-    values.phoneE164,
-    setValue,
-  ]);
+  }, [values.phone, values.phoneCountry, values.phoneE164, setValue]);
 
   useEffect(() => {
     if (!values.phone) return;
@@ -445,7 +440,7 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     try {
       console.log("Send verification code to:", cleanPhone);
 
-      // TODO:
+      // TODO: wire to backend
       // await api.post("/phone/send-code", { phone: cleanPhone });
 
       setPhoneStatus("sent");
@@ -480,7 +475,7 @@ export default function CommunityPlusUserProfile({ onComplete }) {
         code: values.phoneVerificationCode,
       });
 
-      // TODO:
+      // TODO: wire to backend
       // await api.post("/phone/verify-code", {
       //   phone: toE164Phone(values.phone, values.phoneCountry),
       //   code: values.phoneVerificationCode,
@@ -574,13 +569,7 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     } finally {
       setSavingProfile(false);
     }
-  }, [
-    saveProfile,
-    buildProfilePayload,
-    clearStorage,
-    onComplete,
-    navigate,
-  ]);
+  }, [saveProfile, buildProfilePayload, clearStorage, onComplete, navigate]);
 
   const handleComplete = useCallback(async () => {
     const valid = await validateAll();
@@ -661,7 +650,7 @@ export default function CommunityPlusUserProfile({ onComplete }) {
             </div>
           </div>
 
-          <Section title={currentStepConfig?.title}>
+          <Section>
             {isContactStep && (
               <div className="phone-country-row">
                 <label className="phone-country-label" htmlFor="phoneCountry">
