@@ -35,13 +35,70 @@ const CATEGORIES = [
   { id: "store", label: "Shops" },
 ];
 
-const STOCK_TICKER = [
-  "ASX 200 ▲ 0.42%",
-  "Retail ▲ 0.18%",
-  "Hospitality ▼ 0.11%",
-  "AUD/USD ▲ 0.09%",
-  "Local business activity LIVE",
+const MARKET_TICKER = [
+  {
+    symbol: "ASX 200",
+    label: "Australia",
+    value: "+0.42%",
+    direction: "up",
+  },
+  {
+    symbol: "Retail",
+    label: "Local sector",
+    value: "+0.18%",
+    direction: "up",
+  },
+  {
+    symbol: "Hospitality",
+    label: "Local sector",
+    value: "-0.11%",
+    direction: "down",
+  },
+  {
+    symbol: "AUD/USD",
+    label: "Currency",
+    value: "+0.09%",
+    direction: "up",
+  },
+  {
+    symbol: "Local Activity",
+    label: "Community One",
+    value: "LIVE",
+    direction: "neutral",
+  },
 ];
+
+function MarketTicker({ businessCount }) {
+  const tickerItems = useMemo(
+    () => [
+      ...MARKET_TICKER,
+      {
+        symbol: "Businesses",
+        label: "Nearby",
+        value: businessCount,
+        direction: "neutral",
+      },
+    ],
+    [businessCount]
+  );
+
+  return (
+    <section className="yp-stock-ticker" aria-label="Market ticker">
+      <div className="yp-stock-track">
+        {[...tickerItems, ...tickerItems].map((item, index) => (
+          <span
+            className="yp-stock-item"
+            key={`${item.symbol}-${item.value}-${index}`}
+          >
+            <strong>{item.symbol}</strong>
+            <small>{item.label}</small>
+            <em className={item.direction}>{item.value}</em>
+          </span>
+        ))}
+      </div>
+    </section>
+  );
+}
 
 export default function CommunityPlusYellowPages() {
   const mapRef = useRef(null);
@@ -67,6 +124,7 @@ export default function CommunityPlusYellowPages() {
 
   const businesses = useMemo(() => {
     if (category === "all") return MOCK_MARKERS;
+
     return MOCK_MARKERS.filter((biz) => biz.type === category);
   }, [category]);
 
@@ -114,13 +172,7 @@ export default function CommunityPlusYellowPages() {
 
   return (
     <main className="yellowpages-page">
-      <section className="yp-stock-ticker" aria-label="Market ticker">
-        <div className="yp-stock-track">
-          {[...STOCK_TICKER, ...STOCK_TICKER].map((item, index) => (
-            <span key={`${item}-${index}`}>{item}</span>
-          ))}
-        </div>
-      </section>
+      <MarketTicker businessCount={businesses.length} />
 
       <section className="yellowpages-grid">
         <aside className="yellowpages-feed">
