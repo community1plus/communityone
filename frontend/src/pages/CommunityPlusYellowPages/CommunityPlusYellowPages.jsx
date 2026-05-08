@@ -1,5 +1,5 @@
-import React, { useMemo, useState, useCallback } from "react";
-import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
+import React, { useMemo, useState, useCallback, useRef } from "react";
+import { GoogleMap, Marker } from "@react-google-maps/api";
 
 import { useMap } from "../../context/MapContext";
 import "./CommunityPlusYellowPages.css";
@@ -44,19 +44,15 @@ const STOCK_TICKER = [
 ];
 
 export default function CommunityPlusYellowPages() {
-  const {
-    userLocation,
-    resolvedLocation,
-    setBounds,
-    setSelectedMarkerId,
-  } = useMap();
+  const mapRef = useRef(null);
+
+  const { userLocation, resolvedLocation, setBounds, setSelectedMarkerId } =
+    useMap();
 
   const [selectedId, setSelectedId] = useState(null);
   const [category, setCategory] = useState("all");
 
-  const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
-  });
+  const isLoaded = Boolean(window.google?.maps);
 
   const mapCenter = useMemo(() => {
     if (userLocation?.lat && userLocation?.lng) {
@@ -71,7 +67,6 @@ export default function CommunityPlusYellowPages() {
 
   const businesses = useMemo(() => {
     if (category === "all") return MOCK_MARKERS;
-
     return MOCK_MARKERS.filter((biz) => biz.type === category);
   }, [category]);
 
@@ -79,22 +74,28 @@ export default function CommunityPlusYellowPages() {
     (biz) => {
       setSelectedId(biz.id);
       setSelectedMarkerId?.(biz.id);
+
+      if (mapRef.current) {
+        mapRef.current.panTo({
+          lat: biz.lat,
+          lng: biz.lng,
+        });
+
+        mapRef.current.setZoom(16);
+      }
     },
     [setSelectedMarkerId]
   );
 
-  const handleMapIdle = useCallback(
-    (map) => {
-      if (!map) return;
+  const handleMapIdle = useCallback(() => {
+    if (!mapRef.current) return;
 
-      const bounds = map.getBounds();
+    const nextBounds = mapRef.current.getBounds();
 
-      if (bounds) {
-        setBounds?.(bounds);
-      }
-    },
-    [setBounds]
-  );
+    if (nextBounds) {
+      setBounds?.(nextBounds);
+    }
+  }, [setBounds]);
 
   const markers = useMemo(() => {
     return businesses.map((biz) => (
@@ -102,9 +103,14 @@ export default function CommunityPlusYellowPages() {
         key={biz.id}
         position={{ lat: biz.lat, lng: biz.lng }}
         onClick={() => handleSelectBusiness(biz)}
+        icon={
+          selectedId === biz.id
+            ? "http://maps.google.com/mapfiles/ms/icons/red-dot.png"
+            : "http://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+        }
       />
     ));
-  }, [businesses, handleSelectBusiness]);
+  }, [businesses, selectedId, handleSelectBusiness]);
 
   return (
     <main className="yellowpages-page">
@@ -172,13 +178,10 @@ export default function CommunityPlusYellowPages() {
               center={mapCenter}
               zoom={15}
               mapContainerClassName="map-container"
-              onIdle={(event) => {
-                const map = event?.map;
-
-                if (map) {
-                  handleMapIdle(map);
-                }
+              onLoad={(map) => {
+                mapRef.current = map;
               }}
+              onIdle={handleMapIdle}
             >
               {markers}
 
