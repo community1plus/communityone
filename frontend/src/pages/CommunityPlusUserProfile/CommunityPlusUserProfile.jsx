@@ -37,7 +37,12 @@ const profileSteps = [
     title: "USER",
     fields: [
       { name: "username", label: "Username", type: "text", required: true },
-      { name: "display_name", label: "Display Name", type: "text", required: true },
+      {
+        name: "display_name",
+        label: "Display Name",
+        type: "text",
+        required: true,
+      },
       {
         name: "userType",
         label: "User Type",
@@ -100,6 +105,14 @@ const profileSteps = [
     ],
   },
 ];
+
+function safeStringify(value) {
+  try {
+    return JSON.stringify(value ?? null);
+  } catch {
+    return "";
+  }
+}
 
 function digitsOnly(value = "") {
   return String(value).replace(/\D/g, "");
@@ -164,7 +177,10 @@ function toE164Phone(phone = "", countryCode = DEFAULT_PHONE_COUNTRY) {
   return `${country.dialCode}${digits}`;
 }
 
-function isValidInternationalPhone(phone = "", countryCode = DEFAULT_PHONE_COUNTRY) {
+function isValidInternationalPhone(
+  phone = "",
+  countryCode = DEFAULT_PHONE_COUNTRY
+) {
   const country = getPhoneCountry(countryCode);
   const nationalDigits = stripDialCode(phone, countryCode);
 
@@ -176,8 +192,11 @@ function isValidInternationalPhone(phone = "", countryCode = DEFAULT_PHONE_COUNT
 
 export default function CommunityPlusUserProfile({ onComplete }) {
   const navigate = useNavigate();
+
   const autoRef = useRef(null);
   const formattingPhoneRef = useRef(false);
+  const lastHomeLocationRef = useRef("");
+  const lastAutosaveRef = useRef("");
 
   const { isLoaded } = useGoogleMaps();
   const { user } = useAuth();
@@ -219,7 +238,8 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     persistKey: "profile-form",
   });
 
-  const { values, validateAll, setValue, isFormValidating, clearStorage } = form;
+  const { values, validateAll, setValue, isFormValidating, clearStorage } =
+    form;
 
   const [currentStep, setCurrentStep] = useState(0);
   const [savingProfile, setSavingProfile] = useState(false);
@@ -265,6 +285,7 @@ export default function CommunityPlusUserProfile({ onComplete }) {
       phoneVerified: values.phoneVerified,
       social: values.social,
       payment: values.payment,
+      homeLocation: values.homeLocation || homeLocation || null,
     }),
     [
       values.username,
@@ -276,16 +297,36 @@ export default function CommunityPlusUserProfile({ onComplete }) {
       values.phoneVerified,
       values.social,
       values.payment,
+      values.homeLocation,
+      homeLocation,
     ]
   );
 
+  const autosaveFingerprint = useMemo(
+    () => safeStringify(autosaveValues),
+    [autosaveValues]
+  );
+
+  const autosaveEnabled = useMemo(() => {
+    if (!profileReady) return false;
+    if (!profile) return false;
+    if (!autosaveFingerprint) return false;
+
+    return lastAutosaveRef.current !== autosaveFingerprint;
+  }, [profileReady, profile, autosaveFingerprint]);
+
   const { autosaveStatus, autosaveError } = useProfileAutosave({
     values: autosaveValues,
-    homeLocation,
     patchProfile,
-    enabled: Boolean(profileReady && profile),
+    enabled: autosaveEnabled,
     delay: 900,
   });
+
+  useEffect(() => {
+    if (autosaveStatus === "saved") {
+      lastAutosaveRef.current = autosaveFingerprint;
+    }
+  }, [autosaveStatus, autosaveFingerprint]);
 
   useEffect(() => {
     const saved = localStorage.getItem("profile-step");
@@ -321,6 +362,14 @@ export default function CommunityPlusUserProfile({ onComplete }) {
 
   useEffect(() => {
     if (!homeLocation) return;
+
+    const fingerprint = safeStringify(homeLocation);
+
+    if (lastHomeLocationRef.current === fingerprint) {
+      return;
+    }
+
+    lastHomeLocationRef.current = fingerprint;
     setValue("homeLocation", homeLocation);
   }, [homeLocation, setValue]);
 
@@ -348,7 +397,12 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     window.setTimeout(() => {
       formattingPhoneRef.current = false;
     }, 0);
-  }, [values.phone, values.phoneCountry, setValue]);
+  }, [
+    values.phone,
+    values.phoneCountry,
+    values.phoneE164,
+    setValue,
+  ]);
 
   useEffect(() => {
     if (!values.phone) return;
@@ -361,7 +415,13 @@ export default function CommunityPlusUserProfile({ onComplete }) {
       setPhoneStatus("idle");
       setPhoneError("");
     }
-  }, [values.phone, phoneE164, profile?.phoneE164, profile?.phone, setValue]);
+  }, [
+    values.phone,
+    phoneE164,
+    profile?.phoneE164,
+    profile?.phone,
+    setValue,
+  ]);
 
   const sendPhoneCode = useCallback(async () => {
     const cleanPhone = toE164Phone(values.phone, values.phoneCountry);
@@ -384,12 +444,21 @@ export default function CommunityPlusUserProfile({ onComplete }) {
 
     try {
       console.log("Send verification code to:", cleanPhone);
+
+      // TODO:
+      // await api.post("/phone/send-code", { phone: cleanPhone });
+
       setPhoneStatus("sent");
     } catch (err) {
       setPhoneStatus("error");
       setPhoneError(err?.message || "Could not send verification code");
     }
-  }, [values.phone, values.phoneCountry, selectedPhoneCountry.label, setValue]);
+  }, [
+    values.phone,
+    values.phoneCountry,
+    selectedPhoneCountry.label,
+    setValue,
+  ]);
 
   const verifyPhoneCode = useCallback(async () => {
     if (phoneStatus !== "sent") {
@@ -410,6 +479,12 @@ export default function CommunityPlusUserProfile({ onComplete }) {
         phone: toE164Phone(values.phone, values.phoneCountry),
         code: values.phoneVerificationCode,
       });
+
+      // TODO:
+      // await api.post("/phone/verify-code", {
+      //   phone: toE164Phone(values.phone, values.phoneCountry),
+      //   code: values.phoneVerificationCode,
+      // });
 
       setValue("phoneVerified", true);
       setPhoneStatus("verified");
@@ -482,7 +557,10 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     setProfileError("");
 
     try {
-      const nextProfile = await saveProfile(buildProfilePayload());
+      const payload = buildProfilePayload();
+      const nextProfile = await saveProfile(payload);
+
+      lastAutosaveRef.current = safeStringify(payload);
 
       clearStorage();
       localStorage.removeItem("profile-step");
@@ -496,7 +574,13 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     } finally {
       setSavingProfile(false);
     }
-  }, [saveProfile, buildProfilePayload, clearStorage, onComplete, navigate]);
+  }, [
+    saveProfile,
+    buildProfilePayload,
+    clearStorage,
+    onComplete,
+    navigate,
+  ]);
 
   const handleComplete = useCallback(async () => {
     const valid = await validateAll();
