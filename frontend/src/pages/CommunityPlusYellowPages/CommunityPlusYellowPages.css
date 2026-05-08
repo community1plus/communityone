@@ -27,8 +27,7 @@
    STOCK TICKER
 ========================= */
 
-.yp-stock-ticker,
-.yellowpages-ticker {
+.yp-stock-ticker {
   height: 40px;
   flex-shrink: 0;
   overflow: hidden;
@@ -39,17 +38,14 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 
-.yp-stock-track,
-.ticker-track {
+.yp-stock-track {
   display: flex;
   align-items: center;
   width: max-content;
   animation: ypTickerScroll 36s linear infinite;
 }
 
-.yp-stock-item,
-.yp-stock-track span,
-.ticker-item {
+.yp-stock-item {
   display: inline-flex;
   align-items: baseline;
   gap: 7px;
@@ -60,8 +56,7 @@
   font-weight: 700;
 }
 
-.yp-stock-item strong,
-.ticker-item strong {
+.yp-stock-item strong {
   font-size: 0.84rem;
   font-weight: 800;
   color: #ffffff;
@@ -73,25 +68,21 @@
   color: rgba(255, 255, 255, 0.72);
 }
 
-.yp-stock-item em,
-.ticker-item em {
+.yp-stock-item em {
   font-size: 0.8rem;
   font-style: normal;
   font-weight: 800;
 }
 
-.yp-stock-item em.up,
-.ticker-item .up {
+.yp-stock-item em.up {
   color: #00c853;
 }
 
-.yp-stock-item em.down,
-.ticker-item .down {
+.yp-stock-item em.down {
   color: #ff5252;
 }
 
-.yp-stock-item em.neutral,
-.ticker-item .neutral {
+.yp-stock-item em.neutral {
   color: #ffd54f;
 }
 
@@ -129,50 +120,31 @@
    FEED HEADER
 ========================= */
 
-.yp-feed-header,
-.feed-header {
+.yp-feed-header {
   position: relative;
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
   gap: 16px;
-  margin-bottom: 22px;
+  margin-bottom: 20px;
 }
 
-.yp-feed-titleArea {
-  min-width: 0;
-  flex: 1;
-}
-
-.yp-feed-titleRow {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 8px;
-}
-
-.yp-feed-titleRow h1,
-.yp-feed-header h1,
-.feed-header h1 {
+.yp-feed-header p {
   margin: 0;
-  font-size: 1.72rem;
-  line-height: 1.05;
-  font-weight: 850;
-  letter-spacing: -0.04em;
-  color: #0f172a;
-}
-
-.yp-feed-header p,
-.feed-header p {
-  margin: 0;
-  font-size: 0.92rem;
+  padding-top: 8px;
+  font-size: 0.94rem;
   line-height: 1.5;
   color: var(--yp-muted);
 }
 
-.yp-count,
-.business-count {
+.yp-feed-actions {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.yp-count {
   min-width: 40px;
   height: 40px;
   border-radius: 999px;
@@ -185,18 +157,14 @@
   font-weight: 800;
 }
 
-/* =========================
-   MENU BUTTON + DROPDOWN
-========================= */
-
 .yp-menuButton {
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   border: 1px solid var(--yp-border);
   border-radius: 14px;
   background: #ffffff;
   color: var(--yp-purple-bright);
-  font-size: 1.45rem;
+  font-size: 1.5rem;
   line-height: 1;
   font-weight: 800;
   cursor: pointer;
@@ -217,8 +185,8 @@
 
 .yp-dropdownMenu {
   position: absolute;
-  top: 46px;
-  left: 0;
+  top: 48px;
+  right: 0;
   z-index: 100;
   width: 220px;
   overflow: hidden;
@@ -243,71 +211,6 @@
 .yp-dropdownMenu button:hover {
   background: #f7f2ff;
   color: var(--yp-purple-bright);
-}
-
-/* =========================
-   FILTERS
-========================= */
-
-.business-filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 9px;
-  margin: 20px 0 18px;
-}
-
-.business-filters button {
-  border: 1px solid var(--yp-border);
-  background: #ffffff;
-  color: var(--yp-text);
-  padding: 8px 12px;
-  border-radius: 999px;
-  font-size: 0.84rem;
-  font-weight: 800;
-  cursor: pointer;
-  transition:
-    background 160ms ease,
-    border-color 160ms ease,
-    color 160ms ease,
-    transform 160ms ease;
-}
-
-.business-filters button:hover {
-  border-color: var(--yp-purple-bright);
-  color: var(--yp-purple-bright);
-}
-
-.business-filters button.active {
-  background: var(--yp-purple-bright);
-  border-color: var(--yp-purple-bright);
-  color: #ffffff;
-}
-
-.business-filters button:active {
-  transform: scale(0.98);
-}
-
-/* =========================
-   STATES
-========================= */
-
-.loading,
-.error {
-  padding: 14px;
-  border-radius: 14px;
-  margin-bottom: 14px;
-  font-size: 0.9rem;
-  font-weight: 800;
-}
-
-.loading {
-  background: #f3f4f6;
-  color: #374151;
-}
-
-.error {
-  background: #fef2f2;
-  color: #b91c1c;
 }
 
 /* =========================
@@ -339,13 +242,6 @@
   transform: translateY(-2px);
 }
 
-.business-card-top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-}
-
 .business-card h3 {
   margin: 0 0 8px;
   font-size: 0.98rem;
@@ -354,43 +250,17 @@
   color: var(--yp-text);
 }
 
-.business-card p,
-.business-address {
+.business-card p {
   margin: 0 0 10px;
   font-size: 0.9rem;
   line-height: 1.5;
   color: #4b5563;
 }
 
-.business-card strong,
-.business-rating {
+.business-card strong {
   white-space: nowrap;
   font-size: 0.88rem;
   font-weight: 800;
-  color: var(--yp-purple-bright);
-}
-
-.business-actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 12px;
-}
-
-.business-actions button,
-.detail-actions button {
-  border: 1px solid var(--yp-border);
-  background: #f9fafb;
-  color: var(--yp-text);
-  border-radius: 12px;
-  padding: 8px 12px;
-  font-size: 0.84rem;
-  font-weight: 800;
-  cursor: pointer;
-}
-
-.business-actions button:hover,
-.detail-actions button:hover {
-  border-color: var(--yp-purple-bright);
   color: var(--yp-purple-bright);
 }
 
@@ -420,68 +290,6 @@
 }
 
 /* =========================
-   DETAIL DRAWER
-========================= */
-
-.business-detail {
-  position: absolute;
-  right: 28px;
-  bottom: 28px;
-  z-index: 20;
-  width: min(420px, calc(100vw - 56px));
-  overflow: hidden;
-  border-radius: 22px;
-  background: #ffffff;
-  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.18);
-}
-
-.detail-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 18px 20px;
-  border-bottom: 1px solid var(--yp-border);
-}
-
-.detail-header h2 {
-  margin: 0;
-  font-size: 1.08rem;
-  line-height: 1.2;
-  font-weight: 850;
-  color: var(--yp-text);
-}
-
-.detail-header button {
-  width: 34px;
-  height: 34px;
-  border: 0;
-  border-radius: 999px;
-  background: #f3f4f6;
-  color: var(--yp-text);
-  cursor: pointer;
-  font-weight: 800;
-}
-
-.detail-body {
-  padding: 18px 20px;
-}
-
-.detail-body p {
-  margin: 0 0 12px;
-  color: #374151;
-  font-size: 0.92rem;
-  line-height: 1.5;
-}
-
-.detail-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 14px;
-}
-
-/* =========================
    RESPONSIVE
 ========================= */
 
@@ -502,8 +310,7 @@
 }
 
 @media (max-width: 640px) {
-  .yp-stock-ticker,
-  .yellowpages-ticker {
+  .yp-stock-ticker {
     height: 38px;
   }
 
@@ -511,15 +318,11 @@
     padding: 18px;
   }
 
-  .yp-feed-titleRow h1,
-  .yp-feed-header h1,
-  .feed-header h1 {
-    font-size: 1.32rem;
+  .yp-feed-header {
+    grid-template-columns: 1fr;
   }
 
-  .business-detail {
-    right: 16px;
-    bottom: 16px;
-    width: calc(100vw - 32px);
+  .yp-feed-actions {
+    justify-content: flex-end;
   }
 }

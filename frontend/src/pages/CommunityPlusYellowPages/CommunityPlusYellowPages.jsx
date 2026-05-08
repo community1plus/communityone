@@ -33,14 +33,6 @@ const MOCK_MARKERS = [
   },
 ];
 
-const CATEGORIES = [
-  { id: "all", label: "All" },
-  { id: "restaurant", label: "Restaurants" },
-  { id: "cafe", label: "Cafes" },
-  { id: "bar", label: "Bars" },
-  { id: "store", label: "Shops" },
-];
-
 const DEFAULT_MARKET_TICKER = [
   {
     symbol: "ASX 200",
@@ -199,7 +191,6 @@ export default function CommunityPlusYellowPages() {
     useMap();
 
   const [selectedId, setSelectedId] = useState(null);
-  const [category, setCategory] = useState("all");
   const [menuOpen, setMenuOpen] = useState(false);
 
   const isLoaded = Boolean(window.google?.maps);
@@ -215,11 +206,7 @@ export default function CommunityPlusYellowPages() {
     return FALLBACK_CENTER;
   }, [userLocation]);
 
-  const businesses = useMemo(() => {
-    if (category === "all") return MOCK_MARKERS;
-
-    return MOCK_MARKERS.filter((biz) => biz.type === category);
-  }, [category]);
+  const businesses = MOCK_MARKERS;
 
   const handleSelectBusiness = useCallback(
     (biz) => {
@@ -270,52 +257,35 @@ export default function CommunityPlusYellowPages() {
       <section className="yellowpages-grid">
         <aside className="yellowpages-feed">
           <div className="yp-feed-header">
-            <div className="yp-feed-titleArea">
-              <div className="yp-feed-titleRow">
-                <button
-                  type="button"
-                  className="yp-menuButton"
-                  aria-label="Business actions"
-                  onClick={() => setMenuOpen((prev) => !prev)}
-                >
-                  ⋮
-                </button>
+            <p>
+              Discover businesses around{" "}
+              {resolvedLocation?.suburb ||
+                resolvedLocation?.locality ||
+                "your community"}
+              .
+            </p>
 
-                <h1>Local Businesses</h1>
+            <div className="yp-feed-actions">
+              <span className="yp-count">{businesses.length}</span>
 
-                {menuOpen && (
-                  <div className="yp-dropdownMenu">
-                    <button type="button">Add Business</button>
-                    <button type="button">Claim Business</button>
-                    <button type="button">Release Business</button>
-                    <button type="button">Search</button>
-                  </div>
-                )}
-              </div>
-
-              <p>
-                Discover businesses around{" "}
-                {resolvedLocation?.suburb ||
-                  resolvedLocation?.locality ||
-                  "your community"}
-                .
-              </p>
-            </div>
-
-            <span className="yp-count">{businesses.length}</span>
-          </div>
-
-          <div className="business-filters">
-            {CATEGORIES.map((item) => (
               <button
-                key={item.id}
                 type="button"
-                className={category === item.id ? "active" : ""}
-                onClick={() => setCategory(item.id)}
+                className="yp-menuButton"
+                aria-label="Business actions"
+                onClick={() => setMenuOpen((prev) => !prev)}
               >
-                {item.label}
+                ⋮
               </button>
-            ))}
+
+              {menuOpen && (
+                <div className="yp-dropdownMenu">
+                  <button type="button">Add Business</button>
+                  <button type="button">Claim Business</button>
+                  <button type="button">Release Business</button>
+                  <button type="button">Search</button>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="business-feed">
