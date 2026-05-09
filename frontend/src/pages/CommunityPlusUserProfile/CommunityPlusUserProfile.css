@@ -1,21 +1,222 @@
+/* =====================================================
+PROFILE PAGE
+===================================================== */
+
+.profile-container {
+  width: 100%;
+  min-height: 100%;
+  padding: 20px 24px;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+  color: #2f2925;
+  background: #f8f6f3;
+}
+
+.profile-container *,
+.profile-container *::before,
+.profile-container *::after {
+  box-sizing: border-box;
+}
+
+.profile-layout {
+  width: 100%;
+  min-height: calc(100vh - 165px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 20px;
+  align-items: stretch;
+}
+
+.profile-layout > * {
+  min-width: 0;
+}
+
+/* =====================================================
+CARDS
+===================================================== */
+
+.profile-left,
+.profile-guide {
+  background: #ffffff;
+  border: 1px solid #e2dbd3;
+  border-radius: 18px;
+  box-shadow: 0 8px 24px rgba(20, 20, 20, 0.045);
+}
+
+.profile-left {
+  min-height: calc(100vh - 190px);
+  max-height: calc(100vh - 190px);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  overflow: hidden;
+}
+
+.profile-guide {
+  min-height: calc(100vh - 190px);
+  max-height: calc(100vh - 190px);
+  padding: 24px;
+  overflow: hidden;
+}
+
+/* =====================================================
+HEADER
+===================================================== */
+
+.profile-page-header {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.profile-page-header h1,
+.profile-page-header .page-title {
+  margin: 0;
+  font-size: 20px;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #241f1c;
+}
+
+/* =====================================================
+COMPLETION
+===================================================== */
+
+.profile-completion {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.profile-completion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #403832;
+}
+
+.profile-completion-track {
+  width: 100%;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #eee7e0;
+}
+
+.profile-completion-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: #4a0f0f;
+  transition: width 0.28s ease;
+}
+
+.profile-save-status {
+  min-height: 18px;
+  font-size: 12px;
+  font-weight: 650;
+  color: #6f6259;
+}
+
+.profile-save-status.saving {
+  color: #6f6259;
+}
+
+.profile-save-status.saved {
+  color: #16794c;
+}
+
+.profile-save-status.error {
+  color: #b11226;
+}
+
+/* =====================================================
+SECTION TABS
+===================================================== */
+
+.profile-section-tabs {
+  position: relative;
+  width: 100%;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px 0 18px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid #eee7e0;
+}
+
+.profile-section-tab {
+  flex: 1;
+  min-width: 0;
+  height: 38px;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e2dbd3;
+  border-radius: 9px;
+  background: #ffffff;
+  color: #403832;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.18s ease;
+}
+
+.profile-section-tab:hover {
+  background: #faf7f4;
+  border-color: #d8cec4;
+}
+
+.profile-section-tab.active {
+  background: #4a0f0f;
+  border-color: #4a0f0f;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(74, 15, 15, 0.15);
+}
+
+.profile-section-tab.complete {
+  background: rgba(74, 15, 15, 0.06);
+  border-color: rgba(74, 15, 15, 0.2);
+  color: #4a0f0f;
+}
+
+/* =====================================================
+FORM AREA
+===================================================== */
+
 .profile-left .section {
   flex: 1 1 auto;
   min-height: 280px;
   max-height: 100%;
   width: 100%;
   max-width: 100%;
+
+  /* 🔥 scrollbar spacing */
   padding: 24px 18px 36px 0;
+
   overflow-y: auto;
   overflow-x: hidden;
+
   border-bottom: 1px solid #eee7e0;
+
+  /* 🔥 reserves scrollbar space */
   scrollbar-gutter: stable;
 }
 
-.profile-left .section > * {
-  width: 100%;
-  max-width: 100%;
-  padding-right: 8px;
-}
+/* =====================================================
+SCROLLBAR
+===================================================== */
 
 .profile-left .section::-webkit-scrollbar {
   width: 10px;
@@ -37,4 +238,284 @@
 .profile-left .section::-webkit-scrollbar-thumb:hover {
   background: #c7beb6;
   background-clip: content-box;
+}
+
+/* =====================================================
+SECTION INNER SPACING
+===================================================== */
+
+.profile-left .section > * {
+  width: 100%;
+  max-width: 100%;
+  padding-right: 8px;
+}
+
+/* =====================================================
+FORM LAYOUT
+===================================================== */
+
+.profile-left form,
+.profile-left fieldset,
+.profile-left .field,
+.profile-left .form-field,
+.profile-left .form-row {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.profile-left .form-row,
+.profile-left .field,
+.profile-left .form-field {
+  margin-bottom: 20px;
+}
+
+/* =====================================================
+INPUTS
+===================================================== */
+
+.profile-left input,
+.profile-left select,
+.profile-left textarea {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+
+  height: 48px;
+
+  padding: 0 14px;
+
+  display: block;
+
+  border: 1px solid #d8d0c8;
+  border-radius: 12px;
+
+  background: #ffffff;
+  color: #241f1c;
+
+  font: inherit;
+  font-size: 14px;
+
+  outline: none;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.profile-left textarea {
+  min-height: 96px;
+  padding-top: 12px;
+  resize: vertical;
+}
+
+.profile-left input:focus,
+.profile-left select:focus,
+.profile-left textarea:focus {
+  border-color: #4a0f0f;
+  box-shadow: 0 0 0 3px rgba(74, 15, 15, 0.08);
+}
+
+.profile-left input:disabled,
+.profile-left select:disabled,
+.profile-left textarea:disabled {
+  background: #f4f0ec;
+  color: #8a7f77;
+  cursor: not-allowed;
+}
+
+.profile-left input:not([disabled]),
+.profile-left select:not([disabled]),
+.profile-left textarea:not([disabled]) {
+  pointer-events: auto;
+  user-select: text;
+  cursor: text;
+}
+
+.profile-left input[type="tel"] {
+  background: #ffffff;
+  color: #241f1c;
+}
+
+/* =====================================================
+LABELS
+===================================================== */
+
+.profile-left label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 650;
+  color: #241f1c;
+}
+
+/* =====================================================
+PHONE SECTION
+===================================================== */
+
+.phone-country-row {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.phone-country-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 650;
+  color: #241f1c;
+}
+
+.phone-country-select {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+
+  height: 48px;
+
+  padding: 0 14px;
+
+  border: 1px solid #d8d0c8;
+  border-radius: 12px;
+
+  background: #ffffff;
+  color: #241f1c;
+
+  font: inherit;
+}
+
+.phone-verification {
+  width: 100%;
+  padding: 18px 0 22px;
+  margin-top: 0;
+  border-bottom: 1px solid #eee7e0;
+}
+
+.phone-verification-row {
+  width: 100%;
+  display: flex;
+  gap: 12px;
+  margin-top: 14px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* =====================================================
+MESSAGES
+===================================================== */
+
+.hint {
+  margin-top: 8px;
+  color: #6f6259;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.success {
+  margin-top: 10px;
+  color: #146c2e;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.error {
+  margin-top: 10px;
+  color: #b11226;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+/* =====================================================
+NAVIGATION
+===================================================== */
+
+.form-navigation {
+  flex: 0 0 auto;
+  margin-top: 0;
+  padding-top: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* =====================================================
+GUIDE PANEL
+===================================================== */
+
+.profile-guide h2,
+.profile-guide .section-title {
+  margin: 0 0 8px;
+  font-size: 17px;
+  line-height: 1.25;
+  font-weight: 700;
+  color: #241f1c;
+}
+
+.profile-guide p,
+.profile-guide .section-meta {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #6f6259;
+}
+
+/* =====================================================
+RESPONSIVE
+===================================================== */
+
+@media (max-width: 1000px) {
+  .profile-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-left,
+  .profile-guide {
+    min-height: auto;
+    max-height: none;
+  }
+
+  .profile-left .section {
+    overflow: visible;
+    min-height: auto;
+  }
+}
+
+@media (max-width: 700px) {
+  .profile-container {
+    padding: 14px;
+  }
+
+  .profile-left,
+  .profile-guide {
+    padding: 18px;
+    border-radius: 16px;
+  }
+
+  .profile-section-tabs {
+    gap: 6px;
+    overflow-x: auto;
+  }
+
+  .profile-section-tab {
+    flex: 0 0 auto;
+    min-width: 130px;
+    font-size: 11px;
+    padding: 0 10px;
+  }
+
+  .form-navigation {
+    gap: 12px;
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .form-actions {
+    justify-content: flex-end;
+  }
 }
