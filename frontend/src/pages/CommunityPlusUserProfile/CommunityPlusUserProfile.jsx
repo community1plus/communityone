@@ -27,6 +27,29 @@ const PHONE_COUNTRIES = [
   { code: "IN", label: "India", dialCode: "+91", min: 10, max: 10 },
 ];
 
+const SOCIAL_PROVIDERS = [
+  {
+    id: "facebook",
+    label: "Facebook",
+    description: "Verify business page admin access.",
+  },
+  {
+    id: "instagram",
+    label: "Instagram",
+    description: "Verify professional or creator account access.",
+  },
+  {
+    id: "youtube",
+    label: "YouTube",
+    description: "Verify channel ownership.",
+  },
+  {
+    id: "x",
+    label: "X / Twitter",
+    description: "Verify account ownership.",
+  },
+];
+
 const DEFAULT_PHONE_COUNTRY = "AU";
 
 const profileSteps = [
@@ -68,12 +91,7 @@ const profileSteps = [
   {
     id: "social",
     title: "SOCIAL",
-    fields: [
-      { name: "social.twitter", label: "Twitter / X", type: "text" },
-      { name: "social.facebook", label: "Facebook", type: "text" },
-      { name: "social.instagram", label: "Instagram", type: "text" },
-      { name: "social.youtube", label: "YouTube", type: "text" },
-    ],
+    fields: [],
   },
   {
     id: "payment",
@@ -120,6 +138,34 @@ function isValidInternationalPhone(phone = "", countryCode = DEFAULT_PHONE_COUNT
   return nationalDigits.length >= country.min && nationalDigits.length <= country.max;
 }
 
+function getSocialStatus(social = {}, providerId) {
+  const provider = social?.[providerId];
+
+  if (!provider) {
+    return {
+      verified: false,
+      label: "Not verified",
+    };
+  }
+
+  if (provider.verified) {
+    return {
+      verified: true,
+      label:
+        provider.pageName ||
+        provider.channelTitle ||
+        provider.handle ||
+        provider.accountName ||
+        "Verified",
+    };
+  }
+
+  return {
+    verified: false,
+    label: "Not verified",
+  };
+}
+
 export default function CommunityPlusUserProfile({ onComplete }) {
   const navigate = useNavigate();
 
@@ -153,10 +199,10 @@ export default function CommunityPlusUserProfile({ onComplete }) {
       homeLocation: profile?.homeLocation || homeLocation || null,
 
       social: {
-        twitter: profile?.social?.twitter || "",
-        facebook: profile?.social?.facebook || "",
-        instagram: profile?.social?.instagram || "",
-        youtube: profile?.social?.youtube || "",
+        facebook: profile?.social?.facebook || { verified: false },
+        instagram: profile?.social?.instagram || { verified: false },
+        youtube: profile?.social?.youtube || { verified: false },
+        x: profile?.social?.x || { verified: false },
       },
 
       payment: {
@@ -177,6 +223,7 @@ export default function CommunityPlusUserProfile({ onComplete }) {
   const currentStepConfig = profileSteps[currentStep];
   const isLastStep = currentStep === profileSteps.length - 1;
   const isContactStep = currentStepConfig?.id === "contact";
+  const isSocialStep = currentStepConfig?.id === "social";
 
   const selectedPhoneCountry = useMemo(
     () => getPhoneCountry(values.phoneCountry),
@@ -272,6 +319,25 @@ export default function CommunityPlusUserProfile({ onComplete }) {
       setPhoneError("");
     },
     [values.phone, setValue]
+  );
+
+  const startSocialVerification = useCallback(
+    (providerId) => {
+      const baseUrl = import.meta.env.VITE_SOCIAL_API_URL;
+
+      if (!baseUrl) {
+        setProfileError("Social verification API is not configured.");
+        return;
+      }
+
+      const params = new URLSearchParams({
+        provider: providerId,
+        userId: user?.id || "",
+      });
+
+      window.location.href = `${baseUrl}/social/${providerId}/start?${params.toString()}`;
+    },
+    [user?.id]
   );
 
   const sendPhoneCode = useCallback(async () => {
@@ -401,12 +467,7 @@ export default function CommunityPlusUserProfile({ onComplete }) {
 
       homeLocation: values.homeLocation || homeLocation,
 
-      social: {
-        twitter: values.social?.twitter || "",
-        facebook: values.social?.facebook || "",
-        instagram: values.social?.instagram || "",
-        youtube: values.social?.youtube || "",
-      },
+      social: values.social,
 
       payment: {
         cardName: values.payment?.cardName || "",
@@ -509,38 +570,67 @@ export default function CommunityPlusUserProfile({ onComplete }) {
           </div>
 
           <Section>
-            {isContactStep && (
-              <div className="phone-country-row">
-                <label className="phone-country-label" htmlFor="phoneCountry">
-                  Country
-                </label>
+            <div className="section-inner">
+              {isContactStep && (
+                <div className="phone-country-row">
+                  <label className="phone-country-label" htmlFor="phoneCountry">
+                    Country
+                  </label>
 
-                <select
-                  id="phoneCountry"
-                  className="phone-country-select"
-                  value={values.phoneCountry}
-                  onChange={handlePhoneCountryChange}
-                >
-                  {PHONE_COUNTRIES.map((country) => (
-                    <option key={country.code} value={country.code}>
-                      {country.label} {country.dialCode}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
+                  <select
+                    id="phoneCountry"
+                    className="phone-country-select"
+                    value={values.phoneCountry}
+                    onChange={handlePhoneCountryChange}
+                  >
+                    {PHONE_COUNTRIES.map((country) => (
+                      <option key={country.code} value={country.code}>
+                        {country.label} {country.dialCode}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
-            <FormBuilder
-              steps={profileSteps}
-              currentStep={currentStep}
-              form={form}
-              extra={{
-                Autocomplete,
-                autoRef,
-                onPlaceChanged,
-                isLoaded,
-              }}
-            />
+              {isSocialStep ? (
+                <div className="social-verification-list">
+                  {SOCIAL_PROVIDERS.map((provider) => {
+                    const status = getSocialStatus(values.social, provider.id);
+
+                    return (
+                      <div className="social-verification-row" key={provider.id}>
+                        <div className="social-verification-main">
+                          <strong>{provider.label}</strong>
+                          <span>{provider.description}</span>
+                          <small className={status.verified ? "success" : "hint"}>
+                            {status.verified ? `Verified: ${status.label}` : status.label}
+                          </small>
+                        </div>
+
+                        <Button
+                          variant={status.verified ? "ghost" : "primary"}
+                          onClick={() => startSocialVerification(provider.id)}
+                        >
+                          {status.verified ? "Re-verify" : "Verify"}
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <FormBuilder
+                  steps={profileSteps}
+                  currentStep={currentStep}
+                  form={form}
+                  extra={{
+                    Autocomplete,
+                    autoRef,
+                    onPlaceChanged,
+                    isLoaded,
+                  }}
+                />
+              )}
+            </div>
           </Section>
 
           {isContactStep && (
@@ -630,7 +720,7 @@ export default function CommunityPlusUserProfile({ onComplete }) {
         <div className="profile-guide">
           <Section
             title="Profile Guide"
-            meta="Autosave is currently isolated. This page now only writes to the backend when you click Finish."
+            meta="Verify your social accounts to prove ownership of pages, channels, or official accounts."
           />
         </div>
       </div>
