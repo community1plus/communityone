@@ -8,7 +8,7 @@ export default function FormBuilder({
   form,
   extra = {},
 }) {
-  if (!Array.isArray(steps) || !steps.length) {
+  if (!Array.isArray(steps) || steps.length === 0) {
     console.warn("FormBuilder: invalid steps array", steps);
     return null;
   }
@@ -29,13 +29,7 @@ export default function FormBuilder({
     return null;
   }
 
-  const {
-    getValue,
-    handleChange,
-    handleBlur,
-    getError,
-    isFieldValid,
-  } = form;
+  const { getValue, handleChange, handleBlur, getError, isFieldValid } = form;
 
   const renderField = (field) => {
     const {
@@ -47,11 +41,11 @@ export default function FormBuilder({
       required = false,
     } = field;
 
-    const rawValue = getValue(name);
+    const rawValue = getValue?.(name);
     const error = getError?.(name);
     const valid = isFieldValid?.(name);
 
-    const commonFieldProps = {
+    const fieldProps = {
       key: name,
       label,
       error,
@@ -61,13 +55,13 @@ export default function FormBuilder({
 
     if (type === "select") {
       return (
-        <Field {...commonFieldProps}>
+        <Field {...fieldProps}>
           <Select
             name={name}
             value={rawValue ?? ""}
             options={options}
             disabled={readOnly}
-            onChange={(e) => handleChange(name, e.target.value)}
+            onChange={(e) => handleChange?.(name, e.target.value)}
             onBlur={() => handleBlur?.(name)}
           />
         </Field>
@@ -78,12 +72,12 @@ export default function FormBuilder({
       const { Autocomplete, autoRef, onPlaceChanged, isLoaded } = extra;
 
       const displayValue =
-        typeof rawValue === "object"
-          ? rawValue?.label || rawValue?.fullAddress || ""
+        rawValue && typeof rawValue === "object"
+          ? rawValue.label || rawValue.fullAddress || ""
           : rawValue || "";
 
       return (
-        <Field {...commonFieldProps}>
+        <Field {...fieldProps}>
           {isLoaded && Autocomplete ? (
             <Autocomplete
               onLoad={(ref) => {
@@ -97,7 +91,7 @@ export default function FormBuilder({
                 placeholder="Enter your home address"
                 readOnly={readOnly}
                 disabled={readOnly}
-                onChange={(e) => handleChange(name, e.target.value)}
+                onChange={(e) => handleChange?.(name, e.target.value)}
                 onBlur={() => handleBlur?.(name)}
               />
             </Autocomplete>
@@ -115,14 +109,14 @@ export default function FormBuilder({
     }
 
     return (
-      <Field {...commonFieldProps}>
+      <Field {...fieldProps}>
         <Input
           name={name}
           type={type}
           value={rawValue ?? ""}
           readOnly={readOnly}
           disabled={readOnly}
-          onChange={(e) => handleChange(name, e.target.value)}
+          onChange={(e) => handleChange?.(name, e.target.value)}
           onBlur={() => handleBlur?.(name)}
         />
       </Field>
