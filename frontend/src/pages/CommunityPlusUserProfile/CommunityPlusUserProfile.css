@@ -45,8 +45,7 @@ CARDS
 }
 
 .profile-left {
-  min-height: calc(100vh - 190px);
-  max-height: calc(100vh - 190px);
+  height: calc(100vh - 190px);
   padding: 24px;
   display: flex;
   flex-direction: column;
@@ -55,8 +54,7 @@ CARDS
 }
 
 .profile-guide {
-  min-height: calc(100vh - 190px);
-  max-height: calc(100vh - 190px);
+  height: calc(100vh - 190px);
   padding: 24px;
   overflow: hidden;
 }
@@ -197,21 +195,24 @@ FORM AREA
 
 .profile-left .section {
   flex: 1 1 auto;
-  min-height: 280px;
-  max-height: 100%;
+  min-height: 0;
   width: 100%;
   max-width: 100%;
-
-  /* 🔥 scrollbar spacing */
-  padding: 24px 18px 36px 0;
-
+  padding: 24px 18px 120px 0;
   overflow-y: auto;
   overflow-x: hidden;
-
   border-bottom: 1px solid #eee7e0;
-
-  /* 🔥 reserves scrollbar space */
   scrollbar-gutter: stable;
+}
+
+.profile-left .section > * {
+  width: 100%;
+  max-width: 100%;
+  padding-right: 8px;
+}
+
+.profile-left .section-inner {
+  min-height: min-content;
 }
 
 /* =====================================================
@@ -241,16 +242,6 @@ SCROLLBAR
 }
 
 /* =====================================================
-SECTION INNER SPACING
-===================================================== */
-
-.profile-left .section > * {
-  width: 100%;
-  max-width: 100%;
-  padding-right: 8px;
-}
-
-/* =====================================================
 FORM LAYOUT
 ===================================================== */
 
@@ -258,7 +249,8 @@ FORM LAYOUT
 .profile-left fieldset,
 .profile-left .field,
 .profile-left .form-field,
-.profile-left .form-row {
+.profile-left .form-row,
+.form-builder {
   width: 100%;
   max-width: 100%;
   min-width: 0;
@@ -266,7 +258,8 @@ FORM LAYOUT
 
 .profile-left .form-row,
 .profile-left .field,
-.profile-left .form-field {
+.profile-left .form-field,
+.form-builder > * {
   margin-bottom: 20px;
 }
 
@@ -280,24 +273,16 @@ INPUTS
   width: 100%;
   max-width: 100%;
   min-width: 0;
-
   height: 48px;
-
   padding: 0 14px;
-
   display: block;
-
   border: 1px solid #d8d0c8;
   border-radius: 12px;
-
   background: #ffffff;
   color: #241f1c;
-
   font: inherit;
   font-size: 14px;
-
   outline: none;
-
   transition:
     border-color 0.2s ease,
     box-shadow 0.2s ease,
@@ -371,23 +356,18 @@ PHONE SECTION
   width: 100%;
   max-width: 100%;
   min-width: 0;
-
   height: 48px;
-
   padding: 0 14px;
-
   border: 1px solid #d8d0c8;
   border-radius: 12px;
-
   background: #ffffff;
   color: #241f1c;
-
   font: inherit;
 }
 
 .phone-verification {
   width: 100%;
-  padding: 18px 0 22px;
+  padding: 18px 0 28px;
   margin-top: 0;
   border-bottom: 1px solid #eee7e0;
 }
@@ -476,6 +456,7 @@ RESPONSIVE
 
   .profile-left,
   .profile-guide {
+    height: auto;
     min-height: auto;
     max-height: none;
   }
@@ -483,6 +464,7 @@ RESPONSIVE
   .profile-left .section {
     overflow: visible;
     min-height: auto;
+    padding-bottom: 36px;
   }
 }
 
