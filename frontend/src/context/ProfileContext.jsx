@@ -11,6 +11,21 @@ import {
 import { useAuth } from "./AuthContext";
 import useAPI from "../../hooks/useAPI";
 
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+
+import { fetchAuthSession } from "aws-amplify/auth";
+
+import { useAuth } from "./AuthContext";
+import useAPI from "../../hooks/useAPI";
+
 const ProfileContext = createContext(null);
 
 const REQUIRED_PROFILE_FIELDS = [
@@ -19,6 +34,20 @@ const REQUIRED_PROFILE_FIELDS = [
   "homeLocation",
   "phone",
 ];
+
+async function getAuthHeaders(extraHeaders = {}) {
+  const session = await fetchAuthSession();
+  const token = session.tokens?.accessToken?.toString();
+
+  if (!token) {
+    throw new Error("No access token");
+  }
+
+  return {
+    ...extraHeaders,
+    Authorization: `Bearer ${token}`,
+  };
+}
 
 function getValue(obj, path) {
   return path.split(".").reduce((acc, key) => acc?.[key], obj);
@@ -72,7 +101,9 @@ export function ProfileProvider({ children }) {
     setProfileError(null);
 
     try {
-      const res = await apiRef.current.get("/profile");
+      const headers = await getAuthHeaders();
+      const res = await apiRef.current.get("/profile", { headers });
+
       const nextProfile = res?.profile || null;
 
       setProfile(nextProfile);
@@ -130,10 +161,12 @@ export function ProfileProvider({ children }) {
       setProfile(optimisticProfile);
 
       try {
+        const headers = await getAuthHeaders({
+          "x-version": previousProfile?.version || "",
+        });
+
         const res = await apiRef.current.put("/profile", optimisticProfile, {
-          headers: {
-            "x-version": previousProfile?.version,
-          },
+          headers,
         });
 
         const savedProfile = res?.profile || optimisticProfile;
@@ -187,10 +220,12 @@ export function ProfileProvider({ children }) {
       setProfile(optimisticProfile);
 
       try {
+        const headers = await getAuthHeaders({
+          "x-version": previousProfile?.version || "",
+        });
+
         const res = await apiRef.current.patch("/profile", patch, {
-          headers: {
-            "x-version": previousProfile?.version,
-          },
+          headers,
         });
 
         const savedProfile = res?.profile || optimisticProfile;
