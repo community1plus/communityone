@@ -131,33 +131,6 @@ function stripDialCode(phone = "", countryCode = DEFAULT_PHONE_COUNTRY) {
   return digits;
 }
 
-function formatLocalPhone(phone = "", countryCode = DEFAULT_PHONE_COUNTRY) {
-  const country = getPhoneCountry(countryCode);
-  const digits = stripDialCode(phone, countryCode);
-
-  if (!digits) return "";
-
-  if (country.code === "AU") {
-    const local = digits.startsWith("4") ? `0${digits}` : digits;
-
-    return local
-      .slice(0, 10)
-      .replace(/(\d{4})(\d{3})(\d{0,3})/, (_, a, b, c) =>
-        c ? `${a} ${b} ${c}` : `${a} ${b}`
-      );
-  }
-
-  if (country.code === "US" || country.code === "CA") {
-    return digits
-      .slice(0, 10)
-      .replace(/(\d{3})(\d{3})(\d{0,4})/, (_, a, b, c) =>
-        c ? `${a} ${b} ${c}` : `${a} ${b}`
-      );
-  }
-
-  return digits.replace(/(\d{3})(?=\d)/g, "$1 ").trim();
-}
-
 function toE164Phone(phone = "", countryCode = DEFAULT_PHONE_COUNTRY) {
   const country = getPhoneCountry(countryCode);
   const digits = stripDialCode(phone, countryCode);
@@ -184,7 +157,6 @@ export default function CommunityPlusUserProfile({ onComplete }) {
   const navigate = useNavigate();
 
   const autoRef = useRef(null);
-  const formattingPhoneRef = useRef(false);
   const lastHomeLocationRef = useRef("");
 
   const { isLoaded } = useGoogleMaps();
@@ -259,11 +231,7 @@ export default function CommunityPlusUserProfile({ onComplete }) {
   );
 
   const canContinueFromContact = !isContactStep || values.phoneVerified;
-
-  const displayCompletion = useMemo(
-    () => completionPercent || 0,
-    [completionPercent]
-  );
+  const displayCompletion = completionPercent || 0;
 
   useEffect(() => {
     if (!user?.email) return;
@@ -299,30 +267,10 @@ export default function CommunityPlusUserProfile({ onComplete }) {
   }, [homeLocation, setValue]);
 
   useEffect(() => {
-    if (formattingPhoneRef.current) return;
-
-    const formatted = formatLocalPhone(values.phone, values.phoneCountry);
-    const nextE164 = toE164Phone(formatted, values.phoneCountry);
-
-    const shouldUpdatePhone = Boolean(formatted) && formatted !== values.phone;
-    const shouldUpdateE164 = nextE164 !== values.phoneE164;
-
-    if (!shouldUpdatePhone && !shouldUpdateE164) return;
-
-    formattingPhoneRef.current = true;
-
-    if (shouldUpdatePhone) {
-      setValue("phone", formatted);
+    if (phoneE164 !== values.phoneE164) {
+      setValue("phoneE164", phoneE164);
     }
-
-    if (shouldUpdateE164) {
-      setValue("phoneE164", nextE164);
-    }
-
-    window.setTimeout(() => {
-      formattingPhoneRef.current = false;
-    }, 0);
-  }, [values.phone, values.phoneCountry, values.phoneE164, setValue]);
+  }, [phoneE164, values.phoneE164, setValue]);
 
   useEffect(() => {
     if (!values.phone) return;
@@ -346,11 +294,9 @@ export default function CommunityPlusUserProfile({ onComplete }) {
   const handlePhoneCountryChange = useCallback(
     (event) => {
       const nextCountry = event.target.value;
-      const formatted = formatLocalPhone(values.phone, nextCountry);
-      const nextE164 = toE164Phone(formatted, nextCountry);
+      const nextE164 = toE164Phone(values.phone, nextCountry);
 
       setValue("phoneCountry", nextCountry);
-      setValue("phone", formatted);
       setValue("phoneE164", nextE164);
       setValue("phoneVerified", false);
       setValue("phoneVerificationCode", "");
@@ -381,13 +327,28 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     setValue("phoneVerificationCode", "");
 
     try {
-      console.log("Send verification code to:", cleanPhone);
+      const response = await fetch(
+        `${import.meta.env.VITE_SMS_API_URL}/auth/send-phone-code`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            phone: cleanPhone,
+          }),
+        }
+      );
 
-      // Backend wiring later:
-      // await api.post("/phone/send-code", { phone: cleanPhone });
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error("Failed to send verification code");
+      }
 
       setPhoneStatus("sent");
     } catch (err) {
+      console.error("Send phone code failed:", err);
       setPhoneStatus("error");
       setPhoneError(err?.message || "Could not send verification code");
     }
@@ -413,23 +374,33 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     setPhoneError("");
 
     try {
-      console.log("Verify phone code:", {
-        phone: toE164Phone(values.phone, values.phoneCountry),
-        code: values.phoneVerificationCode,
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_SMS_API_URL}/auth/verify-phone-code`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            phone: toE164Phone(values.phone, values.phoneCountry),
+            code: values.phoneVerificationCode,
+          }),
+        }
+      );
 
-      // Backend wiring later:
-      // await api.post("/phone/verify-code", {
-      //   phone: toE164Phone(values.phone, values.phoneCountry),
-      //   code: values.phoneVerificationCode,
-      // });
+      const data = await response.json();
+
+      if (!response.ok || !data.verified) {
+        throw new Error("Invalid verification code");
+      }
 
       setValue("phoneVerified", true);
       setPhoneStatus("verified");
     } catch (err) {
+      console.error("Verify phone code failed:", err);
       setValue("phoneVerified", false);
       setPhoneStatus("error");
-      setPhoneError(err?.message || "Invalid verification code");
+      setPhoneError(err?.message || "Verification failed");
     }
   }, [
     phoneStatus,
@@ -495,7 +466,6 @@ export default function CommunityPlusUserProfile({ onComplete }) {
       const nextProfile = await saveProfile(payload);
 
       clearStorage?.();
-
       onComplete?.(nextProfile);
 
       navigate("/communityplus", { replace: true });
@@ -563,7 +533,6 @@ export default function CommunityPlusUserProfile({ onComplete }) {
               </div>
             </div>
 
-           
             <div className="profile-section-tabs">
               {profileSteps.map((step, index) => (
                 <button
