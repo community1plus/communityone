@@ -563,10 +563,7 @@ export default function CommunityPlusUserProfile({ onComplete }) {
               </div>
             </div>
 
-            <div className="profile-save-status idle">
-              Autosave isolated — profile saves on Finish only.
-            </div>
-
+           
             <div className="profile-section-tabs">
               {profileSteps.map((step, index) => (
                 <button
