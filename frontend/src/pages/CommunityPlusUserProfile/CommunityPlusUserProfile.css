@@ -142,6 +142,7 @@ SECTION TABS
 .profile-section-tabs {
   position: relative;
   width: 100%;
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -196,12 +197,27 @@ FORM AREA
 
 .profile-left .section {
   flex: 1 1 auto;
-  min-height: 0;
+  min-height: 280px;
+  max-height: 100%;
   width: 100%;
   max-width: 100%;
-  padding: 20px 0 22px;
-  overflow: visible;
+  padding: 24px 0 30px;
+  overflow-y: auto;
+  overflow-x: hidden;
   border-bottom: 1px solid #eee7e0;
+}
+
+.profile-left .section::-webkit-scrollbar {
+  width: 8px;
+}
+
+.profile-left .section::-webkit-scrollbar-thumb {
+  background: #d8d0c8;
+  border-radius: 999px;
+}
+
+.profile-left .section::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .profile-left .section > * {
@@ -222,7 +238,7 @@ FORM AREA
 .profile-left .form-row,
 .profile-left .field,
 .profile-left .form-field {
-  margin-bottom: 18px;
+  margin-bottom: 20px;
 }
 
 .profile-left input,
@@ -231,7 +247,7 @@ FORM AREA
   width: 100%;
   max-width: 100%;
   min-width: 0;
-  height: 44px;
+  height: 48px;
   padding: 0 14px;
   display: block;
   border: 1px solid #d8d0c8;
@@ -266,7 +282,7 @@ FORM AREA
 
 .profile-left label {
   display: block;
-  margin-bottom: 7px;
+  margin-bottom: 8px;
   font-size: 13px;
   font-weight: 650;
   color: #241f1c;
@@ -278,12 +294,12 @@ PHONE SECTION
 
 .phone-country-row {
   width: 100%;
-  margin-bottom: 18px;
+  margin-bottom: 20px;
 }
 
 .phone-country-label {
   display: block;
-  margin-bottom: 7px;
+  margin-bottom: 8px;
   font-size: 13px;
   font-weight: 650;
   color: #241f1c;
@@ -293,7 +309,7 @@ PHONE SECTION
   width: 100%;
   max-width: 100%;
   min-width: 0;
-  height: 44px;
+  height: 48px;
   padding: 0 14px;
   border: 1px solid #d8d0c8;
   border-radius: 12px;
@@ -304,7 +320,7 @@ PHONE SECTION
 
 .phone-verification {
   width: 100%;
-  padding: 16px 0 18px;
+  padding: 18px 0 22px;
   margin-top: 0;
   border-bottom: 1px solid #eee7e0;
 }
@@ -395,6 +411,11 @@ RESPONSIVE
   .profile-guide {
     min-height: auto;
     max-height: none;
+  }
+
+  .profile-left .section {
+    overflow: visible;
+    min-height: auto;
   }
 }
 
