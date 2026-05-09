@@ -28,26 +28,10 @@ const PHONE_COUNTRIES = [
 ];
 
 const SOCIAL_PROVIDERS = [
-  {
-    id: "facebook",
-    label: "Facebook",
-    description: "Verify business page admin access.",
-  },
-  {
-    id: "instagram",
-    label: "Instagram",
-    description: "Verify professional or creator account access.",
-  },
-  {
-    id: "youtube",
-    label: "YouTube",
-    description: "Verify channel ownership.",
-  },
-  {
-    id: "x",
-    label: "X / Twitter",
-    description: "Verify account ownership.",
-  },
+  { id: "facebook", label: "Facebook", description: "Verify business page admin access." },
+  { id: "instagram", label: "Instagram", description: "Verify professional or creator account access." },
+  { id: "youtube", label: "YouTube", description: "Verify channel ownership." },
+  { id: "x", label: "X / Twitter", description: "Verify account ownership." },
 ];
 
 const DEFAULT_PHONE_COUNTRY = "AU";
@@ -58,12 +42,7 @@ const profileSteps = [
     title: "USER",
     fields: [
       { name: "username", label: "Username", type: "text", required: true },
-      {
-        name: "display_name",
-        label: "Display Name",
-        type: "text",
-        required: true,
-      },
+      { name: "display_name", label: "Display Name", type: "text", required: true },
       {
         name: "userType",
         label: "User Type",
@@ -81,32 +60,17 @@ const profileSteps = [
   {
     id: "home-address",
     title: "HOME ADDRESS",
-    fields: [
-      {
-        name: "homeLocation",
-        label: "Home Address",
-        type: "location",
-        required: true,
-      },
-    ],
+    fields: [{ name: "homeLocation", label: "Home Address", type: "location", required: true }],
   },
   {
     id: "contact",
     title: "CONTACT",
     fields: [
       { name: "phone", label: "Phone Number", type: "tel", required: true },
-      {
-        name: "phoneVerificationCode",
-        label: "Verification Code",
-        type: "text",
-      },
+      { name: "phoneVerificationCode", label: "Verification Code", type: "text" },
     ],
   },
-  {
-    id: "social",
-    title: "SOCIAL",
-    fields: [],
-  },
+  { id: "social", title: "SOCIAL", fields: [] },
   {
     id: "payment",
     title: "PAYMENT DETAILS",
@@ -122,10 +86,7 @@ function digitsOnly(value = "") {
 }
 
 function getPhoneCountry(code = DEFAULT_PHONE_COUNTRY) {
-  return (
-    PHONE_COUNTRIES.find((country) => country.code === code) ||
-    PHONE_COUNTRIES[0]
-  );
+  return PHONE_COUNTRIES.find((country) => country.code === code) || PHONE_COUNTRIES[0];
 }
 
 function stripDialCode(phone = "", countryCode = DEFAULT_PHONE_COUNTRY) {
@@ -133,13 +94,8 @@ function stripDialCode(phone = "", countryCode = DEFAULT_PHONE_COUNTRY) {
   let digits = digitsOnly(phone);
   const dialDigits = digitsOnly(country.dialCode);
 
-  if (digits.startsWith(dialDigits)) {
-    digits = digits.slice(dialDigits.length);
-  }
-
-  if (country.code === "AU" && digits.startsWith("0")) {
-    digits = digits.slice(1);
-  }
+  if (digits.startsWith(dialDigits)) digits = digits.slice(dialDigits.length);
+  if (country.code === "AU" && digits.startsWith("0")) digits = digits.slice(1);
 
   return digits;
 }
@@ -147,33 +103,21 @@ function stripDialCode(phone = "", countryCode = DEFAULT_PHONE_COUNTRY) {
 function toE164Phone(phone = "", countryCode = DEFAULT_PHONE_COUNTRY) {
   const country = getPhoneCountry(countryCode);
   const digits = stripDialCode(phone, countryCode);
-
   if (!digits) return "";
-
   return `${country.dialCode}${digits}`;
 }
 
-function isValidInternationalPhone(
-  phone = "",
-  countryCode = DEFAULT_PHONE_COUNTRY
-) {
+function isValidInternationalPhone(phone = "", countryCode = DEFAULT_PHONE_COUNTRY) {
   const country = getPhoneCountry(countryCode);
   const nationalDigits = stripDialCode(phone, countryCode);
-
-  return (
-    nationalDigits.length >= country.min &&
-    nationalDigits.length <= country.max
-  );
+  return nationalDigits.length >= country.min && nationalDigits.length <= country.max;
 }
 
 function getSocialStatus(social = {}, providerId) {
   const provider = social?.[providerId];
 
   if (!provider || !provider.verified) {
-    return {
-      verified: false,
-      text: "Not verified",
-    };
+    return { verified: false, text: "Not verified" };
   }
 
   return {
@@ -196,8 +140,7 @@ export default function CommunityPlusUserProfile({ onComplete }) {
 
   const { isLoaded } = useGoogleMaps();
   const { user } = useAuth();
-  const { viewLocation: homeLocation, setManualLocation } =
-    useLocationContext();
+  const { viewLocation: homeLocation, setManualLocation } = useLocationContext();
 
   const {
     profile,
@@ -235,8 +178,7 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     },
   });
 
-  const { values, validateAll, setValue, isFormValidating, clearStorage } =
-    form;
+  const { values, validateAll, setValue, isFormValidating, clearStorage } = form;
 
   const [currentStep, setCurrentStep] = useState(0);
   const [savingProfile, setSavingProfile] = useState(false);
@@ -277,10 +219,7 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     }
 
     if (!values.display_name) {
-      setValue(
-        "display_name",
-        profile?.display_name || user.displayName || prefix
-      );
+      setValue("display_name", profile?.display_name || user.displayName || prefix);
     }
   }, [
     user?.email,
@@ -324,17 +263,9 @@ export default function CommunityPlusUserProfile({ onComplete }) {
       setPhoneStatus("idle");
       setPhoneError("");
     }
-  }, [
-    values.phone,
-    phoneE164,
-    profile?.phoneE164,
-    profile?.phone,
-    setValue,
-  ]);
+  }, [values.phone, phoneE164, profile?.phoneE164, profile?.phone, setValue]);
 
   useEffect(() => {
-    if (!profileReady || socialCallbackHandledRef.current) return;
-
     const syncSocialVerification = async () => {
       const params = new URLSearchParams(window.location.search);
 
@@ -342,55 +273,10 @@ export default function CommunityPlusUserProfile({ onComplete }) {
       const verified = params.get("verified");
       const reason = params.get("reason");
 
-      if (!socialProvider) return;
+      if (!socialProvider || socialCallbackHandledRef.current) return;
 
       socialCallbackHandledRef.current = true;
       setCurrentStep(3);
-
-      if (verified === "true") {
-        const verifiedAt = new Date().toISOString();
-
-        const verifiedSocial = {
-          ...values.social,
-          [socialProvider]: {
-            ...(values.social?.[socialProvider] || {}),
-            verified: true,
-            verifiedAt,
-          },
-        };
-
-        setValue("social", verifiedSocial);
-        setProfileError("");
-
-        try {
-          await saveProfile({
-            username: values.username,
-            display_name: values.display_name,
-            userType: values.userType,
-
-            phone: phoneE164,
-            phoneE164,
-            phoneDisplay: values.phone,
-            phoneCountry: values.phoneCountry,
-            phoneVerified: values.phoneVerified,
-
-            homeLocation: values.homeLocation || homeLocation,
-
-            social: verifiedSocial,
-
-            payment: {
-              cardName: values.payment?.cardName || "",
-              last4: values.payment?.last4 || "",
-            },
-          });
-        } catch (err) {
-          console.error("Social verification save failed:", err);
-          setProfileError(
-            err?.message ||
-              "Social verification succeeded, but saving it failed."
-          );
-        }
-      }
 
       if (verified === "false") {
         setProfileError(
@@ -398,19 +284,73 @@ export default function CommunityPlusUserProfile({ onComplete }) {
             ? `Social verification failed: ${reason}`
             : "Social verification failed."
         );
+
+        window.history.replaceState({}, document.title, window.location.pathname);
+        return;
       }
 
-      window.history.replaceState({}, document.title, window.location.pathname);
+      if (verified !== "true") return;
+
+      const verifiedAt = new Date().toISOString();
+
+      const verifiedSocial = {
+        ...values.social,
+        [socialProvider]: {
+          ...(values.social?.[socialProvider] || {}),
+          verified: true,
+          verifiedAt,
+        },
+      };
+
+      const nextPayload = {
+        username: values.username,
+        display_name: values.display_name,
+        userType: values.userType,
+
+        phone: phoneE164,
+        phoneE164,
+        phoneDisplay: values.phone,
+        phoneCountry: values.phoneCountry,
+        phoneVerified: values.phoneVerified,
+
+        homeLocation: values.homeLocation || homeLocation,
+
+        social: verifiedSocial,
+
+        payment: {
+          cardName: values.payment?.cardName || "",
+          last4: values.payment?.last4 || "",
+        },
+      };
+
+      setValue("social", verifiedSocial);
+      setProfileError("");
+
+      console.log("Saving social verification payload:", nextPayload);
+
+      try {
+        await saveProfile(nextPayload);
+        console.log("Social verification saved.");
+
+        window.history.replaceState({}, document.title, window.location.pathname);
+      } catch (err) {
+        console.error("Social verification save failed:", err);
+
+        setProfileError(
+          err?.message || "Social verification succeeded, but saving it failed."
+        );
+      }
     };
 
     syncSocialVerification();
   }, [
-    profileReady,
+    user?.id,
+    user?.email,
+    saveProfile,
+    setValue,
     values,
     phoneE164,
     homeLocation,
-    saveProfile,
-    setValue,
   ]);
 
   const handlePhoneCountryChange = useCallback(
@@ -457,9 +397,7 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     }
 
     if (!isValidInternationalPhone(values.phone, values.phoneCountry)) {
-      setPhoneError(
-        `Enter a valid phone number for ${selectedPhoneCountry.label}.`
-      );
+      setPhoneError(`Enter a valid phone number for ${selectedPhoneCountry.label}.`);
       return;
     }
 
@@ -715,9 +653,7 @@ export default function CommunityPlusUserProfile({ onComplete }) {
                         <div className="social-verification-main">
                           <strong>{provider.label}</strong>
                           <span>{provider.description}</span>
-                          <small
-                            className={status.verified ? "success" : "hint"}
-                          >
+                          <small className={status.verified ? "success" : "hint"}>
                             {status.text}
                           </small>
                         </div>
