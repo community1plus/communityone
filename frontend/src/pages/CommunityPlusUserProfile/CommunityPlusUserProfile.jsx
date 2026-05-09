@@ -192,6 +192,7 @@ export default function CommunityPlusUserProfile({ onComplete }) {
 
   const autoRef = useRef(null);
   const lastHomeLocationRef = useRef("");
+  const socialCallbackHandledRef = useRef(false);
 
   const { isLoaded } = useGoogleMaps();
   const { user } = useAuth();
@@ -332,35 +333,85 @@ export default function CommunityPlusUserProfile({ onComplete }) {
   ]);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
+    if (!profileReady || socialCallbackHandledRef.current) return;
 
-    const socialProvider = params.get("social");
-    const verified = params.get("verified");
-    const reason = params.get("reason");
+    const syncSocialVerification = async () => {
+      const params = new URLSearchParams(window.location.search);
 
-    if (!socialProvider) return;
+      const socialProvider = params.get("social");
+      const verified = params.get("verified");
+      const reason = params.get("reason");
 
-    if (verified === "true") {
-      setValue(`social.${socialProvider}`, {
-        verified: true,
-        verifiedAt: new Date().toISOString(),
-      });
+      if (!socialProvider) return;
 
+      socialCallbackHandledRef.current = true;
       setCurrentStep(3);
-      setProfileError("");
-    }
 
-    if (verified === "false") {
-      setCurrentStep(3);
-      setProfileError(
-        reason
-          ? `Social verification failed: ${reason}`
-          : "Social verification failed."
-      );
-    }
+      if (verified === "true") {
+        const verifiedAt = new Date().toISOString();
 
-    window.history.replaceState({}, document.title, window.location.pathname);
-  }, [setValue]);
+        const verifiedSocial = {
+          ...values.social,
+          [socialProvider]: {
+            ...(values.social?.[socialProvider] || {}),
+            verified: true,
+            verifiedAt,
+          },
+        };
+
+        setValue("social", verifiedSocial);
+        setProfileError("");
+
+        try {
+          await saveProfile({
+            username: values.username,
+            display_name: values.display_name,
+            userType: values.userType,
+
+            phone: phoneE164,
+            phoneE164,
+            phoneDisplay: values.phone,
+            phoneCountry: values.phoneCountry,
+            phoneVerified: values.phoneVerified,
+
+            homeLocation: values.homeLocation || homeLocation,
+
+            social: verifiedSocial,
+
+            payment: {
+              cardName: values.payment?.cardName || "",
+              last4: values.payment?.last4 || "",
+            },
+          });
+        } catch (err) {
+          console.error("Social verification save failed:", err);
+          setProfileError(
+            err?.message ||
+              "Social verification succeeded, but saving it failed."
+          );
+        }
+      }
+
+      if (verified === "false") {
+        setProfileError(
+          reason
+            ? `Social verification failed: ${reason}`
+            : "Social verification failed."
+        );
+      }
+
+      window.history.replaceState({}, document.title, window.location.pathname);
+    };
+
+    syncSocialVerification();
+  }, [
+    profileReady,
+    values,
+    phoneE164,
+    homeLocation,
+    saveProfile,
+    setValue,
+  ]);
 
   const handlePhoneCountryChange = useCallback(
     (event) => {
