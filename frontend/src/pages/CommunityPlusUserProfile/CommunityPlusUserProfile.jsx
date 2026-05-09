@@ -594,29 +594,32 @@ export default function CommunityPlusUserProfile({ onComplete }) {
 
               {isSocialStep ? (
                 <div className="social-verification-list">
-                  {SOCIAL_PROVIDERS.map((provider) => {
-                    const status = getSocialStatus(values.social, provider.id);
+  {SOCIAL_PROVIDERS.map((provider) => {
+    const status = getSocialStatus(values.social, provider.id);
 
-                    return (
-                      <div className="social-verification-row" key={provider.id}>
-                        <div className="social-verification-main">
-                          <strong>{provider.label}</strong>
-                          <span>{provider.description}</span>
-                          <small className={status.verified ? "success" : "hint"}>
-                            {status.verified ? `Verified: ${status.label}` : status.label}
-                          </small>
-                        </div>
+    return (
+      <div className="social-verification-row" key={provider.id}>
+        <div className="social-verification-main">
+          <strong>{provider.label}</strong>
+          <span>{provider.description}</span>
+          <small className={status.verified ? "success" : "hint"}>
+            {status.verified ? `Verified: ${status.label}` : "Not verified"}
+          </small>
+        </div>
 
-                        <Button
-                          variant={status.verified ? "ghost" : "primary"}
-                          onClick={() => startSocialVerification(provider.id)}
-                        >
-                          {status.verified ? "Re-verify" : "Verify"}
-                        </Button>
-                      </div>
-                    );
-                  })}
-                </div>
+        <button
+          type="button"
+          className={`social-verify-button ${
+            status.verified ? "verified" : "unverified"
+          }`}
+          onClick={() => startSocialVerification(provider.id)}
+        >
+          {status.verified ? "Verified" : "Verify"}
+        </button>
+      </div>
+    );
+  })}
+</div>
               ) : (
                 <FormBuilder
                   steps={profileSteps}
