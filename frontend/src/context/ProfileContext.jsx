@@ -1,4 +1,3 @@
-
 import {
   createContext,
   useCallback,
@@ -31,8 +30,9 @@ async function getAuthHeaders(extraHeaders = {}) {
   }
 
   return {
-    ...extraHeaders,
+    "Content-Type": "application/json",
     Authorization: `Bearer ${token}`,
+    ...extraHeaders,
   };
 }
 
@@ -89,7 +89,14 @@ export function ProfileProvider({ children }) {
 
     try {
       const headers = await getAuthHeaders();
-      const res = await apiRef.current.get("/profile", { headers });
+
+      console.log("GET /profile headers ready");
+
+      const res = await apiRef.current.get("/profile", {
+        headers,
+      });
+
+      console.log("GET /profile response:", res);
 
       const nextProfile = res?.profile || null;
 
@@ -149,12 +156,22 @@ export function ProfileProvider({ children }) {
 
       try {
         const headers = await getAuthHeaders({
-          "x-version": previousProfile?.version || "",
+          "x-version": previousProfile?.version
+            ? String(previousProfile.version)
+            : "",
+        });
+
+        console.log("PUT /profile payload:", optimisticProfile);
+        console.log("PUT /profile headers:", {
+          ...headers,
+          Authorization: headers.Authorization ? "Bearer <present>" : null,
         });
 
         const res = await apiRef.current.put("/profile", optimisticProfile, {
           headers,
         });
+
+        console.log("PUT /profile response:", res);
 
         const savedProfile = res?.profile || optimisticProfile;
 
@@ -208,12 +225,22 @@ export function ProfileProvider({ children }) {
 
       try {
         const headers = await getAuthHeaders({
-          "x-version": previousProfile?.version || "",
+          "x-version": previousProfile?.version
+            ? String(previousProfile.version)
+            : "",
+        });
+
+        console.log("PATCH /profile payload:", patch);
+        console.log("PATCH /profile headers:", {
+          ...headers,
+          Authorization: headers.Authorization ? "Bearer <present>" : null,
         });
 
         const res = await apiRef.current.patch("/profile", patch, {
           headers,
         });
+
+        console.log("PATCH /profile response:", res);
 
         const savedProfile = res?.profile || optimisticProfile;
 
