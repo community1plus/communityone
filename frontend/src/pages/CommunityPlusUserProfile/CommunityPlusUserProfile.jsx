@@ -58,7 +58,12 @@ const profileSteps = [
     title: "USER",
     fields: [
       { name: "username", label: "Username", type: "text", required: true },
-      { name: "display_name", label: "Display Name", type: "text", required: true },
+      {
+        name: "display_name",
+        label: "Display Name",
+        type: "text",
+        required: true,
+      },
       {
         name: "userType",
         label: "User Type",
@@ -77,7 +82,12 @@ const profileSteps = [
     id: "home-address",
     title: "HOME ADDRESS",
     fields: [
-      { name: "homeLocation", label: "Home Address", type: "location", required: true },
+      {
+        name: "homeLocation",
+        label: "Home Address",
+        type: "location",
+        required: true,
+      },
     ],
   },
   {
@@ -85,7 +95,11 @@ const profileSteps = [
     title: "CONTACT",
     fields: [
       { name: "phone", label: "Phone Number", type: "tel", required: true },
-      { name: "phoneVerificationCode", label: "Verification Code", type: "text" },
+      {
+        name: "phoneVerificationCode",
+        label: "Verification Code",
+        type: "text",
+      },
     ],
   },
   {
@@ -108,7 +122,10 @@ function digitsOnly(value = "") {
 }
 
 function getPhoneCountry(code = DEFAULT_PHONE_COUNTRY) {
-  return PHONE_COUNTRIES.find((country) => country.code === code) || PHONE_COUNTRIES[0];
+  return (
+    PHONE_COUNTRIES.find((country) => country.code === code) ||
+    PHONE_COUNTRIES[0]
+  );
 }
 
 function stripDialCode(phone = "", countryCode = DEFAULT_PHONE_COUNTRY) {
@@ -116,8 +133,13 @@ function stripDialCode(phone = "", countryCode = DEFAULT_PHONE_COUNTRY) {
   let digits = digitsOnly(phone);
   const dialDigits = digitsOnly(country.dialCode);
 
-  if (digits.startsWith(dialDigits)) digits = digits.slice(dialDigits.length);
-  if (country.code === "AU" && digits.startsWith("0")) digits = digits.slice(1);
+  if (digits.startsWith(dialDigits)) {
+    digits = digits.slice(dialDigits.length);
+  }
+
+  if (country.code === "AU" && digits.startsWith("0")) {
+    digits = digits.slice(1);
+  }
 
   return digits;
 }
@@ -131,11 +153,17 @@ function toE164Phone(phone = "", countryCode = DEFAULT_PHONE_COUNTRY) {
   return `${country.dialCode}${digits}`;
 }
 
-function isValidInternationalPhone(phone = "", countryCode = DEFAULT_PHONE_COUNTRY) {
+function isValidInternationalPhone(
+  phone = "",
+  countryCode = DEFAULT_PHONE_COUNTRY
+) {
   const country = getPhoneCountry(countryCode);
   const nationalDigits = stripDialCode(phone, countryCode);
 
-  return nationalDigits.length >= country.min && nationalDigits.length <= country.max;
+  return (
+    nationalDigits.length >= country.min &&
+    nationalDigits.length <= country.max
+  );
 }
 
 function getSocialStatus(social = {}, providerId) {
@@ -174,7 +202,8 @@ export default function CommunityPlusUserProfile({ onComplete }) {
 
   const { isLoaded } = useGoogleMaps();
   const { user } = useAuth();
-  const { viewLocation: homeLocation, setManualLocation } = useLocationContext();
+  const { viewLocation: homeLocation, setManualLocation } =
+    useLocationContext();
 
   const {
     profile,
@@ -212,7 +241,8 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     },
   });
 
-  const { values, validateAll, setValue, isFormValidating, clearStorage } = form;
+  const { values, validateAll, setValue, isFormValidating, clearStorage } =
+    form;
 
   const [currentStep, setCurrentStep] = useState(0);
   const [savingProfile, setSavingProfile] = useState(false);
@@ -253,7 +283,10 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     }
 
     if (!values.display_name) {
-      setValue("display_name", profile?.display_name || user.displayName || prefix);
+      setValue(
+        "display_name",
+        profile?.display_name || user.displayName || prefix
+      );
     }
   }, [
     user?.email,
@@ -305,6 +338,37 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     setValue,
   ]);
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+
+    const socialProvider = params.get("social");
+    const verified = params.get("verified");
+    const reason = params.get("reason");
+
+    if (!socialProvider) return;
+
+    if (verified === "true") {
+      setValue(`social.${socialProvider}`, {
+        verified: true,
+        verifiedAt: new Date().toISOString(),
+      });
+
+      setCurrentStep(3);
+      setProfileError("");
+    }
+
+    if (verified === "false") {
+      setCurrentStep(3);
+      setProfileError(
+        reason
+          ? `Social verification failed: ${reason}`
+          : "Social verification failed."
+      );
+    }
+
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }, [setValue]);
+
   const handlePhoneCountryChange = useCallback(
     (event) => {
       const nextCountry = event.target.value;
@@ -332,12 +396,12 @@ export default function CommunityPlusUserProfile({ onComplete }) {
 
       const params = new URLSearchParams({
         provider: providerId,
-        userId: user?.id || "",
+        userId: user?.id || user?.email || "",
       });
 
       window.location.href = `${baseUrl}/social/${providerId}/start?${params.toString()}`;
     },
-    [user?.id]
+    [user?.id, user?.email]
   );
 
   const sendPhoneCode = useCallback(async () => {
@@ -349,7 +413,9 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     }
 
     if (!isValidInternationalPhone(values.phone, values.phoneCountry)) {
-      setPhoneError(`Enter a valid phone number for ${selectedPhoneCountry.label}.`);
+      setPhoneError(
+        `Enter a valid phone number for ${selectedPhoneCountry.label}.`
+      );
       return;
     }
 
@@ -594,32 +660,39 @@ export default function CommunityPlusUserProfile({ onComplete }) {
 
               {isSocialStep ? (
                 <div className="social-verification-list">
-  {SOCIAL_PROVIDERS.map((provider) => {
-    const status = getSocialStatus(values.social, provider.id);
+                  {SOCIAL_PROVIDERS.map((provider) => {
+                    const status = getSocialStatus(values.social, provider.id);
 
-    return (
-      <div className="social-verification-row" key={provider.id}>
-        <div className="social-verification-main">
-          <strong>{provider.label}</strong>
-          <span>{provider.description}</span>
-          <small className={status.verified ? "success" : "hint"}>
-            {status.verified ? `Verified: ${status.label}` : "Not verified"}
-          </small>
-        </div>
+                    return (
+                      <div
+                        className="social-verification-row"
+                        key={provider.id}
+                      >
+                        <div className="social-verification-main">
+                          <strong>{provider.label}</strong>
+                          <span>{provider.description}</span>
+                          <small
+                            className={status.verified ? "success" : "hint"}
+                          >
+                            {status.verified
+                              ? `Verified: ${status.label}`
+                              : "Not verified"}
+                          </small>
+                        </div>
 
-        <button
-          type="button"
-          className={`social-verify-button ${
-            status.verified ? "verified" : "unverified"
-          }`}
-          onClick={() => startSocialVerification(provider.id)}
-        >
-          {status.verified ? "Verified" : "Verify"}
-        </button>
-      </div>
-    );
-  })}
-</div>
+                        <button
+                          type="button"
+                          className={`social-verify-button ${
+                            status.verified ? "verified" : "unverified"
+                          }`}
+                          onClick={() => startSocialVerification(provider.id)}
+                        >
+                          {status.verified ? "Verified" : "Verify"}
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
               ) : (
                 <FormBuilder
                   steps={profileSteps}
