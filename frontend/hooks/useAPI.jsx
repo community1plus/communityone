@@ -1,57 +1,67 @@
-const API_BASE =
-  import.meta.env.VITE_API_BASE ||
-  `${import.meta.env.VITE_API_URL}/api`;
+import { useMemo } from "react";
 
-function buildUrl(path) {
-  if (!API_BASE) {
-    throw new Error("Missing VITE_API_BASE or VITE_API_URL");
+import { useAuth } from "../src/context/AuthContext";
+import { useUI } from "../src/context/UIContext";
+import { apiFetch } from "../src/services/api";
+
+export default function useAPI() {
+  const { token, user } = useAuth();
+
+  let startSaving;
+  let stopSaving;
+
+  try {
+    const ui = useUI();
+    startSaving = ui?.startSaving;
+    stopSaving = ui?.stopSaving;
+  } catch {
+    startSaving = undefined;
+    stopSaving = undefined;
   }
 
-  const cleanBase = API_BASE.replace(/\/$/, "");
-  const cleanPath = path.startsWith("/") ? path : `/${path}`;
+  const api = useMemo(() => {
+    const request =
+      (method) =>
+      async (path, body = null, options = {}) => {
+        startSaving?.();
 
-  return `${cleanBase}${cleanPath}`;
-}
+        try {
+          return await apiFetch(path, {
+            method,
+            token,
+            body,
+            ...options,
+          });
+        } finally {
+          stopSaving?.();
+        }
+      };
 
-export async function apiFetch(path, options = {}) {
-  const {
-    method = "GET",
-    token,
-    body,
-    headers = {},
-  } = options;
+    return {
+      get: async (path, options = {}) => {
+        return apiFetch(path, {
+          method: "GET",
+          token,
+          ...options,
+        });
+      },
 
-  const response = await fetch(buildUrl(path), {
-    method,
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...headers,
-    },
-    body: body ? JSON.stringify(body) : undefined,
-  });
-
-  if (!response.ok) {
-    let errorBody = null;
-
-    try {
-      errorBody = await response.json();
-    } catch {
-      errorBody = null;
-    }
-
-    const error = new Error(
-      errorBody?.error || `API request failed: ${response.status}`
-    );
-
-    error.status = response.status;
-    error.response = {
-      status: response.status,
-      data: errorBody,
+      post: request("POST"),
+      patch: request("PATCH"),
+      put: request("PUT"),
+      delete: request("DELETE"),
     };
+  }, [token, startSaving, stopSaving]);
 
-    throw error;
-  }
+  const version = user?.profile?.version;
 
-  return response.json();
+  return {
+    ...api,
+
+    patchProfile: (path, body, options = {}) =>
+      api.patch(path, body, {
+        version,
+        ...options,
+      }),
+  };
 }
