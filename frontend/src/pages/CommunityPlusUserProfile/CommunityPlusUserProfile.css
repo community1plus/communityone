@@ -45,7 +45,9 @@ CARDS
 }
 
 .profile-left {
-  padding: 22px 24px;
+  min-height: calc(100vh - 190px);
+  max-height: calc(100vh - 190px);
+  padding: 24px;
   display: flex;
   flex-direction: column;
   gap: 18px;
@@ -53,7 +55,10 @@ CARDS
 }
 
 .profile-guide {
-  padding: 22px 24px;
+  min-height: calc(100vh - 190px);
+  max-height: calc(100vh - 190px);
+  padding: 24px;
+  overflow: hidden;
 }
 
 /* =====================================================
@@ -61,6 +66,7 @@ HEADER
 ===================================================== */
 
 .profile-page-header {
+  flex: 0 0 auto;
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -141,20 +147,20 @@ SECTION TABS
   justify-content: space-between;
   gap: 8px;
   padding: 12px 0 18px;
-  margin-bottom: 10px;
+  margin-bottom: 4px;
   border-bottom: 1px solid #eee7e0;
 }
 
 .profile-section-tab {
   flex: 1;
   min-width: 0;
-  height: 36px;
+  height: 38px;
   padding: 0 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   border: 1px solid #e2dbd3;
-  border-radius: 8px;
+  border-radius: 9px;
   background: #ffffff;
   color: #403832;
   font: inherit;
@@ -185,10 +191,24 @@ SECTION TABS
 }
 
 /* =====================================================
-FORM CONTAINMENT FIX
+FORM AREA
 ===================================================== */
 
-.profile-left .section,
+.profile-left .section {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  max-width: 100%;
+  padding: 20px 0 22px;
+  overflow: visible;
+  border-bottom: 1px solid #eee7e0;
+}
+
+.profile-left .section > * {
+  width: 100%;
+  max-width: 100%;
+}
+
 .profile-left form,
 .profile-left fieldset,
 .profile-left .field,
@@ -197,6 +217,12 @@ FORM CONTAINMENT FIX
   width: 100%;
   max-width: 100%;
   min-width: 0;
+}
+
+.profile-left .form-row,
+.profile-left .field,
+.profile-left .form-field {
+  margin-bottom: 18px;
 }
 
 .profile-left input,
@@ -240,7 +266,7 @@ FORM CONTAINMENT FIX
 
 .profile-left label {
   display: block;
-  margin-bottom: 6px;
+  margin-bottom: 7px;
   font-size: 13px;
   font-weight: 650;
   color: #241f1c;
@@ -257,7 +283,7 @@ PHONE SECTION
 
 .phone-country-label {
   display: block;
-  margin-bottom: 6px;
+  margin-bottom: 7px;
   font-size: 13px;
   font-weight: 650;
   color: #241f1c;
@@ -278,14 +304,16 @@ PHONE SECTION
 
 .phone-verification {
   width: 100%;
-  margin-top: 16px;
+  padding: 16px 0 18px;
+  margin-top: 0;
+  border-bottom: 1px solid #eee7e0;
 }
 
 .phone-verification-row {
   width: 100%;
   display: flex;
   gap: 12px;
-  margin-top: 12px;
+  margin-top: 14px;
   align-items: center;
   flex-wrap: wrap;
 }
@@ -320,12 +348,12 @@ NAVIGATION
 ===================================================== */
 
 .form-navigation {
-  margin-top: auto;
-  padding-top: 16px;
+  flex: 0 0 auto;
+  margin-top: 0;
+  padding-top: 18px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-top: 1px solid #eee7e0;
 }
 
 .form-actions {
@@ -363,8 +391,10 @@ RESPONSIVE
     grid-template-columns: 1fr;
   }
 
+  .profile-left,
   .profile-guide {
     min-height: auto;
+    max-height: none;
   }
 }
 
