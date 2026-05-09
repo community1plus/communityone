@@ -169,28 +169,21 @@ function isValidInternationalPhone(
 function getSocialStatus(social = {}, providerId) {
   const provider = social?.[providerId];
 
-  if (!provider) {
+  if (!provider || !provider.verified) {
     return {
       verified: false,
-      label: "Not verified",
-    };
-  }
-
-  if (provider.verified) {
-    return {
-      verified: true,
-      label:
-        provider.pageName ||
-        provider.channelTitle ||
-        provider.handle ||
-        provider.accountName ||
-        "Verified",
+      text: "Not verified",
     };
   }
 
   return {
-    verified: false,
-    label: "Not verified",
+    verified: true,
+    text:
+      provider.pageName ||
+      provider.channelTitle ||
+      provider.handle ||
+      provider.accountName ||
+      "Account verified",
   };
 }
 
@@ -674,9 +667,7 @@ export default function CommunityPlusUserProfile({ onComplete }) {
                           <small
                             className={status.verified ? "success" : "hint"}
                           >
-                            {status.verified
-                              ? `Verified: ${status.label}`
-                              : "Not verified"}
+                            {status.text}
                           </small>
                         </div>
 
