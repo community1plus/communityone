@@ -1,3 +1,5 @@
+const TABLE = "user_profiles";
+
 const PROFILE_FIELDS = [
   "username",
   "display_name",
@@ -9,10 +11,17 @@ const PROFILE_FIELDS = [
 ];
 
 function pickProfileFields(body = {}) {
-  return PROFILE_FIELDS.reduce((acc, key) => {
-    if (body[key] !== undefined) acc[key] = body[key];
-    return acc;
-  }, {});
+  const data = {};
+
+  if (body.username !== undefined) data.username = body.username;
+  if (body.display_name !== undefined) data.display_name = body.display_name;
+  if (body.userType !== undefined) data.user_type = body.userType;
+  if (body.phone !== undefined) data.phone = body.phone;
+  if (body.homeLocation !== undefined) data.home_location = body.homeLocation;
+  if (body.social !== undefined) data.social = body.social;
+  if (body.payment !== undefined) data.payment = body.payment;
+
+  return data;
 }
 
 function normaliseProfile(profile) {
@@ -24,12 +33,12 @@ function normaliseProfile(profile) {
 
     username: profile.username,
     display_name: profile.display_name,
-    userType: profile.userType,
+    userType: profile.user_type,
     phone: profile.phone,
 
-    homeLocation: profile.homeLocation,
-    social: profile.social,
-    payment: profile.payment,
+    homeLocation: profile.home_location,
+    social: profile.social || {},
+    payment: profile.payment || {},
 
     version: profile.version,
     createdAt: profile.created_at,
@@ -45,7 +54,7 @@ export async function getProfile(req, res) {
   try {
     const userId = req.user.userId;
 
-    const profile = await db("profiles")
+    const profile = await db(TABLE)
       .where({ user_id: userId })
       .first();
 
@@ -58,14 +67,13 @@ export async function getProfile(req, res) {
       version: profile.version,
     });
   } catch (err) {
-    console.error(err);
+    console.error("Profile load failed:", err);
     return res.status(500).json({ error: "Profile load failed" });
   }
 }
 
 /* =========================
    PUT /profile
-   create or replace
 ========================= */
 
 export async function putProfile(req, res) {
@@ -73,7 +81,7 @@ export async function putProfile(req, res) {
     const userId = req.user.userId;
     const data = pickProfileFields(req.body);
 
-    const existing = await db("profiles")
+    const existing = await db(TABLE)
       .where({ user_id: userId })
       .first();
 
@@ -88,9 +96,9 @@ export async function putProfile(req, res) {
         updated_at: now,
       };
 
-      await db("profiles").insert(inserted);
+      await db(TABLE).insert(inserted);
 
-      const profile = await db("profiles")
+      const profile = await db(TABLE)
         .where({ user_id: userId })
         .first();
 
@@ -102,15 +110,15 @@ export async function putProfile(req, res) {
 
     const updated = {
       ...data,
-      version: existing.version + 1,
+      version: (existing.version || 1) + 1,
       updated_at: now,
     };
 
-    await db("profiles")
+    await db(TABLE)
       .where({ user_id: userId })
       .update(updated);
 
-    const profile = await db("profiles")
+    const profile = await db(TABLE)
       .where({ user_id: userId })
       .first();
 
@@ -119,14 +127,13 @@ export async function putProfile(req, res) {
       version: profile.version,
     });
   } catch (err) {
-    console.error(err);
+    console.error("Profile save failed:", err);
     return res.status(500).json({ error: "Profile save failed" });
   }
 }
 
 /* =========================
    PATCH /profile
-   update existing only
 ========================= */
 
 export async function patchProfile(req, res) {
@@ -135,7 +142,7 @@ export async function patchProfile(req, res) {
     const patch = pickProfileFields(req.body);
     const clientVersion = req.headers["x-version"];
 
-    const profile = await db("profiles")
+    const profile = await db(TABLE)
       .where({ user_id: userId })
       .first();
 
@@ -153,15 +160,15 @@ export async function patchProfile(req, res) {
 
     const updated = {
       ...patch,
-      version: profile.version + 1,
+      version: (profile.version || 1) + 1,
       updated_at: new Date(),
     };
 
-    await db("profiles")
+    await db(TABLE)
       .where({ user_id: userId })
       .update(updated);
 
-    const nextProfile = await db("profiles")
+    const nextProfile = await db(TABLE)
       .where({ user_id: userId })
       .first();
 
@@ -170,7 +177,7 @@ export async function patchProfile(req, res) {
       version: nextProfile.version,
     });
   } catch (err) {
-    console.error(err);
+    console.error("Profile update failed:", err);
     return res.status(500).json({ error: "Profile update failed" });
   }
 }
