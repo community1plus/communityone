@@ -1,15 +1,3 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-
-import { useAuth } from "./AuthContext";
-import useAPI from "../../hooks/useAPI";
 
 import {
   createContext,
@@ -22,7 +10,6 @@ import {
 } from "react";
 
 import { fetchAuthSession } from "aws-amplify/auth";
-
 import { useAuth } from "./AuthContext";
 import useAPI from "../../hooks/useAPI";
 
