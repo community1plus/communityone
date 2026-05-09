@@ -82,6 +82,10 @@ const pool = new Pool({
    ROUTES
 ========================= */
 
+
+
+app.use("/api", profileRoutes);
+
 // 👤 Auth + user lifecycle
 app.use("/api/users", userRoutes);
 
