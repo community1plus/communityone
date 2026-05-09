@@ -35,12 +35,7 @@ const profileSteps = [
     title: "USER",
     fields: [
       { name: "username", label: "Username", type: "text", required: true },
-      {
-        name: "display_name",
-        label: "Display Name",
-        type: "text",
-        required: true,
-      },
+      { name: "display_name", label: "Display Name", type: "text", required: true },
       {
         name: "userType",
         label: "User Type",
@@ -59,29 +54,15 @@ const profileSteps = [
     id: "home-address",
     title: "HOME ADDRESS",
     fields: [
-      {
-        name: "homeLocation",
-        label: "Home Address",
-        type: "location",
-        required: true,
-      },
+      { name: "homeLocation", label: "Home Address", type: "location", required: true },
     ],
   },
   {
     id: "contact",
     title: "CONTACT",
     fields: [
-      {
-        name: "phone",
-        label: "Phone Number",
-        type: "tel",
-        required: true,
-      },
-      {
-        name: "phoneVerificationCode",
-        label: "Verification Code",
-        type: "text",
-      },
+      { name: "phone", label: "Phone Number", type: "tel", required: true },
+      { name: "phoneVerificationCode", label: "Verification Code", type: "text" },
     ],
   },
   {
@@ -109,10 +90,7 @@ function digitsOnly(value = "") {
 }
 
 function getPhoneCountry(code = DEFAULT_PHONE_COUNTRY) {
-  return (
-    PHONE_COUNTRIES.find((country) => country.code === code) ||
-    PHONE_COUNTRIES[0]
-  );
+  return PHONE_COUNTRIES.find((country) => country.code === code) || PHONE_COUNTRIES[0];
 }
 
 function stripDialCode(phone = "", countryCode = DEFAULT_PHONE_COUNTRY) {
@@ -120,13 +98,8 @@ function stripDialCode(phone = "", countryCode = DEFAULT_PHONE_COUNTRY) {
   let digits = digitsOnly(phone);
   const dialDigits = digitsOnly(country.dialCode);
 
-  if (digits.startsWith(dialDigits)) {
-    digits = digits.slice(dialDigits.length);
-  }
-
-  if (country.code === "AU" && digits.startsWith("0")) {
-    digits = digits.slice(1);
-  }
+  if (digits.startsWith(dialDigits)) digits = digits.slice(dialDigits.length);
+  if (country.code === "AU" && digits.startsWith("0")) digits = digits.slice(1);
 
   return digits;
 }
@@ -140,17 +113,11 @@ function toE164Phone(phone = "", countryCode = DEFAULT_PHONE_COUNTRY) {
   return `${country.dialCode}${digits}`;
 }
 
-function isValidInternationalPhone(
-  phone = "",
-  countryCode = DEFAULT_PHONE_COUNTRY
-) {
+function isValidInternationalPhone(phone = "", countryCode = DEFAULT_PHONE_COUNTRY) {
   const country = getPhoneCountry(countryCode);
   const nationalDigits = stripDialCode(phone, countryCode);
 
-  return (
-    nationalDigits.length >= country.min &&
-    nationalDigits.length <= country.max
-  );
+  return nationalDigits.length >= country.min && nationalDigits.length <= country.max;
 }
 
 export default function CommunityPlusUserProfile({ onComplete }) {
@@ -161,9 +128,7 @@ export default function CommunityPlusUserProfile({ onComplete }) {
 
   const { isLoaded } = useGoogleMaps();
   const { user } = useAuth();
-
-  const { viewLocation: homeLocation, setManualLocation } =
-    useLocationContext();
+  const { viewLocation: homeLocation, setManualLocation } = useLocationContext();
 
   const {
     profile,
@@ -201,13 +166,11 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     },
   });
 
-  const { values, validateAll, setValue, isFormValidating, clearStorage } =
-    form;
+  const { values, validateAll, setValue, isFormValidating, clearStorage } = form;
 
   const [currentStep, setCurrentStep] = useState(0);
   const [savingProfile, setSavingProfile] = useState(false);
   const [profileError, setProfileError] = useState("");
-
   const [phoneStatus, setPhoneStatus] = useState("idle");
   const [phoneError, setPhoneError] = useState("");
 
@@ -238,16 +201,20 @@ export default function CommunityPlusUserProfile({ onComplete }) {
 
     const prefix = user.email.split("@")[0];
 
-    setValue("username", (prev) => prev || profile?.username || prefix);
-    setValue(
-      "display_name",
-      (prev) => prev || profile?.display_name || user.displayName || prefix
-    );
+    if (!values.username) {
+      setValue("username", profile?.username || prefix);
+    }
+
+    if (!values.display_name) {
+      setValue("display_name", profile?.display_name || user.displayName || prefix);
+    }
   }, [
     user?.email,
     user?.displayName,
     profile?.username,
     profile?.display_name,
+    values.username,
+    values.display_name,
     setValue,
   ]);
 
@@ -316,9 +283,7 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     }
 
     if (!isValidInternationalPhone(values.phone, values.phoneCountry)) {
-      setPhoneError(
-        `Enter a valid phone number for ${selectedPhoneCountry.label}.`
-      );
+      setPhoneError(`Enter a valid phone number for ${selectedPhoneCountry.label}.`);
       return;
     }
 
@@ -331,12 +296,8 @@ export default function CommunityPlusUserProfile({ onComplete }) {
         `${import.meta.env.VITE_SMS_API_URL}/auth/send-phone-code`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            phone: cleanPhone,
-          }),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ phone: cleanPhone }),
         }
       );
 
@@ -378,9 +339,7 @@ export default function CommunityPlusUserProfile({ onComplete }) {
         `${import.meta.env.VITE_SMS_API_URL}/auth/verify-phone-code`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             phone: toE164Phone(values.phone, values.phoneCountry),
             code: values.phoneVerificationCode,
