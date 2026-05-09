@@ -3,15 +3,17 @@ export default function Input({
   onChange,
   placeholder,
   type = "text",
+  autoComplete = "off",
   ...props
 }) {
   return (
     <input
       className="input"
       type={type}
-      value={value}
+      value={value ?? ""}
       onChange={onChange}
       placeholder={placeholder}
+      autoComplete={autoComplete}
       {...props}
     />
   );

@@ -8,28 +8,31 @@ export default function FormBuilder({
   form,
   extra = {},
 }) {
-  if (!Array.isArray(steps) || steps.length === 0) {
-    console.warn("FormBuilder: invalid steps array", steps);
-    return null;
-  }
+  if (!Array.isArray(steps) || steps.length === 0) return null;
 
   const step = steps[currentStep];
 
-  if (!step || !Array.isArray(step.fields)) {
-    console.warn("FormBuilder: invalid step config", {
-      currentStep,
-      steps,
-      step,
-    });
-    return null;
-  }
+  if (!step || !Array.isArray(step.fields)) return null;
 
-  if (!form) {
-    console.warn("FormBuilder: missing form object");
-    return null;
-  }
+  const {
+    getValue,
+    setValue,
+    handleChange,
+    handleBlur,
+    getError,
+    isFieldValid,
+  } = form;
 
-  const { getValue, handleChange, handleBlur, getError, isFieldValid } = form;
+  const updateField = (name, value) => {
+    if (typeof setValue === "function") {
+      setValue(name, value);
+      return;
+    }
+
+    if (typeof handleChange === "function") {
+      handleChange(name, value);
+    }
+  };
 
   const renderField = (field) => {
     const {
@@ -61,7 +64,7 @@ export default function FormBuilder({
             value={rawValue ?? ""}
             options={options}
             disabled={readOnly}
-            onChange={(e) => handleChange?.(name, e.target.value)}
+            onChange={(e) => updateField(name, e.target.value)}
             onBlur={() => handleBlur?.(name)}
           />
         </Field>
@@ -91,7 +94,8 @@ export default function FormBuilder({
                 placeholder="Enter your home address"
                 readOnly={readOnly}
                 disabled={readOnly}
-                onChange={(e) => handleChange?.(name, e.target.value)}
+                autoComplete="off"
+                onChange={(e) => updateField(name, e.target.value)}
                 onBlur={() => handleBlur?.(name)}
               />
             </Autocomplete>
@@ -116,7 +120,8 @@ export default function FormBuilder({
           value={rawValue ?? ""}
           readOnly={readOnly}
           disabled={readOnly}
-          onChange={(e) => handleChange?.(name, e.target.value)}
+          autoComplete={type === "tel" ? "new-password" : "off"}
+          onChange={(e) => updateField(name, e.target.value)}
           onBlur={() => handleBlur?.(name)}
         />
       </Field>
