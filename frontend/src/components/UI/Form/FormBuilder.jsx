@@ -8,13 +8,8 @@ export default function FormBuilder({
   form,
   extra = {},
 }) {
-  if (!Array.isArray(steps)) {
-    console.warn("FormBuilder expected steps array but received:", steps);
-    return null;
-  }
-
-  if (!steps.length) {
-    console.warn("FormBuilder: empty steps array");
+  if (!Array.isArray(steps) || !steps.length) {
+    console.warn("FormBuilder: invalid steps array", steps);
     return null;
   }
 
@@ -29,12 +24,16 @@ export default function FormBuilder({
     return null;
   }
 
+  if (!form) {
+    console.warn("FormBuilder: missing form object");
+    return null;
+  }
+
   const {
     getValue,
     handleChange,
     handleBlur,
     getError,
-    isValidating,
     isFieldValid,
   } = form;
 
@@ -48,26 +47,28 @@ export default function FormBuilder({
       required = false,
     } = field;
 
-    const value = getValue(name) ?? "";
-    const error = getError(name);
+    const rawValue = getValue(name);
+    const error = getError?.(name);
     const valid = isFieldValid?.(name);
+
+    const commonFieldProps = {
+      key: name,
+      label,
+      error,
+      required,
+      valid,
+    };
 
     if (type === "select") {
       return (
-        <Field
-          key={name}
-          label={label}
-          error={error}
-          required={required}
-          valid={valid}
-        >
+        <Field {...commonFieldProps}>
           <Select
             name={name}
-            value={value}
+            value={rawValue ?? ""}
             options={options}
-            disabled={readOnly || isValidating}
+            disabled={readOnly}
             onChange={(e) => handleChange(name, e.target.value)}
-            onBlur={() => handleBlur(name)}
+            onBlur={() => handleBlur?.(name)}
           />
         </Field>
       );
@@ -76,36 +77,37 @@ export default function FormBuilder({
     if (type === "location") {
       const { Autocomplete, autoRef, onPlaceChanged, isLoaded } = extra;
 
+      const displayValue =
+        typeof rawValue === "object"
+          ? rawValue?.label || rawValue?.fullAddress || ""
+          : rawValue || "";
+
       return (
-        <Field
-          key={name}
-          label={label}
-          error={error}
-          required={required}
-          valid={valid}
-        >
+        <Field {...commonFieldProps}>
           {isLoaded && Autocomplete ? (
             <Autocomplete
               onLoad={(ref) => {
-                autoRef.current = ref;
+                if (autoRef) autoRef.current = ref;
               }}
               onPlaceChanged={onPlaceChanged}
             >
               <Input
                 name={name}
-                value={value?.label || value?.fullAddress || ""}
+                value={displayValue}
                 placeholder="Enter your home address"
-                disabled={readOnly || isValidating}
+                readOnly={readOnly}
+                disabled={readOnly}
                 onChange={(e) => handleChange(name, e.target.value)}
-                onBlur={() => handleBlur(name)}
+                onBlur={() => handleBlur?.(name)}
               />
             </Autocomplete>
           ) : (
             <Input
               name={name}
-              value={value?.label || value?.fullAddress || ""}
+              value={displayValue}
               placeholder="Loading address search..."
               disabled
+              readOnly
             />
           )}
         </Field>
@@ -113,21 +115,15 @@ export default function FormBuilder({
     }
 
     return (
-      <Field
-        key={name}
-        label={label}
-        error={error}
-        required={required}
-        valid={valid}
-      >
+      <Field {...commonFieldProps}>
         <Input
           name={name}
           type={type}
-          value={value}
+          value={rawValue ?? ""}
           readOnly={readOnly}
-          disabled={readOnly || isValidating}
+          disabled={readOnly}
           onChange={(e) => handleChange(name, e.target.value)}
-          onBlur={() => handleBlur(name)}
+          onBlur={() => handleBlur?.(name)}
         />
       </Field>
     );
