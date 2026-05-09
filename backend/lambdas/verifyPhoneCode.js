@@ -27,7 +27,7 @@ const sendPhoneCode = useCallback(async () => {
 
   try {
     const response = await fetch(
-      `${import.meta.env.VITE_API_URL}/auth/send-phone-code`,
+      `${import.meta.env.VITE_SMS_API_URL}/auth/send-phone-code`,
       {
         method: "POST",
         headers: {

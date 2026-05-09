@@ -1,20 +1,12 @@
 const sendPhoneCode = useCallback(async () => {
-  const cleanPhone = toE164Phone(
-    values.phone,
-    values.phoneCountry
-  );
+  const cleanPhone = toE164Phone(values.phone, values.phoneCountry);
 
   if (!cleanPhone) {
     setPhoneError("Enter your phone number first.");
     return;
   }
 
-  if (
-    !isValidInternationalPhone(
-      values.phone,
-      values.phoneCountry
-    )
-  ) {
+  if (!isValidInternationalPhone(values.phone, values.phoneCountry)) {
     setPhoneError(
       `Enter a valid phone number for ${selectedPhoneCountry.label}.`
     );
@@ -27,7 +19,7 @@ const sendPhoneCode = useCallback(async () => {
 
   try {
     const response = await fetch(
-      `${import.meta.env.VITE_API_URL}/auth/send-phone-code`,
+      `${import.meta.env.VITE_SMS_API_URL}/auth/send-phone-code`,
       {
         method: "POST",
         headers: {
@@ -39,26 +31,18 @@ const sendPhoneCode = useCallback(async () => {
       }
     );
 
-    if (!response.ok) {
-      throw new Error("Failed to send verification code");
-    }
-
     const data = await response.json();
 
-    if (!data.success) {
-      throw new Error("Verification send failed");
+    if (!response.ok || !data.success) {
+      throw new Error("Failed to send verification code");
     }
 
     setPhoneStatus("sent");
   } catch (err) {
-    console.error(err);
+    console.error("Send phone code failed:", err);
 
     setPhoneStatus("error");
-
-    setPhoneError(
-      err?.message ||
-        "Could not send verification code"
-    );
+    setPhoneError(err?.message || "Could not send verification code");
   }
 }, [
   values.phone,
