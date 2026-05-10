@@ -1,0 +1,14 @@
+.auth-links {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.auth-link {
+  border: 0;
+  background: transparent;
+  color: #5d0d0d;
+  font-weight: 700;
+  cursor: pointer;
+}
