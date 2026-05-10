@@ -358,6 +358,8 @@ export default function CommunityPlusUserProfile({ onComplete }) {
       const socialProvider = params.get("social");
       const verified = params.get("verified");
       const reason = params.get("reason");
+      const channelId = params.get("channelId");
+      const channelTitle = params.get("channelTitle");
 
       if (!socialProvider || socialCallbackHandledRef.current) return;
 
@@ -397,6 +399,13 @@ export default function CommunityPlusUserProfile({ onComplete }) {
           ...(values.social?.[socialProvider] || {}),
           verified: true,
           verifiedAt,
+
+          ...(socialProvider === "youtube"
+            ? {
+                channelId: channelId || "",
+                channelTitle: channelTitle || "YouTube channel",
+              }
+            : {}),
         },
       };
 
@@ -476,6 +485,18 @@ export default function CommunityPlusUserProfile({ onComplete }) {
 
   const startSocialVerification = useCallback(
     (providerId) => {
+      if (providerId === "youtube") {
+        const apiBase = import.meta.env.VITE_API_BASE;
+
+        if (!apiBase) {
+          setProfileError("Backend API is not configured.");
+          return;
+        }
+
+        window.location.href = `${apiBase}/youtube/start`;
+        return;
+      }
+
       const baseUrl = import.meta.env.VITE_SOCIAL_API_URL;
 
       if (!baseUrl) {

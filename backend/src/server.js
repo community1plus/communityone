@@ -6,6 +6,7 @@ import pkg from "pg";
 
 import userRoutes from "./routes/userRoutes.js";
 import profileRoutes from "./routes/profileRoutes.js";
+import youtubeRoutes from "./routes/youtubeRoutes.js";
 
 
 const { Pool } = pkg;
@@ -106,7 +107,7 @@ app.get("/api/test", (req, res) => {
 /* =========================
    ROUTES
 ========================= */
-
+app.use("/api/youtube", youtubeRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/profile", profileRoutes);
 
