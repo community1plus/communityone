@@ -625,3 +625,19 @@ RESPONSIVE
     width: 100%;
   }
 }
+
+.social-verification-list {
+  padding-bottom: 120px;
+}
+
+.section-inner {
+  padding-bottom: 96px;
+}
+
+.form-navigation {
+  position: sticky;
+  bottom: 0;
+  background: #fff;
+  z-index: 5;
+  padding-top: 16px;
+}
