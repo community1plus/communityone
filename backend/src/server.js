@@ -4,7 +4,6 @@ import pkg from "pg";
 import dotenv from "dotenv";
 import userRoutes from "./routes/userRoutes.js";
 import profileRoutes from "./routes/profileRoutes.js";
-
 dotenv.config();
 
 const { Pool } = pkg;

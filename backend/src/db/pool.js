@@ -13,8 +13,5 @@ if (!dbUrl) {
 
 export const pool = new Pool({
   connectionString: dbUrl,
-  ssl:
-    process.env.NODE_ENV === "production"
-      ? { rejectUnauthorized: false }
-      : false,
+  ssl: { rejectUnauthorized: false },
 });
