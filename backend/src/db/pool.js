@@ -13,5 +13,7 @@ if (!dbUrl) {
 
 export const pool = new Pool({
   connectionString: dbUrl,
-  ssl: { rejectUnauthorized: false },
+  ssl: {
+    rejectUnauthorized: false,
+  },
 });
