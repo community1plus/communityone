@@ -24,7 +24,7 @@ PROFILE PAGE
   grid-template-columns: minmax(0, 1fr) 420px;
   gap: 24px;
   align-items: stretch;
-  min-height: calc(100vh - 190px);
+  min-height: calc(100vh -220px);
 }
 
 .profile-layout > * {
@@ -37,7 +37,7 @@ CARDS
 
 .profile-left,
 .profile-guide {
-  min-height: calc(100vh - 190px);
+  min-height: calc(100vh - 220px);
   background: #ffffff;
   border: 1px solid #e2dbd3;
   border-radius: 18px;
@@ -179,6 +179,7 @@ FORM AREA
   width: 100%;
   max-width: 100%;
   padding: 24px 18px 140px 0;
+  padding-bottom: 180px;
   overflow-y: auto;
   overflow-x: hidden;
   border-bottom: 1px solid #eee7e0;
@@ -540,10 +541,14 @@ RESPONSIVE
     padding-bottom: 36px;
   }
 
-  .section-inner,
+  .section-inner{
+    padding-bottom: 180px;
+  }
+
+
   .social-verification-list {
     min-height: auto;
-    padding-bottom: 36px;
+    padding-bottom: 200px;
   }
 }
 
