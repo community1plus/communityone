@@ -187,6 +187,24 @@ function getSocialStatus(social = {}, providerId) {
   };
 }
 
+function normaliseSocialState(social = {}) {
+  return {
+    facebook: social.facebook || { verified: false },
+    instagram:
+      typeof social.instagram === "object"
+        ? social.instagram
+        : { verified: false },
+    youtube:
+      typeof social.youtube === "object"
+        ? social.youtube
+        : { verified: false },
+    x:
+      social.x ||
+      (typeof social.twitter === "object" ? social.twitter : null) ||
+      { verified: false },
+  };
+}
+
 export default function CommunityPlusUserProfile({ onComplete }) {
   const navigate = useNavigate();
 
@@ -221,12 +239,7 @@ export default function CommunityPlusUserProfile({ onComplete }) {
 
       homeLocation: profile?.homeLocation || homeLocation || null,
 
-      social: {
-        facebook: profile?.social?.facebook || { verified: false },
-        instagram: profile?.social?.instagram || { verified: false },
-        youtube: profile?.social?.youtube || { verified: false },
-        x: profile?.social?.x || { verified: false },
-      },
+      social: normaliseSocialState(profile?.social),
 
       payment: {
         cardName: profile?.payment?.cardName || "",
@@ -266,6 +279,12 @@ export default function CommunityPlusUserProfile({ onComplete }) {
 
   const canContinueFromContact = !isContactStep || values.phoneVerified;
   const displayCompletion = completionPercent || 0;
+
+  useEffect(() => {
+    if (!profile?.social) return;
+
+    setValue("social", normaliseSocialState(profile.social));
+  }, [profile?.social, setValue]);
 
   useEffect(() => {
     if (!user?.email) return;
@@ -373,7 +392,7 @@ export default function CommunityPlusUserProfile({ onComplete }) {
       const verifiedAt = new Date().toISOString();
 
       const verifiedSocial = {
-        ...values.social,
+        ...normaliseSocialState(values.social),
         [socialProvider]: {
           ...(values.social?.[socialProvider] || {}),
           verified: true,
@@ -603,7 +622,7 @@ export default function CommunityPlusUserProfile({ onComplete }) {
 
       homeLocation: values.homeLocation || homeLocation,
 
-      social: values.social,
+      social: normaliseSocialState(values.social),
 
       payment: {
         cardName: values.payment?.cardName || "",
