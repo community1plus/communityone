@@ -52,7 +52,7 @@ export default function App() {
           <Route path="yellowpages" element={<CommunityPlusYellowPages />} />
 
           <Route path="compose">
-            <Route path="now" element={<PostComposer mode="now" />} />
+            <Route path="/communityplus/compose/:mode" element={<PostComposer />}/>
             <Route path="news" element={<PostComposer mode="news" />} />
             <Route path="blob" element={<PostComposer mode="blob" />} />
             <Route path="event" element={<PostComposer mode="event" />} />

@@ -42,7 +42,7 @@ export const NAVIGATION = [
             label: "NOW",
             icon: "⚡",
             type: "mode",
-            path: "/communityplus",
+            path: "/communityplus/compose/now",
             mode: "NOW",
           },
           {

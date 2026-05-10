@@ -1,7 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { fetchAuthSession } from "aws-amplify/auth";
 
 import "./PostComposer.css";
+
+const API_BASE =
+  import.meta.env.VITE_API_BASE ||
+  (import.meta.env.VITE_API_URL
+    ? `${import.meta.env.VITE_API_URL}/api`
+    : "");
 
 const CATEGORIES = [
   "News",
@@ -111,11 +118,48 @@ function getExpiryTimestamp(hours) {
   return Date.now() + hours * 60 * 60 * 1000;
 }
 
-export default function PostComposer({
-  mode: propMode,
-  onSubmit,
-  onCancel,
-}) {
+async function getAuthHeaders(extraHeaders = {}) {
+  const session = await fetchAuthSession();
+  const token = session.tokens?.accessToken?.toString();
+
+  if (!token) {
+    throw new Error("User is not authenticated");
+  }
+
+  return {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
+    ...extraHeaders,
+  };
+}
+
+async function apiFetch(path, options = {}) {
+  if (!API_BASE) {
+    throw new Error("Backend API is not configured.");
+  }
+
+  const cleanBase = API_BASE.replace(/\/$/, "");
+  const cleanPath = path.startsWith("/") ? path : `/${path}`;
+  const url = `${cleanBase}${cleanPath}`;
+
+  const response = await fetch(url, options);
+
+  let data = null;
+
+  try {
+    data = await response.json();
+  } catch {
+    data = null;
+  }
+
+  if (!response.ok) {
+    throw new Error(data?.error || `API request failed: ${response.status}`);
+  }
+
+  return data;
+}
+
+export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
   const navigate = useNavigate();
   const params = useParams();
   const location = useLocation();
@@ -142,6 +186,7 @@ export default function PostComposer({
   const [selectedSlots, setSelectedSlots] = useState([]);
 
   const [submitting, setSubmitting] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState("");
   const [error, setError] = useState("");
 
   const canPromote = config.allowPromotion;
@@ -157,6 +202,7 @@ export default function PostComposer({
     setScope(config.defaultScope);
     setIsAd(false);
     setSelectedSlots([]);
+    setUploadProgress("");
     setError("");
   }, [mode, config.defaultCategory, config.defaultScope]);
 
@@ -170,9 +216,7 @@ export default function PostComposer({
 
   const addTag = (tag) => {
     const clean = tag.toLowerCase().trim();
-
     if (!clean || tags.includes(clean)) return;
-
     setTags((prev) => [...prev, clean]);
   };
 
@@ -185,13 +229,10 @@ export default function PostComposer({
   };
 
   const handleFiles = (incomingFiles = []) => {
-    const videos = incomingFiles.filter((file) =>
-      file.type.startsWith("video")
-    );
+    const combined = [...files.map((item) => item.file), ...incomingFiles];
 
-    const others = incomingFiles.filter(
-      (file) => !file.type.startsWith("video")
-    );
+    const videos = combined.filter((file) => file.type.startsWith("video"));
+    const others = combined.filter((file) => !file.type.startsWith("video"));
 
     if (videos.length > 4) {
       setError("Maximum 4 videos allowed.");
@@ -208,6 +249,9 @@ export default function PostComposer({
       file,
       url: URL.createObjectURL(file),
       thumbnail: null,
+      uploaded: false,
+      s3Key: null,
+      publicUrl: null,
     }));
 
     setFiles((prev) => [...prev, ...enriched]);
@@ -237,23 +281,22 @@ export default function PostComposer({
     setPreview(null);
     setIsAd(false);
     setSelectedSlots([]);
+    setUploadProgress("");
     setError("");
   };
 
-  const buildPayload = () => ({
+  const buildPayload = (uploadedMedia = []) => ({
     mode,
     type: mode,
+
     title: title.trim(),
     content: content.trim(),
+
     category,
     scope,
     tags,
 
-    media: files.map(({ file }) => ({
-      name: file.name,
-      type: file.type,
-      size: file.size,
-    })),
+    media: uploadedMedia,
 
     status: config.status,
     requiresReview: config.requiresReview,
@@ -268,6 +311,73 @@ export default function PostComposer({
         : null,
   });
 
+  const uploadSingleFile = async (item, index, total) => {
+    const headers = await getAuthHeaders();
+
+    setUploadProgress(`Preparing upload ${index + 1} of ${total}...`);
+
+    const presign = await apiFetch("/posts/upload-url", {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        fileName: item.file.name,
+        fileType: item.file.type,
+        fileSize: item.file.size,
+        mode,
+      }),
+    });
+
+    if (!presign?.uploadUrl || !presign?.key) {
+      throw new Error("Upload URL was not returned by backend.");
+    }
+
+    setUploadProgress(`Uploading ${item.file.name}...`);
+
+    const uploadResponse = await fetch(presign.uploadUrl, {
+      method: "PUT",
+      headers: {
+        "Content-Type": item.file.type || "application/octet-stream",
+      },
+      body: item.file,
+    });
+
+    if (!uploadResponse.ok) {
+      throw new Error(`S3 upload failed for ${item.file.name}`);
+    }
+
+    return {
+      name: item.file.name,
+      type: item.file.type,
+      size: item.file.size,
+      key: presign.key,
+      url: presign.publicUrl || presign.fileUrl || null,
+    };
+  };
+
+  const uploadFilesToS3 = async () => {
+    if (!files.length) return [];
+
+    const uploaded = [];
+
+    for (let index = 0; index < files.length; index += 1) {
+      const result = await uploadSingleFile(files[index], index, files.length);
+      uploaded.push(result);
+    }
+
+    setUploadProgress("Upload complete.");
+    return uploaded;
+  };
+
+  const submitToBackend = async (payload) => {
+    const headers = await getAuthHeaders();
+
+    return apiFetch("/posts", {
+      method: "POST",
+      headers,
+      body: JSON.stringify(payload),
+    });
+  };
+
   const handleSubmit = async () => {
     if (!title.trim()) {
       setError("Add a title first.");
@@ -281,17 +391,27 @@ export default function PostComposer({
 
     setSubmitting(true);
     setError("");
+    setUploadProgress("");
 
     try {
-      const payload = buildPayload();
+      let uploadedMedia = [];
 
       if (onSubmit) {
+        const payload = buildPayload(
+          files.map(({ file }) => ({
+            name: file.name,
+            type: file.type,
+            size: file.size,
+          }))
+        );
+
         await onSubmit(payload, files);
       } else {
-        console.log("Post payload:", payload);
+        uploadedMedia = await uploadFilesToS3();
 
-        // Backend later:
-        // await api.post("/posts", payload);
+        const payload = buildPayload(uploadedMedia);
+
+        await submitToBackend(payload);
       }
 
       resetForm();
@@ -301,6 +421,7 @@ export default function PostComposer({
         state: { mode: mode.toUpperCase() },
       });
     } catch (err) {
+      console.error("Post submit failed:", err);
       setError(err?.message || "Could not submit post.");
     } finally {
       setSubmitting(false);
@@ -308,192 +429,245 @@ export default function PostComposer({
   };
 
   return (
-    <div className={`composer panel ${config.theme}`}>
-      <div className="panel-header">
-        <div className="composer-title">{pageTitle}</div>
+    <div className="post-composer-page">
+      <div className={`composer panel ${config.theme}`}>
+        <div className="panel-header">
+          <div className="composer-title">{pageTitle}</div>
 
-        <input
-          className="body"
-          placeholder={config.titlePlaceholder}
-          value={title}
-          onChange={(event) => setTitle(event.target.value)}
-        />
-      </div>
-
-      <div className="panel-body">
-        <textarea
-          className={`body ${mode === "now" ? "now-text" : "blob-text"}`}
-          placeholder={config.bodyPlaceholder}
-          value={content}
-          onChange={(event) => setContent(event.target.value)}
-        />
-
-        {showDetails && (
-          <>
-            <div className="meta">Category</div>
-            <select
-              className="body"
-              value={category}
-              onChange={(event) => setCategory(event.target.value)}
-            >
-              {CATEGORIES.map((item) => (
-                <option key={item}>{item}</option>
-              ))}
-            </select>
-
-            <div className="meta">Scope</div>
-            <select
-              className="body"
-              value={scope}
-              onChange={(event) => setScope(event.target.value)}
-            >
-              {SCOPES.map((item) => (
-                <option key={item}>{item}</option>
-              ))}
-            </select>
-
-            <input
-              className="body"
-              placeholder="Add tags"
-              value={tagInput}
-              onChange={(event) => setTagInput(event.target.value)}
-              onKeyDown={handleTagKey}
-            />
-
-            <div className="tag-list">
-              {tags.map((tag) => (
-                <span key={tag} className="label">
-                  {tag}
-                </span>
-              ))}
-            </div>
-          </>
-        )}
-
-        {mode === "news" && (
-          <div className="meta">
-            News posts are submitted for review before they appear in iVIEW.
-          </div>
-        )}
-
-        {mode === "beacon" && (
-          <div className="meta">
-            Beacon posts are time-sensitive alerts and expire automatically.
-          </div>
-        )}
-
-        <button
-          type="button"
-          className="btn btn-secondary"
-          onClick={() => fileInputRef.current?.click()}
-        >
-          Upload
-        </button>
-
-        <input
-          type="file"
-          hidden
-          multiple
-          ref={fileInputRef}
-          onChange={(event) =>
-            handleFiles(Array.from(event.target.files || []))
-          }
-        />
-
-        <div className="files">
-          {files.map((item) => (
-            <div key={item.id} className="panel panel-hover panel-compact">
-              {item.file.type.startsWith("image") ? (
-                <img
-                  src={item.url}
-                  alt={item.file.name}
-                  onClick={() => setPreview(item)}
-                />
-              ) : (
-                <span className="meta">Video</span>
-              )}
-
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={() => removeFile(item.id)}
-              >
-                Remove
-              </button>
-            </div>
-          ))}
+          <input
+            className="body"
+            placeholder={config.titlePlaceholder}
+            value={title}
+            onChange={(event) => setTitle(event.target.value)}
+          />
         </div>
 
-        {canPromote && (
-          <>
-            <label className="label">
-              <input
-                type="checkbox"
-                checked={isAd}
-                onChange={() => setIsAd((prev) => !prev)}
-              />
-              Promote
-            </label>
+        <div className="panel-body">
+          <textarea
+            className={`body ${mode === "now" ? "now-text" : "blob-text"}`}
+            placeholder={config.bodyPlaceholder}
+            value={content}
+            onChange={(event) => setContent(event.target.value)}
+          />
 
-            {isAd && (
-              <div className="slots">
-                {[...Array(24)].map((_, hour) => (
-                  <button
-                    key={hour}
-                    type="button"
-                    className={`btn ${
-                      selectedSlots.includes(hour)
-                        ? "btn-primary"
-                        : "btn-secondary"
-                    }`}
-                    onClick={() => {
-                      setSelectedSlots((prev) =>
-                        prev.includes(hour)
-                          ? prev.filter((item) => item !== hour)
-                          : [...prev, hour]
-                      );
-                    }}
-                  >
-                    {hour}:00
-                  </button>
+          {showDetails && (
+            <>
+              <div className="meta">Category</div>
+              <select
+                className="body"
+                value={category}
+                onChange={(event) => setCategory(event.target.value)}
+              >
+                {CATEGORIES.map((item) => (
+                  <option key={item}>{item}</option>
+                ))}
+              </select>
+
+              <div className="meta">Scope</div>
+              <select
+                className="body"
+                value={scope}
+                onChange={(event) => setScope(event.target.value)}
+              >
+                {SCOPES.map((item) => (
+                  <option key={item}>{item}</option>
+                ))}
+              </select>
+
+              <input
+                className="body"
+                placeholder="Add tags"
+                value={tagInput}
+                onChange={(event) => setTagInput(event.target.value)}
+                onKeyDown={handleTagKey}
+              />
+
+              <div className="tag-list">
+                {tags.map((tag) => (
+                  <span key={tag} className="label">
+                    {tag}
+                  </span>
                 ))}
               </div>
-            )}
-          </>
-        )}
+            </>
+          )}
 
-        {error && <div className="error">{error}</div>}
-      </div>
+          {mode === "news" && (
+            <div className="meta">
+              News posts are submitted for review before they appear in iVIEW.
+            </div>
+          )}
 
-      <div className="panel-footer">
-        {onCancel && (
+          {mode === "beacon" && (
+            <div className="meta">
+              Beacon posts are time-sensitive alerts and expire automatically.
+            </div>
+          )}
+
           <button
             type="button"
             className="btn btn-secondary"
-            onClick={onCancel}
+            onClick={() => fileInputRef.current?.click()}
             disabled={submitting}
           >
-            Cancel
+            Upload media
           </button>
-        )}
 
-        <button
-          type="button"
-          className="btn btn-primary btn-block"
-          onClick={handleSubmit}
-          disabled={submitting}
-        >
-          {submitting ? "Submitting..." : config.submitLabel}
-        </button>
+          <input
+            type="file"
+            hidden
+            multiple
+            ref={fileInputRef}
+            onChange={(event) => {
+              handleFiles(Array.from(event.target.files || []));
+              event.target.value = "";
+            }}
+          />
+
+          <div className="files">
+            {files.map((item) => (
+              <div key={item.id} className="panel panel-hover panel-compact">
+                {item.file.type.startsWith("image") ? (
+                  <img
+                    src={item.url}
+                    alt={item.file.name}
+                    onClick={() => setPreview(item)}
+                  />
+                ) : item.file.type.startsWith("video") ? (
+                  <video src={item.url} controls />
+                ) : (
+                  <span className="meta">{item.file.name}</span>
+                )}
+
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => removeFile(item.id)}
+                  disabled={submitting}
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
+          </div>
+
+          {canPromote && (
+            <>
+              <label className="label">
+                <input
+                  type="checkbox"
+                  checked={isAd}
+                  onChange={() => setIsAd((prev) => !prev)}
+                  disabled={submitting}
+                />
+                Promote
+              </label>
+
+              {isAd && (
+                <div className="slots">
+                  {[...Array(24)].map((_, hour) => (
+                    <button
+                      key={hour}
+                      type="button"
+                      className={`btn ${
+                        selectedSlots.includes(hour)
+                          ? "btn-primary"
+                          : "btn-secondary"
+                      }`}
+                      onClick={() => {
+                        setSelectedSlots((prev) =>
+                          prev.includes(hour)
+                            ? prev.filter((item) => item !== hour)
+                            : [...prev, hour]
+                        );
+                      }}
+                      disabled={submitting}
+                    >
+                      {hour}:00
+                    </button>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+
+          {uploadProgress && <div className="meta">{uploadProgress}</div>}
+          {error && <div className="error">{error}</div>}
+        </div>
+
+        <div className="panel-footer">
+          {onCancel && (
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={onCancel}
+              disabled={submitting}
+            >
+              Cancel
+            </button>
+          )}
+
+          <button
+            type="button"
+            className="btn btn-primary btn-block"
+            onClick={handleSubmit}
+            disabled={submitting}
+          >
+            {submitting ? "Submitting..." : config.submitLabel}
+          </button>
+        </div>
+
+        {preview && (
+          <div className="modal" onClick={() => setPreview(null)}>
+            <div onClick={(event) => event.stopPropagation()}>
+              <img src={preview.url} alt={preview.file.name} />
+            </div>
+          </div>
+        )}
       </div>
 
-      {preview && (
-        <div className="modal" onClick={() => setPreview(null)}>
-          <div onClick={(event) => event.stopPropagation()}>
-            <img src={preview.url} alt={preview.file.name} />
-          </div>
+      <aside className="composer-guide-panel panel">
+        <h2>{config.label} Guide</h2>
+
+        {mode === "now" && (
+          <p>
+            NOW posts are short, immediate updates for what is happening around
+            the user right now. They expire automatically after 24 hours.
+          </p>
+        )}
+
+        {mode === "news" && (
+          <p>
+            News posts should be factual, clear, and suitable for review before
+            publication.
+          </p>
+        )}
+
+        {mode === "blob" && (
+          <p>
+            BLOB posts are longer-form commentary, stories, opinions, and
+            community reflections.
+          </p>
+        )}
+
+        {mode === "event" && (
+          <p>
+            Event posts should include what is happening, where, when, and who
+            should attend.
+          </p>
+        )}
+
+        {mode === "beacon" && (
+          <p>
+            Beacon posts are urgent alerts. Keep them short, accurate, and
+            time-sensitive.
+          </p>
+        )}
+
+        <div className="meta">
+          Media uploads are sent to S3 using backend-generated signed URLs.
         </div>
-      )}
+      </aside>
     </div>
   );
 }
