@@ -93,6 +93,13 @@ app.get("/api/health", async (req, res) => {
   }
 });
 
+app.get("/api/route-check", (req, res) => {
+  res.json({
+    version: "route-check-2026-05-10",
+    profileMount: "/api/profile",
+  });
+});
+
 app.get("/api/test", (req, res) => {
   res.json({ ok: true });
 });
