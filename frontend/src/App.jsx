@@ -1,5 +1,6 @@
-import { Routes, Route, Navigate, Outlet } from "react-router-dom";
+import { Routes, Route, Navigate, Outlet, useLocation } from "react-router-dom";
 
+import { useAuth } from "./context/AuthContext";
 import { ProfileProvider } from "./context/ProfileContext";
 import { GoogleMapsProvider } from "./context/GoogleMapsProvider";
 import { MapProvider } from "./context/MapContext";
@@ -20,6 +21,30 @@ function Placeholder({ title }) {
       <p>{title} page coming soon.</p>
     </div>
   );
+}
+
+function ProtectedRoute({ children }) {
+  const location = useLocation();
+  const { isAuthenticated, authReady } = useAuth();
+
+  if (!authReady) {
+    return <div style={{ padding: 40 }}>Loading...</div>;
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <Navigate
+        to="/"
+        replace
+        state={{
+          loginRequired: true,
+          returnTo: location.pathname + location.search,
+        }}
+      />
+    );
+  }
+
+  return children;
 }
 
 function DashboardProviders() {
@@ -43,26 +68,49 @@ export default function App() {
 
       <Route element={<DashboardProviders />}>
         <Route path="/communityplus" element={<CommunityPlusDashboardLayout />}>
+          {/* PUBLIC / GUEST BROWSING */}
           <Route index element={<CommunityPlusDashboardHome />} />
-
           <Route path="about" element={<CommunityPlusAboutPage />} />
-
-          <Route path="profile" element={<CommunityPlusUserProfile />} />
-
           <Route path="yellowpages" element={<CommunityPlusYellowPages />} />
-
-          <Route path="compose">
-            <Route path="/communityplus/compose/:mode" element={<PostComposer />}/>
-            <Route path="news" element={<PostComposer mode="news" />} />
-            <Route path="blob" element={<PostComposer mode="blob" />} />
-            <Route path="event" element={<PostComposer mode="event" />} />
-            <Route path="beacon" element={<PostComposer mode="beacon" />} />
-          </Route>
-
           <Route path="channels" element={<Placeholder title="Channels" />} />
-          <Route path="account" element={<Placeholder title="Account" />} />
-          <Route path="inbox" element={<Placeholder title="Inbox" />} />
           <Route path="help" element={<Placeholder title="Help" />} />
+
+          {/* PROTECTED */}
+          <Route
+            path="profile"
+            element={
+              <ProtectedRoute>
+                <CommunityPlusUserProfile />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="compose/:mode"
+            element={
+              <ProtectedRoute>
+                <PostComposer />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="account"
+            element={
+              <ProtectedRoute>
+                <Placeholder title="Account" />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="inbox"
+            element={
+              <ProtectedRoute>
+                <Placeholder title="Inbox" />
+              </ProtectedRoute>
+            }
+          />
 
           <Route path="*" element={<Navigate to="/communityplus" replace />} />
         </Route>
