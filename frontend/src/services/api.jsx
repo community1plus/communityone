@@ -1,6 +1,8 @@
 const API_BASE =
   import.meta.env.VITE_API_BASE ||
-  `${import.meta.env.VITE_API_URL}/api`;
+  (import.meta.env.VITE_API_URL
+    ? `${import.meta.env.VITE_API_URL}/api`
+    : "");
 
 function buildUrl(path) {
   if (!API_BASE) {
@@ -21,37 +23,76 @@ export async function apiFetch(path, options = {}) {
     headers = {},
   } = options;
 
-  const response = await fetch(buildUrl(path), {
+  const url = buildUrl(path);
+
+  console.log("🌐 API REQUEST:", {
     method,
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...headers,
-    },
-    body: body ? JSON.stringify(body) : undefined,
+    url,
+    hasToken: Boolean(token),
+    body,
+  });
+
+  let response;
+
+  try {
+    response = await fetch(url, {
+      method,
+      headers: {
+        "Content-Type": "application/json",
+        ...(token
+          ? {
+              Authorization: `Bearer ${token}`,
+            }
+          : {}),
+        ...headers,
+      },
+      body:
+        body !== null && body !== undefined
+          ? JSON.stringify(body)
+          : undefined,
+    });
+  } catch (networkError) {
+    console.error("❌ NETWORK ERROR:", networkError);
+
+    throw new Error(
+      networkError?.message || "Network request failed"
+    );
+  }
+
+  let data = null;
+
+  try {
+    data = await response.json();
+  } catch {
+    data = null;
+  }
+
+  console.log("📥 API RESPONSE:", {
+    method,
+    url,
+    status: response.status,
+    ok: response.ok,
+    data,
   });
 
   if (!response.ok) {
-    let errorBody = null;
-
-    try {
-      errorBody = await response.json();
-    } catch {
-      errorBody = null;
-    }
-
     const error = new Error(
-      errorBody?.error || `API request failed: ${response.status}`
+      data?.error ||
+        data?.message ||
+        `API request failed: ${response.status}`
     );
 
     error.status = response.status;
+
     error.response = {
       status: response.status,
-      data: errorBody,
+      data,
     };
 
     throw error;
   }
 
-  return response.json();
+  return data;
 }
+
+export { buildUrl, API_BASE };
