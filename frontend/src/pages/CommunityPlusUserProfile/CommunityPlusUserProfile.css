@@ -4,8 +4,8 @@ PROFILE PAGE
 
 .profile-container {
   width: 100%;
-  min-height: 100%;
-  padding: 20px 24px;
+  min-height: calc(100vh - 140px);
+  padding: 24px;
   box-sizing: border-box;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
     Arial, sans-serif;
@@ -20,12 +20,11 @@ PROFILE PAGE
 }
 
 .profile-layout {
-  width: 100%;
-  min-height: calc(100vh - 165px);
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 360px;
-  gap: 20px;
+  grid-template-columns: minmax(0, 1fr) 420px;
+  gap: 24px;
   align-items: stretch;
+  min-height: calc(100vh - 190px);
 }
 
 .profile-layout > * {
@@ -38,6 +37,7 @@ CARDS
 
 .profile-left,
 .profile-guide {
+  min-height: calc(100vh - 190px);
   background: #ffffff;
   border: 1px solid #e2dbd3;
   border-radius: 18px;
@@ -45,7 +45,6 @@ CARDS
 }
 
 .profile-left {
-  height: calc(100vh - 190px);
   padding: 24px;
   display: flex;
   flex-direction: column;
@@ -54,8 +53,9 @@ CARDS
 }
 
 .profile-guide {
-  height: calc(100vh - 190px);
   padding: 24px;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
 }
 
@@ -114,31 +114,11 @@ COMPLETION
   transition: width 0.28s ease;
 }
 
-.profile-save-status {
-  min-height: 18px;
-  font-size: 12px;
-  font-weight: 650;
-  color: #6f6259;
-}
-
-.profile-save-status.saving {
-  color: #6f6259;
-}
-
-.profile-save-status.saved {
-  color: #16794c;
-}
-
-.profile-save-status.error {
-  color: #b11226;
-}
-
 /* =====================================================
 SECTION TABS
 ===================================================== */
 
 .profile-section-tabs {
-  position: relative;
   width: 100%;
   flex: 0 0 auto;
   display: flex;
@@ -198,7 +178,7 @@ FORM AREA
   min-height: 0;
   width: 100%;
   max-width: 100%;
-  padding: 24px 18px 120px 0;
+  padding: 24px 18px 140px 0;
   overflow-y: auto;
   overflow-x: hidden;
   border-bottom: 1px solid #eee7e0;
@@ -211,8 +191,9 @@ FORM AREA
   padding-right: 8px;
 }
 
-.profile-left .section-inner {
-  min-height: min-content;
+.section-inner {
+  min-height: 100%;
+  padding-bottom: 120px;
 }
 
 /* =====================================================
@@ -283,9 +264,7 @@ INPUTS
   font: inherit;
   font-size: 14px;
   outline: none;
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
+  transition: border-color 0.2s ease, box-shadow 0.2s ease,
     background 0.2s ease;
 }
 
@@ -316,11 +295,6 @@ INPUTS
   pointer-events: auto;
   user-select: text;
   cursor: text;
-}
-
-.profile-left input[type="tel"] {
-  background: #ffffff;
-  color: #241f1c;
 }
 
 /* =====================================================
@@ -382,6 +356,102 @@ PHONE SECTION
 }
 
 /* =====================================================
+SOCIAL VERIFICATION
+===================================================== */
+
+.social-verification-list {
+  width: 100%;
+  min-height: 100%;
+  padding-bottom: 140px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.social-verification-row {
+  width: 100%;
+  min-height: 78px;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  border: 1px solid #e4ddd5;
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+.social-verification-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.social-verification-main strong {
+  font-size: 18px;
+  line-height: 1.2;
+  font-weight: 700;
+  color: #241f1c;
+}
+
+.social-verification-main span {
+  font-size: 14px;
+  line-height: 1.45;
+  color: #5d534c;
+}
+
+.social-verification-main small {
+  font-size: 13px;
+  line-height: 1.2;
+  font-weight: 600;
+}
+
+.social-verification-main small.hint {
+  color: #7d726a;
+}
+
+.social-verification-main small.success {
+  color: #117a37;
+}
+
+.social-verify-button {
+  flex: 0 0 auto;
+  min-width: 110px;
+  height: 42px;
+  padding: 0 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  border: 1px solid #4a0f0f;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.social-verify-button.unverified {
+  background: #4a0f0f;
+  color: #ffffff;
+}
+
+.social-verify-button.unverified:hover {
+  background: #5c1515;
+}
+
+.social-verify-button.verified {
+  background: #eaf7ef;
+  border-color: #117a37;
+  color: #117a37;
+}
+
+.social-verify-button.verified:hover {
+  background: #dff1e6;
+}
+
+/* =====================================================
 MESSAGES
 ===================================================== */
 
@@ -411,9 +481,13 @@ NAVIGATION
 ===================================================== */
 
 .form-navigation {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
   flex: 0 0 auto;
   margin-top: 0;
   padding-top: 18px;
+  background: #ffffff;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -452,13 +526,12 @@ RESPONSIVE
 @media (max-width: 1000px) {
   .profile-layout {
     grid-template-columns: 1fr;
+    min-height: auto;
   }
 
   .profile-left,
   .profile-guide {
-    height: auto;
     min-height: auto;
-    max-height: none;
   }
 
   .profile-left .section {
@@ -466,9 +539,15 @@ RESPONSIVE
     min-height: auto;
     padding-bottom: 36px;
   }
+
+  .section-inner,
+  .social-verification-list {
+    min-height: auto;
+    padding-bottom: 36px;
+  }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 720px) {
   .profile-container {
     padding: 14px;
   }
@@ -491,6 +570,15 @@ RESPONSIVE
     padding: 0 10px;
   }
 
+  .social-verification-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .social-verify-button {
+    width: 100%;
+  }
+
   .form-navigation {
     gap: 12px;
     align-items: stretch;
@@ -500,144 +588,4 @@ RESPONSIVE
   .form-actions {
     justify-content: flex-end;
   }
-}
-
-/* =====================================================
-SOCIAL VERIFICATION
-===================================================== */
-
-.social-verification-list {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-.social-verification-row {
-  width: 100%;
-  min-height: 78px;
-  padding: 18px 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-
-  border: 1px solid #e4ddd5;
-  border-radius: 14px;
-  background: #ffffff;
-}
-
-.social-verification-main {
-  flex: 1;
-  min-width: 0;
-
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.social-verification-main strong {
-  font-size: 18px;
-  line-height: 1.2;
-  font-weight: 700;
-  color: #241f1c;
-}
-
-.social-verification-main span {
-  font-size: 14px;
-  line-height: 1.45;
-  color: #5d534c;
-}
-
-.social-verification-main small {
-  font-size: 13px;
-  line-height: 1.2;
-  font-weight: 600;
-}
-
-.social-verification-main small.hint {
-  color: #7d726a;
-}
-
-.social-verification-main small.success {
-  color: #117a37;
-}
-
-/* =====================================================
-SOCIAL BUTTONS
-===================================================== */
-
-.social-verify-button {
-  flex: 0 0 auto;
-
-  min-width: 110px;
-  height: 42px;
-  padding: 0 18px;
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  border-radius: 10px;
-  border: 1px solid #4a0f0f;
-
-  font-size: 14px;
-  font-weight: 700;
-
-  cursor: pointer;
-  transition: all 0.18s ease;
-}
-
-/* UNVERIFIED */
-
-.social-verify-button.unverified {
-  background: #4a0f0f;
-  color: #ffffff;
-}
-
-.social-verify-button.unverified:hover {
-  background: #5c1515;
-}
-
-/* VERIFIED */
-
-.social-verify-button.verified {
-  background: #eaf7ef;
-  border-color: #117a37;
-  color: #117a37;
-}
-
-.social-verify-button.verified:hover {
-  background: #dff1e6;
-}
-
-/* =====================================================
-RESPONSIVE
-===================================================== */
-
-@media (max-width: 720px) {
-  .social-verification-row {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .social-verify-button {
-    width: 100%;
-  }
-}
-
-.social-verification-list {
-  padding-bottom: 120px;
-}
-
-.section-inner {
-  padding-bottom: 96px;
-}
-
-.form-navigation {
-  position: sticky;
-  bottom: 0;
-  background: #fff;
-  z-index: 5;
-  padding-top: 16px;
 }
