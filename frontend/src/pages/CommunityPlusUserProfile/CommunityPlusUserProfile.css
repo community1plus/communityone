@@ -4,11 +4,15 @@ PROFILE PAGE
 
 .profile-container {
   width: 100%;
-  min-height: calc(100vh - 140px);
+  height: calc(100vh - 140px);
   padding: 24px;
+  overflow: hidden;
+
   box-sizing: border-box;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
-    Arial, sans-serif;
+
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif;
+
   color: #2f2925;
   background: #f8f6f3;
 }
@@ -19,12 +23,19 @@ PROFILE PAGE
   box-sizing: border-box;
 }
 
+/* =====================================================
+LAYOUT
+===================================================== */
+
 .profile-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 420px;
   gap: 24px;
+
   align-items: stretch;
-  min-height: calc(100vh -220px);
+
+  height: 100%;
+  min-height: 0;
 }
 
 .profile-layout > * {
@@ -37,25 +48,32 @@ CARDS
 
 .profile-left,
 .profile-guide {
-  min-height: calc(100vh - 220px);
+  height: 100%;
+  min-height: 0;
+
   background: #ffffff;
   border: 1px solid #e2dbd3;
   border-radius: 18px;
+
   box-shadow: 0 8px 24px rgba(20, 20, 20, 0.045);
 }
 
 .profile-left {
   padding: 24px;
+
   display: flex;
   flex-direction: column;
   gap: 18px;
+
   overflow: hidden;
 }
 
 .profile-guide {
   padding: 24px;
+
   display: flex;
   flex-direction: column;
+
   overflow: hidden;
 }
 
@@ -65,6 +83,7 @@ HEADER
 
 .profile-page-header {
   flex: 0 0 auto;
+
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -73,10 +92,12 @@ HEADER
 .profile-page-header h1,
 .profile-page-header .page-title {
   margin: 0;
+
   font-size: 20px;
   line-height: 1.2;
   font-weight: 700;
   letter-spacing: -0.02em;
+
   color: #241f1c;
 }
 
@@ -94,23 +115,31 @@ COMPLETION
   display: flex;
   justify-content: space-between;
   align-items: center;
+
   font-size: 13px;
   font-weight: 700;
+
   color: #403832;
 }
 
 .profile-completion-track {
   width: 100%;
   height: 8px;
+
   overflow: hidden;
+
   border-radius: 999px;
+
   background: #eee7e0;
 }
 
 .profile-completion-fill {
   height: 100%;
+
   border-radius: 999px;
+
   background: #4a0f0f;
+
   transition: width 0.28s ease;
 }
 
@@ -120,34 +149,46 @@ SECTION TABS
 
 .profile-section-tabs {
   width: 100%;
+
   flex: 0 0 auto;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+
   padding: 12px 0 18px;
   margin-bottom: 4px;
+
   border-bottom: 1px solid #eee7e0;
 }
 
 .profile-section-tab {
   flex: 1;
+
   min-width: 0;
   height: 38px;
+
   padding: 0 10px;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   border: 1px solid #e2dbd3;
   border-radius: 9px;
+
   background: #ffffff;
   color: #403832;
+
   font: inherit;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.04em;
+
   cursor: pointer;
   white-space: nowrap;
+
   transition: all 0.18s ease;
 }
 
@@ -160,6 +201,7 @@ SECTION TABS
   background: #4a0f0f;
   border-color: #4a0f0f;
   color: #ffffff;
+
   box-shadow: 0 2px 6px rgba(74, 15, 15, 0.15);
 }
 
@@ -175,26 +217,32 @@ FORM AREA
 
 .profile-left .section {
   flex: 1 1 auto;
+
   min-height: 0;
+
   width: 100%;
   max-width: 100%;
-  padding: 24px 18px 140px 0;
-  padding-bottom: 180px;
+
+  padding: 24px 18px 220px 0;
+
   overflow-y: auto;
   overflow-x: hidden;
+
   border-bottom: 1px solid #eee7e0;
+
   scrollbar-gutter: stable;
 }
 
 .profile-left .section > * {
   width: 100%;
   max-width: 100%;
+
   padding-right: 8px;
 }
 
 .section-inner {
   min-height: 100%;
-  padding-bottom: 120px;
+  padding-bottom: 220px;
 }
 
 /* =====================================================
@@ -207,14 +255,17 @@ SCROLLBAR
 
 .profile-left .section::-webkit-scrollbar-track {
   background: transparent;
+
   margin-top: 8px;
   margin-bottom: 8px;
 }
 
 .profile-left .section::-webkit-scrollbar-thumb {
   background: #d8d0c8;
+
   border-radius: 999px;
   border: 2px solid transparent;
+
   background-clip: content-box;
 }
 
@@ -255,23 +306,35 @@ INPUTS
   width: 100%;
   max-width: 100%;
   min-width: 0;
+
   height: 48px;
+
   padding: 0 14px;
+
   display: block;
+
   border: 1px solid #d8d0c8;
   border-radius: 12px;
+
   background: #ffffff;
   color: #241f1c;
+
   font: inherit;
   font-size: 14px;
+
   outline: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease,
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
     background 0.2s ease;
 }
 
 .profile-left textarea {
   min-height: 96px;
+
   padding-top: 12px;
+
   resize: vertical;
 }
 
@@ -304,9 +367,12 @@ LABELS
 
 .profile-left label {
   display: block;
+
   margin-bottom: 8px;
+
   font-size: 13px;
   font-weight: 650;
+
   color: #241f1c;
 }
 
@@ -321,9 +387,12 @@ PHONE SECTION
 
 .phone-country-label {
   display: block;
+
   margin-bottom: 8px;
+
   font-size: 13px;
   font-weight: 650;
+
   color: #241f1c;
 }
 
@@ -331,27 +400,38 @@ PHONE SECTION
   width: 100%;
   max-width: 100%;
   min-width: 0;
+
   height: 48px;
+
   padding: 0 14px;
+
   border: 1px solid #d8d0c8;
   border-radius: 12px;
+
   background: #ffffff;
   color: #241f1c;
+
   font: inherit;
 }
 
 .phone-verification {
   width: 100%;
+
   padding: 18px 0 28px;
+
   margin-top: 0;
+
   border-bottom: 1px solid #eee7e0;
 }
 
 .phone-verification-row {
   width: 100%;
+
   display: flex;
   gap: 12px;
+
   margin-top: 14px;
+
   align-items: center;
   flex-wrap: wrap;
 }
@@ -363,7 +443,9 @@ SOCIAL VERIFICATION
 .social-verification-list {
   width: 100%;
   min-height: 100%;
-  padding-bottom: 140px;
+
+  padding-bottom: 240px;
+
   display: flex;
   flex-direction: column;
   gap: 18px;
@@ -372,19 +454,24 @@ SOCIAL VERIFICATION
 .social-verification-row {
   width: 100%;
   min-height: 78px;
+
   padding: 18px 20px;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 20px;
+
   border: 1px solid #e4ddd5;
   border-radius: 14px;
+
   background: #ffffff;
 }
 
 .social-verification-main {
   flex: 1;
   min-width: 0;
+
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -394,12 +481,14 @@ SOCIAL VERIFICATION
   font-size: 18px;
   line-height: 1.2;
   font-weight: 700;
+
   color: #241f1c;
 }
 
 .social-verification-main span {
   font-size: 14px;
   line-height: 1.45;
+
   color: #5d534c;
 }
 
@@ -419,17 +508,24 @@ SOCIAL VERIFICATION
 
 .social-verify-button {
   flex: 0 0 auto;
+
   min-width: 110px;
   height: 42px;
+
   padding: 0 18px;
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
+
   border-radius: 10px;
   border: 1px solid #4a0f0f;
+
   font-size: 14px;
   font-weight: 700;
+
   cursor: pointer;
+
   transition: all 0.18s ease;
 }
 
@@ -458,21 +554,27 @@ MESSAGES
 
 .hint {
   margin-top: 8px;
+
   color: #6f6259;
+
   font-size: 13px;
   line-height: 1.45;
 }
 
 .success {
   margin-top: 10px;
+
   color: #146c2e;
+
   font-size: 13px;
   font-weight: 650;
 }
 
 .error {
   margin-top: 10px;
+
   color: #b11226;
+
   font-size: 13px;
   font-weight: 650;
 }
@@ -484,11 +586,16 @@ NAVIGATION
 .form-navigation {
   position: sticky;
   bottom: 0;
+
   z-index: 5;
+
   flex: 0 0 auto;
+
   margin-top: 0;
   padding-top: 18px;
+
   background: #ffffff;
+
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -506,17 +613,21 @@ GUIDE PANEL
 .profile-guide h2,
 .profile-guide .section-title {
   margin: 0 0 8px;
+
   font-size: 17px;
   line-height: 1.25;
   font-weight: 700;
+
   color: #241f1c;
 }
 
 .profile-guide p,
 .profile-guide .section-meta {
   margin: 0;
+
   font-size: 13px;
   line-height: 1.45;
+
   color: #6f6259;
 }
 
@@ -525,30 +636,39 @@ RESPONSIVE
 ===================================================== */
 
 @media (max-width: 1000px) {
+  .profile-container {
+    height: auto;
+    overflow: visible;
+  }
+
   .profile-layout {
     grid-template-columns: 1fr;
+
+    height: auto;
     min-height: auto;
   }
 
   .profile-left,
   .profile-guide {
+    height: auto;
     min-height: auto;
   }
 
   .profile-left .section {
     overflow: visible;
+
     min-height: auto;
-    padding-bottom: 36px;
+
+    padding-bottom: 48px;
   }
 
-  .section-inner{
-    padding-bottom: 180px;
+  .section-inner {
+    padding-bottom: 48px;
   }
-
 
   .social-verification-list {
     min-height: auto;
-    padding-bottom: 200px;
+    padding-bottom: 60px;
   }
 }
 
@@ -570,8 +690,11 @@ RESPONSIVE
 
   .profile-section-tab {
     flex: 0 0 auto;
+
     min-width: 130px;
+
     font-size: 11px;
+
     padding: 0 10px;
   }
 
@@ -586,6 +709,7 @@ RESPONSIVE
 
   .form-navigation {
     gap: 12px;
+
     align-items: stretch;
     flex-direction: column;
   }
