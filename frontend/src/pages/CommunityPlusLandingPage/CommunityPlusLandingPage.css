@@ -1,513 +1,302 @@
-/* =========================
-ROOT
-========================= */
-
-.cpl-root {
-  position: relative;
-  min-height: 100vh;
-  width: 100%;
-  overflow: hidden;
-  background: #f8f6f3;
-}
-
-/* =========================
-SOFT BACKGROUND EFFECTS
-========================= */
-
-.landing-visual-layer {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-}
-
-.landing-hero-tint {
-  position: absolute;
-  inset: 0;
-
-  background:
-    radial-gradient(
-      circle at 50% 45%,
-      rgba(248, 246, 243, 0.96),
-      rgba(248, 246, 243, 0.88) 42%,
-      rgba(248, 246, 243, 0.76) 76%,
-      rgba(248, 246, 243, 0.68)
-    ),
-    rgba(177, 18, 38, 0.025);
-}
-
-.landing-hero-focus {
-  position: absolute;
-  inset: 0;
-
-  background:
-    radial-gradient(
-      circle at center,
-      transparent 40%,
-      rgba(0, 0, 0, 0.045)
-    );
-}
-
-/* =========================
-FOREGROUND CONTENT
-========================= */
-
-.landing-container {
-  position: relative;
-  z-index: 2;
-
-  min-height: 100vh;
-  width: 100%;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 24px;
-  box-sizing: border-box;
-
-  background: transparent;
-
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
-    Arial, sans-serif;
-}
-
-.landing-hero {
-  width: min(900px, 100%);
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  gap: 18px;
-  text-align: center;
-}
-
-/* =========================
-TYPOGRAPHY
-========================= */
-
-.brand-title {
-  margin: 0;
-
-  font-size: clamp(38px, 5vw, 64px);
-  line-height: 1.05;
-  font-weight: 800;
-
-  letter-spacing: 0.035em;
-  color: #b11226;
-}
-
-.landing-text {
-  width: 100%;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  gap: 10px;
-}
-
-.landing-tagline {
-  margin: 0;
-
-  max-width: 900px;
-
-  font-size: clamp(24px, 3vw, 38px);
-  line-height: 1.15;
-  font-weight: 800;
-
-  white-space: nowrap;
-  color: #b11226;
-}
-
-.accent {
-  color: #b11226;
-}
-
-.landing-sub {
-  margin: 0;
-  max-width: 560px;
-
-  font-size: 16px;
-  line-height: 1.5;
-  font-weight: 450;
-
-  color: #4f4943;
-}
-
-/* =========================
-ACTIONS
-========================= */
-
-.landing-actions {
-  margin-top: 12px;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-}
-
-.auth-maintenance-note {
-  margin: 0;
-  max-width: 460px;
-
-  font-size: 14px;
-  line-height: 1.45;
-  color: #5f564f;
-}
-
-/* =========================
-BUTTONS
-========================= */
-
-.btn {
-  font: inherit;
-}
-
-.btn.primary,
-.btn.ghost,
-.hero-cta {
-  min-width: 220px;
-  height: 46px;
-
-  border-radius: 12px;
-  padding: 0 18px;
-
-  font-size: 15px;
-  font-weight: 700;
-
-  cursor: pointer;
-  transition:
-    transform 0.18s ease,
-    box-shadow 0.18s ease,
-    background 0.18s ease,
-    opacity 0.18s ease;
-}
-
-.btn.primary {
-  border: none;
-  background: #b11226;
-  color: #ffffff;
-  box-shadow: 0 8px 20px rgba(177, 18, 38, 0.25);
-}
-
-.btn.ghost {
-  background: transparent;
-  color: #b11226;
-  border: 1px solid #b11226;
-  box-shadow: 0 8px 20px rgba(177, 18, 38, 0.1);
-}
-
-.btn.primary:hover,
-.btn.ghost:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 12px 26px rgba(177, 18, 38, 0.28);
-}
-
-.btn:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
-}
-
-/* =========================
-FLOATING LOGIN THUMB
-========================= */
-
-.landing-login-thumb {
-  position: fixed;
-  right: 28px;
-  bottom: 28px;
-  z-index: 50;
-
-  width: 72px;
-  height: 72px;
-
-  border: none;
-  border-radius: 50%;
-
-  background: #050505;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  overflow: visible;
-  cursor: pointer;
-
-  box-shadow:
-    0 18px 42px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(255, 255, 255, 0.06) inset;
-
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    opacity 0.2s ease;
-}
-
-.landing-login-thumb img {
-  width: 58%;
-  height: 58%;
-  object-fit: contain;
-
-  opacity: 1;
-  filter: contrast(1.2) saturate(1.2) brightness(1.05);
-
-  transition: transform 0.2s ease;
-}
-
-.landing-login-thumb::after {
-  content: "";
-  position: absolute;
-  inset: -6px;
-
-  border-radius: 50%;
-
-  background: radial-gradient(
-    circle,
-    rgba(177, 18, 38, 0.32),
-    transparent 68%
-  );
-
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.25s ease;
-}
-
-.landing-login-thumb:hover {
-  transform: translateY(-2px) scale(1.05);
-
-  box-shadow:
-    0 24px 54px rgba(0, 0, 0, 0.58),
-    0 0 0 1px rgba(177, 18, 38, 0.28) inset;
-}
-
-.landing-login-thumb:hover img {
-  transform: scale(1.08);
-}
-
-.landing-login-thumb:hover::after {
-  opacity: 1;
-}
-
-.landing-login-thumb:active {
-  transform: scale(0.96);
-}
-
-.landing-login-thumb:disabled {
-  opacity: 0.75;
-  cursor: not-allowed;
-}
-
-/* =========================
-AUTH MODAL
-========================= */
-
-.cpl-modalOverlay,
-.auth-loading-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 18px;
-  box-sizing: border-box;
-
-  background: rgba(20, 20, 20, 0.45);
-  backdrop-filter: blur(3px);
-}
-
-.cpl-authModal,
-.auth-loading-box {
-  width: min(420px, calc(100vw - 32px));
-
-  padding: 26px;
-  box-sizing: border-box;
-
-  background: #ffffff;
-  border: 1px solid #e2dbd3;
-  border-radius: 18px;
-
-  box-shadow: 0 22px 58px rgba(0, 0, 0, 0.22);
-
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
-    Arial, sans-serif;
-}
-
-.cpl-authModal input:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
-}
+/* =========================================
+   AUTH MODAL
+========================================= */
 
 .cpl-authModal {
+  width: 100%;
+  max-width: 520px;
+
+  padding: 42px 34px;
+
+  border-radius: 30px;
+
+  background: #fcfbf9;
+
+  border: 1px solid #e8dfd7;
+
+  box-shadow:
+    0 24px 60px rgba(0,0,0,0.12);
+
+  box-sizing: border-box;
+}
+
+/* =========================================
+   HEADER
+========================================= */
+
+.cpl-authModal h2 {
+  margin: 0 0 30px;
+
+  color: #8f1d1d;
+
+  font-size: 34px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+
+.cpl-authModal h2 span {
+  display: block;
+
+  color: #8f1d1d;
+
+  font-weight: 900;
+}
+
+/* =========================================
+   EMAIL FORM
+========================================= */
+
+.cpl-authModal form {
   display: flex;
   flex-direction: column;
   gap: 14px;
-}
-
-.cpl-authModal h2 {
-  margin: 0 0 8px;
-
-  font-size: 22px;
-  line-height: 1.2;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-
-  color: #241f1c;
 }
 
 .cpl-authModal input {
   width: 100%;
-  height: 44px;
+  height: 56px;
 
-  padding: 10px 14px;
-  box-sizing: border-box;
+  padding: 0 18px;
 
-  border: 1px solid #ddd4ca;
-  border-radius: 10px;
+  border: 1px solid #ddd5cc;
+  border-radius: 16px;
 
-  background: #f8f6f3;
+  background: #f8f7f5;
 
-  font: inherit;
-  font-size: 14px;
-  color: #241f1c;
+  color: #2d2a27;
 
-  outline: none;
+  font-size: 15px;
+  font-weight: 500;
 
   transition:
-    border-color 0.16s ease,
-    box-shadow 0.16s ease,
-    background 0.16s ease;
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease;
+
+  box-sizing: border-box;
 }
 
 .cpl-authModal input:focus {
-  border-color: #b11226;
+  outline: none;
+
   background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(177, 18, 38, 0.1);
+
+  border-color: #a14b4b;
+
+  box-shadow:
+    0 0 0 4px rgba(143, 29, 29, 0.08);
 }
 
-.cpl-authModal button {
+/* =========================================
+   PRIMARY BUTTON
+========================================= */
+
+.cpl-authModal button[type="submit"] {
   width: 100%;
-  min-height: 44px;
+  height: 56px;
+
+  margin-top: 2px;
 
   border: none;
-  border-radius: 10px;
+  border-radius: 16px;
 
-  background: #4a0f0f;
+  background: #8f3f3f;
+
   color: #ffffff;
 
-  font: inherit;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
 
   cursor: pointer;
 
   transition:
-    transform 0.16s ease,
-    box-shadow 0.16s ease,
-    opacity 0.16s ease;
+    background 0.15s ease,
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
-.cpl-authModal button:hover {
+.cpl-authModal button[type="submit"]:hover {
+  background: #7e3434;
+
   transform: translateY(-1px);
-  box-shadow: 0 10px 22px rgba(74, 15, 15, 0.22);
+
+  box-shadow:
+    0 8px 18px rgba(111, 17, 17, 0.16);
 }
 
-.cpl-authModal button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
+/* =========================================
+   DIVIDER
+========================================= */
 
 .auth-divider {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 
-  margin: 4px 0;
+  margin: 28px 0 20px;
 
-  color: #6b625c;
-  font-size: 13px;
+  color: #8c847d;
+
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .auth-divider::before,
 .auth-divider::after {
   content: "";
+
   flex: 1;
+
   height: 1px;
-  background: #e2dbd3;
+
+  background: #e6ddd5;
 }
 
+/* =========================================
+   SOCIAL BUTTONS
+========================================= */
+
 .social-login {
-  background: #ffffff !important;
-  color: #4a0f0f !important;
-  border: 1px solid #ddd4ca !important;
-  box-shadow: none !important;
+  width: 100%;
+  height: 56px;
+
+  margin-top: 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+
+  border-radius: 16px;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .social-login:hover {
-  background: #faf7f4 !important;
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 8px 18px rgba(0,0,0,0.05);
 }
 
-.error {
-  margin-top: 4px;
-  padding: 10px 12px;
+/* GOOGLE */
 
-  border-radius: 10px;
-  background: rgba(177, 18, 38, 0.08);
+.social-login.google {
+  border: 1px solid #ddd6ce;
 
-  font-size: 13px;
-  font-weight: 650;
-  color: #b11226;
+  background: #ffffff;
+
+  color: #3c4043;
 }
 
-/* =========================
-RESPONSIVE
-========================= */
-
-@media (max-width: 900px) {
-  .landing-tagline {
-    white-space: normal;
-  }
+.social-login.google:hover {
+  background: #f8f6f3;
 }
 
-@media (max-width: 700px) {
-  .landing-container {
-    padding: 18px;
-  }
+/* FACEBOOK */
 
-  .landing-hero {
-    gap: 16px;
-  }
+.social-login.facebook {
+  border: 1px solid #dbe5f8;
 
-  .brand-title {
-    font-size: 36px;
-    letter-spacing: 0.025em;
-  }
+  background: #f4f7fd;
 
-  .landing-tagline {
-    font-size: 24px;
-  }
+  color: #1877f2;
+}
 
-  .landing-sub {
-    font-size: 14px;
-  }
+.social-login.facebook:hover {
+  background: #edf3fc;
+}
 
-  .landing-login-thumb {
-    right: 18px;
-    bottom: 18px;
+/* =========================================
+   ICONS
+========================================= */
 
-    width: 64px;
-    height: 64px;
-  }
+.social-brand-icon {
+  width: 24px;
+  height: 24px;
 
-  .cpl-authModal,
-  .auth-loading-box {
-    padding: 22px;
-  }
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+}
+
+/* GOOGLE */
+
+.google-brand {
+  color: #4285f4;
+
+  font-size: 20px;
+  font-weight: 700;
+
+  font-family: Arial, sans-serif;
+}
+
+/* FACEBOOK */
+
+.facebook-brand {
+  border-radius: 50%;
+
+  background: #1877f2;
+
+  color: #ffffff;
+
+  font-size: 18px;
+  font-weight: 700;
+
+  font-family: Arial, sans-serif;
+}
+
+/* =========================================
+   LABELS
+========================================= */
+
+.social-label {
+  line-height: 1;
+}
+
+/* =========================================
+   BOTTOM LINKS
+========================================= */
+
+.auth-links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+
+  margin-top: 26px;
+}
+
+.auth-link-divider {
+  color: #b1aba4;
+}
+
+.auth-text-link {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+
+  padding: 0 !important;
+
+  color: #1a73e8 !important;
+
+  font-size: 14px;
+  font-weight: 500;
+
+  cursor: pointer;
+}
+
+.auth-text-link:hover {
+  text-decoration: underline;
 }
