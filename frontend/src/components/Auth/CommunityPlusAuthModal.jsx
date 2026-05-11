@@ -24,6 +24,20 @@ export default function CommunityPlusAuthModal({
 
         <CommunityPlusEmailForm onSuccess={onSuccess} />
 
+        <div className="auth-divider">or</div>
+
+        <button
+          type="button"
+          className="social-login google"
+          onClick={handleGoogleLogin}
+        >
+          Google
+        </button>
+
+        <button type="button" className="social-login facebook" >
+          Facebook
+        </button>
+
         <div className="auth-links">
           <button
             type="button"
@@ -37,20 +51,6 @@ export default function CommunityPlusAuthModal({
             Join Community.One
           </button>
         </div>
-
-        <div className="auth-divider">or</div>
-
-        <button
-          type="button"
-          className="social-login google"
-          onClick={handleGoogleLogin}
-        >
-          Continue with Google
-        </button>
-
-        <button type="button" className="social-login facebook" disabled>
-          Continue with Facebook
-        </button>
       </div>
     </div>
   );
