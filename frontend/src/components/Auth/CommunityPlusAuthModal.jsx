@@ -37,9 +37,10 @@ export default function CommunityPlusAuthModal({
           className="social-login google"
           onClick={handleGoogleLogin}
         >
-          <span className="social-logo-box" aria-hidden="true">
-            <img src="/google-icon.png" alt="" />
+          <span className="social-brand-icon google-brand" aria-hidden="true">
+            G
           </span>
+
           <span className="social-label">Continue with Google</span>
         </button>
 
@@ -48,9 +49,10 @@ export default function CommunityPlusAuthModal({
           className="social-login facebook"
           onClick={handleFacebookLogin}
         >
-          <span className="social-logo-box" aria-hidden="true">
-            <img src="/facebook-icon.png" alt="" />
+          <span className="social-brand-icon facebook-brand" aria-hidden="true">
+            f
           </span>
+
           <span className="social-label">Continue with Facebook</span>
         </button>
 
