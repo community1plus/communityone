@@ -77,8 +77,6 @@ export default function HeaderTopRow() {
             </div>
 
             
-                <img src="/logo/echo.png" alt="Community One" />
-          
 
             <UserMenu />
           </div>

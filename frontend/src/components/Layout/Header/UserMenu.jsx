@@ -2,6 +2,34 @@ import { useAuth } from "../../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect, useMemo } from "react";
 
+function cleanName(value = "") {
+  return String(value)
+    .replace(/^google_/, "")
+    .replace(/^facebook_/, "")
+    .replace(/[._]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function getDisplayName(user) {
+  if (!user) return "Guest";
+
+  const attrs = user?.attributes || {};
+
+  const rawName =
+    user?.name ||
+    attrs.name ||
+    attrs.given_name ||
+    attrs.preferred_username ||
+    user?.email?.split("@")[0] ||
+    attrs.email?.split("@")[0] ||
+    user?.signInDetails?.loginId?.split("@")[0] ||
+    user?.username?.split("@")[0] ||
+    "Guest";
+
+  return cleanName(rawName);
+}
+
 export default function UserMenu() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -20,25 +48,7 @@ export default function UserMenu() {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  const username = useMemo(() => {
-    if (!user) return "Guest";
-    if (user.name) return user.name;
-    if (user.username && !user.username.includes("@")) return user.username;
-    if (user.email) return user.email.split("@")[0];
-    if (user.username) return user.username.split("@")[0];
-    return "Guest";
-  }, [user]);
-
-  const initials = useMemo(() => {
-    if (!username || username === "Guest") return "G";
-
-    return username
-      .split(/[\s.-]+/)
-      .map((word) => word[0])
-      .join("")
-      .slice(0, 2)
-      .toUpperCase();
-  }, [username]);
+  const username = useMemo(() => getDisplayName(user), [user]);
 
   const goTo = (path) => {
     setOpen(false);
@@ -60,8 +70,9 @@ export default function UserMenu() {
         onClick={() => setOpen((prev) => !prev)}
         aria-haspopup="menu"
         aria-expanded={open}
+        aria-label="Open user menu"
       >
-        {initials}
+        <img src="/echo.png" alt="" aria-hidden="true" />
       </button>
 
       {open && (
