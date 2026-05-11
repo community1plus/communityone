@@ -70,17 +70,7 @@
 ========================================= */
 
 .social-login {
-  width: 100%;
-  height: 54px;
-
-  margin-top: 12px;
-  padding: 0 18px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  gap: 10px;
+  overflow: hidden;
 }
 
 .social-login:hover:not(:disabled) {
@@ -111,30 +101,19 @@
 }
 
 .social-logo {
-  width: 22px;
-  height: 22px;
-
+  width: 20px !important;
+  height: 20px !important;
+  max-width: 20px !important;
+  max-height: 20px !important;
   object-fit: contain;
-
   display: block;
-
-  flex-shrink: 0;
+  flex: 0 0 20px;
 }
 
-/* GOOGLE */
-
-.google-logo {
-  width: 18px;
-  height: 18px;
-}
-
-/* FACEBOOK */
-
+.google-logo,
 .facebook-logo {
-  width: 20px;
-  height: 20px;
-
-  border-radius: 50%;
+  width: 20px !important;
+  height: 20px !important;
 }
 
 .social-label {
