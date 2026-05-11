@@ -7,7 +7,16 @@
   max-width: 520px;
   padding: 40px 32px;
   border-radius: 28px;
-  background: #dfd0d0;
+  background:
+    radial-gradient(
+      circle at 50% 45%,
+      rgba(248, 246, 243, 0.96),
+      rgba(248, 246, 243, 0.88) 42%,
+      rgba(248, 246, 243, 0.76) 76%,
+      rgba(248, 246, 243, 0.68)
+    ),
+    rgba(177, 18, 38, 0.025);
+
   box-sizing: border-box;
 }
 
