@@ -27,7 +27,7 @@ export default function CommunityPlusAuthModal({
   return (
     <div className="cpl-modalOverlay" onClick={onClose}>
       <div className="cpl-authModal" onClick={(e) => e.stopPropagation()}>
-        <h2>Sign in to Community.One</h2>
+        <h2>Community One</h2>
 
         <CommunityPlusEmailForm onSuccess={onSuccess} />
 
@@ -42,7 +42,7 @@ export default function CommunityPlusAuthModal({
             G
           </span>
 
-          <span className="social-label">Continue with Google</span>
+          <span className="social-label">Google</span>
         </button>
 
         <button
@@ -54,7 +54,7 @@ export default function CommunityPlusAuthModal({
             f
           </span>
 
-          <span className="social-label">Continue with Facebook</span>
+          <span className="social-label">Facebook</span>
         </button>
 
         <div className="auth-links">
