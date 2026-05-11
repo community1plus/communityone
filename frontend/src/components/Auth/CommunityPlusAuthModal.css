@@ -5,21 +5,15 @@
 .cpl-authModal {
   width: 100%;
   max-width: 520px;
-
   padding: 40px 32px;
-
   border-radius: 28px;
-
   background: #ffffff;
-
   box-sizing: border-box;
 }
 
 .cpl-authModal h2 {
   margin: 0 0 28px;
-
-  color: #2b2623;
-
+  color: #8f1d1d;
   font-size: 24px;
   font-weight: 800;
 }
@@ -37,45 +31,35 @@
 .cpl-authModal input {
   width: 100%;
   height: 54px;
-
   padding: 0 18px;
-
   border: 1px solid #d8d2ca;
   border-radius: 16px;
-
   background: #f7f8fb;
-
   font-size: 15px;
-
   box-sizing: border-box;
 }
 
 .cpl-authModal input:focus {
   outline: none;
-
-  border-color: #7b1d1d;
-
-  box-shadow:
-    0 0 0 3px rgba(123, 29, 29, 0.08);
+  border-color: #9b4a4a;
+  box-shadow: 0 0 0 3px rgba(143, 29, 29, 0.08);
 }
 
 .cpl-authModal button[type="submit"] {
   width: 100%;
   height: 54px;
-
   margin-top: 2px;
-
   border: none;
   border-radius: 16px;
-
-  background: #6f1111;
-
+  background: #8f3f3f;
   color: #ffffff;
-
   font-size: 16px;
   font-weight: 700;
-
   cursor: pointer;
+}
+
+.cpl-authModal button[type="submit"]:hover {
+  background: #7f3535;
 }
 
 /* =========================================
@@ -86,11 +70,8 @@
   display: flex;
   align-items: center;
   gap: 14px;
-
   margin: 28px 0 20px;
-
   color: #847a73;
-
   font-size: 14px;
   font-weight: 500;
 }
@@ -98,11 +79,8 @@
 .auth-divider::before,
 .auth-divider::after {
   content: "";
-
   flex: 1;
-
   height: 1px;
-
   background: #e7e0d8;
 }
 
@@ -113,19 +91,15 @@
 .social-login {
   width: 100%;
   height: 54px;
-
   margin-top: 14px;
-
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
 
   border-radius: 16px;
-
   font-size: 15px;
   font-weight: 600;
-
   cursor: pointer;
 
   transition:
@@ -136,29 +110,27 @@
 
 .social-login:hover {
   transform: translateY(-1px);
-
-  box-shadow:
-    0 6px 16px rgba(0,0,0,0.06);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.045);
 }
 
-/* GOOGLE */
-
 .social-login.google {
-  border: 1px solid #dadce0;
-
-  background: #ffffff;
-
+  border: 1px solid #ddd8d0;
+  background: #fbfaf8;
   color: #3c4043;
 }
 
-/* FACEBOOK */
+.social-login.google:hover {
+  background: #f5f2ee;
+}
 
 .social-login.facebook {
-  border: 1px solid #dbe7ff;
-
-  background: #eef4ff;
-
+  border: 1px solid #d9e5fb;
+  background: #f4f8ff;
   color: #1877f2;
+}
+
+.social-login.facebook:hover {
+  background: #edf4ff;
 }
 
 /* =========================================
@@ -168,43 +140,27 @@
 .social-brand-icon {
   width: 24px;
   height: 24px;
-
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
   flex-shrink: 0;
 }
 
-/* GOOGLE ICON */
-
 .google-brand {
   color: #4285f4;
-
   font-size: 20px;
   font-weight: 700;
-
   font-family: Arial, sans-serif;
 }
-
-/* FACEBOOK ICON */
 
 .facebook-brand {
   border-radius: 50%;
-
   background: #1877f2;
-
   color: #ffffff;
-
   font-size: 18px;
   font-weight: 700;
-
   font-family: Arial, sans-serif;
 }
-
-/* =========================================
-   LABEL
-========================================= */
 
 .social-label {
   line-height: 1;
@@ -219,7 +175,6 @@
   justify-content: center;
   align-items: center;
   gap: 12px;
-
   margin-top: 24px;
 }
 
@@ -228,16 +183,15 @@
 }
 
 .auth-text-link {
-  border: none;
-  background: transparent;
-
-  padding: 0;
-
-  color: #1a73e8;
-
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  height: auto !important;
+  min-height: 0 !important;
+  color: #1a73e8 !important;
   font-size: 14px;
   font-weight: 500;
-
   cursor: pointer;
 }
 
