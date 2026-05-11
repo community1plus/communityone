@@ -44,6 +44,8 @@ function buildProfilePayload(body = {}) {
 
 router.get("/", requireAuth, async (req, res) => {
   try {
+    
+    console.log("👤 FULL REQ.USER:", req.user);
     const userId = getAuthenticatedUserId(req);
 
     if (!userId) {
@@ -60,6 +62,7 @@ router.get("/", requireAuth, async (req, res) => {
       [userId]
     );
 
+    console.log("📄 PROFILE QUERY RESULT:", result.rows[0]);  
     const profile = normaliseProfile(result.rows[0]);
 
     if (!profile) {
