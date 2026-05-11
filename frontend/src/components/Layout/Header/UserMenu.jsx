@@ -1,4 +1,6 @@
 import { useAuth } from "../../../context/AuthContext";
+import { useProfile } from "../../../context/ProfileContext";
+
 import { useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect, useMemo } from "react";
 
@@ -32,9 +34,12 @@ function getDisplayName(user) {
 
 export default function UserMenu() {
   const { user, logout } = useAuth();
+  const { profile } = useProfile();
+
   const navigate = useNavigate();
 
   const [open, setOpen] = useState(false);
+
   const ref = useRef(null);
 
   useEffect(() => {
@@ -45,10 +50,17 @@ export default function UserMenu() {
     };
 
     document.addEventListener("mousedown", handler);
+
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  const username = useMemo(() => getDisplayName(user), [user]);
+  const username = useMemo(() => {
+    return (
+      profile?.display_name ||
+      profile?.username ||
+      getDisplayName(user)
+    );
+  }, [profile, user]);
 
   const goTo = (path) => {
     setOpen(false);
@@ -72,7 +84,11 @@ export default function UserMenu() {
         aria-expanded={open}
         aria-label="Open user menu"
       >
-        <img src="/logo/echo.png" alt="" aria-hidden="true" />
+        <img
+          src="/logo/echo.png"
+          alt=""
+          aria-hidden="true"
+        />
       </button>
 
       {open && (
