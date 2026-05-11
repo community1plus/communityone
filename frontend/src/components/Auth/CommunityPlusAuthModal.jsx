@@ -31,40 +31,31 @@ export default function CommunityPlusAuthModal({
           className="social-login google"
           onClick={handleGoogleLogin}
         >
-          <span className="social-icon google-icon">
-            G
-          </span>
+          <img
+            src="/google-icon.png"
+            alt="Google"
+            className="social-logo google-logo"
+          />
 
-          <span className="social-label">
-            Continue with Google
-          </span>
+          <span className="social-label">Google</span>
         </button>
 
-        <button
-          type="button"
-          className="social-login facebook"
-        >
-          <span className="social-icon facebook-icon">
-            f
-          </span>
+        <button type="button" className="social-login facebook">
+          <img
+            src="/facebook-icon.png"
+            alt="Facebook"
+            className="social-logo facebook-logo"
+          />
 
-          <span className="social-label">
-            Continue with Facebook
-          </span>
+          <span className="social-label">Facebook</span>
         </button>
 
         <div className="auth-links">
-          <button
-            type="button"
-            className="auth-text-link"
-            onClick={onJoin}
-          >
+          <button type="button" className="auth-text-link" onClick={onJoin}>
             Join Community.One
           </button>
 
-          <span className="auth-link-divider">
-            •
-          </span>
+          <span className="auth-link-divider">•</span>
 
           <button
             type="button"
