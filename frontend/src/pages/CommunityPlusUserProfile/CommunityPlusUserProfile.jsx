@@ -16,6 +16,8 @@ import useForm from "../../hooks/useForm";
 import "../../styles/system.css";
 import "./CommunityPlusUserProfile.css";
 
+const DEFAULT_PHONE_COUNTRY = "AU";
+
 const PHONE_COUNTRIES = [
   { code: "AU", label: "Australia", dialCode: "+61", min: 9, max: 9 },
   { code: "NZ", label: "New Zealand", dialCode: "+64", min: 8, max: 10 },
@@ -28,29 +30,11 @@ const PHONE_COUNTRIES = [
 ];
 
 const SOCIAL_PROVIDERS = [
-  {
-    id: "facebook",
-    label: "Facebook",
-    description: "Verify business page admin access.",
-  },
-  {
-    id: "instagram",
-    label: "Instagram",
-    description: "Verify professional or creator account access.",
-  },
-  {
-    id: "youtube",
-    label: "YouTube",
-    description: "Verify channel ownership.",
-  },
-  {
-    id: "x",
-    label: "X / Twitter",
-    description: "Verify account ownership.",
-  },
+  { id: "facebook", label: "Facebook", description: "Verify business page admin access." },
+  { id: "instagram", label: "Instagram", description: "Verify professional or creator account access." },
+  { id: "youtube", label: "YouTube", description: "Verify channel ownership." },
+  { id: "x", label: "X / Twitter", description: "Verify account ownership." },
 ];
-
-const DEFAULT_PHONE_COUNTRY = "AU";
 
 const profileSteps = [
   {
@@ -58,12 +42,7 @@ const profileSteps = [
     title: "USER",
     fields: [
       { name: "username", label: "Username", type: "text", required: true },
-      {
-        name: "display_name",
-        label: "Display Name",
-        type: "text",
-        required: true,
-      },
+      { name: "display_name", label: "Display Name", type: "text", required: true },
       {
         name: "userType",
         label: "User Type",
@@ -81,32 +60,17 @@ const profileSteps = [
   {
     id: "home-address",
     title: "HOME ADDRESS",
-    fields: [
-      {
-        name: "homeLocation",
-        label: "Home Address",
-        type: "location",
-        required: true,
-      },
-    ],
+    fields: [{ name: "homeLocation", label: "Home Address", type: "location", required: true }],
   },
   {
     id: "contact",
     title: "CONTACT",
     fields: [
       { name: "phone", label: "Phone Number", type: "tel", required: true },
-      {
-        name: "phoneVerificationCode",
-        label: "Verification Code",
-        type: "text",
-      },
+      { name: "phoneVerificationCode", label: "Verification Code", type: "text" },
     ],
   },
-  {
-    id: "social",
-    title: "SOCIAL",
-    fields: [],
-  },
+  { id: "social", title: "SOCIAL", fields: [] },
   {
     id: "payment",
     title: "PAYMENT DETAILS",
@@ -122,10 +86,7 @@ function digitsOnly(value = "") {
 }
 
 function getPhoneCountry(code = DEFAULT_PHONE_COUNTRY) {
-  return (
-    PHONE_COUNTRIES.find((country) => country.code === code) ||
-    PHONE_COUNTRIES[0]
-  );
+  return PHONE_COUNTRIES.find((country) => country.code === code) || PHONE_COUNTRIES[0];
 }
 
 function stripDialCode(phone = "", countryCode = DEFAULT_PHONE_COUNTRY) {
@@ -133,13 +94,8 @@ function stripDialCode(phone = "", countryCode = DEFAULT_PHONE_COUNTRY) {
   let digits = digitsOnly(phone);
   const dialDigits = digitsOnly(country.dialCode);
 
-  if (digits.startsWith(dialDigits)) {
-    digits = digits.slice(dialDigits.length);
-  }
-
-  if (country.code === "AU" && digits.startsWith("0")) {
-    digits = digits.slice(1);
-  }
+  if (digits.startsWith(dialDigits)) digits = digits.slice(dialDigits.length);
+  if (country.code === "AU" && digits.startsWith("0")) digits = digits.slice(1);
 
   return digits;
 }
@@ -147,33 +103,30 @@ function stripDialCode(phone = "", countryCode = DEFAULT_PHONE_COUNTRY) {
 function toE164Phone(phone = "", countryCode = DEFAULT_PHONE_COUNTRY) {
   const country = getPhoneCountry(countryCode);
   const digits = stripDialCode(phone, countryCode);
-
-  if (!digits) return "";
-
-  return `${country.dialCode}${digits}`;
+  return digits ? `${country.dialCode}${digits}` : "";
 }
 
-function isValidInternationalPhone(
-  phone = "",
-  countryCode = DEFAULT_PHONE_COUNTRY
-) {
+function isValidInternationalPhone(phone = "", countryCode = DEFAULT_PHONE_COUNTRY) {
   const country = getPhoneCountry(countryCode);
   const nationalDigits = stripDialCode(phone, countryCode);
 
-  return (
-    nationalDigits.length >= country.min &&
-    nationalDigits.length <= country.max
-  );
+  return nationalDigits.length >= country.min && nationalDigits.length <= country.max;
+}
+
+function normaliseSocialState(social = {}) {
+  return {
+    facebook: social?.facebook || { verified: false },
+    instagram: typeof social?.instagram === "object" ? social.instagram : { verified: false },
+    youtube: typeof social?.youtube === "object" ? social.youtube : { verified: false },
+    x: social?.x || (typeof social?.twitter === "object" ? social.twitter : null) || { verified: false },
+  };
 }
 
 function getSocialStatus(social = {}, providerId) {
   const provider = social?.[providerId];
 
-  if (!provider || !provider.verified) {
-    return {
-      verified: false,
-      text: "Not verified",
-    };
+  if (!provider?.verified) {
+    return { verified: false, text: "Not verified" };
   }
 
   return {
@@ -187,21 +140,46 @@ function getSocialStatus(social = {}, providerId) {
   };
 }
 
-function normaliseSocialState(social = {}) {
+function getUserEmail(user) {
+  return (
+    user?.email ||
+    user?.attributes?.email ||
+    user?.signInDetails?.loginId ||
+    ""
+  );
+}
+
+function getUserDisplayName(user) {
+  return (
+    user?.displayName ||
+    user?.name ||
+    user?.attributes?.name ||
+    user?.attributes?.given_name ||
+    getUserEmail(user).split("@")[0] ||
+    ""
+  );
+}
+
+function buildDefaultProfile({ profile, user, homeLocation }) {
   return {
-    facebook: social.facebook || { verified: false },
-    instagram:
-      typeof social.instagram === "object"
-        ? social.instagram
-        : { verified: false },
-    youtube:
-      typeof social.youtube === "object"
-        ? social.youtube
-        : { verified: false },
-    x:
-      social.x ||
-      (typeof social.twitter === "object" ? social.twitter : null) ||
-      { verified: false },
+    username: profile?.username || getUserEmail(user).split("@")[0] || "",
+    display_name: profile?.display_name || getUserDisplayName(user) || "",
+    userType: profile?.userType || "PERSONAL",
+
+    phoneCountry: profile?.phoneCountry || DEFAULT_PHONE_COUNTRY,
+    phone: profile?.phoneDisplay || profile?.phone || "",
+    phoneE164: profile?.phoneE164 || profile?.phone || "",
+    phoneVerified: profile?.phoneVerified || false,
+    phoneVerificationCode: "",
+
+    homeLocation: profile?.homeLocation || homeLocation || null,
+
+    social: normaliseSocialState(profile?.social),
+
+    payment: {
+      cardName: profile?.payment?.cardName || "",
+      last4: profile?.payment?.last4 || "",
+    },
   };
 }
 
@@ -211,45 +189,31 @@ export default function CommunityPlusUserProfile({ onComplete }) {
   const autoRef = useRef(null);
   const lastHomeLocationRef = useRef("");
   const socialCallbackHandledRef = useRef(false);
+  const hydratedProfileRef = useRef(false);
 
   const { isLoaded } = useGoogleMaps();
   const { user, isAuthenticated } = useAuth();
-  const { viewLocation: homeLocation, setManualLocation } =
-    useLocationContext();
+  const { viewLocation: homeLocation, setManualLocation } = useLocationContext();
 
   const {
     profile,
     profileReady,
+    profileMissing,
+    profileError: contextProfileError,
     completionPercent,
     hasProfile,
     saveProfile,
   } = useProfile();
 
   const form = useForm({
-    initialValues: {
-      username: profile?.username || "",
-      display_name: profile?.display_name || user?.displayName || "",
-      userType: profile?.userType || "PERSONAL",
-
-      phoneCountry: profile?.phoneCountry || DEFAULT_PHONE_COUNTRY,
-      phone: profile?.phoneDisplay || profile?.phone || "",
-      phoneE164: profile?.phoneE164 || profile?.phone || "",
-      phoneVerified: profile?.phoneVerified || false,
-      phoneVerificationCode: "",
-
-      homeLocation: profile?.homeLocation || homeLocation || null,
-
-      social: normaliseSocialState(profile?.social),
-
-      payment: {
-        cardName: profile?.payment?.cardName || "",
-        last4: profile?.payment?.last4 || "",
-      },
-    },
+    initialValues: buildDefaultProfile({
+      profile: null,
+      user,
+      homeLocation,
+    }),
   });
 
-  const { values, validateAll, setValue, isFormValidating, clearStorage } =
-    form;
+  const { values, validateAll, setValue, isFormValidating, clearStorage } = form;
 
   const [currentStep, setCurrentStep] = useState(0);
   const [savingProfile, setSavingProfile] = useState(false);
@@ -281,29 +245,47 @@ export default function CommunityPlusUserProfile({ onComplete }) {
   const displayCompletion = completionPercent || 0;
 
   useEffect(() => {
-    if (!profile?.social) return;
+    if (!profileReady || hydratedProfileRef.current) return;
 
+    const defaults = buildDefaultProfile({
+      profile,
+      user,
+      homeLocation,
+    });
+
+    Object.entries(defaults).forEach(([key, value]) => {
+      setValue(key, value);
+    });
+
+    hydratedProfileRef.current = true;
+  }, [profileReady, profile, user, homeLocation, setValue]);
+
+  useEffect(() => {
+    hydratedProfileRef.current = false;
+  }, [user?.id, user?.username, getUserEmail(user)]);
+
+  useEffect(() => {
+    if (!profile?.social) return;
     setValue("social", normaliseSocialState(profile.social));
   }, [profile?.social, setValue]);
 
   useEffect(() => {
-    if (!user?.email) return;
+    if (!profileReady) return;
 
-    const prefix = user.email.split("@")[0];
+    const email = getUserEmail(user);
+    const displayName = getUserDisplayName(user);
+    const prefix = email.split("@")[0];
 
     if (!values.username) {
-      setValue("username", profile?.username || prefix);
+      setValue("username", profile?.username || prefix || "");
     }
 
     if (!values.display_name) {
-      setValue(
-        "display_name",
-        profile?.display_name || user.displayName || prefix
-      );
+      setValue("display_name", profile?.display_name || displayName || prefix || "");
     }
   }, [
-    user?.email,
-    user?.displayName,
+    profileReady,
+    user,
     profile?.username,
     profile?.display_name,
     values.username,
@@ -343,13 +325,7 @@ export default function CommunityPlusUserProfile({ onComplete }) {
       setPhoneStatus("idle");
       setPhoneError("");
     }
-  }, [
-    values.phone,
-    phoneE164,
-    profile?.phoneE164,
-    profile?.phone,
-    setValue,
-  ]);
+  }, [values.phone, phoneE164, profile?.phoneE164, profile?.phone, setValue]);
 
   useEffect(() => {
     const syncSocialVerification = async () => {
@@ -363,29 +339,22 @@ export default function CommunityPlusUserProfile({ onComplete }) {
 
       if (!socialProvider || socialCallbackHandledRef.current) return;
 
-      if (!isAuthenticated || (!user?.id && !user?.email)) {
-        console.log(
-          "Waiting for authenticated session before saving social verification..."
-        );
+      if (!isAuthenticated || (!user?.id && !getUserEmail(user))) {
+        console.log("Waiting for authenticated session before saving social verification...");
         return;
       }
+
+      if (!profileReady) return;
 
       socialCallbackHandledRef.current = true;
       setCurrentStep(3);
 
       if (verified === "false") {
         setProfileError(
-          reason
-            ? `Social verification failed: ${reason}`
-            : "Social verification failed."
+          reason ? `Social verification failed: ${reason}` : "Social verification failed."
         );
 
-        window.history.replaceState(
-          {},
-          document.title,
-          window.location.pathname
-        );
-
+        window.history.replaceState({}, document.title, window.location.pathname);
         return;
       }
 
@@ -399,7 +368,6 @@ export default function CommunityPlusUserProfile({ onComplete }) {
           ...(values.social?.[socialProvider] || {}),
           verified: true,
           verifiedAt,
-
           ...(socialProvider === "youtube"
             ? {
                 channelId: channelId || "",
@@ -433,24 +401,13 @@ export default function CommunityPlusUserProfile({ onComplete }) {
       setValue("social", verifiedSocial);
       setProfileError("");
 
-      console.log("Saving social verification payload:", nextPayload);
-
       try {
         await saveProfile(nextPayload);
-
-        console.log("Social verification saved.");
-
-        window.history.replaceState(
-          {},
-          document.title,
-          window.location.pathname
-        );
+        window.history.replaceState({}, document.title, window.location.pathname);
       } catch (err) {
         console.error("Social verification save failed:", err);
-
         setProfileError(
-          err?.message ||
-            "Social verification succeeded, but saving it failed."
+          err?.message || "Social verification succeeded, but saving it failed."
         );
       }
     };
@@ -458,8 +415,8 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     syncSocialVerification();
   }, [
     isAuthenticated,
-    user?.id,
-    user?.email,
+    user,
+    profileReady,
     saveProfile,
     setValue,
     values,
@@ -506,12 +463,12 @@ export default function CommunityPlusUserProfile({ onComplete }) {
 
       const params = new URLSearchParams({
         provider: providerId,
-        userId: user?.id || user?.email || "",
+        userId: user?.id || getUserEmail(user),
       });
 
       window.location.href = `${baseUrl}/social/${providerId}/start?${params.toString()}`;
     },
-    [user?.id, user?.email]
+    [user]
   );
 
   const sendPhoneCode = useCallback(async () => {
@@ -523,9 +480,7 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     }
 
     if (!isValidInternationalPhone(values.phone, values.phoneCountry)) {
-      setPhoneError(
-        `Enter a valid phone number for ${selectedPhoneCountry.label}.`
-      );
+      setPhoneError(`Enter a valid phone number for ${selectedPhoneCountry.label}.`);
       return;
     }
 
@@ -555,12 +510,7 @@ export default function CommunityPlusUserProfile({ onComplete }) {
       setPhoneStatus("error");
       setPhoneError(err?.message || "Could not send verification code");
     }
-  }, [
-    values.phone,
-    values.phoneCountry,
-    selectedPhoneCountry.label,
-    setValue,
-  ]);
+  }, [values.phone, values.phoneCountry, selectedPhoneCountry.label, setValue]);
 
   const verifyPhoneCode = useCallback(async () => {
     if (phoneStatus !== "sent") {
@@ -603,13 +553,7 @@ export default function CommunityPlusUserProfile({ onComplete }) {
       setPhoneStatus("error");
       setPhoneError(err?.message || "Verification failed");
     }
-  }, [
-    phoneStatus,
-    values.phone,
-    values.phoneCountry,
-    values.phoneVerificationCode,
-    setValue,
-  ]);
+  }, [phoneStatus, values.phone, values.phoneCountry, values.phoneVerificationCode, setValue]);
 
   const onPlaceChanged = useCallback(() => {
     const place = autoRef.current?.getPlace();
@@ -695,17 +639,19 @@ export default function CommunityPlusUserProfile({ onComplete }) {
 
   const closeProfile = useCallback(() => {
     if (!profileReady) return;
-
-    if (!hasProfile) {
-      navigate("/communityplus/profile", { replace: true });
-      return;
-    }
-
     navigate("/communityplus", { replace: true });
-  }, [profileReady, hasProfile, navigate]);
+  }, [profileReady, navigate]);
 
   if (!profileReady) {
     return <div style={{ padding: 40 }}>Loading profile...</div>;
+  }
+
+  if (contextProfileError && !profileMissing) {
+    return (
+      <div style={{ padding: 40 }}>
+        <div className="error">{contextProfileError}</div>
+      </div>
+    );
   }
 
   return (
@@ -774,17 +720,12 @@ export default function CommunityPlusUserProfile({ onComplete }) {
                     const status = getSocialStatus(values.social, provider.id);
 
                     return (
-                      <div
-                        className="social-verification-row"
-                        key={provider.id}
-                      >
+                      <div className="social-verification-row" key={provider.id}>
                         <div className="social-verification-main">
                           <strong>{provider.label}</strong>
                           <span>{provider.description}</span>
 
-                          <small
-                            className={status.verified ? "success" : "hint"}
-                          >
+                          <small className={status.verified ? "success" : "hint"}>
                             {status.text}
                           </small>
                         </div>
@@ -821,8 +762,8 @@ export default function CommunityPlusUserProfile({ onComplete }) {
           {isContactStep && (
             <div className="phone-verification">
               <div className="hint">
-                Selected country: {selectedPhoneCountry.label}. Verification
-                number: {phoneE164 || selectedPhoneCountry.dialCode}
+                Selected country: {selectedPhoneCountry.label}. Verification number:{" "}
+                {phoneE164 || selectedPhoneCountry.dialCode}
               </div>
 
               {values.phone && !phoneIsValid && (
@@ -847,9 +788,7 @@ export default function CommunityPlusUserProfile({ onComplete }) {
                   onClick={sendPhoneCode}
                   disabled={phoneStatus === "sending" || values.phoneVerified}
                 >
-                  {phoneStatus === "sending"
-                    ? "Sending..."
-                    : "Send verification code"}
+                  {phoneStatus === "sending" ? "Sending..." : "Send verification code"}
                 </Button>
 
                 <Button
@@ -861,16 +800,18 @@ export default function CommunityPlusUserProfile({ onComplete }) {
               </div>
 
               {phoneStatus === "sent" && (
-                <div className="success">
-                  Verification code sent. Enter the code above.
-                </div>
+                <div className="success">Verification code sent. Enter the code above.</div>
               )}
 
-              {values.phoneVerified && (
-                <div className="success">Phone number verified.</div>
-              )}
+              {values.phoneVerified && <div className="success">Phone number verified.</div>}
 
               {phoneError && <div className="error">{phoneError}</div>}
+            </div>
+          )}
+
+          {profileMissing && (
+            <div className="hint">
+              No saved profile found yet. Complete the form and save to create your profile.
             </div>
           )}
 
