@@ -116,6 +116,19 @@
   height: 20px !important;
 }
 
+.social-logo-box {
+  width: 20px;
+  height: 20px;
+  overflow: hidden;
+  flex: 0 0 20px;
+}
+
+.social-logo-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
 .social-label {
   display: inline-flex;
   align-items: center;
