@@ -395,52 +395,59 @@ SOCIAL BUTTONS
 BOTTOM ACTION BOX
 ========================= */
 
+/* =========================
+BOTTOM ACTION BOX
+========================= */
+
 .auth-link-box {
-  width: 100%;
-
-  display: flex;
-  flex-direction: column;
-
-  gap: 14px;
-
-  margin-top: 2px;
-}
-
-.auth-box-link {
   width: 100%;
   min-height: 54px;
 
-  border: none;
-  border-radius: 14px;
-
-  background: #7d0f1f;
-  color: #ffffff;
-
-  font: inherit;
-  font-size: 15px;
-  font-weight: 750;
-
-  cursor: pointer;
+  margin-top: 2px;
+  padding: 0 18px;
 
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 14px;
 
-  transition:
-    background 0.18s ease,
-    transform 0.18s ease,
-    box-shadow 0.18s ease;
+  border-radius: 14px;
+  border: 1px solid #ddd4ca;
+
+  background: #ffffff;
+
+  box-sizing: border-box;
+}
+
+.auth-box-link {
+  width: auto;
+  min-height: 0;
+
+  border: none;
+  border-radius: 0;
+
+  background: transparent;
+  color: #1a73e8;
+
+  padding: 0;
+
+  font: inherit;
+  font-size: 14px;
+  font-weight: 650;
+
+  cursor: pointer;
+}
+
+.auth-box-link + .auth-box-link::before {
+  content: "|";
+  margin-right: 14px;
+  color: #d8d2ca;
+  font-weight: 500;
 }
 
 .auth-box-link:hover {
-  background: #6d0d1b;
-
-  transform: translateY(-1px);
-
-  box-shadow:
-    0 10px 22px rgba(177, 18, 38, 0.14);
+  text-decoration: underline;
 }
-
 /* =========================
 STATUS
 ========================= */
