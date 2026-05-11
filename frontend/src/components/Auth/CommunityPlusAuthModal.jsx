@@ -12,15 +12,11 @@ import "./CommunityPlusAuthModal.css";
 
 export default function CommunityPlusAuthModal({ onClose, onSuccess }) {
   const [mode, setMode] = useState("signin");
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [confirmCode, setConfirmCode] = useState("");
   const [newPassword, setNewPassword] = useState("");
-
   const [busy, setBusy] = useState(false);
-
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
@@ -54,7 +50,6 @@ export default function CommunityPlusAuthModal({ onClose, onSuccess }) {
 
   const handleJoin = async (event) => {
     event.preventDefault();
-
     clearStatus();
     setBusy(true);
 
@@ -79,7 +74,6 @@ export default function CommunityPlusAuthModal({ onClose, onSuccess }) {
 
   const handleConfirmJoin = async (event) => {
     event.preventDefault();
-
     clearStatus();
     setBusy(true);
 
@@ -103,7 +97,6 @@ export default function CommunityPlusAuthModal({ onClose, onSuccess }) {
 
   const handleForgotPassword = async (event) => {
     event.preventDefault();
-
     clearStatus();
     setBusy(true);
 
@@ -122,7 +115,6 @@ export default function CommunityPlusAuthModal({ onClose, onSuccess }) {
 
   const handleResetPassword = async (event) => {
     event.preventDefault();
-
     clearStatus();
     setBusy(true);
 
@@ -182,10 +174,6 @@ export default function CommunityPlusAuthModal({ onClose, onSuccess }) {
               >
                 Join
               </button>
-
-              <span className="auth-box-divider" aria-hidden="true">
-                |
-              </span>
 
               <button
                 type="button"
