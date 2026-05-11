@@ -56,6 +56,17 @@ function calculateCompletion(profile) {
   return Math.round((completed / REQUIRED_PROFILE_FIELDS.length) * 100);
 }
 
+function isNotFoundError(err) {
+  const status = err?.response?.status || err?.status;
+  const data = err?.response?.data;
+
+  return (
+    status === 404 ||
+    data?.error === "Profile not found" ||
+    data?.profile === null
+  );
+}
+
 export function ProfileProvider({ children }) {
   const api = useAPI();
   const { user, isAuthenticated } = useAuth();
@@ -68,18 +79,29 @@ export function ProfileProvider({ children }) {
   const [profileLoading, setProfileLoading] = useState(true);
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileError, setProfileError] = useState(null);
+  const [profileMissing, setProfileMissing] = useState(false);
 
   useEffect(() => {
     apiRef.current = api;
   }, [api]);
 
+  const markProfileReady = useCallback((nextProfile = null, missing = false) => {
+    setProfile(nextProfile);
+    setProfileMissing(missing);
+    setProfileError(null);
+    hasLoadedRef.current = true;
+  }, []);
+
   const loadProfile = useCallback(async () => {
-    if (loadingRef.current) return null;
+    if (loadingRef.current) return profile;
 
     if (!isAuthenticated || !user?.id) {
-      hasLoadedRef.current = true;
+      loadingRef.current = false;
       setProfile(null);
+      setProfileMissing(false);
+      setProfileError(null);
       setProfileLoading(false);
+      hasLoadedRef.current = true;
       return null;
     }
 
@@ -100,21 +122,22 @@ export function ProfileProvider({ children }) {
 
       const nextProfile = res?.profile || null;
 
-      setProfile(nextProfile);
-      hasLoadedRef.current = true;
+      markProfileReady(nextProfile, !nextProfile);
 
       return nextProfile;
     } catch (err) {
-      const status = err?.response?.status || err?.status;
+      if (isNotFoundError(err)) {
+        console.warn("Profile not found. Continuing with empty profile state.");
 
-      if (status === 404) {
-        setProfile(null);
-        hasLoadedRef.current = true;
+        markProfileReady(null, true);
+
         return null;
       }
 
       console.error("Profile load failed:", err);
+
       setProfile(null);
+      setProfileMissing(false);
       setProfileError(err?.message || "Profile load failed");
       hasLoadedRef.current = true;
 
@@ -123,15 +146,21 @@ export function ProfileProvider({ children }) {
       loadingRef.current = false;
       setProfileLoading(false);
     }
-  }, [isAuthenticated, user?.id]);
+  }, [isAuthenticated, user?.id, markProfileReady, profile]);
 
   useEffect(() => {
     hasLoadedRef.current = false;
-    setProfileLoading(true);
+    loadingRef.current = false;
+
+    setProfile(null);
+    setProfileMissing(false);
+    setProfileError(null);
+    setProfileLoading(Boolean(isAuthenticated && user?.id));
   }, [isAuthenticated, user?.id]);
 
   useEffect(() => {
     if (hasLoadedRef.current) return;
+
     loadProfile();
   }, [loadProfile]);
 
@@ -153,6 +182,7 @@ export function ProfileProvider({ children }) {
       };
 
       setProfile(optimisticProfile);
+      setProfileMissing(false);
 
       try {
         const headers = await getAuthHeaders({
@@ -176,6 +206,7 @@ export function ProfileProvider({ children }) {
         const savedProfile = res?.profile || optimisticProfile;
 
         setProfile(savedProfile);
+        setProfileMissing(false);
         hasLoadedRef.current = true;
 
         return savedProfile;
@@ -187,13 +218,16 @@ export function ProfileProvider({ children }) {
 
           if (serverProfile) {
             setProfile(serverProfile);
+            setProfileMissing(false);
             hasLoadedRef.current = true;
             return serverProfile;
           }
         }
 
         console.error("Profile save failed:", err);
+
         setProfile(previousProfile);
+        setProfileMissing(!previousProfile);
         setProfileError(err?.message || "Profile save failed");
 
         throw err;
@@ -222,6 +256,7 @@ export function ProfileProvider({ children }) {
       };
 
       setProfile(optimisticProfile);
+      setProfileMissing(false);
 
       try {
         const headers = await getAuthHeaders({
@@ -245,6 +280,7 @@ export function ProfileProvider({ children }) {
         const savedProfile = res?.profile || optimisticProfile;
 
         setProfile(savedProfile);
+        setProfileMissing(false);
         hasLoadedRef.current = true;
 
         return savedProfile;
@@ -256,13 +292,16 @@ export function ProfileProvider({ children }) {
 
           if (serverProfile) {
             setProfile(serverProfile);
+            setProfileMissing(false);
             hasLoadedRef.current = true;
             return serverProfile;
           }
         }
 
         console.error("Profile patch failed:", err);
+
         setProfile(previousProfile);
+        setProfileMissing(!previousProfile);
         setProfileError(err?.message || "Profile patch failed");
 
         throw err;
@@ -291,6 +330,7 @@ export function ProfileProvider({ children }) {
       profileReady,
       profileSaving,
       profileError,
+      profileMissing,
 
       completionPercent,
       hasProfile,
@@ -306,6 +346,7 @@ export function ProfileProvider({ children }) {
       profileReady,
       profileSaving,
       profileError,
+      profileMissing,
       completionPercent,
       hasProfile,
       isProfileComplete,
