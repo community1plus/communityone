@@ -31,16 +31,22 @@ export default function CommunityPlusAuthModal({
           className="social-login google"
           onClick={handleGoogleLogin}
         >
-         
-            <span className="gsi-material-button-icon">
-              G
-            </span>
-            <span className="gsi-material-button-contents">Google</span>
-          
+          <img
+            src="/google-icon.svg"
+            alt="Google"
+            className="social-logo google-logo"
+          />
+
+          <span className="social-label">Google</span>
         </button>
 
         <button type="button" className="social-login facebook">
-          
+          <img
+            src="/facebook-icon.svg"
+            alt="Facebook"
+            className="social-logo facebook-logo"
+          />
+
           <span className="social-label">Facebook</span>
         </button>
 
