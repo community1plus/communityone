@@ -281,7 +281,7 @@ PRIMARY BUTTON
   border: none;
   border-radius: 14px;
 
-  background: #a0192f;
+  background: #b11226;
   color: #ffffff;
 
   font: inherit;
@@ -297,7 +297,7 @@ PRIMARY BUTTON
 }
 
 .cpl-authModal button[type="submit"]:hover {
-  background: #8e162a;
+  background: #991021;
 
   transform: translateY(-1px);
 
@@ -379,10 +379,7 @@ SOCIAL BUTTONS
     0 8px 18px rgba(0, 0, 0, 0.045);
 }
 
-.social-login.google {
-  color: #2b2522;
-}
-
+.social-login.google,
 .social-login.facebook {
   color: #2b2522;
 }
@@ -418,10 +415,13 @@ BOTTOM ACTION BOX
 
   height: 100%;
 
-  border: none;
-  background: transparent;
+  border: none !important;
+  border-radius: 0 !important;
 
-  color: #1a73e8;
+  background: transparent !important;
+  color: #1a73e8 !important;
+
+  box-shadow: none !important;
 
   font: inherit;
   font-size: 14px;
@@ -435,12 +435,18 @@ BOTTOM ACTION BOX
 }
 
 .auth-box-link:hover {
-  background: #f7f8fb;
+  background: #f7f8fb !important;
+
+  color: #1a73e8 !important;
+
   text-decoration: underline;
+
+  transform: none !important;
+  box-shadow: none !important;
 }
 
 .auth-box-link + .auth-box-link {
-  border-left: 1px solid #ddd4ca;
+  border-left: 1px solid #ddd4ca !important;
 }
 
 /* =========================
