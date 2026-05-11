@@ -8,14 +8,13 @@ import {
 } from "aws-amplify/auth";
 
 import CommunityPlusEmailForm from "./CommunityPlusEmailForm";
-import "./CommunityPlusAuthModal.css";
 
 export default function CommunityPlusAuthModal({ onClose, onSuccess }) {
   const [mode, setMode] = useState("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const [code, setCode] = useState("");
+  const [confirmCode, setConfirmCode] = useState("");
   const [newPassword, setNewPassword] = useState("");
 
   const [busy, setBusy] = useState(false);
@@ -27,15 +26,26 @@ export default function CommunityPlusAuthModal({ onClose, onSuccess }) {
     setError("");
   };
 
-  const goTo = (nextMode) => {
+  const goToSignIn = () => {
     clearStatus();
-    setMode(nextMode);
+    setMode("signin");
+  };
+
+  const goToJoin = () => {
+    clearStatus();
+    setMode("join");
+  };
+
+  const goToForgotPassword = () => {
+    clearStatus();
+    setMode("forgot");
   };
 
   const handleGoogleLogin = async () => {
     try {
       await signInWithRedirect({ provider: "Google" });
     } catch (err) {
+      console.error("Google sign-in failed:", err);
       setError(err?.message || "Google sign-in failed.");
     }
   };
@@ -44,6 +54,7 @@ export default function CommunityPlusAuthModal({ onClose, onSuccess }) {
     try {
       await signInWithRedirect({ provider: "Facebook" });
     } catch (err) {
+      console.error("Facebook sign-in failed:", err);
       setError(err?.message || "Facebook sign-in failed.");
     }
   };
@@ -58,13 +69,16 @@ export default function CommunityPlusAuthModal({ onClose, onSuccess }) {
         username: email,
         password,
         options: {
-          userAttributes: { email },
+          userAttributes: {
+            email,
+          },
         },
       });
 
       setMessage("Check your email for the confirmation code.");
       setMode("confirmJoin");
     } catch (err) {
+      console.error("Join failed:", err);
       setError(err?.message || "Could not create account.");
     } finally {
       setBusy(false);
@@ -79,14 +93,15 @@ export default function CommunityPlusAuthModal({ onClose, onSuccess }) {
     try {
       await confirmSignUp({
         username: email,
-        confirmationCode: code,
+        confirmationCode: confirmCode,
       });
 
       setMessage("Account confirmed. You can now sign in.");
       setMode("signin");
-      setCode("");
+      setConfirmCode("");
       setPassword("");
     } catch (err) {
+      console.error("Confirm join failed:", err);
       setError(err?.message || "Could not confirm account.");
     } finally {
       setBusy(false);
@@ -99,11 +114,14 @@ export default function CommunityPlusAuthModal({ onClose, onSuccess }) {
     setBusy(true);
 
     try {
-      await resetPassword({ username: email });
+      await resetPassword({
+        username: email,
+      });
 
       setMessage("Check your email for the reset code.");
       setMode("resetPassword");
     } catch (err) {
+      console.error("Password reset request failed:", err);
       setError(err?.message || "Could not start password reset.");
     } finally {
       setBusy(false);
@@ -118,15 +136,16 @@ export default function CommunityPlusAuthModal({ onClose, onSuccess }) {
     try {
       await confirmResetPassword({
         username: email,
-        confirmationCode: code,
+        confirmationCode: confirmCode,
         newPassword,
       });
 
       setMessage("Password reset. You can now sign in.");
       setMode("signin");
-      setCode("");
+      setConfirmCode("");
       setNewPassword("");
     } catch (err) {
+      console.error("Password reset failed:", err);
       setError(err?.message || "Could not reset password.");
     } finally {
       setBusy(false);
@@ -136,7 +155,9 @@ export default function CommunityPlusAuthModal({ onClose, onSuccess }) {
   return (
     <div className="cpl-modalOverlay" onClick={onClose}>
       <div className="cpl-authModal" onClick={(e) => e.stopPropagation()}>
-        <h2>Community One</h2>
+        <h2>
+          <span>Community One</span>
+        </h2>
 
         {mode === "signin" && (
           <>
@@ -149,9 +170,7 @@ export default function CommunityPlusAuthModal({ onClose, onSuccess }) {
               className="social-login google"
               onClick={handleGoogleLogin}
             >
-              <span className="social-brand-icon google-brand" aria-hidden="true">
-                G
-              </span>
+              <span className="social-brand-icon google-brand">G</span>
               <span className="social-label">Google</span>
             </button>
 
@@ -160,21 +179,12 @@ export default function CommunityPlusAuthModal({ onClose, onSuccess }) {
               className="social-login facebook"
               onClick={handleFacebookLogin}
             >
-              <span
-                className="social-brand-icon facebook-brand"
-                aria-hidden="true"
-              >
-                f
-              </span>
+              <span className="social-brand-icon facebook-brand">f</span>
               <span className="social-label">Facebook</span>
             </button>
 
             <div className="auth-links">
-              <button
-                type="button"
-                className="auth-text-link"
-                onClick={() => goTo("join")}
-              >
+              <button type="button" className="auth-text-link" onClick={goToJoin}>
                 Join
               </button>
 
@@ -183,7 +193,7 @@ export default function CommunityPlusAuthModal({ onClose, onSuccess }) {
               <button
                 type="button"
                 className="auth-text-link"
-                onClick={() => goTo("forgot")}
+                onClick={goToForgotPassword}
               >
                 Forgot password?
               </button>
@@ -197,8 +207,7 @@ export default function CommunityPlusAuthModal({ onClose, onSuccess }) {
               type="email"
               placeholder="Email address"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              autoComplete="email"
+              onChange={(event) => setEmail(event.target.value)}
               required
             />
 
@@ -206,21 +215,16 @@ export default function CommunityPlusAuthModal({ onClose, onSuccess }) {
               type="password"
               placeholder="Create password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete="new-password"
+              onChange={(event) => setPassword(event.target.value)}
               required
             />
 
             <button type="submit" disabled={busy}>
-              {busy ? "Creating account..." : "Join"}
+              {busy ? "Creating account..." : "Join Community One"}
             </button>
 
             <div className="auth-links">
-              <button
-                type="button"
-                className="auth-text-link"
-                onClick={() => goTo("signin")}
-              >
+              <button type="button" className="auth-text-link" onClick={goToSignIn}>
                 Back to sign in
               </button>
             </div>
@@ -232,14 +236,20 @@ export default function CommunityPlusAuthModal({ onClose, onSuccess }) {
             <input
               type="text"
               placeholder="Confirmation code"
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
+              value={confirmCode}
+              onChange={(event) => setConfirmCode(event.target.value)}
               required
             />
 
             <button type="submit" disabled={busy}>
               {busy ? "Confirming..." : "Confirm account"}
             </button>
+
+            <div className="auth-links">
+              <button type="button" className="auth-text-link" onClick={goToJoin}>
+                Back
+              </button>
+            </div>
           </form>
         )}
 
@@ -249,8 +259,7 @@ export default function CommunityPlusAuthModal({ onClose, onSuccess }) {
               type="email"
               placeholder="Email address"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              autoComplete="email"
+              onChange={(event) => setEmail(event.target.value)}
               required
             />
 
@@ -259,11 +268,7 @@ export default function CommunityPlusAuthModal({ onClose, onSuccess }) {
             </button>
 
             <div className="auth-links">
-              <button
-                type="button"
-                className="auth-text-link"
-                onClick={() => goTo("signin")}
-              >
+              <button type="button" className="auth-text-link" onClick={goToSignIn}>
                 Back to sign in
               </button>
             </div>
@@ -275,8 +280,8 @@ export default function CommunityPlusAuthModal({ onClose, onSuccess }) {
             <input
               type="text"
               placeholder="Reset code"
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
+              value={confirmCode}
+              onChange={(event) => setConfirmCode(event.target.value)}
               required
             />
 
@@ -284,14 +289,19 @@ export default function CommunityPlusAuthModal({ onClose, onSuccess }) {
               type="password"
               placeholder="New password"
               value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              autoComplete="new-password"
+              onChange={(event) => setNewPassword(event.target.value)}
               required
             />
 
             <button type="submit" disabled={busy}>
               {busy ? "Resetting..." : "Reset password"}
             </button>
+
+            <div className="auth-links">
+              <button type="button" className="auth-text-link" onClick={goToSignIn}>
+                Back to sign in
+              </button>
+            </div>
           </form>
         )}
 
