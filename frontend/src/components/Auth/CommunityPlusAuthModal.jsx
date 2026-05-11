@@ -277,10 +277,6 @@ export default function CommunityPlusAuthModal({
                 Join
               </button>
 
-              <span className="auth-inline-divider">
-                |
-              </span>
-
               <button
                 type="button"
                 className="auth-inline-link"

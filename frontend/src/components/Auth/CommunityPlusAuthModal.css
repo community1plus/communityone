@@ -309,7 +309,8 @@ AUTH MODAL
   line-height: 1.15;
   font-weight: 850;
   letter-spacing: -0.025em;
-  color: #111111;
+  color:  #b11226;
+  align-self: center;
 }
 
 .cpl-authModal h2 span {
