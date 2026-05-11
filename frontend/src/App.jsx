@@ -27,6 +27,10 @@ function ProtectedRoute({ children }) {
   const location = useLocation();
   const { isAuthenticated, authReady } = useAuth();
 
+  console.log("PROTECTED ROUTE STATE:", {
+  authReady,
+  isAuthenticated,
+}); 
   if (!authReady) {
     return <div style={{ padding: 40 }}>Loading...</div>;
   }
