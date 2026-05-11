@@ -1,47 +1,297 @@
+/* =========================================
+   AUTH LINKS
+========================================= */
+
 .auth-links {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
 
-  margin-top: 14px;
-  margin-bottom: 22px;
+  gap: 14px;
+
+  margin-top: 22px;
+}
+
+.auth-link-divider {
+  color: #9aa0a6;
+
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .auth-text-link {
   border: 0;
   background: transparent;
 
-  color: #6f1111;
+  color: #1a73e8;
 
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
 
   cursor: pointer;
 
   padding: 0;
+
+  transition:
+    opacity 0.15s ease,
+    color 0.15s ease;
 }
 
 .auth-text-link:hover {
   text-decoration: underline;
+
+  opacity: 0.9;
 }
 
-.social-login {
-  height: 54px;
+/* =========================================
+   AUTH DIVIDER
+========================================= */
 
+.auth-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin: 22px 0 18px;
+
+  color: #80868b;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* =========================================
+   EMAIL FORM SPACING
+========================================= */
+
+.cpl-authModal form {
+  display: flex;
+  flex-direction: column;
+
+  gap: 14px;
+
+  margin-top: 18px;
+}
+
+.cpl-authModal input {
+  width: 100%;
+
+  height: 52px;
+
+  padding: 0 16px;
+
+  border: 1px solid #d7dce1;
   border-radius: 14px;
 
-  font-weight: 700;
+  background: #ffffff;
 
   font-size: 15px;
+  font-weight: 500;
+
+  color: #202124;
+
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+
+  box-sizing: border-box;
+}
+
+.cpl-authModal input:focus {
+  outline: none;
+
+  border-color: #1a73e8;
+
+  box-shadow:
+    0 0 0 3px rgba(26, 115, 232, 0.12);
+}
+
+.cpl-authModal button[type="submit"] {
+  height: 52px;
+
+  margin-top: 4px;
+
+  border: 0;
+  border-radius: 14px;
+
+  background: #5d0d0d;
+
+  color: #ffffff;
+
+  font-size: 15px;
+  font-weight: 700;
+
+  cursor: pointer;
 
   transition:
     transform 0.15s ease,
     box-shadow 0.15s ease;
 }
 
+.cpl-authModal button[type="submit"]:hover {
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+/* =========================================
+   SOCIAL LOGIN BUTTONS
+========================================= */
+
+.social-login {
+  position: relative;
+
+  width: 100%;
+
+  height: 54px;
+
+  margin-top: 14px;
+
+  padding: 0 20px 0 56px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 14px;
+
+  font-size: 15px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease,
+    border-color 0.15s ease;
+
+  box-sizing: border-box;
+}
+
 .social-login:hover:not(:disabled) {
   transform: translateY(-1px);
 
   box-shadow:
-    0 6px 18px rgba(0,0,0,0.08);
+    0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+.social-login:disabled {
+  opacity: 0.55;
+
+  cursor: not-allowed;
+}
+
+/* =========================================
+   GOOGLE BUTTON
+========================================= */
+
+.social-login.google {
+  background: #ffffff;
+
+  border: 1px solid #dadce0;
+
+  color: #3c4043;
+}
+
+.social-login.google:hover:not(:disabled) {
+  background: #fafafa;
+}
+
+/* =========================================
+   FACEBOOK BUTTON
+========================================= */
+
+.social-login.facebook {
+  background: #1877f2;
+
+  border: 1px solid #1877f2;
+
+  color: #ffffff;
+}
+
+.social-login.facebook:hover:not(:disabled) {
+  background: #1669d8;
+}
+
+/* =========================================
+   SOCIAL ICONS
+========================================= */
+
+.social-icon {
+  position: absolute;
+
+  left: 18px;
+
+  width: 22px;
+  height: 22px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+}
+
+/* GOOGLE */
+
+.google-icon {
+  color: #4285f4;
+
+  font-family: Arial, sans-serif;
+
+  font-size: 20px;
+  font-weight: 700;
+}
+
+/* FACEBOOK */
+
+.facebook-icon {
+  width: 24px;
+  height: 24px;
+
+  border-radius: 50%;
+
+  background: #ffffff;
+
+  color: #1877f2;
+
+  font-family: Arial, sans-serif;
+
+  font-size: 18px;
+  font-weight: 700;
+
+  line-height: 1;
+}
+
+/* =========================================
+   LABEL
+========================================= */
+
+.social-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 640px) {
+  .auth-links {
+    flex-wrap: wrap;
+
+    gap: 10px;
+  }
+
+  .auth-link-divider {
+    display: none;
+  }
 }
