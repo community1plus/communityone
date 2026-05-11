@@ -79,8 +79,8 @@ export default function HeaderTopRow() {
             </div>
 
             <button className="avatar" type="button">
-  <img src="/echo.png" alt="Community One" />
-</button>
+                <img src="/logo/echo.png" alt="Community One" />
+            </button>
 
             <UserMenu />
           </div>
