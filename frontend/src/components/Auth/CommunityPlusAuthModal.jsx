@@ -10,10 +10,7 @@ import {
 import CommunityPlusEmailForm from "./CommunityPlusEmailForm";
 import "./CommunityPlusAuthModal.css";
 
-export default function CommunityPlusAuthModal({
-  onClose,
-  onSuccess,
-}) {
+export default function CommunityPlusAuthModal({ onClose, onSuccess }) {
   const [mode, setMode] = useState("signin");
 
   const [email, setEmail] = useState("");
@@ -37,41 +34,23 @@ export default function CommunityPlusAuthModal({
     setMode(nextMode);
   };
 
-  /* =========================================
-     SOCIAL LOGIN
-  ========================================= */
-
   const handleGoogleLogin = async () => {
     try {
-      await signInWithRedirect({
-        provider: "Google",
-      });
+      await signInWithRedirect({ provider: "Google" });
     } catch (err) {
       console.error("Google sign-in failed:", err);
-
-      setError(
-        err?.message || "Google sign-in failed."
-      );
+      setError(err?.message || "Google sign-in failed.");
     }
   };
 
   const handleFacebookLogin = async () => {
     try {
-      await signInWithRedirect({
-        provider: "Facebook",
-      });
+      await signInWithRedirect({ provider: "Facebook" });
     } catch (err) {
       console.error("Facebook sign-in failed:", err);
-
-      setError(
-        err?.message || "Facebook sign-in failed."
-      );
+      setError(err?.message || "Facebook sign-in failed.");
     }
   };
-
-  /* =========================================
-     JOIN FLOW
-  ========================================= */
 
   const handleJoin = async (event) => {
     event.preventDefault();
@@ -83,25 +62,16 @@ export default function CommunityPlusAuthModal({
       await signUp({
         username: email,
         password,
-
         options: {
-          userAttributes: {
-            email,
-          },
+          userAttributes: { email },
         },
       });
 
-      setMessage(
-        "Check your email for the confirmation code."
-      );
-
+      setMessage("Check your email for the confirmation code.");
       setMode("confirmJoin");
     } catch (err) {
       console.error("Join failed:", err);
-
-      setError(
-        err?.message || "Could not create account."
-      );
+      setError(err?.message || "Could not create account.");
     } finally {
       setBusy(false);
     }
@@ -119,28 +89,17 @@ export default function CommunityPlusAuthModal({
         confirmationCode: confirmCode,
       });
 
-      setMessage(
-        "Account confirmed. You can now sign in."
-      );
-
+      setMessage("Account confirmed. You can now sign in.");
       setMode("signin");
-
       setConfirmCode("");
       setPassword("");
     } catch (err) {
       console.error("Confirm join failed:", err);
-
-      setError(
-        err?.message || "Could not confirm account."
-      );
+      setError(err?.message || "Could not confirm account.");
     } finally {
       setBusy(false);
     }
   };
-
-  /* =========================================
-     FORGOT PASSWORD
-  ========================================= */
 
   const handleForgotPassword = async (event) => {
     event.preventDefault();
@@ -149,25 +108,13 @@ export default function CommunityPlusAuthModal({
     setBusy(true);
 
     try {
-      await resetPassword({
-        username: email,
-      });
+      await resetPassword({ username: email });
 
-      setMessage(
-        "Check your email for the reset code."
-      );
-
+      setMessage("Check your email for the reset code.");
       setMode("resetPassword");
     } catch (err) {
-      console.error(
-        "Password reset request failed:",
-        err
-      );
-
-      setError(
-        err?.message ||
-          "Could not start password reset."
-      );
+      console.error("Password reset request failed:", err);
+      setError(err?.message || "Could not start password reset.");
     } finally {
       setBusy(false);
     }
@@ -186,104 +133,63 @@ export default function CommunityPlusAuthModal({
         newPassword,
       });
 
-      setMessage(
-        "Password reset. You can now sign in."
-      );
-
+      setMessage("Password reset. You can now sign in.");
       setMode("signin");
-
       setConfirmCode("");
       setNewPassword("");
     } catch (err) {
-      console.error(
-        "Password reset failed:",
-        err
-      );
-
-      setError(
-        err?.message ||
-          "Could not reset password."
-      );
+      console.error("Password reset failed:", err);
+      setError(err?.message || "Could not reset password.");
     } finally {
       setBusy(false);
     }
   };
 
   return (
-    <div
-      className="cpl-modalOverlay"
-      onClick={onClose}
-    >
-      <div
-        className="cpl-authModal"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <h2>
-          Community One
-        </h2>
-
-        {/* =========================================
-            SIGN IN
-        ========================================= */}
+    <div className="cpl-modalOverlay" onClick={onClose}>
+      <div className="cpl-authModal" onClick={(e) => e.stopPropagation()}>
+        <h2>Community One</h2>
 
         {mode === "signin" && (
           <>
-            <CommunityPlusEmailForm
-              onSuccess={onSuccess}
-            />
+            <CommunityPlusEmailForm onSuccess={onSuccess} />
 
-            {/* EMAIL / SOCIAL DIVIDER */}
-
-            <div className="auth-divider">
-              or
-            </div>
-
-            {/* GOOGLE */}
+            <div className="auth-divider">or</div>
 
             <button
               type="button"
               className="social-login google"
               onClick={handleGoogleLogin}
             >
-              <span className="social-label">
-                Google
-              </span>
+              <span className="social-label">Google</span>
             </button>
-
-            {/* FACEBOOK */}
 
             <button
               type="button"
               className="social-login facebook"
               onClick={handleFacebookLogin}
             >
-              <span className="social-label">
-                Facebook
-              </span>
+              <span className="social-label">Facebook</span>
             </button>
-
-            {/* SOCIAL / LINKS DIVIDER */}
 
             <div className="auth-divider auth-divider-small" />
 
-            {/* INLINE ACTION BAR */}
-
-            <div className="auth-link-bar">
+            <div className="auth-link-box" aria-label="Account actions">
               <button
                 type="button"
-                className="auth-inline-link"
+                className="auth-box-link"
                 onClick={() => goTo("join")}
               >
                 Join
               </button>
 
-              <span className="auth-inline-divider">
+              <span className="auth-box-divider" aria-hidden="true">
                 |
               </span>
 
               <button
                 type="button"
-                className="auth-inline-link"
+                className="auth-box-link"
                 onClick={() => goTo("forgot")}
               >
                 Forgot Password
@@ -292,19 +198,13 @@ export default function CommunityPlusAuthModal({
           </>
         )}
 
-        {/* =========================================
-            JOIN
-        ========================================= */}
-
         {mode === "join" && (
           <form onSubmit={handleJoin}>
             <input
               type="email"
               placeholder="Email address"
               value={email}
-              onChange={(event) =>
-                setEmail(event.target.value)
-              }
+              onChange={(event) => setEmail(event.target.value)}
               required
             />
 
@@ -312,27 +212,20 @@ export default function CommunityPlusAuthModal({
               type="password"
               placeholder="Create password"
               value={password}
-              onChange={(event) =>
-                setPassword(event.target.value)
-              }
+              onChange={(event) => setPassword(event.target.value)}
               required
             />
 
-            <button
-              type="submit"
-              disabled={busy}
-            >
-              {busy
-                ? "Creating account..."
-                : "Join Community One"}
+            <button type="submit" disabled={busy}>
+              {busy ? "Creating account..." : "Join Community One"}
             </button>
 
             <div className="auth-divider auth-divider-small" />
 
-            <div className="auth-link-bar">
+            <div className="auth-link-box">
               <button
                 type="button"
-                className="auth-inline-link"
+                className="auth-box-link"
                 onClick={() => goTo("signin")}
               >
                 Back to sign in
@@ -341,37 +234,26 @@ export default function CommunityPlusAuthModal({
           </form>
         )}
 
-        {/* =========================================
-            CONFIRM JOIN
-        ========================================= */}
-
         {mode === "confirmJoin" && (
           <form onSubmit={handleConfirmJoin}>
             <input
               type="text"
               placeholder="Confirmation code"
               value={confirmCode}
-              onChange={(event) =>
-                setConfirmCode(event.target.value)
-              }
+              onChange={(event) => setConfirmCode(event.target.value)}
               required
             />
 
-            <button
-              type="submit"
-              disabled={busy}
-            >
-              {busy
-                ? "Confirming..."
-                : "Confirm account"}
+            <button type="submit" disabled={busy}>
+              {busy ? "Confirming..." : "Confirm account"}
             </button>
 
             <div className="auth-divider auth-divider-small" />
 
-            <div className="auth-link-bar">
+            <div className="auth-link-box">
               <button
                 type="button"
-                className="auth-inline-link"
+                className="auth-box-link"
                 onClick={() => goTo("join")}
               >
                 Back
@@ -380,37 +262,26 @@ export default function CommunityPlusAuthModal({
           </form>
         )}
 
-        {/* =========================================
-            FORGOT PASSWORD
-        ========================================= */}
-
         {mode === "forgot" && (
           <form onSubmit={handleForgotPassword}>
             <input
               type="email"
               placeholder="Email address"
               value={email}
-              onChange={(event) =>
-                setEmail(event.target.value)
-              }
+              onChange={(event) => setEmail(event.target.value)}
               required
             />
 
-            <button
-              type="submit"
-              disabled={busy}
-            >
-              {busy
-                ? "Sending code..."
-                : "Send reset code"}
+            <button type="submit" disabled={busy}>
+              {busy ? "Sending code..." : "Send reset code"}
             </button>
 
             <div className="auth-divider auth-divider-small" />
 
-            <div className="auth-link-bar">
+            <div className="auth-link-box">
               <button
                 type="button"
-                className="auth-inline-link"
+                className="auth-box-link"
                 onClick={() => goTo("signin")}
               >
                 Back to sign in
@@ -418,10 +289,6 @@ export default function CommunityPlusAuthModal({
             </div>
           </form>
         )}
-
-        {/* =========================================
-            RESET PASSWORD
-        ========================================= */}
 
         {mode === "resetPassword" && (
           <form onSubmit={handleResetPassword}>
@@ -429,9 +296,7 @@ export default function CommunityPlusAuthModal({
               type="text"
               placeholder="Reset code"
               value={confirmCode}
-              onChange={(event) =>
-                setConfirmCode(event.target.value)
-              }
+              onChange={(event) => setConfirmCode(event.target.value)}
               required
             />
 
@@ -439,27 +304,20 @@ export default function CommunityPlusAuthModal({
               type="password"
               placeholder="New password"
               value={newPassword}
-              onChange={(event) =>
-                setNewPassword(event.target.value)
-              }
+              onChange={(event) => setNewPassword(event.target.value)}
               required
             />
 
-            <button
-              type="submit"
-              disabled={busy}
-            >
-              {busy
-                ? "Resetting..."
-                : "Reset password"}
+            <button type="submit" disabled={busy}>
+              {busy ? "Resetting..." : "Reset password"}
             </button>
 
             <div className="auth-divider auth-divider-small" />
 
-            <div className="auth-link-bar">
+            <div className="auth-link-box">
               <button
                 type="button"
-                className="auth-inline-link"
+                className="auth-box-link"
                 onClick={() => goTo("signin")}
               >
                 Back to sign in
@@ -468,19 +326,8 @@ export default function CommunityPlusAuthModal({
           </form>
         )}
 
-        {/* STATUS */}
-
-        {message && (
-          <div className="success">
-            {message}
-          </div>
-        )}
-
-        {error && (
-          <div className="error">
-            {error}
-          </div>
-        )}
+        {message && <div className="success">{message}</div>}
+        {error && <div className="error">{error}</div>}
       </div>
     </div>
   );
