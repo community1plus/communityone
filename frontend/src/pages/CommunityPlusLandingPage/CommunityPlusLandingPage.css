@@ -562,3 +562,15 @@ RESPONSIVE
     padding: 22px;
   }
 }
+
+.cpl-authModal h2 {
+  color: #b11226;
+}
+
+.cpl-authModal button[type="submit"] {
+  background: #a0192f;
+}
+
+.cpl-authModal button[type="submit"]:hover {
+  background: #8f162a;
+}
