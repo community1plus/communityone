@@ -1,39 +1,50 @@
 export function getDisplayName(user) {
-  if (!user) {
-    return "Guest";
+  if (!user) return "Guest";
+
+  const attrs = user?.attributes || {};
+
+  /* ---------------------------------
+     GOOGLE / SOCIAL PROVIDERS
+  --------------------------------- */
+
+  if (attrs.name) {
+    return attrs.name.split(" ")[0];
   }
 
-  const attributes = user?.attributes || {};
-  const loginId = user?.signInDetails?.loginId;
+  if (attrs.given_name) {
+    return attrs.given_name;
+  }
 
-  /* =========================
-     PRIORITY ORDER
-  ========================= */
+  if (attrs.preferred_username) {
+    return attrs.preferred_username;
+  }
 
-  const displayName =
-    attributes.preferred_username ||
-    attributes.name ||
-    attributes.given_name ||
+  /* ---------------------------------
+     EMAIL LOGIN
+  --------------------------------- */
 
-    /* email before username */
-    attributes.email?.split("@")[0] ||
+  if (attrs.email) {
+    return attrs.email.split("@")[0];
+  }
 
-    /* federated login email */
-    loginId?.split("@")[0] ||
+  /* ---------------------------------
+     AMPLIFY USERNAME FALLBACK
+  --------------------------------- */
 
-    /* fallback username cleanup */
-    user?.username
-      ?.replace(/^google_/, "")
-      ?.replace(/^facebook_/, "") ||
+  if (user?.username) {
+    return user.username
+      .replace(/^google_/, "")
+      .replace(/^facebook_/, "")
+      .split("@")[0];
+  }
 
-    "User";
+  /* ---------------------------------
+     LOGIN ID FALLBACK
+  --------------------------------- */
 
-  /* =========================
-     CLEANUP
-  ========================= */
+  if (user?.signInDetails?.loginId) {
+    return user.signInDetails.loginId.split("@")[0];
+  }
 
-  return String(displayName)
-    .replace(/[._-]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+  return "User";
 }
