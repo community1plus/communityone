@@ -7,14 +7,13 @@
   max-width: 520px;
   padding: 40px 32px;
   border-radius: 28px;
-  background: #ffffff;
+  background: #dfd0d0;
   box-sizing: border-box;
-   color: #ec0f0f;
 }
 
 .cpl-authModal h2 {
   margin: 0 0 28px;
-  color: #ec0f0f;
+  color: #b11226;
   font-size: 24px;
   font-weight: 800;
 }
@@ -180,7 +179,7 @@
 }
 
 .auth-link-divider {
-  color: #a0a0a0;
+  color: #b11226;
 }
 
 .auth-text-link {
@@ -190,7 +189,7 @@
   padding: 0 !important;
   height: auto !important;
   min-height: 0 !important;
-  color: #e8321a !important;
+  color: #b11226;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
