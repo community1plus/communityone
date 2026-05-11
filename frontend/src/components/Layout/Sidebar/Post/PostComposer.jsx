@@ -6,9 +6,18 @@ import "./PostComposer.css";
 
 const API_BASE =
   import.meta.env.VITE_API_BASE ||
-  (import.meta.env.VITE_API_URL
-    ? `${import.meta.env.VITE_API_URL}/api`
-    : "");
+  (import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : "");
+
+const NOW_CATEGORIES = ["Information", "Incident", "Alert", "Event", "Beacon"];
+
+const TAG_OPTIONS = [
+  "General",
+  "News",
+  "Opinion",
+  "Events",
+  "Business",
+  "Food & Drink",
+];
 
 const CATEGORIES = [
   "News",
@@ -34,13 +43,15 @@ const MODE_CONFIG = {
     titlePlaceholder: "What's happening right now?",
     bodyPlaceholder: "Quick update...",
     submitLabel: "Post Now",
-    defaultCategory: "News",
+    defaultCategory: "Information",
     defaultScope: "Local",
+    defaultTags: ["General"],
     status: "published",
     requiresReview: false,
     expiresInHours: 24,
     allowPromotion: false,
-    showDetails: false,
+    showDetails: true,
+    showNowOptions: true,
   },
 
   news: {
@@ -52,11 +63,13 @@ const MODE_CONFIG = {
     submitLabel: "Submit for Review",
     defaultCategory: "News",
     defaultScope: "Local",
+    defaultTags: ["News"],
     status: "pending_review",
     requiresReview: true,
     expiresInHours: 168,
     allowPromotion: false,
     showDetails: true,
+    showNowOptions: false,
   },
 
   blob: {
@@ -68,11 +81,13 @@ const MODE_CONFIG = {
     submitLabel: "Publish BLOB",
     defaultCategory: "Lifestyle",
     defaultScope: "Local",
+    defaultTags: ["General"],
     status: "published",
     requiresReview: false,
     expiresInHours: null,
     allowPromotion: true,
     showDetails: true,
+    showNowOptions: false,
   },
 
   event: {
@@ -84,11 +99,13 @@ const MODE_CONFIG = {
     submitLabel: "Create Event",
     defaultCategory: "Events",
     defaultScope: "Local",
+    defaultTags: ["Events"],
     status: "published",
     requiresReview: false,
     expiresInHours: null,
     allowPromotion: false,
     showDetails: true,
+    showNowOptions: false,
   },
 
   beacon: {
@@ -100,11 +117,13 @@ const MODE_CONFIG = {
     submitLabel: "Create Beacon",
     defaultCategory: "Alert",
     defaultScope: "Local",
+    defaultTags: ["General"],
     status: "published",
     requiresReview: false,
     expiresInHours: 12,
     allowPromotion: false,
     showDetails: true,
+    showNowOptions: false,
   },
 };
 
@@ -116,6 +135,26 @@ function normaliseMode(mode) {
 function getExpiryTimestamp(hours) {
   if (!hours) return null;
   return Date.now() + hours * 60 * 60 * 1000;
+}
+
+function parseCustomTags(input = "") {
+  return input
+    .split(/[\s,]+/)
+    .map((tag) => tag.replace(/^#/, "").trim())
+    .filter(Boolean)
+    .map((tag) => tag.replace(/[^\w\s&-]/g, ""))
+    .filter(Boolean);
+}
+
+function uniqueTags(tags = []) {
+  const seen = new Set();
+
+  return tags.filter((tag) => {
+    const key = String(tag).toLowerCase();
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 async function getAuthHeaders(extraHeaders = {}) {
@@ -176,8 +215,11 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
   const [category, setCategory] = useState(config.defaultCategory);
   const [scope, setScope] = useState(config.defaultScope);
 
-  const [tags, setTags] = useState([]);
-  const [tagInput, setTagInput] = useState("");
+  const [selectedTags, setSelectedTags] = useState(config.defaultTags);
+  const [customTagInput, setCustomTagInput] = useState("");
+
+  const [shareToSocial, setShareToSocial] = useState(false);
+  const [shareToGlobal, setShareToGlobal] = useState(false);
 
   const [files, setFiles] = useState([]);
   const [preview, setPreview] = useState(null);
@@ -192,6 +234,16 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
   const canPromote = config.allowPromotion;
   const showDetails = config.showDetails;
 
+  const finalTags = useMemo(
+    () => uniqueTags([...selectedTags, ...parseCustomTags(customTagInput)]),
+    [selectedTags, customTagInput]
+  );
+
+  const categoryOptions = useMemo(
+    () => (mode === "now" ? NOW_CATEGORIES : CATEGORIES),
+    [mode]
+  );
+
   const pageTitle = useMemo(
     () => `${config.icon} ${config.label}`,
     [config.icon, config.label]
@@ -200,11 +252,15 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
   useEffect(() => {
     setCategory(config.defaultCategory);
     setScope(config.defaultScope);
+    setSelectedTags(config.defaultTags || ["General"]);
+    setCustomTagInput("");
+    setShareToSocial(false);
+    setShareToGlobal(false);
     setIsAd(false);
     setSelectedSlots([]);
     setUploadProgress("");
     setError("");
-  }, [mode, config.defaultCategory, config.defaultScope]);
+  }, [mode, config]);
 
   useEffect(() => {
     return () => {
@@ -214,18 +270,21 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
     };
   }, [files]);
 
-  const addTag = (tag) => {
-    const clean = tag.toLowerCase().trim();
-    if (!clean || tags.includes(clean)) return;
-    setTags((prev) => [...prev, clean]);
-  };
+  const togglePresetTag = (tag) => {
+    setSelectedTags((prev) => {
+      const exists = prev.includes(tag);
 
-  const handleTagKey = (event) => {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      addTag(tagInput);
-      setTagInput("");
-    }
+      if (exists) {
+        const next = prev.filter((item) => item !== tag);
+        return next.length ? next : ["General"];
+      }
+
+      if (tag === "General") {
+        return ["General"];
+      }
+
+      return uniqueTags([...prev.filter((item) => item !== "General"), tag]);
+    });
   };
 
   const handleFiles = (incomingFiles = []) => {
@@ -275,8 +334,10 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
     setContent("");
     setCategory(config.defaultCategory);
     setScope(config.defaultScope);
-    setTags([]);
-    setTagInput("");
+    setSelectedTags(config.defaultTags || ["General"]);
+    setCustomTagInput("");
+    setShareToSocial(false);
+    setShareToGlobal(false);
     setFiles([]);
     setPreview(null);
     setIsAd(false);
@@ -293,8 +354,11 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
     content: content.trim(),
 
     category,
-    scope,
-    tags,
+    scope: shareToGlobal ? "Global" : scope,
+    tags: finalTags,
+
+    shareToSocial,
+    shareToGlobal,
 
     media: uploadedMedia,
 
@@ -451,45 +515,99 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
           />
 
           {showDetails && (
-            <>
-              <div className="meta">Category</div>
-              <select
-                className="body"
-                value={category}
-                onChange={(event) => setCategory(event.target.value)}
-              >
-                {CATEGORIES.map((item) => (
-                  <option key={item}>{item}</option>
-                ))}
-              </select>
+            <div className="composer-options">
+              <div className="composer-options-header">Options</div>
 
-              <div className="meta">Scope</div>
-              <select
-                className="body"
-                value={scope}
-                onChange={(event) => setScope(event.target.value)}
-              >
-                {SCOPES.map((item) => (
-                  <option key={item}>{item}</option>
+              <div className="composer-options-grid">
+                <label className="composer-field">
+                  <span className="meta">Category</span>
+                  <select
+                    className="body"
+                    value={category}
+                    onChange={(event) => setCategory(event.target.value)}
+                  >
+                    {categoryOptions.map((item) => (
+                      <option key={item}>{item}</option>
+                    ))}
+                  </select>
+                </label>
+
+                <label className="composer-field">
+                  <span className="meta">Scope</span>
+                  <select
+                    className="body"
+                    value={scope}
+                    onChange={(event) => setScope(event.target.value)}
+                    disabled={shareToGlobal}
+                  >
+                    {SCOPES.map((item) => (
+                      <option key={item}>{item}</option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+
+              <div className="meta">Tags</div>
+
+              <div className="tag-pill-row">
+                {TAG_OPTIONS.map((tag) => (
+                  <button
+                    key={tag}
+                    type="button"
+                    className={`tag-pill ${
+                      selectedTags.includes(tag) ? "active" : ""
+                    }`}
+                    onClick={() => togglePresetTag(tag)}
+                    disabled={submitting}
+                  >
+                    {tag}
+                  </button>
                 ))}
-              </select>
+              </div>
 
               <input
                 className="body"
-                placeholder="Add tags"
-                value={tagInput}
-                onChange={(event) => setTagInput(event.target.value)}
-                onKeyDown={handleTagKey}
+                placeholder="Add custom hashtags, e.g. #traffic #storm"
+                value={customTagInput}
+                onChange={(event) => setCustomTagInput(event.target.value)}
               />
 
               <div className="tag-list">
-                {tags.map((tag) => (
+                {finalTags.map((tag) => (
                   <span key={tag} className="label">
-                    {tag}
+                    #{tag}
                   </span>
                 ))}
               </div>
-            </>
+
+              {config.showNowOptions && (
+                <div className="share-options">
+                  <label className="label">
+                    <input
+                      type="checkbox"
+                      checked={shareToSocial}
+                      onChange={(event) =>
+                        setShareToSocial(event.target.checked)
+                      }
+                      disabled={submitting}
+                    />
+                    Share to social
+                  </label>
+
+                  <label className="label">
+                    <input
+                      type="checkbox"
+                      checked={shareToGlobal}
+                      onChange={(event) =>
+                        setShareToGlobal(event.target.checked)
+                      }
+                      disabled={submitting}
+                    />
+                    Share to global
+                  </label>
+                </div>
+              )}
+            </div>
           )}
 
           {mode === "news" && (
