@@ -2,16 +2,22 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 14px 0 22px;
+
+  margin-top: 14px;
+  margin-bottom: 22px;
 }
 
 .auth-text-link {
   border: 0;
   background: transparent;
+
   color: #6f1111;
+
   font-size: 14px;
   font-weight: 700;
+
   cursor: pointer;
+
   padding: 0;
 }
 
@@ -19,8 +25,23 @@
   text-decoration: underline;
 }
 
-.social-login.google {
-  background: #ffffff;
-  border: 1px solid #d8d8d8;
-  color: #202124;
+.social-login {
+  height: 54px;
+
+  border-radius: 14px;
+
+  font-weight: 700;
+
+  font-size: 15px;
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.social-login:hover:not(:disabled) {
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 6px 18px rgba(0,0,0,0.08);
 }
