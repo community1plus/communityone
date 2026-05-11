@@ -78,9 +78,9 @@ export default function HeaderTopRow() {
               {displayName}
             </div>
 
-            <div className="header-avatar">
-              {initials}
-            </div>
+            <button className="avatar" type="button">
+  <img src="/echo.png" alt="Community One" />
+</button>
 
             <UserMenu />
           </div>
