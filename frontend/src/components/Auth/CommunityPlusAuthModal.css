@@ -1,5 +1,5 @@
 /* =========================================
-   EMAIL FORM SPACING
+   AUTH MODAL FORM
 ========================================= */
 
 .cpl-authModal form {
@@ -17,6 +17,7 @@
   width: 100%;
   height: 52px;
   padding: 0 16px;
+  box-sizing: border-box;
 
   border: 1px solid #ddd7cf;
   border-radius: 14px;
@@ -26,8 +27,6 @@
 
   font-size: 15px;
   font-weight: 500;
-
-  box-sizing: border-box;
 }
 
 .cpl-authModal input:focus {
@@ -37,6 +36,7 @@
 }
 
 .cpl-authModal button[type="submit"] {
+  width: 100%;
   height: 52px;
   margin-top: 4px;
 
@@ -57,20 +57,55 @@
 ========================================= */
 
 .auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
   margin: 24px 0 18px;
-  text-align: center;
 
   color: #8a827a;
   font-size: 13px;
   font-weight: 600;
 }
 
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #e4ddd5;
+}
+
 /* =========================================
-   SOCIAL BUTTONS
+   SOCIAL LOGIN BUTTONS
 ========================================= */
 
 .social-login {
+  width: 100%;
+  height: 54px;
+
+  margin-top: 12px;
+  padding: 0 18px;
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
   overflow: hidden;
+
+  border-radius: 14px;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease;
 }
 
 .social-login:hover:not(:disabled) {
@@ -100,39 +135,43 @@
   background: #1669d8;
 }
 
+/* =========================================
+   SOCIAL ICONS
+========================================= */
+
+.social-logo-box {
+  width: 20px;
+  height: 20px;
+
+  min-width: 20px;
+  min-height: 20px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+  flex: 0 0 20px;
+}
+
+.social-logo-box img,
 .social-logo {
   width: 20px !important;
   height: 20px !important;
   max-width: 20px !important;
   max-height: 20px !important;
+
   object-fit: contain;
   display: block;
-  flex: 0 0 20px;
-}
-
-.google-logo,
-.facebook-logo {
-  width: 20px !important;
-  height: 20px !important;
-}
-
-.social-logo-box {
-  width: 20px;
-  height: 20px;
-  overflow: hidden;
-  flex: 0 0 20px;
-}
-
-.social-logo-box img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
 }
 
 .social-label {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+
+  line-height: 1;
+  white-space: nowrap;
 }
 
 /* =========================================
