@@ -72,7 +72,7 @@ export default function UserMenu() {
         aria-expanded={open}
         aria-label="Open user menu"
       >
-        <img src="/echo.png" alt="" aria-hidden="true" />
+        <img src="/logo/echo.png" alt="" aria-hidden="true" />
       </button>
 
       {open && (
