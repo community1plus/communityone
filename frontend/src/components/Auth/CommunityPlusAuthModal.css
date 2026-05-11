@@ -1,52 +1,78 @@
 /* =========================================
-   AUTH MODAL FORM
+   AUTH MODAL
+========================================= */
+
+.cpl-authModal {
+  width: 100%;
+  max-width: 520px;
+
+  padding: 40px 32px;
+
+  border-radius: 28px;
+
+  background: #ffffff;
+
+  box-sizing: border-box;
+}
+
+.cpl-authModal h2 {
+  margin: 0 0 28px;
+
+  color: #2b2623;
+
+  font-size: 24px;
+  font-weight: 800;
+}
+
+/* =========================================
+   EMAIL FORM
 ========================================= */
 
 .cpl-authModal form {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  margin-top: 18px;
-}
-
-.cpl-authModal form > * {
-  margin: 0;
 }
 
 .cpl-authModal input {
   width: 100%;
-  height: 52px;
-  padding: 0 16px;
-  box-sizing: border-box;
+  height: 54px;
 
-  border: 1px solid #ddd7cf;
-  border-radius: 14px;
+  padding: 0 18px;
 
-  background: #ffffff;
-  color: #202124;
+  border: 1px solid #d8d2ca;
+  border-radius: 16px;
+
+  background: #f7f8fb;
 
   font-size: 15px;
-  font-weight: 500;
+
+  box-sizing: border-box;
 }
 
 .cpl-authModal input:focus {
   outline: none;
-  border-color: #7c2d2d;
-  box-shadow: 0 0 0 3px rgba(124, 45, 45, 0.08);
+
+  border-color: #7b1d1d;
+
+  box-shadow:
+    0 0 0 3px rgba(123, 29, 29, 0.08);
 }
 
 .cpl-authModal button[type="submit"] {
   width: 100%;
-  height: 52px;
-  margin-top: 4px;
+  height: 54px;
 
-  border: 0;
-  border-radius: 14px;
+  margin-top: 2px;
 
-  background: #814747;
+  border: none;
+  border-radius: 16px;
+
+  background: #6f1111;
+
   color: #ffffff;
 
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
 
   cursor: pointer;
@@ -61,126 +87,131 @@
   align-items: center;
   gap: 14px;
 
-  margin: 24px 0 18px;
+  margin: 28px 0 20px;
 
-  color: #8a827a;
-  font-size: 13px;
-  font-weight: 600;
+  color: #847a73;
+
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .auth-divider::before,
 .auth-divider::after {
   content: "";
+
   flex: 1;
+
   height: 1px;
-  background: #e4ddd5;
+
+  background: #e7e0d8;
 }
 
 /* =========================================
-   SOCIAL LOGIN BUTTONS
+   SOCIAL BUTTONS
 ========================================= */
 
 .social-login {
   width: 100%;
-  height: 52px;
+  height: 54px;
+
+  margin-top: 14px;
+
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
+
+  border-radius: 16px;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
+.social-login:hover {
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 6px 16px rgba(0,0,0,0.06);
+}
+
+/* GOOGLE */
+
+.social-login.google {
+  border: 1px solid #dadce0;
+
+  background: #ffffff;
+
+  color: #3c4043;
+}
+
+/* FACEBOOK */
+
+.social-login.facebook {
+  border: 1px solid #dbe7ff;
+
+  background: #eef4ff;
+
+  color: #1877f2;
+}
+
+/* =========================================
+   ICON CIRCLES
+========================================= */
+
 .social-brand-icon {
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  flex: 0 0 22px;
-  font-weight: 800;
+
+  flex-shrink: 0;
 }
+
+/* GOOGLE ICON */
 
 .google-brand {
   color: #4285f4;
-  font-family: Arial, sans-serif;
+
   font-size: 20px;
+  font-weight: 700;
+
+  font-family: Arial, sans-serif;
 }
+
+/* FACEBOOK ICON */
 
 .facebook-brand {
   border-radius: 50%;
+
   background: #1877f2;
-  color: white;
-  font-family: Arial, sans-serif;
-  font-size: 18px;
-}
 
-.social-login:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
-}
-
-.social-login.google {
-  background: #ffffff;
-  border: 1px solid #dadce0;
-  color: #3c4043;
-  font-family: Roboto, Arial, sans-serif;
-}
-
-.social-login.google:hover:not(:disabled) {
-  background: #f8f9fa;
-}
-
-.social-login.facebook {
-  background: #1877f2;
-  border: 1px solid #1877f2;
   color: #ffffff;
-  font-family: Helvetica, Arial, sans-serif;
-}
 
-.social-login.facebook:hover:not(:disabled) {
-  background: #1669d8;
+  font-size: 18px;
+  font-weight: 700;
+
+  font-family: Arial, sans-serif;
 }
 
 /* =========================================
-   SOCIAL ICONS
+   LABEL
 ========================================= */
 
-.social-logo-box {
-  width: 20px;
-  height: 20px;
-
-  min-width: 20px;
-  min-height: 20px;
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  overflow: hidden;
-  flex: 0 0 20px;
-}
-
-.social-logo-box img,
-.social-logo {
-  width: 20px !important;
-  height: 20px !important;
-  max-width: 20px !important;
-  max-height: 20px !important;
-
-  object-fit: contain;
-  display: block;
-}
-
 .social-label {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
   line-height: 1;
-  white-space: nowrap;
 }
 
 /* =========================================
-   AUTH LINKS
+   BOTTOM LINKS
 ========================================= */
 
 .auth-links {
@@ -189,20 +220,18 @@
   align-items: center;
   gap: 12px;
 
-  margin-top: 22px;
+  margin-top: 24px;
 }
 
 .auth-link-divider {
-  color: #9aa0a6;
-  font-size: 14px;
-  font-weight: 500;
+  color: #a0a0a0;
 }
 
 .auth-text-link {
-  border: none !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  outline: none;
+  border: none;
+  background: transparent;
+
+  padding: 0;
 
   color: #1a73e8;
 
@@ -210,10 +239,6 @@
   font-weight: 500;
 
   cursor: pointer;
-
-  padding: 0;
-
-  appearance: none;
 }
 
 .auth-text-link:hover {
