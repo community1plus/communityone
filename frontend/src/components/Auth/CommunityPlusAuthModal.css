@@ -43,7 +43,7 @@
   border: 0;
   border-radius: 14px;
 
-  background: #7a2a2a;
+  background: #814747;
   color: #ffffff;
 
   font-size: 15px;
@@ -79,21 +79,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
 
-  border-radius: 14px;
-
-  font-size: 15px;
-  font-weight: 600;
-
-  cursor: pointer;
-
-  box-sizing: border-box;
-
-  transition:
-    transform 0.15s ease,
-    box-shadow 0.15s ease,
-    background 0.15s ease;
+  gap: 10px;
 }
 
 .social-login:hover:not(:disabled) {
@@ -126,18 +113,28 @@
 .social-logo {
   width: 22px;
   height: 22px;
+
   object-fit: contain;
+
+  display: block;
+
   flex-shrink: 0;
 }
 
+/* GOOGLE */
+
 .google-logo {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
 }
 
+/* FACEBOOK */
+
 .facebook-logo {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
+
+  border-radius: 50%;
 }
 
 .social-label {
