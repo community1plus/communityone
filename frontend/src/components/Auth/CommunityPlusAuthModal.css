@@ -24,6 +24,7 @@ SOFT BACKGROUND EFFECTS
 .landing-hero-tint {
   position: absolute;
   inset: 0;
+
   background:
     radial-gradient(
       circle at 50% 45%,
@@ -38,6 +39,7 @@ SOFT BACKGROUND EFFECTS
 .landing-hero-focus {
   position: absolute;
   inset: 0;
+
   background:
     radial-gradient(
       circle at center,
@@ -147,194 +149,6 @@ TYPOGRAPHY
 }
 
 /* =========================
-ACTIONS
-========================= */
-
-.landing-actions {
-  margin-top: 12px;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  gap: 14px;
-}
-
-.auth-maintenance-note {
-  margin: 0;
-
-  max-width: 460px;
-
-  font-size: 14px;
-  line-height: 1.45;
-
-  color: #5f564f;
-}
-
-/* =========================
-BUTTONS
-========================= */
-
-.btn {
-  font: inherit;
-}
-
-.btn.primary,
-.btn.ghost,
-.hero-cta {
-  min-width: 220px;
-  height: 46px;
-
-  border-radius: 12px;
-
-  padding: 0 18px;
-
-  font-size: 15px;
-  font-weight: 700;
-
-  cursor: pointer;
-
-  transition:
-    transform 0.18s ease,
-    box-shadow 0.18s ease,
-    background 0.18s ease,
-    opacity 0.18s ease;
-}
-
-.btn.primary {
-  border: none;
-
-  background: #b11226;
-  color: #ffffff;
-
-  box-shadow: 0 8px 20px rgba(177, 18, 38, 0.25);
-}
-
-.btn.ghost {
-  background: transparent;
-
-  color: #b11226;
-
-  border: 1px solid #b11226;
-
-  box-shadow: 0 8px 20px rgba(177, 18, 38, 0.1);
-}
-
-.btn.primary:hover,
-.btn.ghost:hover {
-  transform: translateY(-1px);
-
-  box-shadow: 0 12px 26px rgba(177, 18, 38, 0.28);
-}
-
-.btn:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
-}
-
-/* =========================
-FLOATING LOGIN THUMB
-========================= */
-
-.landing-login-thumb {
-  position: fixed;
-
-  right: 28px;
-  bottom: 28px;
-
-  z-index: 50;
-
-  width: 72px;
-  height: 72px;
-
-  border: none;
-  border-radius: 50%;
-
-  background: #050505;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  overflow: visible;
-
-  cursor: pointer;
-
-  box-shadow:
-    0 18px 42px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(255, 255, 255, 0.06) inset;
-
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    opacity 0.2s ease;
-}
-
-.landing-login-thumb img {
-  width: 58%;
-  height: 58%;
-
-  object-fit: contain;
-
-  opacity: 1;
-
-  filter:
-    contrast(1.2)
-    saturate(1.2)
-    brightness(1.05);
-
-  transition: transform 0.2s ease;
-}
-
-.landing-login-thumb::after {
-  content: "";
-
-  position: absolute;
-  inset: -6px;
-
-  border-radius: 50%;
-
-  background:
-    radial-gradient(
-      circle,
-      rgba(177, 18, 38, 0.32),
-      transparent 68%
-    );
-
-  opacity: 0;
-
-  pointer-events: none;
-
-  transition: opacity 0.25s ease;
-}
-
-.landing-login-thumb:hover {
-  transform: translateY(-2px) scale(1.05);
-
-  box-shadow:
-    0 24px 54px rgba(0, 0, 0, 0.58),
-    0 0 0 1px rgba(177, 18, 38, 0.28) inset;
-}
-
-.landing-login-thumb:hover img {
-  transform: scale(1.08);
-}
-
-.landing-login-thumb:hover::after {
-  opacity: 1;
-}
-
-.landing-login-thumb:active {
-  transform: scale(0.96);
-}
-
-.landing-login-thumb:disabled {
-  opacity: 0.75;
-  cursor: not-allowed;
-}
-
-/* =========================
 AUTH MODAL
 ========================= */
 
@@ -359,17 +173,19 @@ AUTH MODAL
 
 .cpl-authModal,
 .auth-loading-box {
-  width: min(420px, calc(100vw - 32px));
+  width: min(460px, calc(100vw - 32px));
 
-  padding: 28px;
+  padding: 34px 32px;
+
   box-sizing: border-box;
 
   background: #fcfbf9;
 
   border: 1px solid #e2dbd3;
-  border-radius: 20px;
+  border-radius: 24px;
 
-  box-shadow: 0 22px 58px rgba(0, 0, 0, 0.22);
+  box-shadow:
+    0 24px 58px rgba(0, 0, 0, 0.22);
 
   font-family:
     -apple-system,
@@ -384,57 +200,65 @@ AUTH MODAL
 .cpl-authModal {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 
-.cpl-authModal h2 {
-  margin: 0 0 10px;
+/* =========================
+MODAL TITLE
+========================= */
 
-  align-self: center;
+.cpl-authModal h2 {
+  margin: 0 0 12px;
+
+  text-align: center;
 
   font-size: 24px;
   line-height: 1.15;
 
   font-weight: 850;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.03em;
 
   color: #b11226;
 }
 
-.cpl-authModal h2 span {
-  color: #b11226;
-  font-weight: 900;
-}
+/* =========================
+FORMS
+========================= */
 
 .cpl-authModal form {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
+
+/* =========================
+INPUTS
+========================= */
 
 .cpl-authModal input {
   width: 100%;
-  height: 48px;
+  height: 56px;
 
-  padding: 10px 14px;
+  padding: 0 18px;
   box-sizing: border-box;
 
   border: 1px solid #ddd4ca;
-  border-radius: 12px;
+  border-radius: 14px;
 
-  background: #f8f6f3;
+  background: #f3f6fc;
 
   font: inherit;
-  font-size: 14px;
+  font-size: 15px;
+  font-weight: 500;
 
   color: #241f1c;
 
   outline: none;
 
   transition:
-    border-color 0.16s ease,
-    box-shadow 0.16s ease,
-    background 0.16s ease;
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    background 0.18s ease;
 }
 
 .cpl-authModal input:focus {
@@ -442,66 +266,61 @@ AUTH MODAL
 
   background: #ffffff;
 
-  box-shadow: 0 0 0 3px rgba(177, 18, 38, 0.1);
+  box-shadow:
+    0 0 0 3px rgba(177, 18, 38, 0.08);
 }
 
-.cpl-authModal input:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
-}
-
-/* primary submit only */
+/* =========================
+PRIMARY BUTTON
+========================= */
 
 .cpl-authModal button[type="submit"] {
   width: 100%;
-  min-height: 48px;
+  height: 56px;
 
   border: none;
-  border-radius: 12px;
+  border-radius: 14px;
 
   background: #a0192f;
   color: #ffffff;
 
   font: inherit;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 750;
 
   cursor: pointer;
 
   transition:
-    background 0.16s ease,
-    transform 0.16s ease,
-    box-shadow 0.16s ease,
-    opacity 0.16s ease;
+    background 0.18s ease,
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
 }
 
 .cpl-authModal button[type="submit"]:hover {
-  background: #8f162a;
+  background: #8e162a;
 
   transform: translateY(-1px);
 
-  box-shadow: 0 10px 22px rgba(177, 18, 38, 0.16);
-}
-
-.cpl-authModal button[type="submit"]:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
+  box-shadow:
+    0 12px 26px rgba(177, 18, 38, 0.18);
 }
 
 /* =========================
-DIVIDER
+DIVIDERS
 ========================= */
 
 .auth-divider {
   display: flex;
   align-items: center;
 
-  gap: 12px;
+  gap: 14px;
 
-  margin: 8px 0 4px;
+  margin: 4px 0;
 
-  color: #6b625c;
-  font-size: 13px;
+  color: #6f6660;
+
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .auth-divider::before,
@@ -514,23 +333,27 @@ DIVIDER
   background: #e2dbd3;
 }
 
+.auth-divider-small {
+  margin-top: 2px;
+}
+
 /* =========================
 SOCIAL BUTTONS
 ========================= */
 
 .social-login {
   width: 100%;
-  min-height: 48px;
+  height: 54px;
 
-  border-radius: 12px;
   border: 1px solid #ddd4ca;
+  border-radius: 14px;
 
   background: #ffffff;
-  color: #222222;
+  color: #2b2522;
 
   font: inherit;
-  font-size: 14px;
-  font-weight: 650;
+  font-size: 15px;
+  font-weight: 700;
 
   cursor: pointer;
 
@@ -538,56 +361,30 @@ SOCIAL BUTTONS
   align-items: center;
   justify-content: center;
 
-  gap: 10px;
-
   transition:
-    background 0.16s ease,
-    border-color 0.16s ease,
-    transform 0.16s ease,
-    box-shadow 0.16s ease;
+    background 0.18s ease,
+    border-color 0.18s ease,
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
 }
 
 .social-login:hover {
   background: #faf7f4;
 
-  border-color: #d3cbc3;
+  border-color: #d5ccc4;
 
   transform: translateY(-1px);
 
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.045);
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.045);
 }
 
-.social-brand-icon {
-  width: 22px;
-  height: 22px;
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  flex-shrink: 0;
+.social-login.google {
+  color: #2b2522;
 }
 
-.google-brand {
-  color: #4285f4;
-
-  font-family: Arial, sans-serif;
-  font-size: 19px;
-  font-weight: 700;
-}
-
-.facebook-brand {
-  width: 22px;
-  height: 22px;
-
-  border-radius: 50%;
-
-  background: #4267b2;
-  color: #ffffff;
-
-  font-family: Arial, sans-serif;
-  font-size: 16px;
-  font-weight: 700;
+.social-login.facebook {
+  color: #2b2522;
 }
 
 .social-label {
@@ -595,90 +392,92 @@ SOCIAL BUTTONS
 }
 
 /* =========================
-BOTTOM LINKS
+BOTTOM ACTION BOX
 ========================= */
 
-.auth-links {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.auth-link-box {
+  width: 100%;
 
-  gap: 14px;
-
-  margin-top: 8px;
-}
-
-.auth-link-divider {
-  color: #a0a0a0;
-}
-
-.auth-text-link {
-  width: auto !important;
-  min-height: 0 !important;
-
-  border: none !important;
-  border-radius: 0 !important;
-
-  background: transparent !important;
-
-  color: #1a73e8 !important;
-
-  padding: 0 !important;
-
-  box-shadow: none !important;
-
-  font: inherit;
-  font-size: 14px;
-  font-weight: 500;
-
-  cursor: pointer;
-}
-
-.auth-text-link:hover {
-  transform: none !important;
-  box-shadow: none !important;
-
-  text-decoration: underline;
-}
-
-/* =========================
-STACKED AUTH BUTTONS
-========================= */
-
-.auth-footer-buttons {
   display: flex;
   flex-direction: column;
 
   gap: 14px;
 
-  margin-top: 14px;
+  margin-top: 2px;
 }
 
-.auth-footer-buttons button {
+.auth-box-link {
   width: 100%;
+  min-height: 54px;
+
+  border: none;
+  border-radius: 14px;
+
+  background: #7d0f1f;
+  color: #ffffff;
+
+  font: inherit;
+  font-size: 15px;
+  font-weight: 750;
+
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition:
+    background 0.18s ease,
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.auth-box-link:hover {
+  background: #6d0d1b;
+
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 10px 22px rgba(177, 18, 38, 0.14);
 }
 
 /* =========================
-ERROR
+STATUS
 ========================= */
 
+.success {
+  padding: 12px 14px;
+
+  border-radius: 12px;
+
+  background: rgba(40, 140, 80, 0.08);
+
+  color: #1f7a45;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
 .error {
-  margin-top: 4px;
+  padding: 12px 14px;
 
-  padding: 10px 12px;
-
-  border-radius: 10px;
+  border-radius: 12px;
 
   background: rgba(177, 18, 38, 0.08);
 
-  font-size: 13px;
-  font-weight: 650;
-
   color: #b11226;
+
+  font-size: 14px;
+  font-weight: 600;
 }
 
-.cpl-authModal button:disabled {
-  opacity: 0.6;
+/* =========================
+DISABLED
+========================= */
+
+.cpl-authModal button:disabled,
+.cpl-authModal input:disabled {
+  opacity: 0.65;
   cursor: not-allowed;
 }
 
@@ -686,44 +485,21 @@ ERROR
 RESPONSIVE
 ========================= */
 
-@media (max-width: 900px) {
-  .landing-tagline {
-    white-space: normal;
-  }
-}
-
 @media (max-width: 700px) {
-  .landing-container {
-    padding: 18px;
-  }
-
-  .landing-hero {
-    gap: 16px;
-  }
-
-  .brand-title {
-    font-size: 36px;
-    letter-spacing: 0.025em;
-  }
-
-  .landing-tagline {
-    font-size: 24px;
-  }
-
-  .landing-sub {
-    font-size: 14px;
-  }
-
-  .landing-login-thumb {
-    right: 18px;
-    bottom: 18px;
-
-    width: 64px;
-    height: 64px;
-  }
-
   .cpl-authModal,
   .auth-loading-box {
-    padding: 22px;
+    padding: 24px;
+    border-radius: 20px;
+  }
+
+  .cpl-authModal h2 {
+    font-size: 22px;
+  }
+
+  .cpl-authModal input,
+  .social-login,
+  .auth-box-link,
+  .cpl-authModal button[type="submit"] {
+    height: 52px;
   }
 }
