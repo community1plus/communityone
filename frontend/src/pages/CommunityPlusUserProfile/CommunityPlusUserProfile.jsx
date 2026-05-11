@@ -232,6 +232,14 @@ export default function CommunityPlusUserProfile({ onComplete }) {
   );
 
   const canContinueFromContact = !isContactStep || values.phoneVerified;
+
+  console.log("PROFILE PAGE STATE:", {
+  profileReady,
+  profile,
+  values,
+  currentStep,
+});
+
   const displayCompletion = completionPercent || 0;
 
   useEffect(() => {
