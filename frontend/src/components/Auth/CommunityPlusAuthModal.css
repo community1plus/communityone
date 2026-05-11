@@ -1,12 +1,29 @@
-/* =========================================
-   AUTH MODAL
-========================================= */
+/* =========================
+ROOT
+========================= */
 
-.cpl-authModal {
+.cpl-root {
+  position: relative;
+  min-height: 100vh;
   width: 100%;
-  max-width: 520px;
-  padding: 40px 32px;
-  border-radius: 28px;
+  overflow: hidden;
+  background: #f8f6f3;
+}
+
+/* =========================
+SOFT BACKGROUND EFFECTS
+========================= */
+
+.landing-visual-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.landing-hero-tint {
+  position: absolute;
+  inset: 0;
   background:
     radial-gradient(
       circle at 50% 45%,
@@ -16,20 +33,289 @@
       rgba(248, 246, 243, 0.68)
     ),
     rgba(177, 18, 38, 0.025);
+}
 
+.landing-hero-focus {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      circle at center,
+      transparent 40%,
+      rgba(0, 0, 0, 0.045)
+    );
+}
+
+/* =========================
+FOREGROUND CONTENT
+========================= */
+
+.landing-container {
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
   box-sizing: border-box;
+  background: transparent;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+}
+
+.landing-hero {
+  width: min(900px, 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  text-align: center;
+}
+
+/* =========================
+TYPOGRAPHY
+========================= */
+
+.brand-title {
+  margin: 0;
+  font-size: clamp(38px, 5vw, 64px);
+  line-height: 1.05;
+  font-weight: 800;
+  letter-spacing: 0.035em;
+  color: #b11226;
+}
+
+.landing-text {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.landing-tagline {
+  margin: 0;
+  max-width: 900px;
+  font-size: clamp(24px, 3vw, 38px);
+  line-height: 1.15;
+  font-weight: 800;
+  white-space: nowrap;
+  color: #b11226;
+}
+
+.accent {
+  color: #b11226;
+}
+
+.landing-sub {
+  margin: 0;
+  max-width: 560px;
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 450;
+  color: #4f4943;
+}
+
+/* =========================
+ACTIONS
+========================= */
+
+.landing-actions {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+
+.auth-maintenance-note {
+  margin: 0;
+  max-width: 460px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: #5f564f;
+}
+
+/* =========================
+BUTTONS
+========================= */
+
+.btn {
+  font: inherit;
+}
+
+.btn.primary,
+.btn.ghost,
+.hero-cta {
+  min-width: 220px;
+  height: 46px;
+  border-radius: 12px;
+  padding: 0 18px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    background 0.18s ease,
+    opacity 0.18s ease;
+}
+
+.btn.primary {
+  border: none;
+  background: #b11226;
+  color: #ffffff;
+  box-shadow: 0 8px 20px rgba(177, 18, 38, 0.25);
+}
+
+.btn.ghost {
+  background: transparent;
+  color: #b11226;
+  border: 1px solid #b11226;
+  box-shadow: 0 8px 20px rgba(177, 18, 38, 0.1);
+}
+
+.btn.primary:hover,
+.btn.ghost:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 26px rgba(177, 18, 38, 0.28);
+}
+
+.btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* =========================
+FLOATING LOGIN THUMB
+========================= */
+
+.landing-login-thumb {
+  position: fixed;
+  right: 28px;
+  bottom: 28px;
+  z-index: 50;
+  width: 72px;
+  height: 72px;
+  border: none;
+  border-radius: 50%;
+  background: #050505;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  cursor: pointer;
+  box-shadow:
+    0 18px 42px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.landing-login-thumb img {
+  width: 58%;
+  height: 58%;
+  object-fit: contain;
+  opacity: 1;
+  filter: contrast(1.2) saturate(1.2) brightness(1.05);
+  transition: transform 0.2s ease;
+}
+
+.landing-login-thumb::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(177, 18, 38, 0.32),
+    transparent 68%
+  );
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.landing-login-thumb:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow:
+    0 24px 54px rgba(0, 0, 0, 0.58),
+    0 0 0 1px rgba(177, 18, 38, 0.28) inset;
+}
+
+.landing-login-thumb:hover img {
+  transform: scale(1.08);
+}
+
+.landing-login-thumb:hover::after {
+  opacity: 1;
+}
+
+.landing-login-thumb:active {
+  transform: scale(0.96);
+}
+
+.landing-login-thumb:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+}
+
+/* =========================
+AUTH MODAL
+========================= */
+
+.cpl-modalOverlay,
+.auth-loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  box-sizing: border-box;
+  background: rgba(20, 20, 20, 0.45);
+  backdrop-filter: blur(3px);
+}
+
+.cpl-authModal,
+.auth-loading-box {
+  width: min(420px, calc(100vw - 32px));
+  padding: 28px;
+  box-sizing: border-box;
+  background: #fcfbf9;
+  border: 1px solid #e2dbd3;
+  border-radius: 20px;
+  box-shadow: 0 22px 58px rgba(0, 0, 0, 0.22);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+}
+
+.cpl-authModal {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
 .cpl-authModal h2 {
-  margin: 0 0 28px;
-  color: #b11226;
+  margin: 0 0 10px;
   font-size: 24px;
-  font-weight: 800;
+  line-height: 1.15;
+  font-weight: 850;
+  letter-spacing: -0.025em;
+  color: #111111;
 }
 
-/* =========================================
-   EMAIL FORM
-========================================= */
+.cpl-authModal h2 span {
+  color: #b11226;
+  font-weight: 900;
+}
 
 .cpl-authModal form {
   display: flex;
@@ -39,50 +325,71 @@
 
 .cpl-authModal input {
   width: 100%;
-  height: 54px;
-  padding: 0 18px;
-  border: 1px solid #d8d2ca;
-  border-radius: 16px;
-  background: #f7f8fb;
-  font-size: 15px;
+  height: 48px;
+  padding: 10px 14px;
   box-sizing: border-box;
+  border: 1px solid #ddd4ca;
+  border-radius: 12px;
+  background: #f8f6f3;
+  font: inherit;
+  font-size: 14px;
+  color: #241f1c;
+  outline: none;
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease,
+    background 0.16s ease;
 }
 
 .cpl-authModal input:focus {
-  outline: none;
-  border-color: #9b4a4a;
-  box-shadow: 0 0 0 3px rgba(143, 29, 29, 0.08);
+  border-color: #b11226;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(177, 18, 38, 0.1);
 }
 
+.cpl-authModal input:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* primary submit only */
 .cpl-authModal button[type="submit"] {
   width: 100%;
-  height: 54px;
-  margin-top: 2px;
+  min-height: 48px;
   border: none;
-  border-radius: 16px;
-  background: #7a5858;
-  color: #d8b8b8;
-  font-size: 16px;
-  font-weight: 700;
+  border-radius: 12px;
+  background: #8d1b2d;
+  color: #ffffff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 750;
   cursor: pointer;
+  transition:
+    background 0.16s ease,
+    transform 0.16s ease,
+    box-shadow 0.16s ease,
+    opacity 0.16s ease;
 }
 
 .cpl-authModal button[type="submit"]:hover {
-  background: #7c6060;
+  background: #7b1626;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(177, 18, 38, 0.16);
 }
 
-/* =========================================
-   DIVIDER
-========================================= */
+.cpl-authModal button[type="submit"]:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
 
+/* divider */
 .auth-divider {
   display: flex;
   align-items: center;
-  gap: 14px;
-  margin: 28px 0 20px;
-  color: #847a73;
-  font-size: 14px;
-  font-weight: 500;
+  gap: 12px;
+  margin: 8px 0 4px;
+  color: #6b625c;
+  font-size: 13px;
 }
 
 .auth-divider::before,
@@ -90,65 +397,50 @@
   content: "";
   flex: 1;
   height: 1px;
-  background: #e7e0d8;
+  background: #e2dbd3;
 }
 
-/* =========================================
-   SOCIAL BUTTONS
-========================================= */
-
+/* social buttons */
 .social-login {
   width: 100%;
-  height: 54px;
-  margin-top: 14px;
+  min-height: 48px;
+  border-radius: 12px;
+  border: 1px solid #ddd4ca;
+  background: #ffffff;
+  color: #222222;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 650;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-
-  border-radius: 16px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-
+  gap: 10px;
+  box-shadow: none;
   transition:
-    background 0.15s ease,
-    transform 0.15s ease,
-    box-shadow 0.15s ease;
+    background 0.16s ease,
+    border-color 0.16s ease,
+    transform 0.16s ease,
+    box-shadow 0.16s ease;
 }
 
 .social-login:hover {
+  background: #faf7f4;
+  border-color: #d3cbc3;
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.045);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.045);
 }
 
-.social-login.google {
-  border: 1px solid #ddd8d0;
-  background: #f5f2ee;
-  color: #3c4043;
-}
-
-.social-login.google:hover {
-  background: #f5f2ee;
-}
-
+.social-login.google,
 .social-login.facebook {
-  border: 1px solid #d9e5fb;
-  background: #f5f2ee;
-  color: #1877f2;
+  background: #ffffff;
+  color: #222222;
+  border: 1px solid #ddd4ca;
 }
-
-.social-login.facebook:hover {
-  background: #edf4ff;
-}
-
-/* =========================================
-   ICON CIRCLES
-========================================= */
 
 .social-brand-icon {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -157,53 +449,128 @@
 
 .google-brand {
   color: #4285f4;
-  font-size: 20px;
-  font-weight: 700;
   font-family: Arial, sans-serif;
+  font-size: 19px;
+  font-weight: 700;
 }
 
 .facebook-brand {
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
-  background: #1877f2;
+  background: #4267b2;
   color: #ffffff;
-  font-size: 18px;
-  font-weight: 700;
   font-family: Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
 }
 
 .social-label {
   line-height: 1;
 }
 
-/* =========================================
-   BOTTOM LINKS
-========================================= */
-
+/* bottom links */
 .auth-links {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 12px;
-  margin-top: 24px;
+  gap: 14px;
+  margin-top: 8px;
 }
 
 .auth-link-divider {
-  color: #b11226;
+  color: #a0a0a0;
 }
 
 .auth-text-link {
-  border: none !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  padding: 0 !important;
-  height: auto !important;
+  width: auto !important;
   min-height: 0 !important;
-  color: #b11226;
+  border: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: #1a73e8 !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  font: inherit;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
 }
 
 .auth-text-link:hover {
+  transform: none !important;
+  box-shadow: none !important;
   text-decoration: underline;
+}
+
+.cpl-authModal button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error {
+  margin-top: 4px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(177, 18, 38, 0.08);
+  font-size: 13px;
+  font-weight: 650;
+  color: #b11226;
+}
+
+/* =========================
+RESPONSIVE
+========================= */
+
+@media (max-width: 900px) {
+  .landing-tagline {
+    white-space: normal;
+  }
+}
+
+@media (max-width: 700px) {
+  .landing-container {
+    padding: 18px;
+  }
+
+  .landing-hero {
+    gap: 16px;
+  }
+
+  .brand-title {
+    font-size: 36px;
+    letter-spacing: 0.025em;
+  }
+
+  .landing-tagline {
+    font-size: 24px;
+  }
+
+  .landing-sub {
+    font-size: 14px;
+  }
+
+  .landing-login-thumb {
+    right: 18px;
+    bottom: 18px;
+    width: 64px;
+    height: 64px;
+  }
+
+  .cpl-authModal,
+  .auth-loading-box {
+    padding: 22px;
+  }
+}
+
+.cpl-authModal h2 {
+  color: #b11226;
+}
+
+.cpl-authModal button[type="submit"] {
+  background: #a0192f;
+}
+
+.cpl-authModal button[type="submit"]:hover {
+  background: #8f162a;
 }
