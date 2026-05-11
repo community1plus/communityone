@@ -72,12 +72,7 @@ export default function HeaderTopRow() {
       <div className="header-right">
         {isAuthenticated ? (
           <div className="header-user">
-            <div className="header-username">
-              {displayName}
-            </div>
-
             
-
             <UserMenu />
           </div>
         ) : (
