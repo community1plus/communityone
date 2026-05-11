@@ -13,7 +13,7 @@
 
 .cpl-authModal h2 {
   margin: 0 0 28px;
-  color: #cc1f1f;
+  color: #ec0f0f;
   font-size: 24px;
   font-weight: 800;
 }
@@ -52,14 +52,14 @@
   border: none;
   border-radius: 16px;
   background: #7a5858;
-  color: #ffffff;
+  color: #d8b8b8;
   font-size: 16px;
   font-weight: 700;
   cursor: pointer;
 }
 
 .cpl-authModal button[type="submit"]:hover {
-  background: #7f3535;
+  background: #7c6060;
 }
 
 /* =========================================
@@ -115,7 +115,7 @@
 
 .social-login.google {
   border: 1px solid #ddd8d0;
-  background: #fbfaf8;
+  background: #5c6b8d;
   color: #3c4043;
 }
 
@@ -125,7 +125,7 @@
 
 .social-login.facebook {
   border: 1px solid #d9e5fb;
-  background: #f4f8ff;
+  background: #c2cee4;
   color: #1877f2;
 }
 

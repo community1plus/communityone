@@ -59,7 +59,7 @@ export default function CommunityPlusAuthModal({
 
         <div className="auth-links">
           <button type="button" className="auth-text-link" onClick={onJoin}>
-            Join Community.One
+            Join 
           </button>
 
           <span className="auth-link-divider">•</span>
