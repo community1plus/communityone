@@ -141,12 +141,7 @@ function getSocialStatus(social = {}, providerId) {
 }
 
 function getUserEmail(user) {
-  return (
-    user?.email ||
-    user?.attributes?.email ||
-    user?.signInDetails?.loginId ||
-    ""
-  );
+  return user?.email || user?.attributes?.email || user?.signInDetails?.loginId || "";
 }
 
 function getUserDisplayName(user) {
@@ -160,25 +155,25 @@ function getUserDisplayName(user) {
   );
 }
 
-function buildDefaultProfile({ profile, user, homeLocation }) {
+function getInitialProfileValues({ user, homeLocation }) {
   return {
-    username: profile?.username || getUserEmail(user).split("@")[0] || "",
-    display_name: profile?.display_name || getUserDisplayName(user) || "",
-    userType: profile?.userType || "PERSONAL",
+    username: getUserEmail(user).split("@")[0] || "",
+    display_name: getUserDisplayName(user) || "",
+    userType: "PERSONAL",
 
-    phoneCountry: profile?.phoneCountry || DEFAULT_PHONE_COUNTRY,
-    phone: profile?.phoneDisplay || profile?.phone || "",
-    phoneE164: profile?.phoneE164 || profile?.phone || "",
-    phoneVerified: profile?.phoneVerified || false,
+    phoneCountry: DEFAULT_PHONE_COUNTRY,
+    phone: "",
+    phoneE164: "",
+    phoneVerified: false,
     phoneVerificationCode: "",
 
-    homeLocation: profile?.homeLocation || homeLocation || null,
+    homeLocation: homeLocation || null,
 
-    social: normaliseSocialState(profile?.social),
+    social: normaliseSocialState(),
 
     payment: {
-      cardName: profile?.payment?.cardName || "",
-      last4: profile?.payment?.last4 || "",
+      cardName: "",
+      last4: "",
     },
   };
 }
@@ -201,16 +196,11 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     profileMissing,
     profileError: contextProfileError,
     completionPercent,
-    hasProfile,
     saveProfile,
   } = useProfile();
 
   const form = useForm({
-    initialValues: buildDefaultProfile({
-      profile: null,
-      user,
-      homeLocation,
-    }),
+    initialValues: getInitialProfileValues({ user, homeLocation }),
   });
 
   const { values, validateAll, setValue, isFormValidating, clearStorage } = form;
@@ -245,56 +235,38 @@ export default function CommunityPlusUserProfile({ onComplete }) {
   const displayCompletion = completionPercent || 0;
 
   useEffect(() => {
+    hydratedProfileRef.current = false;
+  }, [user?.id, user?.username, user?.email]);
+
+  useEffect(() => {
     if (!profileReady || hydratedProfileRef.current) return;
 
-    const defaults = buildDefaultProfile({
-      profile,
-      user,
-      homeLocation,
-    });
+    const email = getUserEmail(user);
+    const emailPrefix = email.split("@")[0] || "";
+    const displayName = getUserDisplayName(user);
 
-    Object.entries(defaults).forEach(([key, value]) => {
-      setValue(key, value);
-    });
+    setValue("username", profile?.username || emailPrefix || "");
+    setValue("display_name", profile?.display_name || displayName || emailPrefix || "");
+    setValue("userType", profile?.userType || "PERSONAL");
+
+    setValue("phoneCountry", profile?.phoneCountry || DEFAULT_PHONE_COUNTRY);
+    setValue("phone", profile?.phoneDisplay || profile?.phone || "");
+    setValue("phoneE164", profile?.phoneE164 || profile?.phone || "");
+    setValue("phoneVerified", profile?.phoneVerified || false);
+    setValue("phoneVerificationCode", "");
+
+    setValue("homeLocation", profile?.homeLocation || homeLocation || null);
+    setValue("social", normaliseSocialState(profile?.social));
+
+    setValue("payment.cardName", profile?.payment?.cardName || "");
+    setValue("payment.last4", profile?.payment?.last4 || "");
 
     hydratedProfileRef.current = true;
   }, [profileReady, profile, user, homeLocation, setValue]);
 
   useEffect(() => {
-    hydratedProfileRef.current = false;
-  }, [user?.id, user?.username, getUserEmail(user)]);
-
-  useEffect(() => {
-    if (!profile?.social) return;
-    setValue("social", normaliseSocialState(profile.social));
-  }, [profile?.social, setValue]);
-
-  useEffect(() => {
-    if (!profileReady) return;
-
-    const email = getUserEmail(user);
-    const displayName = getUserDisplayName(user);
-    const prefix = email.split("@")[0];
-
-    if (!values.username) {
-      setValue("username", profile?.username || prefix || "");
-    }
-
-    if (!values.display_name) {
-      setValue("display_name", profile?.display_name || displayName || prefix || "");
-    }
-  }, [
-    profileReady,
-    user,
-    profile?.username,
-    profile?.display_name,
-    values.username,
-    values.display_name,
-    setValue,
-  ]);
-
-  useEffect(() => {
     if (!homeLocation) return;
+    if (profile?.homeLocation) return;
 
     const fingerprint = JSON.stringify({
       lat: homeLocation.lat,
@@ -306,7 +278,7 @@ export default function CommunityPlusUserProfile({ onComplete }) {
 
     lastHomeLocationRef.current = fingerprint;
     setValue("homeLocation", homeLocation);
-  }, [homeLocation, setValue]);
+  }, [homeLocation, profile?.homeLocation, setValue]);
 
   useEffect(() => {
     if (phoneE164 !== values.phoneE164) {
