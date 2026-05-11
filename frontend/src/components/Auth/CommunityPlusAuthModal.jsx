@@ -1,5 +1,6 @@
 import { signInWithRedirect } from "aws-amplify/auth";
 import CommunityPlusEmailForm from "./CommunityPlusEmailForm";
+import "./CommunityPlusAuthModal.css";
 
 export default function CommunityPlusAuthModal({
   onClose,
