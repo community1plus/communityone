@@ -25,13 +25,19 @@ function Placeholder({ title }) {
 
 function ProtectedRoute({ children }) {
   const location = useLocation();
-  const { isAuthenticated, authReady } = useAuth();
+  const { user, isAuthenticated, loading, authLoading } = useAuth();
+
+  const isAuthChecking = loading || authLoading;
 
   console.log("PROTECTED ROUTE STATE:", {
-  authReady,
-  isAuthenticated,
-}); 
-  if (!authReady) {
+    user,
+    isAuthenticated,
+    loading,
+    authLoading,
+    isAuthChecking,
+  });
+
+  if (isAuthChecking) {
     return <div style={{ padding: 40 }}>Loading...</div>;
   }
 
