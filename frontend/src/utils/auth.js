@@ -1,16 +1,39 @@
 export function getDisplayName(user) {
-  if (!user) return "Guest";
+  if (!user) {
+    return "Guest";
+  }
 
-  const attrs = user?.signInDetails?.loginId
-    ? null
-    : user?.attributes;
+  const attributes = user?.attributes || {};
+  const loginId = user?.signInDetails?.loginId;
 
-  return (
-    attrs?.preferred_username ||
-    attrs?.name ||
-    attrs?.given_name ||
-    attrs?.email?.split("@")[0] ||
-    user?.username?.replace(/^google_/, "") ||
-    "User"
-  );
+  /* =========================
+     PRIORITY ORDER
+  ========================= */
+
+  const displayName =
+    attributes.preferred_username ||
+    attributes.name ||
+    attributes.given_name ||
+
+    /* email before username */
+    attributes.email?.split("@")[0] ||
+
+    /* federated login email */
+    loginId?.split("@")[0] ||
+
+    /* fallback username cleanup */
+    user?.username
+      ?.replace(/^google_/, "")
+      ?.replace(/^facebook_/, "") ||
+
+    "User";
+
+  /* =========================
+     CLEANUP
+  ========================= */
+
+  return String(displayName)
+    .replace(/[._-]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }

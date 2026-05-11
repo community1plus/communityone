@@ -25,22 +25,30 @@ export default function CommunityPlusAuthModal({
         <CommunityPlusEmailForm onSuccess={onSuccess} />
 
         <div className="auth-links">
-          <button type="button" className="auth-link" onClick={onForgotPassword}>
+          <button
+            type="button"
+            className="auth-text-link"
+            onClick={onForgotPassword}
+          >
             Forgot password?
           </button>
 
-          <button type="button" className="auth-link" onClick={onJoin}>
+          <button type="button" className="auth-text-link" onClick={onJoin}>
             Join Community.One
           </button>
         </div>
 
         <div className="auth-divider">or</div>
 
-        <button type="button" className="social-login" onClick={handleGoogleLogin}>
+        <button
+          type="button"
+          className="social-login google"
+          onClick={handleGoogleLogin}
+        >
           Continue with Google
         </button>
 
-        <button type="button" className="social-login" disabled>
+        <button type="button" className="social-login facebook" disabled>
           Continue with Facebook
         </button>
       </div>
