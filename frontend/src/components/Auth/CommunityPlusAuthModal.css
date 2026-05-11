@@ -1,14 +1,26 @@
 .auth-links {
   display: flex;
   justify-content: space-between;
-  gap: 12px;
-  margin-top: 12px;
+  align-items: center;
+  margin: 14px 0 22px;
 }
 
-.auth-link {
+.auth-text-link {
   border: 0;
   background: transparent;
-  color: #5d0d0d;
+  color: #6f1111;
+  font-size: 14px;
   font-weight: 700;
   cursor: pointer;
+  padding: 0;
+}
+
+.auth-text-link:hover {
+  text-decoration: underline;
+}
+
+.social-login.google {
+  background: #ffffff;
+  border: 1px solid #d8d8d8;
+  color: #202124;
 }
