@@ -148,6 +148,39 @@ function uniqueTags(tags = []) {
   });
 }
 
+function formatFileSize(size = 0) {
+  if (!size) return "0 B";
+
+  const units = ["B", "KB", "MB", "GB"];
+  const index = Math.min(
+    Math.floor(Math.log(size) / Math.log(1024)),
+    units.length - 1
+  );
+
+  const value = size / 1024 ** index;
+
+  return `${value.toFixed(value >= 10 || index === 0 ? 0 : 1)} ${units[index]}`;
+}
+
+function formatDateTime(value) {
+  if (!value) return "Unknown";
+
+  return new Intl.DateTimeFormat(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(value));
+}
+
+function getMediaKind(file) {
+  if (file.type.startsWith("image")) return "image";
+  if (file.type.startsWith("video")) return "video";
+  if (file.type.startsWith("audio")) return "audio";
+  return "file";
+}
+
 async function getAuthHeaders(extraHeaders = {}) {
   const session = await fetchAuthSession();
   const token = session.tokens?.accessToken?.toString();
@@ -215,6 +248,8 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
 
   const [files, setFiles] = useState([]);
   const [preview, setPreview] = useState(null);
+  const [metadataOpenId, setMetadataOpenId] = useState(null);
+  const [dragActive, setDragActive] = useState(false);
 
   const [isAd, setIsAd] = useState(false);
   const [selectedSlots, setSelectedSlots] = useState([]);
@@ -278,18 +313,62 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
       return;
     }
 
-    const enriched = incomingFiles.map((file) => ({
-      id: crypto.randomUUID(),
-      file,
-      url: URL.createObjectURL(file),
-      thumbnail: null,
-      uploaded: false,
-      s3Key: null,
-      publicUrl: null,
-    }));
+    const enriched = incomingFiles.map((file) => {
+      const createdAt = Date.now();
+
+      return {
+        id: crypto.randomUUID(),
+        file,
+        kind: getMediaKind(file),
+        url: URL.createObjectURL(file),
+        thumbnail: null,
+        uploaded: false,
+        s3Key: null,
+        publicUrl: null,
+        metadata: {
+          name: file.name,
+          type: file.type || "application/octet-stream",
+          size: file.size,
+          sizeLabel: formatFileSize(file.size),
+          createdAt,
+          createdAtLabel: formatDateTime(createdAt),
+          lastModified: file.lastModified,
+          lastModifiedLabel: formatDateTime(file.lastModified),
+        },
+      };
+    });
 
     setFiles((prev) => [...prev, ...enriched]);
     setError("");
+  };
+
+  const handleDrop = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    setDragActive(false);
+
+    const droppedFiles = Array.from(event.dataTransfer.files || []);
+
+    if (droppedFiles.length) {
+      handleFiles(droppedFiles);
+    }
+  };
+
+  const handleDragOver = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!submitting) {
+      setDragActive(true);
+    }
+  };
+
+  const handleDragLeave = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    setDragActive(false);
   };
 
   const removeFile = (fileId) => {
@@ -302,6 +381,9 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
 
       return prev.filter((item) => item.id !== fileId);
     });
+
+    setMetadataOpenId((current) => (current === fileId ? null : current));
+    setPreview((current) => (current?.id === fileId ? null : current));
   };
 
   const resetForm = () => {
@@ -313,8 +395,16 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
     setCustomTagInput("");
     setShareToSocial(false);
     setShareToGlobal(false);
+
+    files.forEach((item) => {
+      if (item.url) URL.revokeObjectURL(item.url);
+    });
+
     setFiles([]);
     setPreview(null);
+    setMetadataOpenId(null);
+    setDragActive(false);
+
     setIsAd(false);
     setSelectedSlots([]);
     setUploadProgress("");
@@ -388,8 +478,11 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
       name: item.file.name,
       type: item.file.type,
       size: item.file.size,
+      mediaType: item.kind,
       key: presign.key,
       url: presign.publicUrl || presign.fileUrl || null,
+      createdAt: item.metadata.createdAt,
+      lastModified: item.file.lastModified,
     };
   };
 
@@ -439,10 +532,13 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
 
       if (onSubmit) {
         const payload = buildPayload(
-          files.map(({ file }) => ({
+          files.map(({ file, kind, metadata }) => ({
             name: file.name,
             type: file.type,
             size: file.size,
+            mediaType: kind,
+            createdAt: metadata.createdAt,
+            lastModified: file.lastModified,
           }))
         );
 
@@ -471,7 +567,14 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
 
   return (
     <div className="post-composer-page">
-      <div className={`composer panel ${config.theme}`}>
+      <div
+        className={`composer panel ${config.theme} ${
+          dragActive ? "drag-active" : ""
+        }`}
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+      >
         <div className="panel-header">
           <div className="composer-tab-row">
             <button
@@ -523,23 +626,29 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
 
               {mode === "news" && (
                 <div className="meta">
-                  News posts are submitted for review before they appear in iVIEW.
+                  News posts are submitted for review before they appear in
+                  iVIEW.
                 </div>
               )}
 
               {mode === "beacon" && (
                 <div className="meta">
-                  Beacon posts are time-sensitive alerts and expire automatically.
+                  Beacon posts are time-sensitive alerts and expire
+                  automatically.
                 </div>
               )}
 
               <button
                 type="button"
-                className="btn btn-secondary"
+                className={`btn btn-secondary upload-drop-button ${
+                  dragActive ? "active" : ""
+                }`}
                 onClick={() => fileInputRef.current?.click()}
                 disabled={submitting}
               >
-                Upload media
+                {dragActive
+                  ? "Drop files here"
+                  : "Upload media or drag files here"}
               </button>
 
               <input
@@ -552,33 +661,6 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
                   event.target.value = "";
                 }}
               />
-
-              <div className="files">
-                {files.map((item) => (
-                  <div key={item.id} className="panel panel-hover panel-compact">
-                    {item.file.type.startsWith("image") ? (
-                      <img
-                        src={item.url}
-                        alt={item.file.name}
-                        onClick={() => setPreview(item)}
-                      />
-                    ) : item.file.type.startsWith("video") ? (
-                      <video src={item.url} controls />
-                    ) : (
-                      <span className="meta">{item.file.name}</span>
-                    )}
-
-                    <button
-                      type="button"
-                      className="btn btn-secondary"
-                      onClick={() => removeFile(item.id)}
-                      disabled={submitting}
-                    >
-                      Remove
-                    </button>
-                  </div>
-                ))}
-              </div>
 
               {canPromote && (
                 <>
@@ -732,14 +814,144 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
 
         {preview && (
           <div className="modal" onClick={() => setPreview(null)}>
-            <div onClick={(event) => event.stopPropagation()}>
-              <img src={preview.url} alt={preview.file.name} />
+            <div
+              className="media-preview-modal"
+              onClick={(event) => event.stopPropagation()}
+            >
+              {preview.kind === "image" && (
+                <img src={preview.url} alt={preview.file.name} />
+              )}
+
+              {preview.kind === "video" && (
+                <video src={preview.url} controls autoPlay />
+              )}
+
+              {preview.kind === "audio" && <audio src={preview.url} controls />}
+
+              {preview.kind === "file" && (
+                <div className="file-preview-box">
+                  <strong>{preview.file.name}</strong>
+                  <span>{preview.metadata.sizeLabel}</span>
+                </div>
+              )}
+
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => setPreview(null)}
+              >
+                Close
+              </button>
             </div>
           </div>
         )}
       </div>
 
       <aside className="composer-guide-panel panel">
+        <h2>Media</h2>
+
+        {!files.length && (
+          <p>
+            Uploaded files will appear here as thumbnails. Drag media onto the
+            composer or use the upload button.
+          </p>
+        )}
+
+        {!!files.length && (
+          <div className="media-thumb-list">
+            {files.map((item) => {
+              const metadataOpen = metadataOpenId === item.id;
+
+              return (
+                <div key={item.id} className="media-thumb-card">
+                  <div className="media-thumb-preview">
+                    {item.kind === "image" && (
+                      <img src={item.url} alt={item.file.name} />
+                    )}
+
+                    {item.kind === "video" && (
+                      <video src={item.url} muted playsInline />
+                    )}
+
+                    {item.kind === "audio" && (
+                      <div className="media-file-icon">♪</div>
+                    )}
+
+                    {item.kind === "file" && (
+                      <div className="media-file-icon">📄</div>
+                    )}
+                  </div>
+
+                  <div className="media-thumb-info">
+                    <strong title={item.file.name}>{item.file.name}</strong>
+                    <span>{item.metadata.sizeLabel}</span>
+                  </div>
+
+                  <div className="media-thumb-actions">
+                    <button
+                      type="button"
+                      title="Preview"
+                      aria-label={`Preview ${item.file.name}`}
+                      onClick={() => setPreview(item)}
+                    >
+                      👁
+                    </button>
+
+                    <button
+                      type="button"
+                      title="Metadata"
+                      aria-label={`Show metadata for ${item.file.name}`}
+                      onClick={() =>
+                        setMetadataOpenId((current) =>
+                          current === item.id ? null : item.id
+                        )
+                      }
+                    >
+                      ⓘ
+                    </button>
+
+                    <button
+                      type="button"
+                      title="Delete"
+                      aria-label={`Delete ${item.file.name}`}
+                      onClick={() => removeFile(item.id)}
+                      disabled={submitting}
+                    >
+                      ×
+                    </button>
+                  </div>
+
+                  {metadataOpen && (
+                    <div className="media-metadata">
+                      <div>
+                        <span>Created</span>
+                        <strong>{item.metadata.createdAtLabel}</strong>
+                      </div>
+
+                      <div>
+                        <span>File size</span>
+                        <strong>{item.metadata.sizeLabel}</strong>
+                      </div>
+
+                      <div>
+                        <span>Timestamp</span>
+                        <strong>{item.metadata.lastModifiedLabel}</strong>
+                      </div>
+
+                      <div>
+                        <span>Type</span>
+                        <strong>{item.metadata.type}</strong>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        <div className="guide-divider" />
+
         <h2>{config.label} Guide</h2>
 
         {mode === "now" && (
