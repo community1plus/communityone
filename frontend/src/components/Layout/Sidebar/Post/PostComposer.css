@@ -1,9 +1,9 @@
 .post-composer-page {
   width: 100%;
 
-  min-height: calc(100vh - 140px);
+  min-height: auto;
 
-  padding: 30px 30px 60px;
+  padding: 30px 30px 90px;
 
   display: grid;
   grid-template-columns: minmax(0, 1fr) 420px;
