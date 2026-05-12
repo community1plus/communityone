@@ -8,6 +8,8 @@ const API_BASE =
   import.meta.env.VITE_API_BASE ||
   (import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : "");
 
+const MAX_VIDEO_AUDIO_SIZE = 300 * 1024 * 1024;
+
 const NOW_CATEGORIES = ["Information", "Incident", "Alert", "Event", "Beacon"];
 
 const CATEGORIES = [
@@ -181,6 +183,16 @@ function getMediaKind(file) {
   return "file";
 }
 
+function validateIncomingFile(file) {
+  const kind = getMediaKind(file);
+
+  if ((kind === "video" || kind === "audio") && file.size > MAX_VIDEO_AUDIO_SIZE) {
+    return `${file.name} exceeds the 300 MB limit for video/audio.`;
+  }
+
+  return "";
+}
+
 async function getAuthHeaders(extraHeaders = {}) {
   const session = await fetchAuthSession();
   const token = session.tokens?.accessToken?.toString();
@@ -248,7 +260,8 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
 
   const [files, setFiles] = useState([]);
   const [preview, setPreview] = useState(null);
-  const [metadataOpenId, setMetadataOpenId] = useState(null);
+  const [metadataModal, setMetadataModal] = useState(null);
+  const [loadedMediaIds, setLoadedMediaIds] = useState({});
   const [dragActive, setDragActive] = useState(false);
 
   const [isAd, setIsAd] = useState(false);
@@ -297,7 +310,25 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
     };
   }, [files]);
 
+  const markMediaLoaded = (fileId) => {
+    setLoadedMediaIds((prev) => ({
+      ...prev,
+      [fileId]: true,
+    }));
+  };
+
+  const isMediaLoaded = (fileId) => Boolean(loadedMediaIds[fileId]);
+
   const handleFiles = (incomingFiles = []) => {
+    const validationError = incomingFiles
+      .map(validateIncomingFile)
+      .find(Boolean);
+
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
     const combined = [...files.map((item) => item.file), ...incomingFiles];
 
     const videos = combined.filter((file) => file.type.startsWith("video"));
@@ -382,8 +413,20 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
       return prev.filter((item) => item.id !== fileId);
     });
 
-    setMetadataOpenId((current) => (current === fileId ? null : current));
+    setMetadataModal((current) => (current?.id === fileId ? null : current));
     setPreview((current) => (current?.id === fileId ? null : current));
+
+    setLoadedMediaIds((prev) => {
+      const next = { ...prev };
+      delete next[fileId];
+      return next;
+    });
+  };
+
+  const clearComposerText = () => {
+    setTitle("");
+    setContent("");
+    setError("");
   };
 
   const resetForm = () => {
@@ -402,7 +445,8 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
 
     setFiles([]);
     setPreview(null);
-    setMetadataOpenId(null);
+    setMetadataModal(null);
+    setLoadedMediaIds({});
     setDragActive(false);
 
     setIsAd(false);
@@ -640,15 +684,22 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
 
               <button
                 type="button"
-                className={`btn btn-secondary upload-drop-button ${
-                  dragActive ? "active" : ""
-                }`}
+                className={`upload-drop-zone ${dragActive ? "active" : ""}`}
                 onClick={() => fileInputRef.current?.click()}
                 disabled={submitting}
               >
-                {dragActive
-                  ? "Drop files here"
-                  : "Upload media or drag files here"}
+                <span className="upload-icon">⬆</span>
+
+                <span className="upload-title">
+                  {dragActive
+                    ? "Drop files here"
+                    : "Upload media or drag files here"}
+                </span>
+
+                <span className="upload-help">
+                  Max 300 MB for video/audio. Allowed: PNG, JPEG, PDF, Word,
+                  TXT and standard document files.
+                </span>
               </button>
 
               <input
@@ -801,14 +852,43 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
               </button>
             )}
 
-            <button
-              type="button"
-              className="btn btn-primary btn-block"
-              onClick={handleSubmit}
-              disabled={submitting}
-            >
-              {submitting ? "Submitting..." : config.submitLabel}
-            </button>
+            <div className="composer-action-icons">
+              <button
+                type="button"
+                className="composer-icon-action"
+                onClick={resetForm}
+                disabled={submitting}
+                title="Reset"
+                aria-label="Reset form"
+              >
+                ↺
+                <span>Reset</span>
+              </button>
+
+              <button
+                type="button"
+                className="composer-icon-action"
+                onClick={clearComposerText}
+                disabled={submitting}
+                title="Clear"
+                aria-label="Clear text"
+              >
+                ⌫
+                <span>Clear</span>
+              </button>
+
+              <button
+                type="button"
+                className="composer-icon-action primary"
+                onClick={handleSubmit}
+                disabled={submitting}
+                title="Submit"
+                aria-label="Submit post"
+              >
+                ➤
+                <span>{submitting ? "Submitting..." : "Submit"}</span>
+              </button>
+            </div>
           </div>
         )}
 
@@ -845,6 +925,52 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
             </div>
           </div>
         )}
+
+        {metadataModal && (
+          <div className="modal" onClick={() => setMetadataModal(null)}>
+            <div
+              className="metadata-modal"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <h3>File metadata</h3>
+
+              <div className="metadata-modal-grid">
+                <div>
+                  <span>File name</span>
+                  <strong>{metadataModal.metadata.name}</strong>
+                </div>
+
+                <div>
+                  <span>Created</span>
+                  <strong>{metadataModal.metadata.createdAtLabel}</strong>
+                </div>
+
+                <div>
+                  <span>File size</span>
+                  <strong>{metadataModal.metadata.sizeLabel}</strong>
+                </div>
+
+                <div>
+                  <span>Timestamp</span>
+                  <strong>{metadataModal.metadata.lastModifiedLabel}</strong>
+                </div>
+
+                <div>
+                  <span>Type</span>
+                  <strong>{metadataModal.metadata.type}</strong>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => setMetadataModal(null)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       <aside className="composer-guide-panel panel">
@@ -859,18 +985,36 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
 
         {!!files.length && (
           <div className="media-thumb-list">
-            {files.map((item) => {
-              const metadataOpen = metadataOpenId === item.id;
-
-              return (
-                <div key={item.id} className="media-thumb-card">
+            {files.map((item) => (
+              <div key={item.id} className="media-thumb-card">
+                <div className="media-thumb-row">
                   <div className="media-thumb-preview">
+                    {(item.kind === "image" || item.kind === "video") &&
+                      !isMediaLoaded(item.id) && (
+                        <div className="media-loading">Loading...</div>
+                      )}
+
                     {item.kind === "image" && (
-                      <img src={item.url} alt={item.file.name} />
+                      <img
+                        src={item.url}
+                        alt={item.file.name}
+                        onLoad={() => markMediaLoaded(item.id)}
+                        className={
+                          isMediaLoaded(item.id) ? "loaded" : "loading"
+                        }
+                      />
                     )}
 
                     {item.kind === "video" && (
-                      <video src={item.url} muted playsInline />
+                      <video
+                        src={item.url}
+                        muted
+                        playsInline
+                        onLoadedData={() => markMediaLoaded(item.id)}
+                        className={
+                          isMediaLoaded(item.id) ? "loaded" : "loading"
+                        }
+                      />
                     )}
 
                     {item.kind === "audio" && (
@@ -901,11 +1045,7 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
                       type="button"
                       title="Metadata"
                       aria-label={`Show metadata for ${item.file.name}`}
-                      onClick={() =>
-                        setMetadataOpenId((current) =>
-                          current === item.id ? null : item.id
-                        )
-                      }
+                      onClick={() => setMetadataModal(item)}
                     >
                       ⓘ
                     </button>
@@ -920,33 +1060,9 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
                       ×
                     </button>
                   </div>
-
-                  {metadataOpen && (
-                    <div className="media-metadata">
-                      <div>
-                        <span>Created</span>
-                        <strong>{item.metadata.createdAtLabel}</strong>
-                      </div>
-
-                      <div>
-                        <span>File size</span>
-                        <strong>{item.metadata.sizeLabel}</strong>
-                      </div>
-
-                      <div>
-                        <span>Timestamp</span>
-                        <strong>{item.metadata.lastModifiedLabel}</strong>
-                      </div>
-
-                      <div>
-                        <span>Type</span>
-                        <strong>{item.metadata.type}</strong>
-                      </div>
-                    </div>
-                  )}
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
         )}
 
