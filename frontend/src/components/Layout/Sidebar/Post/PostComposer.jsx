@@ -220,6 +220,7 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
 
   const [shareToSocial, setShareToSocial] = useState(false);
   const [shareToGlobal, setShareToGlobal] = useState(false);
+  const [optionsOpen, setOptionsOpen] = useState(false);
 
   const [files, setFiles] = useState([]);
   const [preview, setPreview] = useState(null);
@@ -256,6 +257,7 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
     setCustomTagInput("");
     setShareToSocial(false);
     setShareToGlobal(false);
+    setOptionsOpen(false);
     setIsAd(false);
     setSelectedSlots([]);
     setUploadProgress("");
@@ -338,6 +340,7 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
     setCustomTagInput("");
     setShareToSocial(false);
     setShareToGlobal(false);
+    setOptionsOpen(false);
     setFiles([]);
     setPreview(null);
     setIsAd(false);
@@ -496,7 +499,22 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
     <div className="post-composer-page">
       <div className={`composer panel ${config.theme}`}>
         <div className="panel-header">
-          <div className="composer-title">{pageTitle}</div>
+          <div className="composer-title-row">
+            <div className="composer-title">{pageTitle}</div>
+
+            {showDetails && (
+              <button
+                type="button"
+                className={`composer-options-toggle ${
+                  optionsOpen ? "active" : ""
+                }`}
+                onClick={() => setOptionsOpen((prev) => !prev)}
+                disabled={submitting}
+              >
+                {optionsOpen ? "Hide Options" : "Set Options"}
+              </button>
+            )}
+          </div>
 
           <input
             className="body"
@@ -514,8 +532,8 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
             onChange={(event) => setContent(event.target.value)}
           />
 
-          {showDetails && (
-            <div className="composer-options">
+          {showDetails && optionsOpen && (
+            <div className="composer-options-tab">
               <div className="composer-options-header">Options</div>
 
               <div className="composer-options-grid">
@@ -751,34 +769,6 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
           <p>
             NOW posts are short, immediate updates for what is happening around
             the user right now. They expire automatically after 24 hours.
-          </p>
-        )}
-
-        {mode === "news" && (
-          <p>
-            News posts should be factual, clear, and suitable for review before
-            publication.
-          </p>
-        )}
-
-        {mode === "blob" && (
-          <p>
-            BLOB posts are longer-form commentary, stories, opinions, and
-            community reflections.
-          </p>
-        )}
-
-        {mode === "event" && (
-          <p>
-            Event posts should include what is happening, where, when, and who
-            should attend.
-          </p>
-        )}
-
-        {mode === "beacon" && (
-          <p>
-            Beacon posts are urgent alerts. Keep them short, accurate, and
-            time-sensitive.
           </p>
         )}
 

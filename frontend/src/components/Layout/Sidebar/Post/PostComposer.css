@@ -223,3 +223,32 @@ textarea.body {
     margin-left: 0;
   }
 }
+
+.composer-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.composer-options-toggle {
+  border: 1px solid #ddd4ca;
+  background: #ffffff;
+  color: #6f1111;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.composer-options-toggle:hover {
+  background: #faf7f4;
+}
+
+.composer-options-tab {
+  margin-top: 16px;
+  padding: 18px;
+  border: 1px solid #e2dbd3;
+  border-radius: 16px;
+  background: #fcfbf9;
+}
