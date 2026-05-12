@@ -203,3 +203,23 @@ RESPONSIVE
     padding: 10px;
   }
 }
+
+/* FORCE PANEL ALIGNMENT FIX */
+.post-composer-page {
+  align-items: start !important;
+  align-content: start !important;
+}
+
+.composer-column,
+.guide-column {
+  min-height: 0 !important;
+  height: auto !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+}
+
+.composer.panel,
+.composer-guide-panel.panel {
+  align-self: flex-start !important;
+  margin-top: 0 !important;
+}
