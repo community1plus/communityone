@@ -7,7 +7,7 @@ import pkg from "pg";
 import userRoutes from "./routes/userRoutes.js";
 import profileRoutes from "./routes/profileRoutes.js";
 import youtubeRoutes from "./routes/youtubeRoutes.js";
-import uploadUrlRoute from "../src/routes/posts/uploadUrl.js";
+import uploadUrlRoute from "./routes/posts/uploadUrl.js";
 
 
 
