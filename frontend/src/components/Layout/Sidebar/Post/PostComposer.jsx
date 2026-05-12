@@ -301,27 +301,20 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
   const fileInputRef = useRef(null);
 
   const [activeTab, setActiveTab] = useState("compose");
-
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-
   const [category, setCategory] = useState(config.defaultCategory);
   const [scope, setScope] = useState(config.defaultScope);
-
   const [customTagInput, setCustomTagInput] = useState("");
-
   const [shareToSocial, setShareToSocial] = useState(false);
   const [shareToGlobal, setShareToGlobal] = useState(false);
-
   const [files, setFiles] = useState([]);
   const [preview, setPreview] = useState(null);
   const [metadataModal, setMetadataModal] = useState(null);
   const [loadedMediaIds, setLoadedMediaIds] = useState({});
   const [dragActive, setDragActive] = useState(false);
-
   const [isAd, setIsAd] = useState(false);
   const [selectedSlots, setSelectedSlots] = useState([]);
-
   const [submitting, setSubmitting] = useState(false);
   const [uploadProgress, setUploadProgress] = useState("");
   const [error, setError] = useState("");
@@ -503,7 +496,6 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
     setMetadataModal(null);
     setLoadedMediaIds({});
     setDragActive(false);
-
     setIsAd(false);
     setSelectedSlots([]);
     setUploadProgress("");
@@ -513,24 +505,18 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
   const buildPayload = (uploadedMedia = []) => ({
     mode,
     type: mode,
-
     title: sanitizeText(title),
     content: sanitizeText(content),
-
     category: sanitizeText(category),
     scope: shareToGlobal ? "Global" : sanitizeText(scope),
     tags: finalTags.map(sanitizeText).filter(Boolean),
-
     shareToSocial,
     shareToGlobal,
-
     media: uploadedMedia,
-
     status: config.status,
     requiresReview: config.requiresReview,
     submittedAt: Date.now(),
     expiresAt: getExpiryTimestamp(config.expiresInHours),
-
     ad:
       canPromote && isAd
         ? {
@@ -674,519 +660,523 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
 
   return (
     <div className="post-composer-page">
-      <div
-        className={`composer panel ${config.theme} ${
-          dragActive ? "drag-active" : ""
-        }`}
-        onDrop={handleDrop}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-      >
-        <div className="panel-header">
-          <div className="composer-tab-row">
-            <button
-              type="button"
-              className={`composer-tab ${
-                activeTab === "compose" ? "active" : ""
-              }`}
-              onClick={() => setActiveTab("compose")}
-              disabled={submitting}
-            >
-              {config.label}
-            </button>
+      <div className="composer-column">
+        <div
+          className={`composer panel ${config.theme} ${
+            dragActive ? "drag-active" : ""
+          }`}
+          onDrop={handleDrop}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+        >
+          <div className="panel-header">
+            <div className="composer-tab-row">
+              <button
+                type="button"
+                className={`composer-tab ${
+                  activeTab === "compose" ? "active" : ""
+                }`}
+                onClick={() => setActiveTab("compose")}
+                disabled={submitting}
+              >
+                {config.label}
+              </button>
 
-            {showDetails && (
-              <>
-                <span className="composer-tab-divider">|</span>
-
-                <button
-                  type="button"
-                  className={`composer-tab ${
-                    activeTab === "options" ? "active" : ""
-                  }`}
-                  onClick={() => setActiveTab("options")}
-                  disabled={submitting}
-                >
-                  Set Options
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-
-        <div className="panel-body">
-          {activeTab === "compose" && (
-            <>
-              <input
-                className="body"
-                placeholder={config.titlePlaceholder}
-                value={title}
-                onChange={(event) => setTitle(event.target.value)}
-              />
-
-              <textarea
-                className={`body ${mode === "now" ? "now-text" : "blob-text"}`}
-                placeholder={config.bodyPlaceholder}
-                value={content}
-                onChange={(event) => setContent(event.target.value)}
-              />
-
-              {mode === "news" && (
-                <div className="meta">
-                  News posts are submitted for review before they appear in iVIEW.
-                </div>
-              )}
-
-              {mode === "beacon" && (
-                <div className="meta">
-                  Beacon posts are time-sensitive alerts and expire automatically.
-                </div>
-              )}
-
-              {files.length === 0 && (
-                <button
-                  type="button"
-                  className={`upload-drop-zone ${dragActive ? "active" : ""}`}
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={submitting}
-                >
-                  <span className="upload-icon">⬆</span>
-
-                  <span className="upload-title">
-                    {dragActive
-                      ? "Drop files here"
-                      : "Upload media or drag files here"}
-                  </span>
-
-                  <span className="upload-help">
-                    Max 300 MB for video/audio. One video, one audio and one
-                    document per post. Allowed: PNG, JPEG, PDF, Word, TXT and
-                    standard document files.
-                  </span>
-                </button>
-              )}
-
-              {files.length > 0 && (
-                <div className="upload-complete-note">
-                  Media added. Use the right panel to preview, inspect or delete
-                  files.
-                </div>
-              )}
-
-              <input
-                type="file"
-                hidden
-                multiple
-                ref={fileInputRef}
-                onChange={(event) => {
-                  handleFiles(Array.from(event.target.files || []));
-                  event.target.value = "";
-                }}
-              />
-
-              {canPromote && (
+              {showDetails && (
                 <>
-                  <label className="label">
-                    <input
-                      type="checkbox"
-                      checked={isAd}
-                      onChange={() => setIsAd((prev) => !prev)}
-                      disabled={submitting}
-                    />
-                    Promote
-                  </label>
+                  <span className="composer-tab-divider">|</span>
 
-                  {isAd && (
-                    <div className="slots">
-                      {[...Array(24)].map((_, hour) => (
-                        <button
-                          key={hour}
-                          type="button"
-                          className={`btn ${
-                            selectedSlots.includes(hour)
-                              ? "btn-primary"
-                              : "btn-secondary"
-                          }`}
-                          onClick={() => {
-                            setSelectedSlots((prev) =>
-                              prev.includes(hour)
-                                ? prev.filter((item) => item !== hour)
-                                : [...prev, hour]
-                            );
-                          }}
-                          disabled={submitting}
-                        >
-                          {hour}:00
-                        </button>
-                      ))}
-                    </div>
-                  )}
+                  <button
+                    type="button"
+                    className={`composer-tab ${
+                      activeTab === "options" ? "active" : ""
+                    }`}
+                    onClick={() => setActiveTab("options")}
+                    disabled={submitting}
+                  >
+                    Set Options
+                  </button>
                 </>
               )}
-
-              {uploadProgress && <div className="meta">{uploadProgress}</div>}
-              {error && <div className="error">{error}</div>}
-            </>
-          )}
-
-          {activeTab === "options" && (
-            <div className="composer-options-pane">
-              <div className="composer-options-grid">
-                <label className="composer-field">
-                  <span className="meta">Category</span>
-
-                  <select
-                    className="body"
-                    value={category}
-                    onChange={(event) => setCategory(event.target.value)}
-                  >
-                    {categoryOptions.map((item) => (
-                      <option key={item}>{item}</option>
-                    ))}
-                  </select>
-                </label>
-
-                <label className="composer-field">
-                  <span className="meta">Scope</span>
-
-                  <select
-                    className="body"
-                    value={scope}
-                    onChange={(event) => setScope(event.target.value)}
-                    disabled={shareToGlobal}
-                  >
-                    {SCOPES.map((item) => (
-                      <option key={item}>{item}</option>
-                    ))}
-                  </select>
-                </label>
-              </div>
-
-              <div className="meta">Tags</div>
-
-              <input
-                className="body"
-                placeholder="Add hashtags, e.g. #traffic #storm #food"
-                value={customTagInput}
-                onChange={(event) => setCustomTagInput(event.target.value)}
-              />
-
-              <div className="tag-list">
-                {finalTags.map((tag) => (
-                  <span key={tag} className="label">
-                    #{tag}
-                  </span>
-                ))}
-              </div>
-
-              {config.showNowOptions && (
-                <div className="share-options">
-                  <label className="label">
-                    <input
-                      type="checkbox"
-                      checked={shareToSocial}
-                      onChange={(event) =>
-                        setShareToSocial(event.target.checked)
-                      }
-                      disabled={submitting}
-                    />
-                    Share to social
-                  </label>
-
-                  <label className="label">
-                    <input
-                      type="checkbox"
-                      checked={shareToGlobal}
-                      onChange={(event) =>
-                        setShareToGlobal(event.target.checked)
-                      }
-                      disabled={submitting}
-                    />
-                    Share to global
-                  </label>
-                </div>
-              )}
             </div>
-          )}
-        </div>
+          </div>
 
-        {activeTab === "compose" && (
-          <div className="panel-footer">
-            {onCancel && (
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={onCancel}
-                disabled={submitting}
-              >
-                Cancel
-              </button>
+          <div className="panel-body">
+            {activeTab === "compose" && (
+              <>
+                <input
+                  className="body"
+                  placeholder={config.titlePlaceholder}
+                  value={title}
+                  onChange={(event) => setTitle(event.target.value)}
+                />
+
+                <textarea
+                  className={`body ${mode === "now" ? "now-text" : "blob-text"}`}
+                  placeholder={config.bodyPlaceholder}
+                  value={content}
+                  onChange={(event) => setContent(event.target.value)}
+                />
+
+                {mode === "news" && (
+                  <div className="meta">
+                    News posts are submitted for review before they appear in iVIEW.
+                  </div>
+                )}
+
+                {mode === "beacon" && (
+                  <div className="meta">
+                    Beacon posts are time-sensitive alerts and expire automatically.
+                  </div>
+                )}
+
+                {files.length === 0 && (
+                  <button
+                    type="button"
+                    className={`upload-drop-zone ${dragActive ? "active" : ""}`}
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={submitting}
+                  >
+                    <span className="upload-icon">⬆</span>
+
+                    <span className="upload-title">
+                      {dragActive
+                        ? "Drop files here"
+                        : "Upload media or drag files here"}
+                    </span>
+
+                    <span className="upload-help">
+                      Max 300 MB for video/audio. One video, one audio and one
+                      document per post. Allowed: PNG, JPEG, PDF, Word, TXT and
+                      standard document files.
+                    </span>
+                  </button>
+                )}
+
+                {files.length > 0 && (
+                  <div className="upload-complete-note">
+                    Media added. Use the right panel to preview, inspect or delete
+                    files.
+                  </div>
+                )}
+
+                <input
+                  type="file"
+                  hidden
+                  multiple
+                  ref={fileInputRef}
+                  onChange={(event) => {
+                    handleFiles(Array.from(event.target.files || []));
+                    event.target.value = "";
+                  }}
+                />
+
+                {canPromote && (
+                  <>
+                    <label className="label">
+                      <input
+                        type="checkbox"
+                        checked={isAd}
+                        onChange={() => setIsAd((prev) => !prev)}
+                        disabled={submitting}
+                      />
+                      Promote
+                    </label>
+
+                    {isAd && (
+                      <div className="slots">
+                        {[...Array(24)].map((_, hour) => (
+                          <button
+                            key={hour}
+                            type="button"
+                            className={`btn ${
+                              selectedSlots.includes(hour)
+                                ? "btn-primary"
+                                : "btn-secondary"
+                            }`}
+                            onClick={() => {
+                              setSelectedSlots((prev) =>
+                                prev.includes(hour)
+                                  ? prev.filter((item) => item !== hour)
+                                  : [...prev, hour]
+                              );
+                            }}
+                            disabled={submitting}
+                          >
+                            {hour}:00
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {uploadProgress && <div className="meta">{uploadProgress}</div>}
+                {error && <div className="error">{error}</div>}
+              </>
             )}
 
-            <div className="composer-action-icons">
-              <button
-                type="button"
-                className="composer-icon-action"
-                onClick={resetForm}
-                disabled={submitting}
-                title="Reset"
-                aria-label="Reset form"
-              >
-                ↺
-                <span>Reset</span>
-              </button>
+            {activeTab === "options" && (
+              <div className="composer-options-pane">
+                <div className="composer-options-grid">
+                  <label className="composer-field">
+                    <span className="meta">Category</span>
 
-              <button
-                type="button"
-                className="composer-icon-action"
-                onClick={clearComposerText}
-                disabled={submitting}
-                title="Clear"
-                aria-label="Clear text"
-              >
-                ⌫
-                <span>Clear</span>
-              </button>
+                    <select
+                      className="body"
+                      value={category}
+                      onChange={(event) => setCategory(event.target.value)}
+                    >
+                      {categoryOptions.map((item) => (
+                        <option key={item}>{item}</option>
+                      ))}
+                    </select>
+                  </label>
 
-              <button
-                type="button"
-                className="composer-icon-action primary"
-                onClick={handleSubmit}
-                disabled={submitting}
-                title="Submit"
-                aria-label="Submit post"
-              >
-                ➤
-                <span>{submitting ? "Submitting..." : "Submit"}</span>
-              </button>
-            </div>
-          </div>
-        )}
+                  <label className="composer-field">
+                    <span className="meta">Scope</span>
 
-        {preview && (
-          <div className="modal" onClick={() => setPreview(null)}>
-            <div
-              className="media-preview-modal"
-              onClick={(event) => event.stopPropagation()}
-            >
-              {preview.kind === "image" && (
-                <img src={preview.url} alt={preview.metadata.name} />
-              )}
-
-              {preview.kind === "video" && (
-                <video src={preview.url} controls autoPlay />
-              )}
-
-              {preview.kind === "audio" && <audio src={preview.url} controls />}
-
-              {preview.kind === "document" && (
-                <div className="file-preview-box">
-                  <strong>{preview.metadata.name}</strong>
-                  <span>{preview.metadata.sizeLabel}</span>
-                </div>
-              )}
-
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={() => setPreview(null)}
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        )}
-
-        {metadataModal && (
-          <div className="modal" onClick={() => setMetadataModal(null)}>
-            <div
-              className="metadata-modal"
-              onClick={(event) => event.stopPropagation()}
-            >
-              <h3>File metadata</h3>
-
-              <div className="metadata-modal-grid">
-                <div>
-                  <span>File name</span>
-                  <strong>{metadataModal.metadata.name}</strong>
+                    <select
+                      className="body"
+                      value={scope}
+                      onChange={(event) => setScope(event.target.value)}
+                      disabled={shareToGlobal}
+                    >
+                      {SCOPES.map((item) => (
+                        <option key={item}>{item}</option>
+                      ))}
+                    </select>
+                  </label>
                 </div>
 
-                <div>
-                  <span>Original file name</span>
-                  <strong>{metadataModal.metadata.originalName}</strong>
+                <div className="meta">Tags</div>
+
+                <input
+                  className="body"
+                  placeholder="Add hashtags, e.g. #traffic #storm #food"
+                  value={customTagInput}
+                  onChange={(event) => setCustomTagInput(event.target.value)}
+                />
+
+                <div className="tag-list">
+                  {finalTags.map((tag) => (
+                    <span key={tag} className="label">
+                      #{tag}
+                    </span>
+                  ))}
                 </div>
 
-                <div>
-                  <span>Created</span>
-                  <strong>{metadataModal.metadata.createdAtLabel}</strong>
-                </div>
+                {config.showNowOptions && (
+                  <div className="share-options">
+                    <label className="label">
+                      <input
+                        type="checkbox"
+                        checked={shareToSocial}
+                        onChange={(event) =>
+                          setShareToSocial(event.target.checked)
+                        }
+                        disabled={submitting}
+                      />
+                      Share to social
+                    </label>
 
-                <div>
-                  <span>File size</span>
-                  <strong>{metadataModal.metadata.sizeLabel}</strong>
-                </div>
-
-                <div>
-                  <span>Timestamp</span>
-                  <strong>{metadataModal.metadata.lastModifiedLabel}</strong>
-                </div>
-
-                <div>
-                  <span>Type</span>
-                  <strong>{metadataModal.metadata.type}</strong>
-                </div>
+                    <label className="label">
+                      <input
+                        type="checkbox"
+                        checked={shareToGlobal}
+                        onChange={(event) =>
+                          setShareToGlobal(event.target.checked)
+                        }
+                        disabled={submitting}
+                      />
+                      Share to global
+                    </label>
+                  </div>
+                )}
               </div>
-
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={() => setMetadataModal(null)}
-              >
-                Close
-              </button>
-            </div>
+            )}
           </div>
-        )}
+
+          {activeTab === "compose" && (
+            <div className="panel-footer">
+              {onCancel && (
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={onCancel}
+                  disabled={submitting}
+                >
+                  Cancel
+                </button>
+              )}
+
+              <div className="composer-action-icons">
+                <button
+                  type="button"
+                  className="composer-icon-action"
+                  onClick={resetForm}
+                  disabled={submitting}
+                  title="Reset"
+                  aria-label="Reset form"
+                >
+                  ↺
+                  <span>Reset</span>
+                </button>
+
+                <button
+                  type="button"
+                  className="composer-icon-action"
+                  onClick={clearComposerText}
+                  disabled={submitting}
+                  title="Clear"
+                  aria-label="Clear text"
+                >
+                  ⌫
+                  <span>Clear</span>
+                </button>
+
+                <button
+                  type="button"
+                  className="composer-icon-action primary"
+                  onClick={handleSubmit}
+                  disabled={submitting}
+                  title="Submit"
+                  aria-label="Submit post"
+                >
+                  ➤
+                  <span>{submitting ? "Submitting..." : "Submit"}</span>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {preview && (
+            <div className="modal" onClick={() => setPreview(null)}>
+              <div
+                className="media-preview-modal"
+                onClick={(event) => event.stopPropagation()}
+              >
+                {preview.kind === "image" && (
+                  <img src={preview.url} alt={preview.metadata.name} />
+                )}
+
+                {preview.kind === "video" && (
+                  <video src={preview.url} controls autoPlay />
+                )}
+
+                {preview.kind === "audio" && <audio src={preview.url} controls />}
+
+                {preview.kind === "document" && (
+                  <div className="file-preview-box">
+                    <strong>{preview.metadata.name}</strong>
+                    <span>{preview.metadata.sizeLabel}</span>
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setPreview(null)}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          )}
+
+          {metadataModal && (
+            <div className="modal" onClick={() => setMetadataModal(null)}>
+              <div
+                className="metadata-modal"
+                onClick={(event) => event.stopPropagation()}
+              >
+                <h3>File metadata</h3>
+
+                <div className="metadata-modal-grid">
+                  <div>
+                    <span>File name</span>
+                    <strong>{metadataModal.metadata.name}</strong>
+                  </div>
+
+                  <div>
+                    <span>Original file name</span>
+                    <strong>{metadataModal.metadata.originalName}</strong>
+                  </div>
+
+                  <div>
+                    <span>Created</span>
+                    <strong>{metadataModal.metadata.createdAtLabel}</strong>
+                  </div>
+
+                  <div>
+                    <span>File size</span>
+                    <strong>{metadataModal.metadata.sizeLabel}</strong>
+                  </div>
+
+                  <div>
+                    <span>Timestamp</span>
+                    <strong>{metadataModal.metadata.lastModifiedLabel}</strong>
+                  </div>
+
+                  <div>
+                    <span>Type</span>
+                    <strong>{metadataModal.metadata.type}</strong>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setMetadataModal(null)}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
-      <aside className="composer-guide-panel panel">
-        <h2>Media</h2>
+      <div className="guide-column">
+        <aside className="composer-guide-panel panel">
+          <h2>Media</h2>
 
-        {!files.length && (
-          <p>
-            Uploaded files will appear here as thumbnails. Drag media onto the
-            composer or use the upload button.
-          </p>
-        )}
+          {!files.length && (
+            <p>
+              Uploaded files will appear here as thumbnails. Drag media onto the
+              composer or use the upload button.
+            </p>
+          )}
 
-        {!!files.length && (
-          <div className="media-thumb-list">
-            {files.map((item) => (
-              <div key={item.id} className="media-thumb-card">
-                <div className="media-thumb-row">
-                  <div className="media-thumb-preview">
-                    {(item.kind === "image" || item.kind === "video") &&
-                      !isMediaLoaded(item.id) && (
-                        <div className="media-loading">Loading...</div>
+          {!!files.length && (
+            <div className="media-thumb-list">
+              {files.map((item) => (
+                <div key={item.id} className="media-thumb-card">
+                  <div className="media-thumb-row">
+                    <div className="media-thumb-preview">
+                      {(item.kind === "image" || item.kind === "video") &&
+                        !isMediaLoaded(item.id) && (
+                          <div className="media-loading">Loading...</div>
+                        )}
+
+                      {item.kind === "image" && (
+                        <img
+                          src={item.url}
+                          alt={item.metadata.name}
+                          onLoad={() => markMediaLoaded(item.id)}
+                          className={
+                            isMediaLoaded(item.id) ? "loaded" : "loading"
+                          }
+                        />
                       )}
 
-                    {item.kind === "image" && (
-                      <img
-                        src={item.url}
-                        alt={item.metadata.name}
-                        onLoad={() => markMediaLoaded(item.id)}
-                        className={
-                          isMediaLoaded(item.id) ? "loaded" : "loading"
-                        }
-                      />
-                    )}
+                      {item.kind === "video" && (
+                        <video
+                          src={item.url}
+                          muted
+                          playsInline
+                          onLoadedData={() => markMediaLoaded(item.id)}
+                          className={
+                            isMediaLoaded(item.id) ? "loaded" : "loading"
+                          }
+                        />
+                      )}
 
-                    {item.kind === "video" && (
-                      <video
-                        src={item.url}
-                        muted
-                        playsInline
-                        onLoadedData={() => markMediaLoaded(item.id)}
-                        className={
-                          isMediaLoaded(item.id) ? "loaded" : "loading"
-                        }
-                      />
-                    )}
+                      {item.kind === "audio" && (
+                        <div className="media-file-icon">♪</div>
+                      )}
 
-                    {item.kind === "audio" && (
-                      <div className="media-file-icon">♪</div>
-                    )}
+                      {item.kind === "document" && (
+                        <div className="media-file-icon">📄</div>
+                      )}
+                    </div>
 
-                    {item.kind === "document" && (
-                      <div className="media-file-icon">📄</div>
-                    )}
-                  </div>
+                    <div className="media-thumb-info">
+                      <strong title={item.metadata.name}>
+                        {item.metadata.name}
+                      </strong>
+                      <span>{item.metadata.sizeLabel}</span>
+                    </div>
 
-                  <div className="media-thumb-info">
-                    <strong title={item.metadata.name}>
-                      {item.metadata.name}
-                    </strong>
-                    <span>{item.metadata.sizeLabel}</span>
-                  </div>
+                    <div className="media-thumb-actions">
+                      <button
+                        type="button"
+                        title="Preview"
+                        aria-label={`Preview ${item.metadata.name}`}
+                        onClick={() => setPreview(item)}
+                      >
+                        👁
+                      </button>
 
-                  <div className="media-thumb-actions">
-                    <button
-                      type="button"
-                      title="Preview"
-                      aria-label={`Preview ${item.metadata.name}`}
-                      onClick={() => setPreview(item)}
-                    >
-                      👁
-                    </button>
+                      <button
+                        type="button"
+                        title="Metadata"
+                        aria-label={`Show metadata for ${item.metadata.name}`}
+                        onClick={() => setMetadataModal(item)}
+                      >
+                        ⓘ
+                      </button>
 
-                    <button
-                      type="button"
-                      title="Metadata"
-                      aria-label={`Show metadata for ${item.metadata.name}`}
-                      onClick={() => setMetadataModal(item)}
-                    >
-                      ⓘ
-                    </button>
-
-                    <button
-                      type="button"
-                      title="Delete"
-                      aria-label={`Delete ${item.metadata.name}`}
-                      onClick={() => removeFile(item.id)}
-                      disabled={submitting}
-                    >
-                      ×
-                    </button>
+                      <button
+                        type="button"
+                        title="Delete"
+                        aria-label={`Delete ${item.metadata.name}`}
+                        onClick={() => removeFile(item.id)}
+                        disabled={submitting}
+                      >
+                        ×
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+          )}
+
+          <div className="guide-divider" />
+
+          <h2>{config.label} Guide</h2>
+
+          {mode === "now" && (
+            <p>
+              NOW posts are short, immediate updates for what is happening around
+              the user right now. They expire automatically after 24 hours.
+            </p>
+          )}
+
+          {mode === "news" && (
+            <p>
+              News posts should be factual, clear, and suitable for review before
+              publication.
+            </p>
+          )}
+
+          {mode === "blob" && (
+            <p>
+              BLOB posts are longer-form commentary, stories, opinions, and
+              community reflections.
+            </p>
+          )}
+
+          {mode === "event" && (
+            <p>
+              Event posts should include what is happening, where, when, and who
+              should attend.
+            </p>
+          )}
+
+          {mode === "beacon" && (
+            <p>
+              Beacon posts are urgent alerts. Keep them short, accurate, and
+              time-sensitive.
+            </p>
+          )}
+
+          <div className="meta">
+            Media uploads are sent to S3 using backend-generated signed URLs.
           </div>
-        )}
-
-        <div className="guide-divider" />
-
-        <h2>{config.label} Guide</h2>
-
-        {mode === "now" && (
-          <p>
-            NOW posts are short, immediate updates for what is happening around
-            the user right now. They expire automatically after 24 hours.
-          </p>
-        )}
-
-        {mode === "news" && (
-          <p>
-            News posts should be factual, clear, and suitable for review before
-            publication.
-          </p>
-        )}
-
-        {mode === "blob" && (
-          <p>
-            BLOB posts are longer-form commentary, stories, opinions, and
-            community reflections.
-          </p>
-        )}
-
-        {mode === "event" && (
-          <p>
-            Event posts should include what is happening, where, when, and who
-            should attend.
-          </p>
-        )}
-
-        {mode === "beacon" && (
-          <p>
-            Beacon posts are urgent alerts. Keep them short, accurate, and
-            time-sensitive.
-          </p>
-        )}
-
-        <div className="meta">
-          Media uploads are sent to S3 using backend-generated signed URLs.
-        </div>
-      </aside>
+        </aside>
+      </div>
     </div>
   );
 }

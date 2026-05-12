@@ -2,16 +2,38 @@
   width: 100%;
   min-height: calc(100vh - 140px);
 
-  padding: 48px 30px 110px;
+  padding: 40px 30px 80px;
 
   display: grid;
   grid-template-columns: minmax(0, 1fr) 420px;
   gap: 40px;
 
-  align-items: center;
+  align-content: center;
+  align-items: stretch;
 
   background: #f7f4ef;
+
   box-sizing: border-box;
+}
+
+/* =========================================
+   GRID WRAPPERS
+========================================= */
+
+.composer-column,
+.guide-column {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+}
+
+.composer-column {
+  justify-content: center;
+}
+
+.guide-column {
+  justify-content: center;
 }
 
 /* =========================================
@@ -20,6 +42,8 @@
 
 .composer.panel,
 .composer-guide-panel.panel {
+  width: 100%;
+
   background: #ffffff;
   border: 1px solid #e3d9cf;
   border-radius: 28px;
@@ -40,8 +64,6 @@
   gap: 24px;
 
   min-width: 0;
-
-  align-self: center;
 }
 
 .composer-guide-panel.panel {
@@ -50,8 +72,6 @@
   display: flex;
   flex-direction: column;
   gap: 22px;
-
-  align-self: center;
 }
 
 /* =========================================
@@ -851,13 +871,13 @@ textarea.body {
 @media (max-width: 1100px) {
   .post-composer-page {
     grid-template-columns: 1fr;
-
-    align-items: start;
+    align-content: start;
+    align-items: stretch;
   }
 
-  .composer.panel,
-  .composer-guide-panel.panel {
-    align-self: start;
+  .composer-column,
+  .guide-column {
+    align-items: stretch;
   }
 }
 
