@@ -10,15 +10,6 @@ const API_BASE =
 
 const NOW_CATEGORIES = ["Information", "Incident", "Alert", "Event", "Beacon"];
 
-const TAG_OPTIONS = [
-  "General",
-  "News",
-  "Opinion",
-  "Events",
-  "Business",
-  "Food & Drink",
-];
-
 const CATEGORIES = [
   "News",
   "Opinion",
@@ -217,7 +208,6 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
   const [category, setCategory] = useState(config.defaultCategory);
   const [scope, setScope] = useState(config.defaultScope);
 
-  const [selectedTags, setSelectedTags] = useState(config.defaultTags);
   const [customTagInput, setCustomTagInput] = useState("");
 
   const [shareToSocial, setShareToSocial] = useState(false);
@@ -236,26 +226,25 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
   const canPromote = config.allowPromotion;
   const showDetails = config.showDetails;
 
-  const finalTags = useMemo(
-    () => uniqueTags([...selectedTags, ...parseCustomTags(customTagInput)]),
-    [selectedTags, customTagInput]
-  );
+  const finalTags = useMemo(() => {
+    const customTags = parseCustomTags(customTagInput);
+
+    if (!customTags.length) {
+      return config.defaultTags || ["General"];
+    }
+
+    return uniqueTags(customTags);
+  }, [customTagInput, config.defaultTags]);
 
   const categoryOptions = useMemo(
     () => (mode === "now" ? NOW_CATEGORIES : CATEGORIES),
     [mode]
   );
 
-  const pageTitle = useMemo(
-    () => `${config.icon} ${config.label}`,
-    [config.icon, config.label]
-  );
-
   useEffect(() => {
     setActiveTab("compose");
     setCategory(config.defaultCategory);
     setScope(config.defaultScope);
-    setSelectedTags(config.defaultTags || ["General"]);
     setCustomTagInput("");
     setShareToSocial(false);
     setShareToGlobal(false);
@@ -272,23 +261,6 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
       });
     };
   }, [files]);
-
-  const togglePresetTag = (tag) => {
-    setSelectedTags((prev) => {
-      const exists = prev.includes(tag);
-
-      if (exists) {
-        const next = prev.filter((item) => item !== tag);
-        return next.length ? next : ["General"];
-      }
-
-      if (tag === "General") {
-        return ["General"];
-      }
-
-      return uniqueTags([...prev.filter((item) => item !== "General"), tag]);
-    });
-  };
 
   const handleFiles = (incomingFiles = []) => {
     const combined = [...files.map((item) => item.file), ...incomingFiles];
@@ -338,7 +310,6 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
     setContent("");
     setCategory(config.defaultCategory);
     setScope(config.defaultScope);
-    setSelectedTags(config.defaultTags || ["General"]);
     setCustomTagInput("");
     setShareToSocial(false);
     setShareToGlobal(false);
@@ -505,22 +476,30 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
           <div className="composer-tab-row">
             <button
               type="button"
-              className={`composer-tab ${activeTab === "compose" ? "active" : ""}`}
+              className={`composer-tab ${
+                activeTab === "compose" ? "active" : ""
+              }`}
               onClick={() => setActiveTab("compose")}
               disabled={submitting}
             >
-              {pageTitle}
+              {config.label}
             </button>
 
             {showDetails && (
-              <button
-                type="button"
-                className={`composer-tab ${activeTab === "options" ? "active" : ""}`}
-                onClick={() => setActiveTab("options")}
-                disabled={submitting}
-              >
-                Set Options
-              </button>
+              <>
+                <span className="composer-tab-divider">|</span>
+
+                <button
+                  type="button"
+                  className={`composer-tab ${
+                    activeTab === "options" ? "active" : ""
+                  }`}
+                  onClick={() => setActiveTab("options")}
+                  disabled={submitting}
+                >
+                  Set Options
+                </button>
+              </>
             )}
           </div>
         </div>
@@ -648,8 +627,6 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
 
           {activeTab === "options" && (
             <div className="composer-options-pane">
-              <h3>Options</h3>
-
               <div className="composer-options-grid">
                 <label className="composer-field">
                   <span className="meta">Category</span>
@@ -683,25 +660,9 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
 
               <div className="meta">Tags</div>
 
-              <div className="tag-pill-row">
-                {TAG_OPTIONS.map((tag) => (
-                  <button
-                    key={tag}
-                    type="button"
-                    className={`tag-pill ${
-                      selectedTags.includes(tag) ? "active" : ""
-                    }`}
-                    onClick={() => togglePresetTag(tag)}
-                    disabled={submitting}
-                  >
-                    {tag}
-                  </button>
-                ))}
-              </div>
-
               <input
                 className="body"
-                placeholder="Add custom hashtags, e.g. #traffic #storm"
+                placeholder="Add hashtags, e.g. #traffic #storm #food"
                 value={customTagInput}
                 onChange={(event) => setCustomTagInput(event.target.value)}
               />
@@ -741,15 +702,6 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
                   </label>
                 </div>
               )}
-
-              <button
-                type="button"
-                className="btn btn-secondary btn-block"
-                onClick={() => setActiveTab("compose")}
-                disabled={submitting}
-              >
-                Back to {config.label}
-              </button>
             </div>
           )}
         </div>
