@@ -229,7 +229,10 @@ function validateIncomingFile(file, existingItems = []) {
     return `${file.name} is not an allowed file type.`;
   }
 
-  if ((kind === "video" || kind === "audio") && file.size > MAX_VIDEO_AUDIO_SIZE) {
+  if (
+    (kind === "video" || kind === "audio") &&
+    file.size > MAX_VIDEO_AUDIO_SIZE
+  ) {
     return `${file.name} exceeds the 300 MB limit for video/audio.`;
   }
 
@@ -241,7 +244,10 @@ function validateIncomingFile(file, existingItems = []) {
     return "Only one audio file is allowed per post.";
   }
 
-  if (kind === "document" && existingItems.some((item) => item.kind === "document")) {
+  if (
+    kind === "document" &&
+    existingItems.some((item) => item.kind === "document")
+  ) {
     return "Only one document file is allowed per post.";
   }
 
@@ -321,6 +327,7 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
 
   const canPromote = config.allowPromotion;
   const showDetails = config.showDetails;
+  const hasFiles = files.length > 0;
 
   const finalTags = useMemo(() => {
     const customTags = parseCustomTags(customTagInput);
@@ -949,91 +956,6 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
               </div>
             </div>
           )}
-
-          {preview && (
-            <div className="modal" onClick={() => setPreview(null)}>
-              <div
-                className="media-preview-modal"
-                onClick={(event) => event.stopPropagation()}
-              >
-                {preview.kind === "image" && (
-                  <img src={preview.url} alt={preview.metadata.name} />
-                )}
-
-                {preview.kind === "video" && (
-                  <video src={preview.url} controls autoPlay />
-                )}
-
-                {preview.kind === "audio" && <audio src={preview.url} controls />}
-
-                {preview.kind === "document" && (
-                  <div className="file-preview-box">
-                    <strong>{preview.metadata.name}</strong>
-                    <span>{preview.metadata.sizeLabel}</span>
-                  </div>
-                )}
-
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={() => setPreview(null)}
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          )}
-
-          {metadataModal && (
-            <div className="modal" onClick={() => setMetadataModal(null)}>
-              <div
-                className="metadata-modal"
-                onClick={(event) => event.stopPropagation()}
-              >
-                <h3>File metadata</h3>
-
-                <div className="metadata-modal-grid">
-                  <div>
-                    <span>File name</span>
-                    <strong>{metadataModal.metadata.name}</strong>
-                  </div>
-
-                  <div>
-                    <span>Original file name</span>
-                    <strong>{metadataModal.metadata.originalName}</strong>
-                  </div>
-
-                  <div>
-                    <span>Created</span>
-                    <strong>{metadataModal.metadata.createdAtLabel}</strong>
-                  </div>
-
-                  <div>
-                    <span>File size</span>
-                    <strong>{metadataModal.metadata.sizeLabel}</strong>
-                  </div>
-
-                  <div>
-                    <span>Timestamp</span>
-                    <strong>{metadataModal.metadata.lastModifiedLabel}</strong>
-                  </div>
-
-                  <div>
-                    <span>Type</span>
-                    <strong>{metadataModal.metadata.type}</strong>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={() => setMetadataModal(null)}
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          )}
         </div>
       </div>
 
@@ -1041,14 +963,14 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
         <aside className="composer-guide-panel panel">
           <h2>Media</h2>
 
-          {!files.length && (
+          {!hasFiles && (
             <p>
               Uploaded files will appear here as thumbnails. Drag media onto the
               composer or use the upload button.
             </p>
           )}
 
-          {!!files.length && (
+          {hasFiles && (
             <div className="media-thumb-list">
               {files.map((item) => (
                 <div key={item.id} className="media-thumb-card">
@@ -1133,50 +1055,140 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
             </div>
           )}
 
-          <div className="guide-divider" />
+          {!hasFiles && (
+            <>
+              <div className="guide-divider" />
 
-          <h2>{config.label} Guide</h2>
+              <h2>{config.label} Guide</h2>
 
-          {mode === "now" && (
-            <p>
-              NOW posts are short, immediate updates for what is happening around
-              the user right now. They expire automatically after 24 hours.
-            </p>
+              {mode === "now" && (
+                <p>
+                  NOW posts are short, immediate updates for what is happening
+                  around the user right now. They expire automatically after 24
+                  hours.
+                </p>
+              )}
+
+              {mode === "news" && (
+                <p>
+                  News posts should be factual, clear, and suitable for review
+                  before publication.
+                </p>
+              )}
+
+              {mode === "blob" && (
+                <p>
+                  BLOB posts are longer-form commentary, stories, opinions, and
+                  community reflections.
+                </p>
+              )}
+
+              {mode === "event" && (
+                <p>
+                  Event posts should include what is happening, where, when, and
+                  who should attend.
+                </p>
+              )}
+
+              {mode === "beacon" && (
+                <p>
+                  Beacon posts are urgent alerts. Keep them short, accurate, and
+                  time-sensitive.
+                </p>
+              )}
+
+              <div className="meta">
+                Media uploads are sent to S3 using backend-generated signed URLs.
+              </div>
+            </>
           )}
-
-          {mode === "news" && (
-            <p>
-              News posts should be factual, clear, and suitable for review before
-              publication.
-            </p>
-          )}
-
-          {mode === "blob" && (
-            <p>
-              BLOB posts are longer-form commentary, stories, opinions, and
-              community reflections.
-            </p>
-          )}
-
-          {mode === "event" && (
-            <p>
-              Event posts should include what is happening, where, when, and who
-              should attend.
-            </p>
-          )}
-
-          {mode === "beacon" && (
-            <p>
-              Beacon posts are urgent alerts. Keep them short, accurate, and
-              time-sensitive.
-            </p>
-          )}
-
-          <div className="meta">
-            Media uploads are sent to S3 using backend-generated signed URLs.
-          </div>
         </aside>
       </div>
+
+      {preview && (
+        <div className="modal" onClick={() => setPreview(null)}>
+          <div
+            className="media-preview-modal"
+            onClick={(event) => event.stopPropagation()}
+          >
+            {preview.kind === "image" && (
+              <img src={preview.url} alt={preview.metadata.name} />
+            )}
+
+            {preview.kind === "video" && (
+              <video src={preview.url} controls autoPlay />
+            )}
+
+            {preview.kind === "audio" && <audio src={preview.url} controls />}
+
+            {preview.kind === "document" && (
+              <div className="file-preview-box">
+                <strong>{preview.metadata.name}</strong>
+                <span>{preview.metadata.sizeLabel}</span>
+              </div>
+            )}
+
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => setPreview(null)}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {metadataModal && (
+        <div className="modal" onClick={() => setMetadataModal(null)}>
+          <div
+            className="metadata-modal"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <h3>File metadata</h3>
+
+            <div className="metadata-modal-grid">
+              <div>
+                <span>File name</span>
+                <strong>{metadataModal.metadata.name}</strong>
+              </div>
+
+              <div>
+                <span>Original file name</span>
+                <strong>{metadataModal.metadata.originalName}</strong>
+              </div>
+
+              <div>
+                <span>Created</span>
+                <strong>{metadataModal.metadata.createdAtLabel}</strong>
+              </div>
+
+              <div>
+                <span>File size</span>
+                <strong>{metadataModal.metadata.sizeLabel}</strong>
+              </div>
+
+              <div>
+                <span>Timestamp</span>
+                <strong>{metadataModal.metadata.lastModifiedLabel}</strong>
+              </div>
+
+              <div>
+                <span>Type</span>
+                <strong>{metadataModal.metadata.type}</strong>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => setMetadataModal(null)}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
