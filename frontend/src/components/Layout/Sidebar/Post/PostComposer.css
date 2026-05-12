@@ -2,17 +2,12 @@
    POST COMPOSER PAGE
 ===================================================== */
 
-/* =====================================================
-   POST COMPOSER PAGE
-===================================================== */
-
 .post-composer-page {
   width: 100%;
+  height: calc(100dvh - 148px);
+  min-height: 0;
 
-  min-height: 100%;
-  height: 100%;
-
-  padding: 28px 30px;
+  padding: 24px 30px;
 
   display: grid;
   grid-template-columns: minmax(0, 1fr) 420px;
@@ -26,6 +21,10 @@
   box-sizing: border-box;
 }
 
+/* =====================================================
+   GRID COLUMNS
+===================================================== */
+
 .composer-column,
 .guide-column {
   min-width: 0;
@@ -36,23 +35,41 @@
   justify-content: center;
 }
 
+/* =====================================================
+   PANELS
+===================================================== */
+
 .composer.panel,
 .composer-guide-panel.panel {
+  width: 100%;
   max-height: 100%;
-  overflow: auto;
+
+  background: #ffffff;
+  border: 1px solid #e3d9cf;
+  border-radius: 28px;
+
+  box-shadow: 0 10px 30px rgba(15, 15, 15, 0.04);
+
+  font-family: Inter, "Segoe UI", sans-serif;
+  color: #221d1a;
+
+  box-sizing: border-box;
+  overflow-y: auto;
 }
 
 .composer.panel {
-  padding: 38px;
+  padding: 28px 38px;
+
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 18px;
 
   min-width: 0;
 }
 
 .composer-guide-panel.panel {
   padding: 34px;
+
   display: flex;
   flex-direction: column;
   gap: 22px;
@@ -71,7 +88,7 @@
 .panel-body {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
 }
 
 .panel-footer {
@@ -79,7 +96,7 @@
   justify-content: flex-end;
   gap: 12px;
 
-  padding-top: 14px;
+  padding-top: 8px;
 }
 
 /* =====================================================
@@ -205,23 +222,21 @@
 
 .body:focus {
   outline: none;
-
   border-color: #6f1111;
-
   box-shadow: 0 0 0 3px rgba(111, 17, 17, 0.08);
 }
 
 textarea.body {
-  min-height: 130px;
+  min-height: 108px;
   resize: vertical;
 }
 
 .now-text {
-  min-height: 90px;
+  min-height: 108px;
 }
 
 .blob-text {
-  min-height: 180px;
+  min-height: 160px;
 }
 
 /* =====================================================
@@ -362,9 +377,9 @@ textarea.body {
 
 .upload-drop-zone {
   width: 100%;
-  min-height: 104px;
+  min-height: 92px;
 
-  padding: 18px;
+  padding: 14px 18px;
 
   border: 2px dashed #d6c7b8;
   border-radius: 22px;
@@ -399,7 +414,7 @@ textarea.body {
 }
 
 .upload-icon {
-  font-size: 28px;
+  font-size: 24px;
   line-height: 1;
   color: #6f1111;
 }
@@ -421,7 +436,6 @@ textarea.body {
 
 .drag-active {
   border-color: #8b1d1d !important;
-
   box-shadow: 0 0 0 4px rgba(139, 29, 29, 0.08);
 }
 
@@ -456,7 +470,7 @@ textarea.body {
 
 .composer-icon-action {
   min-width: 96px;
-  height: 48px;
+  height: 44px;
 
   padding: 0 14px;
 
@@ -498,7 +512,6 @@ textarea.body {
 
 .composer-icon-action.primary:hover:not(:disabled) {
   background: #4f0b0b;
-
   box-shadow: 0 10px 22px rgba(93, 13, 13, 0.18);
 }
 
@@ -535,9 +548,7 @@ textarea.body {
 
 .media-thumb-card:hover {
   border-color: #d6c7b8;
-
   transform: translateY(-2px);
-
   box-shadow: 0 6px 16px rgba(25, 20, 15, 0.05);
 }
 
@@ -854,16 +865,27 @@ textarea.body {
 
 @media (max-width: 1100px) {
   .post-composer-page {
+    height: auto;
+    min-height: calc(100dvh - 148px);
+
     grid-template-columns: 1fr;
 
     padding: 28px 24px 80px;
 
     align-items: start;
+    overflow: visible;
   }
 
   .composer-column,
   .guide-column {
+    height: auto;
     align-items: stretch;
+  }
+
+  .composer.panel,
+  .composer-guide-panel.panel {
+    max-height: none;
+    overflow: visible;
   }
 }
 
@@ -917,76 +939,4 @@ textarea.body {
   .upload-drop-zone {
     min-height: 140px;
   }
-}
-
-/* FINAL COMPOSER CENTERING FIX */
-
-.post-composer-page {
-  height: calc(100dvh - 148px) !important;
-  min-height: 0 !important;
-
-  padding: 24px 30px !important;
-
-  display: grid !important;
-  grid-template-columns: minmax(0, 1fr) 420px !important;
-  gap: 40px !important;
-
-  align-items: center !important;
-
-  overflow: hidden !important;
-
-  background: #f7f4ef !important;
-  box-sizing: border-box !important;
-}
-
-.composer-column,
-.guide-column {
-  height: 100% !important;
-  min-height: 0 !important;
-
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-}
-
-.composer.panel {
-  max-height: 100% !important;
-  overflow-y: auto !important;
-
-  padding: 28px 38px !important;
-  gap: 18px !important;
-}
-
-.composer-guide-panel.panel {
-  max-height: 100% !important;
-  overflow-y: auto !important;
-}
-
-.panel-body {
-  gap: 14px !important;
-}
-
-.panel-footer {
-  padding-top: 8px !important;
-}
-
-textarea.body {
-  min-height: 108px !important;
-}
-
-.now-text {
-  min-height: 108px !important;
-}
-
-.upload-drop-zone {
-  min-height: 92px !important;
-  padding: 14px 18px !important;
-}
-
-.upload-icon {
-  font-size: 24px !important;
-}
-
-.composer-icon-action {
-  height: 44px !important;
 }
