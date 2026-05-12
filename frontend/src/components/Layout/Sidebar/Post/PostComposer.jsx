@@ -10,6 +10,29 @@ const API_BASE =
 
 const MAX_VIDEO_AUDIO_SIZE = 300 * 1024 * 1024;
 
+const ALLOWED_FILE_EXTENSIONS = [
+  "png",
+  "jpg",
+  "jpeg",
+  "pdf",
+  "doc",
+  "docx",
+  "txt",
+  "rtf",
+  "odt",
+  "xls",
+  "xlsx",
+  "ppt",
+  "pptx",
+  "csv",
+  "mp4",
+  "mov",
+  "webm",
+  "mp3",
+  "wav",
+  "m4a",
+];
+
 const NOW_CATEGORIES = ["Information", "Incident", "Alert", "Event", "Beacon"];
 
 const CATEGORIES = [
@@ -46,7 +69,6 @@ const MODE_CONFIG = {
     showDetails: true,
     showNowOptions: true,
   },
-
   news: {
     label: "News",
     icon: "📰",
@@ -64,7 +86,6 @@ const MODE_CONFIG = {
     showDetails: true,
     showNowOptions: false,
   },
-
   blob: {
     label: "BLOB",
     icon: "🧠",
@@ -82,7 +103,6 @@ const MODE_CONFIG = {
     showDetails: true,
     showNowOptions: false,
   },
-
   event: {
     label: "Event",
     icon: "📅",
@@ -100,7 +120,6 @@ const MODE_CONFIG = {
     showDetails: true,
     showNowOptions: false,
   },
-
   beacon: {
     label: "Beacon",
     icon: "📡",
@@ -130,12 +149,31 @@ function getExpiryTimestamp(hours) {
   return Date.now() + hours * 60 * 60 * 1000;
 }
 
+function getFileExtension(fileName = "") {
+  return fileName.split(".").pop()?.toLowerCase() || "";
+}
+
+function sanitizeText(value = "") {
+  return String(value)
+    .replace(/[<>]/g, "")
+    .replace(/javascript:/gi, "")
+    .replace(/on\w+=/gi, "")
+    .trim();
+}
+
+function sanitizeFileName(fileName = "") {
+  return String(fileName)
+    .replace(/[^\w.\-()\s]/g, "")
+    .replace(/\s+/g, "_")
+    .slice(0, 120);
+}
+
 function parseCustomTags(input = "") {
   return input
     .split(/[\s,]+/)
     .map((tag) => tag.replace(/^#/, "").trim())
     .filter(Boolean)
-    .map((tag) => tag.replace(/[^\w\s&-]/g, ""))
+    .map((tag) => sanitizeText(tag).replace(/[^\w\s&-]/g, ""))
     .filter(Boolean);
 }
 
@@ -180,14 +218,31 @@ function getMediaKind(file) {
   if (file.type.startsWith("image")) return "image";
   if (file.type.startsWith("video")) return "video";
   if (file.type.startsWith("audio")) return "audio";
-  return "file";
+  return "document";
 }
 
-function validateIncomingFile(file) {
+function validateIncomingFile(file, existingItems = []) {
   const kind = getMediaKind(file);
+  const extension = getFileExtension(file.name);
+
+  if (!ALLOWED_FILE_EXTENSIONS.includes(extension)) {
+    return `${file.name} is not an allowed file type.`;
+  }
 
   if ((kind === "video" || kind === "audio") && file.size > MAX_VIDEO_AUDIO_SIZE) {
     return `${file.name} exceeds the 300 MB limit for video/audio.`;
+  }
+
+  if (kind === "video" && existingItems.some((item) => item.kind === "video")) {
+    return "Only one video file is allowed per post.";
+  }
+
+  if (kind === "audio" && existingItems.some((item) => item.kind === "audio")) {
+    return "Only one audio file is allowed per post.";
+  }
+
+  if (kind === "document" && existingItems.some((item) => item.kind === "document")) {
+    return "Only one document file is allowed per post.";
   }
 
   return "";
@@ -320,32 +375,29 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
   const isMediaLoaded = (fileId) => Boolean(loadedMediaIds[fileId]);
 
   const handleFiles = (incomingFiles = []) => {
-    const validationError = incomingFiles
-      .map(validateIncomingFile)
-      .find(Boolean);
+    const validFiles = [];
 
-    if (validationError) {
-      setError(validationError);
-      return;
+    for (const file of incomingFiles) {
+      const simulatedExisting = [
+        ...files,
+        ...validFiles.map((validFile) => ({
+          kind: getMediaKind(validFile),
+        })),
+      ];
+
+      const validationError = validateIncomingFile(file, simulatedExisting);
+
+      if (validationError) {
+        setError(validationError);
+        return;
+      }
+
+      validFiles.push(file);
     }
 
-    const combined = [...files.map((item) => item.file), ...incomingFiles];
-
-    const videos = combined.filter((file) => file.type.startsWith("video"));
-    const others = combined.filter((file) => !file.type.startsWith("video"));
-
-    if (videos.length > 4) {
-      setError("Maximum 4 videos allowed.");
-      return;
-    }
-
-    if (others.length > 2) {
-      setError("Maximum 2 files or images allowed.");
-      return;
-    }
-
-    const enriched = incomingFiles.map((file) => {
+    const enriched = validFiles.map((file) => {
       const createdAt = Date.now();
+      const safeName = sanitizeFileName(file.name);
 
       return {
         id: crypto.randomUUID(),
@@ -356,9 +408,12 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
         uploaded: false,
         s3Key: null,
         publicUrl: null,
+        safeName,
         metadata: {
-          name: file.name,
+          name: safeName,
+          originalName: file.name,
           type: file.type || "application/octet-stream",
+          extension: getFileExtension(file.name),
           size: file.size,
           sizeLabel: formatFileSize(file.size),
           createdAt,
@@ -459,12 +514,12 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
     mode,
     type: mode,
 
-    title: title.trim(),
-    content: content.trim(),
+    title: sanitizeText(title),
+    content: sanitizeText(content),
 
-    category,
-    scope: shareToGlobal ? "Global" : scope,
-    tags: finalTags,
+    category: sanitizeText(category),
+    scope: shareToGlobal ? "Global" : sanitizeText(scope),
+    tags: finalTags.map(sanitizeText).filter(Boolean),
 
     shareToSocial,
     shareToGlobal,
@@ -486,6 +541,7 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
 
   const uploadSingleFile = async (item, index, total) => {
     const headers = await getAuthHeaders();
+    const safeName = item.safeName || sanitizeFileName(item.file.name);
 
     setUploadProgress(`Preparing upload ${index + 1} of ${total}...`);
 
@@ -493,9 +549,12 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
       method: "POST",
       headers,
       body: JSON.stringify({
-        fileName: item.file.name,
+        fileName: safeName,
+        originalFileName: item.file.name,
         fileType: item.file.type,
         fileSize: item.file.size,
+        mediaType: item.kind,
+        extension: item.metadata.extension,
         mode,
       }),
     });
@@ -504,7 +563,7 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
       throw new Error("Upload URL was not returned by backend.");
     }
 
-    setUploadProgress(`Uploading ${item.file.name}...`);
+    setUploadProgress(`Uploading ${safeName}...`);
 
     const uploadResponse = await fetch(presign.uploadUrl, {
       method: "PUT",
@@ -515,14 +574,16 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
     });
 
     if (!uploadResponse.ok) {
-      throw new Error(`S3 upload failed for ${item.file.name}`);
+      throw new Error(`S3 upload failed for ${safeName}`);
     }
 
     return {
-      name: item.file.name,
+      name: safeName,
+      originalName: item.file.name,
       type: item.file.type,
       size: item.file.size,
       mediaType: item.kind,
+      extension: item.metadata.extension,
       key: presign.key,
       url: presign.publicUrl || presign.fileUrl || null,
       createdAt: item.metadata.createdAt,
@@ -555,13 +616,13 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
   };
 
   const handleSubmit = async () => {
-    if (!title.trim()) {
+    if (!sanitizeText(title)) {
       setError("Add a title first.");
       setActiveTab("compose");
       return;
     }
 
-    if (!content.trim()) {
+    if (!sanitizeText(content)) {
       setError("Add some content first.");
       setActiveTab("compose");
       return;
@@ -576,11 +637,13 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
 
       if (onSubmit) {
         const payload = buildPayload(
-          files.map(({ file, kind, metadata }) => ({
-            name: file.name,
+          files.map(({ file, kind, metadata, safeName }) => ({
+            name: safeName || sanitizeFileName(file.name),
+            originalName: file.name,
             type: file.type,
             size: file.size,
             mediaType: kind,
+            extension: metadata.extension,
             createdAt: metadata.createdAt,
             lastModified: file.lastModified,
           }))
@@ -670,37 +733,45 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
 
               {mode === "news" && (
                 <div className="meta">
-                  News posts are submitted for review before they appear in
-                  iVIEW.
+                  News posts are submitted for review before they appear in iVIEW.
                 </div>
               )}
 
               {mode === "beacon" && (
                 <div className="meta">
-                  Beacon posts are time-sensitive alerts and expire
-                  automatically.
+                  Beacon posts are time-sensitive alerts and expire automatically.
                 </div>
               )}
 
-              <button
-                type="button"
-                className={`upload-drop-zone ${dragActive ? "active" : ""}`}
-                onClick={() => fileInputRef.current?.click()}
-                disabled={submitting}
-              >
-                <span className="upload-icon">⬆</span>
+              {files.length === 0 && (
+                <button
+                  type="button"
+                  className={`upload-drop-zone ${dragActive ? "active" : ""}`}
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={submitting}
+                >
+                  <span className="upload-icon">⬆</span>
 
-                <span className="upload-title">
-                  {dragActive
-                    ? "Drop files here"
-                    : "Upload media or drag files here"}
-                </span>
+                  <span className="upload-title">
+                    {dragActive
+                      ? "Drop files here"
+                      : "Upload media or drag files here"}
+                  </span>
 
-                <span className="upload-help">
-                  Max 300 MB for video/audio. Allowed: PNG, JPEG, PDF, Word,
-                  TXT and standard document files.
-                </span>
-              </button>
+                  <span className="upload-help">
+                    Max 300 MB for video/audio. One video, one audio and one
+                    document per post. Allowed: PNG, JPEG, PDF, Word, TXT and
+                    standard document files.
+                  </span>
+                </button>
+              )}
+
+              {files.length > 0 && (
+                <div className="upload-complete-note">
+                  Media added. Use the right panel to preview, inspect or delete
+                  files.
+                </div>
+              )}
 
               <input
                 type="file"
@@ -899,7 +970,7 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
               onClick={(event) => event.stopPropagation()}
             >
               {preview.kind === "image" && (
-                <img src={preview.url} alt={preview.file.name} />
+                <img src={preview.url} alt={preview.metadata.name} />
               )}
 
               {preview.kind === "video" && (
@@ -908,9 +979,9 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
 
               {preview.kind === "audio" && <audio src={preview.url} controls />}
 
-              {preview.kind === "file" && (
+              {preview.kind === "document" && (
                 <div className="file-preview-box">
-                  <strong>{preview.file.name}</strong>
+                  <strong>{preview.metadata.name}</strong>
                   <span>{preview.metadata.sizeLabel}</span>
                 </div>
               )}
@@ -938,6 +1009,11 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
                 <div>
                   <span>File name</span>
                   <strong>{metadataModal.metadata.name}</strong>
+                </div>
+
+                <div>
+                  <span>Original file name</span>
+                  <strong>{metadataModal.metadata.originalName}</strong>
                 </div>
 
                 <div>
@@ -997,7 +1073,7 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
                     {item.kind === "image" && (
                       <img
                         src={item.url}
-                        alt={item.file.name}
+                        alt={item.metadata.name}
                         onLoad={() => markMediaLoaded(item.id)}
                         className={
                           isMediaLoaded(item.id) ? "loaded" : "loading"
@@ -1021,13 +1097,15 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
                       <div className="media-file-icon">♪</div>
                     )}
 
-                    {item.kind === "file" && (
+                    {item.kind === "document" && (
                       <div className="media-file-icon">📄</div>
                     )}
                   </div>
 
                   <div className="media-thumb-info">
-                    <strong title={item.file.name}>{item.file.name}</strong>
+                    <strong title={item.metadata.name}>
+                      {item.metadata.name}
+                    </strong>
                     <span>{item.metadata.sizeLabel}</span>
                   </div>
 
@@ -1035,7 +1113,7 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
                     <button
                       type="button"
                       title="Preview"
-                      aria-label={`Preview ${item.file.name}`}
+                      aria-label={`Preview ${item.metadata.name}`}
                       onClick={() => setPreview(item)}
                     >
                       👁
@@ -1044,7 +1122,7 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
                     <button
                       type="button"
                       title="Metadata"
-                      aria-label={`Show metadata for ${item.file.name}`}
+                      aria-label={`Show metadata for ${item.metadata.name}`}
                       onClick={() => setMetadataModal(item)}
                     >
                       ⓘ
@@ -1053,7 +1131,7 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
                     <button
                       type="button"
                       title="Delete"
-                      aria-label={`Delete ${item.file.name}`}
+                      aria-label={`Delete ${item.metadata.name}`}
                       onClick={() => removeFile(item.id)}
                       disabled={submitting}
                     >

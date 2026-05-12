@@ -967,3 +967,47 @@ textarea.body {
     min-height: 140px;
   }
 }
+/* =========================================
+   UPLOAD COMPLETE NOTE
+========================================= */
+
+.upload-complete-note {
+  width: 100%;
+  padding: 16px 18px;
+
+  border: 1px solid #e3d9cf;
+  border-radius: 18px;
+
+  background: #fcfbf9;
+  color: #6f1111;
+
+  font-size: 14px;
+  font-weight: 800;
+
+  box-sizing: border-box;
+}
+
+/* Improve long uploaded filenames */
+.media-thumb-info strong {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+
+  overflow: hidden;
+}
+
+/* Make media cards slightly softer */
+.media-thumb-card {
+  background: #fcfbf9;
+}
+
+/* Slightly tighter upload zone */
+.upload-drop-zone {
+  min-height: 104px;
+  padding: 18px;
+}
+
+/* Slightly tighter footer */
+.panel-footer {
+  margin-top: -4px;
+}
