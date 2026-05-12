@@ -51,6 +51,29 @@ const CATEGORIES = [
 
 const SCOPES = ["Local", "Nearby", "Global"];
 
+const SOCIAL_PROVIDERS = [
+  {
+    id: "facebook",
+    label: "Facebook",
+    allowedMediaKinds: ["image", "video", "audio", "document", "text"],
+  },
+  {
+    id: "instagram",
+    label: "Instagram",
+    allowedMediaKinds: ["image", "video"],
+  },
+  {
+    id: "x",
+    label: "X",
+    allowedMediaKinds: ["image", "video", "text"],
+  },
+  {
+    id: "youtube",
+    label: "YouTube",
+    allowedMediaKinds: ["video"],
+  },
+];
+
 const MODE_CONFIG = {
   now: {
     label: "NOW",
@@ -68,6 +91,7 @@ const MODE_CONFIG = {
     allowPromotion: false,
     showDetails: true,
     showNowOptions: true,
+    allowSocialSharing: true,
   },
   news: {
     label: "News",
@@ -85,6 +109,7 @@ const MODE_CONFIG = {
     allowPromotion: false,
     showDetails: true,
     showNowOptions: false,
+    allowSocialSharing: true,
   },
   blob: {
     label: "BLOB",
@@ -102,6 +127,7 @@ const MODE_CONFIG = {
     allowPromotion: true,
     showDetails: true,
     showNowOptions: false,
+    allowSocialSharing: true,
   },
   event: {
     label: "Event",
@@ -119,6 +145,7 @@ const MODE_CONFIG = {
     allowPromotion: false,
     showDetails: true,
     showNowOptions: false,
+    allowSocialSharing: true,
   },
   beacon: {
     label: "Beacon",
@@ -136,6 +163,7 @@ const MODE_CONFIG = {
     allowPromotion: false,
     showDetails: true,
     showNowOptions: false,
+    allowSocialSharing: true,
   },
 };
 
@@ -254,6 +282,50 @@ function validateIncomingFile(file, existingItems = []) {
   return "";
 }
 
+function getDefaultSocialTargets() {
+  return SOCIAL_PROVIDERS.reduce((acc, provider) => {
+    acc[provider.id] = false;
+    return acc;
+  }, {});
+}
+
+function getDistributionFromScope(scope) {
+  const cleanScope = sanitizeText(scope || "Local");
+
+  if (cleanScope === "Global") {
+    return {
+      scope: "Global",
+      feeds: ["Local", "Global"],
+    };
+  }
+
+  if (cleanScope === "Nearby") {
+    return {
+      scope: "Nearby",
+      feeds: ["Local", "Nearby"],
+    };
+  }
+
+  return {
+    scope: "Local",
+    feeds: ["Local"],
+  };
+}
+
+function getPostMediaKinds(files = []) {
+  if (!files.length) return ["text"];
+
+  return files.map((item) => item.kind);
+}
+
+function isProviderAllowedForFiles(provider, files = []) {
+  const mediaKinds = getPostMediaKinds(files);
+
+  return mediaKinds.every((kind) =>
+    provider.allowedMediaKinds.includes(kind || "text")
+  );
+}
+
 async function getAuthHeaders(extraHeaders = {}) {
   const session = await fetchAuthSession();
   const token = session.tokens?.accessToken?.toString();
@@ -312,8 +384,7 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
   const [category, setCategory] = useState(config.defaultCategory);
   const [scope, setScope] = useState(config.defaultScope);
   const [customTagInput, setCustomTagInput] = useState("");
-  const [shareToSocial, setShareToSocial] = useState(false);
-  const [shareToGlobal, setShareToGlobal] = useState(false);
+  const [socialTargets, setSocialTargets] = useState(getDefaultSocialTargets);
   const [files, setFiles] = useState([]);
   const [preview, setPreview] = useState(null);
   const [metadataModal, setMetadataModal] = useState(null);
@@ -328,6 +399,14 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
   const canPromote = config.allowPromotion;
   const showDetails = config.showDetails;
   const hasFiles = files.length > 0;
+
+  const selectedSocialTargets = useMemo(
+    () =>
+      Object.entries(socialTargets)
+        .filter(([, enabled]) => enabled)
+        .map(([provider]) => provider),
+    [socialTargets]
+  );
 
   const finalTags = useMemo(() => {
     const customTags = parseCustomTags(customTagInput);
@@ -344,13 +423,21 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
     [mode]
   );
 
+  const visibleSocialProviders = useMemo(
+    () =>
+      SOCIAL_PROVIDERS.map((provider) => ({
+        ...provider,
+        allowedForFiles: isProviderAllowedForFiles(provider, files),
+      })),
+    [files]
+  );
+
   useEffect(() => {
     setActiveTab("compose");
     setCategory(config.defaultCategory);
     setScope(config.defaultScope);
     setCustomTagInput("");
-    setShareToSocial(false);
-    setShareToGlobal(false);
+    setSocialTargets(getDefaultSocialTargets());
     setIsAd(false);
     setSelectedSlots([]);
     setUploadProgress("");
@@ -363,6 +450,20 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
         if (item.url) URL.revokeObjectURL(item.url);
       });
     };
+  }, [files]);
+
+  useEffect(() => {
+    setSocialTargets((prev) => {
+      const next = { ...prev };
+
+      SOCIAL_PROVIDERS.forEach((provider) => {
+        if (!isProviderAllowedForFiles(provider, files)) {
+          next[provider.id] = false;
+        }
+      });
+
+      return next;
+    });
   }, [files]);
 
   const markMediaLoaded = (fileId) => {
@@ -491,8 +592,7 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
     setCategory(config.defaultCategory);
     setScope(config.defaultScope);
     setCustomTagInput("");
-    setShareToSocial(false);
-    setShareToGlobal(false);
+    setSocialTargets(getDefaultSocialTargets());
 
     files.forEach((item) => {
       if (item.url) URL.revokeObjectURL(item.url);
@@ -509,28 +609,64 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
     setError("");
   };
 
-  const buildPayload = (uploadedMedia = []) => ({
-    mode,
-    type: mode,
-    title: sanitizeText(title),
-    content: sanitizeText(content),
-    category: sanitizeText(category),
-    scope: shareToGlobal ? "Global" : sanitizeText(scope),
-    tags: finalTags.map(sanitizeText).filter(Boolean),
-    shareToSocial,
-    shareToGlobal,
-    media: uploadedMedia,
-    status: config.status,
-    requiresReview: config.requiresReview,
-    submittedAt: Date.now(),
-    expiresAt: getExpiryTimestamp(config.expiresInHours),
-    ad:
-      canPromote && isAd
-        ? {
-            slots: selectedSlots,
-          }
-        : null,
-  });
+  const handleSocialTargetChange = async (providerId, checked) => {
+    if (!checked) {
+      setSocialTargets((prev) => ({
+        ...prev,
+        [providerId]: false,
+      }));
+      return;
+    }
+
+    const provider = SOCIAL_PROVIDERS.find((item) => item.id === providerId);
+
+    if (!provider) return;
+
+    if (!isProviderAllowedForFiles(provider, files)) {
+      setError(`${provider.label} does not support the selected media type.`);
+      return;
+    }
+
+    setSocialTargets((prev) => ({
+      ...prev,
+      [providerId]: true,
+    }));
+
+    setError("");
+  };
+
+  const buildPayload = (uploadedMedia = []) => {
+    const distribution = getDistributionFromScope(scope);
+
+    return {
+      mode,
+      type: mode,
+
+      title: sanitizeText(title),
+      content: sanitizeText(content),
+
+      category: sanitizeText(category),
+      scope: distribution.scope,
+      distribution,
+      tags: finalTags.map(sanitizeText).filter(Boolean),
+
+      socialShareTargets: selectedSocialTargets,
+
+      media: uploadedMedia,
+
+      status: config.status,
+      requiresReview: config.requiresReview,
+      submittedAt: Date.now(),
+      expiresAt: getExpiryTimestamp(config.expiresInHours),
+
+      ad:
+        canPromote && isAd
+          ? {
+              slots: selectedSlots,
+            }
+          : null,
+    };
+  };
 
   const uploadSingleFile = async (item, index, total) => {
     const headers = await getAuthHeaders();
@@ -727,13 +863,15 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
 
                 {mode === "news" && (
                   <div className="meta">
-                    News posts are submitted for review before they appear in iVIEW.
+                    News posts are submitted for review before they appear in
+                    iVIEW.
                   </div>
                 )}
 
                 {mode === "beacon" && (
                   <div className="meta">
-                    Beacon posts are time-sensitive alerts and expire automatically.
+                    Beacon posts are time-sensitive alerts and expire
+                    automatically.
                   </div>
                 )}
 
@@ -762,8 +900,8 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
 
                 {files.length > 0 && (
                   <div className="upload-complete-note">
-                    Media added. Use the right panel to preview, inspect or delete
-                    files.
+                    Media added. Use the right panel to preview, inspect or
+                    delete files.
                   </div>
                 )}
 
@@ -847,7 +985,6 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
                       className="body"
                       value={scope}
                       onChange={(event) => setScope(event.target.value)}
-                      disabled={shareToGlobal}
                     >
                       {SCOPES.map((item) => (
                         <option key={item}>{item}</option>
@@ -873,31 +1010,36 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
                   ))}
                 </div>
 
-                {config.showNowOptions && (
+                {config.allowSocialSharing && (
                   <div className="share-options">
-                    <label className="label">
-                      <input
-                        type="checkbox"
-                        checked={shareToSocial}
-                        onChange={(event) =>
-                          setShareToSocial(event.target.checked)
-                        }
-                        disabled={submitting}
-                      />
-                      Share to social
-                    </label>
+                    <div className="meta">Social sharing</div>
 
-                    <label className="label">
-                      <input
-                        type="checkbox"
-                        checked={shareToGlobal}
-                        onChange={(event) =>
-                          setShareToGlobal(event.target.checked)
+                    {visibleSocialProviders.map((provider) => (
+                      <label
+                        key={provider.id}
+                        className={`label ${
+                          provider.allowedForFiles ? "" : "disabled"
+                        }`}
+                        title={
+                          provider.allowedForFiles
+                            ? `Share to ${provider.label}`
+                            : `${provider.label} does not support this media type`
                         }
-                        disabled={submitting}
-                      />
-                      Share to global
-                    </label>
+                      >
+                        <input
+                          type="checkbox"
+                          checked={Boolean(socialTargets[provider.id])}
+                          onChange={(event) =>
+                            handleSocialTargetChange(
+                              provider.id,
+                              event.target.checked
+                            )
+                          }
+                          disabled={submitting || !provider.allowedForFiles}
+                        />
+                        {provider.label}
+                      </label>
+                    ))}
                   </div>
                 )}
               </div>
