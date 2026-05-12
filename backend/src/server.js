@@ -7,6 +7,8 @@ import pkg from "pg";
 import userRoutes from "./routes/userRoutes.js";
 import profileRoutes from "./routes/profileRoutes.js";
 import youtubeRoutes from "./routes/youtubeRoutes.js";
+import uploadUrlRoute from "./routes/posts/uploadUrl.js";
+
 
 
 const { Pool } = pkg;
@@ -27,6 +29,10 @@ process.on("unhandledRejection", (err) => {
 /* =========================
    MIDDLEWARE
 ========================= */
+app.use(
+  "/api/posts/upload-url",
+  uploadUrlRoute
+);
 
 app.use(
   cors({
