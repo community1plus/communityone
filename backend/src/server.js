@@ -8,10 +8,10 @@ import userRoutes from "./routes/userRoutes.js";
 import profileRoutes from "./routes/profileRoutes.js";
 import youtubeRoutes from "./routes/youtubeRoutes.js";
 import uploadUrlRoute from "./routes/posts/uploadUrl.js";
-
-
+import postsRoute from "./routes/posts/posts.js";
 
 const { Pool } = pkg;
+
 const app = express();
 
 /* =========================
@@ -29,10 +29,6 @@ process.on("unhandledRejection", (err) => {
 /* =========================
    MIDDLEWARE
 ========================= */
-app.use(
-  "/api/posts/upload-url",
-  uploadUrlRoute
-);
 
 app.use(
   cors({
@@ -40,13 +36,39 @@ app.use(
       "https://main.d1ss8rtrtimogr.amplifyapp.com",
       "http://localhost:5173",
     ],
+
     credentials: true,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "x-version"],
+
+    methods: [
+      "GET",
+      "POST",
+      "PUT",
+      "PATCH",
+      "DELETE",
+      "OPTIONS",
+    ],
+
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "x-version",
+    ],
   })
 );
 
-app.use(express.json({ limit: "2mb" }));
+/*
+  IMPORTANT:
+  JSON/body parsing MUST happen
+  BEFORE routes are mounted
+*/
+
+app.use(express.json({ limit: "10mb" }));
+
+app.use(
+  express.urlencoded({
+    extended: true,
+  })
+);
 
 app.use((req, res, next) => {
   console.log("📡 REQUEST:", req.method, req.originalUrl);
@@ -62,7 +84,11 @@ const dbUrl = process.env.DATABASE_URL;
 if (!dbUrl) {
   console.error("❌ DATABASE_URL is MISSING — app will fail");
 } else {
-  const safeUrl = dbUrl.replace(/\/\/.*:.*@/, "//****:****@");
+  const safeUrl = dbUrl.replace(
+    /\/\/.*:.*@/,
+    "//****:****@"
+  );
+
   console.log("🔐 DATABASE_URL:", safeUrl);
 }
 
@@ -72,6 +98,7 @@ if (!dbUrl) {
 
 const pool = new Pool({
   connectionString: dbUrl,
+
   ssl: {
     rejectUnauthorized: false,
   },
@@ -80,6 +107,7 @@ const pool = new Pool({
 (async () => {
   try {
     await pool.query("SELECT 1");
+
     console.log("✅ DB connected successfully");
   } catch (err) {
     console.error("❌ DB connection failed:", err);
@@ -93,9 +121,16 @@ const pool = new Pool({
 app.get("/api/health", async (req, res) => {
   try {
     await pool.query("SELECT 1");
-    res.json({ status: "OK", db: "connected" });
+
+    res.json({
+      status: "OK",
+      db: "connected",
+    });
   } catch {
-    res.json({ status: "OK", db: "failed" });
+    res.json({
+      status: "OK",
+      db: "failed",
+    });
   }
 });
 
@@ -113,20 +148,33 @@ app.get("/api/test", (req, res) => {
 /* =========================
    ROUTES
 ========================= */
+
+app.use("/api/posts/upload-url", uploadUrlRoute);
+
 app.use("/api/youtube", youtubeRoutes);
+
 app.use("/api/users", userRoutes);
+
 app.use("/api/profile", profileRoutes);
 
 console.log("✅ Routes mounted:");
+console.log("   → /api/posts/upload-url");
+console.log("   → /api/youtube");
 console.log("   → /api/users");
 console.log("   → /api/profile");
 
+
+app.use("/api/posts", postsRoute);
 /* =========================
    404 FALLBACK
 ========================= */
 
 app.use((req, res) => {
-  console.warn("404 ROUTE NOT FOUND:", req.method, req.originalUrl);
+  console.warn(
+    "404 ROUTE NOT FOUND:",
+    req.method,
+    req.originalUrl
+  );
 
   res.status(404).json({
     error: "Route not found",
