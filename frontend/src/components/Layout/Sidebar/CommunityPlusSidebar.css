@@ -224,3 +224,6 @@ RESPONSIVE
   margin-top: 0 !important;
 }
 
+.composer-guide-panel.panel {
+  border: 5px solid red !important;
+}
