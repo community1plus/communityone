@@ -1,45 +1,80 @@
 .post-composer-page {
   width: 100%;
 
-  min-height: auto;
+  min-height: calc(100vh - 140px);
 
-  padding: 30px 30px 90px;
+  padding: 36px 30px 100px;
 
   display: grid;
   grid-template-columns: minmax(0, 1fr) 420px;
 
-  gap: 30px;
+  gap: 40px;
+
+  align-items: start;
 
   background: #f7f4ef;
 
   box-sizing: border-box;
 }
 
+/* =========================================
+   PANELS
+========================================= */
+
 .composer.panel,
 .composer-guide-panel.panel {
   background: #ffffff;
+
   border: 1px solid #e3d9cf;
-  border-radius: 26px;
-  box-shadow: 0 8px 28px rgba(15, 15, 15, 0.04);
-  font-family: Inter, "Segoe UI", sans-serif;
+  border-radius: 28px;
+
+  box-shadow:
+    0 10px 30px rgba(15, 15, 15, 0.04);
+
+  font-family:
+    Inter,
+    "Segoe UI",
+    sans-serif;
+
   color: #221d1a;
-  align-self: start;
+
+  box-sizing: border-box;
 }
 
+
+/* =========================================
+   LEFT COMPOSER
+========================================= */
+
 .composer.panel {
-  padding: 34px;
+  padding: 38px;
+
   display: flex;
   flex-direction: column;
-  gap: 22px;
+
+  gap: 24px;
+
   min-width: 0;
+
+  align-self: center;
 }
+
+/* =========================================
+   RIGHT GUIDE PANEL
+========================================= */
 
 .composer-guide-panel.panel {
   padding: 34px;
-  margin-left: 4px;
+
   display: flex;
   flex-direction: column;
-  gap: 20px;
+
+  gap: 22px;
+
+  align-self: start;
+
+  position: sticky;
+  top: 24px;
 }
 
 .panel-header,
