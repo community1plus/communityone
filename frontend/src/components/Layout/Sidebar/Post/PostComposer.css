@@ -2,17 +2,25 @@
    POST COMPOSER PAGE
 ===================================================== */
 
+/* =====================================================
+   POST COMPOSER PAGE
+===================================================== */
+
 .post-composer-page {
   width: 100%;
-  min-height: calc(100vh - 146px);
 
-  padding: 40px 30px;
+  min-height: calc(100vh - 142px);
+  height: calc(100vh - 142px);
+
+  padding: 28px 30px;
 
   display: grid;
   grid-template-columns: minmax(0, 1fr) 420px;
   gap: 40px;
 
   align-items: center;
+
+  overflow: hidden;
 
   background: #f7f4ef;
   box-sizing: border-box;
@@ -25,35 +33,25 @@
 .composer-column,
 .guide-column {
   min-width: 0;
+  height: 100%;
 
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* =====================================================
-   PANELS
-===================================================== */
+.composer.panel {
+  max-height: 100%;
+  overflow: auto;
+}
 
-.composer.panel,
 .composer-guide-panel.panel {
-  width: 100%;
-
-  background: #ffffff;
-  border: 1px solid #e3d9cf;
-  border-radius: 28px;
-
-  box-shadow: 0 10px 30px rgba(15, 15, 15, 0.04);
-
-  font-family: Inter, "Segoe UI", sans-serif;
-  color: #221d1a;
-
-  box-sizing: border-box;
+  max-height: 100%;
+  overflow: auto;
 }
 
 .composer.panel {
   padding: 38px;
-
   display: flex;
   flex-direction: column;
   gap: 24px;
