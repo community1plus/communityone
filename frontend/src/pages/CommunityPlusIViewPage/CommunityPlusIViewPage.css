@@ -279,3 +279,41 @@
 .iview-card.empty {
   background: #111;
 }
+
+.iview-media-loading {
+  position: absolute;
+  inset: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background:
+    radial-gradient(circle, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    #111;
+
+  background-size: 10px 10px;
+
+  color: rgba(255, 255, 255, 0.62);
+
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+
+  z-index: 1;
+}
+
+.iview-image {
+  opacity: 0;
+  transition:
+    opacity 0.25s ease,
+    transform 0.35s ease;
+}
+
+.iview-image.loaded {
+  opacity: 1;
+}
+
+.iview-card:hover .iview-image.loaded {
+  transform: scale(1.03);
+}
