@@ -1,5 +1,5 @@
 /* =========================
-TV SHELL (OUTER FRAME)
+TV SHELL / OUTER FRAME
 ========================= */
 
 .adtv-tv-shell {
@@ -14,50 +14,49 @@ TV SHELL (OUTER FRAME)
   padding: 10px;
 
   box-shadow:
-    0 10px 35px rgba(0,0,0,0.35),
-    inset 0 1px 0 rgba(255,255,255,0.05);
+    0 10px 35px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
 
   z-index: 1000;
 
   display: flex;
   flex-direction: column;
   gap: 8px;
+
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter,
+    sans-serif;
 }
 
 .adtv-tv-shell.adtv-embedded {
-  width: 100%;
-  max-width: 100%;     /* 🔥 don't exceed container */
-  aspect-ratio: 16 / 9;
-  margin: 0 auto;
-}
-
-/* subtle “TV edge” */
-.adtv-tv-shell::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 16px;
-  pointer-events: none;
-
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04);
-}
-
-/* =========================
-EMBEDDED MODE (PAGE)
-========================= */
-
-.adtv-embedded {
   position: relative !important;
   bottom: unset;
   right: unset;
 
   width: 100%;
-  max-width: 720px;
-  margin: 12px 0;
+  max-width: 100%;
+
+  height: 100%;
+  aspect-ratio: auto;
+
+  margin: 0;
+
+  border-radius: 22px;
+}
+
+.adtv-tv-shell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  border-radius: inherit;
+
+  pointer-events: none;
+
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
 }
 
 /* =========================
-SCREEN (INNER DISPLAY)
+SCREEN
 ========================= */
 
 .adtv-screen {
@@ -73,29 +72,29 @@ SCREEN (INNER DISPLAY)
   align-items: center;
   justify-content: center;
 
-  /* 🔥 dotted grey background INSIDE TV */
   background:
-    radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px),
+    radial-gradient(circle, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
     #000;
 
   background-size: 10px 10px;
 }
 
-/* larger screen in page mode */
 .adtv-embedded .adtv-screen {
-  height: 320px;
+  height: 100%;
+  min-height: 100%;
+  border-radius: 18px;
 }
 
-/* subtle screen glow */
 .adtv-screen::after {
   content: "";
   position: absolute;
   inset: 0;
+
   pointer-events: none;
 
   background: radial-gradient(
     circle at center,
-    rgba(255,255,255,0.04),
+    rgba(255, 255, 255, 0.04),
     transparent 70%
   );
 }
@@ -107,54 +106,118 @@ VIDEO
 .adtv-video {
   width: 100%;
   height: 100%;
+
   object-fit: cover;
 }
 
 /* =========================
-EMPTY STATE (BRANDING)
+EMPTY STATE / BRANDING
 ========================= */
 
 .adtv-empty {
+  position: relative;
+  z-index: 1;
+
   text-align: center;
-  color: #fff;
+  color: #ffffff;
 
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 
-  gap: 10px;
+  gap: 12px;
 
-  padding: 12px;
+  padding: 14px;
 }
 
 .adtv-logo {
-  font-weight: 700;
-  font-size: 16px;
-  letter-spacing: 0.5px;
+  position: relative;
+
+  display: inline-flex;
+  align-items: flex-start;
+  justify-content: center;
+
+  color: #ffffff;
+
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1;
+
+  letter-spacing: 0.04em;
+}
+
+/* SP badge styled like a small trademark mark */
+.adtv-sp {
+  position: relative;
+
+  top: -8px;
+  margin-left: 5px;
+
+  width: 19px;
+  height: 19px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1.5px solid #d72626;
+  border-radius: 50%;
+
+  background: #ffffff;
+  color: #d72626;
+
+  font-size: 8px;
+  font-weight: 900;
+  line-height: 1;
+
+  letter-spacing: -0.04em;
 }
 
 /* =========================
-ECHO (MASCOT)
+ECHO / MASCOT
 ========================= */
 
 .adtv-echo {
-  font-size: 30px;
+  font-size: 32px;
+
   animation: echoFloat 3s ease-in-out infinite;
 }
 
 @keyframes echoFloat {
-  0%   { transform: translateY(0) scale(1); opacity: 0.6; }
-  50%  { transform: translateY(-4px) scale(1.1); opacity: 1; }
-  100% { transform: translateY(0) scale(1); opacity: 0.6; }
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0.6;
+  }
+
+  50% {
+    transform: translateY(-4px) scale(1.1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.6;
+  }
+}
+
+.adtv-empty .meta {
+  color: rgba(255, 255, 255, 0.62);
+
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.35;
 }
 
 /* =========================
-IN-TV PANELS (NEW)
+IN-TV PANELS
 ========================= */
 
 .adtv-panel {
-  color: #fff;
+  position: relative;
+  z-index: 1;
+
+  color: #ffffff;
   text-align: center;
 
   display: flex;
@@ -163,16 +226,32 @@ IN-TV PANELS (NEW)
   justify-content: center;
 
   gap: 8px;
-  padding: 12px;
+  padding: 14px;
+}
+
+.adtv-panel .h3 {
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.adtv-panel .meta {
+  color: rgba(255, 255, 255, 0.62);
+
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .adtv-slot-list {
   margin-top: 8px;
-  font-size: 12px;
 
   display: flex;
   flex-direction: column;
   gap: 4px;
+
+  color: rgba(255, 255, 255, 0.78);
+
+  font-size: 12px;
+  font-weight: 600;
 }
 
 /* =========================
@@ -187,30 +266,43 @@ CONTROLS BAR
   padding: 4px 6px;
 
   border-radius: 8px;
-  background: rgba(255,255,255,0.04);
+
+  background: rgba(255, 255, 255, 0.04);
 
   backdrop-filter: blur(6px);
 }
 
-/* button group feel */
 .adtv-controls-bar button {
   background: transparent;
   border: none;
-  color: #fff;
+
+  color: #ffffff;
 
   font-size: 13px;
+  font-weight: 700;
+
   cursor: pointer;
 
   opacity: 0.75;
+
   padding: 4px 6px;
   border-radius: 6px;
 
-  transition: all 0.15s ease;
+  transition:
+    opacity 0.15s ease,
+    background 0.15s ease,
+    transform 0.15s ease;
 }
 
 .adtv-controls-bar button:hover {
   opacity: 1;
-  background: rgba(255,255,255,0.08);
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-1px);
+}
+
+/* Hide controls inside embedded iVIEW grid slot */
+.adtv-embedded .adtv-controls-bar {
+  display: none;
 }
 
 /* =========================
@@ -220,14 +312,24 @@ LIVE DOT
 .adtv-live-dot {
   width: 6px;
   height: 6px;
+
   border-radius: 50%;
+
   background: #ff3b30;
 
   animation: pulseDot 1.4s infinite;
 }
 
 @keyframes pulseDot {
-  0% { opacity: 0.4; }
-  50% { opacity: 1; }
-  100% { opacity: 0.4; }
+  0% {
+    opacity: 0.4;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.4;
+  }
 }
