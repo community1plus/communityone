@@ -358,10 +358,6 @@
   color: #b11226;
 }
 
-.nav-item.active {
-  color: #b11226;
-  border-bottom-color: #b11226;
-}
 
 /* RESPONSIVE */
 @media (max-width: 980px) {

@@ -7,14 +7,14 @@ export const NAVIGATION = [
         id: "home",
         label: "Home",
         type: "route",
-        path: "/",
+        path: "/communityplus",
       },
 
       {
         id: "iview",
         label: "iVIEW",
         type: "route",
-        path: "/communityplus",
+        path: "/communityplus/compose/now",
       },
 
       {
