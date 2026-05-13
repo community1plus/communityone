@@ -188,9 +188,7 @@ router.post("/", async (req, res) => {
       error: "Could not create post.",
     });
   } finally {
-    console.error("Create post failed:");
-    console.error(error);
-    console.error(error.message);
+    
     client.release();
   }
 });

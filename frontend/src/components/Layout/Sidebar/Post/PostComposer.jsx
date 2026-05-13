@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import { fetchAuthSession } from "aws-amplify/auth";
 
 import "./PostComposer.css";
@@ -314,7 +314,6 @@ function getDistributionFromScope(scope) {
 
 function getPostMediaKinds(files = []) {
   if (!files.length) return ["text"];
-
   return files.map((item) => item.kind);
 }
 
@@ -368,7 +367,6 @@ async function apiFetch(path, options = {}) {
 }
 
 export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
-  const navigate = useNavigate();
   const params = useParams();
   const location = useLocation();
 
@@ -394,6 +392,7 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
   const [selectedSlots, setSelectedSlots] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [uploadProgress, setUploadProgress] = useState("");
+  const [submitSuccess, setSubmitSuccess] = useState("");
   const [error, setError] = useState("");
 
   const canPromote = config.allowPromotion;
@@ -441,6 +440,7 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
     setIsAd(false);
     setSelectedSlots([]);
     setUploadProgress("");
+    setSubmitSuccess("");
     setError("");
   }, [mode, config]);
 
@@ -490,6 +490,7 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
 
       if (validationError) {
         setError(validationError);
+        setSubmitSuccess("");
         return;
       }
 
@@ -527,6 +528,7 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
 
     setFiles((prev) => [...prev, ...enriched]);
     setError("");
+    setSubmitSuccess("");
   };
 
   const handleDrop = (event) => {
@@ -583,6 +585,7 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
     setTitle("");
     setContent("");
     setError("");
+    setSubmitSuccess("");
   };
 
   const resetForm = () => {
@@ -606,6 +609,7 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
     setIsAd(false);
     setSelectedSlots([]);
     setUploadProgress("");
+    setSubmitSuccess("");
     setError("");
   };
 
@@ -624,6 +628,7 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
 
     if (!isProviderAllowedForFiles(provider, files)) {
       setError(`${provider.label} does not support the selected media type.`);
+      setSubmitSuccess("");
       return;
     }
 
@@ -633,6 +638,7 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
     }));
 
     setError("");
+    setSubmitSuccess("");
   };
 
   const buildPayload = (uploadedMedia = []) => {
@@ -747,18 +753,21 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
   const handleSubmit = async () => {
     if (!sanitizeText(title)) {
       setError("Add a title first.");
+      setSubmitSuccess("");
       setActiveTab("compose");
       return;
     }
 
     if (!sanitizeText(content)) {
       setError("Add some content first.");
+      setSubmitSuccess("");
       setActiveTab("compose");
       return;
     }
 
     setSubmitting(true);
     setError("");
+    setSubmitSuccess("");
     setUploadProgress("");
 
     try {
@@ -788,14 +797,11 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
       }
 
       resetForm();
-
-      navigate(`/communityplus?mode=${mode.toUpperCase()}`, {
-        replace: true,
-        state: { mode: mode.toUpperCase() },
-      });
+      setSubmitSuccess("Post submitted successfully.");
     } catch (err) {
       console.error("Post submit failed:", err);
       setError(err?.message || "Could not submit post.");
+      setSubmitSuccess("");
     } finally {
       setSubmitting(false);
     }
@@ -851,14 +857,20 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
                   className="body"
                   placeholder={config.titlePlaceholder}
                   value={title}
-                  onChange={(event) => setTitle(event.target.value)}
+                  onChange={(event) => {
+                    setTitle(event.target.value);
+                    setSubmitSuccess("");
+                  }}
                 />
 
                 <textarea
                   className={`body ${mode === "now" ? "now-text" : "blob-text"}`}
                   placeholder={config.bodyPlaceholder}
                   value={content}
-                  onChange={(event) => setContent(event.target.value)}
+                  onChange={(event) => {
+                    setContent(event.target.value);
+                    setSubmitSuccess("");
+                  }}
                 />
 
                 {mode === "news" && (
@@ -957,6 +969,7 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
                 )}
 
                 {uploadProgress && <div className="meta">{uploadProgress}</div>}
+                {submitSuccess && <div className="meta">{submitSuccess}</div>}
                 {error && <div className="error">{error}</div>}
               </>
             )}
