@@ -1,155 +1,184 @@
 /* =====================================================
-FEED COLUMN — STRUCTURAL (LET PARENT CONTROL WIDTH)
-===================================================== */
-
-.feed-column {
-  flex: 1;              /* 👈 controls width ratio */
-  min-width: 0;         /* prevents overflow bugs */
-
-  display: flex;
-  flex-direction: column;
-
-  align-self: stretch;  /* more consistent than start */
-  overflow: hidden;     /* prevent layout leaks */
-
-  transform: translateY(-2px); /* optical alignment */
-}
-
-/* =====================================================
-STACK
-===================================================== */
-
-.feed-stack {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-
-  overflow-y: auto;     /* 👈 enable scroll */
-  padding-right: 4px;   /* avoid scrollbar clipping */
-}
-
-/* =====================================================
-CARD
+   COMMUNITY PLUS FEED CARD
 ===================================================== */
 
 .feed-card {
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.62);
+  width: 100%;
+
+  border: 1px solid var(--line, #e3d9cf);
+  border-left: 4px solid #555;
+
+  background: rgba(255, 255, 255, 0.72);
 
   border-radius: 20px;
-  padding: var(--space-3);
+  padding: var(--space-3, 16px);
 
-  box-shadow: var(--shadow-sm);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: var(--shadow-sm, 0 4px 14px rgba(0, 0, 0, 0.05));
 
+  cursor: pointer;
   overflow: hidden;
-}
 
-/* subtle optical tightening */
-.feed-card:first-child {
-  margin-top: -1px;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
 }
 
 .feed-card:hover {
   transform: translateY(-3px);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-md, 0 10px 26px rgba(0, 0, 0, 0.08));
+}
+
+.feed-card.active {
+  border-color: #4a0f0f;
+  border-left-color: #4a0f0f;
+  background: rgba(74, 15, 15, 0.06);
 }
 
 /* =====================================================
-HEADER
+   HEADER
 ===================================================== */
 
 .feed-card-header {
   display: flex;
   align-items: center;
-  margin-bottom: var(--space-2);
+  gap: var(--space-2, 10px);
+
+  margin-bottom: var(--space-2, 10px);
 }
 
 .feed-avatar {
   width: 38px;
   height: 38px;
+
   border-radius: 50%;
   object-fit: cover;
 
-  margin-right: var(--space-2);
+  border: 1px solid var(--line, #e3d9cf);
+  background: #ffffff;
 
-  border: 1px solid var(--line);
-  background: #fff;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-sm, 0 4px 14px rgba(0, 0, 0, 0.05));
 }
 
 .feed-meta {
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .feed-name {
-  font-size: var(--text-lg);
-  font-weight: var(--fw-bold);
-  color: var(--ink);
+  font-size: var(--text-lg, 16px);
+  font-weight: var(--fw-bold, 800);
+  color: var(--ink, #241f1c);
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .feed-time {
-  font-size: var(--text-xs);
-  color: var(--muted);
   margin-top: 2px;
+
+  font-size: var(--text-xs, 12px);
+  color: var(--muted, #746960);
 }
 
 /* =====================================================
-TEXT
+   TEXT
 ===================================================== */
 
 .feed-text {
-  font-size: var(--text-md);
-  color: var(--ink);
-  line-height: var(--lh-relaxed);
+  margin: var(--space-2, 10px) 0 0;
 
-  margin: var(--space-2) 0 var(--space-3);
+  font-size: var(--text-md, 14px);
+  line-height: var(--lh-relaxed, 1.6);
+
+  color: var(--ink, #241f1c);
 }
 
 /* =====================================================
-IMAGE
+   IMAGE
 ===================================================== */
 
 .feed-image {
   width: 100%;
+  max-height: 240px;
+
+  margin-top: var(--space-3, 16px);
+
+  object-fit: cover;
+
   border-radius: 14px;
-  box-shadow: var(--shadow-sm);
-  margin-top: var(--space-2);
+
+  box-shadow: var(--shadow-sm, 0 4px 14px rgba(0, 0, 0, 0.05));
 }
 
 /* =====================================================
-MAP COLUMN (BALANCE)
+   TYPE STATES
 ===================================================== */
-
-.map-column {
-  flex: 2;             /* 👈 ensures map is wider */
-  min-width: 0;
-
-  transform: translateY(-1px);
-}
-
-/* =====================================================
-STATE + TYPES
-===================================================== */
-
-.feed-card.active {
-  border: 2px solid #4a0f0f;
-  background: rgba(74, 15, 15, 0.05);
-}
 
 .feed-card.type-incident {
-  border-left: 4px solid #d92d20;
+  border-left-color: #d92d20;
 }
 
 .feed-card.type-event {
-  border-left: 4px solid #2e7d32;
+  border-left-color: #2e7d32;
+}
+
+.feed-card.type-beacon {
+  border-left-color: #7c3aed;
 }
 
 .feed-card.type-alert {
-  border-left: 4px solid #f59e0b;
+  border-left-color: #f59e0b;
+}
+
+.feed-card.type-blob {
+  border-left-color: #f97316;
+}
+
+.feed-card.type-now {
+  border-left-color: #8d1b1b;
 }
 
 .feed-card.type-post {
-  border-left: 4px solid #555;
+  border-left-color: #555555;
+}
+
+.feed-card.type-welcome {
+  border-left-color: #8d1b1b;
+  background: #fffdfb;
+}
+
+/* =====================================================
+   SYSTEM / EMPTY CARD
+===================================================== */
+
+.feed-card.type-welcome .feed-name,
+.feed-card.type-welcome .feed-text {
+  color: #4a0f0f;
+}
+
+.feed-card.type-welcome {
+  cursor: default;
+}
+
+.feed-card.type-welcome:hover {
+  transform: none;
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 700px) {
+  .feed-card {
+    border-radius: 18px;
+    padding: 14px;
+  }
+
+  .feed-image {
+    max-height: 200px;
+  }
 }

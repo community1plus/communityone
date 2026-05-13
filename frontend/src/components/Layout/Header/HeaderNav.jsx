@@ -30,20 +30,35 @@ export default function HeaderNav() {
     (path) => {
       if (!path) return false;
 
+      const pathname = routeLocation.pathname;
+      const search = routeLocation.search;
+
+      const isCommunityHome =
+        pathname === "/communityplus" || pathname === "/communityplus/home";
+
+      const isIViewRoute =
+        pathname.includes("/compose") ||
+        pathname.includes("/iview") ||
+        search.includes("mode=");
+
       if (path === "/") {
-        return routeLocation.pathname === "/";
+        return pathname === "/";
       }
 
       if (path === "/communityplus") {
-        return routeLocation.pathname === "/communityplus";
+        return isCommunityHome && !isIViewRoute;
       }
 
-      return (
-        routeLocation.pathname === path ||
-        routeLocation.pathname.startsWith(`${path}/`)
-      );
+      if (
+        path.toLowerCase().includes("iview") ||
+        path.toLowerCase().includes("compose")
+      ) {
+        return isIViewRoute;
+      }
+
+      return pathname === path || pathname.startsWith(`${path}/`);
     },
-    [routeLocation.pathname]
+    [routeLocation.pathname, routeLocation.search]
   );
 
   const handleNavigation = useCallback(
