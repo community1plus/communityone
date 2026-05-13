@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import "./CommunityPlusIViewPage.css";
-
-import CommunityPlusAdTv from "../../components/CommunityPlusAdTv/CommunityPlusAdTv";
+import CommunityPlusAdTv from "./CommunityPlusAdTv/CommunityPlusAdTv";
 
 const API_BASE =
   import.meta.env.VITE_API_BASE ||
