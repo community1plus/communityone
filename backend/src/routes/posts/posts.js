@@ -180,13 +180,17 @@ router.post("/", async (req, res) => {
     });
   } catch (error) {
     await client.query("ROLLBACK");
-
+    console.error("Create post failed:");
+    console.error(error);
     console.error("Create post failed:", error);
 
     return res.status(500).json({
       error: "Could not create post.",
     });
   } finally {
+    console.error("Create post failed:");
+    console.error(error);
+    console.error(error.message);
     client.release();
   }
 });
