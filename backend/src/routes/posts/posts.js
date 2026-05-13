@@ -23,6 +23,41 @@ function toTimestamp(value) {
   return new Date(value);
 }
 
+async function hydrateMediaWithSignedUrls(posts = []) {
+  return Promise.all(
+    posts.map(async (post) => {
+      const media = Array.isArray(post.media) ? post.media : [];
+
+      const hydratedMedia = await Promise.all(
+        media.map(async (item) => {
+          if (!item.s3Bucket || !item.s3Key) {
+            return item;
+          }
+
+          const command = new GetObjectCommand({
+            Bucket: item.s3Bucket,
+            Key: item.s3Key,
+          });
+
+          const signedUrl = await getSignedUrl(s3, command, {
+            expiresIn: 3600,
+          });
+
+          return {
+            ...item,
+            signedUrl,
+          };
+        })
+      );
+
+      return {
+        ...post,
+        media: hydratedMedia,
+      };
+    })
+  );
+}
+
 router.get("/", async (req, res) => {
   try {
     const {
@@ -83,8 +118,10 @@ router.get("/", async (req, res) => {
       values
     );
 
+    const posts = await hydrateMediaWithSignedUrls(result.rows);
+
     res.json({
-      posts: result.rows,
+    posts,
     });
   } catch (error) {
     console.error("Fetch posts failed:");
