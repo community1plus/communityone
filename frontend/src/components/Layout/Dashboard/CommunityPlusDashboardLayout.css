@@ -146,7 +146,7 @@ RESPONSIVE
 
   .dashboard-sidebar {
     height: auto;
-    max-height: 220px;
+    max-height: 200px;
 
     border-right: none;
     border-bottom: 1px solid #e6dfd8;
