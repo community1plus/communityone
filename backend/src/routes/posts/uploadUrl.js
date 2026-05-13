@@ -1,13 +1,8 @@
 import express from "express";
-
-import {
-  PutObjectCommand,
-} from "@aws-sdk/client-s3";
-
+import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 import { s3 } from "../../lib/s3.js";
-
 import { buildS3Key } from "../../utils/buildS3Key.js";
 
 const router = express.Router();
@@ -20,7 +15,7 @@ router.post("/", async (req, res) => {
       fileSize,
       mediaType,
       mode,
-    } = req.body;
+    } = req.body || {};
 
     if (!fileName || !fileType) {
       return res.status(400).json({
@@ -28,23 +23,11 @@ router.post("/", async (req, res) => {
       });
     }
 
-    /*
-      Replace with real authenticated user later
-    */
-
     const userId = req.user?.sub || "test-user";
 
-    /*
-      Replace later with real geo profile lookup
-    */
-
     const countryCode = process.env.COUNTRY_CODE || "au";
-
-    const awsRegion =
-      process.env.AWS_REGION || "ap-southeast-2";
-
+    const awsRegion = process.env.AWS_REGION || "ap-southeast-2";
     const state = "vic";
-
     const locality = "melbourne";
 
     const { mediaId, key } = buildS3Key({
@@ -63,25 +46,17 @@ router.post("/", async (req, res) => {
       ContentType: fileType,
     });
 
-    const uploadUrl = await getSignedUrl(
-      s3,
-      command,
-      {
-        expiresIn: 300,
-      }
-    );
+    const uploadUrl = await getSignedUrl(s3, command, {
+      expiresIn: 900,
+      unhoistableHeaders: new Set(["x-amz-checksum-crc32"]),
+    });
 
     return res.json({
       mediaId,
-
       uploadUrl,
-
       key,
-
       bucket: process.env.MEDIA_BUCKET,
-
       publicUrl: null,
-
       metadata: {
         fileName,
         fileType,
@@ -90,7 +65,7 @@ router.post("/", async (req, res) => {
       },
     });
   } catch (error) {
-    console.error(error);
+    console.error("Could not generate upload URL:", error);
 
     return res.status(500).json({
       error: "Could not generate upload URL",
