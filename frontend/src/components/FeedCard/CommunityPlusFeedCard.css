@@ -3,20 +3,31 @@
 ===================================================== */
 
 .feed-card {
-  width: 100%;
+  width: calc(100% - 28px);
+  max-width: 100%;
+
+  margin: 0 auto 16px auto;
 
   border: 1px solid var(--line, #e3d9cf);
-  background: rgba(255, 255, 255, 0.78);
+  background: rgba(255, 255, 255, 0.82);
 
   border-radius: 18px;
-  padding: 16px 18px;
+  padding: 18px 20px;
 
   box-shadow: var(--shadow-sm, 0 4px 14px rgba(0, 0, 0, 0.04));
 
   cursor: pointer;
   overflow: hidden;
 
-  font-family: Georgia, "Times New Roman", Times, serif;
+  /*
+  OLD SCHOOL MODERN TYPEWRITER
+  */
+
+  font-family:
+    "Courier New",
+    "IBM Plex Mono",
+    "Courier Prime",
+    monospace;
 
   transition:
     transform 0.2s ease,
@@ -25,9 +36,16 @@
     background 0.2s ease;
 }
 
+.feed-card:last-child {
+  margin-bottom: 0;
+}
+
 .feed-card:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-md, 0 10px 24px rgba(0, 0, 0, 0.07));
+
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.07),
+    0 0 0 1px rgba(141, 27, 27, 0.04);
 }
 
 .feed-card.active {
@@ -43,18 +61,19 @@
   width: 100%;
 
   display: grid;
-  grid-template-columns: 34px minmax(0, 1fr);
-  column-gap: 10px;
+  grid-template-columns: 36px minmax(0, 1fr);
+
+  column-gap: 12px;
 
   align-items: start;
 }
 
 .feed-card-title-row {
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .feed-card-time-row {
-  margin-bottom: 6px;
+  margin-bottom: 7px;
 }
 
 .feed-card-location-row {
@@ -62,8 +81,8 @@
 }
 
 .feed-row-spacer {
-  width: 34px;
-  min-width: 34px;
+  width: 36px;
+  min-width: 36px;
 }
 
 /* =====================================================
@@ -71,18 +90,26 @@
 ===================================================== */
 
 .feed-activity-icon {
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
   border-radius: 999px;
-  background: #f6efe9;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(248, 241, 236, 0.95),
+      rgba(243, 233, 226, 0.95)
+    );
 
   font-size: 17px;
   line-height: 1;
+
+  border: 1px solid rgba(141, 27, 27, 0.08);
 }
 
 .feed-title-group {
@@ -90,17 +117,20 @@
 
   display: flex;
   flex-direction: column;
-  gap: 2px;
+
+  gap: 3px;
 }
 
 .feed-activity-label {
-  font-family: Inter, "Segoe UI", sans-serif;
   font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
+  font-weight: 700;
+
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 
   color: #7a211d;
+
+  opacity: 0.9;
 }
 
 .feed-title {
@@ -108,11 +138,13 @@
 
   color: #1f1714;
 
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 700;
-  line-height: 1.25;
+  line-height: 1.28;
 
   letter-spacing: -0.01em;
+
+  word-break: break-word;
 }
 
 /* =====================================================
@@ -121,18 +153,19 @@
 
 .feed-time,
 .feed-location {
-  font-family: Georgia, "Times New Roman", Times, serif;
-
   color: #5f554d;
 
   font-size: 13px;
+  font-weight: 600;
+
   line-height: 1.35;
 }
 
 .feed-location {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+
+  gap: 6px;
 }
 
 .feed-pin {
@@ -148,13 +181,39 @@
   width: 100%;
   max-height: 220px;
 
-  margin-top: 14px;
+  margin-top: 16px;
 
   object-fit: cover;
 
   border-radius: 14px;
 
-  box-shadow: var(--shadow-sm, 0 4px 14px rgba(0, 0, 0, 0.05));
+  box-shadow:
+    0 4px 14px rgba(0, 0, 0, 0.05),
+    0 0 0 1px rgba(0, 0, 0, 0.03);
+}
+
+/* =====================================================
+   TYPE STATES
+===================================================== */
+
+.feed-card.type-incident .feed-activity-icon {
+  background: rgba(255, 237, 237, 0.95);
+}
+
+.feed-card.type-event .feed-activity-icon {
+  background: rgba(235, 247, 236, 0.95);
+}
+
+.feed-card.type-beacon .feed-activity-icon {
+  background: rgba(241, 236, 255, 0.95);
+}
+
+.feed-card.type-blob .feed-activity-icon {
+  background: rgba(255, 243, 231, 0.95);
+}
+
+.feed-card.type-now .feed-activity-icon {
+  background: rgba(255, 239, 239, 0.95);
 }
 
 /* =====================================================
@@ -176,33 +235,67 @@
 }
 
 /* =====================================================
+   FEED COLUMN SPACING
+===================================================== */
+
+.feed-list {
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+
+  padding:
+    6px 14px
+    24px 14px;
+
+  box-sizing: border-box;
+}
+
+/* =====================================================
    RESPONSIVE
 ===================================================== */
 
+@media (max-width: 900px) {
+  .feed-card {
+    width: calc(100% - 16px);
+  }
+}
+
 @media (max-width: 700px) {
   .feed-card {
+    width: calc(100% - 10px);
+
     border-radius: 16px;
-    padding: 14px 15px;
+
+    padding: 15px 16px;
   }
 
   .feed-card-row {
-    grid-template-columns: 30px minmax(0, 1fr);
-    column-gap: 8px;
+    grid-template-columns: 32px minmax(0, 1fr);
+
+    column-gap: 10px;
   }
 
   .feed-row-spacer,
   .feed-activity-icon {
-    width: 30px;
-    min-width: 30px;
+    width: 32px;
+    min-width: 32px;
   }
 
   .feed-activity-icon {
-    height: 30px;
+    height: 32px;
     font-size: 15px;
   }
 
   .feed-title {
     font-size: 16px;
+  }
+
+  .feed-time,
+  .feed-location {
+    font-size: 12px;
   }
 
   .feed-image {
