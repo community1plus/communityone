@@ -20,6 +20,80 @@ function toTimestamp(value) {
   return new Date(value);
 }
 
+router.get("/", async (req, res) => {
+  try {
+    const {
+      mode,
+      type,
+      limit = 30,
+      scope,
+    } = req.query;
+
+    const values = [];
+    const where = ["p.status = 'published'"];
+
+    if (mode) {
+      values.push(mode);
+      where.push(`p.mode = $${values.length}`);
+    }
+
+    if (type) {
+      values.push(type);
+      where.push(`p.type = $${values.length}`);
+    }
+
+    if (scope) {
+      values.push(scope);
+      where.push(`p.scope = $${values.length}`);
+    }
+
+    values.push(Number(limit));
+
+    const result = await pool.query(
+      `
+      select
+        p.*,
+        coalesce(
+          json_agg(
+            json_build_object(
+              'id', pm.id,
+              'fileName', pm.file_name,
+              'fileType', pm.file_type,
+              'fileSize', pm.file_size,
+              'mediaType', pm.media_type,
+              's3Bucket', pm.s3_bucket,
+              's3Key', pm.s3_key,
+              'publicUrl', pm.public_url,
+              'thumbnailUrl', pm.thumbnail_url
+            )
+          ) filter (where pm.id is not null),
+          '[]'
+        ) as media
+      from posts p
+      left join post_media pm
+        on pm.post_id = p.id
+      where ${where.join(" and ")}
+      group by p.id
+      order by p.created_at desc
+      limit $${values.length}
+      `,
+      values
+    );
+
+    res.json({
+      posts: result.rows,
+    });
+  } catch (error) {
+    console.error("Fetch posts failed:");
+    console.error(error);
+
+    res.status(500).json({
+      error: "Could not fetch posts.",
+      detail: error.message,
+    });
+  }
+});
+
 router.post("/", async (req, res) => {
   const client = await pool.connect();
 
