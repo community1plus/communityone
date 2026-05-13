@@ -1,6 +1,6 @@
 import "./CommunityPlusIViewPage.css";
 
-import CommunityPlusAdTv from "../../components/CommunityPlusAdTv/CommunityPlusAdTv";
+import CommunityPlusAdTv from "../../pages/CommunityPlusAdTv/CommunityPlusAdTv";
 
 const MOCK_FEED = [
   {
