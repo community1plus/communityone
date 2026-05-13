@@ -1,27 +1,55 @@
 .iview-page {
   width: 100%;
   height: 100%;
+
   min-width: 0;
   min-height: 0;
 
-  padding: 22px;
+  padding: 18px 18px 18px 18px;
 
   background: #f7f4ef;
 
   box-sizing: border-box;
-  overflow-y: auto;
+
+  /* REMOVE PAGE SCROLLBAR */
+  overflow: hidden;
+
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
 }
+
+/* =====================================================
+GRID
+===================================================== */
 
 .iview-grid {
   width: 100%;
-  max-width: 1320px;
+  height: 100%;
+
+  max-width: 1480px;
+
   margin: 0 auto;
 
   display: grid;
+
+  /* 3 equal cards */
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-auto-rows: minmax(260px, auto);
-  gap: 22px;
+
+  /*
+    Fit perfectly into viewport/content pane
+    without vertical scrolling
+  */
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+
+  gap: 18px;
+
+  min-height: 0;
 }
+
+/* =====================================================
+CARDS
+===================================================== */
 
 .iview-card,
 .iview-ad-slot {
@@ -31,25 +59,41 @@
   border-radius: 24px;
   overflow: hidden;
 
-  background: #111;
+  background: #111111;
 
-  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.10);
 
   transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
 }
 
 .iview-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.18);
+  transform: translateY(-3px);
+
+  box-shadow:
+    0 18px 38px rgba(0, 0, 0, 0.16);
 }
+
+/* =====================================================
+MEDIA
+===================================================== */
 
 .iview-media {
   position: relative;
 
   width: 100%;
-  aspect-ratio: 16 / 10;
+
+  /*
+    REDUCED HEIGHT
+    so entire 2x3 matrix fits on screen
+  */
+  flex: 1 1 auto;
+
+  min-height: 0;
 
   background: #050505;
 }
@@ -63,14 +107,21 @@
   object-fit: cover;
 }
 
+/* =====================================================
+BOTTOM META PANEL
+===================================================== */
+
 .iview-meta {
-  padding: 14px 16px 16px;
+  padding: 14px 16px;
 
   display: grid;
   grid-template-columns: 1fr auto;
+
   gap: 8px 12px;
 
   background: #ffffff;
+
+  flex-shrink: 0;
 }
 
 .iview-title {
@@ -81,6 +132,13 @@
   font-size: 15px;
   font-weight: 800;
   line-height: 1.3;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 .iview-subline {
@@ -101,7 +159,7 @@
 }
 
 .iview-track {
-  padding: 7px 12px;
+  padding: 7px 14px;
 
   border: none;
   border-radius: 999px;
@@ -113,11 +171,20 @@
   font-weight: 800;
 
   cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
 }
 
 .iview-track:hover {
   background: #6f1111;
+  transform: translateY(-1px);
 }
+
+/* =====================================================
+AD.TV SLOT
+===================================================== */
 
 .iview-ad-slot {
   background: #050505;
@@ -126,26 +193,56 @@
 .iview-ad-slot .adtv-tv-shell {
   width: 100%;
   height: 100%;
+
   border-radius: 24px;
+  overflow: hidden;
 }
 
 .iview-ad-slot .adtv-screen {
+  width: 100%;
+  height: 100%;
   min-height: 100%;
 }
 
-@media (max-width: 1200px) {
+/* =====================================================
+RESPONSIVE
+===================================================== */
+
+@media (max-width: 1280px) {
+  .iview-page {
+    overflow-y: auto;
+  }
+
   .iview-grid {
+    height: auto;
+
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: auto;
+  }
+
+  .iview-media {
+    aspect-ratio: 16 / 10;
   }
 }
 
 @media (max-width: 760px) {
   .iview-page {
-    padding: 16px;
+    padding: 14px;
+    overflow-y: auto;
   }
 
   .iview-grid {
     grid-template-columns: 1fr;
-    gap: 18px;
+    grid-template-rows: auto;
+
+    gap: 16px;
+  }
+
+  .iview-media {
+    aspect-ratio: 16 / 10;
+  }
+
+  .iview-title {
+    font-size: 14px;
   }
 }
