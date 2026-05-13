@@ -236,3 +236,46 @@
     font-size: 14px;
   }
 }
+
+.iview-state {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #4a0f0f;
+
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.iview-state.error {
+  color: #b42318;
+}
+
+.iview-empty-media {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background:
+    radial-gradient(circle, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    #111;
+
+  background-size: 10px 10px;
+
+  color: rgba(255, 255, 255, 0.7);
+
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.iview-card.empty {
+  background: #111;
+}
