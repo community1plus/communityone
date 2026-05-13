@@ -23,7 +23,12 @@ export const NAVIGATION = [
         type: "route",
         path: "/communityplus/yellowpages",
       },
-
+      {
+        id: "iview",
+        label: "iVIEW",
+        type: "route",
+        path: "/communityplus/iview",
+      },
       {
         id: "about",
         label: "About Us",

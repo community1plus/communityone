@@ -12,6 +12,7 @@ import CommunityPlusDashboardLayout from "./components/Layout/Dashboard/Communit
 import CommunityPlusDashboardHome from "./pages/CommunityPlusDashboardHome/CommunityPlusDashboardHome";
 import CommunityPlusYellowPages from "./pages/CommunityPlusYellowPages/CommunityPlusYellowPages";
 import CommunityPlusUserProfile from "./pages/CommunityPlusUserProfile/CommunityPlusUserProfile";
+import CommunityPlusIViewPage from "./pages/CommunityPlusIViewPage/CommunityPlusIViewPage";
 import PostComposer from "./components/Layout/Sidebar/Post/PostComposer";
 
 function Placeholder({ title }) {
@@ -80,6 +81,7 @@ export default function App() {
         <Route path="/communityplus" element={<CommunityPlusDashboardLayout />}>
           {/* PUBLIC / GUEST BROWSING */}
           <Route index element={<CommunityPlusDashboardHome />} />
+          <Route path="iview" element={<CommunityPlusIViewPage />} />
           <Route path="about" element={<CommunityPlusAboutPage />} />
           <Route path="yellowpages" element={<CommunityPlusYellowPages />} />
           <Route path="channels" element={<Placeholder title="Channels" />} />
