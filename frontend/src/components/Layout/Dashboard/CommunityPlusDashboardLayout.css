@@ -72,6 +72,10 @@ SIDEBAR
 CONTENT SHELL
 ========================= */
 
+/* =========================
+CONTENT SHELL
+========================= */
+
 .dashboard-content {
   width: 100%;
   height: 100%;
@@ -81,6 +85,8 @@ CONTENT SHELL
 
   display: block;
   overflow: hidden;
+
+  padding-left: 0;
 }
 
 /* =========================
@@ -104,14 +110,19 @@ MAP CONTAINER
 CONTROLLED INNER SCROLL ONLY
 ========================= */
 
+/* =========================
+CONTROLLED INNER SCROLL ONLY
+========================= */
+
 .scroll-container {
   min-height: 0;
 
-  padding: 16px;
+  padding: 10px 12px 14px 10px;
 
   overflow-y: auto;
   overflow-x: hidden;
 }
+
 
 /* =========================
 RESPONSIVE
