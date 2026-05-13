@@ -9,14 +9,6 @@ export const NAVIGATION = [
         type: "route",
         path: "/communityplus",
       },
-
-      {
-        id: "iview",
-        label: "iVIEW",
-        type: "route",
-        path: "/communityplus/compose/now",
-      },
-
       {
         id: "yellowpages",
         label: "Yellow Pages",

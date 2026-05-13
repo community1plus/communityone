@@ -41,7 +41,7 @@ export default function HeaderNav() {
       }
 
       const isIViewRoute =
-        pathname.includes("/iview") || pathname.includes("/compose");
+        pathname.includes("/iview") || pathname.includes("/view");
 
       const isIViewNav =
         path.toLowerCase().includes("iview") ||
