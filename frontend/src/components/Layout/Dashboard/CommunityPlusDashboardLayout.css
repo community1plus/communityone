@@ -20,6 +20,13 @@ body,
 
   background: #faf7f4;
   overflow: hidden;
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(120, 60, 40, 0.03),
+      transparent 40%
+    ),
+    #faf7f4;
 }
 
 /* =========================

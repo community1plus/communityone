@@ -40,8 +40,12 @@ SECTION
   flex-direction: column;
   gap: 6px;
 
-  padding-bottom: 14px;
+  padding-bottom: 18px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.sidebar-item {
+  padding: 10px 14px;
 }
 
 .sidebar-section:last-child {
