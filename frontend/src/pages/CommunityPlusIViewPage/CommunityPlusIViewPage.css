@@ -80,6 +80,20 @@
   display: block;
 
   object-fit: cover;
+
+  opacity: 0;
+
+  transition:
+    opacity 0.25s ease,
+    transform 0.35s ease;
+}
+
+.iview-image.loaded {
+  opacity: 1;
+}
+
+.iview-card:hover .iview-image.loaded {
+  transform: scale(1.03);
 }
 
 .iview-meta {
@@ -110,7 +124,7 @@
 
   font-size: 16px;
   font-weight: 700;
-  line-height: 1.20;
+  line-height: 1.2;
 
   letter-spacing: -0.01em;
 
@@ -120,6 +134,13 @@
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
+
+  background: none;
+  border: none;
+  padding: 0;
+  text-align: left;
+  font-family: inherit;
+  cursor: pointer;
 }
 
 .iview-subline {
@@ -143,7 +164,7 @@
 .iview-track {
   padding: 7px 14px;
 
-  border: 0px solid #cfe8ff;
+  border: 0;
   border-radius: 999px;
 
   background: #ffffff;
@@ -166,7 +187,6 @@
   transition:
     background 0.2s ease,
     color 0.2s ease,
-    border-color 0.2s ease,
     transform 0.2s ease,
     box-shadow 0.2s ease;
 }
@@ -174,7 +194,6 @@
 .iview-track:hover {
   background: #f2f9ff;
   color: #256ca8;
-  border-color: #a8d8ff;
   transform: translateY(-1px);
   box-shadow: 0 6px 16px rgba(59, 130, 196, 0.14);
 }
@@ -198,6 +217,411 @@
   min-height: 100%;
 }
 
+/* STATES */
+
+.iview-state {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #4a0f0f;
+
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.iview-state.error {
+  color: #b42318;
+}
+
+.iview-empty-media,
+.iview-media-loading {
+  position: absolute;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background:
+    radial-gradient(circle, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    #111;
+
+  background-size: 10px 10px;
+
+  color: rgba(255, 255, 255, 0.7);
+
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+
+  z-index: 1;
+}
+
+.iview-media-loading {
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 12px;
+}
+
+.iview-card.empty {
+  background: #111;
+}
+
+/* =====================================================
+   DETAIL PANEL
+===================================================== */
+
+.iview-detail-shell {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+
+  position: relative;
+
+  background: #f7f4ef;
+
+  overflow: hidden;
+}
+
+.iview-detail-close {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  z-index: 20;
+
+  width: 36px;
+  height: 36px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #e3d9cf;
+  border-radius: 999px;
+
+  background: #ffffff;
+  color: #4a0f0f;
+
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+
+  cursor: pointer;
+
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.iview-detail-layout {
+  width: 100%;
+  height: 100%;
+
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(340px, 0.85fr);
+  gap: 18px;
+
+  padding: 18px;
+  box-sizing: border-box;
+}
+
+.iview-detail-main,
+.iview-detail-side {
+  min-width: 0;
+  min-height: 0;
+}
+
+.iview-detail-main {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto auto;
+  gap: 12px;
+}
+
+.iview-detail-player {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+
+  position: relative;
+
+  border-radius: 22px;
+  overflow: hidden;
+
+  background: #050505;
+
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.14);
+}
+
+.iview-detail-player .iview-image {
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;
+
+  background: #050505;
+}
+
+.iview-detail-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  font-family:
+    "Courier New",
+    "IBM Plex Mono",
+    monospace;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  color: #5f554d;
+}
+
+.iview-detail-actions button {
+  padding: 7px 13px;
+
+  border: 1px solid #cfe8ff;
+  border-radius: 999px;
+
+  background: #ffffff;
+  color: #3b82c4;
+
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: lowercase;
+
+  cursor: pointer;
+}
+
+.iview-detail-description {
+  padding: 14px 16px;
+
+  border: 1px solid #e3d9cf;
+  border-radius: 18px;
+
+  background: #ffffff;
+}
+
+.iview-detail-description h1 {
+  margin: 0 0 8px;
+
+  color: #ff425b;
+
+  font-family:
+    "Courier New",
+    "IBM Plex Mono",
+    monospace;
+
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.iview-detail-description p {
+  margin: 0 0 10px;
+
+  color: #3e3630;
+
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.iview-detail-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+
+  color: #6d625a;
+
+  font-size: 12px;
+  font-weight: 650;
+}
+
+/* RIGHT RAIL */
+
+.iview-detail-side {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 14px;
+}
+
+.iview-ai-summary,
+.iview-comments {
+  min-width: 0;
+
+  border: 1px solid #e3d9cf;
+  border-radius: 20px;
+
+  background: #ffffff;
+
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.04);
+}
+
+.iview-ai-summary {
+  padding: 14px 15px;
+}
+
+.iview-ai-summary p {
+  margin: 8px 0 0;
+
+  color: #3e3630;
+
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.iview-side-label {
+  color: #8d1b1b;
+
+  font-family:
+    "Courier New",
+    "IBM Plex Mono",
+    monospace;
+
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.iview-comments {
+  min-height: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 14px;
+
+  overflow: hidden;
+}
+
+.iview-comment-box {
+  margin-top: 12px;
+
+  display: grid;
+  gap: 8px;
+}
+
+.iview-comment-box textarea {
+  width: 100%;
+  min-height: 76px;
+
+  resize: none;
+
+  padding: 10px 11px;
+
+  border: 1px solid #e3d9cf;
+  border-radius: 14px;
+
+  outline: none;
+
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.45;
+
+  box-sizing: border-box;
+}
+
+.iview-comment-box textarea:focus {
+  border-color: #d6b8a6;
+  box-shadow: 0 0 0 3px rgba(141, 27, 27, 0.06);
+}
+
+.iview-comment-box button {
+  justify-self: end;
+
+  padding: 7px 14px;
+
+  border: none;
+  border-radius: 999px;
+
+  background: #4a0f0f;
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: lowercase;
+
+  cursor: pointer;
+}
+
+.iview-comment-box button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.iview-comment-list {
+  min-height: 0;
+  overflow-y: auto;
+
+  margin-top: 12px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  padding-right: 4px;
+}
+
+.iview-comment {
+  padding: 10px 11px;
+
+  border-radius: 14px;
+
+  background: #faf8f5;
+}
+
+.iview-comment-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+
+  margin-bottom: 5px;
+
+  color: #4f4943;
+
+  font-size: 12px;
+}
+
+.iview-comment-header span {
+  color: #8a7d72;
+}
+
+.iview-comment p {
+  margin: 0;
+
+  color: #2f2a25;
+
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.iview-refresh-indicator {
+  position: absolute;
+  right: 22px;
+  bottom: 22px;
+
+  padding: 8px 12px;
+
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, 0.92);
+  color: #4a0f0f;
+
+  font-size: 12px;
+  font-weight: 800;
+
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+/* RESPONSIVE */
+
 @media (max-width: 1280px) {
   .iview-page {
     overflow-y: auto;
@@ -212,6 +636,23 @@
 
   .iview-media {
     aspect-ratio: 16 / 10;
+  }
+}
+
+@media (max-width: 980px) {
+  .iview-detail-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(360px, 55vh) auto;
+
+    overflow-y: auto;
+  }
+
+  .iview-detail-side {
+    grid-template-rows: auto auto;
+  }
+
+  .iview-comments {
+    max-height: 420px;
   }
 }
 
@@ -235,85 +676,4 @@
   .iview-title {
     font-size: 14px;
   }
-}
-
-.iview-state {
-  width: 100%;
-  height: 100%;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  color: #4a0f0f;
-
-  font-size: 15px;
-  font-weight: 700;
-}
-
-.iview-state.error {
-  color: #b42318;
-}
-
-.iview-empty-media {
-  width: 100%;
-  height: 100%;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  background:
-    radial-gradient(circle, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
-    #111;
-
-  background-size: 10px 10px;
-
-  color: rgba(255, 255, 255, 0.7);
-
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-}
-
-.iview-card.empty {
-  background: #111;
-}
-
-.iview-media-loading {
-  position: absolute;
-  inset: 0;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  background:
-    radial-gradient(circle, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
-    #111;
-
-  background-size: 10px 10px;
-
-  color: rgba(255, 255, 255, 0.62);
-
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-
-  z-index: 1;
-}
-
-.iview-image {
-  opacity: 0;
-  transition:
-    opacity 0.25s ease,
-    transform 0.35s ease;
-}
-
-.iview-image.loaded {
-  opacity: 1;
-}
-
-.iview-card:hover .iview-image.loaded {
-  transform: scale(1.03);
 }
