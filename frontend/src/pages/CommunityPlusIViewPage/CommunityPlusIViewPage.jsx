@@ -13,21 +13,6 @@ const FEED_LIMIT = 5;
 const FEED_REFRESH_MS = 5 * 60 * 1000;
 const MEDIA_LOAD_TIMEOUT_MS = 8000;
 
-const MOCK_COMMENTS = [
-  {
-    id: "c1",
-    user: "Community Member",
-    text: "This is useful. I saw something similar nearby.",
-    createdAt: "2m ago",
-  },
-  {
-    id: "c2",
-    user: "Local Viewer",
-    text: "Can someone confirm if this is still current?",
-    createdAt: "6m ago",
-  },
-];
-
 function getMediaUrl(post) {
   const firstMedia = post.media?.[0];
 
@@ -59,6 +44,28 @@ function formatDate(value) {
   }).format(new Date(value));
 }
 
+function formatCommentTime(value) {
+  if (!value) return "Just now";
+
+  const created = new Date(value).getTime();
+  const now = Date.now();
+
+  if (Number.isNaN(created)) return "Just now";
+
+  const minutes = Math.floor((now - created) / 60000);
+
+  if (minutes < 1) return "Just now";
+  if (minutes < 60) return `${minutes}m ago`;
+
+  const hours = Math.floor(minutes / 60);
+
+  if (hours < 24) return `${hours}h ago`;
+
+  const days = Math.floor(hours / 24);
+
+  return `${days}d ago`;
+}
+
 function IViewMedia({ post, detail = false, onMediaExpired }) {
   const mediaUrl = getMediaUrl(post);
   const mediaType = getMediaType(post);
@@ -76,10 +83,7 @@ function IViewMedia({ post, detail = false, onMediaExpired }) {
 
     const timer = setTimeout(() => {
       setMediaFailed(true);
-
-      if (onMediaExpired) {
-        onMediaExpired(post.id);
-      }
+      onMediaExpired?.(post.id);
     }, MEDIA_LOAD_TIMEOUT_MS);
 
     return () => clearTimeout(timer);
@@ -87,10 +91,7 @@ function IViewMedia({ post, detail = false, onMediaExpired }) {
 
   const handleMediaError = () => {
     setMediaFailed(true);
-
-    if (onMediaExpired) {
-      onMediaExpired(post.id);
-    }
+    onMediaExpired?.(post.id);
   };
 
   return (
@@ -170,9 +171,12 @@ function IViewCard({ item, onOpen, onMediaExpired }) {
 
 function IViewDetailPanel({ post, onClose, onMediaExpired }) {
   const [commentText, setCommentText] = useState("");
+  const [comments, setComments] = useState([]);
+  const [commentsLoading, setCommentsLoading] = useState(true);
+  const [commentsError, setCommentsError] = useState("");
+  const [postingComment, setPostingComment] = useState(false);
 
   const uploader = post.uploader || post.user_id || "Community Member";
-  const comments = post.comments || MOCK_COMMENTS;
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -187,6 +191,85 @@ function IViewDetailPanel({ post, onClose, onMediaExpired }) {
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [onClose]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function fetchComments() {
+      if (!API_BASE || !post?.id) return;
+
+      try {
+        setCommentsLoading(true);
+        setCommentsError("");
+
+        const response = await fetch(`${API_BASE}/posts/${post.id}/comments`, {
+          cache: "no-store",
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data?.error || "Could not load comments.");
+        }
+
+        if (!cancelled) {
+          setComments(Array.isArray(data.comments) ? data.comments : []);
+        }
+      } catch (error) {
+        console.error("Fetch comments failed:", error);
+
+        if (!cancelled) {
+          setComments([]);
+          setCommentsError("Could not load comments.");
+        }
+      } finally {
+        if (!cancelled) {
+          setCommentsLoading(false);
+        }
+      }
+    }
+
+    fetchComments();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [post.id]);
+
+  const handlePostComment = async () => {
+    const cleanComment = commentText.trim();
+
+    if (!cleanComment || postingComment) return;
+
+    try {
+      setPostingComment(true);
+      setCommentsError("");
+
+      const response = await fetch(`${API_BASE}/posts/${post.id}/comments`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          comment: cleanComment,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.error || "Could not post comment.");
+      }
+
+      setComments((prev) => [data.comment, ...prev]);
+      setCommentText("");
+    } catch (error) {
+      console.error("Post comment failed:", error);
+      setCommentsError("Could not post comment.");
+    } finally {
+      setPostingComment(false);
+    }
+  };
 
   return (
     <section
@@ -251,22 +334,46 @@ function IViewDetailPanel({ post, onClose, onMediaExpired }) {
                 placeholder="Respond to this post..."
               />
 
-              <button type="button" disabled={!commentText.trim()}>
-                post
+              <button
+                type="button"
+                disabled={!commentText.trim() || postingComment}
+                onClick={handlePostComment}
+              >
+                {postingComment ? "posting..." : "post"}
               </button>
             </div>
 
             <div className="iview-comment-list">
-              {comments.map((comment) => (
-                <article key={comment.id} className="iview-comment">
-                  <div className="iview-comment-header">
-                    <strong>{comment.user}</strong>
-                    <span>{comment.createdAt}</span>
-                  </div>
+              {commentsLoading && (
+                <div className="iview-comment-loading">
+                  Loading comments...
+                </div>
+              )}
 
-                  <p>{comment.text}</p>
-                </article>
-              ))}
+              {!commentsLoading && commentsError && (
+                <div className="iview-comment-loading error">
+                  {commentsError}
+                </div>
+              )}
+
+              {!commentsLoading && !commentsError && comments.length === 0 && (
+                <div className="iview-comment-loading">
+                  No comments yet. Start the discussion.
+                </div>
+              )}
+
+              {!commentsLoading &&
+                !commentsError &&
+                comments.map((comment) => (
+                  <article key={comment.id} className="iview-comment">
+                    <div className="iview-comment-header">
+                      <strong>{comment.user_id || "Community Member"}</strong>
+                      <span>{formatCommentTime(comment.created_at)}</span>
+                    </div>
+
+                    <p>{comment.comment}</p>
+                  </article>
+                ))}
             </div>
           </section>
         </aside>
@@ -282,51 +389,47 @@ export default function CommunityPlusIViewPage() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
 
-  const fetchPosts = useCallback(
-    async ({ silent = false } = {}) => {
-      if (!API_BASE) {
-        setError("Backend API is not configured.");
-        setLoading(false);
-        return;
+  const fetchPosts = useCallback(async ({ silent = false } = {}) => {
+    if (!API_BASE) {
+      setError("Backend API is not configured.");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      if (silent) {
+        setRefreshing(true);
+      } else {
+        setLoading(true);
       }
 
-      try {
-        if (silent) {
-          setRefreshing(true);
-        } else {
-          setLoading(true);
-        }
+      setError("");
 
-        setError("");
+      const response = await fetch(`${API_BASE}/posts?limit=${FEED_LIMIT}`, {
+        cache: "no-store",
+      });
 
-        const response = await fetch(`${API_BASE}/posts?limit=${FEED_LIMIT}`, {
-          cache: "no-store",
-        });
+      const data = await response.json();
 
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data?.error || "Could not fetch posts.");
-        }
-
-        const nextPosts = Array.isArray(data.posts) ? data.posts : [];
-
-        setPosts(nextPosts);
-
-        setSelectedPost((current) => {
-          if (!current) return null;
-
-          return nextPosts.find((post) => post.id === current.id) || current;
-        });
-      } catch (err) {
-        setError(err?.message || "Could not load iVIEW feed.");
-      } finally {
-        setLoading(false);
-        setRefreshing(false);
+      if (!response.ok) {
+        throw new Error(data?.error || "Could not fetch posts.");
       }
-    },
-    []
-  );
+
+      const nextPosts = Array.isArray(data.posts) ? data.posts : [];
+
+      setPosts(nextPosts);
+
+      setSelectedPost((current) => {
+        if (!current) return null;
+        return nextPosts.find((post) => post.id === current.id) || current;
+      });
+    } catch (err) {
+      setError(err?.message || "Could not load iVIEW feed.");
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
 
   useEffect(() => {
     fetchPosts();
@@ -377,15 +480,15 @@ export default function CommunityPlusIViewPage() {
             />
           ))}
 
-          {Array.from({ length: Math.max(0, FEED_LIMIT - feedItems.length) }).map(
-            (_, index) => (
-              <div key={`empty-${index}`} className="iview-card empty">
-                <div className="iview-empty-media">
-                  <span>No content yet</span>
-                </div>
+          {Array.from({
+            length: Math.max(0, FEED_LIMIT - feedItems.length),
+          }).map((_, index) => (
+            <div key={`empty-${index}`} className="iview-card empty">
+              <div className="iview-empty-media">
+                <span>No content yet</span>
               </div>
-            )
-          )}
+            </div>
+          ))}
 
           <div className="iview-ad-slot">
             <CommunityPlusAdTv mode="page" context="iview" tvMode="idle" />
