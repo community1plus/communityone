@@ -134,6 +134,84 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.get("/:postId/comments", async (req, res) => {
+  try {
+    const { postId } = req.params;
+
+    const result = await pool.query(
+      `
+      select
+        id,
+        post_id,
+        user_id,
+        comment,
+        status,
+        created_at
+      from post_comments
+      where post_id = $1
+        and status = 'published'
+      order by created_at desc
+      limit 100
+      `,
+      [postId]
+    );
+
+    res.json({
+      comments: result.rows,
+    });
+  } catch (error) {
+    console.error("Fetch comments failed:", error);
+
+    res.status(500).json({
+      error: "Could not fetch comments.",
+    });
+  }
+});
+
+router.post("/:postId/comments", async (req, res) => {
+  try {
+    const { postId } = req.params;
+    const { comment } = req.body || {};
+
+    if (!comment || !String(comment).trim()) {
+      return res.status(400).json({
+        error: "Comment is required.",
+      });
+    }
+
+    const userId = req.user?.sub || "test-user";
+
+    const result = await pool.query(
+      `
+      insert into post_comments (
+        post_id,
+        user_id,
+        comment
+      )
+      values ($1, $2, $3)
+      returning
+        id,
+        post_id,
+        user_id,
+        comment,
+        status,
+        created_at
+      `,
+      [postId, userId, String(comment).trim()]
+    );
+
+    res.status(201).json({
+      comment: result.rows[0],
+    });
+  } catch (error) {
+    console.error("Create comment failed:", error);
+
+    res.status(500).json({
+      error: "Could not create comment.",
+    });
+  }
+});
+
 router.post("/", async (req, res) => {
   const client = await pool.connect();
 
