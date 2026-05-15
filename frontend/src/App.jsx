@@ -15,7 +15,6 @@ import CommunityPlusUserProfile from "./pages/CommunityPlusUserProfile/Community
 import CommunityPlusIViewPage from "./pages/CommunityPlusIViewPage/CommunityPlusIViewPage";
 import CommunityPlusChannels from "./pages/communityPlusChannels/communityPlusChannels";
 import PostComposer from "./pages/CommunityPlusAdTv/CommunityPlusAdTv";
-import "../
 
 function Placeholder({ title }) {
   return (
