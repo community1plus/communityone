@@ -1,0 +1,74 @@
+.channels-page {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+
+  padding: 18px;
+
+  background: #f7f4ef;
+
+  box-sizing: border-box;
+  overflow: hidden;
+
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 18px;
+}
+
+.channels-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.channels-nav-item {
+  padding: 9px 18px;
+
+  border: 1px solid #e3d9cf;
+  border-radius: 999px;
+
+  background: #ffffff;
+  color: #2f2a25;
+
+  font-size: 13px;
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+.channels-nav-item.active {
+  background: #4a0f0f;
+  border-color: #4a0f0f;
+  color: #ffffff;
+}
+
+.channels-content {
+  min-height: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ad-channel-panel {
+  width: min(100%, 920px);
+  height: min(100%, 520px);
+
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+.channel-placeholder {
+  text-align: center;
+  color: #4a0f0f;
+}
+
+.channel-placeholder h1 {
+  margin: 0 0 8px;
+}
+
+.channel-placeholder p {
+  margin: 0;
+  color: #6d625a;
+}
