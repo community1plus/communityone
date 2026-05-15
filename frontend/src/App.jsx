@@ -13,6 +13,7 @@ import CommunityPlusDashboardHome from "./pages/CommunityPlusDashboardHome/Commu
 import CommunityPlusYellowPages from "./pages/CommunityPlusYellowPages/CommunityPlusYellowPages";
 import CommunityPlusUserProfile from "./pages/CommunityPlusUserProfile/CommunityPlusUserProfile";
 import CommunityPlusIViewPage from "./pages/CommunityPlusIViewPage/CommunityPlusIViewPage";
+import CommunityPlusChannels from "./pages/CommunityPlusChannels/CommunityPlusChannels";
 import PostComposer from "./components/Layout/Sidebar/Post/PostComposer";
 
 function Placeholder({ title }) {
@@ -84,7 +85,7 @@ export default function App() {
           <Route path="iview" element={<CommunityPlusIViewPage />} />
           <Route path="about" element={<CommunityPlusAboutPage />} />
           <Route path="yellowpages" element={<CommunityPlusYellowPages />} />
-          <Route path="channels" element={<Placeholder title="Channels" />} />
+          <Route path="channels" element={<CommunityPlusChannels />} />
           <Route path="help" element={<Placeholder title="Help" />} />
 
           {/* PROTECTED */}
