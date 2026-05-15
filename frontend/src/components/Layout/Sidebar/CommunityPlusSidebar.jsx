@@ -87,7 +87,7 @@ export default function CommunityPlusSidebar() {
   );
 
   const handleEchoClick = useCallback(() => {
-    navigate("/communityplus/iview", {
+    navigate("/communityplus/echo", {
       state: {
         source: "echo",
       },
