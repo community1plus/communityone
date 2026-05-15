@@ -87,15 +87,6 @@ export default function CommunityPlusSidebar() {
   );
 
   const handleEchoClick = useCallback(() => {
-    /*
-      Echo stays subtle for now.
-      Later this can open:
-      - a hidden drawer
-      - drops
-      - signal archive
-      - merch reservation flow
-    */
-
     navigate("/communityplus/iview", {
       state: {
         source: "echo",
@@ -146,9 +137,10 @@ export default function CommunityPlusSidebar() {
         type="button"
         className="echo-sidebar-signal"
         onClick={handleEchoClick}
-        aria-label="Echo signal"
-        title="echo"
+        aria-label="echo"
       >
+        <span className="echo-tooltip">echo</span>
+
         <span className="echo-sidebar-mark">+</span>
 
         <span className="echo-sidebar-meta">

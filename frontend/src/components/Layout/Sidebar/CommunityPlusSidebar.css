@@ -208,3 +208,60 @@ RESPONSIVE
   }
 }
 
+/* ========================================
+   ECHO TOOLTIP
+======================================== */
+
+.echo-sidebar-signal {
+  position: relative;
+}
+
+.echo-tooltip {
+  position: absolute;
+
+  left: calc(100% + 10px);
+  top: 50%;
+
+  transform:
+    translateY(-50%)
+    translateX(-4px);
+
+  padding: 6px 10px;
+
+  border-radius: 999px;
+
+  background: #ffffff;
+  border: 1px solid rgba(74, 15, 15, 0.08);
+
+  color: #4a0f0f;
+
+  font-family:
+    "Courier New",
+    "IBM Plex Mono",
+    monospace;
+
+  font-size: 11px;
+  font-weight: 800;
+
+  text-transform: lowercase;
+
+  white-space: nowrap;
+
+  opacity: 0;
+  pointer-events: none;
+
+  box-shadow: 0 10px 24px rgba(0,0,0,0.08);
+
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease;
+}
+
+.echo-sidebar-signal:hover .echo-tooltip {
+  opacity: 1;
+
+  transform:
+    translateY(-50%)
+    translateX(0);
+}
+
