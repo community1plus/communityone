@@ -385,7 +385,7 @@ RESPONSIVE
   .echo-sidebar-signal:hover {
     transform: translateX(-50%);
   }
-
+ /**/
   .echo-tooltip {
     display: none;
   }
