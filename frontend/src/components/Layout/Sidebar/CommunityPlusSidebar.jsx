@@ -86,42 +86,76 @@ export default function CommunityPlusSidebar() {
     [navigate, handleLogout]
   );
 
+  const handleEchoClick = useCallback(() => {
+    /*
+      Echo stays subtle for now.
+      Later this can open:
+      - a hidden drawer
+      - drops
+      - signal archive
+      - merch reservation flow
+    */
+
+    navigate("/communityplus/iview", {
+      state: {
+        source: "echo",
+      },
+    });
+  }, [navigate]);
+
   return (
     <aside className="sidebar">
-      {sidebar.sections.map((section) => (
-        <div
-          key={section.id}
-          className={`sidebar-section ${section.variant || ""}`}
-        >
-          <div className="sidebar-title">{section.title}</div>
+      <div className="sidebar-main">
+        {sidebar.sections.map((section) => (
+          <div
+            key={section.id}
+            className={`sidebar-section ${section.variant || ""}`}
+          >
+            <div className="sidebar-title">{section.title}</div>
 
-          {section.items.map((item) => {
-            const active = isActive(item);
+            {section.items.map((item) => {
+              const active = isActive(item);
 
-            return (
-              <button
-                key={item.id}
-                type="button"
-                className={[
-                  "sidebar-link",
-                  active && "active",
-                  item.type === "mode" && "mode",
-                  item.type === "compose" && "compose",
-                  item.type === "action" && "action",
-                  item.action === "logout" && "logout",
-                ]
-                  .filter(Boolean)
-                  .join(" ")}
-                onClick={() => handleClick(item)}
-                aria-current={active ? "page" : undefined}
-              >
-                <span className="icon">{item.icon}</span>
-                <span className="label">{item.label}</span>
-              </button>
-            );
-          })}
-        </div>
-      ))}
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  className={[
+                    "sidebar-link",
+                    active && "active",
+                    item.type === "mode" && "mode",
+                    item.type === "compose" && "compose",
+                    item.type === "action" && "action",
+                    item.action === "logout" && "logout",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
+                  onClick={() => handleClick(item)}
+                  aria-current={active ? "page" : undefined}
+                >
+                  <span className="icon">{item.icon}</span>
+                  <span className="label">{item.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        ))}
+      </div>
+
+      <button
+        type="button"
+        className="echo-sidebar-signal"
+        onClick={handleEchoClick}
+        aria-label="Echo signal"
+        title="echo"
+      >
+        <span className="echo-sidebar-mark">+</span>
+
+        <span className="echo-sidebar-meta">
+          <span className="echo-sidebar-name">echo</span>
+          <span className="echo-sidebar-status">signal active</span>
+        </span>
+      </button>
     </aside>
   );
 }
