@@ -1,18 +1,27 @@
 /* =====================================================
-   ROOT TOKENS (DESIGN SYSTEM READY)
+   COMMUNITY PLUS DASHBOARD SHELL
+   Layout / sidebar / content containment
+===================================================== */
+
+/* =====================================================
+   ROOT TOKENS
 ===================================================== */
 
 :root {
-  --sidebar-width: 260px;
+  --sidebar-width: 236px;
+  --sidebar-width-min: 220px;
   --sidebar-width-collapsed: 72px;
 
-  --content-max-width: 1100px;
+  --content-max-width: none;
 
-  --space-x: 24px;
-  --space-y: 20px;
+  --space-x: 0;
+  --space-y: 0;
 
-  --gap: 16px;
-  --gap-lg: 20px;
+  --content-bg: #f8f6f3;
+  --border-soft: #e6dfd8;
+
+  --gap: 0;
+  --gap-lg: 0;
 }
 
 /* =====================================================
@@ -28,12 +37,13 @@
 html,
 body,
 #root {
+  width: 100%;
   height: 100%;
   margin: 0;
 }
 
 body {
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 /* =====================================================
@@ -41,42 +51,117 @@ body {
 ===================================================== */
 
 .app-shell {
+  width: 100%;
   height: 100vh;
+  min-width: 0;
+  min-height: 0;
+
   display: flex;
   flex-direction: column;
+
+  background: var(--content-bg);
+  overflow: hidden;
 }
 
 /* =====================================================
-   MAIN LAYOUT (SIDEBAR + CONTENT)
+   HEADER
+===================================================== */
+
+.cp-header {
+  flex: 0 0 auto;
+
+  min-height: 76px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+
+  padding: 0 24px;
+
+  background: #ffffff;
+  border-bottom: 1px solid var(--border-soft);
+
+  z-index: 20;
+}
+
+.cp-logo-button {
+  border: none;
+  background: transparent;
+
+  color: #d61f26;
+
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+
+  cursor: pointer;
+}
+
+.cp-header-nav {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.cp-header-nav button {
+  border: none;
+  background: transparent;
+
+  color: #1f1714;
+
+  font-size: 14px;
+  font-weight: 750;
+
+  cursor: pointer;
+}
+
+.cp-header-nav button.active {
+  color: #8d1b1b;
+}
+
+/* =====================================================
+   MAIN LAYOUT
 ===================================================== */
 
 .layout-main {
   flex: 1;
+  min-height: 0;
+  min-width: 0;
+
   display: flex;
-  min-height: 0; /* prevents flex overflow bugs */
+
+  background: var(--content-bg);
+  overflow: hidden;
 }
 
 /* =====================================================
    SIDEBAR
 ===================================================== */
 
+.layout-sidebar,
 .sidebar {
-  width: clamp(200px, 18vw, var(--sidebar-width));
-  min-width: 200px;
-  flex-shrink: 0;
-  transition: width 0.2s ease;
+  width: clamp(var(--sidebar-width-min), 14vw, var(--sidebar-width));
+  min-width: var(--sidebar-width-min);
+  flex: 0 0 auto;
+
+  height: 100%;
+  min-height: 0;
+
+  background: #fbf9f7;
+  border-right: 1px solid var(--border-soft);
+
+  overflow: hidden;
+
+  transition:
+    width 0.2s ease,
+    min-width 0.2s ease;
 }
 
-/* collapsed state (controlled via class, not media only) */
+.layout-sidebar.collapsed,
 .sidebar.collapsed {
   width: var(--sidebar-width-collapsed);
-}
-
-/* responsive fallback */
-@media (max-width: 900px) {
-  .sidebar {
-    width: var(--sidebar-width-collapsed);
-  }
+  min-width: var(--sidebar-width-collapsed);
 }
 
 /* =====================================================
@@ -93,103 +178,207 @@ body {
 
   padding: var(--space-y) var(--space-x);
 
-  overflow: hidden; /* 🔥 important for map containment */
-}
+  background: var(--content-bg);
 
-/* scrollable inner layer (not the container itself) */
-.layout-scroll {
-  flex: 1;
-  overflow-y: auto;
-  min-height: 0;
+  overflow: hidden;
 }
 
 /* =====================================================
-   CONTENT INNER (CENTER RAIL)
+   CONTENT INNER
 ===================================================== */
 
 .layout-inner {
+  flex: 1;
+
   width: 100%;
   max-width: var(--content-max-width);
-  margin: 0 auto;
+
+  min-width: 0;
+  min-height: 0;
+
+  margin: 0;
 
   display: flex;
   flex-direction: column;
   gap: var(--gap);
 
-  min-height: 100%;
+  overflow: hidden;
+}
+
+/* Optional scrollable layer for non-map pages */
+.layout-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 /* =====================================================
-   PAGE LAYOUT (SPLIT / GRID)
+   PAGE LAYOUT
 ===================================================== */
 
 .page-layout {
   flex: 1;
+  min-height: 0;
+  min-width: 0;
+
   display: flex;
   gap: var(--gap-lg);
 
   align-items: stretch;
-  min-height: 0;
+
+  overflow: hidden;
 }
 
-/* equal growth */
 .page-layout > * {
   flex: 1;
   min-width: 0;
+  min-height: 0;
 }
 
 /* =====================================================
-   MAP / FULLSCREEN MODE
+   FULL WIDTH / MAP MODE
 ===================================================== */
 
-/* when map is primary surface */
 .layout-content.full-width {
   padding: 0;
 }
 
-/* remove centered constraint */
 .layout-content.full-width .layout-inner {
   max-width: none;
   height: 100%;
 }
 
-/* map container must fill everything */
 .full-height {
-  height: 100%;
   width: 100%;
+  height: 100%;
+  min-height: 0;
 }
 
 /* =====================================================
-   OVERLAY LAYER (FOR FEED / PANELS)
+   OVERLAYS
 ===================================================== */
 
 .overlay-layer {
   position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
+  inset: 0;
+
   width: 100%;
-  pointer-events: none; /* allows map interaction */
+  height: 100%;
+
+  pointer-events: none;
 }
 
-/* re-enable interaction for children */
 .overlay-layer > * {
   pointer-events: auto;
+}
+
+/* =====================================================
+   BASIC SIDEBAR FALLBACK LINKS
+   Used only if this dashboard renders static links
+===================================================== */
+
+.sidebar-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  padding: 16px 10px;
+}
+
+.sidebar-title {
+  padding: 0 6px;
+  margin-bottom: 6px;
+
+  color: #8a8178;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.sidebar-link {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 10px;
+
+  border: none;
+  border-radius: 10px;
+
+  background: transparent;
+  color: #4f4943;
+
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+
+  text-align: left;
+  cursor: pointer;
+}
+
+.sidebar-link:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.sidebar-link span {
+  width: 18px;
+  display: inline-flex;
+  justify-content: center;
+}
+
+.sidebar-link strong {
+  min-width: 0;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* =====================================================
    RESPONSIVE
 ===================================================== */
 
-@media (max-width: 1000px) {
+@media (max-width: 1100px) {
+  :root {
+    --sidebar-width: 220px;
+    --sidebar-width-min: 200px;
+  }
+}
+
+@media (max-width: 900px) {
+  .layout-sidebar,
   .sidebar {
-    width: 220px;
+    width: var(--sidebar-width-collapsed);
+    min-width: var(--sidebar-width-collapsed);
+  }
+
+  .sidebar-title,
+  .sidebar-link strong {
+    display: none;
+  }
+
+  .sidebar-link {
+    justify-content: center;
   }
 }
 
 @media (max-width: 768px) {
+  .cp-header {
+    min-height: 64px;
+    padding: 0 14px;
+  }
+
+  .cp-header-nav {
+    gap: 8px;
+  }
+
   .layout-content {
-    padding: 16px 12px;
+    padding: 0;
   }
 
   .page-layout {
