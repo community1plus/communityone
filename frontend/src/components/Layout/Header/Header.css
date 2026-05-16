@@ -11,6 +11,18 @@
     sans-serif;
 }
 
+.scope-switch.local .scope-track {
+  background: #d8d1c8;
+}
+
+.scope-switch.world .scope-track {
+  background: #244b6b;
+}
+
+.scope-switch.world .scope-label:last-child {
+  color: #244b6b;
+}
+
 /* TOP ROW */
 .header-row {
   height: 72px;

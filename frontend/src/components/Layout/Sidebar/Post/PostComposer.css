@@ -940,3 +940,54 @@ textarea.body {
     min-height: 140px;
   }
 }
+
+.composer.panel {
+  padding: 26px 32px;
+}
+
+.panel-body {
+  gap: 16px;
+}
+
+.body {
+  min-height: 46px;
+}
+
+textarea.body {
+  min-height: 120px;
+}
+
+.upload-drop-zone {
+  min-height: 140px;
+}
+
+.upload-drop-zone {
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.upload-drop-zone.active,
+.composer.drag-active .upload-drop-zone {
+  border-color: #8d1b1b;
+  background: rgba(141, 27, 27, 0.035);
+  box-shadow: 0 0 0 4px rgba(141, 27, 27, 0.05);
+}
+
+.upload-icon {
+  animation: uploadPulse 3s ease-in-out infinite;
+}
+
+@keyframes uploadPulse {
+  0%, 100% {
+    opacity: 0.55;
+    transform: translateY(0);
+  }
+
+  50% {
+    opacity: 1;
+    transform: translateY(-2px);
+  }
+}
+

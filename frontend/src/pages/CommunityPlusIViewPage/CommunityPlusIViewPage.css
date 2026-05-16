@@ -677,3 +677,18 @@
     font-size: 14px;
   }
 }
+
+.iview-card {
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.iview-card:hover {
+  transform: translateY(-3px);
+}
+
+.iview-track {
+  text-transform: lowercase;
+}
