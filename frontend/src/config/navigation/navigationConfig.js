@@ -67,15 +67,6 @@ export const NAVIGATION = [
           },
 
           {
-            id: "compose-news",
-            label: "News Article",
-            icon: "📰",
-            type: "compose",
-            mode: "news",
-            path: "/communityplus/compose/news",
-          },
-
-          {
             id: "compose-blob",
             label: "BLOB",
             icon: "🧠",
@@ -85,8 +76,17 @@ export const NAVIGATION = [
           },
 
           {
+            id: "compose-news",
+            label: "News",
+            icon: "📰",
+            type: "compose",
+            mode: "news",
+            path: "/communityplus/compose/news",
+          },
+
+          {
             id: "event-listing",
-            label: "Event Listing",
+            label: "Events",
             icon: "📅",
             type: "route",
             path: "/communityplus/events/create",
@@ -114,14 +114,6 @@ export const NAVIGATION = [
             icon: "🗞️",
             type: "route",
             path: "/communityplus/news",
-          },
-
-          {
-            id: "events-page",
-            label: "Events",
-            icon: "📆",
-            type: "route",
-            path: "/communityplus/events",
           },
 
           {
