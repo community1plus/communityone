@@ -85,11 +85,10 @@ export const NAVIGATION = [
           },
 
           {
-            id: "create-event",
+            id: "event-listing",
             label: "Event Listing",
             icon: "📅",
             type: "route",
-            mode: "event",
             path: "/communityplus/events/create",
           },
 
