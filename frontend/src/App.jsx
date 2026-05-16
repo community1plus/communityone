@@ -13,9 +13,10 @@ import CommunityPlusDashboardHome from "./pages/CommunityPlusDashboardHome/Commu
 import CommunityPlusYellowPages from "./pages/CommunityPlusYellowPages/CommunityPlusYellowPages";
 import CommunityPlusUserProfile from "./pages/CommunityPlusUserProfile/CommunityPlusUserProfile";
 import CommunityPlusIViewPage from "./pages/CommunityPlusIViewPage/CommunityPlusIViewPage";
-import CommunityPlusChannels from "./pages/communityPlusChannels/communityPlusChannels";
+import CommunityPlusChannels from "./pages/CommunityPlusChannels/CommunityPlusChannels";
+import CommunityPlusNewsPage from "./pages/CommunityPlusNewsPage/CommunityPlusNewsPage";
 import PostComposer from "./components/Layout/Sidebar/Post/PostComposer";
-import CommunityPlusAdTv from "./pages/CommunityPlusAdTv/CommunityPlusAdTv";
+
 function Placeholder({ title }) {
   return (
     <div className="dashboard-view">
@@ -30,14 +31,6 @@ function ProtectedRoute({ children }) {
   const { user, isAuthenticated, loading, authLoading } = useAuth();
 
   const isAuthChecking = loading || authLoading;
-
-  console.log("PROTECTED ROUTE STATE:", {
-    user,
-    isAuthenticated,
-    loading,
-    authLoading,
-    isAuthChecking,
-  });
 
   if (isAuthChecking) {
     return <div style={{ padding: 40 }}>Loading...</div>;
@@ -80,15 +73,14 @@ export default function App() {
 
       <Route element={<DashboardProviders />}>
         <Route path="/communityplus" element={<CommunityPlusDashboardLayout />}>
-          {/* PUBLIC / GUEST BROWSING */}
           <Route index element={<CommunityPlusDashboardHome />} />
           <Route path="iview" element={<CommunityPlusIViewPage />} />
+          <Route path="news" element={<CommunityPlusNewsPage />} />
           <Route path="about" element={<CommunityPlusAboutPage />} />
           <Route path="yellowpages" element={<CommunityPlusYellowPages />} />
           <Route path="channels" element={<CommunityPlusChannels />} />
           <Route path="help" element={<Placeholder title="Help" />} />
 
-          {/* PROTECTED */}
           <Route
             path="profile"
             element={
