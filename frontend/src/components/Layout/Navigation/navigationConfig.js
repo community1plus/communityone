@@ -113,7 +113,7 @@ export const NAVIGATION = [
             label: "Events",
             icon: "📆",
             type: "route",
-            path: "/communityplus/events",
+            path: "/communityplus/events/create",
           },
           {
             id: "yellowpages",
