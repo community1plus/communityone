@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import CommunityPlusAdSlotDial from "../../components/CommunityPlusAdSlotDial/CommunityPlusAdSlotDial";
+import CommunityPlusAdSlotDial from "../CommunityPlusAdSlotDial/CommunityPlusAdSlotDial";
 import "./CommunityPlusEventsPage.css";
 
 const EVENT_CATEGORIES = [
