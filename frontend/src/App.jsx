@@ -15,7 +15,7 @@ import CommunityPlusUserProfile from "./pages/CommunityPlusUserProfile/Community
 import CommunityPlusIViewPage from "./pages/CommunityPlusIViewPage/CommunityPlusIViewPage";
 import CommunityPlusChannels from "./pages/communityPlusChannels/communityPlusChannels";
 import PostComposer from "./components/Layout/Sidebar/Post/PostComposer";
-import CommuityPlusAdTv from "./pages/CommunityPlusAdTv/CommunityPlusAdTv";
+import CommunityPlusAdTv from "./pages/CommunityPlusAdTv/CommunityPlusAdTv"; 
 function Placeholder({ title }) {
   return (
     <div className="dashboard-view">
