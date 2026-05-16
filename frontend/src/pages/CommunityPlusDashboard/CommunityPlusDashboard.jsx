@@ -250,9 +250,7 @@ export default function CommunityPlusDashboardHome() {
     }
 
     const results = FEED_ITEMS.filter((item) => {
-      const haystack =
-        `${item.title} ${item.content} ${item.type}`.toLowerCase();
-
+      const haystack = `${item.title} ${item.content} ${item.type}`.toLowerCase();
       return haystack.includes(value.toLowerCase());
     });
 
@@ -273,9 +271,8 @@ export default function CommunityPlusDashboardHome() {
   return (
     <div className="dashboard-home-page">
       <div className="dashboard-home">
-        {/* LEFT COLUMN */}
         <section className="dashboard-home-feed">
-          <div className="feed-filters feed-filters-left">
+          <div className="feed-filters feed-filters-left" aria-label="Feed filters">
             {FILTERS.map((filter) => (
               <button
                 key={filter.id}
@@ -295,7 +292,6 @@ export default function CommunityPlusDashboardHome() {
           </div>
         </section>
 
-        {/* RIGHT COLUMN */}
         <section className="dashboard-home-map">
           <div className="dashboard-map-toolbar">
             <div className="dashboard-search-controls">
@@ -305,9 +301,7 @@ export default function CommunityPlusDashboardHome() {
                   value={searchQuery}
                   onChange={handleSearch}
                   placeholder={`Search ${
-                    searchMode === "local"
-                      ? "your community"
-                      : "the world"
+                    searchMode === "local" ? "your community" : "the world"
                   }...`}
                 />
 
@@ -355,10 +349,7 @@ export default function CommunityPlusDashboardHome() {
           </div>
 
           <div className="dashboard-map-canvas">
-            <CommunityMap
-              searchQuery={searchQuery}
-              searchMode={searchMode}
-            />
+            <CommunityMap searchQuery={searchQuery} searchMode={searchMode} />
           </div>
         </section>
       </div>
