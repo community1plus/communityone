@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import LocationDisplay from "./LocationDisplay";
@@ -8,6 +8,8 @@ import { NAVIGATION } from "../../../config/navigation/navigationConfig";
 export default function HeaderNav() {
   const navigate = useNavigate();
   const routeLocation = useLocation();
+
+  const [feedScope, setFeedScope] = useState("local");
 
   const {
     viewLocation,
@@ -32,28 +34,13 @@ export default function HeaderNav() {
 
       const pathname = routeLocation.pathname || "";
 
-      /* ========================================
-         HOME
-      ======================================== */
-
       if (path === "/communityplus") {
         return pathname === "/communityplus";
       }
 
-      /* ========================================
-         IVIEW
-      ======================================== */
-
       if (path === "/communityplus/iview") {
-        return (
-          pathname.includes("/iview") ||
-          pathname.includes("/view")
-        );
+        return pathname.includes("/iview") || pathname.includes("/view");
       }
-
-      /* ========================================
-         NEWS
-      ======================================== */
 
       if (path === "/communityplus/news") {
         return (
@@ -62,20 +49,12 @@ export default function HeaderNav() {
         );
       }
 
-      /* ========================================
-         YELLOW PAGES
-      ======================================== */
-
       if (path === "/communityplus/yellowpages") {
         return (
           pathname === "/communityplus/yellowpages" ||
           pathname.startsWith("/communityplus/yellowpages/")
         );
       }
-
-      /* ========================================
-         ABOUT
-      ======================================== */
 
       if (path === "/communityplus/about") {
         return (
@@ -91,21 +70,19 @@ export default function HeaderNav() {
 
   const handleNavigation = useCallback(
     (path) => {
-      if (!path) return;
-
-      if (routeLocation.pathname === path) {
-        return;
-      }
-
+      if (!path || routeLocation.pathname === path) return;
       navigate(path);
     },
     [navigate, routeLocation.pathname]
   );
 
+  const handleScopeToggle = useCallback(() => {
+    setFeedScope((prev) => (prev === "local" ? "world" : "local"));
+  }, []);
+
   const handleManualLocationSet = useCallback(
     (nextManualLocation) => {
       if (!nextManualLocation) return;
-
       setManualLocation(nextManualLocation);
     },
     [setManualLocation]
@@ -147,7 +124,25 @@ export default function HeaderNav() {
         })}
       </div>
 
-      <div className="nav-right" />
+      <div className="nav-right">
+        <button
+          type="button"
+          className={`scope-switch ${feedScope}`}
+          onClick={handleScopeToggle}
+          aria-label={`Switch to ${
+            feedScope === "local" ? "world" : "local"
+          } feed`}
+          title={`Current: ${feedScope === "local" ? "Local" : "World"}`}
+        >
+          <span className="scope-label">LOCAL</span>
+
+          <span className="scope-track" aria-hidden="true">
+            <span className="scope-thumb" />
+          </span>
+
+          <span className="scope-label">WORLD</span>
+        </button>
+      </div>
     </nav>
   );
 }
