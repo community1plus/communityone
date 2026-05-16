@@ -15,16 +15,20 @@ const MAP_CONTAINER_STYLE = {
   height: "100%",
 };
 
-const toMapPosition = (location) => {
+function toMapPosition(location) {
   if (!location?.lat || !location?.lng) return null;
 
   return {
     lat: Number(location.lat),
     lng: Number(location.lng),
   };
-};
+}
 
-export default function CommunityMap({ mode = "embedded" }) {
+export default function CommunityMap({
+  mode = "embedded",
+  searchQuery = "",
+  searchMode = "local",
+}) {
   const {
     filteredMarkers,
     selectedMarkerId,
@@ -32,33 +36,28 @@ export default function CommunityMap({ mode = "embedded" }) {
     focusLocation,
   } = useMap();
 
-  const {
-    viewLocation,
-    displayLocation,
-    locationMode,
-  } = useLocationContext();
+  const { viewLocation, displayLocation, locationMode } =
+    useLocationContext();
 
   const { isLoaded } = useGoogleMaps();
 
   const mapRef = useRef(null);
   const markersRef = useRef([]);
 
-  const activeLocation = useMemo(
-    () => viewLocation || displayLocation,
-    [viewLocation, displayLocation]
-  );
+  const activeLocation = useMemo(() => {
+    return viewLocation || displayLocation;
+  }, [viewLocation, displayLocation]);
 
-  const userPosition = useMemo(
-    () => toMapPosition(activeLocation),
-    [activeLocation]
-  );
+  const userPosition = useMemo(() => {
+    return toMapPosition(activeLocation);
+  }, [activeLocation]);
 
   const center = useMemo(() => {
     return selectedLocation || userPosition || DEFAULT_CENTER;
   }, [selectedLocation, userPosition]);
 
   const zoom = useMemo(() => {
-    if (selectedLocation) return 14;
+    if (selectedLocation) return 15;
     if (locationMode === "manual") return 15;
     if (userPosition) return 13;
     return mode === "full" ? 14 : 12;
@@ -71,6 +70,7 @@ export default function CommunityMap({ mode = "embedded" }) {
       fullscreenControl: false,
       zoomControl: true,
       clickableIcons: false,
+      gestureHandling: "greedy",
     }),
     []
   );
@@ -94,32 +94,66 @@ export default function CommunityMap({ mode = "embedded" }) {
     markersRef.current = [];
   }, []);
 
-  const createMarkerElement = useCallback((styles = {}) => {
+  const createMarkerElement = useCallback((styles = {}, label = "") => {
     const el = document.createElement("div");
 
     Object.assign(el.style, {
-      width: "14px",
-      height: "14px",
+      width: "15px",
+      height: "15px",
       borderRadius: "50%",
       background: "#f59e0b",
-      boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
+      border: "2px solid #ffffff",
+      boxShadow: "0 4px 10px rgba(0,0,0,0.25)",
       cursor: "pointer",
+      transform: "translateY(-2px)",
       ...styles,
     });
+
+    if (label) {
+      el.title = label;
+      el.setAttribute("aria-label", label);
+    }
 
     return el;
   }, []);
 
-  const createMarker = useCallback(
+  const getMarkerColour = useCallback((item, isSelected) => {
+    if (isSelected) return "#8d1b1b";
+
+    switch (item?.type) {
+      case "event":
+        return "#2563eb";
+      case "incident":
+        return "#dc2626";
+      case "beacon":
+        return "#7c3aed";
+      case "blob":
+        return "#f59e0b";
+      case "business":
+        return "#16a34a";
+      default:
+        return "#f59e0b";
+    }
+  }, []);
+
+  const createActivityMarker = useCallback(
     (item, map) => {
       const position = getPosition(item);
       if (!position) return null;
 
       const isSelected = item.id === selectedMarkerId;
 
-      const el = createMarkerElement({
-        background: isSelected ? "#b11226" : "#f59e0b",
-      });
+      const el = createMarkerElement(
+        {
+          width: isSelected ? "19px" : "15px",
+          height: isSelected ? "19px" : "15px",
+          background: getMarkerColour(item, isSelected),
+          boxShadow: isSelected
+            ? "0 0 0 5px rgba(141,27,27,0.18), 0 6px 14px rgba(0,0,0,0.28)"
+            : "0 4px 10px rgba(0,0,0,0.25)",
+        },
+        item.title || item.type || "Community marker"
+      );
 
       el.addEventListener("click", () => {
         focusLocation(position, item.id);
@@ -129,26 +163,38 @@ export default function CommunityMap({ mode = "embedded" }) {
         map,
         position,
         content: el,
+        title: item.title || item.type || "Community marker",
       });
     },
-    [getPosition, selectedMarkerId, createMarkerElement, focusLocation]
+    [
+      getPosition,
+      selectedMarkerId,
+      createMarkerElement,
+      getMarkerColour,
+      focusLocation,
+    ]
   );
 
   const createUserLocationMarker = useCallback(
     (map) => {
       if (!userPosition) return null;
 
-      const el = createMarkerElement({
-        width: "16px",
-        height: "16px",
-        background: locationMode === "manual" ? "#b11226" : "#2563eb",
-        border: "2px solid white",
-      });
+      const el = createMarkerElement(
+        {
+          width: "18px",
+          height: "18px",
+          background: locationMode === "manual" ? "#8d1b1b" : "#2563eb",
+          border: "3px solid #ffffff",
+          boxShadow: "0 0 0 5px rgba(37,99,235,0.16)",
+        },
+        "Your selected location"
+      );
 
       return new window.google.maps.marker.AdvancedMarkerElement({
         map,
         position: userPosition,
         content: el,
+        title: "Your selected location",
       });
     },
     [userPosition, locationMode, createMarkerElement]
@@ -163,34 +209,34 @@ export default function CommunityMap({ mode = "embedded" }) {
 
   useEffect(() => {
     if (!mapRef.current) return;
-    if (!window.google?.maps?.marker) return;
+    if (!window.google?.maps?.marker?.AdvancedMarkerElement) return;
 
     clearMarkers();
 
     const map = mapRef.current;
 
-    const newMarkers = filteredMarkers
-      .map((item) => createMarker(item, map))
+    const activityMarkers = filteredMarkers
+      .map((item) => createActivityMarker(item, map))
       .filter(Boolean);
 
     const userMarker = createUserLocationMarker(map);
 
     if (userMarker) {
-      newMarkers.push(userMarker);
+      activityMarkers.push(userMarker);
     }
 
-    markersRef.current = newMarkers;
+    markersRef.current = activityMarkers;
 
     return clearMarkers;
   }, [
     filteredMarkers,
-    createMarker,
+    createActivityMarker,
     createUserLocationMarker,
     clearMarkers,
   ]);
 
   if (!isLoaded) {
-    return <div style={{ padding: 20 }}>Loading map...</div>;
+    return <div className="map-loading">Loading map...</div>;
   }
 
   return (
@@ -208,6 +254,13 @@ export default function CommunityMap({ mode = "embedded" }) {
         }}
         options={mapOptions}
       />
+
+      {searchQuery && (
+        <div className="map-search-context">
+          <span>{searchMode}</span>
+          <strong>{searchQuery}</strong>
+        </div>
+      )}
     </div>
   );
 }

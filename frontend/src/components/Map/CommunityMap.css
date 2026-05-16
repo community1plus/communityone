@@ -1,0 +1,49 @@
+.map-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 420px;
+  overflow: hidden;
+  border-radius: 22px;
+}
+
+.map-loading {
+  padding: 20px;
+}
+
+.map-search-context {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 5;
+
+  max-width: 320px;
+
+  padding: 10px 14px;
+
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(227, 217, 207, 0.9);
+
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.map-search-context span {
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: #8d1b1b;
+}
+
+.map-search-context strong {
+  font-size: 13px;
+  color: #1f1714;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
