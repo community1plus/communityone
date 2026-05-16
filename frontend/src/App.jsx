@@ -15,6 +15,8 @@ import CommunityPlusUserProfile from "./pages/CommunityPlusUserProfile/Community
 import CommunityPlusIViewPage from "./pages/CommunityPlusIViewPage/CommunityPlusIViewPage";
 import CommunityPlusChannels from "./pages/CommunityPlusChannels/CommunityPlusChannels";
 import CommunityPlusNewsPage from "./pages/CommunityPlusNewsPage/CommunityPlusNewsPage";
+import CommunityPlusEventsPage from "./pages/CommunityPlusEventsPage/CommunityPlusEventsPage";
+import CommunityPlusEventCreatePage from "./pages/CommunityPlusEventsPage/CommunityPlusEventCreatePage";
 import PostComposer from "./components/Layout/Sidebar/Post/PostComposer";
 
 function Placeholder({ title }) {
@@ -28,7 +30,7 @@ function Placeholder({ title }) {
 
 function ProtectedRoute({ children }) {
   const location = useLocation();
-  const { user, isAuthenticated, loading, authLoading } = useAuth();
+  const { isAuthenticated, loading, authLoading } = useAuth();
 
   const isAuthChecking = loading || authLoading;
 
@@ -74,12 +76,23 @@ export default function App() {
       <Route element={<DashboardProviders />}>
         <Route path="/communityplus" element={<CommunityPlusDashboardLayout />}>
           <Route index element={<CommunityPlusDashboardHome />} />
+
           <Route path="iview" element={<CommunityPlusIViewPage />} />
           <Route path="news" element={<CommunityPlusNewsPage />} />
+          <Route path="events" element={<CommunityPlusEventsPage />} />
           <Route path="about" element={<CommunityPlusAboutPage />} />
           <Route path="yellowpages" element={<CommunityPlusYellowPages />} />
           <Route path="channels" element={<CommunityPlusChannels />} />
           <Route path="help" element={<Placeholder title="Help" />} />
+
+          <Route
+            path="events/create"
+            element={
+              <ProtectedRoute>
+                <CommunityPlusEventCreatePage />
+              </ProtectedRoute>
+            }
+          />
 
           <Route
             path="profile"

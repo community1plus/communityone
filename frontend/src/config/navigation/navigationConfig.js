@@ -25,6 +25,13 @@ export const NAVIGATION = [
       },
 
       {
+        id: "events",
+        label: "Events",
+        type: "route",
+        path: "/communityplus/events",
+      },
+
+      {
         id: "yellowpages",
         label: "Yellow Pages",
         type: "route",
@@ -45,7 +52,7 @@ export const NAVIGATION = [
 
     sections: [
       {
-        id: "iview",
+        id: "create",
         title: "CREATE",
         variant: "modes",
 
@@ -78,12 +85,12 @@ export const NAVIGATION = [
           },
 
           {
-            id: "compose-event",
-            label: "Event",
+            id: "create-event",
+            label: "Event Listing",
             icon: "📅",
-            type: "compose",
+            type: "route",
             mode: "event",
-            path: "/communityplus/compose/event",
+            path: "/communityplus/events/create",
           },
 
           {
@@ -108,6 +115,14 @@ export const NAVIGATION = [
             icon: "🗞️",
             type: "route",
             path: "/communityplus/news",
+          },
+
+          {
+            id: "events-page",
+            label: "Events",
+            icon: "📆",
+            type: "route",
+            path: "/communityplus/events",
           },
 
           {
