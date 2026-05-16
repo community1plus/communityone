@@ -9,18 +9,28 @@ export const NAVIGATION = [
         type: "route",
         path: "/communityplus",
       },
-      {
-        id: "yellowpages",
-        label: "Yellow Pages",
-        type: "route",
-        path: "/communityplus/yellowpages",
-      },
+
       {
         id: "iview",
         label: "iVIEW",
         type: "route",
         path: "/communityplus/iview",
       },
+
+      {
+        id: "news",
+        label: "News",
+        type: "route",
+        path: "/communityplus/news",
+      },
+
+      {
+        id: "yellowpages",
+        label: "Yellow Pages",
+        type: "route",
+        path: "/communityplus/yellowpages",
+      },
+
       {
         id: "about",
         label: "About Us",
@@ -36,9 +46,7 @@ export const NAVIGATION = [
     sections: [
       {
         id: "iview",
-
-        title: "iVIEW",
-
+        title: "CREATE",
         variant: "modes",
 
         items: [
@@ -53,7 +61,7 @@ export const NAVIGATION = [
 
           {
             id: "compose-news",
-            label: "News",
+            label: "News Article",
             icon: "📰",
             type: "compose",
             mode: "news",
@@ -71,7 +79,7 @@ export const NAVIGATION = [
 
           {
             id: "compose-event",
-            label: "Events",
+            label: "Event",
             icon: "📅",
             type: "compose",
             mode: "event",
@@ -91,10 +99,17 @@ export const NAVIGATION = [
 
       {
         id: "platform",
-
         title: "PLATFORM",
 
         items: [
+          {
+            id: "news-page",
+            label: "News",
+            icon: "🗞️",
+            type: "route",
+            path: "/communityplus/news",
+          },
+
           {
             id: "yellowpages",
             label: "Yellow Pages",
@@ -131,7 +146,6 @@ export const NAVIGATION = [
 
       {
         id: "account",
-
         title: "ACCOUNT",
 
         items: [
