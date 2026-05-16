@@ -270,23 +270,6 @@ export default function CommunityPlusDashboardHome() {
 
   return (
     <div className="dashboard-home-page">
-      <header className="dashboard-home-filterbar">
-        <div className="feed-filters" aria-label="Feed filters">
-          {FILTERS.map((filter) => (
-            <button
-              key={filter.id}
-              type="button"
-              className={`feed-filter ${
-                activeFilter === filter.id ? "active" : ""
-              }`}
-              onClick={() => setActiveFilter(filter.id)}
-            >
-              {filter.label}
-            </button>
-          ))}
-        </div>
-      </header>
-
       <div className="dashboard-home">
         <section className="dashboard-home-feed">
           <div className="feed-list">
@@ -295,36 +278,53 @@ export default function CommunityPlusDashboardHome() {
         </section>
 
         <section className="dashboard-home-map">
-          <div className="dashboard-map-search">
-            <div className="dashboard-search-box">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={handleSearch}
-                placeholder={`Search ${
-                  searchMode === "local" ? "your community" : "the world"
-                }...`}
-              />
-
-              <span className="dashboard-search-icon">⌕</span>
+          <div className="dashboard-map-toolbar">
+            <div className="feed-filters" aria-label="Feed filters">
+              {FILTERS.map((filter) => (
+                <button
+                  key={filter.id}
+                  type="button"
+                  className={`feed-filter ${
+                    activeFilter === filter.id ? "active" : ""
+                  }`}
+                  onClick={() => setActiveFilter(filter.id)}
+                >
+                  {filter.label}
+                </button>
+              ))}
             </div>
 
-            <div className="dashboard-search-mode">
-              <button
-                type="button"
-                className={searchMode === "local" ? "active" : ""}
-                onClick={() => setSearchMode("local")}
-              >
-                Local
-              </button>
+            <div className="dashboard-search-controls">
+              <div className="dashboard-search-box">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={handleSearch}
+                  placeholder={`Search ${
+                    searchMode === "local" ? "your community" : "the world"
+                  }...`}
+                />
 
-              <button
-                type="button"
-                className={searchMode === "global" ? "active" : ""}
-                onClick={() => setSearchMode("global")}
-              >
-                Global
-              </button>
+                <span className="dashboard-search-icon">⌕</span>
+              </div>
+
+              <div className="dashboard-search-mode">
+                <button
+                  type="button"
+                  className={searchMode === "local" ? "active" : ""}
+                  onClick={() => setSearchMode("local")}
+                >
+                  Local
+                </button>
+
+                <button
+                  type="button"
+                  className={searchMode === "global" ? "active" : ""}
+                  onClick={() => setSearchMode("global")}
+                >
+                  Global
+                </button>
+              </div>
             </div>
 
             {!!searchResults.length && (
