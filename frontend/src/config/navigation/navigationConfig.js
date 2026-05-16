@@ -109,14 +109,6 @@ export const NAVIGATION = [
 
         items: [
           {
-            id: "news-page",
-            label: "News",
-            icon: "🗞️",
-            type: "route",
-            path: "/communityplus/news",
-          },
-
-          {
             id: "yellowpages",
             label: "Yellow Pages",
             icon: "📒",

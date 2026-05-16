@@ -15,8 +15,7 @@ import CommunityPlusUserProfile from "./pages/CommunityPlusUserProfile/Community
 import CommunityPlusIViewPage from "./pages/CommunityPlusIViewPage/CommunityPlusIViewPage";
 import CommunityPlusChannels from "./pages/CommunityPlusChannels/CommunityPlusChannels";
 import CommunityPlusNewsPage from "./pages/CommunityPlusNewsPage/CommunityPlusNewsPage";
-import CommunityPlusEventsPage from "./pages/CommunityPlusEventsPage/CommunityPlusEventsPage"
-
+import CommunityPlusEventsPage from "./pages/CommunityPlusEventsPage/CommunityPlusEventsPage";
 import CommunityPlusEventCreatePage from "./pages/CommunityPlusEventsPage/CommunityPlusEventCreatePage";
 import PostComposer from "./components/Layout/Sidebar/Post/PostComposer";
 
@@ -80,11 +79,6 @@ export default function App() {
 
           <Route path="iview" element={<CommunityPlusIViewPage />} />
           <Route path="news" element={<CommunityPlusNewsPage />} />
-          <Route path="events" element={<CommunityPlusEventsPage />} />
-          <Route path="about" element={<CommunityPlusAboutPage />} />
-          <Route path="yellowpages" element={<CommunityPlusYellowPages />} />
-          <Route path="channels" element={<CommunityPlusChannels />} />
-          <Route path="help" element={<Placeholder title="Help" />} />
 
           <Route
             path="events/create"
@@ -94,6 +88,12 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+
+          <Route path="events" element={<CommunityPlusEventsPage />} />
+          <Route path="about" element={<CommunityPlusAboutPage />} />
+          <Route path="yellowpages" element={<CommunityPlusYellowPages />} />
+          <Route path="channels" element={<CommunityPlusChannels />} />
+          <Route path="help" element={<Placeholder title="Help" />} />
 
           <Route
             path="profile"
