@@ -201,75 +201,87 @@ export default function CommunityPlusEventCreatePage() {
         )}
 
         {/* =========================================
-            DATES TAB
-        ========================================= */}
+    DATES TAB
+========================================= */}
 
-        {activeTab === "dates" && (
-          <div className="event-tab-panel">
-            <div className="event-schedule-header">
-              <span>Schedule</span>
+{activeTab === "dates" && (
+  <div className="event-tab-panel event-dates-layout">
 
-              <h2>Select date and time</h2>
+    {/* LEFT */}
+    <div className="event-date-picker-panel">
+
+      <div className="event-schedule-header">
+        <span>Schedule</span>
+
+        <h2>Select date and time</h2>
+      </div>
+
+      <label className="event-field">
+        <span>Date</span>
+
+        <input
+          type="date"
+          value={selectedDate}
+          min={todayISO()}
+          onChange={(event) =>
+            setSelectedDate(event.target.value)
+          }
+        />
+      </label>
+
+      <div className="event-dial-wrap">
+        <CommunityPlusAdSlotDial
+          mode="event"
+          label={selectedDate ? "EVENT" : "PICK DATE"}
+          disabled={!selectedDate}
+          selectedSlots={selectedSlotIndexes}
+          onSelectSlot={handleSelectSlot}
+        />
+      </div>
+    </div>
+
+    {/* RIGHT */}
+    <aside className="event-selected-panel">
+
+      <div className="event-selected-panel-header">
+        <span>Selected schedule</span>
+
+        <strong>{sortedSchedule.length}</strong>
+      </div>
+
+      {!sortedSchedule.length && (
+        <div className="event-empty-schedule">
+          Select a date, then click the dial to
+          add half-hour event times.
+        </div>
+      )}
+
+      <div className="event-selected-scroll">
+        {sortedSchedule.map((item) => (
+          <div
+            key={item.id}
+            className="event-schedule-item"
+          >
+            <div className="event-schedule-meta">
+              <span>{item.date}</span>
+
+              <strong>{item.time}</strong>
             </div>
 
-            <label className="event-field">
-              <span>Date</span>
-
-              <input
-                type="date"
-                value={selectedDate}
-                min={todayISO()}
-                onChange={(event) =>
-                  setSelectedDate(event.target.value)
-                }
-              />
-            </label>
-
-            <div className="event-dial-wrap">
-              <CommunityPlusAdSlotDial
-                mode="event"
-                label={selectedDate ? "EVENT" : "PICK DATE"}
-                disabled={!selectedDate}
-                selectedSlots={selectedSlotIndexes}
-                onSelectSlot={handleSelectSlot}
-              />
-            </div>
-
-            <div className="event-selected-list">
-              <div className="event-selected-title">
-                Selected dates & times
-              </div>
-
-              {!sortedSchedule.length && (
-                <div className="event-empty-schedule">
-                  Select a date, then click the dial to
-                  add half-hour event times.
-                </div>
-              )}
-
-              {sortedSchedule.map((item) => (
-                <div
-                  key={item.id}
-                  className="event-schedule-item"
-                >
-                  <span>{item.date}</span>
-
-                  <strong>{item.time}</strong>
-
-                  <button
-                    type="button"
-                    onClick={() =>
-                      removeScheduleItem(item.id)
-                    }
-                  >
-                    ×
-                  </button>
-                </div>
-              ))}
-            </div>
+            <button
+              type="button"
+              onClick={() =>
+                removeScheduleItem(item.id)
+              }
+            >
+              ×
+            </button>
           </div>
-        )}
-
+        ))}
+      </div>
+    </aside>
+  </div>
+)}
         {/* =========================================
             MEDIA TAB
         ========================================= */}

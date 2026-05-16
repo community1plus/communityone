@@ -1,4 +1,39 @@
 /* =====================================================
+   COMMUNITY PLUS EVENTS
+   Calendar listing + create event workflow
+===================================================== */
+
+/* =========================
+   SHARED BUTTONS
+========================= */
+
+.event-primary-button,
+.event-secondary-button {
+  border-radius: 999px;
+  padding: 12px 18px;
+  font-size: 13px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.event-primary-button {
+  border: none;
+  background: #4a0f0f;
+  color: #ffffff;
+}
+
+.event-primary-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.event-secondary-button {
+  border: 1px solid #e3d9cf;
+  background: #ffffff;
+  color: #4a0f0f;
+}
+
+/* =====================================================
    EVENTS LISTING — CALENDAR VIEW
 ===================================================== */
 
@@ -6,11 +41,8 @@
   width: 100%;
   height: 100%;
   min-height: 0;
-
   padding: 22px;
-
   background: #f7f4ef;
-
   box-sizing: border-box;
   overflow: hidden;
 
@@ -21,24 +53,17 @@
   color: #1f1714;
 }
 
-/* =====================================================
-   CALENDAR PANEL
-===================================================== */
-
 .events-calendar-panel,
 .events-list-panel {
   min-width: 0;
   min-height: 0;
+  padding: 22px;
 
   border: 1px solid #e3d9cf;
   border-radius: 26px;
-
   background: #ffffff;
 
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.05);
-
-  padding: 22px;
-
   box-sizing: border-box;
   overflow: hidden;
 }
@@ -49,7 +74,8 @@
   gap: 16px;
 }
 
-.events-calendar-header {
+.events-calendar-header,
+.events-list-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -69,12 +95,10 @@
 .events-calendar-header h1,
 .events-list-header h2 {
   margin: 6px 0 0;
-
   font-family: Georgia, "Times New Roman", serif;
   font-size: clamp(32px, 4vw, 56px);
   line-height: 0.95;
   letter-spacing: -0.05em;
-
   color: #1f1714;
 }
 
@@ -87,7 +111,6 @@
 .events-calendar-controls button {
   min-width: 34px;
   height: 34px;
-
   padding: 0 12px;
 
   border: 1px solid #e3d9cf;
@@ -99,7 +122,6 @@
   font-size: 13px;
   font-weight: 800;
   text-transform: lowercase;
-
   cursor: pointer;
 }
 
@@ -108,39 +130,34 @@
   border-color: #d6b8a6;
 }
 
-/* =====================================================
+/* =========================
    WEEKDAYS
-===================================================== */
+========================= */
 
 .events-weekdays {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 8px;
-
   padding-bottom: 8px;
-
   border-bottom: 1px solid #eee4dc;
 }
 
 .events-weekdays span {
   text-align: center;
-
   font-family: "Courier New", monospace;
   font-size: 11px;
   font-weight: 900;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-
   color: #8a8178;
 }
 
-/* =====================================================
+/* =========================
    CALENDAR GRID
-===================================================== */
+========================= */
 
 .events-calendar-grid {
   min-height: 0;
-
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
   grid-template-rows: repeat(6, minmax(66px, 1fr));
@@ -149,10 +166,8 @@
 
 .calendar-day {
   position: relative;
-
   min-width: 0;
   min-height: 0;
-
   padding: 10px;
 
   border: 1px solid #eee4dc;
@@ -202,7 +217,6 @@
   background: #4a0f0f;
   border-color: #4a0f0f;
   color: #ffffff;
-
   box-shadow: 0 10px 24px rgba(74, 15, 15, 0.18);
 }
 
@@ -212,9 +226,7 @@
 
 .calendar-day.has-events::after {
   content: "";
-
   position: absolute;
-
   left: 10px;
   bottom: 10px;
 
@@ -222,7 +234,6 @@
   height: 7px;
 
   border-radius: 50%;
-
   background: #8d1b1b;
 }
 
@@ -232,13 +243,11 @@
 
 .calendar-day i {
   position: absolute;
-
   right: 9px;
   bottom: 7px;
 
   min-width: 18px;
   height: 18px;
-
   padding: 0 5px;
 
   border-radius: 999px;
@@ -257,9 +266,9 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
-/* =====================================================
+/* =========================
    LIST PANEL
-===================================================== */
+========================= */
 
 .events-list-panel {
   display: grid;
@@ -268,13 +277,7 @@
 }
 
 .events-list-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 14px;
-
   padding-bottom: 14px;
-
   border-bottom: 1px solid #eee4dc;
 }
 
@@ -284,27 +287,19 @@
 
 .events-list {
   min-height: 0;
-
   display: flex;
   flex-direction: column;
   gap: 14px;
-
   overflow-y: auto;
   padding-right: 4px;
 }
 
-/* =====================================================
-   EMPTY STATE
-===================================================== */
-
 .events-empty-state {
-  height: 100%;
-
   min-height: 220px;
+  height: 100%;
 
   border: 1px dashed #d6cabb;
   border-radius: 22px;
-
   background: #fbf9f7;
 
   display: flex;
@@ -313,47 +308,40 @@
   justify-content: center;
 
   text-align: center;
-
   padding: 24px;
 }
 
 .events-empty-state h3 {
   margin: 0 0 8px;
-
   font-family: Georgia, "Times New Roman", serif;
   font-size: 28px;
   line-height: 1;
-
   color: #4a0f0f;
 }
 
 .events-empty-state p {
   margin: 0;
-
   color: #6d625a;
-
   font-size: 14px;
   line-height: 1.45;
 }
 
-/* =====================================================
-   COMPACT EVENT CARD
-===================================================== */
+/* =========================
+   EVENT CARD
+========================= */
 
 .event-card.compact {
   margin: 0;
+  padding: 16px;
 
   display: flex;
   flex-direction: column;
   gap: 14px;
 
-  padding: 16px;
-
   border: 1px solid #e3d9cf;
   border-radius: 20px;
 
   background: #ffffff;
-
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.04);
 }
 
@@ -363,7 +351,6 @@
   justify-content: space-between;
 
   padding-bottom: 10px;
-
   border-bottom: 1px solid #eee4dc;
 }
 
@@ -383,7 +370,6 @@
 
 .event-card.compact h2 {
   margin: 0 0 8px;
-
   font-family: Georgia, "Times New Roman", serif;
   font-size: 25px;
   line-height: 1.05;
@@ -391,18 +377,14 @@
 
 .event-card.compact p {
   margin: 0;
-
   color: #5f554d;
-
   font-size: 14px;
   line-height: 1.55;
 }
 
 .event-card-meta {
   margin-top: 12px;
-
   color: #6d625a;
-
   font-size: 13px;
   font-weight: 700;
 }
@@ -428,271 +410,6 @@
 }
 
 /* =====================================================
-   RESPONSIVE — CALENDAR VIEW
-===================================================== */
-
-@media (max-width: 1100px) {
-  .events-page.calendar-view {
-    grid-template-columns: 1fr;
-    overflow-y: auto;
-  }
-
-  .events-calendar-grid {
-    grid-template-rows: repeat(6, 76px);
-  }
-
-  .events-list-panel {
-    min-height: 420px;
-  }
-}
-
-@media (max-width: 720px) {
-  .events-page.calendar-view {
-    padding: 14px;
-    gap: 14px;
-  }
-
-  .events-calendar-panel,
-  .events-list-panel {
-    padding: 16px;
-    border-radius: 22px;
-  }
-
-  .events-calendar-header,
-  .events-list-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .events-calendar-grid {
-    gap: 5px;
-    grid-template-rows: repeat(6, 54px);
-  }
-
-  .calendar-day {
-    padding: 7px;
-    border-radius: 13px;
-  }
-
-  .calendar-day span {
-    font-size: 11px;
-  }
-
-  .calendar-day i {
-    right: 5px;
-    bottom: 5px;
-    min-width: 15px;
-    height: 15px;
-    font-size: 9px;
-  }
-
-  .events-weekdays {
-    gap: 5px;
-  }
-
-  .events-weekdays span {
-    font-size: 9px;
-  }
-}
-
-/* =====================================================
-   EVENT CREATE PAGE
-===================================================== */
-
-.events-create-page {
-  width: 100%;
-  height: 100%;
-  min-height: 0;
-
-  padding: 22px;
-
-  background: #f7f4ef;
-
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 420px;
-  gap: 22px;
-
-  box-sizing: border-box;
-}
-
-.events-create-form,
-.events-create-schedule {
-  border: 1px solid #e3d9cf;
-  border-radius: 26px;
-
-  background: #ffffff;
-
-  padding: 22px;
-
-  box-sizing: border-box;
-
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.05);
-}
-
-.events-create-form {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-.events-create-header span {
-  font-family: "Courier New", monospace;
-  font-size: 11px;
-  font-weight: 900;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #8d1b1b;
-}
-
-.events-create-header h1 {
-  margin: 6px 0 10px;
-
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(34px, 5vw, 54px);
-  line-height: 0.95;
-  letter-spacing: -0.05em;
-}
-
-.events-create-header p {
-  margin: 0;
-
-  color: #6d625a;
-
-  font-size: 14px;
-  line-height: 1.55;
-}
-
-.events-field {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.events-field label {
-  font-size: 12px;
-  font-weight: 800;
-  color: #6d625a;
-}
-
-.events-field input,
-.events-field textarea,
-.events-field select {
-  width: 100%;
-
-  border: 1px solid #e3d9cf;
-  border-radius: 14px;
-
-  background: #fbf9f7;
-
-  padding: 13px 14px;
-
-  font-size: 14px;
-  font-family: inherit;
-
-  outline: none;
-  box-sizing: border-box;
-}
-
-.events-field textarea {
-  min-height: 180px;
-  resize: vertical;
-  line-height: 1.6;
-}
-
-.events-field input:focus,
-.events-field textarea:focus,
-.events-field select:focus {
-  border-color: #d6b8a6;
-  background: #ffffff;
-
-  box-shadow: 0 0 0 3px rgba(141, 27, 27, 0.06);
-}
-
-.events-create-actions {
-  margin-top: auto;
-
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-}
-
-.event-secondary-button,
-.event-primary-button {
-  border-radius: 999px;
-
-  padding: 12px 18px;
-
-  font-size: 13px;
-  font-weight: 900;
-
-  cursor: pointer;
-}
-
-.event-secondary-button {
-  border: 1px solid #e3d9cf;
-  background: #ffffff;
-  color: #4a0f0f;
-}
-
-.event-primary-button {
-  border: none;
-  background: #4a0f0f;
-  color: #ffffff;
-}
-
-.events-create-schedule {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-.events-selected-slots {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-
-  overflow-y: auto;
-}
-
-.events-slot {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  padding: 12px 14px;
-
-  border: 1px solid #e3d9cf;
-  border-radius: 14px;
-
-  background: #fbf9f7;
-}
-
-.events-slot strong {
-  color: #4a0f0f;
-  font-size: 13px;
-}
-
-.events-slot span {
-  color: #6d625a;
-  font-size: 12px;
-}
-
-.events-slot button {
-  border: none;
-  background: transparent;
-
-  color: #8d1b1b;
-
-  cursor: pointer;
-}
-
-@media (max-width: 1100px) {
-  .events-create-page {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* =====================================================
    EVENT CREATE PAGE
 ===================================================== */
 
@@ -705,27 +422,24 @@
   background: #f7f4ef;
 
   box-sizing: border-box;
-  overflow: hidden;
-
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(380px, 0.8fr);
-  gap: 22px;
+  overflow-y: auto;
 
   color: #1f1714;
 }
 
 .event-create-column {
-  min-width: 0;
+  width: min(100%, 980px);
   min-height: 0;
+
+  margin: 0 auto;
 
   border: 1px solid #e3d9cf;
   border-radius: 26px;
 
   background: #ffffff;
-  padding: 22px;
+  padding: 28px;
 
   box-sizing: border-box;
-  overflow: hidden;
 
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.05);
 }
@@ -733,12 +447,13 @@
 .event-details-panel {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 22px;
 }
 
 .event-create-header span,
 .event-schedule-header span,
-.event-selected-title {
+.event-selected-title,
+.event-selected-panel-header span {
   font-family: "Courier New", monospace;
   font-size: 11px;
   font-weight: 900;
@@ -752,9 +467,9 @@
   margin: 6px 0 8px;
 
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(32px, 4vw, 52px);
-  line-height: 0.95;
-  letter-spacing: -0.04em;
+  font-size: clamp(38px, 5vw, 64px);
+  line-height: 0.92;
+  letter-spacing: -0.05em;
 
   color: #1f1714;
 }
@@ -762,14 +477,73 @@
 .event-create-header p {
   margin: 0;
   color: #6d625a;
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.55;
 }
+
+/* =========================
+   TABS
+========================= */
+
+.event-tabs {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.event-tabs button {
+  min-width: 110px;
+  height: 48px;
+  padding: 0 20px;
+
+  border: 1px solid #e3d9cf;
+  border-radius: 999px;
+
+  background: #ffffff;
+  color: #4a0f0f;
+
+  font-size: 14px;
+  font-weight: 900;
+
+  cursor: pointer;
+
+  transition:
+    background 0.18s ease,
+    color 0.18s ease,
+    border-color 0.18s ease,
+    transform 0.12s ease;
+}
+
+.event-tabs button:hover {
+  background: #fbf9f7;
+  transform: translateY(-1px);
+}
+
+.event-tabs button.active {
+  background: #5c0f0f;
+  border-color: #5c0f0f;
+  color: #ffffff;
+}
+
+/* =========================
+   TAB PANELS
+========================= */
+
+.event-tab-panel {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* =========================
+   FORM FIELDS
+========================= */
 
 .event-field {
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 8px;
 }
 
 .event-field span {
@@ -784,24 +558,24 @@
   width: 100%;
 
   border: 1px solid #e3d9cf;
-  border-radius: 14px;
+  border-radius: 16px;
 
   background: #fbf9f7;
   color: #1f1714;
 
   font-family: inherit;
-  font-size: 14px;
+  font-size: 15px;
 
-  padding: 12px 13px;
+  padding: 14px 16px;
 
   outline: none;
   box-sizing: border-box;
 }
 
 .event-field textarea {
-  min-height: 160px;
+  min-height: 180px;
   resize: vertical;
-  line-height: 1.55;
+  line-height: 1.6;
 }
 
 .event-field input:focus,
@@ -812,175 +586,149 @@
   box-shadow: 0 0 0 3px rgba(141, 27, 27, 0.06);
 }
 
-.event-create-actions {
-  margin-top: auto;
+/* =====================================================
+   DATES TAB — WHEEL LEFT / LIST RIGHT
+===================================================== */
 
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
+.event-dates-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 22px;
+  align-items: start;
 }
 
-.event-schedule-panel {
-  display: grid;
-  grid-template-rows: auto auto minmax(250px, auto) minmax(0, 1fr);
-  gap: 16px;
+.event-date-picker-panel {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
 
 .event-dial-wrap {
+  min-width: 0;
+
   display: flex;
   align-items: center;
   justify-content: center;
 
-  min-width: 0;
-  padding: 10px 0;
+  padding: 10px 0 6px;
 }
 
-.event-selected-list {
+.event-selected-panel {
+  min-width: 0;
+  min-height: 420px;
+  max-height: 540px;
+
+  padding: 18px;
+
+  border: 1px solid #e3d9cf;
+  border-radius: 22px;
+
+  background: #fbf9f7;
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  overflow: hidden;
+}
+
+.event-selected-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eadfd5;
+}
+
+.event-selected-panel-header strong {
+  min-width: 26px;
+  height: 26px;
+
+  border-radius: 999px;
+  background: #4a0f0f;
+  color: #ffffff;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  font-family: "Courier New", monospace;
+  font-size: 12px;
+}
+
+.event-selected-scroll {
   min-height: 0;
-
-  border-top: 1px solid #eee4dc;
-  padding-top: 14px;
-
   overflow-y: auto;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .event-empty-schedule {
-  margin-top: 10px;
   color: #7a7067;
   font-size: 13px;
   line-height: 1.45;
 }
 
 .event-schedule-item {
-  margin-top: 10px;
-
   display: grid;
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns: 1fr auto;
   align-items: center;
   gap: 10px;
 
-  padding: 10px 11px;
+  padding: 12px;
 
   border: 1px solid #eadfd5;
   border-radius: 14px;
 
-  background: #fbf9f7;
+  background: #ffffff;
 }
 
-.event-schedule-item span {
+.event-schedule-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.event-schedule-meta span,
+.event-schedule-item > span {
   color: #4f4943;
   font-size: 13px;
   font-weight: 700;
 }
 
-.event-schedule-item strong {
+.event-schedule-meta strong,
+.event-schedule-item > strong {
   color: #8d1b1b;
   font-family: "Courier New", monospace;
   font-size: 13px;
 }
 
 .event-schedule-item button {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
 
   border: none;
   border-radius: 999px;
 
-  background: #ffffff;
+  background: #fff2f2;
   color: #8d1b1b;
 
   cursor: pointer;
+
   font-size: 16px;
   line-height: 1;
 }
 
 .event-schedule-item button:hover {
-  background: #fff2f2;
-}
-
-@media (max-width: 980px) {
-  .event-create-page {
-    grid-template-columns: 1fr;
-    overflow-y: auto;
-  }
-
-  .event-create-column {
-    overflow: visible;
-  }
-}
-
-@media (max-width: 720px) {
-  .event-create-page {
-    padding: 14px;
-    gap: 14px;
-  }
-
-  .event-create-column {
-    padding: 16px;
-    border-radius: 20px;
-  }
-
-  .event-create-actions {
-    flex-direction: column;
-  }
-
-  .event-primary-button,
-  .event-secondary-button {
-    width: 100%;
-  }
+  background: #f9dddd;
 }
 
 /* =====================================================
-   EVENT TABS
-===================================================== */
-
-.event-tabs {
-  display: flex;
-  gap: 10px;
-  margin-top: 8px;
-}
-
-.event-tabs button {
-  height: 42px;
-  padding: 0 18px;
-
-  border: 1px solid #e3d9cf;
-  border-radius: 999px;
-
-  background: #ffffff;
-  color: #4a0f0f;
-
-  font-size: 13px;
-  font-weight: 800;
-
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.event-tabs button:hover {
-  background: #f8f4ef;
-}
-
-.event-tabs button.active {
-  background: #5c0f0f;
-  border-color: #5c0f0f;
-  color: #ffffff;
-}
-
-/* =====================================================
-   TAB PANELS
-===================================================== */
-
-.event-tab-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-
-  min-height: 0;
-}
-
-/* =====================================================
-   MEDIA UPLOAD
+   MEDIA TAB
 ===================================================== */
 
 .event-upload-box {
@@ -995,7 +743,9 @@
 
   overflow: hidden;
 
-  transition: all 0.2s ease;
+  transition:
+    border-color 0.18s ease,
+    background 0.18s ease;
 }
 
 .event-upload-box:hover {
@@ -1036,10 +786,6 @@
   line-height: 1.6;
 }
 
-/* =====================================================
-   UPLOAD LIST
-===================================================== */
-
 .event-upload-list {
   display: flex;
   flex-direction: column;
@@ -1074,7 +820,6 @@
 
 .event-upload-item strong {
   display: block;
-
   margin-bottom: 4px;
 
   color: #1f1714;
@@ -1102,33 +847,96 @@
   cursor: pointer;
 }
 
-/* =====================================================
-   DIAL ACTIVE STATES
-===================================================== */
+/* =========================
+   CREATE ACTIONS
+========================= */
 
-.event-dial-wrap {
+.event-create-actions {
+  margin-top: auto;
+
   display: flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 10px 0 6px;
+  justify-content: flex-end;
+  gap: 12px;
 }
 
 /* =====================================================
-   MOBILE
+   RESPONSIVE
 ===================================================== */
 
-@media (max-width: 980px) {
-  .event-tabs {
-    flex-wrap: wrap;
+@media (max-width: 1100px) {
+  .events-page.calendar-view {
+    grid-template-columns: 1fr;
+    overflow-y: auto;
   }
 
-  .event-upload-content h3 {
-    font-size: 24px;
+  .events-calendar-grid {
+    grid-template-rows: repeat(6, 76px);
+  }
+
+  .events-list-panel {
+    min-height: 420px;
+  }
+
+  .event-dates-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .event-selected-panel {
+    min-height: 180px;
+    max-height: none;
   }
 }
 
 @media (max-width: 720px) {
+  .events-page.calendar-view,
+  .event-create-page {
+    padding: 14px;
+    gap: 14px;
+  }
+
+  .events-calendar-panel,
+  .events-list-panel,
+  .event-create-column {
+    padding: 16px;
+    border-radius: 22px;
+  }
+
+  .events-calendar-header,
+  .events-list-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .events-calendar-grid {
+    gap: 5px;
+    grid-template-rows: repeat(6, 54px);
+  }
+
+  .calendar-day {
+    padding: 7px;
+    border-radius: 13px;
+  }
+
+  .calendar-day span {
+    font-size: 11px;
+  }
+
+  .calendar-day i {
+    right: 5px;
+    bottom: 5px;
+    min-width: 15px;
+    height: 15px;
+    font-size: 9px;
+  }
+
+  .events-weekdays {
+    gap: 5px;
+  }
+
+  .events-weekdays span {
+    font-size: 9px;
+  }
+
   .event-tabs {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -1136,6 +944,12 @@
 
   .event-tabs button {
     width: 100%;
+    min-width: 0;
+  }
+
+  .event-create-header h1,
+  .event-schedule-header h2 {
+    font-size: 36px;
   }
 
   .event-upload-box {
@@ -1148,7 +962,13 @@
     align-items: flex-start;
   }
 
-  .event-upload-item button {
+  .event-upload-item button,
+  .event-primary-button,
+  .event-secondary-button {
     width: 100%;
+  }
+
+  .event-create-actions {
+    flex-direction: column;
   }
 }
