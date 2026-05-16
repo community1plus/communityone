@@ -9,7 +9,7 @@ export default function CommunityPlusSidebar() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { pathname, search } = location;
+  const { pathname } = location;
 
   const sidebar = useMemo(() => {
     return (
@@ -20,30 +20,19 @@ export default function CommunityPlusSidebar() {
     );
   }, []);
 
-  const currentMode = useMemo(() => {
-    const params = new URLSearchParams(search);
-    return params.get("mode") || "";
-  }, [search]);
-
   const isActive = useCallback(
     (item) => {
       if (!item?.path) return false;
 
-      if (item.type === "compose") {
-        return pathname === item.path;
-      }
-
-      if (item.type === "mode") {
-        return pathname === item.path && currentMode === item.mode;
-      }
-
-      if (item.type === "route") {
-        return pathname === item.path;
-      }
-
-      return false;
+      /*
+        Exact matching prevents:
+        /communityplus/events
+        from staying active when user is on:
+        /communityplus/events/create
+      */
+      return pathname === item.path;
     },
-    [pathname, currentMode]
+    [pathname]
   );
 
   const handleLogout = useCallback(async () => {
@@ -64,26 +53,15 @@ export default function CommunityPlusSidebar() {
         return;
       }
 
-      if (item.type === "route" && item.path) {
-        navigate(item.path);
-        return;
-      }
-
-      if (item.type === "compose" && item.path) {
+      if (item.path) {
         navigate(item.path, {
-          state: {
-            mode: item.mode || "now",
-            composerType: item.mode || "now",
-          },
-        });
-        return;
-      }
-
-      if (item.type === "mode" && item.path && item.mode) {
-        navigate(`${item.path}?mode=${item.mode}`, {
-          state: {
-            mode: item.mode,
-          },
+          state:
+            item.type === "compose"
+              ? {
+                  mode: item.mode || "now",
+                  composerType: item.mode || "now",
+                }
+              : undefined,
         });
       }
     },
@@ -118,7 +96,6 @@ export default function CommunityPlusSidebar() {
                   className={[
                     "sidebar-link",
                     active && "active",
-                    item.type === "mode" && "mode",
                     item.type === "compose" && "compose",
                     item.type === "route" && "route",
                     item.type === "action" && "action",
