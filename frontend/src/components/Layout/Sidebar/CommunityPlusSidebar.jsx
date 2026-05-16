@@ -131,5 +131,7 @@ export default function CommunityPlusSidebar() {
         </span>
       </button>
     </aside>
+    
   );
+  console.log("SIDEBAR NAV", sidebar);
 }
