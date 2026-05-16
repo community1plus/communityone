@@ -1,200 +1,212 @@
 import { useMemo, useState } from "react";
-
-import CommunityPlusAdSlotDial from "../CommunityPlusAdSlotDial/CommunityPlusAdSlotDial";
+import { useNavigate } from "react-router-dom";
 import "./CommunityPlusEventsPage.css";
 
-const EVENT_CATEGORIES = [
-  "Community",
-  "Music",
-  "Sport",
-  "Food & Drink",
-  "Markets",
-  "Business",
-  "Civic",
-  "Education",
-  "Health",
+const SAMPLE_EVENTS = [
+  {
+    id: "ev-1",
+    title: "Neighbourhood Market",
+    category: "Markets",
+    venue: "Melbourne Town Hall",
+    date: "2026-06-12",
+    time: "10:00",
+    summary: "Local makers, food stalls, music and community groups.",
+  },
+  {
+    id: "ev-2",
+    title: "Community Safety Forum",
+    category: "Civic",
+    venue: "Library Hall",
+    date: new Date().toISOString().slice(0, 10),
+    time: "18:30",
+    summary: "A public discussion about safety, services and local response.",
+  },
+  {
+    id: "ev-3",
+    title: "Weekend Youth Sports Day",
+    category: "Sport",
+    venue: "Princes Park",
+    date: "2026-07-05",
+    time: "09:00",
+    summary: "Open sports activities for young people and families.",
+  },
 ];
 
-function todayISO() {
-  return new Date().toISOString().slice(0, 10);
+function toISO(date) {
+  return date.toISOString().slice(0, 10);
 }
 
-export default function CommunityPlusEventCreatePage() {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [venue, setVenue] = useState("");
-  const [category, setCategory] = useState("Community");
-  const [selectedDate, setSelectedDate] = useState(todayISO());
-  const [schedule, setSchedule] = useState([]);
+function monthLabel(date) {
+  return new Intl.DateTimeFormat(undefined, {
+    month: "long",
+    year: "numeric",
+  }).format(date);
+}
 
-  const selectedSlotIndexes = useMemo(() => {
-    return schedule
-      .filter((item) => item.date === selectedDate)
-      .map((item) => item.slotIndex);
-  }, [schedule, selectedDate]);
+function buildCalendarDays(monthDate) {
+  const year = monthDate.getFullYear();
+  const month = monthDate.getMonth();
 
-  const sortedSchedule = useMemo(() => {
-    return [...schedule].sort((a, b) =>
-      `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`)
-    );
-  }, [schedule]);
+  const firstDay = new Date(year, month, 1);
+  const startOffset = firstDay.getDay();
+  const calendarStart = new Date(year, month, 1 - startOffset);
 
-  const handleSelectSlot = ({ index, time }) => {
-    if (!selectedDate || !time) return;
+  return Array.from({ length: 42 }, (_, index) => {
+    const date = new Date(calendarStart);
+    date.setDate(calendarStart.getDate() + index);
 
-    const exists = schedule.some(
-      (item) => item.date === selectedDate && item.time === time
-    );
+    return {
+      date,
+      iso: toISO(date),
+      inMonth: date.getMonth() === month,
+      isToday: toISO(date) === toISO(new Date()),
+    };
+  });
+}
 
-    if (exists) return;
+export default function CommunityPlusEventsPage() {
+  const navigate = useNavigate();
 
-    setSchedule((prev) => [
-      ...prev,
-      {
-        id: crypto.randomUUID(),
-        date: selectedDate,
-        time,
-        slotIndex: index,
-      },
-    ]);
+  const today = useMemo(() => new Date(), []);
+
+  const [visibleMonth, setVisibleMonth] = useState(
+    new Date(today.getFullYear(), today.getMonth(), 1)
+  );
+
+  const [selectedDate, setSelectedDate] = useState(toISO(today));
+
+  const calendarDays = useMemo(
+    () => buildCalendarDays(visibleMonth),
+    [visibleMonth]
+  );
+
+  const eventsByDate = useMemo(() => {
+    return SAMPLE_EVENTS.reduce((acc, event) => {
+      if (!acc[event.date]) acc[event.date] = [];
+      acc[event.date].push(event);
+      return acc;
+    }, {});
+  }, []);
+
+  const selectedEvents = eventsByDate[selectedDate] || [];
+
+  const moveMonth = (direction) => {
+    setVisibleMonth((current) => {
+      const next = new Date(current);
+      next.setMonth(current.getMonth() + direction);
+      return next;
+    });
   };
 
-  const removeScheduleItem = (id) => {
-    setSchedule((prev) => prev.filter((item) => item.id !== id));
+  const resetToToday = () => {
+    setVisibleMonth(new Date(today.getFullYear(), today.getMonth(), 1));
+    setSelectedDate(toISO(today));
   };
-
-  const canPublish =
-    title.trim() && description.trim() && venue.trim() && schedule.length > 0;
 
   return (
-    <main className="event-create-page">
-      <section className="event-create-column event-details-panel">
-        <div className="event-create-header">
-          <span>Event Listing</span>
+    <main className="events-page calendar-view">
+      <section className="events-calendar-panel">
+        <header className="events-calendar-header">
+          <div>
+            <span>Community Events</span>
+            <h1>{monthLabel(visibleMonth)}</h1>
+          </div>
 
-          <h1>Create an event</h1>
+          <div className="events-calendar-controls">
+            <button type="button" onClick={() => moveMonth(-1)}>
+              ←
+            </button>
 
-          <p>
-            Add one-off, staggered or recurring event dates up to 12 months in
-            advance.
-          </p>
+            <button type="button" onClick={resetToToday}>
+              today
+            </button>
+
+            <button type="button" onClick={() => moveMonth(1)}>
+              →
+            </button>
+          </div>
+        </header>
+
+        <div className="events-weekdays">
+          {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+            <span key={day}>{day}</span>
+          ))}
         </div>
 
-        <label className="event-field">
-          <span>Event title</span>
+        <div className="events-calendar-grid">
+          {calendarDays.map((day) => {
+            const eventCount = eventsByDate[day.iso]?.length || 0;
+            const selected = selectedDate === day.iso;
 
-          <input
-            type="text"
-            value={title}
-            onChange={(event) => setTitle(event.target.value)}
-            placeholder="Community market, workshop, concert..."
-          />
-        </label>
+            return (
+              <button
+                key={day.iso}
+                type="button"
+                className={[
+                  "calendar-day",
+                  !day.inMonth && "muted",
+                  day.isToday && "today",
+                  selected && "selected",
+                  eventCount > 0 && "has-events",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+                onClick={() => setSelectedDate(day.iso)}
+              >
+                <span>{day.date.getDate()}</span>
 
-        <label className="event-field">
-          <span>Description</span>
+                {eventCount > 0 && <i>{eventCount}</i>}
+              </button>
+            );
+          })}
+        </div>
+      </section>
 
-          <textarea
-            value={description}
-            onChange={(event) => setDescription(event.target.value)}
-            placeholder="Describe the event, who it is for, and what people should know..."
-          />
-        </label>
-
-        <label className="event-field">
-          <span>Venue / location</span>
-
-          <input
-            type="text"
-            value={venue}
-            onChange={(event) => setVenue(event.target.value)}
-            placeholder="Venue name or address"
-          />
-        </label>
-
-        <label className="event-field">
-          <span>Category</span>
-
-          <select
-            value={category}
-            onChange={(event) => setCategory(event.target.value)}
-          >
-            {EVENT_CATEGORIES.map((item) => (
-              <option key={item} value={item}>
-                {item}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <div className="event-create-actions">
-          <button type="button" className="event-secondary-button">
-            save draft
-          </button>
+      <aside className="events-list-panel">
+        <header className="events-list-header">
+          <div>
+            <span>Listings</span>
+            <h2>{selectedDate}</h2>
+          </div>
 
           <button
             type="button"
             className="event-primary-button"
-            disabled={!canPublish}
+            onClick={() => navigate("/communityplus/events/create")}
           >
-            publish event
+            create event
           </button>
-        </div>
-      </section>
+        </header>
 
-      <section className="event-create-column event-schedule-panel">
-        <div className="event-schedule-header">
-          <span>Schedule</span>
-
-          <h2>Select date and time</h2>
-        </div>
-
-        <label className="event-field">
-          <span>Date</span>
-
-          <input
-            type="date"
-            value={selectedDate}
-            min={todayISO()}
-            onChange={(event) => setSelectedDate(event.target.value)}
-          />
-        </label>
-
-        <div className="event-dial-wrap">
-          <CommunityPlusAdSlotDial
-            mode="event"
-            label="EVENT"
-            selectedSlots={selectedSlotIndexes}
-            onSelectSlot={handleSelectSlot}
-          />
-        </div>
-
-        <div className="event-selected-list">
-          <div className="event-selected-title">Selected dates & times</div>
-
-          {!sortedSchedule.length && (
-            <div className="event-empty-schedule">
-              Select a date, then click the dial to add half-hour event times.
+        <div className="events-list">
+          {!selectedEvents.length && (
+            <div className="events-empty-state">
+              <h3>No events listed</h3>
+              <p>There are no listings for this date yet.</p>
             </div>
           )}
 
-          {sortedSchedule.map((item) => (
-            <div key={item.id} className="event-schedule-item">
-              <span>{item.date}</span>
+          {selectedEvents.map((event) => (
+            <article key={event.id} className="event-card compact">
+              <div className="event-card-date">
+                <strong>{event.time}</strong>
+                <span>{event.category}</span>
+              </div>
 
-              <strong>{item.time}</strong>
+              <div className="event-card-body">
+                <h2>{event.title}</h2>
+                <p>{event.summary}</p>
 
-              <button
-                type="button"
-                onClick={() => removeScheduleItem(item.id)}
-                aria-label={`Remove ${item.date} ${item.time}`}
-              >
-                ×
-              </button>
-            </div>
+                <div className="event-card-meta">
+                  <span>📍 {event.venue}</span>
+                </div>
+              </div>
+
+              <button type="button">view event</button>
+            </article>
           ))}
         </div>
-      </section>
+      </aside>
     </main>
   );
 }
