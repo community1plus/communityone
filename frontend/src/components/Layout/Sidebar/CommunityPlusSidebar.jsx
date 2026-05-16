@@ -40,7 +40,7 @@ export default function CommunityPlusSidebar() {
       await signOut();
       navigate("/", { replace: true });
     } catch (error) {
-      console.error("Error signing out:", error);
+      
     }
   }, [navigate]);
 
