@@ -64,7 +64,7 @@ function buildCalendarDays(monthDate) {
   });
 }
 
-export default function CommunityPlusEventsPage() {
+export default function CommunityPlusEventCreatePage() {
   const navigate = useNavigate();
 
   const today = useMemo(() => new Date(), []);
