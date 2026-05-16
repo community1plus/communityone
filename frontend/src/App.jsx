@@ -16,7 +16,7 @@ import CommunityPlusIViewPage from "./pages/CommunityPlusIViewPage/CommunityPlus
 import CommunityPlusChannels from "./pages/CommunityPlusChannels/CommunityPlusChannels";
 import CommunityPlusNewsPage from "./pages/CommunityPlusNewsPage/CommunityPlusNewsPage";
 import CommunityPlusEventsPage from "./pages/CommunityPlusEventsPage/CommunityPlusEventsPage"
-import CommunityPlusEventCreatePage from "./pages/CommunityPlusEventsPage/CommunityPlusEventCreatePage";
+
 import CommunityPlusEventCreatePage from "./pages/CommunityPlusEventsPage/CommunityPlusEventCreatePage";
 import PostComposer from "./components/Layout/Sidebar/Post/PostComposer";
 
