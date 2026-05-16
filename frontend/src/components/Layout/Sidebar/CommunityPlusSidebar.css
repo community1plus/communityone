@@ -1,10 +1,10 @@
 /* =====================================================
-SIDEBAR BASE
+   SIDEBAR BASE
 ===================================================== */
 
 .sidebar {
-  width: clamp(200px, 18vw, 260px);
-  min-width: 200px;
+  width: clamp(220px, 14vw, 236px);
+  min-width: 220px;
   flex-shrink: 0;
 
   height: 100%;
@@ -15,9 +15,9 @@ SIDEBAR BASE
 
   position: relative;
 
-  padding: 16px 12px 18px;
+  padding: 16px 8px 18px;
 
-  gap: 20px;
+  gap: 18px;
 
   overflow: hidden;
 
@@ -36,7 +36,7 @@ SIDEBAR BASE
 }
 
 /* =====================================================
-COLLAPSED MODE
+   COLLAPSED MODE
 ===================================================== */
 
 .sidebar.collapsed {
@@ -45,7 +45,7 @@ COLLAPSED MODE
 }
 
 /* =====================================================
-MAIN
+   MAIN
 ===================================================== */
 
 .sidebar-main {
@@ -54,30 +54,26 @@ MAIN
 
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 16px;
 
   overflow-y: auto;
   overflow-x: hidden;
 
-  padding-right: 2px;
+  padding-right: 0;
 }
 
 /* =====================================================
-SECTION
+   SECTION
 ===================================================== */
 
 .sidebar-section {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
 
-  padding-bottom: 18px;
+  padding-bottom: 16px;
 
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-}
-
-.sidebar-item {
-  padding: 10px 14px;
 }
 
 .sidebar-section:last-child {
@@ -85,11 +81,11 @@ SECTION
 }
 
 /* =====================================================
-SECTION TITLE
+   SECTION TITLE
 ===================================================== */
 
 .sidebar-title {
-  padding: 0 6px;
+  padding: 0 8px;
   margin-bottom: 6px;
 
   color: #8a8178;
@@ -112,7 +108,7 @@ SECTION TITLE
 }
 
 /* =====================================================
-LINKS
+   LINKS
 ===================================================== */
 
 .sidebar-link {
@@ -120,7 +116,7 @@ LINKS
 
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 
   position: relative;
 
@@ -134,7 +130,7 @@ LINKS
   color: #4f4943;
 
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 650;
 
   text-align: left;
 
@@ -145,10 +141,6 @@ LINKS
     color 0.15s ease,
     transform 0.05s ease;
 }
-
-/* =====================================================
-ICON
-===================================================== */
 
 .sidebar-link .icon {
   width: 18px;
@@ -164,7 +156,11 @@ ICON
 }
 
 .sidebar-link .label {
+  min-width: 0;
+
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .sidebar.collapsed .sidebar-link .label {
@@ -172,7 +168,7 @@ ICON
 }
 
 /* =====================================================
-HOVER / ACTIVE
+   HOVER / ACTIVE
 ===================================================== */
 
 .sidebar-link:hover {
@@ -185,9 +181,9 @@ HOVER / ACTIVE
 }
 
 .sidebar-link.active {
-  background: rgba(0, 0, 0, 0.06);
+  background: rgba(0, 0, 0, 0.055);
   color: #2f2a27;
-  font-weight: 600;
+  font-weight: 750;
 }
 
 .sidebar-link.active::before {
@@ -195,7 +191,7 @@ HOVER / ACTIVE
 
   position: absolute;
 
-  left: -8px;
+  left: -4px;
   top: 8px;
   bottom: 8px;
 
@@ -203,19 +199,19 @@ HOVER / ACTIVE
 
   border-radius: 2px;
 
-  background: #000;
+  background: #4a0f0f;
 }
 
 /* =====================================================
-GROUP VARIANTS
+   GROUP VARIANTS
 ===================================================== */
 
 .sidebar-section.platform .sidebar-link {
-  font-weight: 600;
+  font-weight: 650;
 }
 
 /* =====================================================
-LOGOUT
+   LOGOUT
 ===================================================== */
 
 .sidebar-link.logout {
@@ -228,17 +224,17 @@ LOGOUT
 }
 
 /* =====================================================
-ECHO SIGNAL
+   ECHO SIGNAL
 ===================================================== */
 
 .echo-sidebar-signal {
   position: absolute;
 
-  left: -10px;
+  left: -8px;
   bottom: 18px;
 
-  width: 44px;
-  height: 44px;
+  width: 38px;
+  height: 38px;
 
   display: flex;
   align-items: center;
@@ -262,23 +258,21 @@ ECHO SIGNAL
   transform: translateX(2px);
 }
 
-/* =====================================================
-ECHO MARK
-===================================================== */
-
 .echo-sidebar-mark {
-  width: 30px;
-  height: 30px;
+  width: 24px;
+  height: 24px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
+  position: relative;
+
   border-radius: 999px;
 
   background: #ffffff;
 
-  border: 1px solid rgba(255, 66, 91, 0.2);
+  border: 1px solid rgba(255, 66, 91, 0.16);
 
   color: #ff425b;
 
@@ -287,25 +281,19 @@ ECHO MARK
     "IBM Plex Mono",
     monospace;
 
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 900;
 
   box-shadow:
-    0 8px 18px rgba(0,0,0,0.08),
+    0 4px 12px rgba(0,0,0,0.08),
     inset 0 1px 0 rgba(255,255,255,0.8);
-}
 
-/* =====================================================
-META
-===================================================== */
+  overflow: visible;
+}
 
 .echo-sidebar-meta {
   display: none;
 }
-
-/* =====================================================
-TOOLTIP
-===================================================== */
 
 .echo-tooltip {
   position: absolute;
@@ -358,104 +346,8 @@ TOOLTIP
 }
 
 /* =====================================================
-RESPONSIVE
+   ACTIVE COLOURS
 ===================================================== */
-
-@media (max-width: 900px) {
-  .sidebar {
-    width: 72px;
-    min-width: 72px;
-  }
-
-  .sidebar-title,
-  .sidebar-link .label {
-    display: none;
-  }
-
-  .sidebar-link {
-    justify-content: center;
-    padding: 10px;
-  }
-
-  .echo-sidebar-signal {
-    left: 50%;
-    transform: translateX(-50%);
-  }
-
-  .echo-sidebar-signal:hover {
-    transform: translateX(-50%);
-  }
- /**/
-  .echo-tooltip {
-    display: none;
-  }
-}
-
-.echo-sidebar-mark {
-  width: 24px;
-  height: 24px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  position: relative;
-
-  border-radius: 999px;
-
-  background: #ffffff;
-
-  border: 1px solid rgba(255, 66, 91, 0.16);
-
-  color: #ff425b;
-
-  font-family:
-    "Courier New",
-    "IBM Plex Mono",
-    monospace;
-
-  font-size: 14px;
-  font-weight: 900;
-
-  box-shadow:
-    0 4px 12px rgba(0,0,0,0.08),
-    inset 0 1px 0 rgba(255,255,255,0.8);
-
-  overflow: visible;
-}
-
-.echo-sidebar-mark {
-  width: 24px;
-  height: 24px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  position: relative;
-
-  border-radius: 999px;
-
-  background: #ffffff;
-
-  border: 1px solid rgba(255, 66, 91, 0.16);
-
-  color: #ff425b;
-
-  font-family:
-    "Courier New",
-    "IBM Plex Mono",
-    monospace;
-
-  font-size: 14px;
-  font-weight: 900;
-
-  box-shadow:
-    0 4px 12px rgba(0,0,0,0.08),
-    inset 0 1px 0 rgba(255,255,255,0.8);
-
-  overflow: visible;
-}
 
 .sidebar-link.compose.active::before {
   background: #8d1b1b;
@@ -479,4 +371,39 @@ RESPONSIVE
 
 .sidebar-link.compose:nth-of-type(5).active::before {
   background: #22c55e;
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 900px) {
+  .sidebar {
+    width: 72px;
+    min-width: 72px;
+    padding-inline: 8px;
+  }
+
+  .sidebar-title,
+  .sidebar-link .label {
+    display: none;
+  }
+
+  .sidebar-link {
+    justify-content: center;
+    padding: 10px;
+  }
+
+  .echo-sidebar-signal {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .echo-sidebar-signal:hover {
+    transform: translateX(-50%);
+  }
+
+  .echo-tooltip {
+    display: none;
+  }
 }
