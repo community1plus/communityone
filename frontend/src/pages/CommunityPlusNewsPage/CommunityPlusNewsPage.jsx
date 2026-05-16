@@ -41,6 +41,7 @@ const SAMPLE_ARTICLES = [
 
 export default function CommunityPlusNewsPage() {
   const [activeSection, setActiveSection] = useState("Front Page");
+  const [turning, setTurning] = useState(false);
 
   const visibleArticles = useMemo(() => {
     if (activeSection === "Front Page") return SAMPLE_ARTICLES;
@@ -50,11 +51,24 @@ export default function CommunityPlusNewsPage() {
     );
   }, [activeSection]);
 
+  const handleSectionChange = (section) => {
+    if (section === activeSection || turning) return;
+
+    setTurning(true);
+
+    setTimeout(() => {
+      setActiveSection(section);
+      setTurning(false);
+    }, 260);
+  };
+
   return (
     <main className="news-page">
       <header className="newspaper-masthead">
         <div className="newspaper-date">COMMUNITY ONE DAILY</div>
+
         <h1>THE LOCAL SIGNAL</h1>
+
         <div className="newspaper-subtitle">
           News, events, organisations and public life near you
         </div>
@@ -66,14 +80,16 @@ export default function CommunityPlusNewsPage() {
             key={section}
             type="button"
             className={activeSection === section ? "active" : ""}
-            onClick={() => setActiveSection(section)}
+            onClick={() => handleSectionChange(section)}
           >
             {section}
           </button>
         ))}
       </nav>
 
-      <section className="newspaper-edition">
+      <section
+        className={`newspaper-edition ${turning ? "page-turning" : ""}`}
+      >
         <div className="newspaper-page-label">{activeSection}</div>
 
         <div className="newspaper-grid">
@@ -83,19 +99,25 @@ export default function CommunityPlusNewsPage() {
               className={`news-article ${index === 0 ? "lead" : ""}`}
             >
               <div className="article-section">{article.section}</div>
+
               <h2>{article.headline}</h2>
+
               <div className="article-byline">By {article.author}</div>
+
               <p>{article.summary}</p>
+
               <button type="button">read article</button>
             </article>
           ))}
 
           <article className="news-drop-card">
             <h2>Drop an article</h2>
+
             <p>
               Submit a local article, opinion, event report or public-interest
               story for review.
             </p>
+
             <button type="button">submit news</button>
           </article>
         </div>
