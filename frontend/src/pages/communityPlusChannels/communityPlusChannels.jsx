@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import CommunityPlusAdTv from "../../components/CommunityPlusAdTv/CommunityPlusAdTv";
+import CommunityPlusAdTv from "../../pages/CommunityPlusAdTv/CommunityPlusAdTv";
 import "./CommunityPlusChannels.css";
 
 const CHANNELS = [
