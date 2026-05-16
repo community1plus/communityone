@@ -32,23 +32,56 @@ export default function HeaderNav() {
 
       const pathname = routeLocation.pathname || "";
 
-      if (path === "/") {
-        return pathname === "/";
-      }
+      /* ========================================
+         HOME
+      ======================================== */
 
       if (path === "/communityplus") {
-        return pathname === "/communityplus" || pathname === "/communityplus/home";
+        return pathname === "/communityplus";
       }
 
-      const isIViewRoute =
-        pathname.includes("/iview") || pathname.includes("/view");
+      /* ========================================
+         IVIEW
+      ======================================== */
 
-      const isIViewNav =
-        path.toLowerCase().includes("iview") ||
-        path.toLowerCase().includes("compose");
+      if (path === "/communityplus/iview") {
+        return (
+          pathname.includes("/iview") ||
+          pathname.includes("/view")
+        );
+      }
 
-      if (isIViewNav) {
-        return isIViewRoute;
+      /* ========================================
+         NEWS
+      ======================================== */
+
+      if (path === "/communityplus/news") {
+        return (
+          pathname === "/communityplus/news" ||
+          pathname.startsWith("/communityplus/news/")
+        );
+      }
+
+      /* ========================================
+         YELLOW PAGES
+      ======================================== */
+
+      if (path === "/communityplus/yellowpages") {
+        return (
+          pathname === "/communityplus/yellowpages" ||
+          pathname.startsWith("/communityplus/yellowpages/")
+        );
+      }
+
+      /* ========================================
+         ABOUT
+      ======================================== */
+
+      if (path === "/communityplus/about") {
+        return (
+          pathname === "/communityplus/about" ||
+          pathname.startsWith("/communityplus/about/")
+        );
       }
 
       return pathname === path || pathname.startsWith(`${path}/`);
@@ -72,6 +105,7 @@ export default function HeaderNav() {
   const handleManualLocationSet = useCallback(
     (nextManualLocation) => {
       if (!nextManualLocation) return;
+
       setManualLocation(nextManualLocation);
     },
     [setManualLocation]
