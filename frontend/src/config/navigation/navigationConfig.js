@@ -52,8 +52,8 @@ export const NAVIGATION = [
 
     sections: [
       {
-        id: "create",
-        title: "CREATE",
+        id: "iview",
+        title: "iVIEW",
         variant: "modes",
 
         items: [
@@ -140,13 +140,6 @@ export const NAVIGATION = [
             path: "/communityplus/help",
           },
 
-          {
-            id: "about-platform",
-            label: "About Community One",
-            icon: "ℹ️",
-            type: "route",
-            path: "/communityplus/about",
-          },
         ],
       },
 
