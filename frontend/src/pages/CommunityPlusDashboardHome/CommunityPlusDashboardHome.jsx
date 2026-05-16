@@ -236,18 +236,175 @@ function Feed({ activeFilter }) {
 export default function CommunityPlusDashboardHome() {
   const [activeFilter, setActiveFilter] = useState("all");
 
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchMode, setSearchMode] = useState("local");
+
+  const [searchResults, setSearchResults] = useState([]);
+
+  const { focusOnMarker } = useMap();
+
+  /* =========================================
+     HYBRID SEARCH
+  ========================================= */
+
+  const handleSearch = useCallback(
+    (event) => {
+      const value = event.target.value;
+
+      setSearchQuery(value);
+
+      /*
+        FUTURE FLOW:
+        POST /api/search/global
+
+        {
+          query: value,
+          mode: searchMode,
+          semantic: true,
+          vector: true,
+          locationAware: true
+        }
+      */
+
+      if (!value.trim()) {
+        setSearchResults([]);
+        return;
+      }
+
+      /*
+        TEMP LOCAL SEARCH
+      */
+
+      const results = FEED_ITEMS.filter((item) => {
+        const haystack = `
+          ${item.title}
+          ${item.content}
+          ${item.type}
+        `.toLowerCase();
+
+        return haystack.includes(value.toLowerCase());
+      });
+
+      setSearchResults(results);
+    },
+    [searchMode]
+  );
+
+  /* =========================================
+     SEARCH RESULT CLICK
+  ========================================= */
+
+  const handleSearchSelect = useCallback(
+    (result) => {
+      if (!result?.location) return;
+
+      focusOnMarker(result.location, result.id);
+    },
+    [focusOnMarker]
+  );
+
   return (
     <div className="dashboard-home-page">
-      <header className="dashboard-home-filterbar">
-        <div className="feed-filters" aria-label="Feed filters">
+
+      {/* =====================================
+          GLOBAL SEARCH
+      ===================================== */}
+
+      <header className="dashboard-search-header">
+
+        <div className="dashboard-search-wrap">
+
+          <div className="dashboard-search-toprow">
+
+            <div className="dashboard-search-box">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={handleSearch}
+                placeholder={`Search ${
+                  searchMode === "local"
+                    ? "your community"
+                    : "the world"
+                }...`}
+              />
+
+              <span className="dashboard-search-icon">
+                ⌕
+              </span>
+            </div>
+
+            <div className="dashboard-search-mode">
+              <button
+                type="button"
+                className={
+                  searchMode === "local" ? "active" : ""
+                }
+                onClick={() => setSearchMode("local")}
+              >
+                Local
+              </button>
+
+              <button
+                type="button"
+                className={
+                  searchMode === "global" ? "active" : ""
+                }
+                onClick={() => setSearchMode("global")}
+              >
+                Global
+              </button>
+            </div>
+          </div>
+
+          {/* =================================
+              AUTOCOMPLETE RESULTS
+          ================================= */}
+
+          {!!searchResults.length && (
+            <div className="dashboard-search-results">
+
+              {searchResults.map((result) => (
+                <button
+                  key={result.id}
+                  type="button"
+                  className="dashboard-search-result"
+                  onClick={() =>
+                    handleSearchSelect(result)
+                  }
+                >
+                  <div className="dashboard-search-result-meta">
+                    <span>{result.type}</span>
+
+                    <strong>{result.title}</strong>
+                  </div>
+
+                  <p>{result.content}</p>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* =====================================
+            FEED FILTERS
+        ===================================== */}
+
+        <div
+          className="feed-filters"
+          aria-label="Feed filters"
+        >
           {FILTERS.map((filter) => (
             <button
               key={filter.id}
               type="button"
               className={`feed-filter ${
-                activeFilter === filter.id ? "active" : ""
+                activeFilter === filter.id
+                  ? "active"
+                  : ""
               }`}
-              onClick={() => setActiveFilter(filter.id)}
+              onClick={() =>
+                setActiveFilter(filter.id)
+              }
             >
               {filter.label}
             </button>
@@ -255,7 +412,12 @@ export default function CommunityPlusDashboardHome() {
         </div>
       </header>
 
+      {/* =====================================
+          MAIN LAYOUT
+      ===================================== */}
+
       <div className="dashboard-home">
+
         <section className="dashboard-home-feed">
           <div className="feed-list">
             <Feed activeFilter={activeFilter} />
@@ -263,7 +425,10 @@ export default function CommunityPlusDashboardHome() {
         </section>
 
         <section className="dashboard-home-map">
-          <CommunityMap />
+          <CommunityMap
+            searchQuery={searchQuery}
+            searchMode={searchMode}
+          />
         </section>
       </div>
     </div>
