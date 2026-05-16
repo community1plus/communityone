@@ -8,6 +8,15 @@ import FeedCard from "../../components/FeedCard/CommunityPlusFeedCard";
 /* keep your existing FEED_ITEMS, DEFAULT_FEED_CARD, FILTERS,
    and helper functions exactly as they are above this point */
 
+   const FILTERS = [
+  { id: "all", label: "All" },
+  { id: "now", label: "Now" },
+  { id: "blob", label: "Blobs" },
+  { id: "incident", label: "Incidents" },
+  { id: "event", label: "Events" },
+  { id: "beacon", label: "Beacons" },
+];
+
 export default function CommunityPlusDashboardHome() {
   const [activeFilter, setActiveFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
