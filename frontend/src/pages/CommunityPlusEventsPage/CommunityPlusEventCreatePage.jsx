@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import CommunityPlusAdSlotDial from "../CommunityPlusAdSlotDial/CommunityPlusAdSlotDial";
+
+import CommunityPlusAdSlotDial from "../../components/CommunityPlusAdSlotDial/CommunityPlusAdSlotDial";
 import "./CommunityPlusEventsPage.css";
 
 const EVENT_CATEGORIES = [
@@ -32,7 +33,15 @@ export default function CommunityPlusEventCreatePage() {
       .map((item) => item.slotIndex);
   }, [schedule, selectedDate]);
 
+  const sortedSchedule = useMemo(() => {
+    return [...schedule].sort((a, b) =>
+      `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`)
+    );
+  }, [schedule]);
+
   const handleSelectSlot = ({ index, time }) => {
+    if (!selectedDate || !time) return;
+
     const exists = schedule.some(
       (item) => item.date === selectedDate && item.time === time
     );
@@ -54,18 +63,17 @@ export default function CommunityPlusEventCreatePage() {
     setSchedule((prev) => prev.filter((item) => item.id !== id));
   };
 
-  const sortedSchedule = useMemo(() => {
-    return [...schedule].sort((a, b) => {
-      return `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`);
-    });
-  }, [schedule]);
+  const canPublish =
+    title.trim() && description.trim() && venue.trim() && schedule.length > 0;
 
   return (
     <main className="event-create-page">
       <section className="event-create-column event-details-panel">
         <div className="event-create-header">
           <span>Event Listing</span>
+
           <h1>Create an event</h1>
+
           <p>
             Add one-off, staggered or recurring event dates up to 12 months in
             advance.
@@ -74,7 +82,9 @@ export default function CommunityPlusEventCreatePage() {
 
         <label className="event-field">
           <span>Event title</span>
+
           <input
+            type="text"
             value={title}
             onChange={(event) => setTitle(event.target.value)}
             placeholder="Community market, workshop, concert..."
@@ -83,6 +93,7 @@ export default function CommunityPlusEventCreatePage() {
 
         <label className="event-field">
           <span>Description</span>
+
           <textarea
             value={description}
             onChange={(event) => setDescription(event.target.value)}
@@ -92,7 +103,9 @@ export default function CommunityPlusEventCreatePage() {
 
         <label className="event-field">
           <span>Venue / location</span>
+
           <input
+            type="text"
             value={venue}
             onChange={(event) => setVenue(event.target.value)}
             placeholder="Venue name or address"
@@ -101,12 +114,15 @@ export default function CommunityPlusEventCreatePage() {
 
         <label className="event-field">
           <span>Category</span>
+
           <select
             value={category}
             onChange={(event) => setCategory(event.target.value)}
           >
             {EVENT_CATEGORIES.map((item) => (
-              <option key={item}>{item}</option>
+              <option key={item} value={item}>
+                {item}
+              </option>
             ))}
           </select>
         </label>
@@ -119,7 +135,7 @@ export default function CommunityPlusEventCreatePage() {
           <button
             type="button"
             className="event-primary-button"
-            disabled={!title.trim() || !description.trim() || !schedule.length}
+            disabled={!canPublish}
           >
             publish event
           </button>
@@ -129,11 +145,13 @@ export default function CommunityPlusEventCreatePage() {
       <section className="event-create-column event-schedule-panel">
         <div className="event-schedule-header">
           <span>Schedule</span>
+
           <h2>Select date and time</h2>
         </div>
 
         <label className="event-field">
           <span>Date</span>
+
           <input
             type="date"
             value={selectedDate}
@@ -163,9 +181,14 @@ export default function CommunityPlusEventCreatePage() {
           {sortedSchedule.map((item) => (
             <div key={item.id} className="event-schedule-item">
               <span>{item.date}</span>
+
               <strong>{item.time}</strong>
 
-              <button type="button" onClick={() => removeScheduleItem(item.id)}>
+              <button
+                type="button"
+                onClick={() => removeScheduleItem(item.id)}
+                aria-label={`Remove ${item.date} ${item.time}`}
+              >
                 ×
               </button>
             </div>
