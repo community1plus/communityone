@@ -1,5 +1,5 @@
 /* =====================================================
-CONTAINER
+   TWO COLUMN LAYOUT
 ===================================================== */
 
 .two-col-container {
@@ -16,7 +16,7 @@ CONTAINER
 }
 
 /* =====================================================
-LAYOUT
+   LAYOUT
 ===================================================== */
 
 .two-col-layout {
@@ -33,39 +33,48 @@ LAYOUT
   overflow: hidden;
 }
 
-/* MAP MODE: LEFT = MAP, RIGHT = FEED */
-.two-col-layout.map-mode {
-  display: grid;
-  grid-template-columns: clamp(340px, 24vw, 420px) minmax(0, 1fr);
-  height: 100%;
+.two-col-left,
+.two-col-right {
+  min-width: 0;
+  min-height: 0;
   overflow: hidden;
-}
-
-/* =====================================================
-LEFT / RIGHT
-===================================================== */
-
-
-/* LEFT = MAP */
-.two-col-layout.map-mode .two-col-left {
-  position: relative;
-  z-index: 2;
-  overflow-y: auto;
-  background: #faf7f4;
-  border-right: 1px solid #e6dfd8;
 }
 
 .two-col-right {
   display: flex;
 }
 
-.map-wrapper {
-  flex: 1;
+/* =====================================================
+   MAP MODE
+===================================================== */
+
+.two-col-container.map-mode .two-col-layout {
+  grid-template-columns: clamp(340px, 24vw, 420px) minmax(0, 1fr);
 }
 
+.two-col-container.map-mode .two-col-left {
+  position: relative;
+  z-index: 2;
+
+  overflow-y: auto;
+
+  background: #faf7f4;
+  border-right: 1px solid #e6dfd8;
+}
+
+.two-col-container.map-mode .two-col-right {
+  min-width: 0;
+  min-height: 0;
+}
+
+.two-col-container.map-mode .map-wrapper {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
 
 /* =====================================================
-CARD BASE
+   CARD BASE
 ===================================================== */
 
 .two-col-card {
@@ -80,7 +89,11 @@ CARD BASE
   background: #ffffff;
   border: 1px solid #e6dfd8;
   border-radius: 16px;
+
   box-shadow: 0 6px 18px rgba(20, 20, 20, 0.05);
+
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .two-col-card.left {
@@ -92,37 +105,37 @@ CARD BASE
   background: #faf7f4;
 }
 
-/* REMOVE CARD STYLING FOR MAP */
-.two-col-layout.map-mode .two-col-card {
+/* remove card styling for map layouts */
+.two-col-container.map-mode .two-col-card {
   padding: 0;
 
-  background: none;
+  background: transparent;
   border: none;
   border-radius: 0;
   box-shadow: none;
 }
 
 /* =====================================================
-RESPONSIVE
+   RESPONSIVE
 ===================================================== */
 
 @media (max-width: 1000px) {
   .two-col-layout {
     grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
   }
 
-  .two-col-layout.map-mode {
+  .two-col-container.map-mode .two-col-layout {
     grid-template-columns: 1fr;
     grid-template-rows: 60% 40%;
   }
 
-  .two-col-layout.map-mode .two-col-left,
-  .two-col-layout.map-mode .two-col-right {
+  .two-col-container.map-mode .two-col-left,
+  .two-col-container.map-mode .two-col-right {
     height: 100%;
   }
 
-  .two-col-layout.map-mode .two-col-right {
-    border-left: none;
+  .two-col-container.map-mode .two-col-right {
     border-top: 1px solid #eee;
   }
 }

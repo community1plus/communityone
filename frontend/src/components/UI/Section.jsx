@@ -1,9 +1,24 @@
-export default function Section({ title, meta, children }) {
+export default function Section({
+  title,
+  meta,
+  children,
+  actions,
+  className = "",
+}) {
   return (
-    <div className="section">
-      {title && <div className="section-title">{title}</div>}
-      {meta && <div className="section-meta">{meta}</div>}
-      {children}
-    </div>
+    <section className={["section", className].filter(Boolean).join(" ")}>
+      {(title || meta || actions) && (
+        <header className="section-header">
+          <div>
+            {meta && <div className="section-meta">{meta}</div>}
+            {title && <h2 className="section-title">{title}</h2>}
+          </div>
+
+          {actions && <div className="section-actions">{actions}</div>}
+        </header>
+      )}
+
+      <div className="section-body">{children}</div>
+    </section>
   );
 }
