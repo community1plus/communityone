@@ -200,14 +200,14 @@ export default function CommunityPlusEventCreatePage() {
           </div>
         )}
 
-        {/* =========================================
+  {/* =========================================
     DATES TAB
 ========================================= */}
 
 {activeTab === "dates" && (
   <div className="event-tab-panel event-dates-layout">
 
-    {/* LEFT */}
+    {/* LEFT COLUMN */}
     <div className="event-date-picker-panel">
 
       <div className="event-schedule-header">
@@ -229,6 +229,61 @@ export default function CommunityPlusEventCreatePage() {
         />
       </label>
 
+      {/* SELECTED TIMES */}
+      <aside className="event-selected-panel">
+
+        <div className="event-selected-panel-header">
+          <span>Selected schedule</span>
+
+          <strong>{sortedSchedule.length}</strong>
+        </div>
+
+        {!sortedSchedule.length && (
+          <div className="event-empty-schedule">
+            Select a date, then click the wheel
+            to add half-hour event times.
+          </div>
+        )}
+
+        <div className="event-selected-scroll">
+          {sortedSchedule.map((item) => (
+            <div
+              key={item.id}
+              className="event-schedule-item"
+            >
+              <div className="event-schedule-meta">
+                <span>{item.date}</span>
+
+                <strong>{item.time}</strong>
+              </div>
+
+              <button
+                type="button"
+                onClick={() =>
+                  removeScheduleItem(item.id)
+                }
+                aria-label={`Remove ${item.time}`}
+              >
+                ×
+              </button>
+            </div>
+          ))}
+        </div>
+      </aside>
+    </div>
+
+    {/* RIGHT COLUMN */}
+    <div className="event-wheel-panel">
+
+      <div className="event-wheel-header">
+        <span>Time wheel</span>
+
+        <p>
+          Click segments to add event times
+          in 30 minute increments.
+        </p>
+      </div>
+
       <div className="event-dial-wrap">
         <CommunityPlusAdSlotDial
           mode="event"
@@ -239,106 +294,8 @@ export default function CommunityPlusEventCreatePage() {
         />
       </div>
     </div>
-
-    {/* RIGHT */}
-    <aside className="event-selected-panel">
-
-      <div className="event-selected-panel-header">
-        <span>Selected schedule</span>
-
-        <strong>{sortedSchedule.length}</strong>
-      </div>
-
-      {!sortedSchedule.length && (
-        <div className="event-empty-schedule">
-          Select a date, then click the dial to
-          add half-hour event times.
-        </div>
-      )}
-
-      <div className="event-selected-scroll">
-        {sortedSchedule.map((item) => (
-          <div
-            key={item.id}
-            className="event-schedule-item"
-          >
-            <div className="event-schedule-meta">
-              <span>{item.date}</span>
-
-              <strong>{item.time}</strong>
-            </div>
-
-            <button
-              type="button"
-              onClick={() =>
-                removeScheduleItem(item.id)
-              }
-            >
-              ×
-            </button>
-          </div>
-        ))}
-      </div>
-    </aside>
   </div>
 )}
-        {/* =========================================
-            MEDIA TAB
-        ========================================= */}
-
-        {activeTab === "media" && (
-          <div className="event-tab-panel">
-            <div className="event-upload-box">
-              <input
-                type="file"
-                multiple
-                onChange={handleFiles}
-              />
-
-              <div className="event-upload-content">
-                <h3>Upload media</h3>
-
-                <p>
-                  Add flyers, posters, videos,
-                  PDFs or supporting documents.
-                </p>
-              </div>
-            </div>
-
-            <div className="event-upload-list">
-              {!uploadedFiles.length && (
-                <div className="event-empty-upload">
-                  No files uploaded yet.
-                </div>
-              )}
-
-              {uploadedFiles.map((file) => (
-                <div
-                  key={file.name}
-                  className="event-upload-item"
-                >
-                  <div>
-                    <strong>{file.name}</strong>
-
-                    <span>
-                      {Math.round(file.size / 1024)} KB
-                    </span>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() =>
-                      removeFile(file.name)
-                    }
-                  >
-                    remove
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* =========================================
             ACTIONS
         ========================================= */}
