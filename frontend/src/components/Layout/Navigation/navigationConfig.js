@@ -18,6 +18,18 @@ export const NAVIGATION = [
         path: "/communityplus/iview",
       },
       {
+        id: "news",
+        label: "News",
+        type: "route",
+        path: "/communityplus/news",
+      },
+      {
+        id: "events",
+        label: "Events",
+        type: "route",
+        path: "/communityplus/events",
+      },
+      {
         id: "yellowpages",
         label: "Yellow Pages",
         type: "route",
@@ -39,8 +51,8 @@ export const NAVIGATION = [
     group: "sidebar",
     sections: [
       {
-        id: "iview",
-        title: "iVIEW",
+        id: "create",
+        title: "CREATE",
         variant: "modes",
         items: [
           {
@@ -61,19 +73,18 @@ export const NAVIGATION = [
           },
           {
             id: "compose-news",
-            label: "News",
+            label: "News Article",
             icon: "📰",
             type: "compose",
             path: "/communityplus/compose/news",
             mode: "news",
           },
           {
-            id: "compose-event",
-            label: "Events",
+            id: "create-event",
+            label: "Event Listing",
             icon: "📅",
-            type: "compose",
-            path: "/communityplus/compose/event",
-            mode: "event",
+            type: "route",
+            path: "/communityplus/events/create",
           },
           {
             id: "compose-beacon",
@@ -90,6 +101,20 @@ export const NAVIGATION = [
         id: "platform",
         title: "PLATFORM",
         items: [
+          {
+            id: "news-page",
+            label: "News",
+            icon: "🗞️",
+            type: "route",
+            path: "/communityplus/news",
+          },
+          {
+            id: "events-page",
+            label: "Events",
+            icon: "📆",
+            type: "route",
+            path: "/communityplus/events",
+          },
           {
             id: "yellowpages",
             label: "Yellow Pages",
