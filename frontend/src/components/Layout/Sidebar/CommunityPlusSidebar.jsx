@@ -114,7 +114,7 @@ export default function CommunityPlusSidebar() {
           </div>
         ))}
       </div>
-
+      console.log("SIDEBAR NAV", sidebar);
       <button
         type="button"
         className="echo-sidebar-signal"
@@ -133,5 +133,5 @@ export default function CommunityPlusSidebar() {
     </aside>
     
   );
-  console.log("SIDEBAR NAV", sidebar);
+  
 }
