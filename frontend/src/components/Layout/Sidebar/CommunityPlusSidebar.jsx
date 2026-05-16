@@ -22,7 +22,7 @@ export default function CommunityPlusSidebar() {
 
   const currentMode = useMemo(() => {
     const params = new URLSearchParams(search);
-    return params.get("mode") || "now";
+    return params.get("mode") || "";
   }, [search]);
 
   const isActive = useCallback(
@@ -30,14 +30,18 @@ export default function CommunityPlusSidebar() {
       if (!item?.path) return false;
 
       if (item.type === "compose") {
-        return pathname === item.path || currentMode === item.mode;
+        return pathname === item.path;
       }
 
       if (item.type === "mode") {
         return pathname === item.path && currentMode === item.mode;
       }
 
-      return pathname === item.path || pathname.startsWith(`${item.path}/`);
+      if (item.type === "route") {
+        return pathname === item.path;
+      }
+
+      return false;
     },
     [pathname, currentMode]
   );
@@ -60,6 +64,11 @@ export default function CommunityPlusSidebar() {
         return;
       }
 
+      if (item.type === "route" && item.path) {
+        navigate(item.path);
+        return;
+      }
+
       if (item.type === "compose" && item.path) {
         navigate(item.path, {
           state: {
@@ -76,11 +85,6 @@ export default function CommunityPlusSidebar() {
             mode: item.mode,
           },
         });
-        return;
-      }
-
-      if (item.type === "route" && item.path) {
-        navigate(item.path);
       }
     },
     [navigate, handleLogout]
@@ -116,6 +120,7 @@ export default function CommunityPlusSidebar() {
                     active && "active",
                     item.type === "mode" && "mode",
                     item.type === "compose" && "compose",
+                    item.type === "route" && "route",
                     item.type === "action" && "action",
                     item.action === "logout" && "logout",
                   ]
