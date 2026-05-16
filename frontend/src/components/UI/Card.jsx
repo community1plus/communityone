@@ -1,10 +1,25 @@
-export default function Card({ children, variant = "primary", className = "" }) {
+export default function Card({
+  children,
+  variant = "primary",
+  active = false,
+  clickable = false,
+  className = "",
+  as: Component = "div",
+  ...props
+}) {
   const classes = [
     "card",
-    variant === "primary" ? "card-primary" : "",
-    variant === "soft" ? "card-soft" : "",
+    `card-${variant}`,
+    active && "active",
+    clickable && "clickable",
     className,
-  ].join(" ");
+  ]
+    .filter(Boolean)
+    .join(" ");
 
-  return <div className={classes}>{children}</div>;
+  return (
+    <Component className={classes} {...props}>
+      {children}
+    </Component>
+  );
 }

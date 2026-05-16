@@ -1,16 +1,24 @@
 export default function Button({
   children,
   variant = "primary",
+  size = "md",
+  active = false,
   className = "",
+  type = "button",
   ...props
 }) {
   const classes = [
-    variant === "primary" ? "btn-primary" : "btn-ghost",
+    "btn",
+    `btn-${variant}`,
+    `btn-${size}`,
+    active && "active",
     className,
-  ].join(" ");
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
-    <button className={classes} {...props}>
+    <button type={type} className={classes} {...props}>
       {children}
     </button>
   );
