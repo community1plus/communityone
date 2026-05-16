@@ -8,7 +8,25 @@ const API_BASE =
   import.meta.env.VITE_API_BASE ||
   (import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : "");
 
-const MAX_VIDEO_AUDIO_SIZE = 300 * 1024 * 1024;
+const DEFAULT_VIDEO_AUDIO_SIZE = 300 * 1024 * 1024;
+
+const MODE_MEDIA_LIMITS = {
+  now: {
+    maxVideoAudioSize: DEFAULT_VIDEO_AUDIO_SIZE,
+  },
+  news: {
+    maxVideoAudioSize: DEFAULT_VIDEO_AUDIO_SIZE,
+  },
+  blob: {
+    maxVideoAudioSize: null,
+  },
+  event: {
+    maxVideoAudioSize: DEFAULT_VIDEO_AUDIO_SIZE,
+  },
+  beacon: {
+    maxVideoAudioSize: DEFAULT_VIDEO_AUDIO_SIZE,
+  },
+};
 
 const ALLOWED_FILE_EXTENSIONS = [
   "png",
@@ -249,17 +267,21 @@ function getMediaKind(file) {
   return "document";
 }
 
-function validateIncomingFile(file, existingItems = []) {
+function validateIncomingFile(file, existingItems = [], currentMode = "now") {
   const kind = getMediaKind(file);
   const extension = getFileExtension(file.name);
+
+  const mediaRules = MODE_MEDIA_LIMITS[currentMode] || MODE_MEDIA_LIMITS.now;
+  const hasSizeLimit = typeof mediaRules.maxVideoAudioSize === "number";
 
   if (!ALLOWED_FILE_EXTENSIONS.includes(extension)) {
     return `${file.name} is not an allowed file type.`;
   }
 
   if (
+    hasSizeLimit &&
     (kind === "video" || kind === "audio") &&
-    file.size > MAX_VIDEO_AUDIO_SIZE
+    file.size > mediaRules.maxVideoAudioSize
   ) {
     return `${file.name} exceeds the 300 MB limit for video/audio.`;
   }
@@ -398,6 +420,7 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
   const canPromote = config.allowPromotion;
   const showDetails = config.showDetails;
   const hasFiles = files.length > 0;
+  const isBlobMode = mode === "blob";
 
   const selectedSocialTargets = useMemo(
     () =>
@@ -486,7 +509,11 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
         })),
       ];
 
-      const validationError = validateIncomingFile(file, simulatedExisting);
+      const validationError = validateIncomingFile(
+        file,
+        simulatedExisting,
+        mode
+      );
 
       if (validationError) {
         setError(validationError);
@@ -903,9 +930,11 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
                     </span>
 
                     <span className="upload-help">
-                      Max 300 MB for video/audio. One video, one audio and one
-                      document per post. Allowed: PNG, JPEG, PDF, Word, TXT and
-                      standard document files.
+                      {isBlobMode
+                        ? "BLOB supports extended video/audio uploads. One video, one audio and one document per post."
+                        : "Max 300 MB for video/audio. One video, one audio and one document per post."}{" "}
+                      Allowed: PNG, JPEG, PDF, Word, TXT and standard document
+                      files.
                     </span>
                   </button>
                 )}
@@ -1233,8 +1262,9 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
 
               {mode === "blob" && (
                 <p>
-                  BLOB posts are longer-form commentary, stories, opinions, and
-                  community reflections.
+                  BLOB posts are flexible long-form community content. Upload
+                  extended video, audio, commentary, stories, interviews,
+                  documentaries and community reflections.
                 </p>
               )}
 
