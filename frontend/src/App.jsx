@@ -80,15 +80,7 @@ export default function App() {
           <Route path="iview" element={<CommunityPlusIViewPage />} />
           <Route path="news" element={<CommunityPlusNewsPage />} />
 
-          <Route
-            path="events/create"
-            element={
-              <ProtectedRoute>
-                <CommunityPlusEventCreatePage />
-              </ProtectedRoute>
-            }
-          />
-
+          
           <Route path="events" element={<CommunityPlusEventsPage />} />
           <Route path="about" element={<CommunityPlusAboutPage />} />
           <Route path="yellowpages" element={<CommunityPlusYellowPages />} />
