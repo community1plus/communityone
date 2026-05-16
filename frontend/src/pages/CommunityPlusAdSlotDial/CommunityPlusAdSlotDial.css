@@ -76,3 +76,15 @@
   font-weight: 600;
   color: #fff;
 }
+
+.dial-segment.quarter-marker {
+  background: #8d1b1b;
+}
+
+.dial-segment.quarter-marker.available {
+  opacity: 0.95;
+}
+
+.dial-segment.quarter-marker.selected {
+  background: #f59e0b;
+}

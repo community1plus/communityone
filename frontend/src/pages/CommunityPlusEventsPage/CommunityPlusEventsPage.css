@@ -14,12 +14,17 @@
   font-size: 13px;
   font-weight: 900;
   cursor: pointer;
+  transition: all 0.18s ease;
 }
 
 .event-primary-button {
   border: none;
   background: #4a0f0f;
   color: #ffffff;
+}
+
+.event-primary-button:hover {
+  background: #5f1717;
 }
 
 .event-primary-button:disabled {
@@ -33,380 +38,8 @@
   color: #4a0f0f;
 }
 
-/* =====================================================
-   EVENTS LISTING — CALENDAR VIEW
-===================================================== */
-
-.events-page.calendar-view {
-  width: 100%;
-  height: 100%;
-  min-height: 0;
-  padding: 22px;
-  background: #f7f4ef;
-  box-sizing: border-box;
-  overflow: hidden;
-
-  display: grid;
-  grid-template-columns: minmax(420px, 1fr) minmax(360px, 0.72fr);
-  gap: 22px;
-
-  color: #1f1714;
-}
-
-.events-calendar-panel,
-.events-list-panel {
-  min-width: 0;
-  min-height: 0;
-  padding: 22px;
-
-  border: 1px solid #e3d9cf;
-  border-radius: 26px;
-  background: #ffffff;
-
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.05);
-  box-sizing: border-box;
-  overflow: hidden;
-}
-
-.events-calendar-panel {
-  display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr);
-  gap: 16px;
-}
-
-.events-calendar-header,
-.events-list-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 18px;
-}
-
-.events-calendar-header span,
-.events-list-header span {
-  font-family: "Courier New", monospace;
-  font-size: 11px;
-  font-weight: 900;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #8d1b1b;
-}
-
-.events-calendar-header h1,
-.events-list-header h2 {
-  margin: 6px 0 0;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(32px, 4vw, 56px);
-  line-height: 0.95;
-  letter-spacing: -0.05em;
-  color: #1f1714;
-}
-
-.events-calendar-controls {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.events-calendar-controls button {
-  min-width: 34px;
-  height: 34px;
-  padding: 0 12px;
-
-  border: 1px solid #e3d9cf;
-  border-radius: 999px;
-
-  background: #ffffff;
-  color: #4a0f0f;
-
-  font-size: 13px;
-  font-weight: 800;
-  text-transform: lowercase;
-  cursor: pointer;
-}
-
-.events-calendar-controls button:hover {
+.event-secondary-button:hover {
   background: #fbf9f7;
-  border-color: #d6b8a6;
-}
-
-/* =========================
-   WEEKDAYS
-========================= */
-
-.events-weekdays {
-  display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 8px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #eee4dc;
-}
-
-.events-weekdays span {
-  text-align: center;
-  font-family: "Courier New", monospace;
-  font-size: 11px;
-  font-weight: 900;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #8a8178;
-}
-
-/* =========================
-   CALENDAR GRID
-========================= */
-
-.events-calendar-grid {
-  min-height: 0;
-  display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  grid-template-rows: repeat(6, minmax(66px, 1fr));
-  gap: 8px;
-}
-
-.calendar-day {
-  position: relative;
-  min-width: 0;
-  min-height: 0;
-  padding: 10px;
-
-  border: 1px solid #eee4dc;
-  border-radius: 18px;
-
-  background: #fbf9f7;
-  color: #2f2a25;
-
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-start;
-
-  cursor: pointer;
-
-  transition:
-    transform 0.16s ease,
-    background 0.16s ease,
-    border-color 0.16s ease,
-    box-shadow 0.16s ease;
-}
-
-.calendar-day:hover {
-  transform: translateY(-2px);
-  border-color: #d6b8a6;
-  background: #ffffff;
-}
-
-.calendar-day span {
-  font-family: "Courier New", monospace;
-  font-size: 13px;
-  font-weight: 900;
-}
-
-.calendar-day.muted {
-  opacity: 0.38;
-}
-
-.calendar-day.today {
-  border-color: rgba(141, 27, 27, 0.28);
-}
-
-.calendar-day.today span {
-  color: #8d1b1b;
-}
-
-.calendar-day.selected {
-  background: #4a0f0f;
-  border-color: #4a0f0f;
-  color: #ffffff;
-  box-shadow: 0 10px 24px rgba(74, 15, 15, 0.18);
-}
-
-.calendar-day.selected span {
-  color: #ffffff;
-}
-
-.calendar-day.has-events::after {
-  content: "";
-  position: absolute;
-  left: 10px;
-  bottom: 10px;
-
-  width: 7px;
-  height: 7px;
-
-  border-radius: 50%;
-  background: #8d1b1b;
-}
-
-.calendar-day.selected.has-events::after {
-  background: #ffffff;
-}
-
-.calendar-day i {
-  position: absolute;
-  right: 9px;
-  bottom: 7px;
-
-  min-width: 18px;
-  height: 18px;
-  padding: 0 5px;
-
-  border-radius: 999px;
-
-  background: #ffffff;
-  color: #8d1b1b;
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  font-style: normal;
-  font-size: 10px;
-  font-weight: 900;
-
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-}
-
-/* =========================
-   LIST PANEL
-========================= */
-
-.events-list-panel {
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
-  gap: 16px;
-}
-
-.events-list-header {
-  padding-bottom: 14px;
-  border-bottom: 1px solid #eee4dc;
-}
-
-.events-list-header h2 {
-  font-size: clamp(24px, 3vw, 36px);
-}
-
-.events-list {
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  overflow-y: auto;
-  padding-right: 4px;
-}
-
-.events-empty-state {
-  min-height: 220px;
-  height: 100%;
-
-  border: 1px dashed #d6cabb;
-  border-radius: 22px;
-  background: #fbf9f7;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  text-align: center;
-  padding: 24px;
-}
-
-.events-empty-state h3 {
-  margin: 0 0 8px;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 28px;
-  line-height: 1;
-  color: #4a0f0f;
-}
-
-.events-empty-state p {
-  margin: 0;
-  color: #6d625a;
-  font-size: 14px;
-  line-height: 1.45;
-}
-
-/* =========================
-   EVENT CARD
-========================= */
-
-.event-card.compact {
-  margin: 0;
-  padding: 16px;
-
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-
-  border: 1px solid #e3d9cf;
-  border-radius: 20px;
-
-  background: #ffffff;
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.04);
-}
-
-.event-card.compact .event-card-date {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  padding-bottom: 10px;
-  border-bottom: 1px solid #eee4dc;
-}
-
-.event-card.compact .event-card-date strong {
-  font-family: "Courier New", monospace;
-  font-size: 16px;
-  color: #4a0f0f;
-}
-
-.event-card.compact .event-card-date span {
-  font-size: 11px;
-  font-weight: 900;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #8d1b1b;
-}
-
-.event-card.compact h2 {
-  margin: 0 0 8px;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 25px;
-  line-height: 1.05;
-}
-
-.event-card.compact p {
-  margin: 0;
-  color: #5f554d;
-  font-size: 14px;
-  line-height: 1.55;
-}
-
-.event-card-meta {
-  margin-top: 12px;
-  color: #6d625a;
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.event-card.compact > button {
-  align-self: flex-start;
-
-  border: none;
-  background: transparent;
-
-  color: #8d1b1b;
-
-  font-family: "Courier New", monospace;
-  font-size: 12px;
-  font-weight: 900;
-  text-transform: lowercase;
-
-  cursor: pointer;
-}
-
-.event-card.compact > button::after {
-  content: " →";
 }
 
 /* =====================================================
@@ -415,10 +48,9 @@
 
 .event-create-page {
   width: 100%;
-  height: 100%;
-  min-height: 0;
+  min-height: 100%;
 
-  padding: 22px;
+  padding: 24px;
   background: #f7f4ef;
 
   box-sizing: border-box;
@@ -428,16 +60,16 @@
 }
 
 .event-create-column {
-  width: min(100%, 980px);
-  min-height: 0;
+  width: min(100%, 1180px);
 
   margin: 0 auto;
 
   border: 1px solid #e3d9cf;
-  border-radius: 26px;
+  border-radius: 28px;
 
   background: #ffffff;
-  padding: 28px;
+
+  padding: 34px;
 
   box-sizing: border-box;
 
@@ -447,8 +79,12 @@
 .event-details-panel {
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 26px;
 }
+
+/* =====================================================
+   HEADERS
+===================================================== */
 
 .event-create-header span,
 .event-schedule-header span,
@@ -457,33 +93,41 @@
   font-family: "Courier New", monospace;
   font-size: 11px;
   font-weight: 900;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: #8d1b1b;
 }
 
 .event-create-header h1,
 .event-schedule-header h2 {
-  margin: 6px 0 8px;
+  margin: 6px 0 10px;
 
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(38px, 5vw, 64px);
-  line-height: 0.92;
-  letter-spacing: -0.05em;
+
+  font-size: clamp(28px, 3vw, 54px);
+
+  line-height: 0.96;
+  letter-spacing: -0.045em;
 
   color: #1f1714;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .event-create-header p {
   margin: 0;
+
   color: #6d625a;
+
   font-size: 15px;
-  line-height: 1.55;
+  line-height: 1.6;
 }
 
-/* =========================
+/* =====================================================
    TABS
-========================= */
+===================================================== */
 
 .event-tabs {
   display: flex;
@@ -493,7 +137,8 @@
 
 .event-tabs button {
   min-width: 110px;
-  height: 48px;
+  height: 50px;
+
   padding: 0 20px;
 
   border: 1px solid #e3d9cf;
@@ -502,21 +147,21 @@
   background: #ffffff;
   color: #4a0f0f;
 
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 900;
 
   cursor: pointer;
 
   transition:
     background 0.18s ease,
-    color 0.18s ease,
     border-color 0.18s ease,
-    transform 0.12s ease;
+    color 0.18s ease,
+    transform 0.15s ease;
 }
 
 .event-tabs button:hover {
-  background: #fbf9f7;
   transform: translateY(-1px);
+  background: #fbf9f7;
 }
 
 .event-tabs button.active {
@@ -525,31 +170,30 @@
   color: #ffffff;
 }
 
-/* =========================
+/* =====================================================
    TAB PANELS
-========================= */
+===================================================== */
 
 .event-tab-panel {
-  min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 22px;
 }
 
-/* =========================
+/* =====================================================
    FORM FIELDS
-========================= */
+===================================================== */
 
 .event-field {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 9px;
 }
 
 .event-field span {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 800;
-  color: #6d625a;
+  color: #5e554e;
 }
 
 .event-field input,
@@ -558,7 +202,7 @@
   width: 100%;
 
   border: 1px solid #e3d9cf;
-  border-radius: 16px;
+  border-radius: 18px;
 
   background: #fbf9f7;
   color: #1f1714;
@@ -566,14 +210,19 @@
   font-family: inherit;
   font-size: 15px;
 
-  padding: 14px 16px;
+  padding: 15px 17px;
 
   outline: none;
   box-sizing: border-box;
+
+  transition:
+    border-color 0.18s ease,
+    background 0.18s ease,
+    box-shadow 0.18s ease;
 }
 
 .event-field textarea {
-  min-height: 180px;
+  min-height: 190px;
   resize: vertical;
   line-height: 1.6;
 }
@@ -587,48 +236,72 @@
 }
 
 /* =====================================================
-   DATES TAB — WHEEL LEFT / LIST RIGHT
+   DATES LAYOUT
 ===================================================== */
 
 .event-dates-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
-  gap: 22px;
+  grid-template-columns: minmax(0, 1fr) 420px;
+  gap: 28px;
   align-items: start;
 }
 
 .event-date-picker-panel {
-  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 24px;
 }
 
-.event-dial-wrap {
-  min-width: 0;
+/* =====================================================
+   DATE INPUT
+===================================================== */
 
+.event-date-input-wrap {
   display: flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 10px 0 6px;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.event-selected-panel {
-  min-width: 0;
-  min-height: 420px;
-  max-height: 540px;
+.event-date-input-wrap label {
+  font-size: 13px;
+  font-weight: 800;
+  color: #5e554e;
+}
 
-  padding: 18px;
+.event-date-input-wrap input {
+  width: 100%;
+  height: 60px;
+
+  padding: 0 18px;
 
   border: 1px solid #e3d9cf;
-  border-radius: 22px;
+  border-radius: 20px;
+
+  background: #fbf9f7;
+  color: #1f1714;
+
+  font-size: 16px;
+
+  box-sizing: border-box;
+}
+
+/* =====================================================
+   RIGHT PANEL
+===================================================== */
+
+.event-selected-panel {
+  min-height: 620px;
+
+  padding: 20px;
+
+  border: 1px solid #e3d9cf;
+  border-radius: 26px;
 
   background: #fbf9f7;
 
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 18px;
 
   overflow: hidden;
 }
@@ -638,15 +311,17 @@
   align-items: center;
   justify-content: space-between;
 
-  padding-bottom: 10px;
+  padding-bottom: 12px;
+
   border-bottom: 1px solid #eadfd5;
 }
 
 .event-selected-panel-header strong {
-  min-width: 26px;
-  height: 26px;
+  width: 34px;
+  height: 34px;
 
   border-radius: 999px;
+
   background: #4a0f0f;
   color: #ffffff;
 
@@ -655,34 +330,32 @@
   justify-content: center;
 
   font-family: "Courier New", monospace;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .event-selected-scroll {
-  min-height: 0;
   overflow-y: auto;
 
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 14px;
 }
 
-.event-empty-schedule {
-  color: #7a7067;
-  font-size: 13px;
-  line-height: 1.45;
-}
+/* =====================================================
+   SCHEDULE ITEMS
+===================================================== */
 
 .event-schedule-item {
   display: grid;
   grid-template-columns: 1fr auto;
-  align-items: center;
-  gap: 10px;
+  gap: 14px;
 
-  padding: 12px;
+  align-items: center;
+
+  padding: 16px;
 
   border: 1px solid #eadfd5;
-  border-radius: 14px;
+  border-radius: 18px;
 
   background: #ffffff;
 }
@@ -690,41 +363,101 @@
 .event-schedule-meta {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
-.event-schedule-meta span,
-.event-schedule-item > span {
-  color: #4f4943;
-  font-size: 13px;
-  font-weight: 700;
+.event-schedule-meta span {
+  color: #3f3934;
+
+  font-size: 15px;
+  font-weight: 800;
 }
 
-.event-schedule-meta strong,
-.event-schedule-item > strong {
+.event-schedule-meta strong {
   color: #8d1b1b;
+
   font-family: "Courier New", monospace;
-  font-size: 13px;
+  font-size: 15px;
 }
 
 .event-schedule-item button {
-  width: 28px;
-  height: 28px;
+  width: 34px;
+  height: 34px;
 
   border: none;
   border-radius: 999px;
 
-  background: #fff2f2;
+  background: #fff1f1;
   color: #8d1b1b;
+
+  font-size: 18px;
+  font-weight: 900;
 
   cursor: pointer;
 
-  font-size: 16px;
-  line-height: 1;
+  transition: all 0.18s ease;
 }
 
 .event-schedule-item button:hover {
-  background: #f9dddd;
+  background: #f7dede;
+  transform: scale(1.04);
+}
+
+/* =====================================================
+   EMPTY STATE
+===================================================== */
+
+.event-empty-schedule {
+  padding: 20px;
+
+  border: 1px dashed #dccfc4;
+  border-radius: 18px;
+
+  background: #ffffff;
+
+  color: #7a7067;
+
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* =====================================================
+   TIME WHEEL
+===================================================== */
+
+.event-dial-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 18px;
+
+  padding-top: 10px;
+}
+
+.event-wheel-title {
+  width: 100%;
+
+  text-align: center;
+}
+
+.event-wheel-title h3 {
+  margin: 0 0 8px;
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 24px;
+  line-height: 1;
+
+  color: #1f1714;
+}
+
+.event-wheel-title p {
+  margin: 0;
+
+  color: #6d625a;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 /* =====================================================
@@ -739,7 +472,7 @@
 
   background: #fbf9f6;
 
-  padding: 34px 28px;
+  padding: 40px 30px;
 
   overflow: hidden;
 
@@ -761,6 +494,7 @@
   height: 100%;
 
   opacity: 0;
+
   cursor: pointer;
 }
 
@@ -769,11 +503,10 @@
 }
 
 .event-upload-content h3 {
-  margin: 0 0 8px;
+  margin: 0 0 10px;
 
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 28px;
-  line-height: 1;
+  font-size: 30px;
 
   color: #1f1714;
 }
@@ -782,26 +515,27 @@
   margin: 0;
 
   color: #6d625a;
+
   font-size: 14px;
-  line-height: 1.6;
+  line-height: 1.65;
 }
 
 .event-upload-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
 
 .event-empty-upload {
-  padding: 18px;
+  padding: 20px;
 
   border: 1px dashed #e3d9cf;
-  border-radius: 16px;
+  border-radius: 18px;
+
+  background: #fbf9f7;
 
   color: #7a7067;
   font-size: 14px;
-
-  background: #fbf9f7;
 }
 
 .event-upload-item {
@@ -810,7 +544,7 @@
   justify-content: space-between;
   gap: 16px;
 
-  padding: 14px 16px;
+  padding: 16px;
 
   border: 1px solid #eadfd5;
   border-radius: 18px;
@@ -832,7 +566,7 @@
 }
 
 .event-upload-item button {
-  height: 36px;
+  height: 38px;
   padding: 0 14px;
 
   border: none;
@@ -847,94 +581,40 @@
   cursor: pointer;
 }
 
-/* =========================
-   CREATE ACTIONS
-========================= */
+/* =====================================================
+   ACTIONS
+===================================================== */
 
 .event-create-actions {
-  margin-top: auto;
+  margin-top: 10px;
 
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
+  gap: 14px;
 }
 
 /* =====================================================
    RESPONSIVE
 ===================================================== */
 
-@media (max-width: 1100px) {
-  .events-page.calendar-view {
-    grid-template-columns: 1fr;
-    overflow-y: auto;
-  }
-
-  .events-calendar-grid {
-    grid-template-rows: repeat(6, 76px);
-  }
-
-  .events-list-panel {
-    min-height: 420px;
-  }
-
+@media (max-width: 1200px) {
   .event-dates-layout {
     grid-template-columns: 1fr;
   }
 
   .event-selected-panel {
-    min-height: 180px;
-    max-height: none;
+    min-height: 320px;
   }
 }
 
 @media (max-width: 720px) {
-  .events-page.calendar-view,
   .event-create-page {
     padding: 14px;
-    gap: 14px;
   }
 
-  .events-calendar-panel,
-  .events-list-panel,
   .event-create-column {
-    padding: 16px;
+    padding: 18px;
     border-radius: 22px;
-  }
-
-  .events-calendar-header,
-  .events-list-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .events-calendar-grid {
-    gap: 5px;
-    grid-template-rows: repeat(6, 54px);
-  }
-
-  .calendar-day {
-    padding: 7px;
-    border-radius: 13px;
-  }
-
-  .calendar-day span {
-    font-size: 11px;
-  }
-
-  .calendar-day i {
-    right: 5px;
-    bottom: 5px;
-    min-width: 15px;
-    height: 15px;
-    font-size: 9px;
-  }
-
-  .events-weekdays {
-    gap: 5px;
-  }
-
-  .events-weekdays span {
-    font-size: 9px;
   }
 
   .event-tabs {
@@ -949,12 +629,9 @@
 
   .event-create-header h1,
   .event-schedule-header h2 {
-    font-size: 36px;
-  }
-
-  .event-upload-box {
-    padding: 24px 18px;
-    border-radius: 18px;
+    font-size: 30px;
+    white-space: normal;
+    line-height: 1;
   }
 
   .event-upload-item {
@@ -970,5 +647,9 @@
 
   .event-create-actions {
     flex-direction: column;
+  }
+
+  .event-selected-panel {
+    padding: 16px;
   }
 }
