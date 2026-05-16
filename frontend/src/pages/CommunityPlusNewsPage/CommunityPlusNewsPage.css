@@ -1,105 +1,209 @@
-import { useMemo, useState } from "react";
-import "./CommunityPlusNewsPage.css";
+.news-page {
+  width: 100%;
+  height: 100%;
 
-const SECTIONS = [
-  "Front Page",
-  "Local",
-  "Politics",
-  "Business",
-  "Sport",
-  "Culture",
-  "Opinion",
-  "Events",
-];
+  padding: 22px;
 
-const SAMPLE_ARTICLES = [
-  {
-    id: 1,
-    section: "Front Page",
-    headline: "Community One enters local beta testing",
-    author: "Community Desk",
-    summary:
-      "A new locality-aware platform is preparing for early community testing across selected suburbs.",
-  },
-  {
-    id: 2,
-    section: "Local",
-    headline: "Residents gather for weekend clean-up",
-    author: "Local Reporter",
-    summary:
-      "Volunteers are expected to meet on Saturday morning for a neighbourhood clean-up and barbecue.",
-  },
-  {
-    id: 3,
-    section: "Business",
-    headline: "Small traders push for stronger local discovery",
-    author: "Business Desk",
-    summary:
-      "Local businesses say visibility and trust remain key challenges in digital discovery.",
-  },
-];
+  background: #f3efe8;
 
-export default function CommunityPlusNewsPage() {
-  const [activeSection, setActiveSection] = useState("Front Page");
+  box-sizing: border-box;
+  overflow: hidden;
 
-  const visibleArticles = useMemo(() => {
-    if (activeSection === "Front Page") return SAMPLE_ARTICLES;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  gap: 14px;
 
-    return SAMPLE_ARTICLES.filter(
-      (article) => article.section === activeSection
-    );
-  }, [activeSection]);
+  color: #1f1714;
+}
 
-  return (
-    <main className="news-page">
-      <header className="newspaper-masthead">
-        <div className="newspaper-date">COMMUNITY ONE DAILY</div>
-        <h1>THE LOCAL SIGNAL</h1>
-        <div className="newspaper-subtitle">
-          News, events, organisations and public life near you
-        </div>
-      </header>
+.newspaper-masthead {
+  text-align: center;
 
-      <nav className="newspaper-sections" aria-label="News sections">
-        {SECTIONS.map((section) => (
-          <button
-            key={section}
-            type="button"
-            className={activeSection === section ? "active" : ""}
-            onClick={() => setActiveSection(section)}
-          >
-            {section}
-          </button>
-        ))}
-      </nav>
+  padding-bottom: 12px;
 
-      <section className="newspaper-edition">
-        <div className="newspaper-page-label">{activeSection}</div>
+  border-bottom: 4px double #1f1714;
+}
 
-        <div className="newspaper-grid">
-          {visibleArticles.map((article, index) => (
-            <article
-              key={article.id}
-              className={`news-article ${index === 0 ? "lead" : ""}`}
-            >
-              <div className="article-section">{article.section}</div>
-              <h2>{article.headline}</h2>
-              <div className="article-byline">By {article.author}</div>
-              <p>{article.summary}</p>
-              <button type="button">read article</button>
-            </article>
-          ))}
+.newspaper-date {
+  font-family: "Courier New", monospace;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
 
-          <article className="news-drop-card">
-            <h2>Drop an article</h2>
-            <p>
-              Submit a local article, opinion, event report or public-interest
-              story for review.
-            </p>
-            <button type="button">submit news</button>
-          </article>
-        </div>
-      </section>
-    </main>
-  );
+.newspaper-masthead h1 {
+  margin: 4px 0;
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(34px, 5vw, 72px);
+  line-height: 0.95;
+  letter-spacing: -0.06em;
+}
+
+.newspaper-subtitle {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 14px;
+  font-style: italic;
+}
+
+.newspaper-sections {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+
+  padding-bottom: 10px;
+
+  border-bottom: 1px solid #2b211d;
+
+  overflow-x: auto;
+}
+
+.newspaper-sections button {
+  border: none;
+  background: transparent;
+
+  font-family: "Courier New", monospace;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+
+  cursor: pointer;
+}
+
+.newspaper-sections button.active {
+  color: #8d1b1b;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.newspaper-edition {
+  min-height: 0;
+
+  padding: 18px;
+
+  background: #fbf7ef;
+  border: 1px solid #d6cabb;
+
+  overflow-y: auto;
+}
+
+.newspaper-page-label {
+  margin-bottom: 14px;
+
+  font-family: "Courier New", monospace;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.newspaper-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+
+  column-rule: 1px solid #d6cabb;
+}
+
+.news-article {
+  padding-right: 12px;
+
+  border-right: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.news-article.lead {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+
+.article-section {
+  margin-bottom: 8px;
+
+  font-family: "Courier New", monospace;
+  font-size: 11px;
+  font-weight: 900;
+  color: #8d1b1b;
+  text-transform: uppercase;
+}
+
+.news-article h2,
+.news-drop-card h2 {
+  margin: 0 0 8px;
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 24px;
+  line-height: 1.05;
+}
+
+.news-article.lead h2 {
+  font-size: 42px;
+}
+
+.article-byline {
+  margin-bottom: 8px;
+
+  font-family: "Courier New", monospace;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.news-article p,
+.news-drop-card p {
+  margin: 0 0 12px;
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.news-article button,
+.news-drop-card button {
+  border: none;
+  background: transparent;
+
+  color: #8d1b1b;
+
+  font-family: "Courier New", monospace;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: lowercase;
+
+  cursor: pointer;
+}
+
+.news-drop-card {
+  padding: 16px;
+
+  border: 1px dashed #8d1b1b;
+  background: #fffdf8;
+}
+
+@media (max-width: 1100px) {
+  .newspaper-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .news-article.lead {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 720px) {
+  .news-page {
+    overflow-y: auto;
+  }
+
+  .newspaper-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .news-article,
+  .news-article.lead {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .news-article.lead h2 {
+    font-size: 30px;
+  }
 }
