@@ -260,7 +260,9 @@ export default function CommunityPlusDashboardHome() {
   const handleSearchSelect = useCallback(
     (result) => {
       if (!result?.location) return;
+
       focusOnMarker(result.location, result.id);
+      setSearchQuery(result.title || result.content || "");
       setSearchResults([]);
     },
     [focusOnMarker]
@@ -346,7 +348,9 @@ export default function CommunityPlusDashboardHome() {
             )}
           </div>
 
-          <CommunityMap searchQuery={searchQuery} searchMode={searchMode} />
+          <div className="dashboard-map-canvas">
+            <CommunityMap searchQuery={searchQuery} searchMode={searchMode} />
+          </div>
         </section>
       </div>
     </div>

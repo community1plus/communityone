@@ -76,9 +76,7 @@
   min-height: 0;
 
   display: grid;
-  grid-template-columns:
-    minmax(420px, 500px)
-    minmax(0, 1fr);
+  grid-template-columns: minmax(420px, 500px) minmax(0, 1fr);
 
   background: #f8f6f3;
   overflow: hidden;
@@ -95,7 +93,6 @@
   padding: 10px 16px 20px;
 
   background: #f8f6f3;
-  border-right: 0px solid #e2dbd3;
 
   display: flex;
   flex-direction: column;
@@ -129,20 +126,185 @@
 .dashboard-home-map {
   min-width: 0;
   min-height: 0;
-  padding-top: 2px;
+
   padding: 10px 16px 20px;
 
   background: #f8f6f3;
 
-  display: flex;
-  align-items: stretch;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 12px;
 
-  position: relative;
   overflow: hidden;
 }
 
-.dashboard-home-map > * {
+/* =========================
+   MAP SEARCH HEADER
+========================= */
+
+.dashboard-map-search {
+  min-width: 0;
+
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+
+  position: relative;
+  z-index: 10;
+}
+
+.dashboard-search-box {
+  min-width: 0;
+  position: relative;
+}
+
+.dashboard-search-box input {
   width: 100%;
+  height: 46px;
+
+  padding: 0 46px 0 16px;
+
+  border: 1px solid #e2dbd3;
+  border-radius: 999px;
+
+  background: #ffffff;
+  color: #1f1714;
+
+  font-size: 14px;
+  font-family: inherit;
+
+  outline: none;
+  box-sizing: border-box;
+
+  box-shadow: 0 6px 18px rgba(20, 20, 20, 0.05);
+}
+
+.dashboard-search-box input:focus {
+  border-color: #d6b8a6;
+  box-shadow: 0 0 0 3px rgba(141, 27, 27, 0.06);
+}
+
+.dashboard-search-icon {
+  position: absolute;
+  top: 50%;
+  right: 16px;
+
+  transform: translateY(-50%);
+
+  color: #8d1b1b;
+  font-size: 18px;
+  pointer-events: none;
+}
+
+.dashboard-search-mode {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dashboard-search-mode button {
+  height: 38px;
+
+  padding: 0 15px;
+
+  border: 1px solid #e2dbd3;
+  border-radius: 999px;
+
+  background: #ffffff;
+  color: #4a0f0f;
+
+  font-size: 13px;
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+.dashboard-search-mode button.active {
+  background: #4a0f0f;
+  border-color: #4a0f0f;
+  color: #ffffff;
+}
+
+/* =========================
+   SEARCH RESULTS
+========================= */
+
+.dashboard-search-results {
+  grid-column: 1 / -1;
+
+  max-height: 220px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  padding: 10px;
+
+  border: 1px solid #e2dbd3;
+  border-radius: 16px;
+
+  background: #ffffff;
+
+  overflow-y: auto;
+
+  box-shadow: 0 10px 24px rgba(20, 20, 20, 0.08);
+}
+
+.dashboard-search-result {
+  width: 100%;
+
+  padding: 10px 12px;
+
+  border: 1px solid transparent;
+  border-radius: 12px;
+
+  background: #fbf9f7;
+  color: #1f1714;
+
+  text-align: left;
+  cursor: pointer;
+}
+
+.dashboard-search-result:hover {
+  border-color: #e3d9cf;
+  background: #ffffff;
+}
+
+.dashboard-search-result-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dashboard-search-result-meta span {
+  color: #8d1b1b;
+
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.dashboard-search-result-meta strong {
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.dashboard-search-result p {
+  margin: 4px 0 0;
+
+  color: #6f6259;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+/* =========================
+   MAP CANVAS
+========================= */
+
+.dashboard-map-canvas {
+  min-width: 0;
+  min-height: 0;
   height: 100%;
 
   border-radius: 16px;
@@ -151,6 +313,13 @@
   background: #ffffff;
   border: 1px solid #e2dbd3;
   box-shadow: 0 8px 24px rgba(20, 20, 20, 0.08);
+}
+
+.dashboard-map-canvas .map-wrapper {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  border-radius: 16px;
 }
 
 /* =========================
@@ -264,22 +433,13 @@
    RESPONSIVE
 ========================= */
 
-@media (max-width: 768px) {
-  .dashboard-home-page {
-    grid-template-rows: auto minmax(0, 1fr);
-  }
-
-  .dashboard-home-filterbar {
-    padding: 12px 14px 8px;
-  }
-
+@media (max-width: 900px) {
   .dashboard-home {
     grid-template-columns: 1fr;
     grid-template-rows: 42% 58%;
   }
 
   .dashboard-home-feed {
-    border-right: 0;
     border-bottom: 1px solid #e2dbd3;
     padding: 10px 14px 14px;
   }
@@ -287,8 +447,26 @@
   .dashboard-home-map {
     padding: 14px;
   }
+}
 
-  .dashboard-home-map > * {
+@media (max-width: 720px) {
+  .dashboard-home-filterbar {
+    padding: 12px 14px 8px;
+  }
+
+  .dashboard-map-search {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-search-mode {
+    justify-content: flex-start;
+  }
+
+  .dashboard-map-canvas {
+    border-radius: 14px;
+  }
+
+  .dashboard-map-canvas .map-wrapper {
     border-radius: 14px;
   }
 
