@@ -148,38 +148,45 @@ export default function HeaderTopRow() {
       ============================================ */}
 
       <div className="header-right">
-        {/* ========================================
-            AUTHENTICATED USER
-        ======================================== */}
+  {isGuest ? (
+    <>
+      <div className="guest-badge-stack">
+        <div className="guest-pill">
+          Guest Access
+        </div>
 
-        {isAuthenticated ? (
-          <div className="header-user">
-            <UserMenu />
-          </div>
-        ) : isGuest ? (
-          /* ====================================
-              GUEST MODE
-          ==================================== */
+        <div className="guest-readonly">
+          Read Only
+        </div>
 
-          <div className="guest-badge-wrapper">
-            <div className="guest-badge">
-              <span className="guest-dot" />
+        <button
+          type="button"
+          className="guest-signin"
+          onClick={() => navigate("/")}
+        >
+          Sign In →
+        </button>
+      </div>
 
-              <span className="guest-label">
-                Guest Mode
-              </span>
-            </div>
-
-            <button
-              type="button"
-              className="guest-signin-button"
-              onClick={() =>
-                navigate("/")
-              }
-            >
-              Sign In
-            </button>
-          </div>
+      <div className="header-avatar">
+        <img
+          src="/logo/echo.png"
+          alt="Community One"
+        />
+      </div>
+    </>
+  ) : isAuthenticated ? (
+    <UserMenu />
+  ) : (
+    <button
+      type="button"
+      className="header-signin"
+      onClick={() => navigate("/")}
+    >
+      Sign In
+    </button>
+  )}
+</div>
         ) : (
           /* ====================================
               ANONYMOUS
