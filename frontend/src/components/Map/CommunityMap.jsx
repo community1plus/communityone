@@ -1,9 +1,26 @@
+// =========================================================
+// CommunityMap.jsx
+// =========================================================
+
 import { GoogleMap } from "@react-google-maps/api";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { useMap } from "../../context/MapContext";
+
 import { useGoogleMaps } from "../../context/GoogleMapsProvider";
+
 import { useLocationContext } from "../../context/LocationProvider";
+
+/* =========================================================
+   DEFAULTS
+========================================================= */
 
 const DEFAULT_CENTER = {
   lat: -37.8136,
@@ -15,8 +32,14 @@ const MAP_CONTAINER_STYLE = {
   height: "100%",
 };
 
+/* =========================================================
+   HELPERS
+========================================================= */
+
 function toMapPosition(location) {
-  if (!location?.lat || !location?.lng) return null;
+  if (!location?.lat || !location?.lng) {
+    return null;
+  }
 
   return {
     lat: Number(location.lat),
@@ -24,11 +47,19 @@ function toMapPosition(location) {
   };
 }
 
+/* =========================================================
+   COMPONENT
+========================================================= */
+
 export default function CommunityMap({
   mode = "embedded",
   searchQuery = "",
   searchMode = "local",
 }) {
+  /* ======================================================
+     MAP CONTEXT
+  ====================================================== */
+
   const {
     filteredMarkers,
     selectedMarkerId,
@@ -36,196 +67,437 @@ export default function CommunityMap({
     focusLocation,
   } = useMap();
 
-  const { viewLocation, displayLocation, locationMode } =
-    useLocationContext();
+  const {
+    viewLocation,
+    displayLocation,
+    locationMode,
+  } = useLocationContext();
 
-  const { isLoaded } = useGoogleMaps();
+  const { isLoaded } =
+    useGoogleMaps();
+
+  /* ======================================================
+     STATE
+  ====================================================== */
+
+  const [mapReady, setMapReady] =
+    useState(false);
+
+  /* ======================================================
+     REFS
+  ====================================================== */
 
   const mapRef = useRef(null);
+
   const markersRef = useRef([]);
 
-  const activeLocation = useMemo(() => {
-    return viewLocation || displayLocation;
-  }, [viewLocation, displayLocation]);
+  const mapLoadStart = useRef(
+    performance.now()
+  );
 
-  const userPosition = useMemo(() => {
-    return toMapPosition(activeLocation);
-  }, [activeLocation]);
+  /* ======================================================
+     ACTIVE LOCATION
+  ====================================================== */
+
+  const activeLocation =
+    useMemo(() => {
+      return (
+        viewLocation ||
+        displayLocation
+      );
+    }, [
+      viewLocation,
+      displayLocation,
+    ]);
+
+  /* ======================================================
+     USER POSITION
+  ====================================================== */
+
+  const userPosition =
+    useMemo(() => {
+      return toMapPosition(
+        activeLocation
+      );
+    }, [activeLocation]);
+
+  /* ======================================================
+     CENTER
+  ====================================================== */
 
   const center = useMemo(() => {
-    return selectedLocation || userPosition || DEFAULT_CENTER;
-  }, [selectedLocation, userPosition]);
+    return (
+      selectedLocation ||
+      userPosition ||
+      DEFAULT_CENTER
+    );
+  }, [
+    selectedLocation,
+    userPosition,
+  ]);
+
+  /* ======================================================
+     ZOOM
+  ====================================================== */
 
   const zoom = useMemo(() => {
     if (selectedLocation) return 15;
-    if (locationMode === "manual") return 15;
+
+    if (
+      locationMode === "manual"
+    )
+      return 15;
+
     if (userPosition) return 13;
-    return mode === "full" ? 14 : 12;
-  }, [selectedLocation, locationMode, userPosition, mode]);
+
+    return mode === "full"
+      ? 14
+      : 12;
+  }, [
+    selectedLocation,
+    locationMode,
+    userPosition,
+    mode,
+  ]);
+
+  /* ======================================================
+     MAP OPTIONS
+  ====================================================== */
 
   const mapOptions = useMemo(
     () => ({
       streetViewControl: false,
+
       mapTypeControl: false,
+
       fullscreenControl: false,
+
       zoomControl: true,
+
       clickableIcons: false,
+
       gestureHandling: "greedy",
     }),
     []
   );
 
-  const getPosition = useCallback((item) => {
-    if (!item) return null;
+  /* ======================================================
+     POSITION
+  ====================================================== */
 
-    const raw = item.location || {
-      lat: item.lat,
-      lng: item.lng,
-    };
+  const getPosition =
+    useCallback((item) => {
+      if (!item) return null;
 
-    return toMapPosition(raw);
-  }, []);
+      const raw =
+        item.location || {
+          lat: item.lat,
+          lng: item.lng,
+        };
 
-  const clearMarkers = useCallback(() => {
-    markersRef.current.forEach((marker) => {
-      marker.map = null;
-    });
+      return toMapPosition(raw);
+    }, []);
 
-    markersRef.current = [];
-  }, []);
+  /* ======================================================
+     CLEAR MARKERS
+  ====================================================== */
 
-  const createMarkerElement = useCallback((styles = {}, label = "") => {
-    const el = document.createElement("div");
-
-    Object.assign(el.style, {
-      width: "15px",
-      height: "15px",
-      borderRadius: "50%",
-      background: "#f59e0b",
-      border: "2px solid #ffffff",
-      boxShadow: "0 4px 10px rgba(0,0,0,0.25)",
-      cursor: "pointer",
-      transform: "translateY(-2px)",
-      ...styles,
-    });
-
-    if (label) {
-      el.title = label;
-      el.setAttribute("aria-label", label);
-    }
-
-    return el;
-  }, []);
-
-  const getMarkerColour = useCallback((item, isSelected) => {
-    if (isSelected) return "#8d1b1b";
-
-    switch (item?.type) {
-      case "event":
-        return "#2563eb";
-      case "incident":
-        return "#dc2626";
-      case "beacon":
-        return "#7c3aed";
-      case "blob":
-        return "#f59e0b";
-      case "business":
-        return "#16a34a";
-      default:
-        return "#f59e0b";
-    }
-  }, []);
-
-  const createActivityMarker = useCallback(
-    (item, map) => {
-      const position = getPosition(item);
-      if (!position) return null;
-
-      const isSelected = item.id === selectedMarkerId;
-
-      const el = createMarkerElement(
-        {
-          width: isSelected ? "19px" : "15px",
-          height: isSelected ? "19px" : "15px",
-          background: getMarkerColour(item, isSelected),
-          boxShadow: isSelected
-            ? "0 0 0 5px rgba(141,27,27,0.18), 0 6px 14px rgba(0,0,0,0.28)"
-            : "0 4px 10px rgba(0,0,0,0.25)",
-        },
-        item.title || item.type || "Community marker"
+  const clearMarkers =
+    useCallback(() => {
+      markersRef.current.forEach(
+        (marker) => {
+          marker.map = null;
+        }
       );
 
-      el.addEventListener("click", () => {
-        focusLocation(position, item.id);
-      });
+      markersRef.current = [];
+    }, []);
 
-      return new window.google.maps.marker.AdvancedMarkerElement({
-        map,
-        position,
-        content: el,
-        title: item.title || item.type || "Community marker",
-      });
-    },
-    [
-      getPosition,
-      selectedMarkerId,
-      createMarkerElement,
-      getMarkerColour,
-      focusLocation,
-    ]
-  );
+  /* ======================================================
+     MARKER ELEMENT
+  ====================================================== */
 
-  const createUserLocationMarker = useCallback(
-    (map) => {
-      if (!userPosition) return null;
+  const createMarkerElement =
+    useCallback(
+      (
+        styles = {},
+        label = ""
+      ) => {
+        const el =
+          document.createElement(
+            "div"
+          );
 
-      const el = createMarkerElement(
-        {
-          width: "18px",
-          height: "18px",
-          background: locationMode === "manual" ? "#8d1b1b" : "#2563eb",
-          border: "3px solid #ffffff",
-          boxShadow: "0 0 0 5px rgba(37,99,235,0.16)",
-        },
-        "Your selected location"
-      );
+        Object.assign(
+          el.style,
+          {
+            width: "15px",
 
-      return new window.google.maps.marker.AdvancedMarkerElement({
-        map,
-        position: userPosition,
-        content: el,
-        title: "Your selected location",
-      });
-    },
-    [userPosition, locationMode, createMarkerElement]
-  );
+            height: "15px",
+
+            borderRadius: "50%",
+
+            background:
+              "#f59e0b",
+
+            border:
+              "2px solid #ffffff",
+
+            boxShadow:
+              "0 4px 10px rgba(0,0,0,0.25)",
+
+            cursor: "pointer",
+
+            transform:
+              "translateY(-2px)",
+
+            ...styles,
+          }
+        );
+
+        if (label) {
+          el.title = label;
+
+          el.setAttribute(
+            "aria-label",
+            label
+          );
+        }
+
+        return el;
+      },
+      []
+    );
+
+  /* ======================================================
+     MARKER COLOUR
+  ====================================================== */
+
+  const getMarkerColour =
+    useCallback(
+      (item, isSelected) => {
+        if (isSelected)
+          return "#8d1b1b";
+
+        switch (item?.type) {
+          case "event":
+            return "#2563eb";
+
+          case "incident":
+            return "#dc2626";
+
+          case "beacon":
+            return "#7c3aed";
+
+          case "blob":
+            return "#f59e0b";
+
+          case "business":
+            return "#16a34a";
+
+          default:
+            return "#f59e0b";
+        }
+      },
+      []
+    );
+
+  /* ======================================================
+     ACTIVITY MARKER
+  ====================================================== */
+
+  const createActivityMarker =
+    useCallback(
+      (item, map) => {
+        const position =
+          getPosition(item);
+
+        if (!position)
+          return null;
+
+        const isSelected =
+          item.id ===
+          selectedMarkerId;
+
+        const el =
+          createMarkerElement(
+            {
+              width:
+                isSelected
+                  ? "19px"
+                  : "15px",
+
+              height:
+                isSelected
+                  ? "19px"
+                  : "15px",
+
+              background:
+                getMarkerColour(
+                  item,
+                  isSelected
+                ),
+
+              boxShadow:
+                isSelected
+                  ? "0 0 0 5px rgba(141,27,27,0.18), 0 6px 14px rgba(0,0,0,0.28)"
+                  : "0 4px 10px rgba(0,0,0,0.25)",
+            },
+            item.title ||
+              item.type ||
+              "Community marker"
+          );
+
+        el.addEventListener(
+          "click",
+          () => {
+            focusLocation(
+              position,
+              item.id
+            );
+          }
+        );
+
+        return new window.google.maps.marker.AdvancedMarkerElement(
+          {
+            map,
+
+            position,
+
+            content: el,
+
+            title:
+              item.title ||
+              item.type ||
+              "Community marker",
+          }
+        );
+      },
+      [
+        getPosition,
+        selectedMarkerId,
+        createMarkerElement,
+        getMarkerColour,
+        focusLocation,
+      ]
+    );
+
+  /* ======================================================
+     USER LOCATION MARKER
+  ====================================================== */
+
+  const createUserLocationMarker =
+    useCallback(
+      (map) => {
+        if (!userPosition)
+          return null;
+
+        const el =
+          createMarkerElement(
+            {
+              width: "18px",
+
+              height: "18px",
+
+              background:
+                locationMode ===
+                "manual"
+                  ? "#8d1b1b"
+                  : "#2563eb",
+
+              border:
+                "3px solid #ffffff",
+
+              boxShadow:
+                "0 0 0 5px rgba(37,99,235,0.16)",
+            },
+            "Your selected location"
+          );
+
+        return new window.google.maps.marker.AdvancedMarkerElement(
+          {
+            map,
+
+            position:
+              userPosition,
+
+            content: el,
+
+            title:
+              "Your selected location",
+          }
+        );
+      },
+      [
+        userPosition,
+        locationMode,
+        createMarkerElement,
+      ]
+    );
+
+  /* ======================================================
+     PAN + ZOOM
+  ====================================================== */
 
   useEffect(() => {
-    if (!mapRef.current || !center) return;
+    if (
+      !mapRef.current ||
+      !center
+    )
+      return;
 
-    mapRef.current.panTo(center);
-    mapRef.current.setZoom(zoom);
+    mapRef.current.panTo(
+      center
+    );
+
+    mapRef.current.setZoom(
+      zoom
+    );
   }, [center, zoom]);
 
+  /* ======================================================
+     MARKERS
+  ====================================================== */
+
   useEffect(() => {
-    if (!mapRef.current) return;
-    if (!window.google?.maps?.marker?.AdvancedMarkerElement) return;
+    if (!mapRef.current)
+      return;
+
+    if (
+      !window.google?.maps
+        ?.marker
+        ?.AdvancedMarkerElement
+    )
+      return;
 
     clearMarkers();
 
-    const map = mapRef.current;
+    const map =
+      mapRef.current;
 
-    const activityMarkers = filteredMarkers
-      .map((item) => createActivityMarker(item, map))
-      .filter(Boolean);
+    const activityMarkers =
+      filteredMarkers
+        .map((item) =>
+          createActivityMarker(
+            item,
+            map
+          )
+        )
+        .filter(Boolean);
 
-    const userMarker = createUserLocationMarker(map);
+    const userMarker =
+      createUserLocationMarker(
+        map
+      );
 
     if (userMarker) {
-      activityMarkers.push(userMarker);
+      activityMarkers.push(
+        userMarker
+      );
     }
 
-    markersRef.current = activityMarkers;
+    markersRef.current =
+      activityMarkers;
 
     return clearMarkers;
   }, [
@@ -235,30 +507,98 @@ export default function CommunityMap({
     clearMarkers,
   ]);
 
+  /* ======================================================
+     SDK LOADING
+  ====================================================== */
+
   if (!isLoaded) {
-    return <div className="map-loading">Loading map...</div>;
+    return (
+      <div className="map-skeleton">
+        <div className="map-shimmer" />
+
+        <div className="map-loading-text">
+          Loading Community One...
+        </div>
+      </div>
+    );
   }
+
+  /* ======================================================
+     RENDER
+  ====================================================== */
 
   return (
     <div className="map-wrapper">
-      <GoogleMap
-        center={center}
-        zoom={zoom}
-        mapContainerStyle={MAP_CONTAINER_STYLE}
-        onLoad={(map) => {
-          mapRef.current = map;
-        }}
-        onUnmount={() => {
-          clearMarkers();
-          mapRef.current = null;
-        }}
-        options={mapOptions}
-      />
+      {/* MAP SKELETON */}
+
+      {!mapReady && (
+        <div className="map-skeleton">
+          <div className="map-shimmer" />
+
+          <div className="map-loading-text">
+            Loading your area...
+          </div>
+        </div>
+      )}
+
+      {/* MAP */}
+
+      <div
+        className={
+          mapReady
+            ? "map-visible"
+            : "map-hidden"
+        }
+      >
+        <GoogleMap
+          center={center}
+          zoom={zoom}
+          mapContainerStyle={
+            MAP_CONTAINER_STYLE
+          }
+          onLoad={(map) => {
+            console.log(
+              "MAP READY:",
+              (
+                performance.now() -
+                mapLoadStart.current
+              ).toFixed(2),
+              "ms"
+            );
+
+            mapRef.current = map;
+
+            requestAnimationFrame(
+              () => {
+                setMapReady(
+                  true
+                );
+              }
+            );
+          }}
+          onUnmount={() => {
+            clearMarkers();
+
+            mapRef.current =
+              null;
+
+            setMapReady(false);
+          }}
+          options={mapOptions}
+        />
+      </div>
+
+      {/* SEARCH CONTEXT */}
 
       {searchQuery && (
         <div className="map-search-context">
-          <span>{searchMode}</span>
-          <strong>{searchQuery}</strong>
+          <span>
+            {searchMode}
+          </span>
+
+          <strong>
+            {searchQuery}
+          </strong>
         </div>
       )}
     </div>

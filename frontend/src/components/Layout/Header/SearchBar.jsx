@@ -2,7 +2,10 @@
 // SearchBar.jsx
 // =========================================================
 
-import React from "react";
+import React, {
+  useEffect,
+  useState,
+} from "react";
 
 import useSearch from "../../../hooks/useSearch";
 
@@ -34,6 +37,47 @@ export default function SearchBar() {
   } = useSearch();
 
   /* ======================================================
+     DEBOUNCED QUERY
+  ====================================================== */
+
+  const [
+    debouncedQuery,
+    setDebouncedQuery,
+  ] = useState("");
+
+  /* ======================================================
+     DEBOUNCE EFFECT
+  ====================================================== */
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setDebouncedQuery(
+        searchQuery
+      );
+    }, 300);
+
+    return () =>
+      clearTimeout(timeout);
+  }, [searchQuery]);
+
+  /* ======================================================
+     SEARCH EFFECT
+  ====================================================== */
+
+  useEffect(() => {
+    if (
+      !debouncedQuery?.trim()
+    ) {
+      return;
+    }
+
+    search(debouncedQuery);
+  }, [
+    debouncedQuery,
+    search,
+  ]);
+
+  /* ======================================================
      INPUT CHANGE
   ====================================================== */
 
@@ -44,11 +88,7 @@ export default function SearchBar() {
 
     if (!value?.trim()) {
       clearSearch();
-
-      return;
     }
-
-    search(value);
   };
 
   /* ======================================================
