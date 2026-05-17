@@ -9,7 +9,7 @@ import React, {
 
 import useSearch from "../../../hooks/useSearch";
 
-import "./SearchBar.css";
+/*import "./SearchBar.css";*/
 
 export default function SearchBar() {
   const {
