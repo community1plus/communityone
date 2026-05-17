@@ -187,22 +187,6 @@ export default function HeaderTopRow() {
     </button>
   )}
 </div>
-        ) : (
-          /* ====================================
-              ANONYMOUS
-          ==================================== */
-
-          <button
-            type="button"
-            className="header-signin"
-            onClick={() =>
-              navigate("/")
-            }
-          >
-            Sign In
-          </button>
-        )}
-      </div>
     </div>
   );
 }
