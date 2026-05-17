@@ -214,23 +214,19 @@ export default function CommunityPlusSidebar() {
     ECHO
 =================================================== */}
 
-<div className="sidebar-echo">
+<div className="echo-brand">
   <button
     type="button"
-    className="echo-orb"
+    className="echo-brand-button"
     onClick={handleEchoClick}
     aria-label="Echo"
   >
     <img
       src="/logo/echo.png"
       alt="Echo"
-      className="echo-orb-image"
+      className="echo-brand-image"
     />
   </button>
-
-  <span className="echo-label">
-    Echo AI
-  </span>
 </div>
 
     </aside>
