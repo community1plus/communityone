@@ -27,6 +27,42 @@ process.on("unhandledRejection", (err) => {
 });
 
 /* =========================
+   SEARCH
+========================= */
+
+app.get(
+  "/api/search/hybrid",
+  async (req, res) => {
+    const q = req.query.q;
+
+    res.json({
+      summary:
+        "There is increased activity nearby.",
+
+      suggestions: [
+        "events nearby",
+        "incidents nearby",
+        "community alerts",
+      ],
+
+      results: [
+        {
+          id: 1,
+          type: "incident",
+          title: `Road closure near ${q}`,
+        },
+        {
+          id: 2,
+          type: "event",
+          title:
+            "Community BBQ tonight",
+        },
+      ],
+    });
+  }
+);
+
+/* =========================
    MIDDLEWARE
 ========================= */
 
