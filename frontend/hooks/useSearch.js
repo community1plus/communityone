@@ -23,6 +23,7 @@ export default function useSearch() {
   const [error, setError] =
     useState(null);
 
+  console.log("REAL useSearch LOADED");    
   const search = useCallback(
     async (searchQuery) => {
       if (!searchQuery?.trim()) {
