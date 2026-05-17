@@ -18,6 +18,7 @@ import CommunityPlusNewsPage from "./pages/CommunityPlusNewsPage/CommunityPlusNe
 import CommunityPlusEventsPage from "./pages/CommunityPlusEventsPage/CommunityPlusEventsPage";
 import CommunityPlusEventCreatePage from "./pages/CommunityPlusEventsPage/CommunityPlusEventCreatePage";
 import PostComposer from "./components/Layout/Sidebar/Post/PostComposer";
+import {  IViewSessionProvider } from "./context/IViewSessionContext";
 
 function Placeholder({ title }) {
   return (
@@ -77,7 +78,14 @@ export default function App() {
         <Route path="/communityplus" element={<CommunityPlusDashboardLayout />}>
           <Route index element={<CommunityPlusDashboardHome />} />
 
-          <Route path="iview" element={<CommunityPlusIViewPage />} />
+          <Route
+  path="iview"
+  element={
+    <IViewSessionProvider>
+      <CommunityPlusIViewPage />
+    </IViewSessionProvider>
+  }
+/>
           <Route path="news" element={<CommunityPlusNewsPage />} />
 
           <Route
