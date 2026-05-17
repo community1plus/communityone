@@ -28,10 +28,39 @@ class SearchService {
           ...options,
         });
 
-      const response = await fetch(
+     /* const response = await fetch(
         `${SEARCH_ENDPOINTS.hybrid}?${params}`
-      );
+      ); */
 
+      await new Promise((r) =>
+  setTimeout(r, 300)
+);
+
+return {
+  summary:
+    "There is increased activity nearby.",
+
+  suggestions: [
+    "events nearby",
+    "traffic delays",
+    "community alerts",
+  ],
+
+  results: [
+    {
+      id: 1,
+      type: "incident",
+      title:
+        "Fire reported near city center",
+    },
+    {
+      id: 2,
+      type: "event",
+      title:
+        "Community safety meeting",
+    },
+  ],
+};
       console.log(
         "HYBRID SEARCH STATUS:",
         response.status
