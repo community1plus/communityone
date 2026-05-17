@@ -4,6 +4,9 @@ import { useState } from "react";
 import { SEARCH_ENDPOINTS } from "../config/search";
 
 export default function useSearch() {
+    console.log(
+  "REAL useSearch.js LOADED"
+);
   const [results, setResults] = useState([]);
 
   const search = async (query) => {

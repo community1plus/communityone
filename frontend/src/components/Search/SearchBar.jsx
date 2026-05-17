@@ -3,6 +3,9 @@ import React from "react";
 import useSearch from "../../../hooks/useSearch";
 
 export default function SearchBar() {
+    console.log(
+  "REAL SearchBar.jsx LOADED"
+);
   const {
     query,
     setQuery,
