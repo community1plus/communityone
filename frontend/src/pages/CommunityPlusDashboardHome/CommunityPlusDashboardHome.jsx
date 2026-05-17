@@ -678,29 +678,6 @@ export default function CommunityPlusDashboardHome() {
               ECHO ORB
           ============================================== */}
 
-          <button
-            type="button"
-            className="echo-orb"
-            onClick={
-              handleEchoClick
-            }
-            aria-label="Echo"
-          >
-
-            <span className="echo-orb-glow" />
-
-            <span className="echo-orb-pulse" />
-
-            <span className="echo-orb-core">
-
-              <span className="echo-orb-icon">
-                ✦
-              </span>
-
-            </span>
-
-          </button>
-
         </section>
 
       </div>
