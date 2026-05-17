@@ -1,6 +1,11 @@
+/* =========================================================
+   iVIEW PAGE
+========================================================= */
+
 .iview-page {
   width: 100%;
   height: 100%;
+
   min-width: 0;
   min-height: 0;
 
@@ -9,6 +14,7 @@
   background: #f7f4ef;
 
   box-sizing: border-box;
+
   overflow: hidden;
 
   display: flex;
@@ -16,93 +22,231 @@
   align-items: flex-start;
 }
 
+/* =========================================================
+   GRID
+========================================================= */
+
 .iview-grid {
   width: 100%;
   height: calc(100% - 4px);
 
   max-width: 1480px;
+
   margin: 0 auto;
 
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-template-rows: repeat(2, minmax(0, 1fr));
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  grid-template-rows:
+    repeat(2, minmax(0, 1fr));
 
   gap: 18px;
 
   min-height: 0;
+
   padding-bottom: 6px;
+
   box-sizing: border-box;
 }
+
+/* =========================================================
+   CARD + AD SLOT
+========================================================= */
 
 .iview-card,
 .iview-ad-slot {
   min-width: 0;
   min-height: 0;
 
-  border: 1px solid var(--line, #e3d9cf);
-  border-radius: 22px;
+  position: relative;
 
   overflow: hidden;
+
+  border:
+    1px solid #e3d9cf;
+
+  border-radius: 22px;
 
   background: #ffffff;
 
   display: flex;
   flex-direction: column;
 
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.09);
+  box-shadow:
+    0 12px 28px
+      rgba(0,0,0,0.09);
+
+  opacity: 0;
+
+  transform:
+    translateY(10px);
+
+  animation:
+    iviewCardIn 0.45s ease forwards;
 
   transition:
-    transform 0.18s ease,
-    box-shadow 0.18s ease,
-    border-color 0.18s ease;
+    transform 0.22s ease,
+    box-shadow 0.22s ease,
+    border-color 0.22s ease;
 }
 
 .iview-card:hover {
-  transform: translateY(-3px);
+  transform:
+    translateY(-3px);
+
   border-color: #d8c8bd;
-  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.14);
+
+  box-shadow:
+    0 18px 38px
+      rgba(0,0,0,0.14);
 }
 
-.iview-media {
+/* =========================================================
+   MEDIA
+========================================================= */
+
+.iview-media,
+.iview-detail-player {
   position: relative;
 
   width: 100%;
-  flex: 1 1 auto;
-  min-height: 0;
 
-  background: #050505;
+  overflow: hidden;
+
+  border-radius: 22px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #f5f1ec,
+      #ebe5dd
+    );
+
+  aspect-ratio: 16 / 9;
 }
+
+/* =========================================================
+   IMAGE / VIDEO
+========================================================= */
 
 .iview-image {
   width: 100%;
   height: 100%;
 
-  display: block;
-
   object-fit: cover;
+
+  display: block;
 
   opacity: 0;
 
+  transform: scale(1.015);
+
   transition:
-    opacity 0.25s ease,
-    transform 0.35s ease;
+    opacity 0.45s ease,
+    transform 0.6s ease;
 }
 
 .iview-image.loaded {
   opacity: 1;
+
+  transform: scale(1);
 }
 
 .iview-card:hover .iview-image.loaded {
   transform: scale(1.03);
 }
 
+/* =========================================================
+   MEDIA SKELETON
+========================================================= */
+
+.iview-media-skeleton {
+  position: absolute;
+
+  inset: 0;
+
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      135deg,
+      #f5f1ec,
+      #ece7e1
+    );
+
+  z-index: 2;
+
+  pointer-events: none;
+
+  transition:
+    opacity 0.35s ease;
+}
+
+/* =========================================================
+   MEDIA SHIMMER
+========================================================= */
+
+.iview-media-shimmer {
+  position: absolute;
+
+  inset: 0;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(255,255,255,0.4),
+      transparent
+    );
+
+  animation:
+    iviewShimmer 1.6s infinite;
+}
+
+/* =========================================================
+   EMPTY MEDIA
+========================================================= */
+
+.iview-empty-media {
+  position: absolute;
+
+  inset: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background:
+    linear-gradient(
+      135deg,
+      #f3eee8,
+      #e7dfd5
+    );
+
+  color: #8d1b1b;
+
+  letter-spacing: 0.18em;
+
+  font-size: 11px;
+  font-weight: 800;
+
+  text-transform: uppercase;
+}
+
+/* =========================================================
+   META
+========================================================= */
+
 .iview-meta {
-  padding: 14px 16px 15px;
+  display: flex;
 
-  display: grid;
-  grid-template-columns: 1fr auto;
+  flex-direction: column;
 
-  gap: 8px 12px;
+  gap: 10px;
+
+  padding: 14px 16px 16px;
 
   background: #ffffff;
 
@@ -111,95 +255,127 @@
   font-family:
     "Courier New",
     "IBM Plex Mono",
-    "Courier Prime",
     monospace;
 }
 
-.iview-title {
-  grid-column: 1 / -1;
+/* =========================================================
+   TITLE
+========================================================= */
 
+.iview-title {
   margin: 0;
+  padding: 0;
+
+  border: none;
+
+  background: none;
+
+  text-align: left;
 
   color: #ff425b;
 
+  font-family: inherit;
+
   font-size: 16px;
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 1.25;
 
   letter-spacing: -0.01em;
+
+  cursor: pointer;
 
   overflow: hidden;
   text-overflow: ellipsis;
 
   display: -webkit-box;
+
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 
-  background: none;
-  border: none;
-  padding: 0;
-  text-align: left;
-  font-family: inherit;
-  cursor: pointer;
+  transition:
+    opacity 0.18s ease;
 }
 
-.iview-subline {
-  min-width: 0;
+.iview-title:hover {
+  opacity: 0.72;
+}
 
+/* =========================================================
+   SUBLINE
+========================================================= */
+
+.iview-subline {
   display: flex;
   align-items: center;
+
   gap: 7px;
+
+  flex-wrap: wrap;
 
   color: #5f554d;
 
   font-size: 12px;
   font-weight: 600;
-  line-height: 1.35;
 
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.35;
 }
 
-.iview-track {
-  padding: 7px 14px;
+/* =========================================================
+   TRACK BUTTON
+========================================================= */
 
-  border: 0;
+.iview-track {
+  width: fit-content;
+
+  padding: 8px 14px;
+
+  border: none;
   border-radius: 999px;
 
-  background: #ffffff;
+  background:
+    rgba(59,130,196,0.08);
+
   color: #3b82c4;
 
   font-family:
     "Courier New",
     "IBM Plex Mono",
-    "Courier Prime",
     monospace;
 
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 800;
+
+  letter-spacing: 0.06em;
+
   text-transform: lowercase;
 
   cursor: pointer;
 
-  box-shadow: 0 3px 10px rgba(59, 130, 196, 0.08);
-
   transition:
     background 0.2s ease,
-    color 0.2s ease,
     transform 0.2s ease,
     box-shadow 0.2s ease;
 }
 
 .iview-track:hover {
-  background: #f2f9ff;
-  color: #256ca8;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(59, 130, 196, 0.14);
+  background:
+    rgba(59,130,196,0.14);
+
+  transform:
+    translateY(-1px);
+
+  box-shadow:
+    0 8px 18px
+      rgba(59,130,196,0.14);
 }
+
+/* =========================================================
+   AD SLOT
+========================================================= */
 
 .iview-ad-slot {
   background: #050505;
+
   border-color: #050505;
 }
 
@@ -208,16 +384,18 @@
   height: 100%;
 
   border-radius: 22px;
+
   overflow: hidden;
 }
 
 .iview-ad-slot .adtv-screen {
   width: 100%;
   height: 100%;
-  min-height: 100%;
 }
 
-/* STATES */
+/* =========================================================
+   STATES
+========================================================= */
 
 .iview-state {
   width: 100%;
@@ -237,98 +415,101 @@
   color: #b42318;
 }
 
-.iview-empty-media,
-.iview-media-loading {
-  position: absolute;
-  inset: 0;
-
-  width: 100%;
-  height: 100%;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  background:
-    radial-gradient(circle, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
-    #111;
-
-  background-size: 10px 10px;
-
-  color: rgba(255, 255, 255, 0.7);
-
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-
-  z-index: 1;
-}
-
-.iview-media-loading {
-  color: rgba(255, 255, 255, 0.62);
-  font-size: 12px;
-}
-
 .iview-card.empty {
   background: #111;
 }
 
-/* =====================================================
-   DETAIL PANEL
-===================================================== */
+/* =========================================================
+   DETAIL SHELL
+========================================================= */
 
 .iview-detail-shell {
   width: 100%;
   height: 100%;
-  min-width: 0;
-  min-height: 0;
 
   position: relative;
 
-  background: #f7f4ef;
-
   overflow: hidden;
+
+  background: #f7f4ef;
 }
+
+/* =========================================================
+   DETAIL CLOSE
+========================================================= */
 
 .iview-detail-close {
   position: absolute;
+
   top: 14px;
   right: 18px;
-  z-index: 20;
 
-  width: 36px;
-  height: 36px;
+  z-index: 30;
+
+  width: 38px;
+  height: 38px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  border: 1px solid #e3d9cf;
+  border:
+    1px solid #e3d9cf;
+
   border-radius: 999px;
 
-  background: #ffffff;
+  background:
+    rgba(255,255,255,0.95);
+
+  backdrop-filter: blur(16px);
+
   color: #4a0f0f;
 
   font-size: 22px;
   font-weight: 700;
-  line-height: 1;
 
   cursor: pointer;
 
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  box-shadow:
+    0 10px 24px
+      rgba(0,0,0,0.12);
+
+  transition:
+    transform 0.18s ease,
+    background 0.18s ease;
 }
+
+.iview-detail-close:hover {
+  transform:
+    scale(1.04);
+
+  background: #ffffff;
+}
+
+/* =========================================================
+   DETAIL LAYOUT
+========================================================= */
 
 .iview-detail-layout {
   width: 100%;
   height: 100%;
 
   display: grid;
-  grid-template-columns: minmax(0, 1.55fr) minmax(340px, 0.85fr);
+
+  grid-template-columns:
+    minmax(0, 1.55fr)
+    minmax(340px, 0.85fr);
+
   gap: 18px;
 
   padding: 18px;
+
   box-sizing: border-box;
 }
+
+/* =========================================================
+   DETAIL MAIN / SIDE
+========================================================= */
 
 .iview-detail-main,
 .iview-detail-side {
@@ -336,40 +517,32 @@
   min-height: 0;
 }
 
+/* =========================================================
+   DETAIL MAIN
+========================================================= */
+
 .iview-detail-main {
   display: grid;
-  grid-template-rows: minmax(0, 1fr) auto auto;
+
+  grid-template-rows:
+    minmax(0, 1fr)
+    auto
+    auto;
+
   gap: 12px;
 }
 
-.iview-detail-player {
-  width: 100%;
-  height: 100%;
-  min-height: 0;
-
-  position: relative;
-
-  border-radius: 22px;
-  overflow: hidden;
-
-  background: #050505;
-
-  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.14);
-}
-
-.iview-detail-player .iview-image {
-  width: 100%;
-  height: 100%;
-
-  object-fit: contain;
-
-  background: #050505;
-}
+/* =========================================================
+   DETAIL ACTIONS
+========================================================= */
 
 .iview-detail-actions {
   display: flex;
   align-items: center;
+
   gap: 10px;
+
+  color: #5f554d;
 
   font-family:
     "Courier New",
@@ -378,31 +551,40 @@
 
   font-size: 13px;
   font-weight: 700;
-
-  color: #5f554d;
 }
 
 .iview-detail-actions button {
   padding: 7px 13px;
 
-  border: 1px solid #cfe8ff;
+  border:
+    1px solid #cfe8ff;
+
   border-radius: 999px;
 
   background: #ffffff;
+
   color: #3b82c4;
 
   font-family: inherit;
+
   font-size: 12px;
   font-weight: 800;
+
   text-transform: lowercase;
 
   cursor: pointer;
 }
 
+/* =========================================================
+   DETAIL DESCRIPTION
+========================================================= */
+
 .iview-detail-description {
   padding: 14px 16px;
 
-  border: 1px solid #e3d9cf;
+  border:
+    1px solid #e3d9cf;
+
   border-radius: 18px;
 
   background: #ffffff;
@@ -420,6 +602,7 @@
 
   font-size: 20px;
   font-weight: 800;
+
   line-height: 1.25;
 }
 
@@ -429,12 +612,15 @@
   color: #3e3630;
 
   font-size: 14px;
+
   line-height: 1.55;
 }
 
 .iview-detail-meta {
   display: flex;
+
   flex-wrap: wrap;
+
   gap: 7px;
 
   color: #6d625a;
@@ -443,24 +629,38 @@
   font-weight: 650;
 }
 
-/* RIGHT RAIL */
+/* =========================================================
+   RIGHT RAIL
+========================================================= */
 
 .iview-detail-side {
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
+
+  grid-template-rows:
+    auto
+    minmax(0, 1fr);
+
   gap: 14px;
 }
+
+/* =========================================================
+   AI SUMMARY + COMMENTS
+========================================================= */
 
 .iview-ai-summary,
 .iview-comments {
   min-width: 0;
 
-  border: 1px solid #e3d9cf;
+  border:
+    1px solid #e3d9cf;
+
   border-radius: 20px;
 
   background: #ffffff;
 
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.04);
+  box-shadow:
+    0 8px 22px
+      rgba(0,0,0,0.04);
 }
 
 .iview-ai-summary {
@@ -473,8 +673,13 @@
   color: #3e3630;
 
   font-size: 13px;
+
   line-height: 1.55;
 }
+
+/* =========================================================
+   SIDE LABEL
+========================================================= */
 
 .iview-side-label {
   color: #8d1b1b;
@@ -486,9 +691,15 @@
 
   font-size: 12px;
   font-weight: 900;
+
   letter-spacing: 0.08em;
+
   text-transform: uppercase;
 }
+
+/* =========================================================
+   COMMENTS
+========================================================= */
 
 .iview-comments {
   min-height: 0;
@@ -501,10 +712,15 @@
   overflow: hidden;
 }
 
+/* =========================================================
+   COMMENT BOX
+========================================================= */
+
 .iview-comment-box {
   margin-top: 12px;
 
   display: grid;
+
   gap: 8px;
 }
 
@@ -516,13 +732,17 @@
 
   padding: 10px 11px;
 
-  border: 1px solid #e3d9cf;
+  border:
+    1px solid #e3d9cf;
+
   border-radius: 14px;
 
   outline: none;
 
   font-family: inherit;
+
   font-size: 13px;
+
   line-height: 1.45;
 
   box-sizing: border-box;
@@ -530,7 +750,10 @@
 
 .iview-comment-box textarea:focus {
   border-color: #d6b8a6;
-  box-shadow: 0 0 0 3px rgba(141, 27, 27, 0.06);
+
+  box-shadow:
+    0 0 0 3px
+      rgba(141,27,27,0.06);
 }
 
 .iview-comment-box button {
@@ -542,10 +765,12 @@
   border-radius: 999px;
 
   background: #4a0f0f;
+
   color: #ffffff;
 
   font-size: 12px;
   font-weight: 800;
+
   text-transform: lowercase;
 
   cursor: pointer;
@@ -553,21 +778,32 @@
 
 .iview-comment-box button:disabled {
   opacity: 0.45;
+
   cursor: not-allowed;
 }
 
+/* =========================================================
+   COMMENT LIST
+========================================================= */
+
 .iview-comment-list {
   min-height: 0;
+
   overflow-y: auto;
 
   margin-top: 12px;
 
   display: flex;
   flex-direction: column;
+
   gap: 10px;
 
   padding-right: 4px;
 }
+
+/* =========================================================
+   COMMENT
+========================================================= */
 
 .iview-comment {
   padding: 10px 11px;
@@ -580,6 +816,7 @@
 .iview-comment-header {
   display: flex;
   justify-content: space-between;
+
   gap: 10px;
 
   margin-bottom: 5px;
@@ -599,28 +836,88 @@
   color: #2f2a25;
 
   font-size: 13px;
+
   line-height: 1.45;
 }
 
+/* =========================================================
+   REFRESH INDICATOR
+========================================================= */
+
 .iview-refresh-indicator {
-  position: absolute;
+  position: fixed;
+
   right: 22px;
   bottom: 22px;
 
-  padding: 8px 12px;
+  z-index: 50;
+
+  padding: 9px 14px;
 
   border-radius: 999px;
 
-  background: rgba(255, 255, 255, 0.92);
+  background:
+    rgba(255,255,255,0.92);
+
+  backdrop-filter: blur(16px);
+
   color: #4a0f0f;
 
   font-size: 12px;
   font-weight: 800;
 
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  box-shadow:
+    0 10px 24px
+      rgba(0,0,0,0.12);
+
+  animation:
+    iviewFadeIn 0.3s ease;
 }
 
-/* RESPONSIVE */
+/* =========================================================
+   ANIMATIONS
+========================================================= */
+
+@keyframes iviewShimmer {
+  from {
+    transform:
+      translateX(-100%);
+  }
+
+  to {
+    transform:
+      translateX(100%);
+  }
+}
+
+@keyframes iviewCardIn {
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+@keyframes iviewFadeIn {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
 
 @media (max-width: 1280px) {
   .iview-page {
@@ -630,7 +927,9 @@
   .iview-grid {
     height: auto;
 
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
     grid-template-rows: auto;
   }
 
@@ -642,13 +941,18 @@
 @media (max-width: 980px) {
   .iview-detail-layout {
     grid-template-columns: 1fr;
-    grid-template-rows: minmax(360px, 55vh) auto;
+
+    grid-template-rows:
+      minmax(360px, 55vh)
+      auto;
 
     overflow-y: auto;
   }
 
   .iview-detail-side {
-    grid-template-rows: auto auto;
+    grid-template-rows:
+      auto
+      auto;
   }
 
   .iview-comments {
@@ -659,11 +963,13 @@
 @media (max-width: 760px) {
   .iview-page {
     padding: 14px;
+
     overflow-y: auto;
   }
 
   .iview-grid {
     grid-template-columns: 1fr;
+
     grid-template-rows: auto;
 
     gap: 16px;
@@ -676,19 +982,17 @@
   .iview-title {
     font-size: 14px;
   }
-}
 
-.iview-card {
-  transition:
-    transform 0.18s ease,
-    box-shadow 0.18s ease,
-    border-color 0.18s ease;
-}
+  .iview-subline {
+    font-size: 11px;
+  }
 
-.iview-card:hover {
-  transform: translateY(-3px);
-}
+  .iview-track {
+    padding: 7px 12px;
+  }
 
-.iview-track {
-  text-transform: lowercase;
+  .iview-refresh-indicator {
+    right: 14px;
+    bottom: 14px;
+  }
 }

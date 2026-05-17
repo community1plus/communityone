@@ -66,68 +66,202 @@ function formatCommentTime(value) {
   return `${days}d ago`;
 }
 
-function IViewMedia({ post, detail = false, onMediaExpired }) {
-  const mediaUrl = getMediaUrl(post);
-  const mediaType = getMediaType(post);
+function IViewMedia({
+  post,
+  detail = false,
+  onMediaExpired,
+  priority = false,
+}) {
+  const mediaUrl =
+    getMediaUrl(post);
 
-  const [mediaLoaded, setMediaLoaded] = useState(false);
-  const [mediaFailed, setMediaFailed] = useState(false);
+  const mediaType =
+    getMediaType(post);
+
+  const [
+    mediaLoaded,
+    setMediaLoaded,
+  ] = useState(false);
+
+  const [
+    mediaFailed,
+    setMediaFailed,
+  ] = useState(false);
+
+  /* ======================================================
+     RESET MEDIA STATE
+  ====================================================== */
 
   useEffect(() => {
     setMediaLoaded(false);
+
     setMediaFailed(false);
   }, [mediaUrl]);
 
+  /* ======================================================
+     MEDIA TIMEOUT
+  ====================================================== */
+
   useEffect(() => {
-    if (!mediaUrl || mediaLoaded || mediaFailed) return;
+    if (
+      !mediaUrl ||
+      mediaLoaded ||
+      mediaFailed
+    ) {
+      return;
+    }
 
-    const timer = setTimeout(() => {
+    const timer =
+      setTimeout(() => {
+        console.warn(
+          "MEDIA LOAD TIMEOUT:",
+          post.id
+        );
+
+        setMediaFailed(true);
+
+        onMediaExpired?.(
+          post.id
+        );
+      }, MEDIA_LOAD_TIMEOUT_MS);
+
+    return () =>
+      clearTimeout(timer);
+  }, [
+    mediaUrl,
+    mediaLoaded,
+    mediaFailed,
+    onMediaExpired,
+    post.id,
+  ]);
+
+  /* ======================================================
+     MEDIA ERROR
+  ====================================================== */
+
+  const handleMediaError =
+    () => {
+      console.error(
+        "MEDIA FAILED:",
+        post.id
+      );
+
       setMediaFailed(true);
-      onMediaExpired?.(post.id);
-    }, MEDIA_LOAD_TIMEOUT_MS);
 
-    return () => clearTimeout(timer);
-  }, [mediaUrl, mediaLoaded, mediaFailed, onMediaExpired, post.id]);
+      onMediaExpired?.(
+        post.id
+      );
+    };
 
-  const handleMediaError = () => {
-    setMediaFailed(true);
-    onMediaExpired?.(post.id);
-  };
+  /* ======================================================
+     MEDIA LOADED
+  ====================================================== */
+
+  const handleMediaLoaded =
+    () => {
+      console.log(
+        "MEDIA READY:",
+        post.id
+      );
+
+      requestAnimationFrame(
+        () => {
+          setMediaLoaded(
+            true
+          );
+        }
+      );
+    };
+
+  /* ======================================================
+     RENDER
+  ====================================================== */
 
   return (
-    <div className={detail ? "iview-detail-player" : "iview-media"}>
-      {mediaUrl && !mediaLoaded && !mediaFailed && (
-        <div className="iview-media-loading">
-          <span>Loading media...</span>
-        </div>
-      )}
+    <div
+      className={
+        detail
+          ? "iview-detail-player"
+          : "iview-media"
+      }
+    >
+      {/* MEDIA SKELETON */}
 
-      {mediaUrl && mediaType === "image" && !mediaFailed && (
-        <img
-          src={mediaUrl}
-          alt={post.title}
-          className={`iview-image ${mediaLoaded ? "loaded" : ""}`}
-          onLoad={() => setMediaLoaded(true)}
-          onError={handleMediaError}
-        />
-      )}
+      {!mediaLoaded &&
+        !mediaFailed && (
+          <div className="iview-media-skeleton">
+            <div className="iview-media-shimmer" />
+          </div>
+        )}
 
-      {mediaUrl && mediaType === "video" && !mediaFailed && (
-        <video
-          src={mediaUrl}
-          className={`iview-image ${mediaLoaded ? "loaded" : ""}`}
-          muted={!detail}
-          playsInline
-          controls={detail}
-          autoPlay={detail}
-          onLoadedData={() => setMediaLoaded(true)}
-          onError={handleMediaError}
-        />
-      )}
+      {/* IMAGE */}
 
-      {(!mediaUrl || mediaFailed) && (
+      {mediaUrl &&
+        mediaType ===
+          "image" &&
+        !mediaFailed && (
+          <img
+            src={mediaUrl}
+            alt={post.title}
+            loading={
+              priority
+                ? "eager"
+                : "lazy"
+            }
+            decoding="async"
+            className={`iview-image ${
+              mediaLoaded
+                ? "loaded"
+                : ""
+            }`}
+            onLoad={
+              handleMediaLoaded
+            }
+            onError={
+              handleMediaError
+            }
+          />
+        )}
+
+      {/* VIDEO */}
+
+      {mediaUrl &&
+        mediaType ===
+          "video" &&
+        !mediaFailed && (
+          <video
+            src={mediaUrl}
+            className={`iview-image ${
+              mediaLoaded
+                ? "loaded"
+                : ""
+            }`}
+            muted={!detail}
+            playsInline
+            controls={detail}
+            autoPlay={detail}
+            preload={
+              priority
+                ? "auto"
+                : "metadata"
+            }
+            onLoadedData={
+              handleMediaLoaded
+            }
+            onError={
+              handleMediaError
+            }
+          />
+        )}
+
+      {/* EMPTY */}
+
+      {(!mediaUrl ||
+        mediaFailed) && (
         <div className="iview-empty-media">
-          <span>COMMUNITY ONE</span>
+          <span>
+            COMMUNITY ONE
+          </span>
         </div>
       )}
     </div>
