@@ -210,32 +210,28 @@ export default function CommunityPlusSidebar() {
 
       </div>
 
-      {/* ===================================================
-          ECHO ORB
-      ==================================================== */}
+     {/* ===================================================
+    ECHO
+=================================================== */}
 
-      <button
-        type="button"
-        className="echo-orb"
-        onClick={handleEchoClick}
-        aria-label="Echo"
-      >
+<div className="sidebar-echo">
+  <button
+    type="button"
+    className="echo-orb"
+    onClick={handleEchoClick}
+    aria-label="Echo"
+  >
+    <img
+      src="/logo/echo.png"
+      alt="Echo"
+      className="echo-orb-image"
+    />
+  </button>
 
-        {/* PULSE */}
-
-        <span className="echo-orb-pulse" />
-
-        {/* CORE */}
-
-        <span className="echo-orb-core">
-
-          <span className="echo-orb-icon">
-            ✦
-          </span>
-
-        </span>
-
-      </button>
+  <span className="echo-label">
+    Echo AI
+  </span>
+</div>
 
     </aside>
 

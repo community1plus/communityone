@@ -674,33 +674,7 @@ body {
     rgba(0,0,0,0.04);
 }
 
-/* =========================================================
-   ECHO ORB
-========================================================= */
 
-.echo-orb {
-
-  position: absolute;
-
-  left: 24px;
-  bottom: 92px;
-
-  width: 76px;
-  height: 76px;
-
-  border: none;
-  outline: none;
-
-  background: transparent;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  cursor: pointer;
-
-  z-index: 600;
-}
 
 /* =========================================================
    GLOW
