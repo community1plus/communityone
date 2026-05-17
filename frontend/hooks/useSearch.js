@@ -27,6 +27,7 @@ export default function useSearch() {
     async (searchQuery) => {
       if (!searchQuery?.trim()) {
         setResults([]);
+        console.log("SEARCH QUERY:", searchQuery);
         return;
       }
 
@@ -47,6 +48,10 @@ export default function useSearch() {
         );
 
         setSummary(data.summary || "");
+        console.log(
+         "HYBRID SEARCH RESPONSE:",
+          data
+            );
       } catch (err) {
         console.error(err);
 
