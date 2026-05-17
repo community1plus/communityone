@@ -5,6 +5,7 @@
 import {
   useState,
   useCallback,
+  useRef,
 } from "react";
 
 import searchService from "../services/searchService";
@@ -48,6 +49,13 @@ export default function useSearch() {
     setError,
   ] = useState(null);
 
+  /* ======================================================
+     METRICS
+  ====================================================== */
+
+  const lastSearchRef =
+    useRef(null);
+
   console.log(
     "REAL useSearch.js LOADED"
   );
@@ -63,7 +71,13 @@ export default function useSearch() {
         query
       );
 
+      /* EMPTY SEARCH */
+
       if (!query?.trim()) {
+        console.log(
+          "EMPTY SEARCH"
+        );
+
         setResults([]);
 
         setSuggestions([]);
@@ -73,31 +87,95 @@ export default function useSearch() {
         return;
       }
 
+      /* SEARCH START */
+
+      const searchStart =
+        performance.now();
+
+      lastSearchRef.current =
+        query;
+
+      console.log(
+        "HYBRID SEARCH REQUEST:",
+        query
+      );
+
       try {
         setLoading(true);
 
         setError(null);
+
+        /* API */
 
         const data =
           await searchService.hybrid(
             query
           );
 
+        /* SEARCH METRICS */
+
+        const searchTime =
+          (
+            performance.now() -
+            searchStart
+          ).toFixed(2);
+
+        console.log(
+          "SEARCH TIME:",
+          `${searchTime} ms`
+        );
+
         console.log(
           "HYBRID SEARCH RESPONSE:",
           data
         );
 
+        /* RESULTS */
+
+        const safeResults =
+          data?.results || [];
+
+        const safeSuggestions =
+          data?.suggestions ||
+          [];
+
+        const safeSummary =
+          data?.summary || "";
+
         setResults(
-          data.results || []
+          safeResults
         );
 
         setSuggestions(
-          data.suggestions || []
+          safeSuggestions
         );
 
         setSummary(
-          data.summary || ""
+          safeSummary
+        );
+
+        /* EMPTY STATE TRACKING */
+
+        if (
+          !safeResults.length
+        ) {
+          console.log(
+            "EMPTY SEARCH RESULTS:",
+            query
+          );
+        }
+
+        /* SEARCH SUCCESS */
+
+        console.log(
+          "SEARCH SUCCESS:",
+          {
+            query,
+            results:
+              safeResults.length,
+            suggestions:
+              safeSuggestions.length,
+          }
         );
       } catch (err) {
         console.error(
@@ -105,7 +183,10 @@ export default function useSearch() {
           err
         );
 
-        setError(err.message);
+        setError(
+          err?.message ||
+            "Search failed"
+        );
       } finally {
         setLoading(false);
       }
@@ -119,6 +200,22 @@ export default function useSearch() {
 
   const clearSearch =
     useCallback(() => {
+      console.log(
+        "CLEAR SEARCH"
+      );
+
+      /* ABANDONED SEARCH */
+
+      if (
+        searchQuery?.trim() &&
+        !results?.length
+      ) {
+        console.log(
+          "SEARCH ABANDONED:",
+          searchQuery
+        );
+      }
+
       setSearchQuery("");
 
       setResults([]);
@@ -128,7 +225,10 @@ export default function useSearch() {
       setSummary("");
 
       setError(null);
-    }, []);
+    }, [
+      searchQuery,
+      results,
+    ]);
 
   /* ======================================================
      RETURN
