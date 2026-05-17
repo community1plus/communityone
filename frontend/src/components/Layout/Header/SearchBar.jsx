@@ -120,8 +120,7 @@ export default function SearchBar() {
         {/* CLEAR BUTTON */}
 
         <div className="search-actions">
-
-  {/* CLEAR */}
+          {/* CLEAR */}
 
   {showClear && (
     <button
@@ -133,17 +132,11 @@ export default function SearchBar() {
     </button>
   )}
 
-  {/* CLOSE */}
+          {/* CLOSE */}
 
-  <button
-    className="search-close"
-    onClick={handleClose}
-    aria-label="Close search"
-  >
-    ✕
-  </button>
-
-</div>
+          
+        </div>
+      </div>
 
       {/* SEARCH OVERLAY */}
 
