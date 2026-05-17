@@ -1058,57 +1058,8 @@
     );
 }
 
-/* =========================================================
-   SEARCH ACTIONS
-========================================================= */
 
-.search-actions {
-  position: absolute;
 
-  top: 14px;
-  right: 14px;
-
-  display: flex;
-  align-items: center;
-
-  gap: 8px;
-
-  z-index: 20;
-}
-
-/* =========================================================
-   SEARCH ICON BUTTONS
-========================================================= */
-
-.search-clear,
-.search-close {
-  width: 34px;
-  height: 34px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border: none;
-  border-radius: 50%;
-
-  background:
-    rgba(0, 0, 0, 0.04);
-
-  backdrop-filter: blur(10px);
-
-  color: #433c36;
-
-  font-size: 14px;
-  font-weight: 700;
-
-  cursor: pointer;
-
-  transition:
-    background 0.15s ease,
-    transform 0.15s ease,
-    color 0.15s ease;
-}
 
 .search-clear:hover,
 .search-close:hover {
@@ -1131,6 +1082,59 @@
 /* =========================================================
    CLEAR HOVER
 ========================================================= */
+
+/* =========================================================
+   SEARCH CLEAR
+========================================================= */
+
+.search-input-wrapper {
+  position: relative;
+}
+
+.search-clear {
+  position: absolute;
+
+  top: 50%;
+  right: 12px;
+
+  transform: translateY(-50%);
+
+  width: 30px;
+  height: 30px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  border-radius: 50%;
+
+  background:
+    rgba(0, 0, 0, 0.04);
+
+  backdrop-filter: blur(10px);
+
+  color: #433c36;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    transform 0.15s ease;
+}
+
+.search-clear:hover {
+  background:
+    rgba(0, 0, 0, 0.08);
+
+  transform:
+    translateY(-50%)
+    rotate(-90deg)
+    scale(1.04);
+}
 
 .search-clear:hover {
   transform:
