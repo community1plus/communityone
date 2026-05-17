@@ -1,9 +1,20 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+
 import "./CommunityPlusDashboardHome.css";
 
 import { useMap } from "../../context/MapContext";
 import CommunityMap from "../../components/Map/CommunityMap";
 import FeedCard from "../../components/FeedCard/CommunityPlusFeedCard";
+
+/* =========================================================
+   MOCK FEED
+========================================================= */
 
 const FEED_ITEMS = [
   {
@@ -16,6 +27,7 @@ const FEED_ITEMS = [
     expires_at: "2026-05-13T08:00:00.000Z",
     location: { lat: -37.8136, lng: 144.9631 },
   },
+
   {
     id: 2,
     type: "event",
@@ -26,6 +38,7 @@ const FEED_ITEMS = [
     expires_at: null,
     location: { lat: -37.81, lng: 144.97 },
   },
+
   {
     id: 3,
     type: "beacon",
@@ -36,6 +49,7 @@ const FEED_ITEMS = [
     expires_at: "2026-05-11T08:00:00.000Z",
     location: { lat: -37.82, lng: 144.95 },
   },
+
   {
     id: 4,
     type: "blob",
@@ -48,18 +62,33 @@ const FEED_ITEMS = [
   },
 ];
 
+/* =========================================================
+   DEFAULT EMPTY STATE
+========================================================= */
+
 const DEFAULT_FEED_CARD = {
   id: "default-feed-card",
   type: "welcome",
+
   title: "👋 Welcome to Community One",
+
   content:
     "No community activity has been posted yet. Be the first to share news, events, alerts or updates with your local area.",
+
   author: "Community One",
+
   created_at: new Date().toISOString(),
+
   expires_at: null,
+
   system: true,
+
   location: null,
 };
+
+/* =========================================================
+   FILTERS
+========================================================= */
 
 const FILTERS = [
   { id: "all", label: "All" },
@@ -70,8 +99,13 @@ const FILTERS = [
   { id: "beacon", label: "Beacons" },
 ];
 
+/* =========================================================
+   HELPERS
+========================================================= */
+
 function isCurrentActivity(item) {
   if (!item?.expires_at) return true;
+
   return new Date(item.expires_at).getTime() > Date.now();
 }
 
@@ -124,6 +158,7 @@ function formatRelativeTime(value) {
   if (!value) return "Just now";
 
   const now = Date.now();
+
   const then = new Date(value).getTime();
 
   if (Number.isNaN(then)) return "Just now";
@@ -131,18 +166,28 @@ function formatRelativeTime(value) {
   const diffMinutes = Math.floor((now - then) / 60000);
 
   if (diffMinutes < 1) return "Just now";
-  if (diffMinutes < 60) return `${diffMinutes}m ago`;
+
+  if (diffMinutes < 60) {
+    return `${diffMinutes}m ago`;
+  }
 
   const diffHours = Math.floor(diffMinutes / 60);
 
-  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffHours < 24) {
+    return `${diffHours}h ago`;
+  }
 
   const diffDays = Math.floor(diffHours / 24);
 
   return `${diffDays}d ago`;
 }
 
+/* =========================================================
+   FEED
+========================================================= */
+
 function Feed({ activeFilter }) {
+
   const {
     addMarkers,
     visibleMarkers,
@@ -151,45 +196,102 @@ function Feed({ activeFilter }) {
     clearSelection,
   } = useMap();
 
+  /* =======================================================
+     RESOLVED FEED
+  ======================================================= */
+
   const resolvedFeed = useMemo(() => {
-    const filteredItems = applyFeedFilter(FEED_ITEMS, activeFilter);
+
+    const filteredItems =
+      applyFeedFilter(
+        FEED_ITEMS,
+        activeFilter
+      );
+
     return resolveDashboardFeed(filteredItems);
+
   }, [activeFilter]);
 
   const feedItems = resolvedFeed.items;
 
+  /* =======================================================
+     MAP MARKERS
+  ======================================================= */
+
   useEffect(() => {
-    const markerItems = feedItems.filter(
-      (item) => item.location && !item.system
-    );
+
+    const markerItems =
+      feedItems.filter(
+        (item) =>
+          item.location &&
+          !item.system
+      );
 
     addMarkers(markerItems, "feed");
+
   }, [feedItems, addMarkers]);
 
+  /* =======================================================
+     FILTER VISIBLE ITEMS
+  ======================================================= */
+
   const itemsToRender = useMemo(() => {
-    if (resolvedFeed.mode === "empty") return feedItems;
-    if (!visibleMarkers.length) return feedItems;
+
+    if (resolvedFeed.mode === "empty") {
+      return feedItems;
+    }
+
+    if (!visibleMarkers.length) {
+      return feedItems;
+    }
 
     return feedItems.filter((item) =>
-      visibleMarkers.some((marker) => marker.id === item.id)
+      visibleMarkers.some(
+        (marker) => marker.id === item.id
+      )
     );
-  }, [visibleMarkers, feedItems, resolvedFeed.mode]);
+
+  }, [
+    visibleMarkers,
+    feedItems,
+    resolvedFeed.mode,
+  ]);
+
+  /* =======================================================
+     SELECT
+  ======================================================= */
 
   const handleSelect = useCallback(
     ({ id, location }) => {
+
       if (!location) return;
+
       focusOnMarker(location, id);
+
     },
     [focusOnMarker]
   );
 
+  /* =======================================================
+     HOVER CLEAR
+  ======================================================= */
+
   const handleMouseLeave = useCallback(
     (item) => {
+
       if (item.system) return;
-      if (selectedMarkerId !== item.id) clearSelection();
+
+      if (selectedMarkerId !== item.id) {
+        clearSelection();
+      }
+
     },
     [selectedMarkerId, clearSelection]
   );
+
+  /* =======================================================
+     EMPTY
+  ======================================================= */
 
   if (!itemsToRender.length) {
     return (
@@ -205,25 +307,43 @@ function Feed({ activeFilter }) {
     );
   }
 
+  /* =======================================================
+     RENDER
+  ======================================================= */
+
   return (
     <>
       {resolvedFeed.mode === "fallback" && (
         <div className="feed-empty">
-          No current activity. Showing the most recent update.
+          No current activity.
+          Showing the most recent update.
         </div>
       )}
 
       {itemsToRender.map((item) => (
-        <div key={item.id} onMouseLeave={() => handleMouseLeave(item)}>
+        <div
+          key={item.id}
+          onMouseLeave={() =>
+            handleMouseLeave(item)
+          }
+        >
           <FeedCard
             id={item.id}
             type={item.type}
-            name={item.author || "Community Member"}
+            name={
+              item.author ||
+              "Community Member"
+            }
             time={formatRelativeTime(item.created_at)}
-            text={item.content || item.title}
+            text={
+              item.content ||
+              item.title
+            }
             image={item.image || null}
             location={item.location}
-            active={selectedMarkerId === item.id}
+            active={
+              selectedMarkerId === item.id
+            }
             onSelect={handleSelect}
           />
         </div>
@@ -232,16 +352,74 @@ function Feed({ activeFilter }) {
   );
 }
 
+/* =========================================================
+   MAIN
+========================================================= */
+
 export default function CommunityPlusDashboardHome() {
-  const [activeFilter, setActiveFilter] = useState("all");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchMode, setSearchMode] = useState("local");
-  const [searchResults, setSearchResults] = useState([]);
+
+  /* =======================================================
+     STATE
+  ======================================================= */
+
+  const [activeFilter, setActiveFilter] =
+    useState("all");
+
+  const [searchQuery, setSearchQuery] =
+    useState("");
+
+  const [searchMode, setSearchMode] =
+    useState("local");
+
+  const [searchResults, setSearchResults] =
+    useState([]);
+
+  /* =======================================================
+     FILTER RAIL REF
+  ======================================================= */
+
+  const filterRailRef = useRef(null);
+
+  /* =======================================================
+     MAP
+  ======================================================= */
 
   const { focusOnMarker } = useMap();
 
+  /* =======================================================
+     FILTER RAIL SHIFT
+  ======================================================= */
+
+  const shiftFiltersLeft = useCallback(() => {
+
+    if (!filterRailRef.current) return;
+
+    filterRailRef.current.scrollBy({
+      left: -220,
+      behavior: "smooth",
+    });
+
+  }, []);
+
+  const shiftFiltersRight = useCallback(() => {
+
+    if (!filterRailRef.current) return;
+
+    filterRailRef.current.scrollBy({
+      left: 220,
+      behavior: "smooth",
+    });
+
+  }, []);
+
+  /* =======================================================
+     SEARCH
+  ======================================================= */
+
   const handleSearch = useCallback((event) => {
+
     const value = event.target.value;
+
     setSearchQuery(value);
 
     if (!value.trim()) {
@@ -250,109 +428,271 @@ export default function CommunityPlusDashboardHome() {
     }
 
     const results = FEED_ITEMS.filter((item) => {
-      const haystack = `${item.title} ${item.content} ${item.type}`.toLowerCase();
-      return haystack.includes(value.toLowerCase());
+
+      const haystack =
+        `${item.title}
+         ${item.content}
+         ${item.type}`.toLowerCase();
+
+      return haystack.includes(
+        value.toLowerCase()
+      );
     });
 
     setSearchResults(results);
+
   }, []);
+
+  /* =======================================================
+     SEARCH SELECT
+  ======================================================= */
 
   const handleSearchSelect = useCallback(
     (result) => {
+
       if (!result?.location) return;
 
-      focusOnMarker(result.location, result.id);
-      setSearchQuery(result.title || result.content || "");
+      focusOnMarker(
+        result.location,
+        result.id
+      );
+
+      setSearchQuery(
+        result.title ||
+        result.content ||
+        ""
+      );
+
       setSearchResults([]);
+
     },
     [focusOnMarker]
   );
 
+  /* =======================================================
+     RENDER
+  ======================================================= */
+
   return (
     <div className="dashboard-home-page">
+
       <div className="dashboard-home">
+
+        {/* ===================================================
+            FEED
+        ==================================================== */}
+
         <section className="dashboard-home-feed">
-          <div className="feed-filters feed-filters-left" aria-label="Feed filters">
-            {FILTERS.map((filter) => (
-              <button
-                key={filter.id}
-                type="button"
-                className={`feed-filter ${
-                  activeFilter === filter.id ? "active" : ""
-                }`}
-                onClick={() => setActiveFilter(filter.id)}
-              >
-                {filter.label}
-              </button>
-            ))}
+
+          {/* ===============================================
+              FILTER RAIL
+          ================================================ */}
+
+          <div
+            className="feed-filters-wrapper"
+            aria-label="Feed filters"
+          >
+
+            {/* LEFT SHIFT */}
+
+            <button
+              type="button"
+              className="filter-shift left"
+              onClick={shiftFiltersLeft}
+            >
+              ←
+            </button>
+
+            {/* FILTERS */}
+
+            <div
+              className="feed-filters"
+              ref={filterRailRef}
+            >
+              {FILTERS.map((filter) => (
+
+                <button
+                  key={filter.id}
+                  type="button"
+                  className={`feed-filter ${
+                    activeFilter === filter.id
+                      ? "active"
+                      : ""
+                  }`}
+                  onClick={() =>
+                    setActiveFilter(filter.id)
+                  }
+                >
+                  {filter.label}
+                </button>
+
+              ))}
+            </div>
+
+            {/* RIGHT SHIFT */}
+
+            <button
+              type="button"
+              className="filter-shift right"
+              onClick={shiftFiltersRight}
+            >
+              →
+            </button>
+
           </div>
+
+          {/* ===============================================
+              FEED LIST
+          ================================================ */}
 
           <div className="feed-list">
             <Feed activeFilter={activeFilter} />
           </div>
+
         </section>
 
+        {/* ===================================================
+            MAP
+        ==================================================== */}
+
         <section className="dashboard-home-map">
+
+          {/* ===============================================
+              TOOLBAR
+          ================================================ */}
+
           <div className="dashboard-map-toolbar">
+
             <div className="dashboard-search-controls">
+
+              {/* SEARCH */}
+
               <div className="dashboard-search-box">
+
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={handleSearch}
                   placeholder={`Search ${
-                    searchMode === "local" ? "your community" : "the world"
+                    searchMode === "local"
+                      ? "your community"
+                      : "the world"
                   }...`}
                 />
 
-                <span className="dashboard-search-icon">⌕</span>
+                <span className="dashboard-search-icon">
+                  ⌕
+                </span>
+
+                {/* SEARCH RESULTS */}
+
+                {!!searchResults.length && (
+
+                  <div className="dashboard-search-results">
+
+                    {searchResults.map((result) => (
+
+                      <button
+                        key={result.id}
+                        type="button"
+                        className="dashboard-search-result"
+                        onClick={() =>
+                          handleSearchSelect(result)
+                        }
+                      >
+
+                        <div className="dashboard-search-result-meta">
+
+                          <span>
+                            {result.type}
+                          </span>
+
+                          <strong>
+                            {result.title}
+                          </strong>
+
+                        </div>
+
+                        <p>
+                          {result.content}
+                        </p>
+
+                      </button>
+
+                    ))}
+
+                  </div>
+
+                )}
+
               </div>
 
+              {/* SEARCH MODE */}
+
               <div className="dashboard-search-mode">
+
                 <button
                   type="button"
-                  className={searchMode === "local" ? "active" : ""}
-                  onClick={() => setSearchMode("local")}
+                  className={
+                    searchMode === "local"
+                      ? "active"
+                      : ""
+                  }
+                  onClick={() =>
+                    setSearchMode("local")
+                  }
                 >
                   Local
                 </button>
 
                 <button
                   type="button"
-                  className={searchMode === "global" ? "active" : ""}
-                  onClick={() => setSearchMode("global")}
+                  className={
+                    searchMode === "global"
+                      ? "active"
+                      : ""
+                  }
+                  onClick={() =>
+                    setSearchMode("global")
+                  }
                 >
                   Global
                 </button>
+
               </div>
+
             </div>
 
-            {!!searchResults.length && (
-              <div className="dashboard-search-results">
-                {searchResults.map((result) => (
-                  <button
-                    key={result.id}
-                    type="button"
-                    className="dashboard-search-result"
-                    onClick={() => handleSearchSelect(result)}
-                  >
-                    <div className="dashboard-search-result-meta">
-                      <span>{result.type}</span>
-                      <strong>{result.title}</strong>
-                    </div>
-
-                    <p>{result.content}</p>
-                  </button>
-                ))}
-              </div>
-            )}
           </div>
+
+          {/* ===============================================
+              MAP
+          ================================================ */}
 
           <div className="dashboard-map-canvas">
-            <CommunityMap searchQuery={searchQuery} searchMode={searchMode} />
+
+            <CommunityMap
+              searchQuery={searchQuery}
+              searchMode={searchMode}
+            />
+
           </div>
+
+          {/* ===============================================
+              ECHO
+          ================================================ */}
+
+          <button
+            type="button"
+            className="echo-button"
+          >
+            ✨ Echo
+          </button>
+
         </section>
+
       </div>
+
     </div>
   );
 }
