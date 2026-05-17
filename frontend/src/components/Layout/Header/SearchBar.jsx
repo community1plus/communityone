@@ -61,13 +61,20 @@ export default function SearchBar() {
       {/* SEARCH INPUT */}
 
       <input
-        className="search-input"
-        placeholder="Search your area..."
-        value={query}
-        onChange={(e) =>
-          setQuery(e.target.value)
-        }
-      />
+  className="search-input"
+  placeholder="Search your area..."
+  value={query}
+  onChange={(e) => {
+    console.log("SET QUERY:", setQuery);
+
+    console.log(
+      "TYPE:",
+      typeof setQuery
+    );
+
+    setQuery(e.target.value);
+  }}
+/>
 
       {/* LOADING */}
 
