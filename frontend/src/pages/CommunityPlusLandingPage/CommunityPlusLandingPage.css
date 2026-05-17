@@ -511,3 +511,23 @@ RESPONSIVE
     padding: 22px;
   }
 }
+
+.landing-secondary-auth {
+  margin-top: 14px;
+
+  background: transparent;
+  border: none;
+
+  color: #7b0d1e;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: opacity 0.2s ease;
+}
+
+.landing-secondary-auth:hover {
+  opacity: 0.7;
+}
