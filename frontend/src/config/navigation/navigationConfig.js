@@ -16,6 +16,13 @@ export const NAVIGATION = [
         type: "route",
         path: "/communityplus/iview",
       },
+      {
+        id: "incidents",
+        label: "Incidents",
+        icon: "🚨",
+        path: "/communityplus/incidents",
+        type: "route",
+    },
 
       {
         id: "news",

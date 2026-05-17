@@ -77,448 +77,47 @@ const FEED_ITEMS = [
 ];
 
 /* =========================================================
-   EMPTY STATE
-========================================================= */
-
-const DEFAULT_FEED_CARD = {
-  id: "default-feed-card",
-
-  type: "welcome",
-
-  title: "👋 Welcome to Community One",
-
-  content:
-    "No community activity has been posted yet. Be the first to share news, events, alerts or updates with your local area.",
-
-  author: "Community One",
-
-  created_at: new Date().toISOString(),
-
-  expires_at: null,
-
-  system: true,
-
-  location: null,
-};
-
-/* =========================================================
    FILTERS
 ========================================================= */
 
 const FILTERS = [
-  {
-    id: "all",
-    label: "All",
-  },
-
-  {
-    id: "now",
-    label: "Now",
-  },
-
-  {
-    id: "blob",
-    label: "Blobs",
-  },
-
-  {
-    id: "incident",
-    label: "Incidents",
-  },
-
-  {
-    id: "event",
-    label: "Events",
-  },
-
-  {
-    id: "beacon",
-    label: "Beacons",
-  },
+  { id: "all", label: "All" },
+  { id: "now", label: "Now" },
+  { id: "blob", label: "Blobs" },
+  { id: "incident", label: "Incidents" },
+  { id: "event", label: "Events" },
+  { id: "beacon", label: "Beacons" },
 ];
 
 /* =========================================================
    HELPERS
 ========================================================= */
 
-function isCurrentActivity(item) {
-
-  if (!item?.expires_at) {
-    return true;
-  }
-
-  return (
-    new Date(item.expires_at).getTime() >
-    Date.now()
-  );
-
-}
-
-function sortByMostRecent(items = []) {
-
-  return [...items].sort(
-    (a, b) =>
-      new Date(
-        b.created_at || 0
-      ).getTime() -
-      new Date(
-        a.created_at || 0
-      ).getTime()
-  );
-
-}
-
-function applyFeedFilter(
-  items = [],
-  activeFilter = "all"
-) {
-
-  if (activeFilter === "all") {
-    return items;
-  }
-
-  if (activeFilter === "now") {
-
-    return items.filter((item) =>
-      [
-        "now",
-        "incident",
-        "event",
-        "beacon",
-      ].includes(item.type)
-    );
-
-  }
-
-  return items.filter(
-    (item) =>
-      item.type === activeFilter
-  );
-
-}
-
-function resolveDashboardFeed(
-  items = []
-) {
-
-  if (!items.length) {
-
-    return {
-      mode: "empty",
-      items: [DEFAULT_FEED_CARD],
-    };
-
-  }
-
-  const currentItems =
-    items.filter(isCurrentActivity);
-
-  if (currentItems.length) {
-
-    return {
-      mode: "active",
-      items:
-        sortByMostRecent(
-          currentItems
-        ),
-    };
-
-  }
-
-  const latestItem =
-    sortByMostRecent(items)[0];
-
-  return {
-    mode: "fallback",
-
-    items:
-      latestItem
-        ? [latestItem]
-        : [DEFAULT_FEED_CARD],
-  };
-
-}
-
 function formatRelativeTime(value) {
 
-  if (!value) {
-    return "Just now";
-  }
+  if (!value) return "Just now";
 
   const now = Date.now();
 
   const then =
     new Date(value).getTime();
 
-  if (Number.isNaN(then)) {
+  const diff =
+    Math.floor((now - then) / 60000);
+
+  if (diff < 1) {
     return "Just now";
   }
 
-  const diffMinutes =
-    Math.floor(
-      (now - then) / 60000
-    );
-
-  if (diffMinutes < 1) {
-    return "Just now";
+  if (diff < 60) {
+    return `${diff}m ago`;
   }
 
-  if (diffMinutes < 60) {
-    return `${diffMinutes}m ago`;
+  if (diff < 1440) {
+    return `${Math.floor(diff / 60)}h ago`;
   }
 
-  const diffHours =
-    Math.floor(diffMinutes / 60);
-
-  if (diffHours < 24) {
-    return `${diffHours}h ago`;
-  }
-
-  const diffDays =
-    Math.floor(diffHours / 24);
-
-  return `${diffDays}d ago`;
-
-}
-
-/* =========================================================
-   FEED
-========================================================= */
-
-function Feed({
-  activeFilter,
-}) {
-
-  const {
-    addMarkers,
-    visibleMarkers,
-    selectedMarkerId,
-    focusOnMarker,
-    clearSelection,
-  } = useMap();
-
-  /* =======================================================
-     RESOLVE FEED
-  ======================================================= */
-
-  const resolvedFeed =
-    useMemo(() => {
-
-      const filteredItems =
-        applyFeedFilter(
-          FEED_ITEMS,
-          activeFilter
-        );
-
-      return resolveDashboardFeed(
-        filteredItems
-      );
-
-    }, [activeFilter]);
-
-  const feedItems =
-    resolvedFeed.items;
-
-  /* =======================================================
-     ADD MARKERS
-  ======================================================= */
-
-  useEffect(() => {
-
-    const markerItems =
-      feedItems.filter(
-        (item) =>
-          item.location &&
-          !item.system
-      );
-
-    addMarkers(
-      markerItems,
-      "feed"
-    );
-
-  }, [
-    feedItems,
-    addMarkers,
-  ]);
-
-  /* =======================================================
-     FILTER VISIBLE
-  ======================================================= */
-
-  const itemsToRender =
-    useMemo(() => {
-
-      if (
-        resolvedFeed.mode ===
-        "empty"
-      ) {
-        return feedItems;
-      }
-
-      if (!visibleMarkers.length) {
-        return feedItems;
-      }
-
-      return feedItems.filter(
-        (item) =>
-          visibleMarkers.some(
-            (marker) =>
-              marker.id === item.id
-          )
-      );
-
-    }, [
-      visibleMarkers,
-      feedItems,
-      resolvedFeed.mode,
-    ]);
-
-  /* =======================================================
-     SELECT
-  ======================================================= */
-
-  const handleSelect =
-    useCallback(
-      ({
-        id,
-        location,
-      }) => {
-
-        if (!location) return;
-
-        focusOnMarker(
-          location,
-          id
-        );
-
-      },
-      [focusOnMarker]
-    );
-
-  /* =======================================================
-     CLEAR
-  ======================================================= */
-
-  const handleMouseLeave =
-    useCallback(
-      (item) => {
-
-        if (item.system) return;
-
-        if (
-          selectedMarkerId !==
-          item.id
-        ) {
-          clearSelection();
-        }
-
-      },
-      [
-        selectedMarkerId,
-        clearSelection,
-      ]
-    );
-
-  /* =======================================================
-     EMPTY
-  ======================================================= */
-
-  if (!itemsToRender.length) {
-
-    return (
-
-      <FeedCard
-        id={
-          DEFAULT_FEED_CARD.id
-        }
-        type={
-          DEFAULT_FEED_CARD.type
-        }
-        name={
-          DEFAULT_FEED_CARD.author
-        }
-        time="Just now"
-        text={
-          DEFAULT_FEED_CARD.content
-        }
-        location={
-          DEFAULT_FEED_CARD.location
-        }
-        active={false}
-      />
-
-    );
-
-  }
-
-  /* =======================================================
-     RENDER
-  ======================================================= */
-
-  return (
-    <>
-
-      {resolvedFeed.mode ===
-        "fallback" && (
-
-        <div className="feed-empty">
-
-          No current activity.
-          Showing the most recent update.
-
-        </div>
-
-      )}
-
-      {itemsToRender.map(
-        (item) => (
-
-          <div
-            key={item.id}
-            onMouseLeave={() =>
-              handleMouseLeave(
-                item
-              )
-            }
-          >
-
-            <FeedCard
-              id={item.id}
-              type={item.type}
-              name={
-                item.author ||
-                "Community Member"
-              }
-              time={formatRelativeTime(
-                item.created_at
-              )}
-              text={
-                item.content ||
-                item.title
-              }
-              image={
-                item.image || null
-              }
-              location={
-                item.location
-              }
-              active={
-                selectedMarkerId ===
-                item.id
-              }
-              onSelect={
-                handleSelect
-              }
-            />
-
-          </div>
-
-        )
-      )}
-
-    </>
-  );
+  return `${Math.floor(diff / 1440)}d ago`;
 
 }
 
@@ -527,6 +126,14 @@ function Feed({
 ========================================================= */
 
 export default function CommunityPlusDashboardHome() {
+
+  const {
+    addMarkers,
+    focusOnMarker,
+    visibleMarkers,
+    selectedMarkerId,
+    clearSelection,
+  } = useMap();
 
   /* =======================================================
      STATE
@@ -570,15 +177,54 @@ export default function CommunityPlusDashboardHome() {
     useRef(null);
 
   /* =======================================================
-     MAP
+     FILTERED FEED
   ======================================================= */
 
-  const {
-    focusOnMarker,
-  } = useMap();
+  const filteredFeed =
+    useMemo(() => {
+
+      if (activeFilter === "all") {
+        return FEED_ITEMS;
+      }
+
+      if (activeFilter === "now") {
+
+        return FEED_ITEMS.filter(
+          (item) =>
+            [
+              "incident",
+              "event",
+              "beacon",
+            ].includes(item.type)
+        );
+
+      }
+
+      return FEED_ITEMS.filter(
+        (item) =>
+          item.type === activeFilter
+      );
+
+    }, [activeFilter]);
 
   /* =======================================================
-     FILTER RAIL STATE
+     MAP MARKERS
+  ======================================================= */
+
+  useEffect(() => {
+
+    addMarkers(
+      filteredFeed,
+      "feed"
+    );
+
+  }, [
+    filteredFeed,
+    addMarkers,
+  ]);
+
+  /* =======================================================
+     RAIL STATE
   ======================================================= */
 
   const updateRailState =
@@ -630,38 +276,26 @@ export default function CommunityPlusDashboardHome() {
   }, [updateRailState]);
 
   /* =======================================================
-     SHIFT
+     FILTER SHIFT
   ======================================================= */
 
   const shiftFiltersLeft =
     useCallback(() => {
 
-      if (!filterRailRef.current) {
-        return;
-      }
-
-      filterRailRef.current.scrollBy(
-        {
-          left: -220,
-          behavior: "smooth",
-        }
-      );
+      filterRailRef.current?.scrollBy({
+        left: -220,
+        behavior: "smooth",
+      });
 
     }, []);
 
   const shiftFiltersRight =
     useCallback(() => {
 
-      if (!filterRailRef.current) {
-        return;
-      }
-
-      filterRailRef.current.scrollBy(
-        {
-          left: 220,
-          behavior: "smooth",
-        }
-      );
+      filterRailRef.current?.scrollBy({
+        left: 220,
+        behavior: "smooth",
+      });
 
     }, []);
 
@@ -685,22 +319,20 @@ export default function CommunityPlusDashboardHome() {
       }
 
       const results =
-        FEED_ITEMS.filter(
-          (item) => {
+        FEED_ITEMS.filter((item) => {
 
-            const haystack =
-              `
-                ${item.title}
-                ${item.content}
-                ${item.type}
-              `.toLowerCase();
+          const haystack =
+            `
+              ${item.title}
+              ${item.content}
+              ${item.type}
+            `.toLowerCase();
 
-            return haystack.includes(
-              value.toLowerCase()
-            );
+          return haystack.includes(
+            value.toLowerCase()
+          );
 
-          }
-        );
+        });
 
       setSearchResults(results);
 
@@ -712,24 +344,41 @@ export default function CommunityPlusDashboardHome() {
 
   const handleSearchSelect =
     useCallback(
-      (result) => {
+      (item) => {
 
-        if (!result?.location) {
+        if (!item?.location) {
           return;
         }
 
         focusOnMarker(
-          result.location,
-          result.id
+          item.location,
+          item.id
         );
 
         setSearchQuery(
-          result.title ||
-            result.content ||
-            ""
+          item.title
         );
 
         setSearchResults([]);
+
+      },
+      [focusOnMarker]
+    );
+
+  /* =======================================================
+     FEED SELECT
+  ======================================================= */
+
+  const handleFeedSelect =
+    useCallback(
+      ({ id, location }) => {
+
+        if (!location) return;
+
+        focusOnMarker(
+          location,
+          id
+        );
 
       },
       [focusOnMarker]
@@ -759,7 +408,7 @@ export default function CommunityPlusDashboardHome() {
       <div className="dashboard-home">
 
         {/* =================================================
-            FEED
+            FEED PANEL
         ================================================== */}
 
         <section className="dashboard-home-feed">
@@ -768,12 +417,7 @@ export default function CommunityPlusDashboardHome() {
               FILTER RAIL
           ============================================== */}
 
-          <div
-            className="feed-filters-wrapper"
-            aria-label="Feed filters"
-          >
-
-            {/* LEFT */}
+          <div className="feed-filters-wrapper">
 
             {canScrollLeft && (
 
@@ -789,42 +433,36 @@ export default function CommunityPlusDashboardHome() {
 
             )}
 
-            {/* FILTERS */}
-
             <div
-              className="feed-filters"
               ref={filterRailRef}
+              className="feed-filters"
             >
 
-              {FILTERS.map(
-                (filter) => (
+              {FILTERS.map((filter) => (
 
-                  <button
-                    key={filter.id}
-                    type="button"
-                    className={`feed-filter ${
-                      activeFilter ===
+                <button
+                  key={filter.id}
+                  type="button"
+                  className={`feed-filter ${
+                    activeFilter ===
+                    filter.id
+                      ? "active"
+                      : ""
+                  }`}
+                  onClick={() =>
+                    setActiveFilter(
                       filter.id
-                        ? "active"
-                        : ""
-                    }`}
-                    onClick={() =>
-                      setActiveFilter(
-                        filter.id
-                      )
-                    }
-                  >
+                    )
+                  }
+                >
 
-                    {filter.label}
+                  {filter.label}
 
-                  </button>
+                </button>
 
-                )
-              )}
+              ))}
 
             </div>
-
-            {/* RIGHT */}
 
             {canScrollRight && (
 
@@ -848,24 +486,60 @@ export default function CommunityPlusDashboardHome() {
 
           <div className="feed-list">
 
-            <Feed
-              activeFilter={
-                activeFilter
-              }
-            />
+            {filteredFeed.map((item) => (
+
+              <div
+                key={item.id}
+                onMouseLeave={() => {
+
+                  if (
+                    selectedMarkerId !==
+                    item.id
+                  ) {
+                    clearSelection();
+                  }
+
+                }}
+              >
+
+                <FeedCard
+                  id={item.id}
+                  type={item.type}
+                  name={item.author}
+                  text={
+                    item.content
+                  }
+                  time={formatRelativeTime(
+                    item.created_at
+                  )}
+                  location={
+                    item.location
+                  }
+                  active={
+                    selectedMarkerId ===
+                    item.id
+                  }
+                  onSelect={
+                    handleFeedSelect
+                  }
+                />
+
+              </div>
+
+            ))}
 
           </div>
 
         </section>
 
         {/* =================================================
-            MAP
+            MAP PANEL
         ================================================== */}
 
         <section className="dashboard-home-map">
 
           {/* =============================================
-              TOOLBAR
+              TOP TOOLBAR
           ============================================== */}
 
           <div className="dashboard-map-toolbar">
@@ -894,24 +568,20 @@ export default function CommunityPlusDashboardHome() {
                   ⌕
                 </span>
 
-                {/* RESULTS */}
-
                 {!!searchResults.length && (
 
                   <div className="dashboard-search-results">
 
                     {searchResults.map(
-                      (result) => (
+                      (item) => (
 
                         <button
-                          key={
-                            result.id
-                          }
+                          key={item.id}
                           type="button"
                           className="dashboard-search-result"
                           onClick={() =>
                             handleSearchSelect(
-                              result
+                              item
                             )
                           }
                         >
@@ -919,23 +589,17 @@ export default function CommunityPlusDashboardHome() {
                           <div className="dashboard-search-result-meta">
 
                             <span>
-                              {
-                                result.type
-                              }
+                              {item.type}
                             </span>
 
                             <strong>
-                              {
-                                result.title
-                              }
+                              {item.title}
                             </strong>
 
                           </div>
 
                           <p>
-                            {
-                              result.content
-                            }
+                            {item.content}
                           </p>
 
                         </button>
@@ -949,7 +613,7 @@ export default function CommunityPlusDashboardHome() {
 
               </div>
 
-              {/* SEARCH MODE */}
+              {/* MODE */}
 
               <div className="dashboard-search-mode">
 
@@ -1023,11 +687,11 @@ export default function CommunityPlusDashboardHome() {
             aria-label="Echo"
           >
 
+            <span className="echo-orb-glow" />
+
             <span className="echo-orb-pulse" />
 
             <span className="echo-orb-core">
-
-              <span className="echo-orb-inner-glow" />
 
               <span className="echo-orb-icon">
                 ✦
