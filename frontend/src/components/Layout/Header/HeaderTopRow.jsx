@@ -150,23 +150,23 @@ export default function HeaderTopRow() {
       <div className="header-right">
   {isGuest ? (
     <>
-      <div className="guest-badge-stack">
-        <div className="guest-pill">
-          Guest Access
-        </div>
+      <div className="guest-inline">
+  <div className="guest-pill">
+    Guest Access
+  </div>
 
-        <div className="guest-readonly">
-          Read Only
-        </div>
+  <span className="guest-readonly">
+    Read Only
+  </span>
 
-        <button
-          type="button"
-          className="guest-signin"
-          onClick={() => navigate("/")}
-        >
-          Sign In →
-        </button>
-      </div>
+  <button
+    type="button"
+    className="guest-signin"
+    onClick={() => navigate("/")}
+  >
+    Sign In →
+  </button>
+</div>
 
       <div className="header-avatar">
         <img
