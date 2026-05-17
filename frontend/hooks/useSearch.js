@@ -1,4 +1,11 @@
-import { useState, useCallback } from "react";
+// =========================================================
+// /src/hooks/useSearch.js
+// =========================================================
+
+import {
+  useState,
+  useCallback,
+} from "react";
 
 import searchService from "../services/searchService";
 
@@ -7,28 +14,62 @@ import {
 } from "../config/search";
 
 export default function useSearch() {
-  const [query, setQuery] = useState("");
+  /* ======================================================
+     STATE
+  ====================================================== */
 
-  const [results, setResults] = useState([]);
+  const [
+    searchQuery,
+    setSearchQuery,
+  ] = useState("");
 
-  const [suggestions, setSuggestions] =
-    useState([]);
+  const [
+    results,
+    setResults,
+  ] = useState([]);
 
-  const [summary, setSummary] =
-    useState("");
+  const [
+    suggestions,
+    setSuggestions,
+  ] = useState([]);
 
-  const [loading, setLoading] =
-    useState(false);
+  const [
+    summary,
+    setSummary,
+  ] = useState("");
 
-  const [error, setError] =
-    useState(null);
+  const [
+    loading,
+    setLoading,
+  ] = useState(false);
 
-  console.log("REAL useSearch LOADED");    
+  const [
+    error,
+    setError,
+  ] = useState(null);
+
+  console.log(
+    "REAL useSearch.js LOADED"
+  );
+
+  /* ======================================================
+     SEARCH
+  ====================================================== */
+
   const search = useCallback(
-    async (searchQuery) => {
-      if (!searchQuery?.trim()) {
+    async (query) => {
+      console.log(
+        "SEARCH QUERY:",
+        query
+      );
+
+      if (!query?.trim()) {
         setResults([]);
-        console.log("SEARCH QUERY:", searchQuery);
+
+        setSuggestions([]);
+
+        setSummary("");
+
         return;
       }
 
@@ -39,22 +80,30 @@ export default function useSearch() {
 
         const data =
           await searchService.hybrid(
-            searchQuery
+            query
           );
 
-        setResults(data.results || []);
+        console.log(
+          "HYBRID SEARCH RESPONSE:",
+          data
+        );
+
+        setResults(
+          data.results || []
+        );
 
         setSuggestions(
           data.suggestions || []
         );
 
-        setSummary(data.summary || "");
-        console.log(
-         "HYBRID SEARCH RESPONSE:",
-          data
-            );
+        setSummary(
+          data.summary || ""
+        );
       } catch (err) {
-        console.error(err);
+        console.error(
+          "SEARCH ERROR:",
+          err
+        );
 
         setError(err.message);
       } finally {
@@ -64,17 +113,56 @@ export default function useSearch() {
     []
   );
 
+  /* ======================================================
+     CLEAR SEARCH
+  ====================================================== */
+
+  const clearSearch =
+    useCallback(() => {
+      setSearchQuery("");
+
+      setResults([]);
+
+      setSuggestions([]);
+
+      setSummary("");
+
+      setError(null);
+    }, []);
+
+  /* ======================================================
+     RETURN
+  ====================================================== */
+
   return {
-    query,
-    setQuery,
+    /* QUERY */
+
+    searchQuery,
+    setSearchQuery,
+
+    /* RESULTS */
 
     results,
+    setResults,
+
+    /* SUGGESTIONS */
+
     suggestions,
+    setSuggestions,
+
+    /* SUMMARY */
+
     summary,
+    setSummary,
+
+    /* STATE */
 
     loading,
     error,
 
+    /* ACTIONS */
+
     search,
+    clearSearch,
   };
 }
