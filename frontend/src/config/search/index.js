@@ -8,7 +8,7 @@ export * from "./searchResultConfig";
 
 export * from "./searchPromptConfig";
 
-export * from "./searchUIConfig";
+export * from "../searchUIConfig";
 
 export * from "./searchRankingConfig";
 
