@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
 import SearchBar from "./SearchBar";
 import UserMenu from "./UserMenu.jsx";
-import SearchBar from "./SearchBar.jsx";
+
 
 function getDisplayName(user) {
   if (!user) return "Guest";
