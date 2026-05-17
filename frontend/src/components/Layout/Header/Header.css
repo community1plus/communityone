@@ -1057,3 +1057,83 @@
       rgba(255,255,255,0)
     );
 }
+
+/* =========================================================
+   SEARCH ACTIONS
+========================================================= */
+
+.search-actions {
+  position: absolute;
+
+  top: 14px;
+  right: 14px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  z-index: 20;
+}
+
+/* =========================================================
+   SEARCH ICON BUTTONS
+========================================================= */
+
+.search-clear,
+.search-close {
+  width: 34px;
+  height: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  border-radius: 50%;
+
+  background:
+    rgba(0, 0, 0, 0.04);
+
+  backdrop-filter: blur(10px);
+
+  color: #433c36;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    transform 0.15s ease,
+    color 0.15s ease;
+}
+
+.search-clear:hover,
+.search-close:hover {
+  background:
+    rgba(0, 0, 0, 0.08);
+
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   CLOSE HOVER
+========================================================= */
+
+.search-close:hover {
+  transform:
+    rotate(90deg)
+    scale(1.04);
+}
+
+/* =========================================================
+   CLEAR HOVER
+========================================================= */
+
+.search-clear:hover {
+  transform:
+    rotate(-90deg)
+    scale(1.04);
+}
