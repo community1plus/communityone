@@ -527,80 +527,81 @@ export default function CommunityMap({
      RENDER
   ====================================================== */
 
-  return (
-    <div className="map-wrapper">
-      {/* MAP SKELETON */}
+  /* ======================================================
+   RENDER
+====================================================== */
 
-      {!mapReady && (
-        <div className="map-skeleton">
-          <div className="map-shimmer" />
+return (
+  <div className="map-wrapper">
+    {/* MAP SKELETON */}
 
-          <div className="map-loading-text">
-            Loading your area...
-          </div>
-        </div>
-      )}
+    <div
+      className="map-skeleton"
+      style={{
+        opacity: mapReady ? 0 : 1,
+      }}
+    >
+      <div className="map-shimmer" />
 
-      {/* MAP */}
-
-      <div
-        className={
-          mapReady
-            ? "map-visible"
-            : "map-hidden"
-        }
-      >
-        <GoogleMap
-          center={center}
-          zoom={zoom}
-          mapContainerStyle={
-            MAP_CONTAINER_STYLE
-          }
-          onLoad={(map) => {
-            console.log(
-              "MAP READY:",
-              (
-                performance.now() -
-                mapLoadStart.current
-              ).toFixed(2),
-              "ms"
-            );
-
-            mapRef.current = map;
-
-            requestAnimationFrame(
-              () => {
-                setMapReady(
-                  true
-                );
-              }
-            );
-          }}
-          onUnmount={() => {
-            clearMarkers();
-
-            mapRef.current =
-              null;
-
-            setMapReady(false);
-          }}
-          options={mapOptions}
-        />
+      <div className="map-loading-text">
+        Loading your area...
       </div>
-
-      {/* SEARCH CONTEXT */}
-
-      {searchQuery && (
-        <div className="map-search-context">
-          <span>
-            {searchMode}
-          </span>
-
-          <strong>
-            {searchQuery}
-          </strong>
-        </div>
-      )}
     </div>
-  );
+
+    {/* MAP */}
+
+    <div className="map-visible">
+      <GoogleMap
+        center={center}
+        zoom={zoom}
+        mapContainerStyle={
+          MAP_CONTAINER_STYLE
+        }
+        onLoad={(map) => {
+          console.log(
+            "MAP READY:",
+            (
+              performance.now() -
+              mapLoadStart.current
+            ).toFixed(2),
+            "ms"
+          );
+
+          mapRef.current = map;
+
+          requestAnimationFrame(
+            () => {
+              setMapReady(
+                true
+              );
+            }
+          );
+        }}
+        onUnmount={() => {
+          clearMarkers();
+
+          mapRef.current =
+            null;
+
+          setMapReady(false);
+        }}
+        options={mapOptions}
+      />
+    </div>
+
+    {/* SEARCH CONTEXT */}
+
+    {searchQuery && (
+      <div className="map-search-context">
+        <span>
+          {searchMode}
+        </span>
+
+        <strong>
+          {searchQuery}
+        </strong>
+      </div>
+    )}
+  </div>
+);
 }
