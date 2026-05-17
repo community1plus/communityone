@@ -9,12 +9,12 @@ import React, {
 
 import useSearch from "../../../hooks/useSearch";
 
-/*import "./SearchBar.css";*/
+/* import "./SearchBar.css"; */
 
 export default function SearchBar() {
   const {
-    query,
-    setQuery,
+    searchQuery,
+    setSearchQuery,
 
     results,
 
@@ -27,8 +27,23 @@ export default function SearchBar() {
     search,
   } = useSearch();
 
-  const [debouncedQuery, setDebouncedQuery] =
-    useState("");
+  const [
+    debouncedQuery,
+    setDebouncedQuery,
+  ] = useState("");
+
+  /* ======================================================
+     DEBUG
+  ====================================================== */
+
+  console.log(
+    "SEARCH BAR STATE:",
+    {
+      searchQuery,
+      setSearchQuery,
+      type: typeof setSearchQuery,
+    }
+  );
 
   /* ======================================================
      DEBOUNCE
@@ -36,21 +51,66 @@ export default function SearchBar() {
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      setDebouncedQuery(query);
+      setDebouncedQuery(searchQuery);
     }, 300);
 
     return () => clearTimeout(timeout);
-  }, [query]);
+  }, [searchQuery]);
 
   /* ======================================================
      SEARCH
   ====================================================== */
 
   useEffect(() => {
-    if (!debouncedQuery?.trim()) return;
+    if (!debouncedQuery?.trim()) {
+      return;
+    }
 
     search(debouncedQuery);
-  }, [debouncedQuery]);
+  }, [debouncedQuery, search]);
+
+  /* ======================================================
+     INPUT CHANGE
+  ====================================================== */
+
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+
+    console.log(
+      "INPUT CHANGE:",
+      value
+    );
+
+    console.log(
+      "SET SEARCH QUERY TYPE:",
+      typeof setSearchQuery
+    );
+
+    if (
+      typeof setSearchQuery !==
+      "function"
+    ) {
+      console.error(
+        "setSearchQuery is not a function"
+      );
+
+      return;
+    }
+
+    setSearchQuery(value);
+  };
+
+  /* ======================================================
+     SUGGESTION CLICK
+  ====================================================== */
+
+  const handleSuggestionClick = (
+    suggestion
+  ) => {
+    setSearchQuery(suggestion);
+
+    search(suggestion);
+  };
 
   /* ======================================================
      RENDER
@@ -61,20 +121,11 @@ export default function SearchBar() {
       {/* SEARCH INPUT */}
 
       <input
-  className="search-input"
-  placeholder="Search your area..."
-  value={query}
-  onChange={(e) => {
-    console.log("SET QUERY:", setQuery);
-
-    console.log(
-      "TYPE:",
-      typeof setQuery
-    );
-
-    setQuery(e.target.value);
-  }}
-/>
+        className="search-input"
+        placeholder="Search your area..."
+        value={searchQuery}
+        onChange={handleInputChange}
+      />
 
       {/* LOADING */}
 
@@ -96,19 +147,21 @@ export default function SearchBar() {
 
       {!!suggestions?.length && (
         <div className="search-suggestions">
-          {suggestions.map((item) => (
-            <button
-              key={item}
-              className="search-suggestion-pill"
-              onClick={() => {
-                setQuery(item);
-
-                search(item);
-              }}
-            >
-              {item}
-            </button>
-          ))}
+          {suggestions.map(
+            (suggestion) => (
+              <button
+                key={suggestion}
+                className="search-suggestion-pill"
+                onClick={() =>
+                  handleSuggestionClick(
+                    suggestion
+                  )
+                }
+              >
+                {suggestion}
+              </button>
+            )
+          )}
         </div>
       )}
 
