@@ -272,6 +272,21 @@ export default function CommunityPlusDashboardHome() {
     <div className="dashboard-home-page">
       <div className="dashboard-home">
         <section className="dashboard-home-feed">
+          <div className="feed-filters feed-filters-left" aria-label="Feed filters">
+            {FILTERS.map((filter) => (
+              <button
+                key={filter.id}
+                type="button"
+                className={`feed-filter ${
+                  activeFilter === filter.id ? "active" : ""
+                }`}
+                onClick={() => setActiveFilter(filter.id)}
+              >
+                {filter.label}
+              </button>
+            ))}
+          </div>
+
           <div className="feed-list">
             <Feed activeFilter={activeFilter} />
           </div>
@@ -279,21 +294,6 @@ export default function CommunityPlusDashboardHome() {
 
         <section className="dashboard-home-map">
           <div className="dashboard-map-toolbar">
-            <div className="feed-filters" aria-label="Feed filters">
-              {FILTERS.map((filter) => (
-                <button
-                  key={filter.id}
-                  type="button"
-                  className={`feed-filter ${
-                    activeFilter === filter.id ? "active" : ""
-                  }`}
-                  onClick={() => setActiveFilter(filter.id)}
-                >
-                  {filter.label}
-                </button>
-              ))}
-            </div>
-
             <div className="dashboard-search-controls">
               <div className="dashboard-search-box">
                 <input
