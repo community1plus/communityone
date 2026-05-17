@@ -12,21 +12,25 @@ export default function SearchBar() {
   );
 
   const {
+    /* QUERY */
+
     searchQuery,
     setSearchQuery,
 
+    /* DATA */
+
     results,
-    setResults,
-
     suggestions,
-    setSuggestions,
-
     summary,
-    setSummary,
+
+    /* STATE */
 
     loading,
 
+    /* ACTIONS */
+
     search,
+    clearSearch,
   } = useSearch();
 
   /* ======================================================
@@ -39,7 +43,7 @@ export default function SearchBar() {
     setSearchQuery(value);
 
     if (!value?.trim()) {
-      handleClear();
+      clearSearch();
 
       return;
     }
@@ -48,25 +52,11 @@ export default function SearchBar() {
   };
 
   /* ======================================================
-     CLEAR SEARCH
-  ====================================================== */
-
-  const handleClear = () => {
-    setSearchQuery("");
-
-    setResults([]);
-
-    setSuggestions([]);
-
-    setSummary("");
-  };
-
-  /* ======================================================
      CLOSE OVERLAY
   ====================================================== */
 
   const handleClose = () => {
-    handleClear();
+    clearSearch();
   };
 
   /* ======================================================
@@ -121,8 +111,9 @@ export default function SearchBar() {
 
         {showClear && (
           <button
+            type="button"
             className="search-clear"
-            onClick={handleClear}
+            onClick={clearSearch}
             aria-label="Clear search"
           >
             ⟲
@@ -137,6 +128,7 @@ export default function SearchBar() {
           {/* CLOSE */}
 
           <button
+            type="button"
             className="search-close"
             onClick={handleClose}
             aria-label="Close search"
@@ -168,6 +160,7 @@ export default function SearchBar() {
                 (suggestion) => (
                   <button
                     key={suggestion}
+                    type="button"
                     className="search-suggestion-pill"
                     onClick={() =>
                       handleSuggestionClick(
