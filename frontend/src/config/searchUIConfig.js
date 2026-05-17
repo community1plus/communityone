@@ -2,7 +2,7 @@
 // /src/config/search/searchUIConfig.js
 // =========================================================
 
-export const search_ui_config = {
+export const searchUIConfig = {
   showAISummary: true,
 
   showSuggestions: true,
