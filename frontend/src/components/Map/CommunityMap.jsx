@@ -524,10 +524,6 @@ export default function CommunityMap({
   }
 
   /* ======================================================
-     RENDER
-  ====================================================== */
-
-  /* ======================================================
    RENDER
 ====================================================== */
 
@@ -550,44 +546,42 @@ return (
 
     {/* MAP */}
 
-    <div className="map-visible">
-      <GoogleMap
-        center={center}
-        zoom={zoom}
-        mapContainerStyle={
-          MAP_CONTAINER_STYLE
-        }
-        onLoad={(map) => {
-          console.log(
-            "MAP READY:",
-            (
-              performance.now() -
-              mapLoadStart.current
-            ).toFixed(2),
-            "ms"
-          );
+    <GoogleMap
+      center={center}
+      zoom={zoom}
+      mapContainerStyle={
+        MAP_CONTAINER_STYLE
+      }
+      onLoad={(map) => {
+        console.log(
+          "MAP READY:",
+          (
+            performance.now() -
+            mapLoadStart.current
+          ).toFixed(2),
+          "ms"
+        );
 
-          mapRef.current = map;
+        mapRef.current = map;
 
-          requestAnimationFrame(
-            () => {
-              setMapReady(
-                true
-              );
-            }
-          );
-        }}
-        onUnmount={() => {
-          clearMarkers();
+        requestAnimationFrame(
+          () => {
+            setMapReady(
+              true
+            );
+          }
+        );
+      }}
+      onUnmount={() => {
+        clearMarkers();
 
-          mapRef.current =
-            null;
+        mapRef.current =
+          null;
 
-          setMapReady(false);
-        }}
-        options={mapOptions}
-      />
-    </div>
+        setMapReady(false);
+      }}
+      options={mapOptions}
+    />
 
     {/* SEARCH CONTEXT */}
 
