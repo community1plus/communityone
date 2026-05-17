@@ -167,16 +167,18 @@ export default function CommunityPlusLandingPage() {
               Sign In
             </button>
 
+            <div className="guest-pill">
+                READ ONLY ACCESS
+          </div>   
+
+
             {/* ====================================
                 SUBTEXT
             ==================================== */}
 
-            <p className="auth-maintenance-note">
-              Create an account
-              later to post,
-              comment, and
-              contribute to your
-              community.
+            <p className="guest-mode-copy">
+                Explore your local community in read-only mode.
+                Create an account later to post, comment, and contribute.
             </p>
           </div>
         </section>
