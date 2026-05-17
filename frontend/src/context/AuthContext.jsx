@@ -17,115 +17,257 @@ import {
 
 const AuthContext = createContext(null);
 
-function normaliseUser(amplifyUser, tokens) {
+/* =========================================================
+   NORMALISE USER
+========================================================= */
+
+function normaliseUser(
+  amplifyUser,
+  tokens
+) {
   if (!amplifyUser) return null;
 
-  const idPayload = tokens?.idToken?.payload || {};
+  const idPayload =
+    tokens?.idToken?.payload || {};
 
-  const email = idPayload.email || amplifyUser.signInDetails?.loginId || "";
-  const name = idPayload.name || "";
-  const username = amplifyUser.username || email || "";
-  const fallback = email?.split("@")[0] || username || "User";
-  const displayName = name || fallback;
+  const email =
+    idPayload.email ||
+    amplifyUser.signInDetails
+      ?.loginId ||
+    "";
 
-  const initials = displayName
-    .split(/[\s._-]+/)
-    .filter(Boolean)
-    .map((part) => part[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
+  const name =
+    idPayload.name || "";
+
+  const username =
+    amplifyUser.username ||
+    email ||
+    "";
+
+  const fallback =
+    email?.split("@")[0] ||
+    username ||
+    "User";
+
+  const displayName =
+    name || fallback;
+
+  const initials =
+    displayName
+      .split(/[\s._-]+/)
+      .filter(Boolean)
+      .map((part) => part[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase();
 
   return {
     id: amplifyUser.userId,
+
     username,
     email,
     name,
+
     displayName,
     initials,
   };
 }
 
-export function AuthProvider({ children }) {
-  const mountedRef = useRef(false);
+/* =========================================================
+   PROVIDER
+========================================================= */
 
-  const [user, setUser] = useState(null);
-  const [token, setToken] = useState(null);
-  const [tokens, setTokens] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [hydrating, setHydrating] = useState(false);
+export function AuthProvider({
+  children,
+}) {
+  const mountedRef =
+    useRef(false);
 
-  const clearAuth = useCallback(() => {
-    if (!mountedRef.current) return;
+  /* ======================================================
+     USER STATE
+  ====================================================== */
 
-    setUser(null);
-    setToken(null);
-    setTokens(null);
-  }, []);
+  const [user, setUser] =
+    useState(null);
 
-  const refreshAuth = useCallback(
-    async ({ forceRefresh = false } = {}) => {
-      if (mountedRef.current) {
-        setHydrating(true);
-      }
+  const [token, setToken] =
+    useState(null);
 
-      try {
-        let amplifyUser;
+  const [tokens, setTokens] =
+    useState(null);
+
+  /* ======================================================
+     GUEST STATE
+  ====================================================== */
+
+  const [isGuest, setIsGuest] =
+    useState(() => {
+      return (
+        localStorage.getItem(
+          "community_guest"
+        ) === "true"
+      );
+    });
+
+  /* ======================================================
+     LOADING
+  ====================================================== */
+
+  const [loading, setLoading] =
+    useState(true);
+
+  const [
+    hydrating,
+    setHydrating,
+  ] = useState(false);
+
+  /* ======================================================
+     CLEAR AUTH
+  ====================================================== */
+
+  const clearAuth =
+    useCallback(() => {
+      if (!mountedRef.current)
+        return;
+
+      setUser(null);
+
+      setToken(null);
+
+      setTokens(null);
+    }, []);
+
+  /* ======================================================
+     REFRESH AUTH
+  ====================================================== */
+
+  const refreshAuth =
+    useCallback(
+      async ({
+        forceRefresh = false,
+      } = {}) => {
+        if (mountedRef.current) {
+          setHydrating(true);
+        }
 
         try {
-          amplifyUser = await getCurrentUser();
-        } catch {
-          clearAuth();
-          return null;
-        }
+          let amplifyUser;
 
-        const session = await fetchAuthSession({ forceRefresh });
-        const accessToken = session.tokens?.accessToken?.toString();
+          try {
+            amplifyUser =
+              await getCurrentUser();
+          } catch {
+            clearAuth();
 
-        if (!accessToken) {
-          clearAuth();
-          return null;
-        }
+            return null;
+          }
 
-        const normalisedUser = normaliseUser(amplifyUser, session.tokens);
+          const session =
+            await fetchAuthSession({
+              forceRefresh,
+            });
 
-        if (!mountedRef.current) {
+          const accessToken =
+            session.tokens?.accessToken?.toString();
+
+          if (!accessToken) {
+            clearAuth();
+
+            return null;
+          }
+
+          const normalisedUser =
+            normaliseUser(
+              amplifyUser,
+              session.tokens
+            );
+
+          if (
+            !mountedRef.current
+          ) {
+            return normalisedUser;
+          }
+
+          /* ============================================
+             AUTH USER RESTORED
+          ============================================ */
+
+          setUser(
+            normalisedUser
+          );
+
+          setToken(
+            accessToken
+          );
+
+          setTokens(
+            session.tokens
+          );
+
+          /* ============================================
+             REMOVE GUEST MODE
+          ============================================ */
+
+          localStorage.removeItem(
+            "community_guest"
+          );
+
+          setIsGuest(false);
+
           return normalisedUser;
-        }
+        } catch (err) {
+          if (
+            err?.name !==
+            "UserUnAuthenticatedException"
+          ) {
+            console.warn(
+              "Auth refresh skipped:",
+              err?.name ||
+                err?.message ||
+                err
+            );
+          }
 
-        setUser(normalisedUser);
-        setToken(accessToken);
-        setTokens(session.tokens);
+          clearAuth();
 
-        return normalisedUser;
-      } catch (err) {
-        if (err?.name !== "UserUnAuthenticatedException") {
-          console.warn("Auth refresh skipped:", err?.name || err?.message || err);
+          return null;
+        } finally {
+          if (
+            mountedRef.current
+          ) {
+            setHydrating(false);
+          }
         }
+      },
+      [clearAuth]
+    );
 
-        clearAuth();
-        return null;
-      } finally {
-        if (mountedRef.current) {
-          setHydrating(false);
-        }
-      }
-    },
-    [clearAuth]
-  );
+  /* ======================================================
+     INIT
+  ====================================================== */
 
   useEffect(() => {
     mountedRef.current = true;
 
     async function initAuth() {
       try {
-        const currentUser = await refreshAuth();
+        const currentUser =
+          await refreshAuth();
 
         if (currentUser) {
-          console.log("✅ Auth restored:", currentUser.displayName);
+          console.log(
+            "✅ Auth restored:",
+            currentUser.displayName
+          );
+        } else if (isGuest) {
+          console.log(
+            "👀 Guest session restored"
+          );
         }
       } finally {
-        if (mountedRef.current) {
+        if (
+          mountedRef.current
+        ) {
           setLoading(false);
         }
       }
@@ -134,39 +276,142 @@ export function AuthProvider({ children }) {
     initAuth();
 
     return () => {
-      mountedRef.current = false;
+      mountedRef.current =
+        false;
     };
-  }, [refreshAuth]);
+  }, [
+    refreshAuth,
+    isGuest,
+  ]);
 
-  const login = useCallback(async () => {
-    await signInWithRedirect();
-  }, []);
+  /* ======================================================
+     LOGIN
+  ====================================================== */
 
-  const logout = useCallback(async () => {
-    try {
-      await signOut({ global: true });
-    } catch (err) {
-      console.warn("Logout warning:", err?.message || err);
-    } finally {
-      clearAuth();
-      window.location.assign("/");
-    }
-  }, [clearAuth]);
+  const login =
+    useCallback(async () => {
+      localStorage.removeItem(
+        "community_guest"
+      );
 
-  const isAuthenticated = Boolean(user && token);
+      setIsGuest(false);
+
+      await signInWithRedirect();
+    }, []);
+
+  /* ======================================================
+     CONTINUE AS GUEST
+  ====================================================== */
+
+  const continueAsGuest =
+    useCallback(() => {
+      console.log(
+        "👀 Guest mode enabled"
+      );
+
+      localStorage.setItem(
+        "community_guest",
+        "true"
+      );
+
+      setIsGuest(true);
+    }, []);
+
+  /* ======================================================
+     LOGOUT
+  ====================================================== */
+
+  const logout =
+    useCallback(async () => {
+      try {
+        await signOut({
+          global: true,
+        });
+      } catch (err) {
+        console.warn(
+          "Logout warning:",
+          err?.message || err
+        );
+      } finally {
+        /* ============================================
+           CLEAR AUTH
+        ============================================ */
+
+        clearAuth();
+
+        /* ============================================
+           CLEAR GUEST
+        ============================================ */
+
+        localStorage.removeItem(
+          "community_guest"
+        );
+
+        setIsGuest(false);
+
+        /* ============================================
+           REDIRECT
+        ============================================ */
+
+        window.location.assign(
+          "/"
+        );
+      }
+    }, [clearAuth]);
+
+  /* ======================================================
+     AUTH STATE
+  ====================================================== */
+
+  const isAuthenticated =
+    Boolean(user && token);
+
+  /* ======================================================
+     ROLE
+  ====================================================== */
+
+  const role =
+    isAuthenticated
+      ? "member"
+      : isGuest
+      ? "guest"
+      : "anonymous";
+
+  /* ======================================================
+     CONTEXT VALUE
+  ====================================================== */
 
   const value = useMemo(
     () => ({
+      /* ============================================
+         USER
+      ============================================ */
+
       user,
       token,
       tokens,
 
+      /* ============================================
+         FLAGS
+      ============================================ */
+
       loading,
       hydrating,
+
       isAuthenticated,
+      isGuest,
+
+      role,
+
+      /* ============================================
+         ACTIONS
+      ============================================ */
 
       login,
       logout,
+
+      continueAsGuest,
+
       refreshAuth,
       clearAuth,
     }),
@@ -174,24 +419,50 @@ export function AuthProvider({ children }) {
       user,
       token,
       tokens,
+
       loading,
       hydrating,
+
       isAuthenticated,
+      isGuest,
+
+      role,
+
       login,
       logout,
+
+      continueAsGuest,
+
       refreshAuth,
       clearAuth,
     ]
   );
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  /* ======================================================
+     PROVIDER
+  ====================================================== */
+
+  return (
+    <AuthContext.Provider
+      value={value}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
+/* =========================================================
+   HOOK
+========================================================= */
+
 export function useAuth() {
-  const context = useContext(AuthContext);
+  const context =
+    useContext(AuthContext);
 
   if (!context) {
-    throw new Error("useAuth must be used within AuthProvider");
+    throw new Error(
+      "useAuth must be used within AuthProvider"
+    );
   }
 
   return context;

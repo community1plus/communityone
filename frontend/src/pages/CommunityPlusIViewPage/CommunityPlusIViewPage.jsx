@@ -1,7 +1,18 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+
 import "./CommunityPlusIViewPage.css";
 
 import CommunityPlusAdTv from "../CommunityPlusAdTv/CommunityPlusAdTv";
+
+import {
+  useIViewSession,
+} from "../../context/IViewSessionContext";
 
 const API_BASE =
   import.meta.env.VITE_API_BASE ||
@@ -10,11 +21,20 @@ const API_BASE =
     : "");
 
 const FEED_LIMIT = 5;
-const FEED_REFRESH_MS = 5 * 60 * 1000;
-const MEDIA_LOAD_TIMEOUT_MS = 8000;
+
+const FEED_REFRESH_MS =
+  5 * 60 * 1000;
+
+const MEDIA_LOAD_TIMEOUT_MS =
+  8000;
+
+/* =========================================================
+   HELPERS
+========================================================= */
 
 function getMediaUrl(post) {
-  const firstMedia = post.media?.[0];
+  const firstMedia =
+    post.media?.[0];
 
   return (
     firstMedia?.signedUrl ||
@@ -25,46 +45,84 @@ function getMediaUrl(post) {
 }
 
 function getMediaType(post) {
-  return post.media?.[0]?.mediaType || "text";
+  return (
+    post.media?.[0]
+      ?.mediaType || "text"
+  );
 }
 
-function formatViews(value = 0) {
-  return Number(value || 0).toLocaleString();
+function formatViews(
+  value = 0
+) {
+  return Number(
+    value || 0
+  ).toLocaleString();
 }
 
 function formatDate(value) {
-  if (!value) return "Unknown";
+  if (!value)
+    return "Unknown";
 
-  return new Intl.DateTimeFormat(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(value));
+  return new Intl.DateTimeFormat(
+    undefined,
+    {
+      year: "numeric",
+      month: "short",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    }
+  ).format(
+    new Date(value)
+  );
 }
 
-function formatCommentTime(value) {
-  if (!value) return "Just now";
+function formatCommentTime(
+  value
+) {
+  if (!value)
+    return "Just now";
 
-  const created = new Date(value).getTime();
+  const created =
+    new Date(value).getTime();
+
   const now = Date.now();
 
-  if (Number.isNaN(created)) return "Just now";
+  if (
+    Number.isNaN(created)
+  ) {
+    return "Just now";
+  }
 
-  const minutes = Math.floor((now - created) / 60000);
+  const minutes =
+    Math.floor(
+      (now - created) /
+        60000
+    );
 
-  if (minutes < 1) return "Just now";
-  if (minutes < 60) return `${minutes}m ago`;
+  if (minutes < 1)
+    return "Just now";
 
-  const hours = Math.floor(minutes / 60);
+  if (minutes < 60)
+    return `${minutes}m ago`;
 
-  if (hours < 24) return `${hours}h ago`;
+  const hours =
+    Math.floor(
+      minutes / 60
+    );
 
-  const days = Math.floor(hours / 24);
+  if (hours < 24)
+    return `${hours}h ago`;
+
+  const days =
+    Math.floor(hours / 24);
 
   return `${days}d ago`;
 }
+
+/* =========================================================
+   MEDIA
+========================================================= */
 
 function IViewMedia({
   post,
@@ -88,9 +146,7 @@ function IViewMedia({
     setMediaFailed,
   ] = useState(false);
 
-  /* ======================================================
-     RESET MEDIA STATE
-  ====================================================== */
+  /* RESET */
 
   useEffect(() => {
     setMediaLoaded(false);
@@ -98,9 +154,7 @@ function IViewMedia({
     setMediaFailed(false);
   }, [mediaUrl]);
 
-  /* ======================================================
-     MEDIA TIMEOUT
-  ====================================================== */
+  /* TIMEOUT */
 
   useEffect(() => {
     if (
@@ -135,9 +189,7 @@ function IViewMedia({
     post.id,
   ]);
 
-  /* ======================================================
-     MEDIA ERROR
-  ====================================================== */
+  /* ERROR */
 
   const handleMediaError =
     () => {
@@ -153,9 +205,7 @@ function IViewMedia({
       );
     };
 
-  /* ======================================================
-     MEDIA LOADED
-  ====================================================== */
+  /* LOADED */
 
   const handleMediaLoaded =
     () => {
@@ -173,9 +223,7 @@ function IViewMedia({
       );
     };
 
-  /* ======================================================
-     RENDER
-  ====================================================== */
+  /* RENDER */
 
   return (
     <div
@@ -185,7 +233,7 @@ function IViewMedia({
           : "iview-media"
       }
     >
-      {/* MEDIA SKELETON */}
+      {/* SKELETON */}
 
       {!mediaLoaded &&
         !mediaFailed && (
@@ -268,17 +316,40 @@ function IViewMedia({
   );
 }
 
-function IViewCard({ item, onOpen, onMediaExpired }) {
+/* =========================================================
+   CARD
+========================================================= */
+
+function IViewCard({
+  item,
+  onOpen,
+  onMediaExpired,
+  priority = false,
+}) {
   return (
-    <article className="iview-card" onClick={() => onOpen(item)}>
-      <IViewMedia post={item} onMediaExpired={onMediaExpired} />
+    <article
+      className="iview-card"
+      onClick={() =>
+        onOpen(item)
+      }
+    >
+      <IViewMedia
+        post={item}
+        priority={priority}
+        onMediaExpired={
+          onMediaExpired
+        }
+      />
 
       <div className="iview-meta">
         <button
           type="button"
           className="iview-title"
-          onClick={(event) => {
+          onClick={(
+            event
+          ) => {
             event.stopPropagation();
+
             onOpen(item);
           }}
         >
@@ -286,15 +357,30 @@ function IViewCard({ item, onOpen, onMediaExpired }) {
         </button>
 
         <div className="iview-subline">
-          <span>{item.uploader || item.user_id || "Community Member"}</span>
+          <span>
+            {item.uploader ||
+              item.user_id ||
+              "Community Member"}
+          </span>
+
           <span>•</span>
-          <span>{formatViews(item.views)} views</span>
+
+          <span>
+            {formatViews(
+              item.views
+            )}{" "}
+            views
+          </span>
         </div>
 
         <button
           type="button"
           className="iview-track"
-          onClick={(event) => event.stopPropagation()}
+          onClick={(
+            event
+          ) =>
+            event.stopPropagation()
+          }
         >
           track
         </button>
@@ -303,62 +389,136 @@ function IViewCard({ item, onOpen, onMediaExpired }) {
   );
 }
 
-function IViewDetailPanel({ post, onClose, onMediaExpired }) {
-  const [commentText, setCommentText] = useState("");
-  const [comments, setComments] = useState([]);
-  const [commentsLoading, setCommentsLoading] = useState(true);
-  const [commentsError, setCommentsError] = useState("");
-  const [postingComment, setPostingComment] = useState(false);
+/* =========================================================
+   DETAIL PANEL
+========================================================= */
 
-  const uploader = post.uploader || post.user_id || "Community Member";
+function IViewDetailPanel({
+  post,
+  onClose,
+  onMediaExpired,
+}) {
+  const [
+    commentText,
+    setCommentText,
+  ] = useState("");
+
+  const [comments, setComments] =
+    useState([]);
+
+  const [
+    commentsLoading,
+    setCommentsLoading,
+  ] = useState(true);
+
+  const [
+    commentsError,
+    setCommentsError,
+  ] = useState("");
+
+  const [
+    postingComment,
+    setPostingComment,
+  ] = useState(false);
+
+  const uploader =
+    post.uploader ||
+    post.user_id ||
+    "Community Member";
+
+  /* ESC */
 
   useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (event.key === "Escape") {
+    const handleKeyDown = (
+      event
+    ) => {
+      if (
+        event.key ===
+        "Escape"
+      ) {
         onClose();
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener(
+      "keydown",
+      handleKeyDown
+    );
 
     return () => {
-      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener(
+        "keydown",
+        handleKeyDown
+      );
     };
   }, [onClose]);
+
+  /* FETCH COMMENTS */
 
   useEffect(() => {
     let cancelled = false;
 
     async function fetchComments() {
-      if (!API_BASE || !post?.id) return;
+      if (
+        !API_BASE ||
+        !post?.id
+      ) {
+        return;
+      }
 
       try {
-        setCommentsLoading(true);
+        setCommentsLoading(
+          true
+        );
+
         setCommentsError("");
 
-        const response = await fetch(`${API_BASE}/posts/${post.id}/comments`, {
-          cache: "no-store",
-        });
+        const response =
+          await fetch(
+            `${API_BASE}/posts/${post.id}/comments`,
+            {
+              cache:
+                "no-store",
+            }
+          );
 
-        const data = await response.json();
+        const data =
+          await response.json();
 
         if (!response.ok) {
-          throw new Error(data?.error || "Could not load comments.");
+          throw new Error(
+            data?.error ||
+              "Could not load comments."
+          );
         }
 
         if (!cancelled) {
-          setComments(Array.isArray(data.comments) ? data.comments : []);
+          setComments(
+            Array.isArray(
+              data.comments
+            )
+              ? data.comments
+              : []
+          );
         }
       } catch (error) {
-        console.error("Fetch comments failed:", error);
+        console.error(
+          "Fetch comments failed:",
+          error
+        );
 
         if (!cancelled) {
           setComments([]);
-          setCommentsError("Could not load comments.");
+
+          setCommentsError(
+            "Could not load comments."
+          );
         }
       } finally {
         if (!cancelled) {
-          setCommentsLoading(false);
+          setCommentsLoading(
+            false
+          );
         }
       }
     }
@@ -370,144 +530,287 @@ function IViewDetailPanel({ post, onClose, onMediaExpired }) {
     };
   }, [post.id]);
 
-  const handlePostComment = async () => {
-    const cleanComment = commentText.trim();
+  /* POST COMMENT */
 
-    if (!cleanComment || postingComment) return;
+  const handlePostComment =
+    async () => {
+      const cleanComment =
+        commentText.trim();
 
-    try {
-      setPostingComment(true);
-      setCommentsError("");
-
-      const response = await fetch(`${API_BASE}/posts/${post.id}/comments`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          comment: cleanComment,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data?.error || "Could not post comment.");
+      if (
+        !cleanComment ||
+        postingComment
+      ) {
+        return;
       }
 
-      setComments((prev) => [data.comment, ...prev]);
-      setCommentText("");
-    } catch (error) {
-      console.error("Post comment failed:", error);
-      setCommentsError("Could not post comment.");
-    } finally {
-      setPostingComment(false);
-    }
-  };
+      try {
+        setPostingComment(
+          true
+        );
+
+        setCommentsError("");
+
+        const response =
+          await fetch(
+            `${API_BASE}/posts/${post.id}/comments`,
+            {
+              method: "POST",
+
+              headers: {
+                "Content-Type":
+                  "application/json",
+              },
+
+              body: JSON.stringify(
+                {
+                  comment:
+                    cleanComment,
+                }
+              ),
+            }
+          );
+
+        const data =
+          await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data?.error ||
+              "Could not post comment."
+          );
+        }
+
+        setComments(
+          (prev) => [
+            data.comment,
+            ...prev,
+          ]
+        );
+
+        setCommentText("");
+      } catch (error) {
+        console.error(
+          "Post comment failed:",
+          error
+        );
+
+        setCommentsError(
+          "Could not post comment."
+        );
+      } finally {
+        setPostingComment(
+          false
+        );
+      }
+    };
+
+  /* RENDER */
 
   return (
     <section
       className="iview-detail-shell"
       aria-label="iVIEW content panel"
-      onMouseDown={(event) => {
-        if (event.target === event.currentTarget) {
+      onMouseDown={(
+        event
+      ) => {
+        if (
+          event.target ===
+          event.currentTarget
+        ) {
           onClose();
         }
       }}
     >
-      <button type="button" className="iview-detail-close" onClick={onClose}>
+      <button
+        type="button"
+        className="iview-detail-close"
+        onClick={onClose}
+      >
         ×
       </button>
 
       <div
         className="iview-detail-layout"
-        onMouseDown={(event) => event.stopPropagation()}
+        onMouseDown={(
+          event
+        ) =>
+          event.stopPropagation()
+        }
       >
         <main className="iview-detail-main">
-          <IViewMedia post={post} detail onMediaExpired={onMediaExpired} />
+          <IViewMedia
+            post={post}
+            detail
+            onMediaExpired={
+              onMediaExpired
+            }
+          />
 
           <div className="iview-detail-actions">
-            <span>{formatViews(post.views)} views</span>
+            <span>
+              {formatViews(
+                post.views
+              )}{" "}
+              views
+            </span>
 
-            <button type="button">track</button>
-            <button type="button">discuss</button>
+            <button type="button">
+              track
+            </button>
+
+            <button type="button">
+              discuss
+            </button>
           </div>
 
           <section className="iview-detail-description">
-            <h1>{post.title}</h1>
+            <h1>
+              {post.title}
+            </h1>
 
-            <p>{post.content || "No description has been added yet."}</p>
+            <p>
+              {post.content ||
+                "No description has been added yet."}
+            </p>
 
             <div className="iview-detail-meta">
-              <span>{uploader}</span>
+              <span>
+                {uploader}
+              </span>
+
               <span>•</span>
-              <span>{post.category || "Community"}</span>
+
+              <span>
+                {post.category ||
+                  "Community"}
+              </span>
+
               <span>•</span>
-              <span>{formatDate(post.created_at)}</span>
+
+              <span>
+                {formatDate(
+                  post.created_at
+                )}
+              </span>
             </div>
           </section>
         </main>
 
         <aside className="iview-detail-side">
           <section className="iview-ai-summary">
-            <div className="iview-side-label">AI summary</div>
+            <div className="iview-side-label">
+              AI summary
+            </div>
+
             <p>
-              Community discussion will be summarised here as comments are added.
-              The summary will highlight key themes, concerns, confirmations and
-              useful local context.
+              Community
+              discussion
+              will be
+              summarised
+              here as
+              comments are
+              added.
             </p>
           </section>
 
           <section className="iview-comments">
-            <div className="iview-side-label">Comments</div>
+            <div className="iview-side-label">
+              Comments
+            </div>
 
             <div className="iview-comment-box">
               <textarea
-                value={commentText}
-                onChange={(event) => setCommentText(event.target.value)}
+                value={
+                  commentText
+                }
+                onChange={(
+                  event
+                ) =>
+                  setCommentText(
+                    event.target
+                      .value
+                  )
+                }
                 placeholder="Respond to this post..."
               />
 
               <button
                 type="button"
-                disabled={!commentText.trim() || postingComment}
-                onClick={handlePostComment}
+                disabled={
+                  !commentText.trim() ||
+                  postingComment
+                }
+                onClick={
+                  handlePostComment
+                }
               >
-                {postingComment ? "posting..." : "post"}
+                {postingComment
+                  ? "posting..."
+                  : "post"}
               </button>
             </div>
 
             <div className="iview-comment-list">
               {commentsLoading && (
                 <div className="iview-comment-loading">
-                  Loading comments...
-                </div>
-              )}
-
-              {!commentsLoading && commentsError && (
-                <div className="iview-comment-loading error">
-                  {commentsError}
-                </div>
-              )}
-
-              {!commentsLoading && !commentsError && comments.length === 0 && (
-                <div className="iview-comment-loading">
-                  No comments yet. Start the discussion.
+                  Loading
+                  comments...
                 </div>
               )}
 
               {!commentsLoading &&
-                !commentsError &&
-                comments.map((comment) => (
-                  <article key={comment.id} className="iview-comment">
-                    <div className="iview-comment-header">
-                      <strong>{comment.user_id || "Community Member"}</strong>
-                      <span>{formatCommentTime(comment.created_at)}</span>
-                    </div>
+                commentsError && (
+                  <div className="iview-comment-loading error">
+                    {
+                      commentsError
+                    }
+                  </div>
+                )}
 
-                    <p>{comment.comment}</p>
-                  </article>
-                ))}
+              {!commentsLoading &&
+                !commentsError &&
+                comments.length ===
+                  0 && (
+                  <div className="iview-comment-loading">
+                    No comments
+                    yet.
+                  </div>
+                )}
+
+              {!commentsLoading &&
+                !commentsError &&
+                comments.map(
+                  (
+                    comment
+                  ) => (
+                    <article
+                      key={
+                        comment.id
+                      }
+                      className="iview-comment"
+                    >
+                      <div className="iview-comment-header">
+                        <strong>
+                          {comment.user_id ||
+                            "Community Member"}
+                        </strong>
+
+                        <span>
+                          {formatCommentTime(
+                            comment.created_at
+                          )}
+                        </span>
+                      </div>
+
+                      <p>
+                        {
+                          comment.comment
+                        }
+                      </p>
+                    </article>
+                  )
+                )}
             </div>
           </section>
         </aside>
@@ -516,131 +819,392 @@ function IViewDetailPanel({ post, onClose, onMediaExpired }) {
   );
 }
 
-export default function CommunityPlusIViewPage() {
-  const [posts, setPosts] = useState([]);
-  const [selectedPost, setSelectedPost] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [error, setError] = useState("");
+/* =========================================================
+   PAGE
+========================================================= */
 
-  const fetchPosts = useCallback(async ({ silent = false } = {}) => {
-    if (!API_BASE) {
-      setError("Backend API is not configured.");
-      setLoading(false);
+export default function CommunityPlusIViewPage() {
+  /* SESSION */
+
+  const {
+    cachedFeed,
+    setCachedFeed,
+
+    selectedPost,
+    setSelectedPost,
+
+    scrollPosition,
+  } = useIViewSession();
+
+  /* LOCAL */
+
+  const [posts, setPosts] =
+    useState(
+      cachedFeed || []
+    );
+
+  const [loading, setLoading] =
+    useState(
+      !cachedFeed?.length
+    );
+
+  const [
+    refreshing,
+    setRefreshing,
+  ] = useState(false);
+
+  const [error, setError] =
+    useState("");
+
+  /* REFS */
+
+  const containerRef =
+    useRef(null);
+
+  /* RESTORE SCROLL */
+
+  useEffect(() => {
+    const container =
+      containerRef.current;
+
+    if (!container)
+      return;
+
+    requestAnimationFrame(
+      () => {
+        container.scrollTop =
+          scrollPosition.current;
+
+        console.log(
+          "SCROLL RESTORED:",
+          scrollPosition.current
+        );
+      }
+    );
+  }, [scrollPosition]);
+
+  /* SAVE SCROLL */
+
+  const handleScroll =
+    useCallback(() => {
+      if (
+        !containerRef.current
+      ) {
+        return;
+      }
+
+      scrollPosition.current =
+        containerRef.current.scrollTop;
+    }, [scrollPosition]);
+
+  /* FETCH POSTS */
+
+  const fetchPosts =
+    useCallback(
+      async ({
+        silent = false,
+      } = {}) => {
+        if (!API_BASE) {
+          setError(
+            "Backend API is not configured."
+          );
+
+          setLoading(false);
+
+          return;
+        }
+
+        try {
+          if (silent) {
+            setRefreshing(
+              true
+            );
+          } else if (
+            !cachedFeed?.length
+          ) {
+            setLoading(true);
+          }
+
+          setError("");
+
+          const response =
+            await fetch(
+              `${API_BASE}/posts?limit=${FEED_LIMIT}`,
+              {
+                cache:
+                  "no-store",
+              }
+            );
+
+          const data =
+            await response.json();
+
+          if (!response.ok) {
+            throw new Error(
+              data?.error ||
+                "Could not fetch posts."
+            );
+          }
+
+          const nextPosts =
+            Array.isArray(
+              data.posts
+            )
+              ? data.posts
+              : [];
+
+          setPosts(
+            nextPosts
+          );
+
+          setCachedFeed(
+            nextPosts
+          );
+
+          setSelectedPost(
+            (current) => {
+              if (!current)
+                return null;
+
+              return (
+                nextPosts.find(
+                  (
+                    post
+                  ) =>
+                    post.id ===
+                    current.id
+                ) || current
+              );
+            }
+          );
+        } catch (err) {
+          console.error(
+            "iVIEW FETCH ERROR:",
+            err
+          );
+
+          setError(
+            err?.message ||
+              "Could not load iVIEW feed."
+          );
+        } finally {
+          setLoading(false);
+
+          setRefreshing(
+            false
+          );
+        }
+      },
+      [
+        cachedFeed,
+        setCachedFeed,
+        setSelectedPost,
+      ]
+    );
+
+  /* INITIAL */
+
+  useEffect(() => {
+    if (
+      cachedFeed?.length
+    ) {
+      setPosts(
+        cachedFeed
+      );
+
       return;
     }
 
-    try {
-      if (silent) {
-        setRefreshing(true);
-      } else {
-        setLoading(true);
-      }
-
-      setError("");
-
-      const response = await fetch(`${API_BASE}/posts?limit=${FEED_LIMIT}`, {
-        cache: "no-store",
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data?.error || "Could not fetch posts.");
-      }
-
-      const nextPosts = Array.isArray(data.posts) ? data.posts : [];
-
-      setPosts(nextPosts);
-
-      setSelectedPost((current) => {
-        if (!current) return null;
-        return nextPosts.find((post) => post.id === current.id) || current;
-      });
-    } catch (err) {
-      setError(err?.message || "Could not load iVIEW feed.");
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, []);
-
-  useEffect(() => {
     fetchPosts();
-  }, [fetchPosts]);
+  }, [
+    cachedFeed,
+    fetchPosts,
+  ]);
+
+  /* INTERVAL */
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      fetchPosts({ silent: true });
-    }, FEED_REFRESH_MS);
+    const interval =
+      setInterval(() => {
+        fetchPosts({
+          silent: true,
+        });
+      }, FEED_REFRESH_MS);
 
-    return () => clearInterval(interval);
+    return () =>
+      clearInterval(
+        interval
+      );
   }, [fetchPosts]);
 
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (!document.hidden) {
-        fetchPosts({ silent: true });
-      }
-    };
+  /* VISIBILITY */
 
-    document.addEventListener("visibilitychange", handleVisibilityChange);
+  useEffect(() => {
+    const handleVisibilityChange =
+      () => {
+        if (
+          !document.hidden
+        ) {
+          fetchPosts({
+            silent: true,
+          });
+        }
+      };
+
+    document.addEventListener(
+      "visibilitychange",
+      handleVisibilityChange
+    );
 
     return () => {
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      document.removeEventListener(
+        "visibilitychange",
+        handleVisibilityChange
+      );
     };
   }, [fetchPosts]);
 
-  const handleMediaExpired = useCallback(() => {
-    fetchPosts({ silent: true });
-  }, [fetchPosts]);
+  /* MEDIA EXPIRED */
 
-  const feedItems = useMemo(() => posts.slice(0, FEED_LIMIT), [posts]);
+  const handleMediaExpired =
+    useCallback(() => {
+      fetchPosts({
+        silent: true,
+      });
+    }, [fetchPosts]);
+
+  /* FEED */
+
+  const feedItems =
+    useMemo(
+      () =>
+        posts.slice(
+          0,
+          FEED_LIMIT
+        ),
+      [posts]
+    );
+
+  /* RENDER */
 
   return (
-    <div className="iview-page">
-      {loading && <div className="iview-state">Loading iVIEW...</div>}
+    <div
+      ref={containerRef}
+      className="iview-page"
+      onScroll={
+        handleScroll
+      }
+    >
+      {/* LOADING */}
 
-      {!loading && error && <div className="iview-state error">{error}</div>}
-
-      {!loading && !error && !selectedPost && (
-        <div className="iview-grid">
-          {feedItems.map((post) => (
-            <IViewCard
-              key={post.id}
-              item={post}
-              onOpen={setSelectedPost}
-              onMediaExpired={handleMediaExpired}
-            />
-          ))}
-
-          {Array.from({
-            length: Math.max(0, FEED_LIMIT - feedItems.length),
-          }).map((_, index) => (
-            <div key={`empty-${index}`} className="iview-card empty">
-              <div className="iview-empty-media">
-                <span>No content yet</span>
-              </div>
-            </div>
-          ))}
-
-          <div className="iview-ad-slot">
-            <CommunityPlusAdTv mode="page" context="iview" tvMode="idle" />
-          </div>
-
-          {refreshing && (
-            <div className="iview-refresh-indicator">Refreshing media...</div>
-          )}
+      {loading && (
+        <div className="iview-state">
+          Loading
+          iVIEW...
         </div>
       )}
 
-      {!loading && !error && selectedPost && (
-        <IViewDetailPanel
-          post={selectedPost}
-          onClose={() => setSelectedPost(null)}
-          onMediaExpired={handleMediaExpired}
-        />
-      )}
+      {/* ERROR */}
+
+      {!loading &&
+        error && (
+          <div className="iview-state error">
+            {error}
+          </div>
+        )}
+
+      {/* FEED */}
+
+      {!loading &&
+        !error &&
+        !selectedPost && (
+          <div className="iview-grid">
+            {feedItems.map(
+              (
+                post,
+                index
+              ) => (
+                <IViewCard
+                  key={post.id}
+                  item={post}
+                  priority={
+                    index < 2
+                  }
+                  onOpen={
+                    setSelectedPost
+                  }
+                  onMediaExpired={
+                    handleMediaExpired
+                  }
+                />
+              )
+            )}
+
+            {/* EMPTY */}
+
+            {Array.from({
+              length:
+                Math.max(
+                  0,
+                  FEED_LIMIT -
+                    feedItems.length
+                ),
+            }).map(
+              (_, index) => (
+                <div
+                  key={`empty-${index}`}
+                  className="iview-card empty"
+                >
+                  <div className="iview-empty-media">
+                    <span>
+                      No content
+                      yet
+                    </span>
+                  </div>
+                </div>
+              )
+            )}
+
+            {/* AD */}
+
+            <div className="iview-ad-slot">
+              <CommunityPlusAdTv
+                mode="page"
+                context="iview"
+                tvMode="idle"
+              />
+            </div>
+
+            {/* REFRESH */}
+
+            {refreshing && (
+              <div className="iview-refresh-indicator">
+                Refreshing
+                media...
+              </div>
+            )}
+          </div>
+        )}
+
+      {/* DETAIL */}
+
+      {!loading &&
+        !error &&
+        selectedPost && (
+          <IViewDetailPanel
+            post={
+              selectedPost
+            }
+            onClose={() =>
+              setSelectedPost(
+                null
+              )
+            }
+            onMediaExpired={
+              handleMediaExpired
+            }
+          />
+        )}
     </div>
   );
 }

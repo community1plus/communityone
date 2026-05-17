@@ -1050,3 +1050,8 @@
     padding: 16px;
   }
 }
+
+.disabled-action {
+  opacity: 0.45;
+  pointer-events: none;
+}
