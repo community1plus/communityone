@@ -16,10 +16,13 @@ export default function SearchBar() {
     setSearchQuery,
 
     results,
+    setResults,
 
     suggestions,
+    setSuggestions,
 
     summary,
+    setSummary,
 
     loading,
 
@@ -35,6 +38,12 @@ export default function SearchBar() {
 
     setSearchQuery(value);
 
+    if (!value?.trim()) {
+      handleClear();
+
+      return;
+    }
+
     search(value);
   };
 
@@ -42,8 +51,22 @@ export default function SearchBar() {
      CLEAR SEARCH
   ====================================================== */
 
-  const handleClose = () => {
+  const handleClear = () => {
     setSearchQuery("");
+
+    setResults([]);
+
+    setSuggestions([]);
+
+    setSummary("");
+  };
+
+  /* ======================================================
+     CLOSE OVERLAY
+  ====================================================== */
+
+  const handleClose = () => {
+    handleClear();
   };
 
   /* ======================================================
@@ -69,20 +92,42 @@ export default function SearchBar() {
     !!results?.length;
 
   /* ======================================================
+     SHOW CLEAR BUTTON
+  ====================================================== */
+
+  const showClear =
+    !!searchQuery?.trim();
+
+  /* ======================================================
      RENDER
   ====================================================== */
 
   return (
     <div className="search-bar-wrapper">
-      {/* SEARCH INPUT */}
+      {/* SEARCH INPUT WRAPPER */}
 
-      <input
-        type="text"
-        className="search-input"
-        placeholder="Search Community One..."
-        value={searchQuery}
-        onChange={handleChange}
-      />
+      <div className="search-input-wrapper">
+        {/* SEARCH INPUT */}
+
+        <input
+          type="text"
+          className="search-input"
+          placeholder="Search Community One..."
+          value={searchQuery}
+          onChange={handleChange}
+        />
+
+        {/* CLEAR BUTTON */}
+
+        {showClear && (
+          <button
+            className="search-clear"
+            onClick={handleClear}
+          >
+            Clear
+          </button>
+        )}
+      </div>
 
       {/* SEARCH OVERLAY */}
 
@@ -162,4 +207,3 @@ export default function SearchBar() {
     </div>
   );
 }
-/** */
