@@ -548,9 +548,31 @@ const [editingVerifiedPhone, setEditingVerifiedPhone] = useState(false);
       setEditingVerifiedPhone(false);
 
       const verifiedPayload = {
-        ...buildProfilePayload(),
-        phoneVerified: true,
-      };
+  username: values.username,
+  display_name: values.display_name,
+  userType: values.userType,
+
+  phone: toE164Phone(values.phone, values.phoneCountry),
+
+  phoneE164: toE164Phone(values.phone, values.phoneCountry),
+
+  phoneDisplay: values.phone,
+
+  phoneCountry: values.phoneCountry,
+
+  phoneVerified: true,
+
+  homeLocation: values.homeLocation || homeLocation,
+
+  social: normaliseSocialState(values.social),
+
+  payment: {
+    cardName: values.payment?.cardName || "",
+    last4: values.payment?.last4 || "",
+  },
+};
+
+await saveProfile(verifiedPayload);
 
 await saveProfile(verifiedPayload);
     } catch (err) {
@@ -559,7 +581,13 @@ await saveProfile(verifiedPayload);
       setPhoneStatus("error");
       setPhoneError(err?.message || "Verification failed");
     }
-  }, [phoneStatus, values.phone, values.phoneCountry, values.phoneVerificationCode, setValue]);
+  }, [
+  phoneStatus,
+  values,
+  setValue,
+  saveProfile,
+  homeLocation,
+]);
 
   const onPlaceChanged = useCallback(() => {
     const place = autoRef.current?.getPlace();
