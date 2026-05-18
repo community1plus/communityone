@@ -674,7 +674,39 @@ body {
     rgba(0,0,0,0.04);
 }
 
+/* =========================================================
+   SIDEBAR ORB
+========================================================= */
 
+.echo-orb {
+
+  position: sticky;
+
+  margin-top: auto;
+  margin-bottom: 18px;
+
+  align-self: center;
+
+  width: 58px;
+  height: 58px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  z-index: 30;
+
+  transition:
+    transform var(--transition);
+}
+
+.echo-orb:hover {
+
+  transform:
+    translateY(-2px);
+}
 
 /* =========================================================
    GLOW

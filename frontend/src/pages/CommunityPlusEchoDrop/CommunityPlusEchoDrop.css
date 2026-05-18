@@ -7,9 +7,9 @@
   min-height: 100%;
 
   padding:
-    28px
+    18px
     clamp(22px, 2.5vw, 42px)
-    64px;
+    44px;
 
   box-sizing: border-box;
 
@@ -50,11 +50,11 @@
     minmax(0, 1fr)
     460px;
 
-  gap: 42px;
+  gap: 34px;
 
   align-items: start;
 
-  margin-bottom: 22px;
+  margin-bottom: 12px;
 }
 
 /* =====================================================
@@ -118,23 +118,23 @@
 }
 
 .echo-drop-intro h1 {
-  margin: 0 0 26px;
+  margin: 0 0 18px;
 
   color: #111111;
 
   font-size: clamp(
-    72px,
-    5.8vw,
-    118px
+    64px,
+    4.8vw,
+    102px
   );
 
   font-weight: 900;
 
   letter-spacing: -0.11em;
 
-  line-height: 0.84;
+  line-height: 0.86;
 
-  max-width: 920px;
+  max-width: 780px;
 }
 
 .echo-drop-intro p {
@@ -207,7 +207,7 @@
 .echo-tv-screen {
   position: relative;
 
-  height: 520px;
+  height: 420px;
 
   border-radius: 28px;
 
@@ -291,11 +291,11 @@
     minmax(0, 1.5fr)
     minmax(320px, 0.82fr);
 
-  gap: 26px;
+  gap: 22px;
 
   align-items: start;
 
-  margin-top: 18px;
+  margin-top: 2px;
 }
 
 /* =====================================================
@@ -384,10 +384,10 @@
 .echo-shirt {
   position: relative;
 
-  width: 300px;
-  height: 360px;
+  width: 250px;
+  height: 300px;
 
-  border-radius: 34px 34px 20px 20px;
+  border-radius: 30px 30px 18px 18px;
 
   background:
     linear-gradient(
@@ -402,7 +402,7 @@
 
   box-shadow:
     0 30px 80px
-      rgba(0,0,0,0.3);
+      rgba(0,0,0,0.26);
 }
 
 .echo-shirt-logo {
@@ -776,7 +776,7 @@
   }
 
   .echo-object-visual {
-    min-height: 340px;
+    min-height: 440px;
   }
 
   .echo-tv-screen {
