@@ -7,7 +7,9 @@ body,
 #root {
   width: 100%;
   height: 100%;
+
   margin: 0;
+
   overflow: hidden;
 }
 
@@ -18,8 +20,8 @@ body,
   display: grid;
   grid-template-rows: auto 1fr;
 
-  background: #faf7f4;
   overflow: hidden;
+
   background:
     radial-gradient(
       circle at top left,
@@ -36,9 +38,16 @@ HEADER
 .dashboard-header {
   min-height: 0;
 
-  background: #ffffff;
-  border-bottom: 1px solid #e6dfd8;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  background: rgba(255,255,255,0.92);
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  border-bottom:
+    1px solid #e6dfd8;
+
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.04);
 
   z-index: 20;
 }
@@ -52,7 +61,9 @@ BODY
   min-height: 0;
 
   display: grid;
-  grid-template-columns: 240px minmax(0, 1fr);
+
+  grid-template-columns:
+    240px minmax(0, 1fr);
 
   overflow: hidden;
 }
@@ -62,6 +73,8 @@ SIDEBAR
 ========================= */
 
 .dashboard-sidebar {
+  position: relative;
+
   width: 100%;
   height: 100%;
   min-height: 0;
@@ -69,21 +82,65 @@ SIDEBAR
   display: flex;
   flex-direction: column;
 
-  background: #fbf9f7;
-  border-right: 1px solid #e6dfd8;
-
   overflow: hidden;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(251,249,247,0.96),
+      rgba(246,242,238,0.96)
+    );
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  border-right:
+    1px solid rgba(230,223,216,0.9);
+
+  box-shadow:
+    inset -1px 0 0 rgba(255,255,255,0.45);
+
+  opacity: 0.92;
+
+  transition:
+    opacity 0.3s ease,
+    background 0.3s ease;
+}
+
+/* =========================
+SUBTLE SIDEBAR LIGHT
+========================= */
+
+.dashboard-sidebar::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: 0;
+  right: 0;
+
+  height: 220px;
+
+  pointer-events: none;
+
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(255,255,255,0.65),
+      transparent 70%
+    );
+
+  opacity: 0.8;
 }
 
 /* =========================
 CONTENT SHELL
 ========================= */
 
-/* =========================
-CONTENT SHELL
-========================= */
-
 .dashboard-content {
+  position: relative;
+
   width: 100%;
   height: 100%;
 
@@ -91,6 +148,7 @@ CONTENT SHELL
   min-height: 0;
 
   display: block;
+
   overflow: hidden;
 
   padding-left: 0;
@@ -102,6 +160,7 @@ MAP CONTAINER
 
 .map-container {
   position: absolute;
+
   inset: 0;
 
   width: 100%;
@@ -114,34 +173,122 @@ MAP CONTAINER
 }
 
 /* =========================
-CONTROLLED INNER SCROLL ONLY
-========================= */
-
-/* =========================
-CONTROLLED INNER SCROLL ONLY
+CONTROLLED INNER SCROLL
 ========================= */
 
 .scroll-container {
+  position: relative;
+
   min-height: 0;
 
-  padding: 10px 12px 14px 10px;
+  padding:
+    10px
+    12px
+    14px
+    10px;
 
   overflow-y: auto;
   overflow-x: hidden;
+
+  scrollbar-width: thin;
+  scrollbar-color:
+    rgba(120,110,100,0.18)
+    transparent;
 }
 
+/* =========================
+WEBKIT SCROLLBAR
+========================= */
+
+.scroll-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.scroll-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scroll-container::-webkit-scrollbar-thumb {
+  background:
+    rgba(120,110,100,0.16);
+
+  border-radius: 999px;
+}
+
+.scroll-container::-webkit-scrollbar-thumb:hover {
+  background:
+    rgba(120,110,100,0.28);
+}
+
+/* =========================
+SIDEBAR TYPOGRAPHY SOFTENING
+========================= */
+
+.sidebar-section-title {
+  opacity: 0.58;
+
+  transition:
+    opacity 0.2s ease;
+}
+
+.sidebar-nav-item,
+.sidebar-link,
+.sidebar-menu-item {
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.sidebar-nav-item:hover,
+.sidebar-link:hover,
+.sidebar-menu-item:hover {
+  transform:
+    translateX(2px);
+}
+
+/* =========================
+CONTENT TRANSITION SUPPORT
+========================= */
+
+.dashboard-content::before {
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255,255,255,0.22),
+      transparent 18%
+    );
+
+  opacity: 0.5;
+}
 
 /* =========================
 RESPONSIVE
 ========================= */
 
 @media (max-width: 900px) {
+
   .dashboard-body {
-    grid-template-columns: 200px minmax(0, 1fr);
+    grid-template-columns:
+      200px minmax(0, 1fr);
   }
 }
 
+/* =========================
+MOBILE
+========================= */
+
 @media (max-width: 700px) {
+
   .dashboard-root {
     height: 100dvh;
   }
@@ -156,6 +303,12 @@ RESPONSIVE
     max-height: 200px;
 
     border-right: none;
-    border-bottom: 1px solid #e6dfd8;
+
+    border-bottom:
+      1px solid #e6dfd8;
+  }
+
+  .dashboard-sidebar::before {
+    height: 120px;
   }
 }
