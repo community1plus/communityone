@@ -247,6 +247,11 @@ const [editingVerifiedPhone, setEditingVerifiedPhone] = useState(false);
 
   useEffect(() => {
 
+    console.log("HYDRATION EFFECT RUNNING", {
+  profileReady,
+  profile,
+  hydratedProfileRef: hydratedProfileRef.current,});
+
   if (!profileReady) return;
 
   if (!profile) return;
@@ -275,7 +280,7 @@ const [editingVerifiedPhone, setEditingVerifiedPhone] = useState(false);
     "phoneCountry",
     profile?.phoneCountry || DEFAULT_PHONE_COUNTRY
   );
-
+console.log("SETTING PHONE", profile?.phoneDisplay);
   setValue(
     "phone",
     profile?.phoneDisplay || ""
@@ -335,6 +340,10 @@ useEffect(() => {
 }, [profile?.id]);
 
   useEffect(() => {
+    console.log("HYDRATION EFFECT RUNNING", {
+  profileReady,
+  profile,
+});
 
   if (values.phoneVerified) {
     setPhoneStatus("verified");
