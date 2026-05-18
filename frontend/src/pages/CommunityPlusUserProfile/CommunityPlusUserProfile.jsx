@@ -261,7 +261,7 @@ const [editingVerifiedPhone, setEditingVerifiedPhone] = useState(false);
     setValue("userType", profile?.userType || "PERSONAL");
 
     setValue("phoneCountry", profile?.phoneCountry || DEFAULT_PHONE_COUNTRY);
-    setValue("phone", profile?.phoneDisplay || profile?.phone || "");
+    setValue("phone", profile?.phoneDisplay || "");
     setValue("phoneE164", profile?.phoneE164 || profile?.phone || "");
     setValue("phoneVerified", profile?.phoneVerified || false);
     setValue("phoneVerificationCode", "");
@@ -548,29 +548,20 @@ const [editingVerifiedPhone, setEditingVerifiedPhone] = useState(false);
       setEditingVerifiedPhone(false);
 
       const verifiedPayload = {
-  username: values.username,
-  display_name: values.display_name,
-  userType: values.userType,
+        username: values.username,
+        display_name: values.display_name,
+        userType: values.userType,
 
-  phone: toE164Phone(values.phone, values.phoneCountry),
+        phone: toE164Phone(values.phone, values.phoneCountry),
 
-  phoneE164: toE164Phone(values.phone, values.phoneCountry),
+        phoneE164: toE164Phone(values.phone, values.phoneCountry),
 
-  phoneDisplay: values.phone,
+        phoneDisplay: values.phone,
 
-  phoneCountry: values.phoneCountry,
+        phoneCountry: values.phoneCountry,
 
-  phoneVerified: true,
-
-  homeLocation: values.homeLocation || homeLocation,
-
-  social: normaliseSocialState(values.social),
-
-  payment: {
-    cardName: values.payment?.cardName || "",
-    last4: values.payment?.last4 || "",
-  },
-};
+        phoneVerified: true,
+      };
 
 await saveProfile(verifiedPayload);
 
