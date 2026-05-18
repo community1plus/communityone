@@ -218,7 +218,9 @@ export default function CommunityPlusSidebar() {
   <button
     type="button"
     className="echo-brand-button"
-    onClick={handleEchoClick}
+    onClick={() =>
+  navigate("/communityplus/echo")
+}
     aria-label="Echo"
   >
     <img
