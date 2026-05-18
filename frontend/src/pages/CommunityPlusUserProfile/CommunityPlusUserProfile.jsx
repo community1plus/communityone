@@ -298,12 +298,18 @@ const [editingVerifiedPhone, setEditingVerifiedPhone] = useState(false);
   }, [phoneE164, values.phoneE164, setValue]);
 
   useEffect(() => {
+
   if (values.phoneVerified) {
     setPhoneStatus("verified");
+    setEditingVerifiedPhone(false);
+  } else {
+    setPhoneStatus("idle");
   }
-  }, [values.phoneVerified]);
+
+}, [values.phoneVerified]);
 
   useEffect(() => {
+    if (!hydratedProfileRef.current) return;
     if (!values.phone) return;
 
     const originalPhone = profile?.phoneE164 || profile?.phone || "";
@@ -422,9 +428,10 @@ const [editingVerifiedPhone, setEditingVerifiedPhone] = useState(false);
       setValue("phoneE164", nextE164);
       setValue("phoneVerified", false);
       setValue("phoneVerificationCode", "");
-
+      
       setPhoneStatus("idle");
       setPhoneError("");
+      setEditingVerifiedPhone(false);
     },
     [values.phone, setValue]
   );
