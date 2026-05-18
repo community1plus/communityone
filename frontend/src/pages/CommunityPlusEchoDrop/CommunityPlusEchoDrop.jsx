@@ -70,7 +70,7 @@ const DROPS = [
 export default function CommunityPlusEchoDrop() {
   const navigate = useNavigate();
 
-    /* =====================================================
+  /* =====================================================
      DROP CLICK
   ===================================================== */
 
@@ -86,74 +86,102 @@ export default function CommunityPlusEchoDrop() {
       `/communityplus/echo/${drop.id.toLowerCase()}`
     );
   };
+
+  /* =====================================================
+     FEATURED
+  ===================================================== */
+
+  const featuredDrop =
+    DROPS[0];
+
+  const secondaryDrops =
+    DROPS.slice(1);
+
+  /* =====================================================
+     RENDER
+  ===================================================== */
+
   return (
     <section className="echo-drop-shell">
-      {/* =====================================================
-          HERO
-      ===================================================== */}
+      <div className="echo-drop-frame">
 
-      <div className="echo-drop-hero">
-        <div className="echo-drop-brand">
-          <div className="echo-drop-mark">
-            ECHO<span>.</span>
+        {/* =================================================
+            HERO
+        ================================================= */}
+
+        <div className="echo-drop-hero">
+
+          <div className="echo-drop-copy">
+
+            <div className="echo-drop-brand">
+
+              <div className="echo-drop-mark">
+                ECHO<span>.</span>
+              </div>
+
+              <div className="echo-drop-sub">
+                signal objects by community.one
+              </div>
+
+            </div>
+
+            <div className="echo-drop-intro">
+
+              <h1>
+                Objects extracted from the signal.
+              </h1>
+
+              <p>
+                Limited releases connected
+                to geography, movement,
+                and local transmission
+                culture.
+              </p>
+
+            </div>
+
           </div>
 
-          <div className="echo-drop-sub">
-            signal objects by community.one
+          <div className="echo-drop-status">
+            SIGNAL DROP — LIVE
           </div>
+
         </div>
 
-        <div className="echo-drop-status">
-          SIGNAL DROP — LIVE
-        </div>
-      </div>
+        {/* =================================================
+            GRID
+        ================================================= */}
 
-      {/* =====================================================
-          INTRO
-      ===================================================== */}
+        <div className="echo-drop-grid">
 
-      <div className="echo-drop-intro">
-        <h1>
-          Objects extracted from the signal.
-        </h1>
+          {/* =============================================
+              FEATURED DROP
+          ============================================= */}
 
-        <p>
-          Limited releases connected to
-          geography, movement, and local
-          transmission culture.
-        </p>
-      </div>
-
-      {/* =====================================================
-          GRID
-      ===================================================== */}
-
-      <div className="echo-drop-grid">
-        {DROPS.map((drop, index) => (
           <article
-  key={drop.id}
-  className={`echo-object-card ${
-    index === 0
-      ? "echo-object-featured"
-      : ""
-  }`}
-  onClick={() =>
-    handleDropClick(drop)
-  }
-  role="button"
-  tabIndex={0}
->
-            {/* =============================================
+            className="
+              echo-object-card
+              echo-object-featured
+            "
+            onClick={() =>
+              handleDropClick(
+                featuredDrop
+              )
+            }
+            role="button"
+            tabIndex={0}
+          >
+
+            {/* =========================================
                 VISUAL
-            ============================================= */}
+            ========================================= */}
 
             <div className="echo-object-visual">
-              {/* =========================================
-                  SHIRT
-              ========================================= */}
 
-              {drop.type === "shirt" && (
+              {featuredDrop.type ===
+                "shirt" && (
                 <div className="echo-shirt">
+
                   <div className="echo-shirt-logo">
                     E/01
                   </div>
@@ -161,89 +189,200 @@ export default function CommunityPlusEchoDrop() {
                   <div className="echo-object-overlay">
                     SIGNAL UNIT
                   </div>
+
                 </div>
               )}
 
-              {/* =========================================
-                  TOTE
-              ========================================= */}
-
-              {drop.type === "tote" && (
-                <div className="echo-tote">
-                  <div className="echo-tote-logo">
-                    echo
-                  </div>
-
-                  <div className="echo-tote-tag">
-                    signal unit
-                  </div>
-                </div>
-              )}
-
-              {/* =========================================
-                  DECK
-              ========================================= */}
-
-              {drop.type === "deck" && (
-                <div className="echo-board">
-                  <div className="echo-board-line" />
-
-                  <div className="echo-board-logo">
-                    +
-                  </div>
-
-                  <div className="echo-object-overlay">
-                    OBJECT RELEASE
-                  </div>
-                </div>
-              )}
             </div>
 
-            {/* =============================================
+            {/* =========================================
                 META
-            ============================================= */}
+            ========================================= */}
 
             <div className="echo-object-meta">
-              <div className="echo-object-row">
-                <h2>{drop.title}</h2>
 
-                <span>{drop.id}</span>
+              <div className="echo-object-row">
+
+                <h2>
+                  {featuredDrop.title}
+                </h2>
+
+                <span>
+                  {featuredDrop.id}
+                </span>
+
               </div>
 
               <div className="echo-object-spec">
-                {drop.location} /{" "}
-                {drop.state}
+                {featuredDrop.location}
+                {" / "}
+                {featuredDrop.state}
               </div>
 
-              <p>{drop.description}</p>
+              <p>
+                {
+                  featuredDrop.description
+                }
+              </p>
 
               <button
                 type="button"
-                onClick={() =>
-                handleDropClick(drop)
-              }
-            >
-                {drop.cta}
-                </button>
+                onClick={(e) => {
+                  e.stopPropagation();
+
+                  handleDropClick(
+                    featuredDrop
+                  );
+                }}
+              >
+                {featuredDrop.cta}
+              </button>
+
             </div>
+
           </article>
-        ))}
-      </div>
 
-      {/* =====================================================
-          FOOTER
-      ===================================================== */}
+          {/* =============================================
+              SIDE STACK
+          ============================================= */}
 
-      <div className="echo-drop-footer">
-        <div className="echo-drop-note">
-          echo releases are produced in
-          limited quantities and broadcast
-          through signal windows.
+          <div className="echo-drop-side-stack">
+
+            {secondaryDrops.map(
+              (drop) => (
+                <article
+                  key={drop.id}
+                  className="
+                    echo-object-card
+                    echo-object-secondary
+                  "
+                  onClick={() =>
+                    handleDropClick(
+                      drop
+                    )
+                  }
+                  role="button"
+                  tabIndex={0}
+                >
+
+                  {/* =====================================
+                      VISUAL
+                  ===================================== */}
+
+                  <div className="echo-object-visual">
+
+                    {/* ===============================
+                        TOTE
+                    =============================== */}
+
+                    {drop.type ===
+                      "tote" && (
+                      <div className="echo-tote">
+
+                        <div className="echo-tote-logo">
+                          echo
+                        </div>
+
+                        <div className="echo-tote-tag">
+                          signal unit
+                        </div>
+
+                      </div>
+                    )}
+
+                    {/* ===============================
+                        DECK
+                    =============================== */}
+
+                    {drop.type ===
+                      "deck" && (
+                      <div className="echo-board">
+
+                        <div className="echo-board-line" />
+
+                        <div className="echo-board-logo">
+                          +
+                        </div>
+
+                        <div className="echo-object-overlay">
+                          OBJECT RELEASE
+                        </div>
+
+                      </div>
+                    )}
+
+                  </div>
+
+                  {/* =====================================
+                      META
+                  ===================================== */}
+
+                  <div className="echo-object-meta">
+
+                    <div className="echo-object-row">
+
+                      <h2>
+                        {drop.title}
+                      </h2>
+
+                      <span>
+                        {drop.id}
+                      </span>
+
+                    </div>
+
+                    <div className="echo-object-spec">
+                      {drop.location}
+                      {" / "}
+                      {drop.state}
+                    </div>
+
+                    <p>
+                      {drop.description}
+                    </p>
+
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+
+                        handleDropClick(
+                          drop
+                        );
+                      }}
+                    >
+                      {drop.cta}
+                    </button>
+
+                  </div>
+
+                </article>
+              )
+            )}
+
+          </div>
+
         </div>
 
-        <div className="echo-drop-window">
-          transmission closes in 12 days
+        {/* =================================================
+            FOOTER
+        ================================================= */}
+
+        <div className="echo-drop-footer">
+
+          <div className="echo-drop-note">
+            echo releases are produced
+            in limited quantities and
+            broadcast through signal
+            windows.
+          </div>
+
+          <div className="echo-drop-window">
+            transmission closes in 12 days
+          </div>
+
         </div>
+
       </div>
     </section>
   );
