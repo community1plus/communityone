@@ -147,6 +147,32 @@ body {
 }
 
 /* =========================================================
+   HEADER
+========================================================= */
+
+.dashboard-header {
+
+  min-height: 0;
+
+  background:
+    rgba(255,255,255,0.82);
+
+  backdrop-filter:
+    blur(18px);
+
+  -webkit-backdrop-filter:
+    blur(18px);
+
+  border-bottom:
+    1px solid rgba(22,22,22,0.06);
+
+  box-shadow:
+    0 2px 10px rgba(0,0,0,0.03);
+
+  z-index: 20;
+}
+
+/* =========================================================
    FEED
 ========================================================= */
 
@@ -482,7 +508,7 @@ body {
 .dashboard-search-box input {
 
   width: 100%;
-  height: 62px;
+  height: 54px;
 
   padding:
     0 60px
@@ -553,7 +579,7 @@ body {
 
 .dashboard-search-mode button {
 
-  height: 62px;
+  height: 54px;
 
   padding: 0 26px;
 
@@ -675,6 +701,181 @@ body {
 }
 
 /* =========================================================
+   ECHO DROP SHELL
+========================================================= */
+
+.echo-drop-shell {
+
+  position: relative;
+
+  overflow: hidden;
+}
+
+.echo-drop-shell::after {
+
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255,255,255,0.02),
+      transparent 30%,
+      transparent 70%,
+      rgba(255,255,255,0.03)
+    );
+
+  pointer-events: none;
+}
+
+/* =========================================================
+   HERO ATMOSPHERE
+========================================================= */
+
+.echo-drop-copy {
+
+  position: relative;
+
+  z-index: 2;
+}
+
+.echo-drop-copy::before {
+
+  content: "";
+
+  position: absolute;
+
+  top: -160px;
+  left: -240px;
+
+  width: 760px;
+  height: 760px;
+
+  border-radius: 999px;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(127,18,18,0.05),
+      transparent 68%
+    );
+
+  z-index: -1;
+
+  pointer-events: none;
+}
+
+/* =========================================================
+   HERO TITLE
+========================================================= */
+
+.echo-drop-title {
+
+  margin: 0;
+
+  max-width: 780px;
+
+  font-size:
+    clamp(4.8rem, 8vw, 8.4rem);
+
+  line-height: 0.9;
+
+  letter-spacing: -0.08em;
+
+  font-weight: 900;
+
+  color:
+    #050505;
+
+  text-wrap: balance;
+}
+
+/* =========================================================
+   HERO DESCRIPTION
+========================================================= */
+
+.echo-drop-description {
+
+  max-width: 760px;
+
+  margin-top: 22px;
+
+  font-size: 1.45rem;
+  line-height: 1.6;
+  font-weight: 500;
+
+  color:
+    rgba(20,20,20,0.62);
+}
+
+/* =========================================================
+   AD.TV PANEL
+========================================================= */
+
+.echo-tv-panel {
+
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 28px;
+
+  border-radius: 36px;
+
+  background:
+    rgba(255,255,255,0.78);
+
+  border:
+    1px solid rgba(22,22,22,0.08);
+
+  backdrop-filter:
+    blur(22px);
+
+  -webkit-backdrop-filter:
+    blur(22px);
+
+  box-shadow:
+    0 30px 80px rgba(0,0,0,0.08);
+}
+
+/* =========================================================
+   AD.TV SCREEN
+========================================================= */
+
+.echo-tv-screen {
+
+  position: relative;
+
+  overflow: hidden;
+}
+
+.echo-tv-screen::after {
+
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  background:
+    linear-gradient(
+      120deg,
+      transparent 20%,
+      rgba(255,255,255,0.035) 45%,
+      transparent 70%
+    );
+
+  animation:
+    echoTvSweep 7s linear infinite;
+
+  pointer-events: none;
+}
+
+/* =========================================================
    SIDEBAR ORB
 ========================================================= */
 
@@ -706,6 +907,30 @@ body {
 
   transform:
     translateY(-2px);
+}
+
+.echo-orb::after {
+
+  content: "";
+
+  position: absolute;
+
+  width: 8px;
+  height: 8px;
+
+  top: 4px;
+  right: 2px;
+
+  border-radius: 999px;
+
+  background:
+    #ff3b30;
+
+  box-shadow:
+    0 0 12px rgba(255,59,48,0.8);
+
+  animation:
+    echoLivePulse 1.8s ease infinite;
 }
 
 /* =========================================================
@@ -760,8 +985,8 @@ body {
 
   position: relative;
 
-  width: 58px;
-  height: 58px;
+  width: 54px;
+  height: 54px;
 
   border-radius: 999px;
 
@@ -772,16 +997,16 @@ body {
   background:
     radial-gradient(
       circle at 30% 30%,
-      rgba(255,255,255,0.16),
+      rgba(255,255,255,0.18),
       rgba(120,0,0,1)
     );
 
   border:
-    1px solid rgba(255,255,255,0.08);
+    1px solid rgba(255,255,255,0.1);
 
   box-shadow:
-    0 10px 24px rgba(120,0,0,0.34),
-    0 0 20px rgba(180,18,18,0.24);
+    0 8px 22px rgba(120,0,0,0.32),
+    0 0 24px rgba(180,18,18,0.22);
 
   backdrop-filter:
     blur(18px);
@@ -852,6 +1077,35 @@ body {
   100% {
     transform: scale(0.96);
     opacity: 0.65;
+  }
+}
+
+@keyframes echoLivePulse {
+
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.4);
+    opacity: 0.6;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes echoTvSweep {
+
+  0% {
+    transform: translateX(-120%);
+  }
+
+  100% {
+    transform: translateX(120%);
   }
 }
 
