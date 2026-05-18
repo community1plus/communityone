@@ -682,196 +682,208 @@ const [editingVerifiedPhone, setEditingVerifiedPhone] = useState(false);
           </div>
 
           <Section>
-            <div className="section-inner">
-              {isContactStep && (
-                <div className="phone-country-row">
-                  <label className="phone-country-label" htmlFor="phoneCountry">
-                    Country
-                  </label>
+  <div className="section-inner">
 
-                  <select
-                    id="phoneCountry"
-                    className="phone-country-select"
-                    value={values.phoneCountry}
-                    onChange={handlePhoneCountryChange}
-                    disabled={
-                    values.phoneVerified &&
-                    !editingVerifiedPhone
-                    }
-                  >
-                    {PHONE_COUNTRIES.map((country) => (
-                      <option key={country.code} value={country.code}>
-                        {country.label} {country.dialCode}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
+    {isContactStep && (
+      <div className="phone-meta-inline">
+        Selected country: {selectedPhoneCountry.label}. Verification number:{" "}
+        {phoneE164 || selectedPhoneCountry.dialCode}
+      </div>
+    )}
 
-              {isSocialStep ? (
-                <div className="social-verification-list">
-                  {SOCIAL_PROVIDERS.map((provider) => {
-                    const status = getSocialStatus(values.social, provider.id);
+    {isContactStep && (
+      <div className="phone-country-row">
+        <label className="phone-country-label" htmlFor="phoneCountry">
+          Country
+        </label>
 
-                    return (
-                      <div className="social-verification-row" key={provider.id}>
-                        <div className="social-verification-main">
-                          <strong>{provider.label}</strong>
-                          <span>{provider.description}</span>
+        <select
+          id="phoneCountry"
+          className="phone-country-select"
+          value={values.phoneCountry}
+          onChange={handlePhoneCountryChange}
+          disabled={
+            values.phoneVerified &&
+            !editingVerifiedPhone
+          }
+        >
+          {PHONE_COUNTRIES.map((country) => (
+            <option key={country.code} value={country.code}>
+              {country.label} {country.dialCode}
+            </option>
+          ))}
+        </select>
+      </div>
+    )}
 
-                          <small className={status.verified ? "success" : "hint"}>
-                            {status.text}
-                          </small>
-                        </div>
+    {isSocialStep ? (
+      <div className="social-verification-list">
+        {SOCIAL_PROVIDERS.map((provider) => {
+          const status = getSocialStatus(values.social, provider.id);
 
-                        <button
-                          type="button"
-                          className={`social-verify-button ${
-                            status.verified ? "verified" : "unverified"
-                          }`}
-                          onClick={() => startSocialVerification(provider.id)}
-                        >
-                          {status.verified ? "Verified" : "Verify"}
-                        </button>
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <FormBuilder
-                  steps={profileSteps}
-                  currentStep={currentStep}
-                  form={form}
-                  extra={{
-                    Autocomplete,
-                    autoRef,
-                    onPlaceChanged,
-                    isLoaded,
-                  }}
-                />
-              )}
+          return (
+            <div className="social-verification-row" key={provider.id}>
+              <div className="social-verification-main">
+                <strong>{provider.label}</strong>
+                <span>{provider.description}</span>
+
+                <small className={status.verified ? "success" : "hint"}>
+                  {status.text}
+                </small>
+              </div>
+
+              <button
+                type="button"
+                className={`social-verify-button ${
+                  status.verified ? "verified" : "unverified"
+                }`}
+                onClick={() => startSocialVerification(provider.id)}
+              >
+                {status.verified ? "Verified" : "Verify"}
+              </button>
             </div>
-          </Section>
-
-          {isContactStep && (
-  <div className="phone-verification">
-
-    <div className="hint">
-      Selected country: {selectedPhoneCountry.label}. Verification number:{" "}
-      {phoneE164 || selectedPhoneCountry.dialCode}
-    </div>
-
-    {/* =========================================
-       VERIFIED STATE
-    ========================================= */}
-
-    {values.phoneVerified && !editingVerifiedPhone ? (
-      <div className="phone-verified-state">
-
-        <div className="success">
-          ✓ Verified Number
-        </div>
-
-        <div className="verified-phone-display">
-          {phoneE164}
-        </div>
-
-        <div className="hint">
-          This number has already been verified using MFA.
-        </div>
-
-        <div className="phone-verification-row">
-          <Button
-            variant="ghost"
-            onClick={() => {
-              setEditingVerifiedPhone(true);
-
-              setValue("phoneVerified", false);
-
-              setValue("phoneVerificationCode", "");
-
-              setPhoneStatus("idle");
-
-              setPhoneError("");
-            }}
-          >
-            Change Number
-          </Button>
-        </div>
+          );
+        })}
       </div>
     ) : (
-      <>
-        {/* =========================================
-           ACTIVE VERIFICATION FLOW
-        ========================================= */}
-
-        {values.phone && !phoneIsValid && (
-          <div className="error">
-            Enter a valid phone number for {selectedPhoneCountry.label}.
-          </div>
-        )}
-
-        {phoneStatus === "idle" && (
-          <div className="hint">
-            Enter your phone number and request a verification code.
-          </div>
-        )}
-
-        {phoneStatus === "sent" && (
-          <div className="hint">
-            Enter the verification code sent to your phone.
-          </div>
-        )}
-
-        <div className="phone-verification-row">
-
-          <Button
-            variant="ghost"
-            onClick={sendPhoneCode}
-            disabled={
-              phoneStatus === "sending" ||
-              !phoneIsValid
-            }
-          >
-            {phoneStatus === "sending"
-              ? "Sending..."
-              : "Send verification code"}
-          </Button>
-
-          <Button
-            onClick={verifyPhoneCode}
-            disabled={
-              phoneStatus !== "sent"
-            }
-          >
-            {phoneStatus === "verifying"
-              ? "Verifying..."
-              : "Verify"}
-          </Button>
-
-        </div>
-
-        {phoneStatus === "sent" && (
-          <div className="success">
-            Verification code sent. Enter the code above.
-          </div>
-        )}
-
-        {phoneStatus === "verified" && (
-          <div className="success">
-            Phone number verified successfully.
-          </div>
-        )}
-
-        {phoneError && (
-          <div className="error">
-            {phoneError}
-          </div>
-        )}
-      </>
+      <FormBuilder
+        steps={profileSteps}
+        currentStep={currentStep}
+        form={form}
+        extra={{
+          Autocomplete,
+          autoRef,
+          onPlaceChanged,
+          isLoaded,
+        }}
+      />
     )}
+
+    {/* =========================================
+       CONTACT VERIFICATION
+    ========================================= */}
+
+    {isContactStep && (
+
+      <div className="phone-verification">
+
+        {values.phoneVerified && !editingVerifiedPhone ? (
+
+          <div className="phone-verified-state">
+
+            <div className="success">
+              ✓ Verified Number
+            </div>
+
+            <div className="verified-phone-display">
+              {phoneE164}
+            </div>
+
+            <div className="hint">
+              This number has already been verified using MFA.
+            </div>
+
+            <div className="phone-verification-row">
+              <Button
+                variant="ghost"
+                onClick={() => {
+
+                  setEditingVerifiedPhone(true);
+
+                  setValue("phoneVerified", false);
+
+                  setValue("phoneVerificationCode", "");
+
+                  setPhoneStatus("idle");
+
+                  setPhoneError("");
+
+                }}
+              >
+                Change Number
+              </Button>
+            </div>
+
+          </div>
+
+        ) : (
+
+          <>
+
+            {values.phone && !phoneIsValid && (
+              <div className="error">
+                Enter a valid phone number for {selectedPhoneCountry.label}.
+              </div>
+            )}
+
+            {phoneStatus === "idle" && (
+              <div className="hint">
+                Enter your phone number and request a verification code.
+              </div>
+            )}
+
+            {phoneStatus === "sent" && (
+              <div className="hint">
+                Enter the verification code sent to your phone.
+              </div>
+            )}
+
+            <div className="phone-verification-row">
+
+              <Button
+                variant="ghost"
+                onClick={sendPhoneCode}
+                disabled={
+                  phoneStatus === "sending" ||
+                  !phoneIsValid
+                }
+              >
+                {phoneStatus === "sending"
+                  ? "Sending..."
+                  : "Send verification code"}
+              </Button>
+
+              <Button
+                onClick={verifyPhoneCode}
+                disabled={
+                  phoneStatus !== "sent"
+                }
+              >
+                {phoneStatus === "verifying"
+                  ? "Verifying..."
+                  : "Verify"}
+              </Button>
+
+            </div>
+
+            {phoneStatus === "sent" && (
+              <div className="success">
+                Verification code sent. Enter the code above.
+              </div>
+            )}
+
+            {phoneStatus === "verified" && (
+              <div className="success">
+                Phone number verified successfully.
+              </div>
+            )}
+
+            {phoneError && (
+              <div className="error">
+                {phoneError}
+              </div>
+            )}
+
+          </>
+
+        )}
+      </div>
+    )}
+
   </div>
-)}
+</Section>
+
+          
 
           {profileMissing && (
             <div className="hint">

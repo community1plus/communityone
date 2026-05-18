@@ -396,6 +396,17 @@ PHONE SECTION
   color: #241f1c;
 }
 
+.phone-meta-inline {
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: #777;
+}
+
+.phone-verification {
+  margin-top: 20px;
+  padding-bottom: 20px;
+}
+
 .phone-country-select {
   width: 100%;
   max-width: 100%;
