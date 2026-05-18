@@ -249,6 +249,7 @@ const [editingVerifiedPhone, setEditingVerifiedPhone] = useState(false);
 
   if (!profileReady) return;
 
+   if (hydratedProfileRef.current) return;
   if (!profile) return;
 
   const email = getUserEmail(user);
@@ -256,6 +257,8 @@ const [editingVerifiedPhone, setEditingVerifiedPhone] = useState(false);
   const emailPrefix = email.split("@")[0] || "";
 
   const displayName = getUserDisplayName(user);
+
+
 
   setValue("username", profile?.username || emailPrefix || "");
 
@@ -314,6 +317,8 @@ const [editingVerifiedPhone, setEditingVerifiedPhone] = useState(false);
     profile?.payment?.last4 || ""
   );
 
+  hydratedProfileRef.current = true;
+
 }, [
   profileReady,
   profile,
@@ -321,6 +326,12 @@ const [editingVerifiedPhone, setEditingVerifiedPhone] = useState(false);
   homeLocation,
   setValue,
 ]);
+
+useEffect(() => {
+
+  hydratedProfileRef.current = false;
+
+}, [profile?.id]);
 
   useEffect(() => {
 
@@ -588,7 +599,6 @@ const [editingVerifiedPhone, setEditingVerifiedPhone] = useState(false);
         phoneVerified: true,
       };
 
-await saveProfile(verifiedPayload);
 
 await saveProfile(verifiedPayload);
     } catch (err) {
