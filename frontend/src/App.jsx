@@ -45,7 +45,7 @@ import CommunityPlusEventCreatePage from "./pages/CommunityPlusEventsPage/Commun
 import PostComposer from "./components/Layout/Sidebar/Post/PostComposer";
 import CommunityPlusEchoPage from "./pages/CommunityPlusEchoPage/CommunityPlusEchoPage";
 
-import CommunityPlusEchoDropPage from "./pages/CommunityPlusEchoDropPage/CommunityPlusEchoDropPage";
+import CommunityPlusEchoDropPage from "./pages/CommunityPlusEchoPage/CommunityPlusEchoDropPage";
 
 /* =========================================================
    PLACEHOLDER
@@ -252,12 +252,12 @@ export default function App() {
           }
           />
 
-<Route
-  path="echo/:dropId"
-  element={
-    <CommunityPlusEchoDropPage />
-  }
-/>
+          <Route
+            path="echo/:dropId"
+            element={
+              <CommunityPlusEchoDropPage />
+            }
+          />
 
           {/* HELP */}
 
