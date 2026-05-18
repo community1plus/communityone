@@ -776,7 +776,7 @@ body {
 
   margin: 0;
 
-  max-width: 780px;
+  max-width: 640px;
 
   font-size:
     clamp(4.8rem, 8vw, 8.4rem);
@@ -801,7 +801,7 @@ body {
 
   max-width: 760px;
 
-  margin-top: 22px;
+  margin-top: 10px;
 
   font-size: 1.45rem;
   line-height: 1.6;
@@ -831,7 +831,7 @@ body {
 
   border:
     1px solid rgba(22,22,22,0.08);
-
+  margin-top: -18px;
   backdrop-filter:
     blur(22px);
 

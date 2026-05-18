@@ -7,9 +7,9 @@
   min-height: 100%;
 
   padding:
-    18px
+    10px
     clamp(22px, 2.5vw, 42px)
-    44px;
+    34px;
 
   box-sizing: border-box;
 
@@ -48,13 +48,14 @@
 
   grid-template-columns:
     minmax(0, 1fr)
-    460px;
+    500px;
 
-  gap: 34px;
+  gap: 44px;
 
   align-items: start;
 
-  margin-bottom: 12px;
+  margin-top: -8px;
+  margin-bottom: 0;
 }
 
 /* =====================================================
@@ -74,9 +75,9 @@
   display: flex;
   flex-direction: column;
 
-  gap: 16px;
+  gap: 10px;
 
-  margin-bottom: 34px;
+  margin-bottom: 24px;
 }
 
 .echo-drop-mark {
@@ -114,11 +115,11 @@
 ===================================================== */
 
 .echo-drop-intro {
-  max-width: 940px;
+  max-width: 780px;
 }
 
 .echo-drop-intro h1 {
-  margin: 0 0 18px;
+  margin: 0;
 
   color: #111111;
 
@@ -132,20 +133,20 @@
 
   letter-spacing: -0.11em;
 
-  line-height: 0.86;
+  line-height: 0.84;
 
-  max-width: 780px;
+  max-width: 640px;
 }
 
 .echo-drop-intro p {
-  margin: 0;
+  margin-top: 12px;
 
-  max-width: 720px;
+  max-width: 620px;
 
   color: #6f655d;
 
   font-size: 18px;
-  line-height: 1.8;
+  line-height: 1.75;
 }
 
 /* =====================================================
@@ -160,10 +161,12 @@
 
   padding: 24px;
 
+  margin-top: -18px;
+
   border-radius: 34px;
 
   background:
-    rgba(255,255,255,0.8);
+    rgba(255,255,255,0.82);
 
   border:
     1px solid
@@ -174,6 +177,18 @@
   box-shadow:
     0 20px 50px
       rgba(0,0,0,0.05);
+
+  transition:
+    transform 300ms ease,
+    box-shadow 300ms ease;
+}
+
+.echo-drop-tv:hover {
+  transform: translateY(-4px);
+
+  box-shadow:
+    0 40px 90px
+      rgba(0,0,0,0.12);
 }
 
 .echo-tv-header {
@@ -207,9 +222,9 @@
 .echo-tv-screen {
   position: relative;
 
-  height: 420px;
+  height: 520px;
 
-  border-radius: 28px;
+  border-radius: 30px;
 
   overflow: hidden;
 
@@ -288,14 +303,14 @@
   display: grid;
 
   grid-template-columns:
-    minmax(0, 1.5fr)
-    minmax(320px, 0.82fr);
+    minmax(0, 1.45fr)
+    minmax(300px, 0.72fr);
 
   gap: 22px;
 
   align-items: start;
 
-  margin-top: 2px;
+  margin-top: -18px;
 }
 
 /* =====================================================
@@ -597,148 +612,23 @@
 }
 
 /* =====================================================
-   TOTE
-===================================================== */
-
-.echo-tote {
-  width: 120px;
-  height: 150px;
-
-  border-radius: 14px;
-
-  background:
-    linear-gradient(
-      180deg,
-      #faf7f1,
-      #ede7de
-    );
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  position: relative;
-
-  box-shadow:
-    inset 0 0 0 1px rgba(0,0,0,0.04);
-}
-
-.echo-tote-logo {
-  color: #2a2a2a;
-
-  font-size: 22px;
-  font-weight: 900;
-
-  letter-spacing: -0.06em;
-}
-
-.echo-tote-tag {
-  position: absolute;
-
-  bottom: 12px;
-
-  color: #8d8178;
-
-  font-size: 10px;
-
-  text-transform: uppercase;
-
-  letter-spacing: 0.12em;
-}
-
-/* =====================================================
-   BOARD
-===================================================== */
-
-.echo-board {
-  width: 74px;
-  height: 190px;
-
-  border-radius: 999px;
-
-  position: relative;
-
-  background:
-    linear-gradient(
-      180deg,
-      #0f0f0f,
-      #2b2b2b
-    );
-}
-
-.echo-board-line {
-  position: absolute;
-
-  left: 50%;
-  top: 14px;
-  bottom: 14px;
-
-  width: 1px;
-
-  background:
-    rgba(255,255,255,0.08);
-
-  transform: translateX(-50%);
-}
-
-.echo-board-logo {
-  position: absolute;
-
-  inset: 0;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  color: #d61f1f;
-
-  font-size: 24px;
-  font-weight: 900;
-}
-
-/* =====================================================
-   FOOTER
-===================================================== */
-
-.echo-drop-footer {
-  margin-top: 34px;
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  gap: 20px;
-
-  padding-top: 26px;
-
-  border-top:
-    1px solid
-    rgba(214,205,195,0.9);
-}
-
-.echo-drop-note,
-.echo-drop-window {
-  color: #7a6f67;
-
-  font-size: 13px;
-  line-height: 1.6;
-}
-
-/* =====================================================
    RESPONSIVE
 ===================================================== */
 
 @media (max-width: 1450px) {
+
   .echo-drop-hero {
     grid-template-columns: 1fr;
   }
 
   .echo-drop-tv {
     max-width: 620px;
+    margin-top: 0;
   }
 
   .echo-drop-grid {
     grid-template-columns: 1fr;
+    margin-top: 20px;
   }
 
   .echo-drop-side-stack {
@@ -750,12 +640,14 @@
 }
 
 @media (max-width: 1100px) {
+
   .echo-object-featured {
     grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 760px) {
+
   .echo-drop-shell {
     padding:
       22px
