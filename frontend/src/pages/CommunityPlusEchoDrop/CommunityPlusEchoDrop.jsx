@@ -1,183 +1,250 @@
+// =========================================================
+// CommunityPlusEchoDrop.jsx
+// =========================================================
+
+import { useNavigate } from "react-router-dom";
+
 import "./CommunityPlusEchoDrop.css";
 
+/* =========================================================
+   DROP DATA
+========================================================= */
+
+const DROPS = [
+  {
+    id: "E-01",
+
+    title: "Signal Tee",
+
+    location: "WHEELERS HILL",
+
+    state: "LIVE",
+
+    description:
+      "heavyweight cotton • relaxed fit • limited monthly production",
+
+    cta: "enter drop",
+
+    type: "shirt",
+  },
+
+  {
+    id: "E-02",
+
+    title: "Transit Tote",
+
+    location: "CLAYTON",
+
+    state: "LIMITED",
+
+    description:
+      "utility canvas • everyday carry • city signal system",
+
+    cta: "enter drop",
+
+    type: "tote",
+  },
+
+  {
+    id: "E-03",
+
+    title: "Signal Deck",
+
+    location: "MELBOURNE",
+
+    state: "ARCHIVED",
+
+    description:
+      "maple deck • matte finish • object edition release",
+
+    cta: "view archive",
+
+    type: "deck",
+  },
+];
+
+/* =========================================================
+   COMPONENT
+========================================================= */
+
 export default function CommunityPlusEchoDrop() {
+  const navigate = useNavigate();
+
+    /* =====================================================
+     DROP CLICK
+  ===================================================== */
+
+  const handleDropClick = (
+    drop
+  ) => {
+    console.log(
+      "ECHO DROP CLICK:",
+      drop
+    );
+
+    navigate(
+      `/communityplus/echo/${drop.id.toLowerCase()}`
+    );
+  };
   return (
     <section className="echo-drop-shell">
-
-      {/* ========================================
+      {/* =====================================================
           HERO
-      ======================================== */}
+      ===================================================== */}
 
       <div className="echo-drop-hero">
-
         <div className="echo-drop-brand">
-
           <div className="echo-drop-mark">
-            COMMUNITY<span>+</span>
+            ECHO<span>.</span>
           </div>
 
           <div className="echo-drop-sub">
-            signal objects by echo
+            signal objects by community.one
           </div>
-
         </div>
 
         <div className="echo-drop-status">
-          DROP 01 — OPEN
+          SIGNAL DROP — LIVE
         </div>
-
       </div>
 
-      {/* ========================================
+      {/* =====================================================
+          INTRO
+      ===================================================== */}
+
+      <div className="echo-drop-intro">
+        <h1>
+          Objects extracted from the signal.
+        </h1>
+
+        <p>
+          Limited releases connected to
+          geography, movement, and local
+          transmission culture.
+        </p>
+      </div>
+
+      {/* =====================================================
           GRID
-      ======================================== */}
+      ===================================================== */}
 
       <div className="echo-drop-grid">
+        {DROPS.map((drop, index) => (
+          <article
+  key={drop.id}
+  className={`echo-object-card ${
+    index === 0
+      ? "echo-object-featured"
+      : ""
+  }`}
+  onClick={() =>
+    handleDropClick(drop)
+  }
+  role="button"
+  tabIndex={0}
+>
+            {/* =============================================
+                VISUAL
+            ============================================= */}
 
-        {/* ========================================
-            SIGNAL TEE
-        ======================================== */}
+            <div className="echo-object-visual">
+              {/* =========================================
+                  SHIRT
+              ========================================= */}
 
-        <article className="echo-object-card">
+              {drop.type === "shirt" && (
+                <div className="echo-shirt">
+                  <div className="echo-shirt-logo">
+                    E/01
+                  </div>
 
-          <div className="echo-object-visual">
+                  <div className="echo-object-overlay">
+                    SIGNAL UNIT
+                  </div>
+                </div>
+              )}
 
-            <div className="echo-shirt">
+              {/* =========================================
+                  TOTE
+              ========================================= */}
 
-              <div className="echo-shirt-logo">
-                COMMUNITY<span>+</span>
+              {drop.type === "tote" && (
+                <div className="echo-tote">
+                  <div className="echo-tote-logo">
+                    echo
+                  </div>
+
+                  <div className="echo-tote-tag">
+                    signal unit
+                  </div>
+                </div>
+              )}
+
+              {/* =========================================
+                  DECK
+              ========================================= */}
+
+              {drop.type === "deck" && (
+                <div className="echo-board">
+                  <div className="echo-board-line" />
+
+                  <div className="echo-board-logo">
+                    +
+                  </div>
+
+                  <div className="echo-object-overlay">
+                    OBJECT RELEASE
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* =============================================
+                META
+            ============================================= */}
+
+            <div className="echo-object-meta">
+              <div className="echo-object-row">
+                <h2>{drop.title}</h2>
+
+                <span>{drop.id}</span>
               </div>
 
-            </div>
-
-          </div>
-
-          <div className="echo-object-meta">
-
-            <div className="echo-object-row">
-
-              <h2>Signal Tee</h2>
-
-              <span>01</span>
-
-            </div>
-
-            <p>
-              heavyweight cotton • relaxed fit • limited monthly production
-            </p>
-
-            <button type="button">
-              reserve
-            </button>
-
-          </div>
-
-        </article>
-
-        {/* ========================================
-            TRANSIT TOTE
-        ======================================== */}
-
-        <article className="echo-object-card">
-
-          <div className="echo-object-visual">
-
-            <div className="echo-tote">
-
-              <div className="echo-tote-logo">
-                COMMUNITY<span>+</span>
+              <div className="echo-object-spec">
+                {drop.location} /{" "}
+                {drop.state}
               </div>
 
-              <div className="echo-tote-tag">
-                echo
-              </div>
+              <p>{drop.description}</p>
 
+              <button
+                type="button"
+                onClick={() =>
+                handleDropClick(drop)
+              }
+            >
+                {drop.cta}
+                </button>
             </div>
-
-          </div>
-
-          <div className="echo-object-meta">
-
-            <div className="echo-object-row">
-
-              <h2>Transit Tote</h2>
-
-              <span>02</span>
-
-            </div>
-
-            <p>
-              utility canvas • everyday carry • city signal system
-            </p>
-
-            <button type="button">
-              reserve
-            </button>
-
-          </div>
-
-        </article>
-
-        {/* ========================================
-            SIGNAL DECK
-        ======================================== */}
-
-        <article className="echo-object-card">
-
-          <div className="echo-object-visual">
-
-            <div className="echo-board">
-
-              <div className="echo-board-line" />
-
-              <div className="echo-board-logo">
-                +
-              </div>
-
-            </div>
-
-          </div>
-
-          <div className="echo-object-meta">
-
-            <div className="echo-object-row">
-
-              <h2>Signal Deck</h2>
-
-              <span>03</span>
-
-            </div>
-
-            <p>
-              maple deck • matte finish • object edition release
-            </p>
-
-            <button type="button">
-              reserve
-            </button>
-
-          </div>
-
-        </article>
-
+          </article>
+        ))}
       </div>
 
-      {/* ========================================
+      {/* =====================================================
           FOOTER
-      ======================================== */}
+      ===================================================== */}
 
       <div className="echo-drop-footer">
-
         <div className="echo-drop-note">
-          echo releases are produced monthly in limited quantities.
+          echo releases are produced in
+          limited quantities and broadcast
+          through signal windows.
         </div>
 
         <div className="echo-drop-window">
-          ordering window closes in 12 days
+          transmission closes in 12 days
         </div>
-
       </div>
-
     </section>
   );
 }
