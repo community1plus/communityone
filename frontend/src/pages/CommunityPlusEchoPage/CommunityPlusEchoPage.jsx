@@ -1,5 +1,4 @@
-import CommunityPlusEchoDrop
-from "../../components/Echo/CommunityPlusEchoDrop";
+import CommunityPlusEchoDrop from "../pages/CommunityPlusEchoDrop/CommunityPlusEchoDrop";
 
 export default function CommunityPlusEchoPage() {
   return (
