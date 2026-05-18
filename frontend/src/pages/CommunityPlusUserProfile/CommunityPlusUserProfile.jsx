@@ -246,56 +246,81 @@ const [editingVerifiedPhone, setEditingVerifiedPhone] = useState(false);
   const displayCompletion = completionPercent || 0;
 
   useEffect(() => {
-    hydratedProfileRef.current = false;
-  }, [user?.id, user?.username, user?.email]);
 
-  useEffect(() => {
-    if (!profileReady || hydratedProfileRef.current) return;
+  if (!profileReady) return;
 
-    const email = getUserEmail(user);
-    const emailPrefix = email.split("@")[0] || "";
-    const displayName = getUserDisplayName(user);
+  if (!profile) return;
 
-    setValue("username", profile?.username || emailPrefix || "");
-    setValue("display_name", profile?.display_name || displayName || emailPrefix || "");
-    setValue("userType", profile?.userType || "PERSONAL");
+  const email = getUserEmail(user);
 
-    setValue("phoneCountry", profile?.phoneCountry || DEFAULT_PHONE_COUNTRY);
-    setValue("phone", profile?.phoneDisplay || "");
-    setValue("phoneE164", profile?.phoneE164 || profile?.phone || "");
-    setValue("phoneVerified", profile?.phoneVerified || false);
-    setValue("phoneVerificationCode", "");
+  const emailPrefix = email.split("@")[0] || "";
 
-    setValue("homeLocation", profile?.homeLocation || homeLocation || null);
-    setValue("social", normaliseSocialState(profile?.social));
+  const displayName = getUserDisplayName(user);
 
-    setValue("payment.cardName", profile?.payment?.cardName || "");
-    setValue("payment.last4", profile?.payment?.last4 || "");
+  setValue("username", profile?.username || emailPrefix || "");
 
-    hydratedProfileRef.current = true;
-  }, [profileReady, profile, user, homeLocation, setValue]);
+  setValue(
+    "display_name",
+    profile?.display_name || displayName || emailPrefix || ""
+  );
 
-  useEffect(() => {
-    if (!homeLocation) return;
-    if (profile?.homeLocation) return;
+  setValue(
+    "userType",
+    profile?.userType || "PERSONAL"
+  );
 
-    const fingerprint = JSON.stringify({
-      lat: homeLocation.lat,
-      lng: homeLocation.lng,
-      label: homeLocation.label || homeLocation.fullAddress || "",
-    });
+  setValue(
+    "phoneCountry",
+    profile?.phoneCountry || DEFAULT_PHONE_COUNTRY
+  );
 
-    if (lastHomeLocationRef.current === fingerprint) return;
+  setValue(
+    "phone",
+    profile?.phoneDisplay || ""
+  );
 
-    lastHomeLocationRef.current = fingerprint;
-    setValue("homeLocation", homeLocation);
-  }, [homeLocation, profile?.homeLocation, setValue]);
+  setValue(
+    "phoneE164",
+    profile?.phoneE164 || profile?.phone || ""
+  );
 
-  useEffect(() => {
-    if (phoneE164 !== values.phoneE164) {
-      setValue("phoneE164", phoneE164);
-    }
-  }, [phoneE164, values.phoneE164, setValue]);
+  setValue(
+    "phoneVerified",
+    profile?.phoneVerified || false
+  );
+
+  setValue(
+    "phoneVerificationCode",
+    ""
+  );
+
+  setValue(
+    "homeLocation",
+    profile?.homeLocation || homeLocation || null
+  );
+
+  setValue(
+    "social",
+    normaliseSocialState(profile?.social)
+  );
+
+  setValue(
+    "payment.cardName",
+    profile?.payment?.cardName || ""
+  );
+
+  setValue(
+    "payment.last4",
+    profile?.payment?.last4 || ""
+  );
+
+}, [
+  profileReady,
+  profile,
+  user,
+  homeLocation,
+  setValue,
+]);
 
   useEffect(() => {
 
@@ -309,7 +334,7 @@ const [editingVerifiedPhone, setEditingVerifiedPhone] = useState(false);
 }, [values.phoneVerified]);
 
   useEffect(() => {
-    if (!hydratedProfileRef.current) return;
+   
     if (!values.phone) return;
 
     const originalPhone = profile?.phoneE164 || profile?.phone || "";
