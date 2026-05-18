@@ -66,7 +66,7 @@ const profileSteps = [
     id: "contact",
     title: "CONTACT",
     fields: [
-      { name: "phone", label: "Phone Number", type: "tel", required: true, disabled: values?.phoneVerified && !editingVerifiedPhone, },
+      { name: "phone", label: "Phone Number", type: "tel", required: true },
       { name: "phoneVerificationCode", label: "Verification Code", type: "text" },
     ],
   },
