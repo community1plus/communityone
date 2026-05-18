@@ -542,8 +542,17 @@ const [editingVerifiedPhone, setEditingVerifiedPhone] = useState(false);
       }
 
       setValue("phoneVerified", true);
+
       setPhoneStatus("verified");
+
       setEditingVerifiedPhone(false);
+
+      const verifiedPayload = {
+        ...buildProfilePayload(),
+        phoneVerified: true,
+      };
+
+await saveProfile(verifiedPayload);
     } catch (err) {
       console.error("Verify phone code failed:", err);
       setValue("phoneVerified", false);
