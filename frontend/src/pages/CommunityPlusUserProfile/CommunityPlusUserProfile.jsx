@@ -208,9 +208,7 @@ export default function CommunityPlusUserProfile({ onComplete }) {
   const [currentStep, setCurrentStep] = useState(0);
   const [savingProfile, setSavingProfile] = useState(false);
   const [profileError, setProfileError] = useState("");
-  const [phoneStatus, setPhoneStatus] = useState(
-    values?.phoneVerified ? "verified" : "idle"
-  );
+  const [phoneStatus, setPhoneStatus] = useState("idle");
 
 const [phoneError, setPhoneError] = useState("");
 
