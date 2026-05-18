@@ -74,9 +74,7 @@ export default function CommunityPlusEchoDrop() {
      DROP CLICK
   ===================================================== */
 
-  const handleDropClick = (
-    drop
-  ) => {
+  const handleDropClick = (drop) => {
     console.log(
       "ECHO DROP CLICK:",
       drop
@@ -103,6 +101,7 @@ export default function CommunityPlusEchoDrop() {
 
   return (
     <section className="echo-drop-shell">
+
       <div className="echo-drop-frame">
 
         {/* =================================================
@@ -110,6 +109,10 @@ export default function CommunityPlusEchoDrop() {
         ================================================= */}
 
         <div className="echo-drop-hero">
+
+          {/* =============================================
+              LEFT — COPY
+          ============================================= */}
 
           <div className="echo-drop-copy">
 
@@ -120,7 +123,7 @@ export default function CommunityPlusEchoDrop() {
               </div>
 
               <div className="echo-drop-sub">
-                signal objects by community.one
+                SIGNAL OBJECTS BY COMMUNITY.ONE
               </div>
 
             </div>
@@ -128,22 +131,67 @@ export default function CommunityPlusEchoDrop() {
             <div className="echo-drop-intro">
 
               <h1>
-                Objects extracted from the signal.
+                Objects extracted
+                <br />
+                from the signal.
               </h1>
 
               <p>
                 Limited releases connected
                 to geography, movement,
-                and local transmission
-                culture.
+                and local transmission culture.
               </p>
 
             </div>
 
           </div>
 
-          <div className="echo-drop-status">
-            SIGNAL DROP — LIVE
+          {/* =============================================
+              RIGHT — AD.TV
+          ============================================= */}
+
+          <div className="echo-drop-tv">
+
+            <div className="echo-tv-header">
+
+              <span className="echo-tv-label">
+                AD.TV
+              </span>
+
+              <span className="echo-tv-live">
+                DROP 01 LIVE
+              </span>
+
+            </div>
+
+            {/* =========================================
+                SCREEN
+            ========================================= */}
+
+            <div className="echo-tv-screen">
+
+              <div className="echo-tv-product">
+
+                <div className="echo-tv-shirt">
+
+                  <div className="echo-tv-shirt-logo">
+                    E/01
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+            {/* =========================================
+                FOOTER
+            ========================================= */}
+
+            <div className="echo-tv-footer">
+              rotating signal objects
+            </div>
+
           </div>
 
         </div>
@@ -384,6 +432,7 @@ export default function CommunityPlusEchoDrop() {
         </div>
 
       </div>
+
     </section>
   );
 }
