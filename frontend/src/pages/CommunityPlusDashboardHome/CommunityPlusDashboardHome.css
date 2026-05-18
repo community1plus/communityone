@@ -1,28 +1,738 @@
 /* =========================================================
-   ECHO HERO LAYOUT REFINEMENT
+   COMMUNITY ONE — PREMIUM SPATIAL UI
 ========================================================= */
 
 /* =========================================================
-   MAIN GRID
+   ROOT TOKENS
 ========================================================= */
 
-.echo-drop-grid {
+:root {
+
+  --bg:
+    #f5f3ef;
+
+  --panel:
+    rgba(255,255,255,0.82);
+
+  --panel-solid:
+    #ffffff;
+
+  --border:
+    rgba(22,22,22,0.08);
+
+  --border-strong:
+    rgba(22,22,22,0.12);
+
+  --text:
+    #171717;
+
+  --text-soft:
+    #6e6e73;
+
+  --text-muted:
+    #9b9ba1;
+
+  --accent:
+    #7f1212;
+
+  --success:
+    #16a34a;
+
+  --warning:
+    #f59e0b;
+
+  --danger:
+    #dc2626;
+
+  --info:
+    #2563eb;
+
+  --radius-sm: 14px;
+  --radius-md: 20px;
+  --radius-lg: 28px;
+  --radius-xl: 38px;
+
+  --shadow-sm:
+    0 1px 2px rgba(0,0,0,0.04);
+
+  --shadow-md:
+    0 12px 30px rgba(0,0,0,0.08);
+
+  --shadow-lg:
+    0 28px 70px rgba(0,0,0,0.14);
+
+  --transition:
+    180ms cubic-bezier(.2,.8,.2,1);
+
+  --glass:
+    blur(24px);
+}
+
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+  box-sizing: border-box;
+
+  -webkit-font-smoothing:
+    antialiased;
+
+  -moz-osx-font-smoothing:
+    grayscale;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+
+  margin: 0;
+  padding: 0;
+}
+
+body {
+
+  overflow: hidden;
+
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(127,18,18,0.03),
+      transparent 28%
+    ),
+    var(--bg);
+
+  font-family:
+    Inter,
+    system-ui,
+    sans-serif;
+
+  color:
+    var(--text);
+}
+
+/* =========================================================
+   PAGE
+========================================================= */
+
+.dashboard-home-page {
+  width: 100%;
+  height: 100%;
+
+  overflow: hidden;
+}
+
+/* =========================================================
+   LAYOUT
+========================================================= */
+
+.dashboard-home {
+
+  width: 100%;
+  height: 100%;
 
   display: grid;
 
   grid-template-columns:
-    minmax(0, 1fr)
-    560px;
+    420px
+    minmax(0,1fr);
 
-  gap: 28px;
+  gap: 18px;
 
-  align-items: start;
+  padding: 18px;
 
-  width: 100%;
+  overflow: hidden;
 }
 
 /* =========================================================
-   HERO COPY
+   HEADER
+========================================================= */
+
+.dashboard-header {
+
+  min-height: 0;
+
+  background:
+    rgba(255,255,255,0.82);
+
+  backdrop-filter:
+    blur(18px);
+
+  -webkit-backdrop-filter:
+    blur(18px);
+
+  border-bottom:
+    1px solid rgba(22,22,22,0.06);
+
+  box-shadow:
+    0 2px 10px rgba(0,0,0,0.03);
+
+  z-index: 20;
+}
+
+/* =========================================================
+   FEED
+========================================================= */
+
+.dashboard-home-feed {
+
+  min-width: 0;
+  min-height: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 26px;
+
+  border-radius:
+    var(--radius-xl);
+
+  background:
+    var(--panel);
+
+  border:
+    1px solid var(--border);
+
+  backdrop-filter:
+    var(--glass);
+
+  -webkit-backdrop-filter:
+    var(--glass);
+
+  box-shadow:
+    var(--shadow-md);
+
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.dashboard-home-feed::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dashboard-home-feed::-webkit-scrollbar-thumb {
+
+  background:
+    rgba(0,0,0,0.08);
+
+  border-radius: 999px;
+}
+
+/* =========================================================
+   FILTER RAIL
+========================================================= */
+
+.feed-filters-wrapper {
+
+  position: relative;
+
+  margin-bottom: 30px;
+}
+
+.feed-filters {
+
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  scroll-behavior: smooth;
+
+  padding:
+    0 72px
+    8px;
+
+  scrollbar-width: none;
+}
+
+.feed-filters::-webkit-scrollbar {
+  display: none;
+}
+
+/* =========================================================
+   FILTER EDGE FADES
+========================================================= */
+
+.feed-filters-wrapper::before,
+.feed-filters-wrapper::after {
+
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  bottom: 0;
+
+  width: 56px;
+
+  z-index: 2;
+
+  pointer-events: none;
+}
+
+.feed-filters-wrapper::before {
+
+  left: 0;
+
+  background:
+    linear-gradient(
+      to right,
+      rgba(255,255,255,0.96),
+      transparent
+    );
+}
+
+.feed-filters-wrapper::after {
+
+  right: 0;
+
+  background:
+    linear-gradient(
+      to left,
+      rgba(255,255,255,0.96),
+      transparent
+    );
+}
+
+/* =========================================================
+   SHIFT BUTTONS
+========================================================= */
+
+.filter-shift {
+
+  position: absolute;
+
+  top: 50%;
+
+  transform:
+    translateY(-50%);
+
+  width: 36px;
+  height: 36px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 999px;
+
+  border:
+    1px solid rgba(22,22,22,0.06);
+
+  background:
+    rgba(255,255,255,0.92);
+
+  backdrop-filter:
+    blur(12px);
+
+  box-shadow:
+    0 8px 18px rgba(0,0,0,0.08);
+
+  cursor: pointer;
+
+  z-index: 5;
+
+  transition:
+    transform var(--transition),
+    background var(--transition);
+}
+
+.filter-shift:hover {
+
+  transform:
+    translateY(-50%)
+    scale(1.05);
+
+  background: white;
+}
+
+.filter-shift.left {
+  left: 14px;
+}
+
+.filter-shift.right {
+  right: 14px;
+}
+
+/* =========================================================
+   FILTER CHIP
+========================================================= */
+
+.feed-filter {
+
+  flex-shrink: 0;
+
+  height: 44px;
+
+  padding: 0 20px;
+
+  border-radius: 999px;
+
+  border:
+    1px solid var(--border);
+
+  background:
+    rgba(255,255,255,0.82);
+
+  color:
+    var(--text-soft);
+
+  font-size: 13px;
+  font-weight: 700;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  transition:
+    transform var(--transition),
+    background var(--transition),
+    border-color var(--transition),
+    color var(--transition);
+}
+
+.feed-filter:hover {
+
+  transform:
+    translateY(-1px);
+
+  background:
+    white;
+
+  border-color:
+    var(--border-strong);
+}
+
+.feed-filter.active {
+
+  background:
+    var(--accent);
+
+  border-color:
+    var(--accent);
+
+  color: white;
+}
+
+/* =========================================================
+   FEED LIST
+========================================================= */
+
+.feed-list {
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 18px;
+}
+
+/* =========================================================
+   MAP
+========================================================= */
+
+.dashboard-home-map {
+
+  position: relative;
+
+  min-width: 0;
+  min-height: 0;
+
+  overflow: hidden;
+
+  border-radius:
+    var(--radius-xl);
+
+  background:
+    rgba(255,255,255,0.72);
+
+  border:
+    1px solid var(--border);
+
+  backdrop-filter:
+    blur(18px);
+
+  box-shadow:
+    var(--shadow-lg);
+}
+
+/* =========================================================
+   TOOLBAR
+========================================================= */
+
+.dashboard-map-toolbar {
+
+  position: absolute;
+
+  top: 22px;
+  left: 22px;
+  right: 22px;
+
+  z-index: 100;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  pointer-events: none;
+}
+
+.dashboard-map-toolbar > * {
+  pointer-events: auto;
+}
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+.dashboard-search-controls {
+
+  display: flex;
+  align-items: center;
+
+  gap: 14px;
+}
+
+.dashboard-search-box {
+
+  position: relative;
+
+  width: 460px;
+  max-width: 42vw;
+}
+
+.dashboard-search-box input {
+
+  width: 100%;
+  height: 54px;
+
+  padding:
+    0 60px
+    0 24px;
+
+  border-radius: 999px;
+
+  border:
+    1px solid rgba(255,255,255,0.12);
+
+  background:
+    rgba(255,255,255,0.92);
+
+  backdrop-filter:
+    blur(18px);
+
+  box-shadow:
+    0 12px 32px rgba(0,0,0,0.08);
+
+  outline: none;
+
+  color:
+    var(--text);
+
+  font-size: 16px;
+  font-weight: 600;
+
+  transition:
+    border-color var(--transition),
+    box-shadow var(--transition);
+}
+
+.dashboard-search-box input:focus {
+
+  border-color:
+    rgba(127,18,18,0.18);
+
+  box-shadow:
+    0 20px 42px rgba(127,18,18,0.12);
+}
+
+.dashboard-search-icon {
+
+  position: absolute;
+
+  top: 50%;
+  right: 22px;
+
+  transform:
+    translateY(-50%);
+
+  color:
+    var(--accent);
+
+  pointer-events: none;
+}
+
+/* =========================================================
+   SEARCH MODE
+========================================================= */
+
+.dashboard-search-mode {
+
+  display: flex;
+
+  gap: 10px;
+}
+
+.dashboard-search-mode button {
+
+  height: 54px;
+
+  padding: 0 26px;
+
+  border-radius: 999px;
+
+  border:
+    1px solid rgba(255,255,255,0.12);
+
+  background:
+    rgba(255,255,255,0.9);
+
+  backdrop-filter:
+    blur(18px);
+
+  box-shadow:
+    0 10px 28px rgba(0,0,0,0.06);
+
+  color:
+    var(--text-soft);
+
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    transform var(--transition),
+    background var(--transition);
+}
+
+.dashboard-search-mode button:hover {
+
+  transform:
+    translateY(-1px);
+
+  background:
+    white;
+}
+
+.dashboard-search-mode button.active {
+
+  background:
+    var(--accent);
+
+  color:
+    white;
+}
+
+/* =========================================================
+   MAP CANVAS
+========================================================= */
+
+.dashboard-map-canvas {
+
+  width: 100%;
+  height: 100%;
+
+  padding-top: 96px;
+}
+
+.dashboard-map-canvas .map-wrapper {
+  width: 100%;
+  height: 100%;
+}
+
+/* =========================================================
+   SEARCH RESULTS
+========================================================= */
+
+.dashboard-search-results {
+
+  position: absolute;
+
+  top:
+    calc(100% + 12px);
+
+  left: 0;
+  right: 0;
+
+  max-height: 320px;
+
+  padding: 10px;
+
+  border-radius: 22px;
+
+  background:
+    rgba(255,255,255,0.96);
+
+  border:
+    1px solid rgba(22,22,22,0.08);
+
+  backdrop-filter:
+    blur(20px);
+
+  box-shadow:
+    0 30px 70px rgba(0,0,0,0.14);
+
+  overflow-y: auto;
+
+  z-index: 300;
+}
+
+.dashboard-search-result {
+
+  padding: 14px;
+
+  border-radius: 14px;
+
+  cursor: pointer;
+
+  transition:
+    background var(--transition);
+}
+
+.dashboard-search-result:hover {
+
+  background:
+    rgba(0,0,0,0.04);
+}
+
+/* =========================================================
+   ECHO DROP SHELL
+========================================================= */
+
+.echo-drop-shell {
+
+  position: relative;
+
+  overflow: hidden;
+}
+
+.echo-drop-shell::after {
+
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255,255,255,0.02),
+      transparent 30%,
+      transparent 70%,
+      rgba(255,255,255,0.03)
+    );
+
+  pointer-events: none;
+}
+
+/* =========================================================
+   HERO ATMOSPHERE
 ========================================================= */
 
 .echo-drop-copy {
@@ -30,8 +740,6 @@
   position: relative;
 
   z-index: 2;
-
-  padding-top: 12px;
 }
 
 .echo-drop-copy::before {
@@ -68,12 +776,12 @@
 
   margin: 0;
 
-  max-width: 640px;
+  max-width: 780px;
 
   font-size:
-    clamp(4.4rem, 6.8vw, 7rem);
+    clamp(4.8rem, 8vw, 8.4rem);
 
-  line-height: 0.88;
+  line-height: 0.9;
 
   letter-spacing: -0.08em;
 
@@ -91,16 +799,16 @@
 
 .echo-drop-description {
 
-  max-width: 520px;
+  max-width: 760px;
 
-  margin-top: 18px;
+  margin-top: 22px;
 
-  font-size: 1.18rem;
-  line-height: 1.7;
+  font-size: 1.45rem;
+  line-height: 1.6;
   font-weight: 500;
 
   color:
-    rgba(20,20,20,0.58);
+    rgba(20,20,20,0.62);
 }
 
 /* =========================================================
@@ -115,8 +823,6 @@
   flex-direction: column;
 
   padding: 28px;
-
-  margin-top: -12px;
 
   border-radius: 36px;
 
@@ -137,40 +843,7 @@
 }
 
 /* =========================================================
-   TV HEADER
-========================================================= */
-
-.echo-tv-header {
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  margin-bottom: 20px;
-}
-
-.echo-tv-label {
-
-  font-size: 1rem;
-  font-weight: 800;
-  letter-spacing: 0.22em;
-
-  color:
-    #111;
-}
-
-.echo-tv-status {
-
-  font-size: 0.82rem;
-  font-weight: 700;
-  letter-spacing: 0.22em;
-
-  color:
-    var(--accent);
-}
-
-/* =========================================================
-   TV SCREEN
+   AD.TV SCREEN
 ========================================================= */
 
 .echo-tv-screen {
@@ -178,34 +851,7 @@
   position: relative;
 
   overflow: hidden;
-
-  min-height: 620px;
-
-  border-radius: 34px;
-
-  background:
-    radial-gradient(
-      circle at top,
-      rgba(255,255,255,0.04),
-      transparent 20%
-    ),
-    linear-gradient(
-      145deg,
-      #050505,
-      #151515
-    );
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  animation:
-    echoTvFloat 8s ease-in-out infinite;
 }
-
-/* =========================================================
-   TV AMBIENT SWEEP
-========================================================= */
 
 .echo-tv-screen::after {
 
@@ -227,62 +873,6 @@
     echoTvSweep 7s linear infinite;
 
   pointer-events: none;
-}
-
-/* =========================================================
-   TV OBJECT
-========================================================= */
-
-.echo-tv-object {
-
-  width: 320px;
-  height: 420px;
-
-  border-radius: 34px;
-
-  background:
-    linear-gradient(
-      145deg,
-      #171717,
-      #242424
-    );
-
-  box-shadow:
-    inset 0 0 60px rgba(255,255,255,0.03),
-    0 40px 80px rgba(0,0,0,0.38);
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  transform: scale(1.06);
-}
-
-.echo-tv-object-mark {
-
-  font-size: 4.8rem;
-  font-weight: 900;
-
-  letter-spacing: -0.06em;
-
-  color:
-    white;
-}
-
-/* =========================================================
-   TV FOOTER
-========================================================= */
-
-.echo-tv-footer {
-
-  margin-top: 18px;
-
-  font-size: 0.82rem;
-  font-weight: 700;
-  letter-spacing: 0.24em;
-
-  color:
-    rgba(20,20,20,0.48);
 }
 
 /* =========================================================
@@ -319,10 +909,6 @@
     translateY(-2px);
 }
 
-/* =========================================================
-   ORB LIVE DOT
-========================================================= */
-
 .echo-orb::after {
 
   content: "";
@@ -348,7 +934,7 @@
 }
 
 /* =========================================================
-   ORB GLOW
+   GLOW
 ========================================================= */
 
 .echo-orb-glow {
@@ -373,7 +959,7 @@
 }
 
 /* =========================================================
-   ORB PULSE
+   RING
 ========================================================= */
 
 .echo-orb-pulse {
@@ -392,14 +978,12 @@
 }
 
 /* =========================================================
-   ORB CORE
+   CORE
 ========================================================= */
 
 .echo-orb-core {
 
   position: relative;
-
-  overflow: hidden;
 
   width: 54px;
   height: 54px;
@@ -432,33 +1016,6 @@
     box-shadow var(--transition);
 }
 
-/* =========================================================
-   ORB SWEEP
-========================================================= */
-
-.echo-orb-core::after {
-
-  content: "";
-
-  position: absolute;
-
-  inset: -30%;
-
-  background:
-    linear-gradient(
-      120deg,
-      transparent,
-      rgba(255,255,255,0.18),
-      transparent
-    );
-
-  transform:
-    rotate(25deg);
-
-  animation:
-    echoOrbSweep 4s linear infinite;
-}
-
 .echo-orb:hover .echo-orb-core {
 
   transform:
@@ -475,15 +1032,7 @@
     scale(0.94);
 }
 
-/* =========================================================
-   ORB ICON
-========================================================= */
-
 .echo-orb-icon {
-
-  position: relative;
-
-  z-index: 2;
 
   color: white;
 
@@ -492,63 +1041,7 @@
 }
 
 /* =========================================================
-   TV FLOAT
-========================================================= */
-
-@keyframes echoTvFloat {
-
-  0% {
-    transform: translateY(0px);
-  }
-
-  50% {
-    transform: translateY(-6px);
-  }
-
-  100% {
-    transform: translateY(0px);
-  }
-}
-
-/* =========================================================
-   TV SWEEP
-========================================================= */
-
-@keyframes echoTvSweep {
-
-  0% {
-    transform: translateX(-120%);
-  }
-
-  100% {
-    transform: translateX(120%);
-  }
-}
-
-/* =========================================================
-   LIVE PULSE
-========================================================= */
-
-@keyframes echoLivePulse {
-
-  0% {
-    transform: scale(1);
-    opacity: 1;
-  }
-
-  50% {
-    transform: scale(1.4);
-    opacity: 0.6;
-  }
-
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-/* =========================================================
-   ORB RING
+   ANIMATIONS
 ========================================================= */
 
 @keyframes echoRingPulse {
@@ -569,10 +1062,6 @@
   }
 }
 
-/* =========================================================
-   ORB GLOW
-========================================================= */
-
 @keyframes echoGlowPulse {
 
   0% {
@@ -591,71 +1080,146 @@
   }
 }
 
-/* =========================================================
-   ORB SWEEP
-========================================================= */
-
-@keyframes echoOrbSweep {
+@keyframes echoLivePulse {
 
   0% {
+    transform: scale(1);
+    opacity: 1;
+  }
 
-    transform:
-      translateX(-120%)
-      rotate(25deg);
+  50% {
+    transform: scale(1.4);
+    opacity: 0.6;
   }
 
   100% {
-
-    transform:
-      translateX(120%)
-      rotate(25deg);
+    transform: scale(1);
+    opacity: 1;
   }
+}
+
+@keyframes echoTvSweep {
+
+  0% {
+    transform: translateX(-120%);
+  }
+
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+/* =========================================================
+   GOOGLE MAP SPACING
+========================================================= */
+
+.gm-style .gm-bundled-control {
+
+  margin-right: 14px !important;
+
+  margin-bottom: 112px !important;
+}
+
+.gm-style .gm-fullscreen-control {
+
+  margin-top: 94px !important;
 }
 
 /* =========================================================
    RESPONSIVE
 ========================================================= */
 
-@media (max-width: 1200px) {
+@media (max-width: 1100px) {
 
-  .echo-drop-grid {
+  .dashboard-home {
 
     grid-template-columns:
-      1fr;
-  }
-
-  .echo-tv-panel {
-
-    margin-top: 0;
-  }
-
-  .echo-tv-screen {
-
-    min-height: 480px;
+      360px
+      minmax(0,1fr);
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 980px) {
 
-  .echo-drop-title {
+  .dashboard-home {
 
-    font-size:
-      clamp(3.6rem, 14vw, 5.4rem);
+    grid-template-columns: 1fr;
+
+    grid-template-rows:
+      42%
+      58%;
   }
 
-  .echo-tv-screen {
+  .dashboard-home-feed,
+  .dashboard-home-map {
 
-    min-height: 400px;
+    border-radius: 30px;
+  }
+}
+
+@media (max-width: 720px) {
+
+  .dashboard-home {
+
+    gap: 12px;
+    padding: 12px;
   }
 
-  .echo-tv-object {
+  .dashboard-home-feed {
 
-    width: 240px;
-    height: 320px;
+    padding: 18px;
   }
 
-  .echo-tv-object-mark {
+  .dashboard-map-toolbar {
 
-    font-size: 3.6rem;
+    top: 14px;
+    left: 14px;
+    right: 14px;
+
+    flex-direction: column;
+  }
+
+  .dashboard-search-controls {
+
+    width: 100%;
+
+    flex-direction: column;
+  }
+
+  .dashboard-search-box {
+
+    width: 100%;
+    max-width: none;
+  }
+
+  .dashboard-search-mode {
+
+    width: 100%;
+  }
+
+  .dashboard-search-mode button {
+
+    flex: 1;
+  }
+
+  .dashboard-map-canvas {
+
+    padding-top: 144px;
+  }
+
+  .echo-orb {
+
+    left: 18px;
+
+    bottom:
+      max(
+        18px,
+        env(safe-area-inset-bottom)
+      );
+  }
+
+  .gm-style .gm-bundled-control {
+
+    margin-bottom: 124px !important;
   }
 }
