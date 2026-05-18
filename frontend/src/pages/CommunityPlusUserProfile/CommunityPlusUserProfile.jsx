@@ -66,7 +66,7 @@ const profileSteps = [
     id: "contact",
     title: "CONTACT",
     fields: [
-      { name: "phone", label: "Phone Number", type: "tel", required: true },
+      { name: "phone", label: "Phone Number", type: "tel", required: true, disabled: values?.phoneVerified && !editingVerifiedPhone, },
       { name: "phoneVerificationCode", label: "Verification Code", type: "text" },
     ],
   },
@@ -208,8 +208,13 @@ export default function CommunityPlusUserProfile({ onComplete }) {
   const [currentStep, setCurrentStep] = useState(0);
   const [savingProfile, setSavingProfile] = useState(false);
   const [profileError, setProfileError] = useState("");
-  const [phoneStatus, setPhoneStatus] = useState("idle");
-  const [phoneError, setPhoneError] = useState("");
+  const [phoneStatus, setPhoneStatus] = useState(
+    values?.phoneVerified ? "verified" : "idle"
+  );
+
+const [phoneError, setPhoneError] = useState("");
+
+const [editingVerifiedPhone, setEditingVerifiedPhone] = useState(false);
 
   const currentStepConfig = profileSteps[currentStep];
   const isLastStep = currentStep === profileSteps.length - 1;
@@ -293,6 +298,12 @@ export default function CommunityPlusUserProfile({ onComplete }) {
       setValue("phoneE164", phoneE164);
     }
   }, [phoneE164, values.phoneE164, setValue]);
+
+  useEffect(() => {
+  if (values.phoneVerified) {
+    setPhoneStatus("verified");
+  }
+  }, [values.phoneVerified]);
 
   useEffect(() => {
     if (!values.phone) return;
@@ -527,6 +538,7 @@ export default function CommunityPlusUserProfile({ onComplete }) {
 
       setValue("phoneVerified", true);
       setPhoneStatus("verified");
+      setEditingVerifiedPhone(false);
     } catch (err) {
       console.error("Verify phone code failed:", err);
       setValue("phoneVerified", false);
@@ -684,6 +696,10 @@ export default function CommunityPlusUserProfile({ onComplete }) {
                     className="phone-country-select"
                     value={values.phoneCountry}
                     onChange={handlePhoneCountryChange}
+                    disabled={
+                    values.phoneVerified &&
+                    !editingVerifiedPhone
+                    }
                   >
                     {PHONE_COUNTRIES.map((country) => (
                       <option key={country.code} value={country.code}>
@@ -740,54 +756,124 @@ export default function CommunityPlusUserProfile({ onComplete }) {
           </Section>
 
           {isContactStep && (
-            <div className="phone-verification">
-              <div className="hint">
-                Selected country: {selectedPhoneCountry.label}. Verification number:{" "}
-                {phoneE164 || selectedPhoneCountry.dialCode}
-              </div>
+  <div className="phone-verification">
 
-              {values.phone && !phoneIsValid && (
-                <div className="error">
-                  Enter a valid phone number for {selectedPhoneCountry.label}.
-                </div>
-              )}
+    <div className="hint">
+      Selected country: {selectedPhoneCountry.label}. Verification number:{" "}
+      {phoneE164 || selectedPhoneCountry.dialCode}
+    </div>
 
-              {phoneStatus === "idle" && (
-                <div className="hint">
-                  Enter your phone number and request a verification code.
-                </div>
-              )}
+    {/* =========================================
+       VERIFIED STATE
+    ========================================= */}
 
-              {phoneStatus === "sent" && !values.phoneVerified && (
-                <div className="hint">Enter the code sent to your phone.</div>
-              )}
+    {values.phoneVerified && !editingVerifiedPhone ? (
+      <div className="phone-verified-state">
 
-              <div className="phone-verification-row">
-                <Button
-                  variant="ghost"
-                  onClick={sendPhoneCode}
-                  disabled={phoneStatus === "sending" || values.phoneVerified}
-                >
-                  {phoneStatus === "sending" ? "Sending..." : "Send verification code"}
-                </Button>
+        <div className="success">
+          ✓ Verified Number
+        </div>
 
-                <Button
-                  onClick={verifyPhoneCode}
-                  disabled={phoneStatus !== "sent" || values.phoneVerified}
-                >
-                  {phoneStatus === "verifying" ? "Verifying..." : "Verify"}
-                </Button>
-              </div>
+        <div className="verified-phone-display">
+          {phoneE164}
+        </div>
 
-              {phoneStatus === "sent" && (
-                <div className="success">Verification code sent. Enter the code above.</div>
-              )}
+        <div className="hint">
+          This number has already been verified using MFA.
+        </div>
 
-              {values.phoneVerified && <div className="success">Phone number verified.</div>}
+        <div className="phone-verification-row">
+          <Button
+            variant="ghost"
+            onClick={() => {
+              setEditingVerifiedPhone(true);
 
-              {phoneError && <div className="error">{phoneError}</div>}
-            </div>
-          )}
+              setValue("phoneVerified", false);
+
+              setValue("phoneVerificationCode", "");
+
+              setPhoneStatus("idle");
+
+              setPhoneError("");
+            }}
+          >
+            Change Number
+          </Button>
+        </div>
+      </div>
+    ) : (
+      <>
+        {/* =========================================
+           ACTIVE VERIFICATION FLOW
+        ========================================= */}
+
+        {values.phone && !phoneIsValid && (
+          <div className="error">
+            Enter a valid phone number for {selectedPhoneCountry.label}.
+          </div>
+        )}
+
+        {phoneStatus === "idle" && (
+          <div className="hint">
+            Enter your phone number and request a verification code.
+          </div>
+        )}
+
+        {phoneStatus === "sent" && (
+          <div className="hint">
+            Enter the verification code sent to your phone.
+          </div>
+        )}
+
+        <div className="phone-verification-row">
+
+          <Button
+            variant="ghost"
+            onClick={sendPhoneCode}
+            disabled={
+              phoneStatus === "sending" ||
+              !phoneIsValid
+            }
+          >
+            {phoneStatus === "sending"
+              ? "Sending..."
+              : "Send verification code"}
+          </Button>
+
+          <Button
+            onClick={verifyPhoneCode}
+            disabled={
+              phoneStatus !== "sent"
+            }
+          >
+            {phoneStatus === "verifying"
+              ? "Verifying..."
+              : "Verify"}
+          </Button>
+
+        </div>
+
+        {phoneStatus === "sent" && (
+          <div className="success">
+            Verification code sent. Enter the code above.
+          </div>
+        )}
+
+        {phoneStatus === "verified" && (
+          <div className="success">
+            Phone number verified successfully.
+          </div>
+        )}
+
+        {phoneError && (
+          <div className="error">
+            {phoneError}
+          </div>
+        )}
+      </>
+    )}
+  </div>
+)}
 
           {profileMissing && (
             <div className="hint">

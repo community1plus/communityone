@@ -62,6 +62,11 @@ app.get(
   }
 );
 
+import identityRoutes
+from "./routes/identityRoutes.js";
+
+app.use("/api", identityRoutes);
+
 /* =========================
    MIDDLEWARE
 ========================= */
