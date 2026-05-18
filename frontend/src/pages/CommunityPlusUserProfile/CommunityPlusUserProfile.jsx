@@ -247,83 +247,34 @@ const [editingVerifiedPhone, setEditingVerifiedPhone] = useState(false);
 
   useEffect(() => {
 
-  if (!profileReady) return;
+  if (!hydratedProfileRef.current) return;
 
-   if (hydratedProfileRef.current) return;
-  if (!profile) return;
+  if (!values.phone) return;
 
-  const email = getUserEmail(user);
+  const originalPhone =
+    profile?.phoneE164 || profile?.phone || "";
 
-  const emailPrefix = email.split("@")[0] || "";
+  if (
+    originalPhone &&
+    phoneE164 &&
+    phoneE164 !== originalPhone
+  ) {
 
-  const displayName = getUserDisplayName(user);
+    setValue("phoneVerified", false);
 
+    setValue("phoneVerificationCode", "");
 
+    setPhoneStatus("idle");
 
-  setValue("username", profile?.username || emailPrefix || "");
+    setPhoneError("");
 
-  setValue(
-    "display_name",
-    profile?.display_name || displayName || emailPrefix || ""
-  );
-
-  setValue(
-    "userType",
-    profile?.userType || "PERSONAL"
-  );
-
-  setValue(
-    "phoneCountry",
-    profile?.phoneCountry || DEFAULT_PHONE_COUNTRY
-  );
-
-  setValue(
-    "phone",
-    profile?.phoneDisplay || ""
-  );
-
-  setValue(
-    "phoneE164",
-    profile?.phoneE164 || profile?.phone || ""
-  );
-
-  setValue(
-    "phoneVerified",
-    profile?.phoneVerified || false
-  );
-
-  setValue(
-    "phoneVerificationCode",
-    ""
-  );
-
-  setValue(
-    "homeLocation",
-    profile?.homeLocation || homeLocation || null
-  );
-
-  setValue(
-    "social",
-    normaliseSocialState(profile?.social)
-  );
-
-  setValue(
-    "payment.cardName",
-    profile?.payment?.cardName || ""
-  );
-
-  setValue(
-    "payment.last4",
-    profile?.payment?.last4 || ""
-  );
-
-  hydratedProfileRef.current = true;
+  }
 
 }, [
-  profileReady,
-  profile,
-  user,
-  homeLocation,
+  values.phone,
+  phoneE164,
+  profile?.phoneE164,
+  profile?.phone,
   setValue,
 ]);
 
