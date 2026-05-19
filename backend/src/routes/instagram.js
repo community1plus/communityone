@@ -76,14 +76,11 @@ router.get("/start", async (req, res) => {
       redirect_uri:
         process.env.INSTAGRAM_REDIRECT_URI,
 
-      scope:
+     scope:
 [
   "instagram_basic",
-  "instagram_manage_insights",
   "pages_show_list",
   "pages_read_engagement",
-  "pages_manage_metadata",
-  "business_management",
 ].join(","),
 
       response_type: "code",
@@ -225,6 +222,10 @@ const pagesResponse =
 
 const pagesData =
   await pagesResponse.json();
+  console.log(
+  "PAGES DATA:",
+  JSON.stringify(pagesData, null, 2)
+);
 
 if (
   !pagesResponse.ok ||
