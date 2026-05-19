@@ -14,7 +14,7 @@ import profileRoutes from "./routes/profileRoutes.js";
 
 import youtubeRoutes from "./routes/youtubeRoutes.js";
 import xRoutes from "./routes/xRoutes.js";
-
+import instagramRoutes from "./routes/instagram.js";
 
 import uploadUrlRoute from "./routes/posts/uploadUrl.js";
 import postsRoute from "./routes/posts/posts.js";
@@ -323,6 +323,11 @@ app.use(
   xRoutes
 );
 
+app.use(
+  "/api/instagram",
+  instagramRoutes
+);
+
 // app.use("/api/x", identityRoutes);
 
 /* =========================
@@ -353,6 +358,10 @@ console.log(
 
 console.log(
   "   → /api/x"
+);
+
+console.log(
+  "   → /api/instagram"
 );
 
 /* =========================
