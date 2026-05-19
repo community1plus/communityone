@@ -18,6 +18,10 @@ function normaliseProfile(row) {
     display_name: row.display_name || "",
     userType: row.user_type || "PERSONAL",
     phone: row.phone || "",
+    phoneE164: row.phone_e164 || row.phone || "",
+    phoneDisplay: row.phone_display || "",
+    phoneCountry: row.phone_country || "AU",
+    phoneVerified: row.phone_verified || false,
     homeLocation: row.home_location || null,
     social: row.social || {},
     payment: row.payment || {},
@@ -32,6 +36,10 @@ function buildProfilePayload(body = {}) {
     display_name: body.display_name || "",
     user_type: body.userType || body.user_type || "PERSONAL",
     phone: body.phone || body.phoneE164 || "",
+    phone_e164: body.phoneE164 || body.phone || "",
+    phone_display: body.phoneDisplay || "",
+    phone_country: body.phoneCountry || "AU",
+    phone_verified: body.phoneVerified || false,
     home_location: body.homeLocation || body.home_location || null,
     social: body.social || {},
     payment: body.payment || {},
@@ -152,6 +160,25 @@ router.patch("/", requireAuth, async (req, res) => {
         req.body.payment !== undefined
           ? incoming.payment
           : existing.payment || {},
+      phone_e164:
+  req.body.phoneE164 !== undefined
+    ? incoming.phone_e164
+    : existing.phone_e164,
+
+phone_display:
+  req.body.phoneDisplay !== undefined
+    ? incoming.phone_display
+    : existing.phone_display,
+
+phone_country:
+  req.body.phoneCountry !== undefined
+    ? incoming.phone_country
+    : existing.phone_country,
+
+phone_verified:
+  req.body.phoneVerified !== undefined
+    ? incoming.phone_verified
+    : existing.phone_verified,    
     };
 
     const result = await pool.query(
@@ -162,23 +189,36 @@ router.patch("/", requireAuth, async (req, res) => {
         display_name = $3,
         user_type = $4,
         phone = $5,
-        home_location = $6,
-        social = $7::jsonb,
-        payment = $8::jsonb,
+phone_e164 = $6,
+phone_display = $7,
+phone_country = $8,
+phone_verified = $9,
+home_location = $10,
+social = $11::jsonb,
+payment = $12::jsonb,
         updated_at = NOW()
       WHERE user_id = $1
       RETURNING *
       `,
       [
-        userId,
-        merged.username,
-        merged.display_name,
-        merged.user_type,
-        merged.phone,
-        merged.home_location ? JSON.stringify(merged.home_location) : null,
-        JSON.stringify(merged.social || {}),
-        JSON.stringify(merged.payment || {}),
-      ]
+  userId,
+  merged.username,
+  merged.display_name,
+  merged.user_type,
+
+  merged.phone,
+  merged.phone_e164,
+  merged.phone_display,
+  merged.phone_country,
+  merged.phone_verified,
+
+  merged.home_location
+    ? JSON.stringify(merged.home_location)
+    : null,
+
+  JSON.stringify(merged.social || {}),
+  JSON.stringify(merged.payment || {}),
+]
     );
 
     return res.json({
@@ -218,6 +258,10 @@ async function upsertProfile(req, res) {
           payment,
           created_at,
           updated_at
+          data.phone_e164,
+data.phone_display,
+data.phone_country,
+data.phone_verified,
         )
       VALUES
         ($1,$2,$3,$4,$5,$6,$7::jsonb,$8::jsonb,NOW(),NOW())
@@ -230,6 +274,11 @@ async function upsertProfile(req, res) {
         social = EXCLUDED.social,
         payment = EXCLUDED.payment,
         updated_at = NOW()
+        data.phone_e164,
+        phone_e164 = EXCLUDED.phone_e164,
+        phone_display = EXCLUDED.phone_display,
+        phone_country = EXCLUDED.phone_country,
+        phone_verified = EXCLUDED.phone_verified,
       RETURNING *
       `,
       [
