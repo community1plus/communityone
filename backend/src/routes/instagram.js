@@ -211,10 +211,94 @@ router.get("/callback", async (req, res) => {
        GET USER PROFILE
     ========================= */
 
-    const meResponse =
-      await fetch(
-        `${IG_ME_URL}?fields=id,username&access_token=${tokenData.access_token}`
-      );
+    /* =========================
+   GET FACEBOOK PAGES
+========================= */
+
+const pagesResponse =
+  await fetch(
+    `https://graph.facebook.com/v23.0/me/accounts?access_token=${tokenData.access_token}`
+  );
+
+const pagesData =
+  await pagesResponse.json();
+
+if (
+  !pagesResponse.ok ||
+  !pagesData.data?.length
+) {
+
+  console.error(
+    "❌ FACEBOOK PAGES ERROR:",
+    pagesData
+  );
+
+  return redirectFailure(
+    res,
+    "facebook_pages_lookup_failed"
+  );
+}
+
+/* =========================
+   GET INSTAGRAM ACCOUNT
+========================= */
+
+const pageId =
+  pagesData.data[0].id;
+
+const igResponse =
+  await fetch(
+    `https://graph.facebook.com/v23.0/${pageId}?fields=instagram_business_account&access_token=${tokenData.access_token}`
+  );
+
+const igData =
+  await igResponse.json();
+
+if (
+  !igData.instagram_business_account?.id
+) {
+
+  console.error(
+    "❌ INSTAGRAM BUSINESS ACCOUNT ERROR:",
+    igData
+  );
+
+  return redirectFailure(
+    res,
+    "instagram_business_account_missing"
+  );
+}
+
+const instagramId =
+  igData.instagram_business_account.id;
+
+/* =========================
+   GET INSTAGRAM PROFILE
+========================= */
+
+const profileResponse =
+  await fetch(
+    `https://graph.facebook.com/v23.0/${instagramId}?fields=id,username,profile_picture_url&access_token=${tokenData.access_token}`
+  );
+
+const profileData =
+  await profileResponse.json();
+
+if (
+  !profileResponse.ok ||
+  !profileData.id
+) {
+
+  console.error(
+    "❌ INSTAGRAM PROFILE ERROR:",
+    profileData
+  );
+
+  return redirectFailure(
+    res,
+    "instagram_profile_lookup_failed"
+  );
+}
 
     const meData =
       await meResponse.json();
