@@ -28,6 +28,26 @@ import postsRoute from "./routes/posts/posts.js";
 
 const app = express();
 
+app.set("trust proxy", 1);
+
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+
+    resave: false,
+
+    saveUninitialized: false,
+
+    cookie: {
+      secure: true,
+
+      sameSite: "none",
+
+      httpOnly: true,
+    },
+  })
+);
+
 const { Pool } = pkg;
 
 /* =========================
