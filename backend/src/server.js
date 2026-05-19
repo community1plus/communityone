@@ -3,16 +3,30 @@ import "./config/env.js";
 import express from "express";
 import cors from "cors";
 import pkg from "pg";
+import session from "express-session";
+
+/* =========================
+   ROUTES
+========================= */
 
 import userRoutes from "./routes/userRoutes.js";
 import profileRoutes from "./routes/profileRoutes.js";
+
 import youtubeRoutes from "./routes/youtubeRoutes.js";
+import xRoutes from "./routes/xRoutes.js";
+
 import uploadUrlRoute from "./routes/posts/uploadUrl.js";
 import postsRoute from "./routes/posts/posts.js";
 
-const { Pool } = pkg;
+// import identityRoutes from "./routes/identityRoutes.js";
+
+/* =========================
+   APP
+========================= */
 
 const app = express();
+
+const { Pool } = pkg;
 
 /* =========================
    GLOBAL ERROR HANDLERS
@@ -25,47 +39,6 @@ process.on("uncaughtException", (err) => {
 process.on("unhandledRejection", (err) => {
   console.error("🔥 UNHANDLED REJECTION:", err);
 });
-
-/* =========================
-   SEARCH
-========================= */
-
-app.get(
-  "/api/search/hybrid",
-  async (req, res) => {
-    const q = req.query.q;
-
-    res.json({
-      summary:
-        "There is increased activity nearby.",
-
-      suggestions: [
-        "events nearby",
-        "incidents nearby",
-        "community alerts",
-      ],
-
-      results: [
-        {
-          id: 1,
-          type: "incident",
-          title: `Road closure near ${q}`,
-        },
-        {
-          id: 2,
-          type: "event",
-          title:
-            "Community BBQ tonight",
-        },
-      ],
-    });
-  }
-);
-
-import identityRoutes
-from "./routes/identityRoutes.js";
-
-//app.use("/api", identityRoutes);
 
 /* =========================
    MIDDLEWARE
@@ -97,13 +70,40 @@ app.use(
   })
 );
 
-/*
-  IMPORTANT:
-  JSON/body parsing MUST happen
-  BEFORE routes are mounted
-*/
+/* =========================
+   SESSION
+========================= */
 
-app.use(express.json({ limit: "10mb" }));
+app.use(
+  session({
+    secret:
+      process.env.SESSION_SECRET ||
+      "communityone-dev-secret",
+
+    resave: false,
+
+    saveUninitialized: false,
+
+    cookie: {
+      secure:
+        process.env.NODE_ENV === "production",
+
+      httpOnly: true,
+
+      sameSite: "lax",
+    },
+  })
+);
+
+/* =========================
+   BODY PARSING
+========================= */
+
+app.use(
+  express.json({
+    limit: "10mb",
+  })
+);
 
 app.use(
   express.urlencoded({
@@ -111,8 +111,17 @@ app.use(
   })
 );
 
+/* =========================
+   REQUEST LOGGER
+========================= */
+
 app.use((req, res, next) => {
-  console.log("📡 REQUEST:", req.method, req.originalUrl);
+  console.log(
+    "📡 REQUEST:",
+    req.method,
+    req.originalUrl
+  );
+
   next();
 });
 
@@ -123,18 +132,26 @@ app.use((req, res, next) => {
 const dbUrl = process.env.DATABASE_URL;
 
 if (!dbUrl) {
-  console.error("❌ DATABASE_URL is MISSING — app will fail");
+
+  console.error(
+    "❌ DATABASE_URL is MISSING"
+  );
+
 } else {
+
   const safeUrl = dbUrl.replace(
     /\/\/.*:.*@/,
     "//****:****@"
   );
 
-  console.log("🔐 DATABASE_URL:", safeUrl);
+  console.log(
+    "🔐 DATABASE_URL:",
+    safeUrl
+  );
 }
 
 /* =========================
-   DATABASE TEST
+   DATABASE
 ========================= */
 
 const pool = new Pool({
@@ -146,71 +163,181 @@ const pool = new Pool({
 });
 
 (async () => {
+
   try {
+
     await pool.query("SELECT 1");
 
-    console.log("✅ DB connected successfully");
+    console.log(
+      "✅ DB connected successfully"
+    );
+
   } catch (err) {
-    console.error("❌ DB connection failed:", err);
+
+    console.error(
+      "❌ DB connection failed:",
+      err
+    );
   }
+
 })();
 
 /* =========================
-   HEALTH / TEST
+   HEALTH
 ========================= */
 
-app.get("/api/health", async (req, res) => {
-  try {
-    await pool.query("SELECT 1");
+app.get(
+  "/api/health",
+  async (req, res) => {
 
-    res.json({
-      status: "OK",
-      db: "connected",
-    });
-  } catch {
-    res.json({
-      status: "OK",
-      db: "failed",
-    });
+    try {
+
+      await pool.query("SELECT 1");
+
+      res.json({
+        status: "OK",
+        db: "connected",
+      });
+
+    } catch {
+
+      res.json({
+        status: "OK",
+        db: "failed",
+      });
+    }
   }
-});
-
-app.get("/api/route-check", (req, res) => {
-  res.json({
-    version: "route-check-2026-05-10",
-    profileMount: "/api/profile",
-  });
-});
+);
 
 app.get("/api/test", (req, res) => {
   res.json({ ok: true });
 });
 
+app.get(
+  "/api/route-check",
+  (req, res) => {
+
+    res.json({
+      version:
+        "route-check-2026-05-18",
+
+      profileMount:
+        "/api/profile",
+    });
+  }
+);
+
+/* =========================
+   HYBRID SEARCH
+========================= */
+
+app.get(
+  "/api/search/hybrid",
+  async (req, res) => {
+
+    const q = req.query.q;
+
+    res.json({
+      summary:
+        "There is increased activity nearby.",
+
+      suggestions: [
+        "events nearby",
+        "incidents nearby",
+        "community alerts",
+      ],
+
+      results: [
+        {
+          id: 1,
+          type: "incident",
+          title:
+            `Road closure near ${q}`,
+        },
+
+        {
+          id: 2,
+          type: "event",
+          title:
+            "Community BBQ tonight",
+        },
+      ],
+    });
+  }
+);
+
 /* =========================
    ROUTES
 ========================= */
 
-app.use("/api/posts/upload-url", uploadUrlRoute);
+app.use(
+  "/api/posts/upload-url",
+  uploadUrlRoute
+);
 
-app.use("/api/youtube", youtubeRoutes);
+app.use(
+  "/api/posts",
+  postsRoute
+);
 
-app.use("/api/users", userRoutes);
+app.use(
+  "/api/users",
+  userRoutes
+);
 
-app.use("/api/profile", profileRoutes);
+app.use(
+  "/api/profile",
+  profileRoutes
+);
+
+app.use(
+  "/api/youtube",
+  youtubeRoutes
+);
+
+app.use(
+  "/api/x",
+  xRoutes
+);
+
+// app.use("/api", identityRoutes);
+
+/* =========================
+   ROUTE DEBUG
+========================= */
 
 console.log("✅ Routes mounted:");
-console.log("   → /api/posts/upload-url");
-console.log("   → /api/youtube");
-console.log("   → /api/users");
-console.log("   → /api/profile");
 
+console.log(
+  "   → /api/posts/upload-url"
+);
 
-app.use("/api/posts", postsRoute);
+console.log(
+  "   → /api/posts"
+);
+
+console.log(
+  "   → /api/users"
+);
+
+console.log(
+  "   → /api/profile"
+);
+
+console.log(
+  "   → /api/youtube"
+);
+
+console.log(
+  "   → /api/x"
+);
+
 /* =========================
    404 FALLBACK
 ========================= */
 
 app.use((req, res) => {
+
   console.warn(
     "404 ROUTE NOT FOUND:",
     req.method,
@@ -228,8 +355,13 @@ app.use((req, res) => {
    START SERVER
 ========================= */
 
-const PORT = process.env.PORT || 5000;
+const PORT =
+  process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+
+  console.log(
+    `🚀 Server running on port ${PORT}`
+  );
+
 });
