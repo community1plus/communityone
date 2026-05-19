@@ -191,6 +191,15 @@ router.get("/callback", async (req, res) => {
     const tokenData =
       await tokenResponse.json();
 
+      console.log(
+  "📘 TOKEN DATA:",
+  JSON.stringify(
+    tokenData,
+    null,
+    2
+  )
+);
+
     if (
       !tokenResponse.ok ||
       !tokenData.access_token
@@ -225,6 +234,15 @@ const pagesData =
   console.log(
   "PAGES DATA:",
   JSON.stringify(pagesData, null, 2)
+);
+
+console.log(
+  "📘 FACEBOOK PAGES RESPONSE:",
+  JSON.stringify(
+    pagesData,
+    null,
+    2
+  )
 );
 
 if (
