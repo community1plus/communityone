@@ -1,7 +1,5 @@
 import express from "express";
-import {
-  createIdentityController,
-} from "../controllers/identityController.js";
+import { createIdentityController } from "../../controllers/identityController.js";
 
 const router = express.Router();
 
