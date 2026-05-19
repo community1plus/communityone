@@ -488,9 +488,6 @@ useEffect(() => {
     const apiBase =
       import.meta.env.VITE_API_BASE;
 
-    const socialApiBase =
-      import.meta.env.VITE_SOCIAL_API_URL;
-
     if (!apiBase) {
 
       setProfileError(
@@ -500,51 +497,38 @@ useEffect(() => {
       return;
     }
 
-    const renderProviders = {
-      youtube: "/youtube/start",
-      x: "/x/start",
-    };
+    const providerRoutes = {
 
-    const legacyProviders = {
-      facebook:
-        "/social/facebook/start",
+      youtube:
+        "/youtube/start",
+
+      x:
+        "/x/start",
 
       instagram:
-        "/social/instagram/start",
+        "/instagram/start",
+
+      facebook:
+        "/facebook/start",
     };
 
-    /* =========================
-       NEW RENDER BACKEND
-    ========================= */
+    const route =
+      providerRoutes[providerId];
 
-    if (renderProviders[providerId]) {
+    if (!route) {
 
-      window.location.href =
-        `${apiBase}${renderProviders[providerId]}`;
-
-      return;
-    }
-
-    /* =========================
-       LEGACY AWS BACKEND
-    ========================= */
-
-    if (
-      legacyProviders[providerId]
-    ) {
-
-      window.location.href =
-        `${socialApiBase}${legacyProviders[providerId]}?provider=${providerId}&userId=${user?.id || ""}`;
+      setProfileError(
+        "Unsupported social provider."
+      );
 
       return;
     }
 
-    setProfileError(
-      "Unsupported social provider."
-    );
+    window.location.href =
+      `${apiBase}${route}`;
 
   },
-  [user]
+  []
 );
 
   const sendPhoneCode = useCallback(async () => {
