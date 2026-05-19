@@ -3,9 +3,9 @@ import express from "express";
 
 const router = express.Router();
 
-router.post(
+/* router.post(
   "/identities",
   createIdentityController
-);
+); */
 
 export default router;
