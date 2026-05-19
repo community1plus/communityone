@@ -244,54 +244,77 @@ async function upsertProfile(req, res) {
 
     const data = buildProfilePayload(req.body);
 
-    const result = await pool.query(
-      `
-      INSERT INTO user_profiles
-        (
-          user_id,
-          username,
-          display_name,
-          user_type,
-          phone,
-          home_location,
-          social,
-          payment,
-          created_at,
-          updated_at
-          data.phone_e164,
-data.phone_display,
-data.phone_country,
-data.phone_verified,
-        )
-      VALUES
-        ($1,$2,$3,$4,$5,$6,$7::jsonb,$8::jsonb,NOW(),NOW())
-      ON CONFLICT (user_id) DO UPDATE SET
-        username = EXCLUDED.username,
-        display_name = EXCLUDED.display_name,
-        user_type = EXCLUDED.user_type,
-        phone = EXCLUDED.phone,
-        home_location = EXCLUDED.home_location,
-        social = EXCLUDED.social,
-        payment = EXCLUDED.payment,
-        updated_at = NOW()
-        data.phone_e164,
-        phone_e164 = EXCLUDED.phone_e164,
-        phone_display = EXCLUDED.phone_display,
-        phone_country = EXCLUDED.phone_country,
-        phone_verified = EXCLUDED.phone_verified,
-      RETURNING *
-      `,
-      [
-        userId,
-        data.username,
-        data.display_name,
-        data.user_type,
-        data.phone,
-        data.home_location ? JSON.stringify(data.home_location) : null,
-        JSON.stringify(data.social || {}),
-        JSON.stringify(data.payment || {}),
-      ]
-    );
+   const result = await pool.query(
+  `
+  INSERT INTO user_profiles
+    (
+      user_id,
+      username,
+      display_name,
+      user_type,
+
+      phone,
+      phone_e164,
+      phone_display,
+      phone_country,
+      phone_verified,
+
+      home_location,
+      social,
+      payment,
+
+      created_at,
+      updated_at
+    )
+  VALUES
+    (
+      $1,$2,$3,$4,
+      $5,$6,$7,$8,$9,
+      $10,$11::jsonb,$12::jsonb,
+      NOW(),NOW()
+    )
+
+  ON CONFLICT (user_id) DO UPDATE SET
+
+    username = EXCLUDED.username,
+    display_name = EXCLUDED.display_name,
+    user_type = EXCLUDED.user_type,
+
+    phone = EXCLUDED.phone,
+    phone_e164 = EXCLUDED.phone_e164,
+    phone_display = EXCLUDED.phone_display,
+    phone_country = EXCLUDED.phone_country,
+    phone_verified = EXCLUDED.phone_verified,
+
+    home_location = EXCLUDED.home_location,
+    social = EXCLUDED.social,
+    payment = EXCLUDED.payment,
+
+    updated_at = NOW()
+
+  RETURNING *
+  `,
+  [
+    userId,
+
+    data.username,
+    data.display_name,
+    data.user_type,
+
+    data.phone,
+    data.phone_e164,
+    data.phone_display,
+    data.phone_country,
+    data.phone_verified,
+
+    data.home_location
+      ? JSON.stringify(data.home_location)
+      : null,
+
+    JSON.stringify(data.social || {}),
+    JSON.stringify(data.payment || {}),
+  ]
+);
 
     return res.json({
       profile: normaliseProfile(result.rows[0]),
