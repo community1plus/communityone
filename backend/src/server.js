@@ -31,7 +31,9 @@ app.set("trust proxy", 1);
 
 app.use(
   session({
-    secret: process.env.SESSION_SECRET,
+    secret:
+      process.env.SESSION_SECRET ||
+      "communityone-dev-secret",
 
     resave: false,
 
