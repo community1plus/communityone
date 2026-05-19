@@ -77,11 +77,14 @@ router.get("/start", async (req, res) => {
         process.env.INSTAGRAM_REDIRECT_URI,
 
       scope:
-        [
-          "instagram_basic",
-          "pages_show_list",
-          "pages_read_engagement",
-        ].join(","),
+[
+  "instagram_basic",
+  "instagram_manage_insights",
+  "pages_show_list",
+  "pages_read_engagement",
+  "pages_manage_metadata",
+  "business_management",
+].join(","),
 
       response_type: "code",
 
