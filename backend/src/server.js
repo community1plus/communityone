@@ -15,7 +15,6 @@ import profileRoutes from "./routes/profileRoutes.js";
 import youtubeRoutes from "./routes/youtubeRoutes.js";
 import xRoutes from "./routes/xRoutes.js";
 
-import facebookRoutes from "./routes/facebookRoutes.js";
 
 import uploadUrlRoute from "./routes/posts/uploadUrl.js";
 import postsRoute from "./routes/posts/posts.js";
