@@ -483,35 +483,45 @@ useEffect(() => {
   );
 
   const startSocialVerification = useCallback(
-    (providerId) => {
-      if (providerId === "youtube") {
-        const apiBase = import.meta.env.VITE_API_BASE;
+  (providerId) => {
 
-        if (!apiBase) {
-          setProfileError("Backend API is not configured.");
-          return;
-        }
+    const apiBase =
+      import.meta.env.VITE_API_BASE;
 
-        window.location.href = `${apiBase}/youtube/start`;
-        return;
-      }
+    if (!apiBase) {
 
-      const baseUrl = import.meta.env.VITE_SOCIAL_API_URL;
+      setProfileError(
+        "Backend API is not configured."
+      );
 
-      if (!baseUrl) {
-        setProfileError("Social verification API is not configured.");
-        return;
-      }
+      return;
+    }
 
-      const params = new URLSearchParams({
-        provider: providerId,
-        userId: user?.id || getUserEmail(user),
-      });
+    const providerRoutes = {
+      youtube: "/youtube/start",
+      x: "/x/start",
+      instagram: "/instagram/start",
+      facebook: "/facebook/start",
+    };
 
-      window.location.href = `${baseUrl}/social/${providerId}/start?${params.toString()}`;
-    },
-    [user]
-  );
+    const route =
+      providerRoutes[providerId];
+
+    if (!route) {
+
+      setProfileError(
+        "Unsupported social provider."
+      );
+
+      return;
+    }
+
+    window.location.href =
+      `${apiBase}${route}`;
+
+  },
+  []
+);
 
   const sendPhoneCode = useCallback(async () => {
     const cleanPhone = toE164Phone(values.phone, values.phoneCountry);
