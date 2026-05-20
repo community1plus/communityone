@@ -8,7 +8,7 @@ const router = express.Router();
    PROFILE NORMALIZER
 ========================= */
 
-const normalizeProfile = (profile) => {
+normalizeProfile = (profile) => {
 
   if (!profile) return null;
 
