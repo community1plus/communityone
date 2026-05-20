@@ -44,15 +44,12 @@ router.get(
     [user.sub]
   );
 
-const profile =
-  profileResult.rows[0] || null;
-
       /* =========================
          PROFILE
       ========================= */
 
       const profile =
-        user.profile || null;
+  profileResult.rows[0] || null;
 
       /* =========================
          PROVIDERS
