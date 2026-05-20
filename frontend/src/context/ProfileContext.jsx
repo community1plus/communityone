@@ -31,15 +31,7 @@ async function getAuthHeaders(extraHeaders = {}) {
     await fetchAuthSession();
 
   const token =
-    session.tokens
-      ?.accessToken
-      ?.toString();
-
-  if (!token) {
-    throw new Error(
-      "No access token"
-    );
-  }
+  session.tokens?.idToken?.toString();
 
   return {
 
