@@ -170,9 +170,13 @@ req.user = {
   } catch (err) {
 
     console.error(
-      "❌ AUTH ERROR:",
-      err
-    );
+  "❌ AUTH ERROR FULL:",
+  {
+    message: err.message,
+    name: err.name,
+    stack: err.stack,
+  }
+);
 
     return res.status(401).json({
       error:
