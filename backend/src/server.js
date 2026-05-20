@@ -22,8 +22,9 @@ import postsRoute from "./routes/posts/posts.js";
 import facebookRoutes from "./routes/facebookRoutes.js";
 import providerRoutes from "./routes/providerRoutes.js";
 
-import meRoutes
-  from "./routes/meRoutes.js";
+import authMiddleware from "./middleware/authMiddleware.js";
+
+import meRoutes from "./routes/meRoutes.js";
 
 
 
@@ -309,14 +310,21 @@ app.use(
 
 app.use(
   "/api/me",
+  authMiddleware,
   meRoutes
 );
 
 app.use(
   "/api/me/providers",
+  authMiddleware,
   providerRoutes
 );
 
+app.use(
+  "/api/profile",
+  authMiddleware,
+  profileRoutes
+);
 app.use(
   "/api/posts",
   postsRoute
@@ -327,10 +335,6 @@ app.use(
   userRoutes
 );
 
-app.use(
-  "/api/profile",
-  profileRoutes
-);
 
 app.use(
   "/api/facebook",
