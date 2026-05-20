@@ -464,7 +464,12 @@ const pageCount =
       const verifiedAt = new Date().toISOString();
 
       const verifiedSocial = {
-        ...(socialProvider === "youtube"
+        ...normaliseSocialState(values.social),
+        [socialProvider]: {
+          ...(values.social?.[socialProvider] || {}),
+          verified: true,
+          verifiedAt,
+          ...(socialProvider === "youtube"
   ? {
       channelId:
         channelId || "",
