@@ -113,30 +113,45 @@ function isValidInternationalPhone(phone = "", countryCode = DEFAULT_PHONE_COUNT
   return nationalDigits.length >= country.min && nationalDigits.length <= country.max;
 }
 
-function normaliseSocialState(social = {}) {
-  return {
-    facebook:
-      typeof social?.facebook === "object"
-        ? social.facebook
-        : { verified: false },
+function normaliseSocialState(
+  social = {}
+) {
 
-    instagram:
-      typeof social?.instagram === "object"
-        ? social.instagram
-        : { verified: false },
+  const result = {};
 
-    youtube:
-      typeof social?.youtube === "object"
-        ? social.youtube
-        : { verified: false },
+  if (
+    social?.facebook &&
+    typeof social.facebook === "object"
+  ) {
+    result.facebook =
+      social.facebook;
+  }
 
-    x:
-      typeof social?.x === "object"
-        ? social.x
-        : typeof social?.twitter === "object"
-        ? social.twitter
-        : { verified: false },
-  };
+  if (
+    social?.instagram &&
+    typeof social.instagram === "object"
+  ) {
+    result.instagram =
+      social.instagram;
+  }
+
+  if (
+    social?.youtube &&
+    typeof social.youtube === "object"
+  ) {
+    result.youtube =
+      social.youtube;
+  }
+
+  if (
+    social?.x &&
+    typeof social.x === "object"
+  ) {
+    result.x =
+      social.x;
+  }
+
+  return result;
 }
 
 function getSocialStatus(
@@ -334,7 +349,7 @@ console.log("SETTING PHONE", profile?.phoneDisplay);
     profile?.homeLocation || homeLocation || null
   );
 
-  reset(
+ setValue(
   "social",
   profile?.social || {}
 );

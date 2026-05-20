@@ -174,7 +174,7 @@ export default function useForm({
         validateField(path, next);
 
         if (fieldConfig?.validateAsync) {
-          debouncedAsync(path, path, value, fieldConfig, next);
+          debouncedAsync(path, value, fieldConfig, next);
         }
       }
 
