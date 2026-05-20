@@ -19,6 +19,10 @@ import instagramRoutes from "./routes/instagram.js";
 import uploadUrlRoute from "./routes/posts/uploadUrl.js";
 import postsRoute from "./routes/posts/posts.js";
 
+import facebookRoutes from "./routes/facebook.js";
+
+
+
 // import identityRoutes from "./routes/identityRoutes.js";
 
 /* =========================
@@ -311,6 +315,11 @@ app.use(
 app.use(
   "/api/profile",
   profileRoutes
+);
+
+app.use(
+  "/api/facebook",
+  facebookRoutes
 );
 
 app.use(
