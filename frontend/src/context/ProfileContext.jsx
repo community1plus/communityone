@@ -121,32 +121,41 @@ function normaliseProviders(
   providers = {}
 ) {
 
-  return {
+  const result = {};
 
-    facebook:
-      providers?.facebook || {
-        verified: false,
-        connected: false,
-      },
+  if (
+    providers?.facebook &&
+    typeof providers.facebook === "object"
+  ) {
+    result.facebook =
+      providers.facebook;
+  }
 
-    instagram:
-      providers?.instagram || {
-        verified: false,
-        connected: false,
-      },
+  if (
+    providers?.instagram &&
+    typeof providers.instagram === "object"
+  ) {
+    result.instagram =
+      providers.instagram;
+  }
 
-    youtube:
-      providers?.youtube || {
-        verified: false,
-        connected: false,
-      },
+  if (
+    providers?.youtube &&
+    typeof providers.youtube === "object"
+  ) {
+    result.youtube =
+      providers.youtube;
+  }
 
-    x:
-      providers?.x || {
-        verified: false,
-        connected: false,
-      },
-  };
+  if (
+    providers?.x &&
+    typeof providers.x === "object"
+  ) {
+    result.x =
+      providers.x;
+  }
+
+  return result;
 }
 
 /* =========================================
@@ -504,12 +513,20 @@ export function ProfileProvider({
 
         const optimisticProfile = {
 
-          ...previousProfile,
-          ...nextProfile,
+  ...previousProfile,
 
-          updatedAt:
-            Date.now(),
-        };
+  ...nextProfile,
+
+  social: {
+
+    ...(previousProfile?.social || {}),
+
+    ...(nextProfile?.social || {}),
+  },
+
+  updatedAt:
+    Date.now(),
+};
 
         setProfile(
           optimisticProfile
@@ -556,9 +573,19 @@ export function ProfileProvider({
             res?.profile ||
             optimisticProfile;
 
-          setProfile(
-            savedProfile
-          );
+          setProfile({
+
+  ...previousProfile,
+
+  ...savedProfile,
+
+  social: {
+
+    ...(previousProfile?.social || {}),
+
+    ...(savedProfile?.social || {}),
+  },
+});
 
           /* =========================
              HYDRATE PROVIDERS
@@ -685,12 +712,20 @@ export function ProfileProvider({
 
         const optimisticProfile = {
 
-          ...previousProfile,
-          ...patch,
+  ...previousProfile,
 
-          updatedAt:
-            Date.now(),
-        };
+  ...patch,
+
+  social: {
+
+    ...(previousProfile?.social || {}),
+
+    ...(patch?.social || {}),
+  },
+
+  updatedAt:
+    Date.now(),
+};
 
         setProfile(
           optimisticProfile
