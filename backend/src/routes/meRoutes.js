@@ -33,6 +33,19 @@ router.get(
 
       const user =
         req.user;
+        const profileResult =
+  await pool.query(
+    `
+    SELECT *
+    FROM user_profiles
+    WHERE user_id = $1
+    LIMIT 1
+    `,
+    [user.sub]
+  );
+
+const profile =
+  profileResult.rows[0] || null;
 
       /* =========================
          PROFILE
