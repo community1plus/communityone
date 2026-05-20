@@ -20,6 +20,11 @@ import uploadUrlRoute from "./routes/posts/uploadUrl.js";
 import postsRoute from "./routes/posts/posts.js";
 
 import facebookRoutes from "./routes/facebookRoutes.js";
+import providerRoutes from "./routes/providerRoutes.js";
+
+import meRoutes
+  from "./routes/meRoutes.js";
+
 
 
 
@@ -300,6 +305,16 @@ app.get(
 app.use(
   "/api/posts/upload-url",
   uploadUrlRoute
+);
+
+app.use(
+  "/api/me",
+  meRoutes
+);
+
+app.use(
+  "/api/me/providers",
+  providerRoutes
 );
 
 app.use(
