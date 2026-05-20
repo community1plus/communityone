@@ -464,44 +464,50 @@ const pageCount =
       const verifiedAt = new Date().toISOString();
 
       const verifiedSocial = {
-        ...normaliseSocialState(values.social),
-        [socialProvider]: {
-          ...(values.social?.[socialProvider] || {}),
-          verified: true,
-          verifiedAt,
-          ...(socialProvider === "youtube"
-  ? {
-      channelId:
-        channelId || "",
 
-      channelTitle:
-        channelTitle ||
-        "YouTube channel",
-    }
+  ...normaliseSocialState(profile?.social),
 
-  : socialProvider === "facebook"
+  [socialProvider]: {
 
-  ? {
-      facebookId:
-        facebookId || "",
+    ...(profile?.social?.[socialProvider] || {}),
 
-      accountName:
-        name ||
-        "Facebook Account",
+    verified: true,
 
-      email:
-        email || "",
+    verifiedAt,
 
-      profilePicture:
-        profilePicture || "",
+    ...(socialProvider === "youtube"
+      ? {
+          channelId:
+            channelId || "",
 
-      pageCount:
-        Number(pageCount || 0),
-    }
+          channelTitle:
+            channelTitle ||
+            "YouTube channel",
+        }
 
-  : {}),
-        },
-      };
+      : socialProvider === "facebook"
+
+      ? {
+          facebookId:
+            facebookId || "",
+
+          accountName:
+            name ||
+            "Facebook Account",
+
+          email:
+            email || "",
+
+          profilePicture:
+            profilePicture || "",
+
+          pageCount:
+            Number(pageCount || 0),
+        }
+
+      : {}),
+  },
+};
 
       const nextPayload = {
         username: values.username,
