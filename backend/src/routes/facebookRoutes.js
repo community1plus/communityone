@@ -93,8 +93,6 @@ router.get("/start", async (req, res) => {
         scope: [
           "public_profile",
           "email",
-          "pages_show_list",
-          "pages_read_engagement",
         ].join(","),
       });
 
