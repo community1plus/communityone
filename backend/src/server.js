@@ -22,7 +22,7 @@ import postsRoute from "./routes/posts/posts.js";
 import facebookRoutes from "./routes/facebookRoutes.js";
 import providerRoutes from "./routes/providerRoutes.js";
 
-import authMiddleware from "./middleware/authMiddleware.js";
+import authMiddleware from "../middleware/authMiddleware.js";
 
 import meRoutes from "./routes/meRoutes.js";
 
