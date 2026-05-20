@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import jwkToPem from "jwk-to-pem";
+import pool from "../src/db/db.js";
 
 const REGION =
   "ap-southeast-2";
@@ -114,7 +115,7 @@ export default async function authMiddleware(
         }
       );
 
-    import pool from "../src/db/pool.js";
+    
 
     /* =========================
    LOAD PROFILE
