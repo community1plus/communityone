@@ -197,7 +197,7 @@ function getInitialProfileValues({ user, homeLocation }) {
 
     homeLocation: homeLocation || null,
 
-    social: normaliseSocialState(),
+    social: {},
 
     payment: {
       cardName: "",
@@ -335,9 +335,9 @@ console.log("SETTING PHONE", profile?.phoneDisplay);
   );
 
   setValue(
-    "social",
-    normaliseSocialState(profile?.social)
-  );
+  "social",
+  profile?.social || {}
+);
 
   setValue(
     "payment.cardName",
