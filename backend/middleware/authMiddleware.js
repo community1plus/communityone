@@ -114,7 +114,7 @@ export default async function authMiddleware(
         }
       );
 
-    import pool from "../db/pool.js";
+    import pool from "../src/db/pool.js";
 
     /* =========================
    LOAD PROFILE
