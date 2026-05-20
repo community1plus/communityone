@@ -19,7 +19,7 @@ import instagramRoutes from "./routes/instagram.js";
 import uploadUrlRoute from "./routes/posts/uploadUrl.js";
 import postsRoute from "./routes/posts/posts.js";
 
-import facebookRoutes from "./routes/facebook.js";
+import facebookRoutes from "./routes/facebookRoutes.js";
 
 
 
