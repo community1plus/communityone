@@ -4,17 +4,17 @@ import crypto from "crypto";
 const router = express.Router();
 
 /* =========================
-   INSTAGRAM CONFIG
+   INSTAGRAM GRAPH API CONFIG
 ========================= */
 
-const IG_AUTH_URL =
-  "https://www.facebook.com/v23.0/dialog/oauth";
+const FB_OAUTH_URL =
+  "https://www.facebook.com/v25.0/dialog/oauth";
 
-const IG_TOKEN_URL =
-  "https://graph.facebook.com/v23.0/oauth/access_token";
+const FB_TOKEN_URL =
+  "https://graph.facebook.com/v25.0/oauth/access_token";
 
-const IG_ME_URL =
-  "https://graph.instagram.com/me";
+const FB_GRAPH_URL =
+  "https://graph.facebook.com/v25.0";
 
 /* =========================
    FRONTEND REDIRECT
@@ -26,7 +26,8 @@ function getFrontendRedirect(params = {}) {
     process.env.FRONTEND_URL ||
     "https://main.d1ss8rtrtimogr.amplifyapp.com";
 
-  const query = new URLSearchParams(params);
+  const query =
+    new URLSearchParams(params);
 
   return `${baseUrl}/communityplus/profile?${query.toString()}`;
 }
@@ -35,6 +36,11 @@ function redirectFailure(
   res,
   reason = "instagram_verification_failed"
 ) {
+
+  console.error(
+    "❌ INSTAGRAM FAILURE:",
+    reason
+  );
 
   return res.redirect(
     getFrontendRedirect({
@@ -46,7 +52,7 @@ function redirectFailure(
 }
 
 /* =========================
-   START OAUTH
+   START INSTAGRAM OAUTH
 ========================= */
 
 router.get("/start", async (req, res) => {
@@ -64,33 +70,45 @@ router.get("/start", async (req, res) => {
       );
     }
 
-    const state = crypto.randomUUID();
+    const state =
+      crypto.randomUUID();
 
-    req.session.igOAuthState = state;
+    req.session.igOAuthState =
+      state;
 
-    const params = new URLSearchParams({
+    const params =
+      new URLSearchParams({
 
-      client_id:
-        process.env.INSTAGRAM_APP_ID,
+        client_id:
+          process.env.INSTAGRAM_APP_ID,
 
-      redirect_uri:
-        process.env.INSTAGRAM_REDIRECT_URI,
+        redirect_uri:
+          process.env.INSTAGRAM_REDIRECT_URI,
 
-     scope:
-[
-  "instagram_basic",
-  "pages_show_list",
-  "pages_read_engagement",
-].join(","),
+        response_type:
+          "code",
 
-      response_type: "code",
+        state,
 
-      state,
-    });
+        scope: [
+          "instagram_basic",
+          "instagram_manage_messages",
+          "instagram_manage_comments",
+          "pages_show_list",
+          "pages_read_engagement",
+          "business_management",
+        ].join(","),
+      });
 
-    return res.redirect(
-      `${IG_AUTH_URL}?${params.toString()}`
+    const authUrl =
+      `${FB_OAUTH_URL}?${params.toString()}`;
+
+    console.log(
+      "📘 INSTAGRAM AUTH URL:",
+      authUrl
     );
+
+    return res.redirect(authUrl);
 
   } catch (err) {
 
@@ -107,28 +125,52 @@ router.get("/start", async (req, res) => {
 });
 
 /* =========================
-   CALLBACK
+   INSTAGRAM CALLBACK
 ========================= */
 
 router.get("/callback", async (req, res) => {
 
   try {
 
-    const code = req.query.code;
+    const {
+      code,
+      error,
+      error_reason,
+      error_description,
+      state,
+    } = req.query;
 
-    const oauthError =
-      req.query.error;
+    console.log(
+      "📘 INSTAGRAM CALLBACK QUERY:",
+      req.query
+    );
 
-    const state =
-      req.query.state;
+    /* =========================
+       OAUTH ERROR
+    ========================= */
 
-    if (oauthError) {
+    if (error) {
+
+      console.error(
+        "❌ INSTAGRAM OAUTH ERROR:",
+        {
+          error,
+          error_reason,
+          error_description,
+        }
+      );
 
       return redirectFailure(
         res,
-        String(oauthError)
+        error_reason ||
+        error_description ||
+        "instagram_oauth_failed"
       );
     }
+
+    /* =========================
+       MISSING CODE
+    ========================= */
 
     if (!code) {
 
@@ -138,16 +180,34 @@ router.get("/callback", async (req, res) => {
       );
     }
 
+    /* =========================
+       STATE CHECK
+    ========================= */
+
     if (
       state !==
       req.session.igOAuthState
     ) {
+
+      console.error(
+        "❌ STATE MISMATCH",
+        {
+          expected:
+            req.session.igOAuthState,
+          received:
+            state,
+        }
+      );
 
       return redirectFailure(
         res,
         "instagram_state_mismatch"
       );
     }
+
+    /* =========================
+       ENV CHECK
+    ========================= */
 
     if (
       !process.env.INSTAGRAM_APP_ID ||
@@ -174,31 +234,34 @@ router.get("/callback", async (req, res) => {
         client_secret:
           process.env.INSTAGRAM_APP_SECRET,
 
-        grant_type:
-          "authorization_code",
-
         redirect_uri:
           process.env.INSTAGRAM_REDIRECT_URI,
 
         code,
       });
 
+    const tokenUrl =
+      `${FB_TOKEN_URL}?${tokenParams.toString()}`;
+
+    console.log(
+      "📘 TOKEN URL:",
+      tokenUrl
+    );
+
     const tokenResponse =
-      await fetch(
-        `${IG_TOKEN_URL}?${tokenParams.toString()}`
-      );
+      await fetch(tokenUrl);
 
     const tokenData =
       await tokenResponse.json();
 
-      console.log(
-  "📘 TOKEN DATA:",
-  JSON.stringify(
-    tokenData,
-    null,
-    2
-  )
-);
+    console.log(
+      "📘 TOKEN RESPONSE:",
+      JSON.stringify(
+        tokenData,
+        null,
+        2
+      )
+    );
 
     if (
       !tokenResponse.ok ||
@@ -206,7 +269,7 @@ router.get("/callback", async (req, res) => {
     ) {
 
       console.error(
-        "❌ INSTAGRAM TOKEN ERROR:",
+        "❌ TOKEN EXCHANGE FAILED:",
         tokenData
       );
 
@@ -216,124 +279,124 @@ router.get("/callback", async (req, res) => {
       );
     }
 
+    const accessToken =
+      tokenData.access_token;
+
     /* =========================
-       GET USER PROFILE
+       GET FACEBOOK PAGES
     ========================= */
 
-    /* =========================
-   GET FACEBOOK PAGES
-========================= */
+    const pagesResponse =
+      await fetch(
+        `${FB_GRAPH_URL}/me/accounts?access_token=${accessToken}`
+      );
 
-const pagesResponse =
-  await fetch(
-    `https://graph.facebook.com/v23.0/me/accounts?access_token=${tokenData.access_token}`
-  );
+    const pagesData =
+      await pagesResponse.json();
 
-const pagesData =
-  await pagesResponse.json();
-  console.log(
-  "PAGES DATA:",
-  JSON.stringify(pagesData, null, 2)
-);
-
-console.log(
-  "📘 FACEBOOK PAGES RESPONSE:",
-  JSON.stringify(
-    pagesData,
-    null,
-    2
-  )
-);
-
-if (
-  !pagesResponse.ok ||
-  !pagesData.data?.length
-) {
-
-  console.error(
-    "❌ FACEBOOK PAGES ERROR:",
-    pagesData
-  );
-
-  return redirectFailure(
-    res,
-    "facebook_pages_lookup_failed"
-  );
-}
-
-/* =========================
-   GET INSTAGRAM ACCOUNT
-========================= */
-
-const pageId =
-  pagesData.data[0].id;
-
-const igResponse =
-  await fetch(
-    `https://graph.facebook.com/v23.0/${pageId}?fields=instagram_business_account&access_token=${tokenData.access_token}`
-  );
-
-const igData =
-  await igResponse.json();
-
-if (
-  !igData.instagram_business_account?.id
-) {
-
-  console.error(
-    "❌ INSTAGRAM BUSINESS ACCOUNT ERROR:",
-    igData
-  );
-
-  return redirectFailure(
-    res,
-    "instagram_business_account_missing"
-  );
-}
-
-const instagramId =
-  igData.instagram_business_account.id;
-
-/* =========================
-   GET INSTAGRAM PROFILE
-========================= */
-
-const profileResponse =
-  await fetch(
-    `https://graph.facebook.com/v23.0/${instagramId}?fields=id,username,profile_picture_url&access_token=${tokenData.access_token}`
-  );
-
-const profileData =
-  await profileResponse.json();
-
-if (
-  !profileResponse.ok ||
-  !profileData.id
-) {
-
-  console.error(
-    "❌ INSTAGRAM PROFILE ERROR:",
-    profileData
-  );
-
-  return redirectFailure(
-    res,
-    "instagram_profile_lookup_failed"
-  );
-}
-
-    const meData =
-      await meResponse.json();
+    console.log(
+      "📘 FACEBOOK PAGES:",
+      JSON.stringify(
+        pagesData,
+        null,
+        2
+      )
+    );
 
     if (
-      !meResponse.ok ||
-      !meData.id
+      !pagesResponse.ok ||
+      !pagesData.data?.length
     ) {
 
-      console.error(
-        "❌ INSTAGRAM PROFILE ERROR:",
-        meData
+      return redirectFailure(
+        res,
+        "facebook_pages_lookup_failed"
       );
+    }
+
+    /* =========================
+       FIND PAGE WITH IG ACCOUNT
+    ========================= */
+
+    let instagramBusinessId =
+      null;
+
+    let selectedPageId =
+      null;
+
+    for (const page of pagesData.data) {
+
+      const pageId =
+        page.id;
+
+      const igLookupResponse =
+        await fetch(
+          `${FB_GRAPH_URL}/${pageId}?fields=instagram_business_account&access_token=${accessToken}`
+        );
+
+      const igLookupData =
+        await igLookupResponse.json();
+
+      console.log(
+        `📘 PAGE ${pageId} IG LOOKUP:`,
+        JSON.stringify(
+          igLookupData,
+          null,
+          2
+        )
+      );
+
+      if (
+        igLookupData
+          .instagram_business_account
+          ?.id
+      ) {
+
+        instagramBusinessId =
+          igLookupData
+            .instagram_business_account
+            .id;
+
+        selectedPageId =
+          pageId;
+
+        break;
+      }
+    }
+
+    if (!instagramBusinessId) {
+
+      return redirectFailure(
+        res,
+        "instagram_business_account_missing"
+      );
+    }
+
+    /* =========================
+       GET INSTAGRAM PROFILE
+    ========================= */
+
+    const profileResponse =
+      await fetch(
+        `${FB_GRAPH_URL}/${instagramBusinessId}?fields=id,username,profile_picture_url,followers_count,follows_count,media_count&access_token=${accessToken}`
+      );
+
+    const profileData =
+      await profileResponse.json();
+
+    console.log(
+      "📘 INSTAGRAM PROFILE:",
+      JSON.stringify(
+        profileData,
+        null,
+        2
+      )
+    );
+
+    if (
+      !profileResponse.ok ||
+      !profileData.id
+    ) {
 
       return redirectFailure(
         res,
@@ -349,7 +412,7 @@ if (
       .igOAuthState;
 
     /* =========================
-       SUCCESS REDIRECT
+       SUCCESS
     ========================= */
 
     return res.redirect(
@@ -360,10 +423,13 @@ if (
         verified: "true",
 
         username:
-          meData.username || "",
+          profileData.username || "",
 
         instagramId:
-          meData.id || "",
+          profileData.id || "",
+
+        pageId:
+          selectedPageId || "",
       })
     );
 
