@@ -4,6 +4,7 @@ import express from "express";
 import cors from "cors";
 import pkg from "pg";
 import session from "express-session";
+import { pool } from "./db/pool.js";
 
 /* =========================
    ROUTES
@@ -37,10 +38,9 @@ import meRoutes from "./routes/meRoutes.js";
 
 const app = express();
 
-app.set("trust proxy", 1);
-
 app.use(
   session({
+
     secret:
       process.env.SESSION_SECRET ||
       "communityone-dev-secret",
@@ -49,15 +49,25 @@ app.use(
 
     saveUninitialized: false,
 
-    cookie: {
-      secure: true,
+    proxy: true,
 
-      sameSite: "none",
+    cookie: {
+
+      secure:
+        process.env.NODE_ENV === "production",
+
+      sameSite:
+        process.env.NODE_ENV === "production"
+          ? "none"
+          : "lax",
 
       httpOnly: true,
     },
   })
 );
+
+app.set("trust proxy", 1);
+
 
 const { Pool } = pkg;
 
@@ -107,26 +117,7 @@ app.use(
    SESSION
 ========================= */
 
-app.use(
-  session({
-    secret:
-      process.env.SESSION_SECRET ||
-      "communityone-dev-secret",
 
-    resave: false,
-
-    saveUninitialized: false,
-
-    cookie: {
-      secure:
-        process.env.NODE_ENV === "production",
-
-      httpOnly: true,
-
-      sameSite: "lax",
-    },
-  })
-);
 
 /* =========================
    BODY PARSING
@@ -187,13 +178,7 @@ if (!dbUrl) {
    DATABASE
 ========================= */
 
-const pool = new Pool({
-  connectionString: dbUrl,
 
-  ssl: {
-    rejectUnauthorized: false,
-  },
-});
 
 (async () => {
 

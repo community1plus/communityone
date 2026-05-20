@@ -1,5 +1,6 @@
 import express from "express";
 import { pool } from "../db/pool.js";
+import { normalizeProfile } from "../utils/normalizeProfile.js";
 
 const router = express.Router();
 
