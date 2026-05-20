@@ -115,22 +115,50 @@ function isValidInternationalPhone(phone = "", countryCode = DEFAULT_PHONE_COUNT
 
 function normaliseSocialState(social = {}) {
   return {
-    facebook: social?.facebook || { verified: false },
-    instagram: typeof social?.instagram === "object" ? social.instagram : { verified: false },
-    youtube: typeof social?.youtube === "object" ? social.youtube : { verified: false },
-    x: social?.x || (typeof social?.twitter === "object" ? social.twitter : null) || { verified: false },
+    facebook:
+      typeof social?.facebook === "object"
+        ? social.facebook
+        : { verified: false },
+
+    instagram:
+      typeof social?.instagram === "object"
+        ? social.instagram
+        : { verified: false },
+
+    youtube:
+      typeof social?.youtube === "object"
+        ? social.youtube
+        : { verified: false },
+
+    x:
+      typeof social?.x === "object"
+        ? social.x
+        : typeof social?.twitter === "object"
+        ? social.twitter
+        : { verified: false },
   };
 }
 
-function getSocialStatus(social = {}, providerId) {
-  const provider = social?.[providerId];
+function getSocialStatus(
+  social = {},
+  providerId
+) {
+
+  const provider =
+    social?.[providerId];
 
   if (!provider?.verified) {
-    return { verified: false, text: "Not verified" };
+
+    return {
+      verified: false,
+      text: "Not verified",
+    };
   }
 
   return {
+
     verified: true,
+
     text:
       provider.pageName ||
       provider.channelTitle ||
@@ -372,11 +400,43 @@ useEffect(() => {
     const syncSocialVerification = async () => {
       const params = new URLSearchParams(window.location.search);
 
-      const socialProvider = params.get("social");
-      const verified = params.get("verified");
-      const reason = params.get("reason");
-      const channelId = params.get("channelId");
-      const channelTitle = params.get("channelTitle");
+      const socialProvider =
+  params.get("social");
+
+const verified =
+  params.get("verified");
+
+const reason =
+  params.get("reason");
+
+/* =========================
+   YOUTUBE
+========================= */
+
+const channelId =
+  params.get("channelId");
+
+const channelTitle =
+  params.get("channelTitle");
+
+/* =========================
+   FACEBOOK
+========================= */
+
+const facebookId =
+  params.get("facebookId");
+
+const name =
+  params.get("name");
+
+const email =
+  params.get("email");
+
+const profilePicture =
+  params.get("profilePicture");
+
+const pageCount =
+  params.get("pageCount");
 
       if (!socialProvider || socialCallbackHandledRef.current) return;
 
@@ -404,17 +464,37 @@ useEffect(() => {
       const verifiedAt = new Date().toISOString();
 
       const verifiedSocial = {
-        ...normaliseSocialState(values.social),
-        [socialProvider]: {
-          ...(values.social?.[socialProvider] || {}),
-          verified: true,
-          verifiedAt,
-          ...(socialProvider === "youtube"
-            ? {
-                channelId: channelId || "",
-                channelTitle: channelTitle || "YouTube channel",
-              }
-            : {}),
+        ...(socialProvider === "youtube"
+  ? {
+      channelId:
+        channelId || "",
+
+      channelTitle:
+        channelTitle ||
+        "YouTube channel",
+    }
+
+  : socialProvider === "facebook"
+
+  ? {
+      facebookId:
+        facebookId || "",
+
+      accountName:
+        name ||
+        "Facebook Account",
+
+      email:
+        email || "",
+
+      profilePicture:
+        profilePicture || "",
+
+      pageCount:
+        Number(pageCount || 0),
+    }
+
+  : {}),
         },
       };
 
