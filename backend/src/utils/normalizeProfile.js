@@ -1,6 +1,8 @@
 export const normalizeProfile = (profile) => {
 
-  if (!profile) return null;
+  if (!profile) {
+    return null;
+  }
 
   return {
 
