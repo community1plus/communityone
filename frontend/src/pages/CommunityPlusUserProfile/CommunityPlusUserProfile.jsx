@@ -334,7 +334,7 @@ console.log("SETTING PHONE", profile?.phoneDisplay);
     profile?.homeLocation || homeLocation || null
   );
 
-  setValue(
+  reset(
   "social",
   profile?.social || {}
 );
