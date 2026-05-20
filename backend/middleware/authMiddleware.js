@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import jwkToPem from "jwk-to-pem";
-import pool from "../src/db/db.js";
+import pool from "../src/db/pool.js";
 
 const REGION =
   "ap-southeast-2";
