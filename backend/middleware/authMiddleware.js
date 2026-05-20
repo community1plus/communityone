@@ -1,6 +1,9 @@
 import jwt from "jsonwebtoken";
 import jwkToPem from "jwk-to-pem";
-import { pool } from "../src/db/pool.js";
+
+/* =========================================
+   COGNITO CONFIG
+========================================= */
 
 const REGION =
   "ap-southeast-2";
@@ -8,14 +11,21 @@ const REGION =
 const USER_POOL_ID =
   "ap-southeast-2_2TGqghCuO";
 
+const COGNITO_ISSUER =
+  `https://cognito-idp.${REGION}.amazonaws.com/${USER_POOL_ID}`;
+
 const JWKS_URL =
-  `https://cognito-idp.${REGION}.amazonaws.com/${USER_POOL_ID}/.well-known/jwks.json`;
+  `${COGNITO_ISSUER}/.well-known/jwks.json`;
+
+/* =========================================
+   JWKS CACHE
+========================================= */
 
 let pems = null;
 
-/* =========================
+/* =========================================
    LOAD JWKS
-========================= */
+========================================= */
 
 async function getPems() {
 
@@ -23,8 +33,19 @@ async function getPems() {
     return pems;
   }
 
+  console.log(
+    "🔑 LOADING COGNITO JWKS..."
+  );
+
   const response =
     await fetch(JWKS_URL);
+
+  if (!response.ok) {
+
+    throw new Error(
+      `Failed to load JWKS: ${response.status}`
+    );
+  }
 
   const data =
     await response.json();
@@ -37,12 +58,16 @@ async function getPems() {
       jwkToPem(key);
   }
 
+  console.log(
+    "✅ JWKS LOADED"
+  );
+
   return pems;
 }
 
-/* =========================
+/* =========================================
    AUTH MIDDLEWARE
-========================= */
+========================================= */
 
 export default async function authMiddleware(
   req,
@@ -52,8 +77,19 @@ export default async function authMiddleware(
 
   try {
 
+    /* =========================================
+       AUTH HEADER
+    ========================================= */
+
     const authHeader =
       req.headers.authorization;
+
+    console.log(
+      "🔐 AUTH HEADER:",
+      authHeader
+        ? "PRESENT"
+        : "MISSING"
+    );
 
     if (
       !authHeader ||
@@ -68,11 +104,24 @@ export default async function authMiddleware(
       });
     }
 
+    /* =========================================
+       TOKEN
+    ========================================= */
+
     const token =
       authHeader.replace(
         "Bearer ",
         ""
       );
+
+    console.log(
+      "🎫 TOKEN PREFIX:",
+      token.slice(0, 25)
+    );
+
+    /* =========================================
+       DECODE TOKEN
+    ========================================= */
 
     const decoded =
       jwt.decode(
@@ -81,14 +130,34 @@ export default async function authMiddleware(
       );
 
     if (
-      !decoded?.header?.kid
+      !decoded ||
+      !decoded.header ||
+      !decoded.header.kid
     ) {
+
+      console.error(
+        "❌ INVALID TOKEN FORMAT"
+      );
 
       return res.status(401).json({
         error:
           "Invalid token",
       });
     }
+
+    console.log(
+      "🪪 TOKEN HEADER:",
+      decoded.header
+    );
+
+    console.log(
+      "🪪 TOKEN PAYLOAD:",
+      decoded.payload
+    );
+
+    /* =========================================
+       GET PEM
+    ========================================= */
 
     const pems =
       await getPems();
@@ -100,11 +169,19 @@ export default async function authMiddleware(
 
     if (!pem) {
 
+      console.error(
+        "❌ PEM NOT FOUND FOR TOKEN"
+      );
+
       return res.status(401).json({
         error:
           "Invalid token signature",
       });
     }
+
+    /* =========================================
+       VERIFY TOKEN
+    ========================================= */
 
     const verified =
       jwt.verify(
@@ -112,71 +189,85 @@ export default async function authMiddleware(
         pem,
         {
           algorithms: ["RS256"],
+
+          issuer:
+            COGNITO_ISSUER,
         }
       );
 
-    
+    console.log(
+      "✅ VERIFIED TOKEN:",
+      verified
+    );
 
-    /* =========================
-   LOAD PROFILE
-========================= */
+    /* =========================================
+       OPTIONAL TOKEN TYPE CHECK
+    ========================================= */
 
-const profileResult =
-  await pool.query(
-    `
-    SELECT *
-    FROM profiles
-    WHERE cognito_sub = $1
-    LIMIT 1
-    `,
-    [verified.sub]
-  );
+    if (
+      verified.token_use &&
+      verified.token_use !== "id"
+    ) {
 
-const profile =
-  profileResult.rows[0] || null;
+      console.warn(
+        "⚠️ NON-ID TOKEN RECEIVED:",
+        verified.token_use
+      );
+    }
 
-/* =========================
-   ATTACH USER
-========================= */
+    /* =========================================
+       ATTACH USER
+    ========================================= */
 
-req.user = {
+    req.user = {
 
-  id:
-    verified.sub,
+      id:
+        verified.sub,
 
-  sub:
-    verified.sub,
+      sub:
+        verified.sub,
 
-  email:
-    verified.email || "",
+      email:
+        verified.email || "",
 
-  username:
-    verified["cognito:username"] ||
+      username:
+        verified["cognito:username"] ||
 
-    verified.username ||
+        verified.username ||
 
-    "",
+        "",
 
-  profile,
-};
+      tokenUse:
+        verified.token_use ||
+        "",
+
+      provider:
+        verified.identities ||
+        null,
+    };
 
     console.log(
       "✅ AUTH SUCCESS:",
-      req.user.id
+      req.user
     );
 
-    next();
+    return next();
 
   } catch (err) {
 
     console.error(
-  "❌ AUTH ERROR FULL:",
-  {
-    message: err.message,
-    name: err.name,
-    stack: err.stack,
-  }
-);
+      "❌ AUTH ERROR FULL:",
+      {
+        message:
+          err.message,
+
+        name:
+          err.name,
+
+        stack:
+          err.stack,
+      }
+    );
 
     return res.status(401).json({
       error:
