@@ -157,7 +157,6 @@ function normaliseProviders(
 
   return result;
 }
-
 /* =========================================
    PROVIDER
 ========================================= */
