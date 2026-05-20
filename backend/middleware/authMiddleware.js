@@ -114,26 +114,50 @@ export default async function authMiddleware(
         }
       );
 
-    req.user = {
+    import pool from "../db/pool.js";
 
-      id:
-        verified.sub,
+    /* =========================
+   LOAD PROFILE
+========================= */
 
-      sub:
-        verified.sub,
+const profileResult =
+  await pool.query(
+    `
+    SELECT *
+    FROM profiles
+    WHERE cognito_sub = $1
+    LIMIT 1
+    `,
+    [verified.sub]
+  );
 
-      email:
-        verified.email ||
+const profile =
+  profileResult.rows[0] || null;
 
-        "",
+/* =========================
+   ATTACH USER
+========================= */
 
-      username:
-        verified["cognito:username"] ||
+req.user = {
 
-        verified.username ||
+  id:
+    verified.sub,
 
-        "",
-    };
+  sub:
+    verified.sub,
+
+  email:
+    verified.email || "",
+
+  username:
+    verified["cognito:username"] ||
+
+    verified.username ||
+
+    "",
+
+  profile,
+};
 
     console.log(
       "✅ AUTH SUCCESS:",
