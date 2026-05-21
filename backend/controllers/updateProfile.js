@@ -298,12 +298,17 @@ export async function putProfile(req, res) {
         .where({ user_id: userId })
         .first();
 
-        const existing =
-  await db(TABLE)
-    .where({
-      user_id: userId,
-    })
-    .first();
+  console.log(
+  "================ EXISTING PROFILE ================"
+);
+
+console.log(
+  JSON.stringify(
+    existing,
+    null,
+    2
+  )
+);
 
     console.log(
       "Existing profile:",
@@ -399,6 +404,18 @@ export async function putProfile(req, res) {
   }
 );
 
+console.log(
+  "================ EXISTING PROFILE ================"
+);
+
+console.log(
+  JSON.stringify(
+    existing,
+    null,
+    2
+  )
+);
+
     const mergedSocial =
       mergeSocialState(
         existing.social || {},
@@ -486,6 +503,18 @@ const updated = {
     );
 
     console.log(
+  "================ FINAL WRITE ================"
+);
+
+console.log(
+  JSON.stringify(
+    updated,
+    null,
+    2
+  )
+);
+
+    console.log(
       "Saved social field:",
       JSON.stringify(profile?.social, null, 2)
     );
@@ -538,6 +567,18 @@ export async function patchProfile(req, res) {
 
      console.log(
   "================ PATCH PAYLOAD ================"
+);
+
+console.log(
+  "================ PATCH AFTER PICK ================"
+);
+
+console.log(
+  JSON.stringify(
+    patch,
+    null,
+    2
+  )
 );
 
 console.log(
