@@ -491,7 +491,7 @@ if (socialProvider === "youtube") {
   };
 }
 
-if (socialProvider === "facebook") {
+else if (socialProvider === "facebook") {
 
   socialPatch.social.facebook = {
     verified: true,
@@ -507,6 +507,53 @@ if (socialProvider === "facebook") {
       profilePicture || "",
     pageCount:
       Number(pageCount || 0),
+  };
+}
+
+else if (socialProvider === "instagram") {
+
+  socialPatch.social.instagram = {
+
+    verified: true,
+
+    verifiedAt,
+
+    instagramId:
+      instagramId || "",
+
+    username:
+      username || "",
+
+    followersCount:
+      followersCount || 0,
+
+    followsCount:
+      followsCount || 0,
+
+    mediaCount:
+      mediaCount || 0,
+  };
+}
+
+else (socialProvider === "x") {
+
+  socialPatch.social.x = {
+
+    verified: true,
+
+    verifiedAt,
+
+    username:
+      username || "",
+
+    name:
+      name || "",
+
+    profileImage:
+      profileImage || "",
+
+    followersCount:
+      followersCount || 0,
   };
 }
 
