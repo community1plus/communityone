@@ -669,6 +669,7 @@ const updated =
     patch
   );
 
+ 
 /* =========================
    FORCE CANONICAL MERGES TO DB
 ========================= */
@@ -700,6 +701,15 @@ updated.updated_at =
       JSON.stringify(updated, null, 2)
     );
 
+    console.log(
+  "DB SOCIAL WRITE:",
+  JSON.stringify(
+    updated.social,
+    null,
+    2
+  )
+);
+
     const updateResult =
       await db(TABLE)
         .where({ user_id: userId })
@@ -709,6 +719,10 @@ updated.updated_at =
       "Rows updated:",
       updateResult
     );
+
+     console.log(
+  "DB UPDATE COMPLETE"
+);
 
     const nextProfile =
       await db(TABLE)
