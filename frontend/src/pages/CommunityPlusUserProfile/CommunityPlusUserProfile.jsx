@@ -385,12 +385,6 @@ const [editingVerifiedPhone, setEditingVerifiedPhone] = useState(false);
   setValue,
 ]);
 
-useEffect(() => {
-
-  hydratedProfileRef.current = false;
-
-}, [profile]);
-
   useEffect(() => {
     console.log("HYDRATION EFFECT RUNNING", {
   profileReady,
@@ -733,7 +727,7 @@ await loadProfile();
       };
 
 
-await saveProfile(verifiedPayload);
+await patchProfile(verifiedPayload);
     } catch (err) {
       console.error("Verify phone code failed:", err);
       setValue("phoneVerified", false);
@@ -780,7 +774,7 @@ await saveProfile(verifiedPayload);
 
       homeLocation: values.homeLocation || homeLocation,
 
-      social: profile?.social || values.social || {},
+      social: values.social || profile?.social || {},
 
       payment: {
         cardName: values.payment?.cardName || "",
