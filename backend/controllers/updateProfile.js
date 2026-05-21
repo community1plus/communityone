@@ -1,5 +1,11 @@
+
 import deepmerge from "deepmerge";
+
 const TABLE = "user_profiles";
+
+/* =========================
+   MERGE PAYMENT STATE
+========================= */
 
 function mergePaymentState(
   existing = {},
@@ -11,7 +17,36 @@ function mergePaymentState(
   };
 }
 
+/* =========================
+   MERGE SOCIAL STATE
+========================= */
 
+function mergeSocialState(
+  existing = {},
+  incoming = {}
+) {
+  return {
+    facebook: {
+      ...(existing.facebook || {}),
+      ...(incoming.facebook || {}),
+    },
+
+    instagram: {
+      ...(existing.instagram || {}),
+      ...(incoming.instagram || {}),
+    },
+
+    youtube: {
+      ...(existing.youtube || {}),
+      ...(incoming.youtube || {}),
+    },
+
+    x: {
+      ...(existing.x || {}),
+      ...(incoming.x || {}),
+    },
+  };
+}
 
 /* =========================
    PICK PROFILE FIELDS
@@ -26,7 +61,7 @@ function pickProfileFields(body = {}) {
   }
 
   /* =========================
-     SUPPORT BOTH CASE STYLES
+     DISPLAY NAME
   ========================= */
 
   if (body.displayName !== undefined) {
@@ -37,6 +72,10 @@ function pickProfileFields(body = {}) {
     data.display_name = body.display_name;
   }
 
+  /* =========================
+     USER TYPE
+  ========================= */
+
   if (body.userType !== undefined) {
     data.user_type = body.userType;
   }
@@ -44,6 +83,10 @@ function pickProfileFields(body = {}) {
   else if (body.user_type !== undefined) {
     data.user_type = body.user_type;
   }
+
+  /* =========================
+     PHONE
+  ========================= */
 
   if (body.phone !== undefined) {
     data.phone = body.phone;
@@ -65,6 +108,10 @@ function pickProfileFields(body = {}) {
     data.phone_verified = body.phoneVerified;
   }
 
+  /* =========================
+     HOME LOCATION
+  ========================= */
+
   if (body.homeLocation !== undefined) {
     data.home_location = body.homeLocation;
   }
@@ -73,9 +120,17 @@ function pickProfileFields(body = {}) {
     data.home_location = body.home_location;
   }
 
+  /* =========================
+     SOCIAL
+  ========================= */
+
   if (body.social !== undefined) {
     data.social = body.social;
   }
+
+  /* =========================
+     PAYMENT
+  ========================= */
 
   if (body.payment !== undefined) {
     data.payment = body.payment;
@@ -90,7 +145,9 @@ function pickProfileFields(body = {}) {
 
 function normaliseProfile(profile) {
 
-  if (!profile) return null;
+  if (!profile) {
+    return null;
+  }
 
   return {
 
@@ -102,10 +159,6 @@ function normaliseProfile(profile) {
 
     username:
       profile.username || "",
-
-    /* =========================
-       TEMPORARY DUAL FORMAT
-    ========================= */
 
     displayName:
       profile.display_name || "",
@@ -147,46 +200,13 @@ function normaliseProfile(profile) {
       profile.payment || {},
 
     version:
-      profile.version,
+      profile.version || 1,
 
     createdAt:
       profile.created_at,
 
     updatedAt:
       profile.updated_at,
-  };
-}
-
-/* =========================
-   MERGE SOCIAL STATE
-========================= */
-
-function mergeSocialState(
-  existing = {},
-  incoming = {}
-) {
-
-  return {
-
-    facebook: {
-      ...(existing.facebook || {}),
-      ...(incoming.facebook || {}),
-    },
-
-    instagram: {
-      ...(existing.instagram || {}),
-      ...(incoming.instagram || {}),
-    },
-
-    youtube: {
-      ...(existing.youtube || {}),
-      ...(incoming.youtube || {}),
-    },
-
-    x: {
-      ...(existing.x || {}),
-      ...(incoming.x || {}),
-    },
   };
 }
 
@@ -204,7 +224,6 @@ export async function getProfile(req, res) {
     console.log("=================================");
     console.log("GET /profile");
     console.log("Authenticated userId:", userId);
-    console.log("TABLE:", TABLE);
 
     const profile =
       await db(TABLE)
@@ -218,18 +237,10 @@ export async function getProfile(req, res) {
 
     if (!profile) {
 
-      console.log(
-        "No profile found for user"
-      );
-
       return res.status(404).json({
         error: "Profile not found",
       });
     }
-
-    console.log(
-      "Returning profile to frontend"
-    );
 
     return res.json({
 
@@ -267,7 +278,6 @@ export async function putProfile(req, res) {
     console.log("=================================");
     console.log("PUT /profile");
     console.log("Authenticated userId:", userId);
-    console.log("TABLE:", TABLE);
 
     console.log(
       "Raw request body:",
@@ -277,17 +287,8 @@ export async function putProfile(req, res) {
     const data =
       pickProfileFields(req.body);
 
-      console.log(
-  "PATCH AFTER PICK:",
-  JSON.stringify(
-    data,
-    null,
-    2
-  )
-);
-
     console.log(
-      "Picked profile data:",
+      "PUT AFTER PICK:",
       JSON.stringify(data, null, 2)
     );
 
@@ -296,40 +297,18 @@ export async function putProfile(req, res) {
         .where({ user_id: userId })
         .first();
 
-  console.log(
-  "================ EXISTING PROFILE ================"
-);
-
-console.log(
-  JSON.stringify(
-    existing,
-    null,
-    2
-  )
-);
-
     console.log(
-      "Existing profile:",
+      "EXISTING PROFILE:",
       JSON.stringify(existing, null, 2)
     );
 
-    const profile =
-  await db(TABLE)
-    .where({ user_id: useId })
-    .first();
-
-    const now =
-      new Date();
+    const now = new Date();
 
     /* =========================
        CREATE PROFILE
     ========================= */
 
     if (!existing) {
-
-      console.log(
-        "Creating new profile"
-      );
 
       const inserted = {
 
@@ -344,6 +323,12 @@ console.log(
             data.social || {}
           ),
 
+        payment:
+          mergePaymentState(
+            {},
+            data.payment || {}
+          ),
+
         version: 1,
 
         created_at:
@@ -354,7 +339,7 @@ console.log(
       };
 
       console.log(
-        "Insert payload:",
+        "INSERT PAYLOAD:",
         JSON.stringify(inserted, null, 2)
       );
 
@@ -365,20 +350,6 @@ console.log(
         await db(TABLE)
           .where({ user_id: userId })
           .first();
-
-          console.log(
-  "EXISTING PROFILE:",
-  JSON.stringify(
-    profile,
-    null,
-    2
-  )
-);
-
-      console.log(
-        "Inserted profile:",
-        JSON.stringify(profile, null, 2)
-      );
 
       return res.status(201).json({
 
@@ -391,37 +362,8 @@ console.log(
     }
 
     /* =========================
-       UPDATE PROFILE
+       UPDATE EXISTING PROFILE
     ========================= */
-
-    console.log(
-      "Updating existing profile"
-    );
-    console.log(
-  "SOCIAL DIFF",
-  {
-    existing:
-      profile.social,
-
-    incoming:
-      data.social,
-
-    merged:
-      mergedSocialocial,
-  }
-);
-
-console.log(
-  "================ EXISTING PROFILE ================"
-);
-
-console.log(
-  JSON.stringify(
-    existing,
-    null,
-    2
-  )
-);
 
     const mergedSocial =
       mergeSocialState(
@@ -429,74 +371,68 @@ console.log(
         data.social || {}
       );
 
-      console.log(
-  "================ SOCIAL MERGE ================"
-);
+    const mergedPayment =
+      mergePaymentState(
+        existing.payment || {},
+        data.payment || {}
+      );
 
-console.log(
-  JSON.stringify(
-    {
-      existing:
-        existing.social,
+    console.log(
+      "SOCIAL MERGE:",
+      JSON.stringify(
+        {
+          existing:
+            existing.social,
 
-      incoming:
-        data.social,
+          incoming:
+            data.social,
 
-      merged:
+          merged:
+            mergedSocial,
+        },
+        null,
+        2
+      )
+    );
+
+    const updated = {
+
+      ...existing,
+
+      ...data,
+
+      social:
         mergedSocial,
-    },
-    null,
-    2
-  )
-);
 
-   const mergedPayment =
-  mergePaymentState(
-    existing.payment || {},
-    data.payment || {}
-  );
+      payment:
+        mergedPayment,
 
-const updated = {
+      version:
+        (existing.version || 1) + 1,
 
-  ...existing,
+      updated_at:
+        now,
+    };
 
-  ...data,
-
-  social:
-    mergedSocial,
-
-  payment:
-    mergedPayment,
-
-  version:
-    (existing.version || 1) + 1,
-
-  updated_at:
-    now,
-};
     /* =========================
        PREVENT DB POLLUTION
     ========================= */
 
     delete updated.id;
-
     delete updated.user_id;
-
     delete updated.created_at;
 
     console.log(
-      "Update payload:",
+      "FINAL UPDATE:",
       JSON.stringify(updated, null, 2)
     );
 
-    const updateResult =
-      await db(TABLE)
-        .where({ user_id: userId })
-        .update(updated);
+    await db(TABLE)
+      .where({ user_id: userId })
+      .update(updated);
 
     console.log(
-      "Rows updated:",
-      updateResult
+      "DB UPDATE COMPLETE"
     );
 
     const profile =
@@ -505,25 +441,8 @@ const updated = {
         .first();
 
     console.log(
-      "Saved profile from DB:",
+      "SAVED PROFILE:",
       JSON.stringify(profile, null, 2)
-    );
-
-    console.log(
-  "================ FINAL WRITE ================"
-);
-
-console.log(
-  JSON.stringify(
-    updated,
-    null,
-    2
-  )
-);
-
-    console.log(
-      "Saved social field:",
-      JSON.stringify(profile?.social, null, 2)
     );
 
     return res.json({
@@ -562,7 +481,6 @@ export async function patchProfile(req, res) {
     console.log("=================================");
     console.log("PATCH /profile");
     console.log("Authenticated userId:", userId);
-    console.log("TABLE:", TABLE);
 
     console.log(
       "Raw patch body:",
@@ -572,43 +490,10 @@ export async function patchProfile(req, res) {
     const patch =
       pickProfileFields(req.body);
 
-     console.log(
-  "================ PATCH PAYLOAD ================"
-);
-
-console.log(
-  "================ PATCH AFTER PICK ================"
-);
-
-console.log(
-  JSON.stringify(
-    data,
-    null,
-    2
-  )
-);
-
-console.log(
-  JSON.stringify(
-    patch,
-    null,
-    2
-  )
-); 
-
     console.log(
-      "Picked patch data:",
+      "PATCH AFTER PICK:",
       JSON.stringify(patch, null, 2)
     );
-
-    console.log(
-  "PATCH INCOMING:",
-  JSON.stringify(
-    data,
-    null,
-    2
-  )
-);
 
     const clientVersion =
       req.headers["x-version"];
@@ -624,15 +509,11 @@ console.log(
         .first();
 
     console.log(
-      "Existing profile:",
+      "EXISTING PROFILE:",
       JSON.stringify(profile, null, 2)
     );
 
     if (!profile) {
-
-      console.log(
-        "No profile found for PATCH"
-      );
 
       return res.status(404).json({
         error: "Profile not found",
@@ -662,110 +543,103 @@ console.log(
     }
 
     /* =========================
-       MERGE SOCIAL STATE
+       MERGE CANONICAL STATE
     ========================= */
 
     const mergedSocial =
       mergeSocialState(
         profile.social || {},
-        data.social || {}
+        patch.social || {}
       );
+
+    const mergedPayment =
+      mergePaymentState(
+        profile.payment || {},
+        patch.payment || {}
+      );
+
+    console.log(
+      "SOCIAL MERGE:",
+      JSON.stringify(
+        {
+          existing:
+            profile.social,
+
+          incoming:
+            patch.social,
+
+          merged:
+            mergedSocial,
+        },
+        null,
+        2
+      )
+    );
 
     /* =========================
        SAFE PATCH UPDATE
     ========================= */
 
-    const mergedPayment =
-  mergePaymentState(
-    profile.payment || {},
-    patch.payment || {}
-  );
+    const updated =
+      deepmerge(
+        profile,
+        patch
+      );
 
-const updated =
-  deepmerge(
-    profile,
-    patch
-  );
+    /* =========================
+       FORCE CANONICAL MERGES
+    ========================= */
 
- 
-/* =========================
-   FORCE CANONICAL MERGES TO DB
-========================= */
+    updated.social =
+      mergedSocial;
 
-updated.social =
-  mergedSocial;
+    updated.payment =
+      mergedPayment;
 
-updated.payment =
-  mergedPayment;
+    updated.version =
+      (profile.version || 1) + 1;
 
-updated.version =
-  (profile.version || 1) + 1;
-
-updated.updated_at =
-  new Date();
+    updated.updated_at =
+      new Date();
 
     /* =========================
        PREVENT DB POLLUTION
     ========================= */
 
     delete updated.id;
-
     delete updated.user_id;
-
     delete updated.created_at;
 
     console.log(
-      "PATCH update payload:",
+      "PATCH UPDATE PAYLOAD:",
       JSON.stringify(updated, null, 2)
     );
 
     console.log(
-  "DB SOCIAL WRITE:",
-  JSON.stringify(
-    updated.social,
-    null,
-    2
-  )
-);
-
-    const updateResult =
-      await db(TABLE)
-        .where({ user_id: userId })
-        .update(updated);
-
-    console.log(
-      "Rows updated:",
-      updateResult
+      "DB SOCIAL WRITE:",
+      JSON.stringify(
+        updated.social,
+        null,
+        2
+      )
     );
 
-     console.log(
-  "DB UPDATE COMPLETE"
-);
+    await db(TABLE)
+      .where({ user_id: userId })
+      .update(updated);
+
+    console.log(
+      "DB UPDATE COMPLETE"
+    );
 
     const nextProfile =
       await db(TABLE)
         .where({ user_id: userId })
         .first();
 
-        console.log(
-  "================ SAVED PROFILE ================"
-);
-
-console.log(
-  JSON.stringify(
-    nextProfile,
-    null,
-    2
-  )
-);
     console.log(
-      "Updated profile:",
+      "SAVED PROFILE:",
       JSON.stringify(nextProfile, null, 2)
-    );
-
-    console.log(
-      "Updated social field:",
-      JSON.stringify(nextProfile?.social, null, 2)
     );
 
     return res.json({
@@ -789,3 +663,4 @@ console.log(
     });
   }
 }
+
