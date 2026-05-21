@@ -670,7 +670,7 @@ const updated =
   );
 
 /* =========================
-   FORCE CANONICAL MERGES
+   FORCE CANONICAL MERGES TO DB
 ========================= */
 
 updated.social =
