@@ -12,18 +12,7 @@ function mergePaymentState(
 }
 
 
-function mergePaymentState(
-  existing = {},
-  incoming = {}
-) {
 
-  return {
-
-    ...existing,
-
-    ...incoming,
-  };
-}
 /* =========================
    PICK PROFILE FIELDS
 ========================= */
@@ -317,7 +306,7 @@ console.log(
 
     const profile =
   await db(TABLE)
-    .where({ user_id })
+    .where({ user_id: useid })
     .first();
 
     const now =
@@ -397,7 +386,7 @@ console.log(
       profile.social,
 
     incoming:
-      patch.social,
+      data.social,
 
     merged:
       updated.social,
@@ -679,6 +668,16 @@ const updated =
     profile,
     patch
   );
+
+/* =========================
+   FORCE CANONICAL MERGES
+========================= */
+
+updated.social =
+  mergedSocial;
+
+updated.payment =
+  mergedPayment;
 
 updated.version =
   (profile.version || 1) + 1;
