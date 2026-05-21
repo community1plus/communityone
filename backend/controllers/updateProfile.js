@@ -1,5 +1,28 @@
 const TABLE = "user_profiles";
 
+function mergePaymentState(
+  existing = {},
+  incoming = {}
+) {
+  return {
+    ...existing,
+    ...incoming,
+  };
+}
+
+
+function mergePaymentState(
+  existing = {},
+  incoming = {}
+) {
+
+  return {
+
+    ...existing,
+
+    ...incoming,
+  };
+}
 /* =========================
    PICK PROFILE FIELDS
 ========================= */
@@ -368,22 +391,30 @@ export async function putProfile(req, res) {
         data.social || {}
       );
 
-    const updated = {
+   const mergedPayment =
+  mergePaymentState(
+    existing.payment || {},
+    data.payment || {}
+  );
 
-      ...existing,
+const updated = {
 
-      ...data,
+  ...existing,
 
-      social:
-        mergedSocial,
+  ...data,
 
-      version:
-        (existing.version || 1) + 1,
+  social:
+    mergedSocial,
 
-      updated_at:
-        now,
-    };
+  payment:
+    mergedPayment,
 
+  version:
+    (existing.version || 1) + 1,
+
+  updated_at:
+    now,
+};
     /* =========================
        PREVENT DB POLLUTION
     ========================= */
@@ -540,21 +571,30 @@ export async function patchProfile(req, res) {
        SAFE PATCH UPDATE
     ========================= */
 
-    const updated = {
+    const mergedPayment =
+  mergePaymentState(
+    profile.payment || {},
+    patch.payment || {}
+  );
 
-      ...profile,
+const updated = {
 
-      ...patch,
+  ...profile,
 
-      social:
-        mergedSocial,
+  ...patch,
 
-      version:
-        (profile.version || 1) + 1,
+  social:
+    mergedSocial,
 
-      updated_at:
-        new Date(),
-    };
+  payment:
+    mergedPayment,
+
+  version:
+    (profile.version || 1) + 1,
+
+  updated_at:
+    new Date(),
+};
 
     /* =========================
        PREVENT DB POLLUTION

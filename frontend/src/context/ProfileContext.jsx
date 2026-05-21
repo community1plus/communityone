@@ -425,7 +425,6 @@ export function ProfileProvider({
         isAuthenticated,
         user?.id,
         markProfileReady,
-        profile,
       ]
     );
 
@@ -510,31 +509,7 @@ export function ProfileProvider({
         const previousProfile =
           profile;
 
-        const optimisticProfile = {
-
-  ...previousProfile,
-
-  ...nextProfile,
-
-  social: {
-
-    ...(previousProfile?.social || {}),
-
-    ...(nextProfile?.social || {}),
-  },
-
-  updatedAt:
-    Date.now(),
-};
-
-        setProfile(
-          optimisticProfile
-        );
-
-        setProfileMissing(
-          false
-        );
-
+        
         try {
 
           const headers =
@@ -550,65 +525,36 @@ export function ProfileProvider({
             });
 
           console.log(
-            "PUT /profile payload:",
-            optimisticProfile
-          );
+  "PUT /profile payload:",
+  nextProfile
+);
 
-          const res =
-            await apiRef.current.put(
-              "/profile",
-              optimisticProfile,
-              {
-                headers,
-              }
-            );
+const res =
+  await apiRef.current.put(
+    "/profile",
+    nextProfile,
+    { headers }
+  );
 
-          console.log(
-            "PUT /profile response:",
-            res
-          );
+const savedProfile =
+  res?.profile;
 
-          const savedProfile =
-            res?.profile ||
-            optimisticProfile;
+setProfile(savedProfile);
 
-          setProfile({
+if (res?.providers) {
 
-  ...previousProfile,
+  setProviders(
+    normaliseProviders(
+      res.providers
+    )
+  );
+}
 
-  ...savedProfile,
+setProfileMissing(false);
 
-  social: {
+hasLoadedRef.current = true;
 
-    ...(previousProfile?.social || {}),
-
-    ...(savedProfile?.social || {}),
-  },
-});
-
-          /* =========================
-             HYDRATE PROVIDERS
-          ========================= */
-
-          if (
-            res?.providers
-          ) {
-
-            setProviders(
-              normaliseProviders(
-                res.providers
-              )
-            );
-          }
-
-          setProfileMissing(
-            false
-          );
-
-          hasLoadedRef.current =
-            true;
-
-          return savedProfile;
+return savedProfile;
 
         } catch (err) {
 
@@ -650,13 +596,7 @@ export function ProfileProvider({
             err
           );
 
-          setProfile(
-            previousProfile
-          );
-
-          setProfileMissing(
-            !previousProfile
-          );
+          
 
           setProfileError(
             err?.message ||
@@ -676,7 +616,7 @@ export function ProfileProvider({
       [
         isAuthenticated,
         user?.id,
-        profile,
+        profile?.version,
       ]
     );
 
@@ -685,153 +625,86 @@ export function ProfileProvider({
   ========================================= */
 
   const patchProfile =
-    useCallback(
-      async (patch) => {
+  useCallback(
+    async (patch) => {
 
-        if (
-          !isAuthenticated ||
-          !user?.id
-        ) {
+      if (
+        !isAuthenticated ||
+        !user?.id
+      ) {
+        throw new Error(
+          "User is not authenticated"
+        );
+      }
 
-          throw new Error(
-            "User is not authenticated"
+      setProfileSaving(true);
+      setProfileError(null);
+
+      try {
+
+        const headers =
+          await getAuthHeaders({
+
+            "x-version":
+              profile?.version
+                ? String(profile.version)
+                : "",
+          });
+
+        const res =
+          await apiRef.current.patch(
+            "/profile",
+            patch,
+            { headers }
+          );
+
+        const savedProfile =
+          res?.profile;
+
+        setProfile(savedProfile);
+
+        if (res?.providers) {
+
+          setProviders(
+            normaliseProviders(
+              res.providers
+            )
           );
         }
 
-        setProfileSaving(
-          true
+        setProfileMissing(false);
+
+        hasLoadedRef.current =
+          true;
+
+        return savedProfile;
+
+      } catch (err) {
+
+        console.error(
+          "Profile patch failed:",
+          err
         );
 
         setProfileError(
-          null
+          err?.message ||
+          "Profile patch failed"
         );
 
-        const previousProfile =
-          profile;
+        throw err;
 
-        const optimisticProfile = {
+      } finally {
 
-  ...previousProfile,
+        setProfileSaving(false);
+      }
+    },
 
-  ...patch,
-
-  social: {
-
-    ...(previousProfile?.social || {}),
-
-    ...(patch?.social || {}),
-  },
-
-  updatedAt:
-    Date.now(),
-};
-
-        setProfile(
-          optimisticProfile
-        );
-
-        setProfileMissing(
-          false
-        );
-
-        try {
-
-          const headers =
-            await getAuthHeaders({
-
-              "x-version":
-                previousProfile
-                  ?.version
-                  ? String(
-                      previousProfile.version
-                    )
-                  : "",
-            });
-
-          console.log(
-            "PATCH /profile payload:",
-            patch
-          );
-
-          const res =
-            await apiRef.current.patch(
-              "/profile",
-              patch,
-              {
-                headers,
-              }
-            );
-
-          console.log(
-            "PATCH /profile response:",
-            res
-          );
-
-          const savedProfile =
-            res?.profile ||
-            optimisticProfile;
-
-          setProfile(
-            savedProfile
-          );
-
-          if (
-            res?.providers
-          ) {
-
-            setProviders(
-              normaliseProviders(
-                res.providers
-              )
-            );
-          }
-
-          setProfileMissing(
-            false
-          );
-
-          hasLoadedRef.current =
-            true;
-
-          return savedProfile;
-
-        } catch (err) {
-
-          console.error(
-            "Profile patch failed:",
-            err
-          );
-
-          setProfile(
-            previousProfile
-          );
-
-          setProfileMissing(
-            !previousProfile
-          );
-
-          setProfileError(
-            err?.message ||
-            "Profile patch failed"
-          );
-
-          throw err;
-
-        } finally {
-
-          setProfileSaving(
-            false
-          );
-        }
-      },
-
-      [
-        isAuthenticated,
-        user?.id,
-        profile,
-      ]
-    );
-
+    [
+      isAuthenticated,
+      user?.id,
+      profile?.version,
+    ]
+  );
   /* =========================================
      COMPLETION
   ========================================= */
