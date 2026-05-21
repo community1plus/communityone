@@ -303,6 +303,11 @@ export async function putProfile(req, res) {
       JSON.stringify(existing, null, 2)
     );
 
+    const profile =
+  await db(TABLE)
+    .where({ user_id })
+    .first();
+
     const now =
       new Date();
 
@@ -373,6 +378,19 @@ export async function putProfile(req, res) {
     console.log(
       "Updating existing profile"
     );
+    console.log(
+  "SOCIAL DIFF",
+  {
+    existing:
+      profile.social,
+
+    incoming:
+      patch.social,
+
+    merged:
+      updated.social,
+  }
+);
 
     const mergedSocial =
       mergeSocialState(
@@ -494,6 +512,15 @@ export async function patchProfile(req, res) {
       "Picked patch data:",
       JSON.stringify(patch, null, 2)
     );
+
+    console.log(
+  "PATCH INCOMING:",
+  JSON.stringify(
+    patch,
+    null,
+    2
+  )
+);
 
     const clientVersion =
       req.headers["x-version"];
