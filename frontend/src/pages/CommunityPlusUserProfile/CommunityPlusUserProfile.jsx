@@ -238,8 +238,7 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     profileError: contextProfileError,
     completionPercent,
     saveProfile,
-    patchProfile,
-    loadProfile,
+    patchProfile
   } = useProfile();
 
   const form = useForm({
@@ -370,23 +369,27 @@ const [editingVerifiedPhone, setEditingVerifiedPhone] = useState(false);
   });
 
 }, [
-  profileReady
+  profileReady,
+  profile,
+  user,
+  homeLocation,
+  setValues,
 ]);
 
   useEffect(() => {
-    console.log("HYDRATION EFFECT RUNNING", {
+    console.log("HYDRATION EFFECT RUNNING FOR PHONE", {
   profileReady,
   profile,
 });
 
-  if (values.phoneVerified) {
+  if (social?.phoneVerified) {
     setPhoneStatus("verified");
     setEditingVerifiedPhone(false);
   } else {
     setPhoneStatus("idle");
   }
 
-}, [values.phoneVerified]);
+}, [social?.phoneVerified]);
 
   useEffect(() => {
    
@@ -638,7 +641,15 @@ else {
       setProfileError("");
 
       try {
-        await patchProfile(socialPatch);
+        const saved =
+  await patchProfile(
+    socialPatch
+  );
+
+console.log(
+  "SOCIAL SAVED:",
+  saved
+);
 
 
         window.history.replaceState({}, document.title, window.location.pathname);
@@ -655,10 +666,7 @@ else {
   isAuthenticated,
   user?.id,
   profileReady,
-  profile?.social,
   patchProfile,
-  loadProfile,
-  setValue,
 ]);
 
   const handlePhoneCountryChange = useCallback(
@@ -888,8 +896,7 @@ await patchProfile(verifiedPayload);
     phoneCountry:
       values.phoneCountry,
 
-    phoneVerified:
-      profile?.phoneVerified || false,
+  
 
     homeLocation:
       values.homeLocation ||
@@ -941,13 +948,13 @@ await patchProfile(verifiedPayload);
   }, [validateAll, handleSaveProfile]);
 
   const nextStep = useCallback(() => {
-    if (isContactStep && !values.phoneVerified) {
+    if (isContactStep && !social?.phoneVerified) {
       setPhoneError("Verify your phone number before continuing.");
       return;
     }
 
     setCurrentStep((step) => Math.min(profileSteps.length - 1, step + 1));
-  }, [isContactStep, values.phoneVerified]);
+  }, [isContactStep, social?.phoneVerified]);
 
   const prevStep = useCallback(() => {
     setCurrentStep((step) => Math.max(0, step - 1));
@@ -1029,7 +1036,7 @@ await patchProfile(verifiedPayload);
           value={values.phoneCountry}
           onChange={handlePhoneCountryChange}
           disabled={
-            social?.phoneVerified &&
+            profile?.phoneVerified &&
             !editingVerifiedPhone
           }
         >
@@ -1093,7 +1100,7 @@ await patchProfile(verifiedPayload);
 
       <div className="phone-verification">
 
-        {values.phoneVerified && !editingVerifiedPhone ? (
+        {social?.phoneVerified && !editingVerifiedPhone ? (
 
           <div className="phone-verified-state">
 
