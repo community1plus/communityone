@@ -522,7 +522,7 @@ if (socialProvider === "facebook") {
   };
 }
 
-      setValue("social", verifiedSocial);
+     
       setProfileError("");
 
       try {
