@@ -1100,7 +1100,7 @@ await patchProfile(verifiedPayload);
 
       <div className="phone-verification">
 
-        {social?.phoneVerified && !editingVerifiedPhone ? (
+        {profile?.phoneVerified && !editingVerifiedPhone ? (
 
           <div className="phone-verified-state">
 
