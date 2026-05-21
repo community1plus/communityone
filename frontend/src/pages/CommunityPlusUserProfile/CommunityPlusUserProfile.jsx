@@ -207,12 +207,10 @@ function getInitialProfileValues({ user, homeLocation }) {
     phoneCountry: DEFAULT_PHONE_COUNTRY,
     phone: "",
     phoneE164: "",
-    phoneVerified: false,
     phoneVerificationCode: "",
 
     homeLocation: homeLocation || null,
 
-    social: {},
 
     payment: {
       cardName: "",
@@ -288,7 +286,7 @@ const [editingVerifiedPhone, setEditingVerifiedPhone] = useState(false);
     [values.phone, values.phoneCountry]
   );
 
-  const canContinueFromContact = !isContactStep || values.phoneVerified;
+  const canContinueFromContact = !isContactStep || profile?.phoneVerified;
 
   console.log("PROFILE PAGE STATE:", {
   profileReady,
@@ -349,9 +347,6 @@ const [editingVerifiedPhone, setEditingVerifiedPhone] = useState(false);
     profile?.phone ||
     "",
 
-  phoneVerified:
-    profile?.phoneVerified || false,
-
   phoneVerificationCode:
     "",
 
@@ -359,9 +354,6 @@ const [editingVerifiedPhone, setEditingVerifiedPhone] = useState(false);
     profile?.homeLocation ||
     homeLocation ||
     null,
-
-  social:
-    profile?.social || {},
 
   payment: {
 
@@ -378,11 +370,7 @@ const [editingVerifiedPhone, setEditingVerifiedPhone] = useState(false);
   });
 
 }, [
-  profileReady,
-  profile,
-  user,
-  homeLocation,
-  setValue,
+  profileReady
 ]);
 
   useEffect(() => {
@@ -407,7 +395,7 @@ const [editingVerifiedPhone, setEditingVerifiedPhone] = useState(false);
     const originalPhone = profile?.phoneE164 || profile?.phone || "";
 
     if (originalPhone && phoneE164 && phoneE164 !== originalPhone) {
-      setValue("phoneVerified", false);
+      
       setValue("phoneVerificationCode", "");
       setPhoneStatus("idle");
       setPhoneError("");
@@ -528,7 +516,7 @@ if (socialProvider === "facebook") {
       try {
         await patchProfile(socialPatch);
 
-await loadProfile();
+
         window.history.replaceState({}, document.title, window.location.pathname);
       } catch (err) {
         console.error("Social verification save failed:", err);
@@ -556,7 +544,7 @@ await loadProfile();
 
       setValue("phoneCountry", nextCountry);
       setValue("phoneE164", nextE164);
-      setValue("phoneVerified", false);
+      
       setValue("phoneVerificationCode", "");
       
       setPhoneStatus("idle");
@@ -689,33 +677,41 @@ await loadProfile();
         throw new Error("Invalid verification code");
       }
 
-      setValue("phoneVerified", true);
+     
 
       setPhoneStatus("verified");
 
       setEditingVerifiedPhone(false);
 
       const verifiedPayload = {
-        username: values.username,
-        display_name: values.display_name,
-        userType: values.userType,
 
-        phone: toE164Phone(values.phone, values.phoneCountry),
+  phone:
+    toE164Phone(
+      values.phone,
+      values.phoneCountry
+    ),
 
-        phoneE164: toE164Phone(values.phone, values.phoneCountry),
+  phoneE164:
+    toE164Phone(
+      values.phone,
+      values.phoneCountry
+    ),
 
-        phoneDisplay: values.phone,
+  phoneDisplay:
+    values.phone,
 
-        phoneCountry: values.phoneCountry,
+  phoneCountry:
+    values.phoneCountry,
 
-        phoneVerified: true,
-      };
+  phoneVerified:
+    true,
+};
 
 
 await patchProfile(verifiedPayload);
     } catch (err) {
       console.error("Verify phone code failed:", err);
-      setValue("phoneVerified", false);
+      
       setPhoneStatus("error");
       setPhoneError(err?.message || "Verification failed");
     }
@@ -746,28 +742,55 @@ await patchProfile(verifiedPayload);
   }, [setManualLocation, setValue]);
 
   const buildProfilePayload = useCallback(
-    () => ({
-      username: values.username,
-      display_name: values.display_name,
-      userType: values.userType,
+  () => ({
 
-      phone: phoneE164,
+    username:
+      values.username,
+
+    display_name:
+      values.display_name,
+
+    userType:
+      values.userType,
+
+    phone:
       phoneE164,
-      phoneDisplay: values.phone,
-      phoneCountry: values.phoneCountry,
-      phoneVerified: values.phoneVerified,
 
-      homeLocation: values.homeLocation || homeLocation,
+    phoneE164,
 
-      social: values.social || profile?.social || {},
+    phoneDisplay:
+      values.phone,
 
-      payment: {
-        cardName: values.payment?.cardName || "",
-        last4: values.payment?.last4 || "",
-      },
-    }),
-    [values, phoneE164, homeLocation]
-  );
+    phoneCountry:
+      values.phoneCountry,
+
+    phoneVerified:
+      profile?.phoneVerified || false,
+
+    homeLocation:
+      values.homeLocation ||
+      homeLocation,
+
+    social:
+      profile?.social || {},
+
+    payment: {
+
+      cardName:
+        values.payment?.cardName || "",
+
+      last4:
+        values.payment?.last4 || "",
+    },
+  }),
+
+  [
+    values,
+    phoneE164,
+    homeLocation,
+    profile,
+  ]
+);
 
   const handleSaveProfile = useCallback(async () => {
     setSavingProfile(true);
@@ -885,7 +908,7 @@ await patchProfile(verifiedPayload);
           value={values.phoneCountry}
           onChange={handlePhoneCountryChange}
           disabled={
-            values.phoneVerified &&
+            social?.phoneVerified &&
             !editingVerifiedPhone
           }
         >
@@ -901,7 +924,7 @@ await patchProfile(verifiedPayload);
     {isSocialStep ? (
       <div className="social-verification-list">
         {SOCIAL_PROVIDERS.map((provider) => {
-          const status = getSocialStatus(values.social, provider.id);
+          const status = getSocialStatus(profile?.social, provider.id);
 
           return (
             <div className="social-verification-row" key={provider.id}>
@@ -972,7 +995,7 @@ await patchProfile(verifiedPayload);
 
                   setEditingVerifiedPhone(true);
 
-                  setValue("phoneVerified", false);
+                 
 
                   setValue("phoneVerificationCode", "");
 
