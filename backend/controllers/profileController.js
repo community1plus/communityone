@@ -1,4 +1,5 @@
 import deepmerge from "deepmerge";
+import db from "../src/db/db.js";
 
 const TABLE = "profiles";
 
