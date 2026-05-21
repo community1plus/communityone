@@ -280,7 +280,7 @@ export async function putProfile(req, res) {
       console.log(
   "PATCH AFTER PICK:",
   JSON.stringify(
-    patch,
+    data,
     null,
     2
   )
@@ -315,7 +315,7 @@ console.log(
 
     const profile =
   await db(TABLE)
-    .where({ user_id: useid })
+    .where({ user_id: useId })
     .first();
 
     const now =
@@ -407,7 +407,7 @@ console.log(
       data.social,
 
     merged:
-      updated.social,
+      mergedSocialocial,
   }
 );
 
@@ -426,7 +426,7 @@ console.log(
     const mergedSocial =
       mergeSocialState(
         existing.social || {},
-        patch.social || {}
+        data.social || {}
       );
 
       console.log(
@@ -440,7 +440,7 @@ console.log(
         existing.social,
 
       incoming:
-        patch.social,
+        data.social,
 
       merged:
         mergedSocial,
@@ -582,19 +582,13 @@ console.log(
 
 console.log(
   JSON.stringify(
-    patch,
+    data,
     null,
     2
   )
 );
 
-console.log(
-  JSON.stringify(
-    patch,
-    null,
-    2
-  )
-); 
+ 
 
     console.log(
       "Picked patch data:",
@@ -604,7 +598,7 @@ console.log(
     console.log(
   "PATCH INCOMING:",
   JSON.stringify(
-    patch,
+    data,
     null,
     2
   )
@@ -668,7 +662,7 @@ console.log(
     const mergedSocial =
       mergeSocialState(
         profile.social || {},
-        patch.social || {}
+        DataView.social || {}
       );
 
     /* =========================
@@ -681,11 +675,12 @@ console.log(
     patch.payment || {}
   );
 
-const updated =
-  deepmerge(
-    profile,
-    patch
-  );
+const updated = {
+
+  ...profile,
+
+  ...patch,
+};
 
  
 /* =========================
