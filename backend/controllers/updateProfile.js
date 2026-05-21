@@ -1,3 +1,4 @@
+import deepmerge from "deepmerge";
 const TABLE = "user_profiles";
 
 function mergePaymentState(
@@ -178,35 +179,23 @@ function mergeSocialState(
 
   return {
 
-    ...existing,
-
-    ...incoming,
-
     facebook: {
-
       ...(existing.facebook || {}),
-
       ...(incoming.facebook || {}),
     },
 
     instagram: {
-
       ...(existing.instagram || {}),
-
       ...(incoming.instagram || {}),
     },
 
     youtube: {
-
       ...(existing.youtube || {}),
-
       ...(incoming.youtube || {}),
     },
 
     x: {
-
       ...(existing.x || {}),
-
       ...(incoming.x || {}),
     },
   };
@@ -388,7 +377,7 @@ export async function putProfile(req, res) {
     const mergedSocial =
       mergeSocialState(
         existing.social || {},
-        data.social || {}
+        patch.social || {}
       );
 
    const mergedPayment =
@@ -577,24 +566,17 @@ export async function patchProfile(req, res) {
     patch.payment || {}
   );
 
-const updated = {
+const updated =
+  deepmerge(
+    profile,
+    patch
+  );
 
-  ...profile,
+updated.version =
+  (profile.version || 1) + 1;
 
-  ...patch,
-
-  social:
-    mergedSocial,
-
-  payment:
-    mergedPayment,
-
-  version:
-    (profile.version || 1) + 1,
-
-  updated_at:
-    new Date(),
-};
+updated.updated_at =
+  new Date();
 
     /* =========================
        PREVENT DB POLLUTION
