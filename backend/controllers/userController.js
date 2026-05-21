@@ -10,7 +10,9 @@ export async function getMe(req, res) {
        🔐 AUTH CONTEXT
     ========================= */
 
-    const userId = req.user?.sub;
+    c const userId =
+  req.user.id ||
+  req.user.sub;
     const email = req.user?.email;
 
     console.log("👤 getMe user:", { userId, email });

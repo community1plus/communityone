@@ -280,7 +280,8 @@ export async function getProfile(
   try {
 
     const userId =
-      req.user.userId;
+  req.user.id ||
+  req.user.sub;;
 
     console.log(
       "================================="
@@ -363,7 +364,8 @@ export async function putProfile(
   try {
 
     const userId =
-      req.user.userId;
+  req.user.id ||
+  req.user.sub;
 
     console.log(
       "================================="
@@ -700,7 +702,8 @@ export async function patchProfile(
   try {
 
     const userId =
-      req.user.userId;
+  req.user.id ||
+  req.user.sub;
 
     console.log(
       "================================="

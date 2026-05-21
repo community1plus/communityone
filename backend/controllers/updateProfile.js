@@ -219,7 +219,8 @@ export async function getProfile(req, res) {
   try {
 
     const userId =
-      req.user.userId;
+  req.user.id ||
+  req.user.sub;
 
     console.log("=================================");
     console.log("GET /profile");
@@ -273,7 +274,8 @@ export async function putProfile(req, res) {
   try {
 
     const userId =
-      req.user.userId;
+  req.user.id ||
+  req.user.sub;
 
     console.log("=================================");
     console.log("PUT /profile");
@@ -476,7 +478,8 @@ export async function patchProfile(req, res) {
   try {
 
     const userId =
-      req.user.userId;
+  req.user.id ||
+  req.user.sub;
 
     console.log("=================================");
     console.log("PATCH /profile");
