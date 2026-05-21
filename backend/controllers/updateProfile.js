@@ -277,6 +277,15 @@ export async function putProfile(req, res) {
     const data =
       pickProfileFields(req.body);
 
+      console.log(
+  "PATCH AFTER PICK:",
+  JSON.stringify(
+    patch,
+    null,
+    2
+  )
+);
+
     console.log(
       "Picked profile data:",
       JSON.stringify(data, null, 2)
@@ -356,6 +365,15 @@ console.log(
         await db(TABLE)
           .where({ user_id: userId })
           .first();
+
+          console.log(
+  "EXISTING PROFILE:",
+  JSON.stringify(
+    profile,
+    null,
+    2
+  )
+);
 
       console.log(
         "Inserted profile:",
