@@ -481,61 +481,46 @@ const pageCount =
 
       const verifiedAt = new Date().toISOString();
 
-     const existingSocial =
-  profile?.social || {};
-
-const verifiedSocial = {
-
-  ...existingSocial,
-
-  [socialProvider]: {
-
-    ...(existingSocial[socialProvider] || {}),
-
-    verified: true,
-
-    verifiedAt,
-
-    ...(socialProvider === "youtube"
-      ? {
-          channelId:
-            channelId || "",
-
-          channelTitle:
-            channelTitle ||
-            "YouTube channel",
-        }
-
-      : socialProvider === "facebook"
-
-      ? {
-          facebookId:
-            facebookId || "",
-
-          accountName:
-            name ||
-            "Facebook Account",
-
-          email:
-            email || "",
-
-          profilePicture:
-            profilePicture || "",
-
-          pageCount:
-            Number(pageCount || 0),
-        }
-
-      : {}),
-  },
-};
-
+     
 const socialPatch = {
   social: {
-    [socialProvider]:
-      verifiedSocial[socialProvider],
+    [socialProvider]: {
+      verified: true,
+      verifiedAt,
+    },
   },
 };
+
+if (socialProvider === "youtube") {
+
+  socialPatch.social.youtube = {
+    verified: true,
+    verifiedAt,
+    channelId: channelId || "",
+    channelTitle:
+      channelTitle ||
+      "YouTube channel",
+  };
+}
+
+if (socialProvider === "facebook") {
+
+  socialPatch.social.facebook = {
+    verified: true,
+    verifiedAt,
+    facebookId:
+      facebookId || "",
+    accountName:
+      name ||
+      "Facebook Account",
+    email:
+      email || "",
+    profilePicture:
+      profilePicture || "",
+    pageCount:
+      Number(pageCount || 0),
+  };
+}
 
       setValue("social", verifiedSocial);
       setProfileError("");
