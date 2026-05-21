@@ -248,7 +248,16 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     initialValues: getInitialProfileValues({ user, homeLocation }),
   });
 
-  const { values, validateAll, setValue, isFormValidating, clearStorage } = form;
+  const {
+  values,
+  validateAll,
+
+  setValue,
+  setValues,
+
+  isFormValidating,
+  clearStorage,
+} = form;
 
   const [currentStep, setCurrentStep] = useState(0);
   const [savingProfile, setSavingProfile] = useState(false);
