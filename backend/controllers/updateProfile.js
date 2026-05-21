@@ -588,7 +588,13 @@ console.log(
   )
 );
 
- 
+console.log(
+  JSON.stringify(
+    patch,
+    null,
+    2
+  )
+); 
 
     console.log(
       "Picked patch data:",
@@ -662,7 +668,7 @@ console.log(
     const mergedSocial =
       mergeSocialState(
         profile.social || {},
-        DataView.social || {}
+        data.social || {}
       );
 
     /* =========================
@@ -675,12 +681,11 @@ console.log(
     patch.payment || {}
   );
 
-const updated = {
-
-  ...profile,
-
-  ...patch,
-};
+const updated =
+  deepmerge(
+    profile,
+    patch
+  );
 
  
 /* =========================
