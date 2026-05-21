@@ -508,6 +508,18 @@ export async function patchProfile(req, res) {
     const patch =
       pickProfileFields(req.body);
 
+     console.log(
+  "================ PATCH PAYLOAD ================"
+);
+
+console.log(
+  JSON.stringify(
+    patch,
+    null,
+    2
+  )
+); 
+
     console.log(
       "Picked patch data:",
       JSON.stringify(patch, null, 2)
