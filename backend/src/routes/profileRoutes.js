@@ -1,14 +1,8 @@
 import express from "express";
 
-import { requireAuth }
-  from "../../middleware/auth.js";
+import { requireAuth } from "../../middleware/auth.js";
 
-import {
-  getProfile,
-  putProfile,
-  patchProfile,
-} from "../../controllers/profileController.js";
-
+import { getProfile, putProfile, patchProfile } from "../../controllers/profileController.js";
 const router =
   express.Router();
 
