@@ -240,6 +240,8 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     profileError: contextProfileError,
     completionPercent,
     saveProfile,
+    patchProfile,
+    loadProfile,
   } = useProfile();
 
   const form = useForm({
@@ -307,62 +309,60 @@ const [editingVerifiedPhone, setEditingVerifiedPhone] = useState(false);
 
   const displayName = getUserDisplayName(user);
 
-  setValue("username", profile?.username || emailPrefix || "");
+  setValues((prev) => ({
 
-  setValue(
-    "display_name",
-    profile?.display_name || displayName || emailPrefix || ""
-  );
+  ...prev,
 
-  setValue(
-    "userType",
-    profile?.userType || "PERSONAL"
-  );
+  username:
+    profile?.username ||
+    emailPrefix ||
+    "",
 
-  setValue(
-    "phoneCountry",
-    profile?.phoneCountry || DEFAULT_PHONE_COUNTRY
-  );
-console.log("SETTING PHONE", profile?.phoneDisplay);
-  setValue(
-    "phone",
-    profile?.phoneDisplay || ""
-  );
+  display_name:
+    profile?.display_name ||
+    displayName ||
+    emailPrefix ||
+    "",
 
-  setValue(
-    "phoneE164",
-    profile?.phoneE164 || profile?.phone || ""
-  );
+  userType:
+    profile?.userType ||
+    "PERSONAL",
 
-  setValue(
-    "phoneVerified",
-    profile?.phoneVerified || false
-  );
+  phoneCountry:
+    profile?.phoneCountry ||
+    DEFAULT_PHONE_COUNTRY,
 
-  setValue(
-    "phoneVerificationCode",
-    ""
-  );
+  phone:
+    profile?.phoneDisplay || "",
 
-  setValue(
-    "homeLocation",
-    profile?.homeLocation || homeLocation || null
-  );
+  phoneE164:
+    profile?.phoneE164 ||
+    profile?.phone ||
+    "",
 
- setValue(
-  "social",
-  profile?.social || {}
-);
+  phoneVerified:
+    profile?.phoneVerified || false,
 
-  setValue(
-    "payment.cardName",
-    profile?.payment?.cardName || ""
-  );
+  phoneVerificationCode:
+    "",
 
-  setValue(
-    "payment.last4",
-    profile?.payment?.last4 || ""
-  );
+  homeLocation:
+    profile?.homeLocation ||
+    homeLocation ||
+    null,
+
+  social:
+    profile?.social || {},
+
+  payment: {
+
+    cardName:
+      profile?.payment?.cardName || "",
+
+    last4:
+      profile?.payment?.last4 || "",
+  },
+}));
 
   requestAnimationFrame(() => {
     hydratedProfileRef.current = true;
@@ -380,7 +380,7 @@ useEffect(() => {
 
   hydratedProfileRef.current = false;
 
-}, [profile?.id]);
+}, [profile]);
 
   useEffect(() => {
     console.log("HYDRATION EFFECT RUNNING", {
@@ -478,13 +478,16 @@ const pageCount =
 
       const verifiedAt = new Date().toISOString();
 
-      const verifiedSocial = {
+     const existingSocial =
+  profile?.social || {};
 
-  ...normaliseSocialState(profile?.social),
+const verifiedSocial = {
+
+  ...existingSocial,
 
   [socialProvider]: {
 
-    ...(profile?.social?.[socialProvider] || {}),
+    ...(existingSocial[socialProvider] || {}),
 
     verified: true,
 
@@ -524,32 +527,20 @@ const pageCount =
   },
 };
 
-      const nextPayload = {
-        username: values.username,
-        display_name: values.display_name,
-        userType: values.userType,
-
-        phone: phoneE164,
-        phoneE164,
-        phoneDisplay: values.phone,
-        phoneCountry: values.phoneCountry,
-        phoneVerified: values.phoneVerified,
-
-        homeLocation: values.homeLocation || homeLocation,
-
-        social: verifiedSocial,
-
-        payment: {
-          cardName: values.payment?.cardName || "",
-          last4: values.payment?.last4 || "",
-        },
-      };
+const socialPatch = {
+  social: {
+    [socialProvider]:
+      verifiedSocial[socialProvider],
+  },
+};
 
       setValue("social", verifiedSocial);
       setProfileError("");
 
       try {
-        await saveProfile(nextPayload);
+        await patchProfile(socialPatch);
+
+await loadProfile();
         window.history.replaceState({}, document.title, window.location.pathname);
       } catch (err) {
         console.error("Social verification save failed:", err);
@@ -561,15 +552,14 @@ const pageCount =
 
     syncSocialVerification();
   }, [
-    isAuthenticated,
-    user,
-    profileReady,
-    saveProfile,
-    setValue,
-    values,
-    phoneE164,
-    homeLocation,
-  ]);
+  isAuthenticated,
+  user?.id,
+  profileReady,
+  profile?.social,
+  patchProfile,
+  loadProfile,
+  setValue,
+]);
 
   const handlePhoneCountryChange = useCallback(
     (event) => {
@@ -781,7 +771,7 @@ await saveProfile(verifiedPayload);
 
       homeLocation: values.homeLocation || homeLocation,
 
-      social: normaliseSocialState(values.social),
+      social: profile?.social || values.social || {},
 
       payment: {
         cardName: values.payment?.cardName || "",
