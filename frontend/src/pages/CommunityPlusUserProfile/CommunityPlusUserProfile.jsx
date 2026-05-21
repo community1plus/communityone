@@ -382,14 +382,14 @@ const [editingVerifiedPhone, setEditingVerifiedPhone] = useState(false);
   profile,
 });
 
-  if (social?.phoneVerified) {
+  if (profile?.phoneVerified) {
     setPhoneStatus("verified");
     setEditingVerifiedPhone(false);
   } else {
     setPhoneStatus("idle");
   }
 
-}, [social?.phoneVerified]);
+}, [profile?.phoneVerified]);
 
   useEffect(() => {
    
@@ -954,7 +954,7 @@ await patchProfile(verifiedPayload);
     }
 
     setCurrentStep((step) => Math.min(profileSteps.length - 1, step + 1));
-  }, [isContactStep, social?.phoneVerified]);
+  }, [isContactStep, profile?.phoneVerified]);
 
   const prevStep = useCallback(() => {
     setCurrentStep((step) => Math.max(0, step - 1));
