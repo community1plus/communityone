@@ -298,6 +298,13 @@ export async function putProfile(req, res) {
         .where({ user_id: userId })
         .first();
 
+        const existing =
+  await db(TABLE)
+    .where({
+      user_id: userId,
+    })
+    .first();
+
     console.log(
       "Existing profile:",
       JSON.stringify(existing, null, 2)
@@ -397,6 +404,27 @@ export async function putProfile(req, res) {
         existing.social || {},
         patch.social || {}
       );
+
+      console.log(
+  "================ SOCIAL MERGE ================"
+);
+
+console.log(
+  JSON.stringify(
+    {
+      existing:
+        existing.social,
+
+      incoming:
+        patch.social,
+
+      merged:
+        mergedSocial,
+    },
+    null,
+    2
+  )
+);
 
    const mergedPayment =
   mergePaymentState(
@@ -647,6 +675,17 @@ updated.updated_at =
         .where({ user_id: userId })
         .first();
 
+        console.log(
+  "================ SAVED PROFILE ================"
+);
+
+console.log(
+  JSON.stringify(
+    nextProfile,
+    null,
+    2
+  )
+);
     console.log(
       "Updated profile:",
       JSON.stringify(nextProfile, null, 2)
