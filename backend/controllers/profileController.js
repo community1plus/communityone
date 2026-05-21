@@ -1,7 +1,6 @@
-import deepmerge from "deepmerge";
 import db from "../src/db/db.js";
 
-const TABLE = "profiles";
+const TABLE = "user_profiles";
 
 /* =========================
    MERGE SOCIAL STATE
@@ -730,11 +729,10 @@ export async function patchProfile(
        SAFE PATCH UPDATE
     ========================= */
 
-    const updated =
-      deepmerge(
-        existing,
-        patch
-      );
+    const updated = {
+  ...existing,
+  ...patch,
+};
 
     updated.social =
       mergedSocial;
