@@ -535,7 +535,7 @@ else if (socialProvider === "instagram") {
   };
 }
 
-else (socialProvider === "x") {
+else if (socialProvider === "x") {
 
   socialPatch.social.x = {
 
@@ -555,6 +555,17 @@ else (socialProvider === "x") {
     followersCount:
       followersCount || 0,
   };
+}
+else {
+   socialPatch.social[
+    socialProvider
+  ] = {
+
+    verified: true,
+
+    verifiedAt,
+  };
+
 }
 
      
