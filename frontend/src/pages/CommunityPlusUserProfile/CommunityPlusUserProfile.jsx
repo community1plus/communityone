@@ -471,46 +471,90 @@ const pageCount =
 
      
 const socialPatch = {
-  social: {
-    [socialProvider]: {
-      verified: true,
-      verifiedAt,
-    },
-  },
+  social: {},
 };
+
+/* =========================
+   YOUTUBE
+========================= */
 
 if (socialProvider === "youtube") {
 
   socialPatch.social.youtube = {
+
     verified: true,
+
     verifiedAt,
-    channelId: channelId || "",
+
+    channelId:
+      channelId || "",
+
     channelTitle:
       channelTitle ||
       "YouTube channel",
   };
 }
 
-else if (socialProvider === "facebook") {
+/* =========================
+   FACEBOOK
+========================= */
+
+else if (
+  socialProvider === "facebook"
+) {
 
   socialPatch.social.facebook = {
+
     verified: true,
+
     verifiedAt,
+
     facebookId:
       facebookId || "",
+
     accountName:
       name ||
       "Facebook Account",
+
     email:
       email || "",
+
     profilePicture:
       profilePicture || "",
+
     pageCount:
       Number(pageCount || 0),
   };
 }
 
-else if (socialProvider === "instagram") {
+/* =========================
+   INSTAGRAM
+========================= */
+
+else if (
+  socialProvider === "instagram"
+) {
+
+  const instagramId =
+    params.get("instagramId");
+
+  const instagramUsername =
+    params.get("username");
+
+  const followersCount =
+    Number(
+      params.get("followersCount") || 0
+    );
+
+  const followsCount =
+    Number(
+      params.get("followsCount") || 0
+    );
+
+  const mediaCount =
+    Number(
+      params.get("mediaCount") || 0
+    );
 
   socialPatch.social.instagram = {
 
@@ -522,20 +566,37 @@ else if (socialProvider === "instagram") {
       instagramId || "",
 
     username:
-      username || "",
+      instagramUsername || "",
 
-    followersCount:
-      followersCount || 0,
+    followersCount,
 
-    followsCount:
-      followsCount || 0,
+    followsCount,
 
-    mediaCount:
-      mediaCount || 0,
+    mediaCount,
   };
 }
 
-else if (socialProvider === "x") {
+/* =========================
+   X / TWITTER
+========================= */
+
+else if (
+  socialProvider === "x"
+) {
+
+  const xUsername =
+    params.get("username");
+
+  const xName =
+    params.get("name");
+
+  const xProfileImage =
+    params.get("profileImage");
+
+  const xFollowersCount =
+    Number(
+      params.get("followersCount") || 0
+    );
 
   socialPatch.social.x = {
 
@@ -544,20 +605,26 @@ else if (socialProvider === "x") {
     verifiedAt,
 
     username:
-      username || "",
+      xUsername || "",
 
     name:
-      name || "",
+      xName || "",
 
     profileImage:
-      profileImage || "",
+      xProfileImage || "",
 
     followersCount:
-      followersCount || 0,
+      xFollowersCount,
   };
 }
+
+/* =========================
+   FALLBACK
+========================= */
+
 else {
-   socialPatch.social[
+
+  socialPatch.social[
     socialProvider
   ] = {
 
@@ -565,7 +632,6 @@ else {
 
     verifiedAt,
   };
-
 }
 
      
@@ -828,9 +894,6 @@ await patchProfile(verifiedPayload);
     homeLocation:
       values.homeLocation ||
       homeLocation,
-
-    social:
-      profile?.social || {},
 
     payment: {
 
