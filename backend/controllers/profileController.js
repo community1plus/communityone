@@ -1,6 +1,8 @@
-import db from "../src/db/db.js";
+import { pool }
+  from "../db/db.js";
 
-const TABLE = "user_profiles";
+const TABLE =
+  "user_profiles";
 
 /* =========================
    MERGE SOCIAL STATE
@@ -61,14 +63,18 @@ function pickProfileFields(
   const data = {};
 
   if (body.username !== undefined) {
-    data.username = body.username;
+    data.username =
+      body.username;
   }
 
   /* =========================
      DISPLAY NAME
   ========================= */
 
-  if (body.displayName !== undefined) {
+  if (
+    body.displayName !== undefined
+  ) {
+
     data.display_name =
       body.displayName;
   }
@@ -85,7 +91,9 @@ function pickProfileFields(
      USER TYPE
   ========================= */
 
-  if (body.userType !== undefined) {
+  if (
+    body.userType !== undefined
+  ) {
 
     data.user_type =
       body.userType;
@@ -104,10 +112,14 @@ function pickProfileFields(
   ========================= */
 
   if (body.phone !== undefined) {
-    data.phone = body.phone;
+
+    data.phone =
+      body.phone;
   }
 
-  if (body.phoneE164 !== undefined) {
+  if (
+    body.phoneE164 !== undefined
+  ) {
 
     data.phone_e164 =
       body.phoneE164;
@@ -161,7 +173,9 @@ function pickProfileFields(
      SOCIAL
   ========================= */
 
-  if (body.social !== undefined) {
+  if (
+    body.social !== undefined
+  ) {
 
     data.social =
       body.social;
@@ -282,12 +296,19 @@ export async function getProfile(
       userId
     );
 
+    const result =
+      await pool.query(
+        `
+          SELECT *
+          FROM ${TABLE}
+          WHERE user_id = $1
+          LIMIT 1
+        `,
+        [userId]
+      );
+
     const profile =
-      await db(TABLE)
-        .where({
-          user_id: userId,
-        })
-        .first();
+      result.rows[0];
 
     console.log(
       "FETCHED PROFILE:",
@@ -381,12 +402,19 @@ export async function putProfile(
       )
     );
 
+    const existingResult =
+      await pool.query(
+        `
+          SELECT *
+          FROM ${TABLE}
+          WHERE user_id = $1
+          LIMIT 1
+        `,
+        [userId]
+      );
+
     const existing =
-      await db(TABLE)
-        .where({
-          user_id: userId,
-        })
-        .first();
+      existingResult.rows[0];
 
     console.log(
       "EXISTING PROFILE:",
@@ -443,26 +471,59 @@ export async function putProfile(
         )
       );
 
-      await db(TABLE)
-        .insert(inserted);
-
-      const saved =
-        await db(TABLE)
-          .where({
-            user_id: userId,
-          })
-          .first();
-
-      return res.status(201).json({
-
-        profile:
-          normaliseProfile(
-            saved
+      await pool.query(
+        `
+          INSERT INTO ${TABLE} (
+            user_id,
+            username,
+            display_name,
+            user_type,
+            phone,
+            phone_e164,
+            phone_display,
+            phone_country,
+            phone_verified,
+            home_location,
+            social,
+            payment,
+            version,
+            created_at,
+            updated_at
+          )
+          VALUES (
+            $1,$2,$3,$4,$5,
+            $6,$7,$8,$9,$10,
+            $11::jsonb,
+            $12::jsonb,
+            $13,$14,$15
+          )
+        `,
+        [
+          inserted.user_id,
+          inserted.username,
+          inserted.display_name,
+          inserted.user_type,
+          inserted.phone,
+          inserted.phone_e164,
+          inserted.phone_display,
+          inserted.phone_country,
+          inserted.phone_verified,
+          inserted.home_location
+            ? JSON.stringify(
+                inserted.home_location
+              )
+            : null,
+          JSON.stringify(
+            inserted.social || {}
           ),
-
-        version:
-          saved.version,
-      });
+          JSON.stringify(
+            inserted.payment || {}
+          ),
+          inserted.version,
+          inserted.created_at,
+          inserted.updated_at,
+        ]
+      );
     }
 
     /* =========================
@@ -471,13 +532,13 @@ export async function putProfile(
 
     const mergedSocial =
       mergeSocialState(
-        existing.social || {},
+        existing?.social || {},
         data.social || {}
       );
 
     const mergedPayment =
       mergePaymentState(
-        existing.payment || {},
+        existing?.payment || {},
         data.payment || {}
       );
 
@@ -486,7 +547,7 @@ export async function putProfile(
       JSON.stringify(
         {
           existing:
-            existing.social,
+            existing?.social,
 
           incoming:
             data.social,
@@ -512,7 +573,7 @@ export async function putProfile(
         mergedPayment,
 
       version:
-        (existing.version || 1) + 1,
+        (existing?.version || 1) + 1,
 
       updated_at:
         now,
@@ -531,22 +592,68 @@ export async function putProfile(
       )
     );
 
-    await db(TABLE)
-      .where({
-        user_id: userId,
-      })
-      .update(updated);
+    await pool.query(
+      `
+        UPDATE ${TABLE}
+        SET
+          username = $1,
+          display_name = $2,
+          user_type = $3,
+          phone = $4,
+          phone_e164 = $5,
+          phone_display = $6,
+          phone_country = $7,
+          phone_verified = $8,
+          home_location = $9::jsonb,
+          social = $10::jsonb,
+          payment = $11::jsonb,
+          version = $12,
+          updated_at = $13
+        WHERE user_id = $14
+      `,
+      [
+        updated.username,
+        updated.display_name,
+        updated.user_type,
+        updated.phone,
+        updated.phone_e164,
+        updated.phone_display,
+        updated.phone_country,
+        updated.phone_verified,
+        updated.home_location
+          ? JSON.stringify(
+              updated.home_location
+            )
+          : null,
+        JSON.stringify(
+          updated.social || {}
+        ),
+        JSON.stringify(
+          updated.payment || {}
+        ),
+        updated.version,
+        updated.updated_at,
+        userId,
+      ]
+    );
 
     console.log(
       "DB UPDATE COMPLETE"
     );
 
+    const savedResult =
+      await pool.query(
+        `
+          SELECT *
+          FROM ${TABLE}
+          WHERE user_id = $1
+          LIMIT 1
+        `,
+        [userId]
+      );
+
     const saved =
-      await db(TABLE)
-        .where({
-          user_id: userId,
-        })
-        .first();
+      savedResult.rows[0];
 
     console.log(
       "SAVED PROFILE:",
@@ -632,17 +739,19 @@ export async function patchProfile(
       )
     );
 
-    const clientVersion =
-      req.headers[
-        "x-version"
-      ];
+    const existingResult =
+      await pool.query(
+        `
+          SELECT *
+          FROM ${TABLE}
+          WHERE user_id = $1
+          LIMIT 1
+        `,
+        [userId]
+      );
 
     const existing =
-      await db(TABLE)
-        .where({
-          user_id: userId,
-        })
-        .first();
+      existingResult.rows[0];
 
     console.log(
       "EXISTING PROFILE:",
@@ -660,40 +769,6 @@ export async function patchProfile(
           "Profile not found",
       });
     }
-
-    /* =========================
-       VERSION CHECK
-    ========================= */
-
-    if (
-      clientVersion &&
-      Number(
-        clientVersion
-      ) !== existing.version
-    ) {
-
-      console.log(
-        "VERSION CONFLICT"
-      );
-
-      return res.status(409).json({
-
-        error:
-          "VERSION_CONFLICT",
-
-        serverProfile:
-          normaliseProfile(
-            existing
-          ),
-
-        serverVersion:
-          existing.version,
-      });
-    }
-
-    /* =========================
-       MERGE STATE
-    ========================= */
 
     const mergedSocial =
       mergeSocialState(
@@ -725,26 +800,24 @@ export async function patchProfile(
       )
     );
 
-    /* =========================
-       SAFE PATCH UPDATE
-    ========================= */
-
     const updated = {
-  ...existing,
-  ...patch,
-};
 
-    updated.social =
-      mergedSocial;
+      ...existing,
 
-    updated.payment =
-      mergedPayment;
+      ...patch,
 
-    updated.version =
-      (existing.version || 1) + 1;
+      social:
+        mergedSocial,
 
-    updated.updated_at =
-      new Date();
+      payment:
+        mergedPayment,
+
+      version:
+        (existing.version || 1) + 1,
+
+      updated_at:
+        new Date(),
+    };
 
     delete updated.id;
     delete updated.user_id;
@@ -768,22 +841,68 @@ export async function patchProfile(
       )
     );
 
-    await db(TABLE)
-      .where({
-        user_id: userId,
-      })
-      .update(updated);
+    await pool.query(
+      `
+        UPDATE ${TABLE}
+        SET
+          username = $1,
+          display_name = $2,
+          user_type = $3,
+          phone = $4,
+          phone_e164 = $5,
+          phone_display = $6,
+          phone_country = $7,
+          phone_verified = $8,
+          home_location = $9::jsonb,
+          social = $10::jsonb,
+          payment = $11::jsonb,
+          version = $12,
+          updated_at = $13
+        WHERE user_id = $14
+      `,
+      [
+        updated.username,
+        updated.display_name,
+        updated.user_type,
+        updated.phone,
+        updated.phone_e164,
+        updated.phone_display,
+        updated.phone_country,
+        updated.phone_verified,
+        updated.home_location
+          ? JSON.stringify(
+              updated.home_location
+            )
+          : null,
+        JSON.stringify(
+          updated.social || {}
+        ),
+        JSON.stringify(
+          updated.payment || {}
+        ),
+        updated.version,
+        updated.updated_at,
+        userId,
+      ]
+    );
 
     console.log(
       "DB UPDATE COMPLETE"
     );
 
+    const savedResult =
+      await pool.query(
+        `
+          SELECT *
+          FROM ${TABLE}
+          WHERE user_id = $1
+          LIMIT 1
+        `,
+        [userId]
+      );
+
     const saved =
-      await db(TABLE)
-        .where({
-          user_id: userId,
-        })
-        .first();
+      savedResult.rows[0];
 
     console.log(
       "SAVED PROFILE:",
