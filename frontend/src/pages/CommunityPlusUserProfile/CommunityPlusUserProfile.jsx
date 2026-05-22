@@ -74,10 +74,7 @@ const profileSteps = [
   {
     id: "payment",
     title: "PAYMENT DETAILS",
-    fields: [
-      { name: "payment.cardName", label: "Name on Card", type: "text" },
-      { name: "payment.last4", label: "Card Last 4 Digits", type: "text" },
-    ],
+    customComponent: "stripe-payment",
   },
 ];
 

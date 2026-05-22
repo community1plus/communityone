@@ -23,7 +23,7 @@ function toTimestamp(value) {
   return new Date(value);
 }
 
-async function hydrateMediaWithSignedUrls(posts = []) {
+ async function hydrateMediaWithSignedUrls(posts = []) {
   return Promise.all(
     posts.map(async (post) => {
       const media = Array.isArray(post.media) ? post.media : [];

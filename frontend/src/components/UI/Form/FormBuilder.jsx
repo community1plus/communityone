@@ -1,6 +1,7 @@
 import Input from "./Input";
 import Select from "./Select";
 import Field from "./Field";
+import PaymentDetailsStep from "../../../components/PaymentDetails/PaymentDetailsStep";
 
 export default function FormBuilder({
   steps = [],
@@ -11,6 +12,17 @@ export default function FormBuilder({
   if (!Array.isArray(steps) || steps.length === 0) return null;
 
   const step = steps[currentStep];
+
+  if (
+  step?.customComponent ===
+  "stripe-payment"
+) {
+  return (
+    <div className="form-builder">
+      <PaymentDetailsStep />
+    </div>
+  );
+}
 
   if (!step || !Array.isArray(step.fields)) return null;
 

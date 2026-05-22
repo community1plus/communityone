@@ -13,6 +13,13 @@ import { AuthProvider } from "./context/AuthContext";
 import { UIProvider } from "./context/UIContext";
 import { LocationProvider } from "./context/LocationProvider.jsx";
 
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
+
+const stripePromise = loadStripe(
+  import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
+);
+
 const oauth = outputs.auth?.oauth ?? {};
 
 const redirectSignIn = Array.isArray(oauth.redirect_sign_in_uri)
@@ -65,15 +72,17 @@ Hub.listen("auth", ({ payload }) => {
 
 function Root() {
   return (
-    <AuthProvider>
-      <UIProvider>
-        <LocationProvider>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
-        </LocationProvider>
-      </UIProvider>
-    </AuthProvider>
+    <Elements stripe={stripePromise}>
+      <AuthProvider>
+        <UIProvider>
+          <LocationProvider>
+            <BrowserRouter>
+              <App />
+            </BrowserRouter>
+          </LocationProvider>
+        </UIProvider>
+      </AuthProvider>
+    </Elements>
   );
 }
 
