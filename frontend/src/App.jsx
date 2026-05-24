@@ -43,13 +43,31 @@ import CommunityPlusEventsPage from "./pages/CommunityPlusEventsPage/CommunityPl
 import CommunityPlusEventCreatePage from "./pages/CommunityPlusEventsPage/CommunityPlusEventCreatePage";
 
 import PostComposer from "./components/Layout/Sidebar/Post/PostComposer";
+
 import CommunityPlusEchoPage from "./pages/CommunityPlusEchoPage/CommunityPlusEchoPage";
 
 import CommunityPlusEchoDropPage from "./pages/CommunityPlusEchoPage/CommunityPlusEchoDropPage";
 
-/* =========================================================
+/* =========================================
+   STRIPE
+========================================= */
+
+import {
+  Elements,
+} from "@stripe/react-stripe-js";
+
+import {
+  loadStripe,
+} from "@stripe/stripe-js";
+
+const stripePromise = loadStripe(
+  import.meta.env
+    .VITE_STRIPE_PUBLISHABLE_KEY
+);
+
+/* =========================================
    PLACEHOLDER
-========================================================= */
+========================================= */
 
 function Placeholder({
   title,
@@ -66,9 +84,9 @@ function Placeholder({
   );
 }
 
-/* =========================================================
+/* =========================================
    PROTECTED ROUTE
-========================================================= */
+========================================= */
 
 function ProtectedRoute({
   children,
@@ -122,9 +140,9 @@ function ProtectedRoute({
   return children;
 }
 
-/* =========================================================
+/* =========================================
    DASHBOARD PROVIDERS
-========================================================= */
+========================================= */
 
 function DashboardProviders() {
   return (
@@ -132,7 +150,11 @@ function DashboardProviders() {
       <MapProvider>
         <SessionProvider>
           <ProfileProvider>
-            <Outlet />
+            <Elements
+              stripe={stripePromise}
+            >
+              <Outlet />
+            </Elements>
           </ProfileProvider>
         </SessionProvider>
       </MapProvider>
@@ -140,9 +162,9 @@ function DashboardProviders() {
   );
 }
 
-/* =========================================================
+/* =========================================
    APP
-========================================================= */
+========================================= */
 
 export default function App() {
   return (
@@ -249,7 +271,7 @@ export default function App() {
             path="echo"
             element={
               <CommunityPlusEchoPage />
-          }
+            }
           />
 
           <Route

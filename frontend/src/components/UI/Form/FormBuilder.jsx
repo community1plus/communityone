@@ -1,7 +1,8 @@
 import Input from "./Input";
 import Select from "./Select";
 import Field from "./Field";
-import PaymentDetailsStep from "../../../components/PaymentDetails/PaymentDetailsStep";
+
+import StripePaymentWrapper from "../../../pages/CommunityPlusUserProfile/StripePaymentWrapper";
 
 export default function FormBuilder({
   steps = [],
@@ -9,22 +10,40 @@ export default function FormBuilder({
   form,
   extra = {},
 }) {
-  if (!Array.isArray(steps) || steps.length === 0) return null;
+  if (
+    !Array.isArray(steps) ||
+    steps.length === 0
+  ) {
+    return null;
+  }
 
   const step = steps[currentStep];
 
-  if (
-  step?.customComponent ===
-  "stripe-payment"
-) {
-  return (
-    <div className="form-builder">
-      <PaymentDetailsStep />
-    </div>
-  );
-}
+  /* =========================================
+     STRIPE PAYMENT STEP
+  ========================================= */
 
-  if (!step || !Array.isArray(step.fields)) return null;
+  if (
+    step?.customComponent ===
+    "stripe-payment"
+  ) {
+    return (
+      <div className="form-builder">
+        <StripePaymentWrapper />
+      </div>
+    );
+  }
+
+  /* =========================================
+     NORMAL FORM STEPS
+  ========================================= */
+
+  if (
+    !step ||
+    !Array.isArray(step.fields)
+  ) {
+    return null;
+  }
 
   const {
     getValue,
@@ -35,13 +54,22 @@ export default function FormBuilder({
     isFieldValid,
   } = form;
 
-  const updateField = (name, value) => {
-    if (typeof setValue === "function") {
+  const updateField = (
+    name,
+    value
+  ) => {
+    if (
+      typeof setValue ===
+      "function"
+    ) {
       setValue(name, value);
       return;
     }
 
-    if (typeof handleChange === "function") {
+    if (
+      typeof handleChange ===
+      "function"
+    ) {
       handleChange(name, value);
     }
   };
@@ -56,9 +84,14 @@ export default function FormBuilder({
       required = false,
     } = field;
 
-    const rawValue = getValue?.(name);
-    const error = getError?.(name);
-    const valid = isFieldValid?.(name);
+    const rawValue =
+      getValue?.(name);
+
+    const error =
+      getError?.(name);
+
+    const valid =
+      isFieldValid?.(name);
 
     const fieldProps = {
       key: name,
@@ -68,6 +101,10 @@ export default function FormBuilder({
       valid,
     };
 
+    /* =========================================
+       SELECT
+    ========================================= */
+
     if (type === "select") {
       return (
         <Field {...fieldProps}>
@@ -76,29 +113,55 @@ export default function FormBuilder({
             value={rawValue ?? ""}
             options={options}
             disabled={readOnly}
-            onChange={(e) => updateField(name, e.target.value)}
-            onBlur={() => handleBlur?.(name)}
+            onChange={(e) =>
+              updateField(
+                name,
+                e.target.value
+              )
+            }
+            onBlur={() =>
+              handleBlur?.(name)
+            }
           />
         </Field>
       );
     }
 
+    /* =========================================
+       LOCATION
+    ========================================= */
+
     if (type === "location") {
-      const { Autocomplete, autoRef, onPlaceChanged, isLoaded } = extra;
+      const {
+        Autocomplete,
+        autoRef,
+        onPlaceChanged,
+        isLoaded,
+      } = extra;
 
       const displayValue =
-        rawValue && typeof rawValue === "object"
-          ? rawValue.label || rawValue.fullAddress || ""
+        rawValue &&
+        typeof rawValue ===
+          "object"
+          ? rawValue.label ||
+            rawValue.fullAddress ||
+            ""
           : rawValue || "";
 
       return (
         <Field {...fieldProps}>
-          {isLoaded && Autocomplete ? (
+          {isLoaded &&
+          Autocomplete ? (
             <Autocomplete
               onLoad={(ref) => {
-                if (autoRef) autoRef.current = ref;
+                if (autoRef) {
+                  autoRef.current =
+                    ref;
+                }
               }}
-              onPlaceChanged={onPlaceChanged}
+              onPlaceChanged={
+                onPlaceChanged
+              }
             >
               <Input
                 name={name}
@@ -107,8 +170,15 @@ export default function FormBuilder({
                 readOnly={readOnly}
                 disabled={readOnly}
                 autoComplete="off"
-                onChange={(e) => updateField(name, e.target.value)}
-                onBlur={() => handleBlur?.(name)}
+                onChange={(e) =>
+                  updateField(
+                    name,
+                    e.target.value
+                  )
+                }
+                onBlur={() =>
+                  handleBlur?.(name)
+                }
               />
             </Autocomplete>
           ) : (
@@ -124,6 +194,10 @@ export default function FormBuilder({
       );
     }
 
+    /* =========================================
+       DEFAULT INPUT
+    ========================================= */
+
     return (
       <Field {...fieldProps}>
         <Input
@@ -132,13 +206,30 @@ export default function FormBuilder({
           value={rawValue ?? ""}
           readOnly={readOnly}
           disabled={readOnly}
-          autoComplete={type === "tel" ? "new-password" : "off"}
-          onChange={(e) => updateField(name, e.target.value)}
-          onBlur={() => handleBlur?.(name)}
+          autoComplete={
+            type === "tel"
+              ? "new-password"
+              : "off"
+          }
+          onChange={(e) =>
+            updateField(
+              name,
+              e.target.value
+            )
+          }
+          onBlur={() =>
+            handleBlur?.(name)
+          }
         />
       </Field>
     );
   };
 
-  return <div className="form-builder">{step.fields.map(renderField)}</div>;
+  return (
+    <div className="form-builder">
+      {step.fields.map(
+        renderField
+      )}
+    </div>
+  );
 }
