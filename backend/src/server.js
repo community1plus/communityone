@@ -288,6 +288,8 @@ app.get(
    ROUTES
 ========================= */
 
+app.use("/api/payments", paymentRoutes);
+
 app.use(
   "/api/posts/upload-url",
   uploadUrlRoute
