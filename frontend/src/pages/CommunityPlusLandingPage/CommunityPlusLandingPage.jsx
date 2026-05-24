@@ -167,6 +167,16 @@ export default function CommunityPlusLandingPage() {
               Sign In
             </button>
 
+            <button
+              type="button"
+              className="landing-secondary-auth"
+              onClick={() =>
+              navigate("/communityplus/welcome")
+              }
+            >
+              COMMUNITY+ TEST
+            </button>
+
             <div className="guest-pill">
                 READ ONLY ACCESS
           </div>   

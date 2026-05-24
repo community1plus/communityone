@@ -47,6 +47,8 @@ import PostComposer from "./components/Layout/Sidebar/Post/PostComposer";
 import CommunityPlusEchoPage from "./pages/CommunityPlusEchoPage/CommunityPlusEchoPage";
 
 import CommunityPlusEchoDropPage from "./pages/CommunityPlusEchoPage/CommunityPlusEchoDropPage";
+import CommunityPlusSplash
+from "./pages/CommunityPlus/CommunityPlusSplash";
 
 /* =========================================
    STRIPE
@@ -347,6 +349,11 @@ export default function App() {
           />
         </Route>
       </Route>
+
+      <Route
+        path="/communityplus/welcome"
+        element={<CommunityPlusSplash />}
+      />
 
       {/* ROOT FALLBACK */}
 
