@@ -39,38 +39,135 @@ const SOCIAL_PROVIDERS = [
 const profileSteps = [
   {
     id: "user",
-    title: "USER",
+    title: "USER PROFILE",
     fields: [
-      { name: "username", label: "Username", type: "text", required: true },
-      { name: "display_name", label: "Display Name", type: "text", required: true },
+      {
+        name: "username",
+        label: "Username",
+        type: "text",
+        required: true,
+      },
+
+      {
+        name: "display_name",
+        label: "Display Name",
+        type: "text",
+        required: true,
+      },
+
       {
         name: "userType",
-        label: "User Type",
+        label: "Profile Type",
         type: "select",
         required: true,
         options: [
           { value: "PERSONAL", label: "Personal" },
           { value: "BUSINESS", label: "Business" },
-          { value: "GOVT", label: "Government" },
-          { value: "COMMUNITY_SERVICES", label: "Community Services" },
+          { value: "ORG", label: "Organisation" },
+          { value: "MIXED", label: "Mixed" },
         ],
       },
     ],
   },
+
+  {
+    id: "user-details",
+    title: "USER DETAILS",
+
+    condition: (values) =>
+      ["BUSINESS", "ORG", "MIXED"].includes(values.userType),
+
+    fields: [
+      {
+        name: "business.name",
+        label: "Business / Organisation Name",
+        type: "text",
+        required: true,
+      },
+
+      {
+        name: "business.registration",
+        label: "ABN / Registration",
+        type: "text",
+      },
+
+      {
+        name: "business.website",
+        label: "Website",
+        type: "text",
+      },
+
+      {
+        name: "business.description",
+        label: "Description",
+        type: "text",
+      },
+    ],
+  },
+
+  {
+    id: "community-policies",
+    title: "COMMUNITY POLICIES",
+    fields: [
+      {
+        name: "policies.communityStandards",
+        label: "Accept Community Standards",
+        type: "checkbox",
+        required: true,
+      },
+
+      {
+        name: "policies.creatorGuidelines",
+        label: "Accept Creator Guidelines",
+        type: "checkbox",
+      },
+
+      {
+        name: "policies.marketplacePolicies",
+        label: "Accept Marketplace Policies",
+        type: "checkbox",
+      },
+    ],
+  },
+
   {
     id: "home-address",
     title: "HOME ADDRESS",
-    fields: [{ name: "homeLocation", label: "Home Address", type: "location", required: true }],
+    fields: [
+      {
+        name: "homeLocation",
+        label: "Home Address",
+        type: "location",
+        required: true,
+      },
+    ],
   },
+
   {
     id: "contact",
     title: "CONTACT",
     fields: [
-      { name: "phone", label: "Phone Number", type: "tel", required: true },
-      { name: "phoneVerificationCode", label: "Verification Code", type: "text" },
+      {
+        name: "phone",
+        label: "Phone Number",
+        type: "tel",
+        required: true,
+      },
+
+      {
+        name: "phoneVerificationCode",
+        label: "Verification Code",
+        type: "text",
+      },
     ],
   },
-  { id: "social", title: "SOCIAL", fields: [] },
+
+  {
+    id: "social",
+    title: "SOCIAL",
+    fields: [],
+  },
+
   {
     id: "payment",
     title: "PAYMENT DETAILS",
