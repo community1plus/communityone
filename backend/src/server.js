@@ -27,6 +27,8 @@ import authMiddleware from "../middleware/authMiddleware.js";
 
 import meRoutes from "./routes/meRoutes.js";
 
+import paymentRoutes from "./routes/paymentRoutes.js";
+
 
 
 
