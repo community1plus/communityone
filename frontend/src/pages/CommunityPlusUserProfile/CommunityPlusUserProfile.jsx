@@ -36,10 +36,6 @@ const SOCIAL_PROVIDERS = [
   { id: "x", label: "X / Twitter", description: "Verify account ownership." },
 ];
 
-/* =========================================
-   PROFILE TABS
-========================================= */
-
 const PROFILE_TABS = [
   {
     id: "PERSONAL",
@@ -62,14 +58,10 @@ const PROFILE_TABS = [
   },
 ];
 
-/* =========================================
-   PERSONAL FORM
-========================================= */
-
 const PERSONAL_STEPS = [
   {
-    id: "personal-details",
-    title: "USER DETAILS",
+    id: "user-profile",
+    title: "USER PROFILE",
 
     fields: [
       {
@@ -135,14 +127,10 @@ const PERSONAL_STEPS = [
   },
 ];
 
-/* =========================================
-   ORGANISATION FORM
-========================================= */
-
 const ORG_STEPS = [
   {
-    id: "organisation-details",
-    title: "ORGANISATION DETAILS",
+    id: "organisation-profile",
+    title: "ORGANISATION",
 
     fields: [
       {
@@ -173,25 +161,6 @@ const ORG_STEPS = [
   },
 
   {
-    id: "organisation-contact",
-    title: "CONTACT",
-
-    fields: [
-      {
-        name: "organisation.phone",
-        label: "Organisation Phone",
-        type: "tel",
-      },
-
-      {
-        name: "organisation.email",
-        label: "Organisation Email",
-        type: "text",
-      },
-    ],
-  },
-
-  {
     id: "organisation-social",
     title: "SOCIAL",
     fields: [],
@@ -204,14 +173,10 @@ const ORG_STEPS = [
   },
 ];
 
-/* =========================================
-   MIXED FORM
-========================================= */
-
 const MIXED_STEPS = [
   {
     id: "mixed-profile",
-    title: "CREATOR PROFILE",
+    title: "MIXED PROFILE",
 
     fields: [
       {
@@ -220,19 +185,6 @@ const MIXED_STEPS = [
         type: "text",
       },
 
-      {
-        name: "creator.description",
-        label: "Creator Description",
-        type: "text",
-      },
-    ],
-  },
-
-  {
-    id: "mixed-business",
-    title: "BUSINESS DETAILS",
-
-    fields: [
       {
         name: "business.name",
         label: "Business Name",
@@ -259,10 +211,6 @@ const MIXED_STEPS = [
     customComponent: "stripe-payment",
   },
 ];
-
-/* =========================================
-   COMMUNITY POLICIES
-========================================= */
 
 const COMMUNITY_POLICY_STEPS = [
   {
@@ -298,186 +246,6 @@ const COMMUNITY_POLICY_STEPS = [
   },
 ];
 
-/* =========================================
-   ACTIVE PROFILE TAB STATE
-========================================= */
-
-const [activeProfileTab, setActiveProfileTab] =
-  useState("PERSONAL");
-
-/* =========================================
-   ACTIVE STEP SYSTEM
-========================================= */
-
-const activeSteps = useMemo(() => {
-
-  switch (activeProfileTab) {
-
-    case "ORG":
-      return ORG_STEPS;
-
-    case "MIXED":
-      return MIXED_STEPS;
-
-    case "COMMUNITY_POLICIES":
-      return COMMUNITY_POLICY_STEPS;
-
-    case "PERSONAL":
-    default:
-      return PERSONAL_STEPS;
-  }
-
-}, [activeProfileTab]);
-
-/* =========================================
-   CURRENT STEP
-========================================= */
-
-const currentStepConfig =
-  activeSteps[currentStep];
-
-const isLastStep =
-  currentStep === activeSteps.length - 1;
-
-/* =========================================
-   RESET STEP WHEN SWITCHING TABS
-========================================= */
-
-useEffect(() => {
-
-  setCurrentStep(0);
-
-}, [activeProfileTab]);
-
-/* =========================================
-   NEXT STEP
-========================================= */
-
-const nextStep = useCallback(() => {
-
-  setCurrentStep((step) =>
-    Math.min(
-      activeSteps.length - 1,
-      step + 1
-    )
-  );
-
-}, [activeSteps]);
-
-/* =========================================
-   PREV STEP
-========================================= */
-
-const prevStep = useCallback(() => {
-
-  setCurrentStep((step) =>
-    Math.max(0, step - 1)
-  );
-
-}, []);
-
-/* =========================================
-   HEADER
-========================================= */
-
-<div className="profile-page-header">
-
-  <PageHeader title="USER PROFILE" />
-
-  <div className="profile-type-tabs">
-
-    {PROFILE_TABS.map((tab) => (
-
-      <button
-        key={tab.id}
-        type="button"
-        className={`profile-type-tab ${
-          activeProfileTab === tab.id
-            ? "active"
-            : ""
-        }`}
-        onClick={() =>
-          setActiveProfileTab(tab.id)
-        }
-      >
-        {tab.label}
-      </button>
-
-    ))}
-
-  </div>
-
-  <div className="profile-completion">
-
-    <div className="profile-completion-header">
-
-      <span>
-        Profile completion
-      </span>
-
-      <strong>
-        {displayCompletion}%
-      </strong>
-
-    </div>
-
-    <div className="profile-completion-track">
-
-      <div
-        className="profile-completion-fill"
-        style={{
-          width: `${displayCompletion}%`,
-        }}
-      />
-
-    </div>
-
-  </div>
-
-  <div className="profile-section-tabs">
-
-    {activeSteps.map((step, index) => (
-
-      <button
-        key={step.id}
-        type="button"
-        className={`profile-section-tab ${
-          currentStep === index
-            ? "active"
-            : ""
-        } ${
-          index < currentStep
-            ? "complete"
-            : ""
-        }`}
-        onClick={() =>
-          setCurrentStep(index)
-        }
-      >
-        {step.title}
-      </button>
-
-    ))}
-
-  </div>
-
-</div>
-
-/* =========================================
-   FORM BUILDER
-========================================= */
-
-<FormBuilder
-  steps={activeSteps}
-  currentStep={currentStep}
-  form={form}
-  extra={{
-    Autocomplete,
-    autoRef,
-    onPlaceChanged,
-    isLoaded,
-  }}
-/>
 
 function digitsOnly(value = "") {
   return String(value).replace(/\D/g, "");
@@ -654,19 +422,47 @@ export default function CommunityPlusUserProfile({ onComplete }) {
   clearStorage,
 } = form;
 
-  const [currentStep, setCurrentStep] = useState(0);
+  const [activeProfileTab, setActiveProfileTab] =  useState("PERSONAL");
+
+  const [currentStep, setCurrentStep] =  useState(0);
   const [savingProfile, setSavingProfile] = useState(false);
   const [profileError, setProfileError] = useState("");
   const [phoneStatus, setPhoneStatus] = useState("idle");
 
-const [phoneError, setPhoneError] = useState("");
+  const [phoneError, setPhoneError] = useState("");
 
-const [editingVerifiedPhone, setEditingVerifiedPhone] = useState(false);
+  const [editingVerifiedPhone, setEditingVerifiedPhone] = useState(false);
 
-  const currentStepConfig = profileSteps[currentStep];
-  const isLastStep = currentStep === profileSteps.length - 1;
-  const isContactStep = currentStepConfig?.id === "contact";
-  const isSocialStep = currentStepConfig?.id === "social";
+  const activeSteps = useMemo(() => {
+
+  switch (activeProfileTab) {
+
+    case "ORG":
+      return ORG_STEPS;
+
+    case "MIXED":
+      return MIXED_STEPS;
+
+    case "COMMUNITY_POLICIES":
+      return COMMUNITY_POLICY_STEPS;
+
+    case "PERSONAL":
+    default:
+      return PERSONAL_STEPS;
+  }
+
+}, [activeProfileTab]);
+
+const currentStepConfig =  activeSteps[currentStep];
+const isLastStep =  currentStep === activeSteps.length - 1;
+const isContactStep =  currentStepConfig?.id === "contact";
+const isSocialStep =  currentStepConfig?.id === "social";
+
+useEffect(() => {
+
+  setCurrentStep(0);
+
+}, [activeProfileTab]);
 
   const selectedPhoneCountry = useMemo(
     () => getPhoneCountry(values.phoneCountry),
@@ -1346,13 +1142,31 @@ await patchProfile(verifiedPayload);
   }, [validateAll, handleSaveProfile]);
 
   const nextStep = useCallback(() => {
-    if (isContactStep && !social?.phoneVerified) {
-      setPhoneError("Verify your phone number before continuing.");
-      return;
-    }
 
-    setCurrentStep((step) => Math.min(profileSteps.length - 1, step + 1));
-  }, [isContactStep, profile?.phoneVerified]);
+  if (
+    isContactStep &&
+    !profile?.phoneVerified
+  ) {
+
+    setPhoneError(
+      "Verify your phone number before continuing."
+    );
+
+    return;
+  }
+
+  setCurrentStep((step) =>
+    Math.min(
+      activeSteps.length - 1,
+      step + 1
+    )
+  );
+
+}, [
+  isContactStep,
+  profile?.phoneVerified,
+  activeSteps.length,
+]);
 
   const prevStep = useCallback(() => {
     setCurrentStep((step) => Math.max(0, step - 1));
@@ -1380,37 +1194,87 @@ await patchProfile(verifiedPayload);
       <div className="profile-layout">
         <div className="profile-left">
           <div className="profile-page-header">
-            <PageHeader title="USER PROFILE" />
 
-            <div className="profile-completion">
-              <div className="profile-completion-header">
-                <span>Profile completion</span>
-                <strong>{displayCompletion}%</strong>
-              </div>
+  <PageHeader title="USER PROFILE" />
 
-              <div className="profile-completion-track">
-                <div
-                  className="profile-completion-fill"
-                  style={{ width: `${displayCompletion}%` }}
-                />
-              </div>
-            </div>
+  <div className="profile-type-tabs">
 
-            <div className="profile-section-tabs">
-              {profileSteps.map((step, index) => (
-                <button
-                  key={step.id}
-                  type="button"
-                  className={`profile-section-tab ${
-                    currentStep === index ? "active" : ""
-                  } ${index < currentStep ? "complete" : ""}`}
-                  onClick={() => setCurrentStep(index)}
-                >
-                  {step.title}
-                </button>
-              ))}
-            </div>
-          </div>
+    {PROFILE_TABS.map((tab) => (
+
+      <button
+        key={tab.id}
+        type="button"
+        className={`profile-type-tab ${
+          activeProfileTab === tab.id
+            ? "active"
+            : ""
+        }`}
+        onClick={() =>
+          setActiveProfileTab(tab.id)
+        }
+      >
+        {tab.label}
+      </button>
+
+    ))}
+
+  </div>
+
+  <div className="profile-completion">
+
+    <div className="profile-completion-header">
+
+      <span>
+        Profile completion
+      </span>
+
+      <strong>
+        {displayCompletion}%
+      </strong>
+
+    </div>
+
+    <div className="profile-completion-track">
+
+      <div
+        className="profile-completion-fill"
+        style={{
+          width: `${displayCompletion}%`,
+        }}
+      />
+
+    </div>
+
+  </div>
+
+  <div className="profile-section-tabs">
+
+    {activeSteps.map((step, index) => (
+
+      <button
+        key={step.id}
+        type="button"
+        className={`profile-section-tab ${
+          currentStep === index
+            ? "active"
+            : ""
+        } ${
+          index < currentStep
+            ? "complete"
+            : ""
+        }`}
+        onClick={() =>
+          setCurrentStep(index)
+        }
+      >
+        {step.title}
+      </button>
+
+    ))}
+
+  </div>
+
+</div>
 
           <Section>
   <div className="section-inner">
@@ -1478,7 +1342,7 @@ await patchProfile(verifiedPayload);
       </div>
     ) : (
       <FormBuilder
-        steps={profileSteps}
+        steps={activeSteps}
         currentStep={currentStep}
         form={form}
         extra={{
