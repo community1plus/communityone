@@ -1195,6 +1195,8 @@ await patchProfile(verifiedPayload);
         <div className="profile-left">
           <div className="profile-page-header">
 
+  <div className="profile-title-row">
+
   <PageHeader title="USER PROFILE" />
 
   <div className="profile-type-tabs">
@@ -1219,6 +1221,8 @@ await patchProfile(verifiedPayload);
     ))}
 
   </div>
+
+</div>
 
   <div className="profile-completion">
 
