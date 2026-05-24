@@ -11,7 +11,7 @@ import {
 import api from "../../src/lib/api";
 
 import PaymentDetailsStep
-  from "../components/PaymentDetailsStep";
+  from "../components/PaymentDetails/PaymentDetailsStep";
 
 const stripePromise = loadStripe(
   import.meta.env
