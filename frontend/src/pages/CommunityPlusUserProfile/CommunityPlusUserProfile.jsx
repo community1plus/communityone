@@ -36,10 +36,41 @@ const SOCIAL_PROVIDERS = [
   { id: "x", label: "X / Twitter", description: "Verify account ownership." },
 ];
 
-const profileSteps = [
+/* =========================================
+   PROFILE TABS
+========================================= */
+
+const PROFILE_TABS = [
   {
-    id: "user",
-    title: "USER PROFILE",
+    id: "PERSONAL",
+    label: "Personal",
+  },
+
+  {
+    id: "ORG",
+    label: "Organisation",
+  },
+
+  {
+    id: "MIXED",
+    label: "Mixed",
+  },
+
+  {
+    id: "COMMUNITY_POLICIES",
+    label: "Community Policies",
+  },
+];
+
+/* =========================================
+   PERSONAL FORM
+========================================= */
+
+const PERSONAL_STEPS = [
+  {
+    id: "personal-details",
+    title: "USER DETAILS",
+
     fields: [
       {
         name: "username",
@@ -54,85 +85,13 @@ const profileSteps = [
         type: "text",
         required: true,
       },
-
-      {
-        name: "userType",
-        label: "Profile Type",
-        type: "select",
-        required: true,
-        options: [
-          { value: "PERSONAL", label: "Personal" },
-          { value: "BUSINESS", label: "Business" },
-          { value: "ORG", label: "Organisation" },
-          { value: "MIXED", label: "Mixed" },
-        ],
-      },
-    ],
-  },
-
-  {
-    id: "user-details",
-    title: "USER DETAILS",
-
-    condition: (values) =>
-      ["BUSINESS", "ORG", "MIXED"].includes(values.userType),
-
-    fields: [
-      {
-        name: "business.name",
-        label: "Business / Organisation Name",
-        type: "text",
-        required: true,
-      },
-
-      {
-        name: "business.registration",
-        label: "ABN / Registration",
-        type: "text",
-      },
-
-      {
-        name: "business.website",
-        label: "Website",
-        type: "text",
-      },
-
-      {
-        name: "business.description",
-        label: "Description",
-        type: "text",
-      },
-    ],
-  },
-
-  {
-    id: "community-policies",
-    title: "COMMUNITY POLICIES",
-    fields: [
-      {
-        name: "policies.communityStandards",
-        label: "Accept Community Standards",
-        type: "checkbox",
-        required: true,
-      },
-
-      {
-        name: "policies.creatorGuidelines",
-        label: "Accept Creator Guidelines",
-        type: "checkbox",
-      },
-
-      {
-        name: "policies.marketplacePolicies",
-        label: "Accept Marketplace Policies",
-        type: "checkbox",
-      },
     ],
   },
 
   {
     id: "home-address",
     title: "HOME ADDRESS",
+
     fields: [
       {
         name: "homeLocation",
@@ -146,6 +105,7 @@ const profileSteps = [
   {
     id: "contact",
     title: "CONTACT",
+
     fields: [
       {
         name: "phone",
@@ -174,6 +134,350 @@ const profileSteps = [
     customComponent: "stripe-payment",
   },
 ];
+
+/* =========================================
+   ORGANISATION FORM
+========================================= */
+
+const ORG_STEPS = [
+  {
+    id: "organisation-details",
+    title: "ORGANISATION DETAILS",
+
+    fields: [
+      {
+        name: "organisation.name",
+        label: "Organisation Name",
+        type: "text",
+        required: true,
+      },
+
+      {
+        name: "organisation.registration",
+        label: "Registration / ABN",
+        type: "text",
+      },
+
+      {
+        name: "organisation.website",
+        label: "Website",
+        type: "text",
+      },
+
+      {
+        name: "organisation.description",
+        label: "Description",
+        type: "text",
+      },
+    ],
+  },
+
+  {
+    id: "organisation-contact",
+    title: "CONTACT",
+
+    fields: [
+      {
+        name: "organisation.phone",
+        label: "Organisation Phone",
+        type: "tel",
+      },
+
+      {
+        name: "organisation.email",
+        label: "Organisation Email",
+        type: "text",
+      },
+    ],
+  },
+
+  {
+    id: "organisation-social",
+    title: "SOCIAL",
+    fields: [],
+  },
+
+  {
+    id: "organisation-payment",
+    title: "PAYMENT DETAILS",
+    customComponent: "stripe-payment",
+  },
+];
+
+/* =========================================
+   MIXED FORM
+========================================= */
+
+const MIXED_STEPS = [
+  {
+    id: "mixed-profile",
+    title: "CREATOR PROFILE",
+
+    fields: [
+      {
+        name: "creator.name",
+        label: "Creator Name",
+        type: "text",
+      },
+
+      {
+        name: "creator.description",
+        label: "Creator Description",
+        type: "text",
+      },
+    ],
+  },
+
+  {
+    id: "mixed-business",
+    title: "BUSINESS DETAILS",
+
+    fields: [
+      {
+        name: "business.name",
+        label: "Business Name",
+        type: "text",
+      },
+
+      {
+        name: "business.website",
+        label: "Website",
+        type: "text",
+      },
+    ],
+  },
+
+  {
+    id: "mixed-social",
+    title: "SOCIAL",
+    fields: [],
+  },
+
+  {
+    id: "mixed-payment",
+    title: "PAYMENT DETAILS",
+    customComponent: "stripe-payment",
+  },
+];
+
+/* =========================================
+   COMMUNITY POLICIES
+========================================= */
+
+const COMMUNITY_POLICY_STEPS = [
+  {
+    id: "community-policies",
+    title: "COMMUNITY POLICIES",
+
+    fields: [
+      {
+        name: "policies.communityStandards",
+        label: "Accept Community Standards",
+        type: "checkbox",
+        required: true,
+      },
+
+      {
+        name: "policies.creatorGuidelines",
+        label: "Accept Creator Guidelines",
+        type: "checkbox",
+      },
+
+      {
+        name: "policies.marketplacePolicies",
+        label: "Accept Marketplace Policies",
+        type: "checkbox",
+      },
+
+      {
+        name: "policies.participationFramework",
+        label: "Accept Proof of Participation Framework",
+        type: "checkbox",
+      },
+    ],
+  },
+];
+
+/* =========================================
+   ACTIVE PROFILE TAB STATE
+========================================= */
+
+const [activeProfileTab, setActiveProfileTab] =
+  useState("PERSONAL");
+
+/* =========================================
+   ACTIVE STEP SYSTEM
+========================================= */
+
+const activeSteps = useMemo(() => {
+
+  switch (activeProfileTab) {
+
+    case "ORG":
+      return ORG_STEPS;
+
+    case "MIXED":
+      return MIXED_STEPS;
+
+    case "COMMUNITY_POLICIES":
+      return COMMUNITY_POLICY_STEPS;
+
+    case "PERSONAL":
+    default:
+      return PERSONAL_STEPS;
+  }
+
+}, [activeProfileTab]);
+
+/* =========================================
+   CURRENT STEP
+========================================= */
+
+const currentStepConfig =
+  activeSteps[currentStep];
+
+const isLastStep =
+  currentStep === activeSteps.length - 1;
+
+/* =========================================
+   RESET STEP WHEN SWITCHING TABS
+========================================= */
+
+useEffect(() => {
+
+  setCurrentStep(0);
+
+}, [activeProfileTab]);
+
+/* =========================================
+   NEXT STEP
+========================================= */
+
+const nextStep = useCallback(() => {
+
+  setCurrentStep((step) =>
+    Math.min(
+      activeSteps.length - 1,
+      step + 1
+    )
+  );
+
+}, [activeSteps]);
+
+/* =========================================
+   PREV STEP
+========================================= */
+
+const prevStep = useCallback(() => {
+
+  setCurrentStep((step) =>
+    Math.max(0, step - 1)
+  );
+
+}, []);
+
+/* =========================================
+   HEADER
+========================================= */
+
+<div className="profile-page-header">
+
+  <PageHeader title="USER PROFILE" />
+
+  <div className="profile-type-tabs">
+
+    {PROFILE_TABS.map((tab) => (
+
+      <button
+        key={tab.id}
+        type="button"
+        className={`profile-type-tab ${
+          activeProfileTab === tab.id
+            ? "active"
+            : ""
+        }`}
+        onClick={() =>
+          setActiveProfileTab(tab.id)
+        }
+      >
+        {tab.label}
+      </button>
+
+    ))}
+
+  </div>
+
+  <div className="profile-completion">
+
+    <div className="profile-completion-header">
+
+      <span>
+        Profile completion
+      </span>
+
+      <strong>
+        {displayCompletion}%
+      </strong>
+
+    </div>
+
+    <div className="profile-completion-track">
+
+      <div
+        className="profile-completion-fill"
+        style={{
+          width: `${displayCompletion}%`,
+        }}
+      />
+
+    </div>
+
+  </div>
+
+  <div className="profile-section-tabs">
+
+    {activeSteps.map((step, index) => (
+
+      <button
+        key={step.id}
+        type="button"
+        className={`profile-section-tab ${
+          currentStep === index
+            ? "active"
+            : ""
+        } ${
+          index < currentStep
+            ? "complete"
+            : ""
+        }`}
+        onClick={() =>
+          setCurrentStep(index)
+        }
+      >
+        {step.title}
+      </button>
+
+    ))}
+
+  </div>
+
+</div>
+
+/* =========================================
+   FORM BUILDER
+========================================= */
+
+<FormBuilder
+  steps={activeSteps}
+  currentStep={currentStep}
+  form={form}
+  extra={{
+    Autocomplete,
+    autoRef,
+    onPlaceChanged,
+    isLoaded,
+  }}
+/>
 
 function digitsOnly(value = "") {
   return String(value).replace(/\D/g, "");
