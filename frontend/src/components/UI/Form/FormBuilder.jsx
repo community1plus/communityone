@@ -2,7 +2,7 @@ import Input from "./Input";
 import Select from "./Select";
 import Field from "./Field";
 
-import StripePaymentWrapper from "../../../pages/CommunityPlusUserProfile/StripePaymentWrapper";
+import StripePaymentWrapper from "../../../pages/StripePaymentWrapper";
 
 export default function FormBuilder({
   steps = [],
