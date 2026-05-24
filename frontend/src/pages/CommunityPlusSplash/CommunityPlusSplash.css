@@ -30,7 +30,7 @@
   align-items: center;
   justify-content: space-between;
 
-  background: rgba(255,255,255,0.9);
+  background: rgba(255,255,255,0.92);
 
   backdrop-filter: blur(10px);
 
@@ -152,9 +152,16 @@
 
   object-fit: contain;
 
+  opacity: 0;
+
+  transform:
+    rotate(-180deg)
+    scale(0.6);
+
   animation:
-    splashRotate 2.5s ease forwards,
-    splashFloat 5s ease-in-out infinite;
+    splashEntrance 2.2s
+    cubic-bezier(0.22, 1, 0.36, 1)
+    forwards;
 
   filter:
     drop-shadow(
@@ -194,8 +201,12 @@
   font-weight: 700;
   letter-spacing: 0.08em;
 
+  opacity: 0;
+
   animation:
-    fadeUp 1s ease;
+    slideLeftFade 1s ease forwards;
+
+  animation-delay: 0.8s;
 }
 
 .communityplus-splash-copy h1 {
@@ -206,8 +217,17 @@
 
   color: #2c1c1c;
 
+  opacity: 0;
+
+  transform:
+    translateX(60px);
+
   animation:
-    fadeUp 1.2s ease;
+    slideRightFade 1.2s
+    cubic-bezier(0.22, 1, 0.36, 1)
+    forwards;
+
+  animation-delay: 1s;
 }
 
 .communityplus-splash-copy p {
@@ -220,8 +240,17 @@
 
   max-width: 560px;
 
+  opacity: 0;
+
+  transform:
+    translateX(-60px);
+
   animation:
-    fadeUp 1.4s ease;
+    slideLeftFade 1.3s
+    cubic-bezier(0.22, 1, 0.36, 1)
+    forwards;
+
+  animation-delay: 1.2s;
 }
 
 /* =========================================
@@ -233,48 +262,82 @@
   align-items: center;
   justify-content: center;
 
+  opacity: 0;
+
+  transform:
+    translateY(20px);
+
   animation:
-    fadeUp 1.6s ease;
+    fadeUp 1s ease forwards;
+
+  animation-delay: 1.5s;
 }
 
 /* =========================================
-   ANIMATIONS
+   KEYFRAMES
 ========================================= */
 
-@keyframes splashRotate {
+@keyframes splashEntrance {
 
   0% {
     opacity: 0;
 
     transform:
+      translateY(40px)
       rotate(-180deg)
       scale(0.6);
+  }
+
+  60% {
+    opacity: 1;
+
+    transform:
+      translateY(-8px)
+      rotate(10deg)
+      scale(1.04);
   }
 
   100% {
     opacity: 1;
 
     transform:
+      translateY(0)
       rotate(0deg)
       scale(1);
   }
 }
 
-@keyframes splashFloat {
+@keyframes slideRightFade {
 
   0% {
-    transform:
-      translateY(0px);
-  }
+    opacity: 0;
 
-  50% {
     transform:
-      translateY(-10px);
+      translateX(60px);
   }
 
   100% {
+    opacity: 1;
+
     transform:
-      translateY(0px);
+      translateX(0);
+  }
+}
+
+@keyframes slideLeftFade {
+
+  0% {
+    opacity: 0;
+
+    transform:
+      translateX(-60px);
+  }
+
+  100% {
+    opacity: 1;
+
+    transform:
+      translateX(0);
   }
 }
 
