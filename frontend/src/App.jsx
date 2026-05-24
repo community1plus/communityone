@@ -48,7 +48,7 @@ import CommunityPlusEchoPage from "./pages/CommunityPlusEchoPage/CommunityPlusEc
 
 import CommunityPlusEchoDropPage from "./pages/CommunityPlusEchoPage/CommunityPlusEchoDropPage";
 import CommunityPlusSplash
-from "./pages/CommunityPlus/CommunityPlusSplash";
+from "./pages/CommunityPlusSplash/CommunityPlusSplash";
 
 /* =========================================
    STRIPE
