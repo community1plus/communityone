@@ -1,5 +1,11 @@
-import { useNavigate } from "react-router-dom";
-import { MapPin } from "lucide-react";
+import {
+  useEffect,
+  useState,
+} from "react";
+
+import {
+  useNavigate,
+} from "react-router-dom";
 
 import Button from "../../components/UI/Button";
 
@@ -7,6 +13,19 @@ import "./CommunityPlusSplash.css";
 
 export default function CommunityPlusSplash() {
   const navigate = useNavigate();
+
+  const [visible, setVisible] =
+    useState(false);
+
+  useEffect(() => {
+
+    const timer = setTimeout(() => {
+      setVisible(true);
+    }, 100);
+
+    return () => clearTimeout(timer);
+
+  }, []);
 
   const handleContinue = () => {
     navigate("/communityplus/profile");
@@ -24,7 +43,7 @@ export default function CommunityPlusSplash() {
         <div className="communityplus-brand">
 
           <img
-            src="/logos/communityone-red.png"
+            src="/logo/echo_splash.png"
             alt="Community One"
             className="communityplus-logo"
           />
@@ -37,7 +56,7 @@ export default function CommunityPlusSplash() {
 
         <div className="communityplus-location">
 
-          <MapPin size={16} />
+          <span>📍</span>
 
           <span>Melbourne, Australia</span>
 
@@ -51,7 +70,29 @@ export default function CommunityPlusSplash() {
 
       <main className="communityplus-splash-main">
 
-        <div className="communityplus-splash-card">
+        <div
+          className={`communityplus-splash-card ${
+            visible ? "visible" : ""
+          }`}
+        >
+
+          {/* =====================================
+              VISUAL
+          ===================================== */}
+
+          <div className="communityplus-visual">
+
+            <img
+              src="/logo/echo_splash.png"
+              alt="Echo"
+              className="communityplus-hero-logo"
+            />
+
+          </div>
+
+          {/* =====================================
+              COPY
+          ===================================== */}
 
           <div className="communityplus-splash-copy">
 
@@ -70,6 +111,10 @@ export default function CommunityPlusSplash() {
             </p>
 
           </div>
+
+          {/* =====================================
+              ACTIONS
+          ===================================== */}
 
           <div className="communityplus-splash-actions">
 
