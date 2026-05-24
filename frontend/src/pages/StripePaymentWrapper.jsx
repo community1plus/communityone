@@ -8,7 +8,7 @@ import {
   loadStripe,
 } from "@stripe/stripe-js";
 
-import api from "../../lib/api";
+import api from "../../src/lib/api";
 
 import PaymentDetailsStep
   from "./PaymentDetailsStep";
