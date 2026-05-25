@@ -78,7 +78,10 @@
 .communityplus-main {
   flex: 1;
 
+  width: 100%;
+
   display: flex;
+
   align-items: center;
   justify-content: center;
 
@@ -86,17 +89,19 @@
     56px
     32px
     96px;
-}
 
+  box-sizing: border-box;
+}
 /* =========================================
    CARD
 ========================================= */
 
 .communityplus-splash-card {
-  width: 100%;
-  max-width: 860px;
+  width: min(92vw, 860px);
 
   min-height: 760px;
+
+  margin: 0 auto;
 
   background: rgba(255,255,255,0.92);
 
