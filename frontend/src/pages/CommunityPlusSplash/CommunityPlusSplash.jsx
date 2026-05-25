@@ -1,9 +1,8 @@
 import {
   useEffect,
   useState,
-  useRef,
 } from "react";
-/**/ 
+
 import {
   useNavigate,
 } from "react-router-dom";
@@ -13,107 +12,26 @@ import Button from "../../components/UI/Button";
 import "./CommunityPlusSplash.css";
 
 export default function CommunityPlusSplash() {
-
-  /* =========================================
-     PERFORMANCE TIMERS
-  ========================================= */
-
-  const pageLoadStartRef =
-    useRef(performance.now());
-
-  const animationStartRef =
-    useRef(null);
-
   const navigate = useNavigate();
 
   const [visible, setVisible] =
     useState(false);
 
-  /* =========================================
-     INITIAL PAGE LOAD
-  ========================================= */
-
   useEffect(() => {
 
-    console.log(
-      "[SPLASH] Component mounted"
-    );
-
-    animationStartRef.current =
-      performance.now();
-
     const timer = setTimeout(() => {
-
       setVisible(true);
-
-      console.log(
-        `[SPLASH] Initial animation triggered after ${
-          (
-            performance.now() -
-            animationStartRef.current
-          ).toFixed(2)
-        }ms`
-      );
-
     }, 100);
 
     return () => clearTimeout(timer);
 
   }, []);
 
-  /* =========================================
-     FULL PAGE READY
-  ========================================= */
-
-  useEffect(() => {
-
-    if (!visible) return;
-
-    requestAnimationFrame(() => {
-
-      const total =
-        performance.now() -
-        pageLoadStartRef.current;
-
-      console.log(
-        `[SPLASH] Page visually ready in ${total.toFixed(2)}ms`
-      );
-
-    });
-
-  }, [visible]);
-
-  /* =========================================
-     NAVIGATION TIMER
-  ========================================= */
-
   const handleContinue = () => {
-
-    const navStart =
-      performance.now();
-
-    console.log(
-      "[SPLASH] Navigating to profile setup..."
-    );
-
     navigate("/communityplus/profile");
-
-    requestAnimationFrame(() => {
-
-      console.log(
-        `[SPLASH] Navigation dispatched in ${
-          (
-            performance.now() -
-            navStart
-          ).toFixed(2)
-        }ms`
-      );
-
-    });
   };
 
   return (
-
     <div className="communityplus-splash-page">
 
       {/* =========================================
@@ -147,10 +65,10 @@ export default function CommunityPlusSplash() {
       </header>
 
       {/* =========================================
-          MAIN
+          HERO
       ========================================= */}
 
-      <main className="communityplus-main">
+      <main className="communityplus-splash-main">
 
         <div
           className={`communityplus-splash-card ${
@@ -159,58 +77,50 @@ export default function CommunityPlusSplash() {
         >
 
           {/* =====================================
-              HERO
+              VISUAL
           ===================================== */}
 
-          <div className="communityplus-hero">
+          <div className="communityplus-visual">
 
-            {/* =====================================
-                VISUAL
-            ===================================== */}
+            <img
+              src="/logo/echo_splash.png"
+              alt="Echo"
+              className="communityplus-hero-logo"
+            />
 
-            <div className="communityplus-visual">
+          </div>
 
-              <img
-                src="/logo/echo_splash.png"
-                alt="Echo"
-                className="communityplus-hero-logo"
-              />
+          {/* =====================================
+              COPY
+          ===================================== */}
 
+          <div className="communityplus-splash-copy">
+
+            <div className="communityplus-pill">
+              COMMUNITY+
             </div>
 
-            {/* =====================================
-                COPY
-            ===================================== */}
+            <h1>
+              Welcome to Community One
+            </h1>
 
-            <div className="communityplus-splash-copy">
+            <p>
+              Build your profile, verify your identity,
+              connect your participation, and unlock the
+              Community+ ecosystem.
+            </p>
 
-              <div className="communityplus-pill">
-                COMMUNITY+
-              </div>
+          </div>
 
-              <h1>
-                Welcome to Community One
-              </h1>
+          {/* =====================================
+              ACTIONS
+          ===================================== */}
 
-              <p>
-                Build your profile, verify your identity,
-                connect your participation, and unlock the
-                Community+ ecosystem.
-              </p>
+          <div className="communityplus-splash-actions">
 
-            </div>
-
-            {/* =====================================
-                ACTIONS
-            ===================================== */}
-
-            <div className="communityplus-splash-actions">
-
-              <Button onClick={handleContinue}>
-                Continue to Profile Setup
-              </Button>
-
-            </div>
+            <Button onClick={handleContinue}>
+              Continue to Profile Setup
+            </Button>
 
           </div>
 
