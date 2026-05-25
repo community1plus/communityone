@@ -1,0 +1,142 @@
+/* =====================================================
+SPLASH HEADER
+Reusable across:
+- Splash
+- Profile
+- Future onboarding pages
+===================================================== */
+
+.communityplus-splash-header {
+  height: 72px;
+
+  width: 100%;
+
+  padding: 0 36px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  background:
+    rgba(255, 255, 255, 0.92);
+
+  border-bottom:
+    1px solid #e7dfd6;
+
+  backdrop-filter:
+    blur(10px);
+
+  position: sticky;
+
+  top: 0;
+
+  z-index: 100;
+}
+
+/* =====================================
+BRAND
+===================================== */
+
+.communityplus-brand {
+  display: flex;
+
+  align-items: center;
+
+  gap: 14px;
+
+  min-width: 0;
+}
+
+.communityplus-logo {
+  width: 30px;
+
+  height: 30px;
+
+  object-fit: contain;
+
+  flex-shrink: 0;
+}
+
+.communityplus-brand-text {
+  font-size: 15px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.08em;
+
+  color: #4a0d0d;
+
+  white-space: nowrap;
+}
+
+/* =====================================
+LOCATION
+===================================== */
+
+.communityplus-location {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: flex-end;
+
+  min-width: 220px;
+
+  color: #6d6259;
+
+  font-size: 14px;
+
+  font-weight: 500;
+}
+
+.communityplus-location .location-display,
+.communityplus-location .location-edit {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+}
+
+.communityplus-location .location-text {
+  white-space: nowrap;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  max-width: 240px;
+}
+
+.communityplus-location .location-pin-button {
+  background: transparent;
+
+  border: none;
+
+  padding: 0;
+
+  cursor: pointer;
+
+  font-size: 16px;
+}
+
+/* =====================================
+RESPONSIVE
+===================================== */
+
+@media (max-width: 768px) {
+
+  .communityplus-splash-header {
+    padding: 0 20px;
+
+    height: 64px;
+  }
+
+  .communityplus-brand-text {
+    font-size: 13px;
+  }
+
+  .communityplus-location {
+    display: none;
+  }
+}
