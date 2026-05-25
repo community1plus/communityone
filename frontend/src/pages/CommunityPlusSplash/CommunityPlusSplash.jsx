@@ -44,10 +44,6 @@ export default function CommunityPlusSplash() {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleContinue = () => {
-    navigate("/communityplus/profile");
-  };
-
   return (
     <div className="communityplus-splash-page">
 
