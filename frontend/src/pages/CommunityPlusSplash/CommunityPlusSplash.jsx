@@ -69,7 +69,7 @@ export default function CommunityPlusSplash() {
           HERO
       ========================================= */}
 
-      <main className="communityplus-splash-main">
+      <main className="communityplus-main">
 
         <div
           className={`communityplus-splash-card ${
