@@ -39,6 +39,10 @@ PROFILE PAGE
   white-space: nowrap;
 }
 
+.communityplus-hero {
+  transform: translateY(-34px);
+}
+
 .profile-type-tabs {
   display: flex;
   align-items: center;

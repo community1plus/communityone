@@ -16,6 +16,14 @@ import useForm from "../../hooks/useForm";
 import "../../styles/system.css";
 import "./CommunityPlusUserProfile.css";
 
+
+const pageLoadStartRef = useRef(
+  performance.now()
+);
+
+const hydrationStartRef =
+  useRef(null);
+
 const DEFAULT_PHONE_COUNTRY = "AU";
 
 const PHONE_COUNTRIES = [
@@ -862,6 +870,18 @@ console.log(
   profileReady,
   patchProfile,
 ]);
+
+useEffect(() => {
+
+  const total =
+    performance.now() -
+    pageLoadStartRef.current;
+
+  console.log(
+    `[PROFILE PAGE] Total render ready: ${total.toFixed(2)}ms`
+  );
+
+}, []);
 
   const handlePhoneCountryChange = useCallback(
     (event) => {
