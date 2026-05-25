@@ -49,6 +49,10 @@
   object-fit: contain;
 }
 
+.communityplus-splash-copy h1 {
+  max-width: 880px;
+}
+
 .communityplus-brand-text {
   font-size: 15px;
   font-weight: 700;
@@ -111,9 +115,10 @@
 
   border-radius: 34px;
 
-  box-shadow:
-    0 40px 120px rgba(0,0,0,0.08),
-    0 10px 30px rgba(120,0,0,0.05);
+ box-shadow:
+  0 40px 120px rgba(0,0,0,0.08),
+  0 10px 30px rgba(120,0,0,0.05),
+  inset 0 1px 0 rgba(255,255,255,0.85);
 
   overflow: hidden;
 
@@ -232,13 +237,19 @@
     rotate(-180deg)
     scale(0.6);
 
+ animation:
+  splashEntrance 2.2s
+  cubic-bezier(0.22, 1, 0.36, 1)
+  forwards;
+
+  .communityplus-hero-logo {
+  animation-fill-mode: forwards;
+}
+
+.communityplus-hero-logo.loaded {
   animation:
-    splashEntrance 2.2s
-    cubic-bezier(0.22, 1, 0.36, 1)
-    forwards,
-    ambientFloat 7s
-    ease-in-out
-    infinite;
+    ambientFloat 7s ease-in-out infinite;
+}
 
   filter:
     drop-shadow(

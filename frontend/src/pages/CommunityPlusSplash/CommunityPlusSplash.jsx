@@ -13,6 +13,7 @@ import "./CommunityPlusSplash.css";
 
 export default function CommunityPlusSplash() {
 
+
   const navigate = useNavigate();
 
   const [visible, setVisible] =
@@ -35,6 +36,19 @@ export default function CommunityPlusSplash() {
     navigate("/communityplus/profile");
 
   };
+
+  const [logoLoaded, setLogoLoaded] = useState(false);
+
+  const logoClassName = `communityplus-hero-logo ${
+    logoLoaded ? "loaded" : ""
+  }`;
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLogoLoaded(true);
+    }, 2200);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
 
@@ -116,6 +130,8 @@ export default function CommunityPlusSplash() {
               </p>
 
             </div>
+
+            
 
             {/* ================================
                 ACTIONS
