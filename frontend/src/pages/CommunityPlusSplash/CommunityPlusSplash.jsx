@@ -44,7 +44,9 @@ export default function CommunityPlusSplash() {
 
   return (
     <div className="communityplus-splash-page">
+
       <header className="communityplus-splash-header">
+
         <div className="communityplus-brand">
           <img
             src="/logo/echo_splash.png"
@@ -67,21 +69,21 @@ export default function CommunityPlusSplash() {
             onAutoSet={setAutoMode}
           />
         </div>
+
       </header>
 
-      {/* rest of page */}
-    </div>
-  );
-}
-
       <main className="communityplus-main">
+
         <div
           className={`communityplus-splash-card ${
             visible ? "visible" : ""
           }`}
         >
+
           <div className="communityplus-hero">
+
             <div className="communityplus-visual">
+
               <img
                 src="/logo/echo_splash.png"
                 alt="Echo"
@@ -89,32 +91,42 @@ export default function CommunityPlusSplash() {
                   logoLoaded ? " loaded" : ""
                 }`}
               />
+
             </div>
 
             <div className="communityplus-splash-copy">
+
               <h1>
                 Welcome to
                 <span>Community One</span>
               </h1>
 
               <p>
-                Build your profile, verify your identity,
-                connect your participation, and access
-                the Community One ecosystem.
+                Build your profile,
+                verify your identity,
+                connect your participation,
+                and access the Community One ecosystem.
               </p>
+
             </div>
 
             <div className="communityplus-splash-actions">
+
               <Button
                 onClick={handleContinue}
                 className="communityplus-cta"
               >
                 Continue to Profile Setup
               </Button>
+
             </div>
+
           </div>
+
         </div>
+
       </main>
+
     </div>
   );
 }
