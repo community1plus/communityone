@@ -9,9 +9,6 @@
     ),
     #f7f4ef;
 
-  display: flex;
-  flex-direction: column;
-
   overflow: hidden;
 }
 
@@ -76,7 +73,7 @@
 ========================================= */
 
 .communityplus-main {
-  flex: 1;
+  height: calc(100vh - 72px);
 
   width: 100%;
 
@@ -86,12 +83,12 @@
   justify-content: center;
 
   padding:
-    56px
-    32px
-    96px;
+    40px
+    32px;
 
   box-sizing: border-box;
 }
+
 /* =========================================
    CARD
 ========================================= */
@@ -99,11 +96,9 @@
 .communityplus-splash-card {
   width: min(92vw, 860px);
 
-  min-height: 760px;
+  min-height: 720px;
 
-  margin: 0 auto;
-
-  background: rgba(255,255,255,0.92);
+  background: rgba(255,255,255,0.94);
 
   border: 1px solid #e4ddd3;
 
@@ -114,30 +109,26 @@
     0 10px 30px rgba(120,0,0,0.05);
 
   display: flex;
-  flex-direction: column;
-
   align-items: center;
   justify-content: center;
-
-  opacity: 0;
-
-  transform:
-    translateY(30px);
-
-  transition:
-    opacity 1s ease,
-    transform 1s ease;
 
   overflow: hidden;
 
   position: relative;
+
+  opacity: 0;
+
+  transform: translateY(30px);
+
+  transition:
+    opacity 1s ease,
+    transform 1s ease;
 }
 
 .communityplus-splash-card.visible {
   opacity: 1;
 
-  transform:
-    translateY(0);
+  transform: translateY(0);
 }
 
 /* =========================================
@@ -155,16 +146,16 @@
 
   text-align: center;
 
-  min-height: 100%;
-
   padding:
-  56px
-  56px
-  100px;
+    48px
+    56px
+    72px;
 
   box-sizing: border-box;
 
   position: relative;
+
+  transform: translateY(-24px);
 }
 
 /* =========================================
@@ -180,7 +171,7 @@
 
   width: 100%;
 
-  margin-bottom: 36px;
+  margin-bottom: 28px;
 }
 
 /* =========================================
@@ -192,8 +183,8 @@
 
   position: absolute;
 
-width: min(48vw, 360px);
-height: min(48vw, 360px);
+  width: min(48vw, 340px);
+  height: min(48vw, 340px);
 
   border-radius: 36px;
 
@@ -223,10 +214,10 @@ height: min(48vw, 360px);
   position: relative;
   z-index: 2;
 
-  width: min(38vw, 220px);
+  width: min(36vw, 210px);
 
-  max-width: 220px;
-  max-height: 220px;
+  max-width: 210px;
+  max-height: 210px;
 
   object-fit: contain;
 
@@ -261,6 +252,8 @@ height: min(48vw, 360px);
 
   max-width: 620px;
 
+  margin-top: -6px;
+
   position: relative;
   z-index: 2;
 }
@@ -268,7 +261,7 @@ height: min(48vw, 360px);
 .communityplus-pill {
   width: fit-content;
 
-  margin-bottom: 40px;
+  margin-bottom: 28px;
 
   padding: 8px 14px;
 
@@ -293,7 +286,7 @@ height: min(48vw, 360px);
 }
 
 .communityplus-splash-copy h1 {
-  margin: 0 0 32px;
+  margin: 0 0 24px;
 
   font-size: clamp(52px, 4.8vw, 76px);
 
@@ -343,7 +336,7 @@ height: min(48vw, 360px);
 ========================================= */
 
 .communityplus-splash-actions {
-  margin-top: 48px;
+  margin-top: 40px;
 
   display: flex;
   align-items: center;
