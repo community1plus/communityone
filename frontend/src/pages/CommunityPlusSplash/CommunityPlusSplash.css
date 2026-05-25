@@ -337,6 +337,7 @@
   color: #6d6259;
 
   opacity: 0;
+  letter-spacing: 0.04em; /* instead of larger */
 
   transform:
     translateX(-60px);
