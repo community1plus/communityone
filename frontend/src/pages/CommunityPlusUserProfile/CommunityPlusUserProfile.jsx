@@ -15,6 +15,7 @@ import useForm from "../../hooks/useForm";
 
 import "../../styles/system.css";
 import "./CommunityPlusUserProfile.css";
+import SplashHeader from "../../components/SplashHeader/SplashHeader";
 
 
 
@@ -394,7 +395,7 @@ export default function CommunityPlusUserProfile({ onComplete }) {
   performance.now()
 );
 
-const hydrationStartRef =
+  const hydrationStartRef =
   useRef(null);
 
   const autoRef = useRef(null);
@@ -441,8 +442,6 @@ const hydrationStartRef =
   const [phoneError, setPhoneError] = useState("");
 
   const [editingVerifiedPhone, setEditingVerifiedPhone] = useState(false);
-
-  
 
   const activeSteps = useMemo(() => {
 
@@ -1213,341 +1212,298 @@ await patchProfile(verifiedPayload);
   }
 
   return (
-    <div className="profile-container">
-      <div className="profile-layout">
-        <div className="profile-left">
-          <div className="profile-page-header">
+  <div className="profile-page">
+    <SplashHeader />
 
-  <div className="profile-title-row">
+    <main className="profile-main">
+      <div className="profile-container">
+        <div className="profile-layout">
+          <div className="profile-left">
+            <div className="profile-page-header">
+              <div className="profile-title-row">
+                <PageHeader title="USER PROFILE" />
 
-  <PageHeader title="USER PROFILE" />
-
-  <div className="profile-type-tabs">
-
-    {PROFILE_TABS.map((tab) => (
-
-      <button
-        key={tab.id}
-        type="button"
-        className={`profile-type-tab ${
-          activeProfileTab === tab.id
-            ? "active"
-            : ""
-        }`}
-        onClick={() =>
-          setActiveProfileTab(tab.id)
-        }
-      >
-        {tab.label}
-      </button>
-
-    ))}
-
-  </div>
-
-</div>
-
-  <div className="profile-completion">
-
-    <div className="profile-completion-header">
-
-      <span>
-        Profile completion
-      </span>
-
-      <strong>
-        {displayCompletion}%
-      </strong>
-
-    </div>
-
-    <div className="profile-completion-track">
-
-      <div
-        className="profile-completion-fill"
-        style={{
-          width: `${displayCompletion}%`,
-        }}
-      />
-
-    </div>
-
-  </div>
-
-  <div className="profile-section-tabs">
-
-    {activeSteps.map((step, index) => (
-
-      <button
-        key={step.id}
-        type="button"
-        className={`profile-section-tab ${
-          currentStep === index
-            ? "active"
-            : ""
-        } ${
-          index < currentStep
-            ? "complete"
-            : ""
-        }`}
-        onClick={() =>
-          setCurrentStep(index)
-        }
-      >
-        {step.title}
-      </button>
-
-    ))}
-
-  </div>
-
-</div>
-
-          <Section>
-  <div className="section-inner">
-
-    {isContactStep && (
-      <div className="phone-meta-inline">
-        Selected country: {selectedPhoneCountry.label}. Verification number:{" "}
-        {phoneE164 || selectedPhoneCountry.dialCode}
-      </div>
-    )}
-
-    {isContactStep && (
-      <div className="phone-country-row">
-        <label className="phone-country-label" htmlFor="phoneCountry">
-          Country
-        </label>
-
-        <select
-          id="phoneCountry"
-          className="phone-country-select"
-          value={values.phoneCountry}
-          onChange={handlePhoneCountryChange}
-          disabled={
-            profile?.phoneVerified &&
-            !editingVerifiedPhone
-          }
-        >
-          {PHONE_COUNTRIES.map((country) => (
-            <option key={country.code} value={country.code}>
-              {country.label} {country.dialCode}
-            </option>
-          ))}
-        </select>
-      </div>
-    )}
-
-    {isSocialStep ? (
-      <div className="social-verification-list">
-        {SOCIAL_PROVIDERS.map((provider) => {
-          const status = getSocialStatus(profile?.social, provider.id);
-
-          return (
-            <div className="social-verification-row" key={provider.id}>
-              <div className="social-verification-main">
-                <strong>{provider.label}</strong>
-                <span>{provider.description}</span>
-
-                <small className={status.verified ? "success" : "hint"}>
-                  {status.text}
-                </small>
+                <div className="profile-type-tabs">
+                  {PROFILE_TABS.map((tab) => (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      className={`profile-type-tab ${
+                        activeProfileTab === tab.id ? "active" : ""
+                      }`}
+                      onClick={() => setActiveProfileTab(tab.id)}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
               </div>
 
-              <button
-                type="button"
-                className={`social-verify-button ${
-                  status.verified ? "verified" : "unverified"
-                }`}
-                onClick={() => startSocialVerification(provider.id)}
-              >
-                {status.verified ? "Verified" : "Verify"}
-              </button>
-            </div>
-          );
-        })}
-      </div>
-    ) : (
-      <FormBuilder
-        steps={activeSteps}
-        currentStep={currentStep}
-        form={form}
-        extra={{
-          Autocomplete,
-          autoRef,
-          onPlaceChanged,
-          isLoaded,
-        }}
-      />
-    )}
+              <div className="profile-completion">
+                <div className="profile-completion-header">
+                  <span>Profile completion</span>
+                  <strong>{displayCompletion}%</strong>
+                </div>
 
-    {/* =========================================
-       CONTACT VERIFICATION
-    ========================================= */}
-
-    {isContactStep && (
-
-      <div className="phone-verification">
-
-        {profile?.phoneVerified && !editingVerifiedPhone ? (
-
-          <div className="phone-verified-state">
-
-            <div className="success">
-              ✓ Verified Number
-            </div>
-
-            <div className="verified-phone-display">
-              {phoneE164}
-            </div>
-
-            <div className="hint">
-              This number has already been verified using MFA.
-            </div>
-
-            <div className="phone-verification-row">
-              <Button
-                variant="ghost"
-                onClick={() => {
-
-                  setEditingVerifiedPhone(true);
-
-                 
-
-                  setValue("phoneVerificationCode", "");
-
-                  setPhoneStatus("idle");
-
-                  setPhoneError("");
-
-                }}
-              >
-                Change Number
-              </Button>
-            </div>
-
-          </div>
-
-        ) : (
-
-          <>
-
-            {values.phone && !phoneIsValid && (
-              <div className="error">
-                Enter a valid phone number for {selectedPhoneCountry.label}.
+                <div className="profile-completion-track">
+                  <div
+                    className="profile-completion-fill"
+                    style={{
+                      width: `${displayCompletion}%`,
+                    }}
+                  />
+                </div>
               </div>
-            )}
 
-            {phoneStatus === "idle" && (
+              <div className="profile-section-tabs">
+                {activeSteps.map((step, index) => (
+                  <button
+                    key={step.id}
+                    type="button"
+                    className={`profile-section-tab ${
+                      currentStep === index ? "active" : ""
+                    } ${index < currentStep ? "complete" : ""}`}
+                    onClick={() => setCurrentStep(index)}
+                  >
+                    {step.title}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <Section>
+              <div className="section-inner">
+                {isContactStep && (
+                  <div className="phone-meta-inline">
+                    Selected country: {selectedPhoneCountry.label}.
+                    Verification number:{" "}
+                    {phoneE164 || selectedPhoneCountry.dialCode}
+                  </div>
+                )}
+
+                {isContactStep && (
+                  <div className="phone-country-row">
+                    <label
+                      className="phone-country-label"
+                      htmlFor="phoneCountry"
+                    >
+                      Country
+                    </label>
+
+                    <select
+                      id="phoneCountry"
+                      className="phone-country-select"
+                      value={values.phoneCountry}
+                      onChange={handlePhoneCountryChange}
+                      disabled={
+                        profile?.phoneVerified && !editingVerifiedPhone
+                      }
+                    >
+                      {PHONE_COUNTRIES.map((country) => (
+                        <option key={country.code} value={country.code}>
+                          {country.label} {country.dialCode}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                {isSocialStep ? (
+                  <div className="social-verification-list">
+                    {SOCIAL_PROVIDERS.map((provider) => {
+                      const status = getSocialStatus(
+                        profile?.social,
+                        provider.id
+                      );
+
+                      return (
+                        <div
+                          className="social-verification-row"
+                          key={provider.id}
+                        >
+                          <div className="social-verification-main">
+                            <strong>{provider.label}</strong>
+                            <span>{provider.description}</span>
+
+                            <small
+                              className={status.verified ? "success" : "hint"}
+                            >
+                              {status.text}
+                            </small>
+                          </div>
+
+                          <button
+                            type="button"
+                            className={`social-verify-button ${
+                              status.verified ? "verified" : "unverified"
+                            }`}
+                            onClick={() =>
+                              startSocialVerification(provider.id)
+                            }
+                          >
+                            {status.verified ? "Verified" : "Verify"}
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <FormBuilder
+                    steps={activeSteps}
+                    currentStep={currentStep}
+                    form={form}
+                    extra={{
+                      Autocomplete,
+                      autoRef,
+                      onPlaceChanged,
+                      isLoaded,
+                    }}
+                  />
+                )}
+
+                {isContactStep && (
+                  <div className="phone-verification">
+                    {profile?.phoneVerified && !editingVerifiedPhone ? (
+                      <div className="phone-verified-state">
+                        <div className="success">✓ Verified Number</div>
+
+                        <div className="verified-phone-display">
+                          {phoneE164}
+                        </div>
+
+                        <div className="hint">
+                          This number has already been verified using MFA.
+                        </div>
+
+                        <div className="phone-verification-row">
+                          <Button
+                            variant="ghost"
+                            onClick={() => {
+                              setEditingVerifiedPhone(true);
+                              setValue("phoneVerificationCode", "");
+                              setPhoneStatus("idle");
+                              setPhoneError("");
+                            }}
+                          >
+                            Change Number
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        {values.phone && !phoneIsValid && (
+                          <div className="error">
+                            Enter a valid phone number for{" "}
+                            {selectedPhoneCountry.label}.
+                          </div>
+                        )}
+
+                        {phoneStatus === "idle" && (
+                          <div className="hint">
+                            Enter your phone number and request a verification
+                            code.
+                          </div>
+                        )}
+
+                        {phoneStatus === "sent" && (
+                          <div className="hint">
+                            Enter the verification code sent to your phone.
+                          </div>
+                        )}
+
+                        <div className="phone-verification-row">
+                          <Button
+                            variant="ghost"
+                            onClick={sendPhoneCode}
+                            disabled={
+                              phoneStatus === "sending" || !phoneIsValid
+                            }
+                          >
+                            {phoneStatus === "sending"
+                              ? "Sending..."
+                              : "Send verification code"}
+                          </Button>
+
+                          <Button
+                            onClick={verifyPhoneCode}
+                            disabled={phoneStatus !== "sent"}
+                          >
+                            {phoneStatus === "verifying"
+                              ? "Verifying..."
+                              : "Verify"}
+                          </Button>
+                        </div>
+
+                        {phoneStatus === "sent" && (
+                          <div className="success">
+                            Verification code sent. Enter the code above.
+                          </div>
+                        )}
+
+                        {phoneStatus === "verified" && (
+                          <div className="success">
+                            Phone number verified successfully.
+                          </div>
+                        )}
+
+                        {phoneError && (
+                          <div className="error">{phoneError}</div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+            </Section>
+
+            {profileMissing && (
               <div className="hint">
-                Enter your phone number and request a verification code.
+                No saved profile found yet. Complete the form and save to create
+                your profile.
               </div>
             )}
 
-            {phoneStatus === "sent" && (
-              <div className="hint">
-                Enter the verification code sent to your phone.
-              </div>
-            )}
+            {profileError && <div className="error">{profileError}</div>}
 
-            <div className="phone-verification-row">
-
-              <Button
-                variant="ghost"
-                onClick={sendPhoneCode}
-                disabled={
-                  phoneStatus === "sending" ||
-                  !phoneIsValid
-                }
-              >
-                {phoneStatus === "sending"
-                  ? "Sending..."
-                  : "Send verification code"}
+            <div className="form-navigation">
+              <Button variant="ghost" onClick={closeProfile}>
+                Close
               </Button>
 
-              <Button
-                onClick={verifyPhoneCode}
-                disabled={
-                  phoneStatus !== "sent"
-                }
-              >
-                {phoneStatus === "verifying"
-                  ? "Verifying..."
-                  : "Verify"}
-              </Button>
+              <div className="form-actions">
+                {currentStep > 0 && (
+                  <Button variant="ghost" onClick={prevStep}>
+                    Back
+                  </Button>
+                )}
 
-            </div>
-
-            {phoneStatus === "sent" && (
-              <div className="success">
-                Verification code sent. Enter the code above.
-              </div>
-            )}
-
-            {phoneStatus === "verified" && (
-              <div className="success">
-                Phone number verified successfully.
-              </div>
-            )}
-
-            {phoneError && (
-              <div className="error">
-                {phoneError}
-              </div>
-            )}
-
-          </>
-
-        )}
-      </div>
-    )}
-
-  </div>
-</Section>
-
-          
-
-          {profileMissing && (
-            <div className="hint">
-              No saved profile found yet. Complete the form and save to create your profile.
-            </div>
-          )}
-
-          {profileError && <div className="error">{profileError}</div>}
-
-          <div className="form-navigation">
-            <Button variant="ghost" onClick={closeProfile}>
-              Close
-            </Button>
-
-            <div className="form-actions">
-              {currentStep > 0 && (
-                <Button variant="ghost" onClick={prevStep}>
-                  Back
+                <Button
+                  onClick={isLastStep ? handleComplete : nextStep}
+                  disabled={
+                    isFormValidating ||
+                    savingProfile ||
+                    (isContactStep && !canContinueFromContact)
+                  }
+                >
+                  {savingProfile
+                    ? "Saving..."
+                    : isLastStep
+                    ? "Finish"
+                    : "Next"}
                 </Button>
-              )}
-
-              <Button
-                onClick={isLastStep ? handleComplete : nextStep}
-                disabled={
-                  isFormValidating ||
-                  savingProfile ||
-                  (isContactStep && !canContinueFromContact)
-                }
-              >
-                {savingProfile ? "Saving..." : isLastStep ? "Finish" : "Next"}
-              </Button>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="profile-guide">
-          <Section
-            title="Profile Guide"
-            meta="Verify your social accounts to prove ownership of pages, channels, or official accounts."
-          />
+          <div className="profile-guide">
+            <Section
+              title="Profile Guide"
+              meta="Verify your social accounts to prove ownership of pages, channels, or official accounts."
+            />
+          </div>
         </div>
       </div>
-    </div>
-  );
+    </main>
+  </div>
+);
 }
