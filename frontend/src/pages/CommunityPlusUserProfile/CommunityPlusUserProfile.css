@@ -104,6 +104,20 @@ CARDS
   box-shadow: 0 8px 24px rgba(20, 20, 20, 0.045);
 }
 
+.communityplus-splash-page {
+  min-height: 100vh;
+
+  background:
+    radial-gradient(
+      circle at top,
+      rgba(120, 0, 0, 0.05),
+      transparent 40%
+    ),
+    #f7f4ef;
+
+  overflow: hidden;
+}
+
 .profile-left {
   padding: 24px;
 

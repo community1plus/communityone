@@ -174,7 +174,7 @@ export default function CommunityPlusLandingPage() {
               navigate("/communityplus/welcome")
               }
             >
-              COMMUNITY+ TEST
+              COMMUNITY ONE
             </button>
 
             <div className="guest-pill">
