@@ -12,6 +12,7 @@ import Button from "../../components/UI/Button";
 import "./CommunityPlusSplash.css";
 
 export default function CommunityPlusSplash() {
+
   const navigate = useNavigate();
 
   const [visible, setVisible] =
@@ -20,7 +21,9 @@ export default function CommunityPlusSplash() {
   useEffect(() => {
 
     const timer = setTimeout(() => {
+
       setVisible(true);
+
     }, 100);
 
     return () => clearTimeout(timer);
@@ -28,15 +31,18 @@ export default function CommunityPlusSplash() {
   }, []);
 
   const handleContinue = () => {
+
     navigate("/communityplus/profile");
+
   };
 
   return (
+
     <div className="communityplus-splash-page">
 
-      {/* =========================================
+      {/* =====================================
           HEADER
-      ========================================= */}
+      ===================================== */}
 
       <header className="communityplus-splash-header">
 
@@ -64,9 +70,9 @@ export default function CommunityPlusSplash() {
 
       </header>
 
-      {/* =========================================
+      {/* =====================================
           HERO
-      ========================================= */}
+      ===================================== */}
 
       <main className="communityplus-main">
 
@@ -76,51 +82,55 @@ export default function CommunityPlusSplash() {
           }`}
         >
 
-          {/* =====================================
-              VISUAL
-          ===================================== */}
+          <div className="communityplus-hero">
 
-          <div className="communityplus-visual">
+            {/* ================================
+                VISUAL
+            ================================= */}
 
-            <img
-              src="/logo/echo_splash.png"
-              alt="Echo"
-              className="communityplus-hero-logo"
-            />
+            <div className="communityplus-visual">
 
-          </div>
+              <img
+                src="/logo/echo_splash.png"
+                alt="Echo"
+                className="communityplus-hero-logo"
+              />
 
-          {/* =====================================
-              COPY
-          ===================================== */}
-
-          <div className="communityplus-splash-copy">
-
-            <div className="communityplus-pill">
-              COMMUNITY+
             </div>
 
-            <h1>
-              Welcome to Community One
-            </h1>
+            {/* ================================
+                COPY
+            ================================= */}
 
-            <p>
-              Build your profile, verify your identity,
-              connect your participation, and unlock the
-              Community+ ecosystem.
-            </p>
+            <div className="communityplus-splash-copy">
 
-          </div>
+              <h1>
+                Welcome to
+                <span>Community One</span>
+              </h1>
 
-          {/* =====================================
-              ACTIONS
-          ===================================== */}
+              <p>
+                Build your profile, verify your identity,
+                connect your participation, and access
+                the Community One ecosystem.
+              </p>
 
-          <div className="communityplus-splash-actions">
+            </div>
 
-            <Button onClick={handleContinue}>
-              Continue to Profile Setup
-            </Button>
+            {/* ================================
+                ACTIONS
+            ================================= */}
+
+            <div className="communityplus-splash-actions">
+
+              <Button
+                onClick={handleContinue}
+                className="communityplus-cta"
+              >
+                Continue to Profile Setup
+              </Button>
+
+            </div>
 
           </div>
 
@@ -129,5 +139,6 @@ export default function CommunityPlusSplash() {
       </main>
 
     </div>
+
   );
 }
