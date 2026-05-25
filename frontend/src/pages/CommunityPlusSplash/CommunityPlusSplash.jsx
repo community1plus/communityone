@@ -15,6 +15,10 @@ export default function CommunityPlusSplash() {
   const [visible, setVisible] = useState(false);
   const [logoLoaded, setLogoLoaded] = useState(false);
 
+  const handleContinue = () => {
+  navigate("/communityplus/profile");
+  };
+
   const {
     displayLocation,
     mode,
@@ -111,7 +115,7 @@ export default function CommunityPlusSplash() {
 
             <div className="communityplus-splash-actions">
 
-              <Button
+            <Button
                 onClick={handleContinue}
                 className="communityplus-cta"
               >
