@@ -17,12 +17,7 @@ import "../../styles/system.css";
 import "./CommunityPlusUserProfile.css";
 
 
-const pageLoadStartRef = useRef(
-  performance.now()
-);
 
-const hydrationStartRef =
-  useRef(null);
 
 const DEFAULT_PHONE_COUNTRY = "AU";
 
@@ -395,6 +390,12 @@ function getInitialProfileValues({ user, homeLocation }) {
 
 export default function CommunityPlusUserProfile({ onComplete }) {
   const navigate = useNavigate();
+  const pageLoadStartRef = useRef(
+  performance.now()
+);
+
+const hydrationStartRef =
+  useRef(null);
 
   const autoRef = useRef(null);
   const lastHomeLocationRef = useRef("");
@@ -440,6 +441,8 @@ export default function CommunityPlusUserProfile({ onComplete }) {
   const [phoneError, setPhoneError] = useState("");
 
   const [editingVerifiedPhone, setEditingVerifiedPhone] = useState(false);
+
+  
 
   const activeSteps = useMemo(() => {
 
