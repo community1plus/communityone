@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import Button from "../../components/UI/Button";
-import LocationDisplay from "../../components/LocationDisplay/LocationDisplay";
+import LocationDisplay from "../../components/Layout/Header/LocationDisplay";
 import { useUserLocation } from "../../hooks/useUserLocation";
 
 import "./CommunityPlusSplash.css";
