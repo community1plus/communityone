@@ -303,10 +303,7 @@ export default function App() {
             }
           />
 
-          <Route
-              path="/communityplus/profile"
-              element={<CommunityPlusUserProfile />}
-          />
+         
 
           {/* COMPOSE */}
 
