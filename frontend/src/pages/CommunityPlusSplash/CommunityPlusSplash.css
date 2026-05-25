@@ -158,9 +158,9 @@
   min-height: 100%;
 
   padding:
-    80px
-    56px
-    120px;
+  56px
+  56px
+  100px;
 
   box-sizing: border-box;
 
@@ -180,7 +180,7 @@
 
   width: 100%;
 
-  margin-bottom: 72px;
+  margin-bottom: 36px;
 }
 
 /* =========================================
@@ -192,8 +192,8 @@
 
   position: absolute;
 
-  width: min(56vw, 420px);
-  height: min(56vw, 420px);
+width: min(48vw, 360px);
+height: min(48vw, 360px);
 
   border-radius: 36px;
 
@@ -295,7 +295,7 @@
 .communityplus-splash-copy h1 {
   margin: 0 0 32px;
 
-  font-size: clamp(56px, 5vw, 84px);
+  font-size: clamp(52px, 4.8vw, 76px);
 
   line-height: 0.95;
   letter-spacing: -0.04em;
