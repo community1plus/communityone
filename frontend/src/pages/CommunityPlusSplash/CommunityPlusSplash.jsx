@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Button from "../../components/UI/Button";
 import LocationDisplay from "../../components/Layout/Header/LocationDisplay";
 import { useUserLocation } from "../../hooks/useUserLocation";
-import SplashHeader from "../CommunityPlusSplash/SplashHeader";
+import SplashHeader from "../../components/SplashHeader/SplashHeader";
 
 import "./CommunityPlusSplash.css";
 
