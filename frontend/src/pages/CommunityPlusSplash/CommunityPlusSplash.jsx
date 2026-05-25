@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import Button from "../../components/UI/Button";
-import LocationDisplay from "../../components/Layout/Header/LocationDisplay";
+import LocationDisplay from "../../components/LocationDisplay/LocationDisplay";
 import { useUserLocation } from "../../hooks/useUserLocation";
 
 import "./CommunityPlusSplash.css";
@@ -70,6 +70,51 @@ export default function CommunityPlusSplash() {
       </header>
 
       {/* rest of page */}
+    </div>
+  );
+}
+
+      <main className="communityplus-main">
+        <div
+          className={`communityplus-splash-card ${
+            visible ? "visible" : ""
+          }`}
+        >
+          <div className="communityplus-hero">
+            <div className="communityplus-visual">
+              <img
+                src="/logo/echo_splash.png"
+                alt="Echo"
+                className={`communityplus-hero-logo${
+                  logoLoaded ? " loaded" : ""
+                }`}
+              />
+            </div>
+
+            <div className="communityplus-splash-copy">
+              <h1>
+                Welcome to
+                <span>Community One</span>
+              </h1>
+
+              <p>
+                Build your profile, verify your identity,
+                connect your participation, and access
+                the Community One ecosystem.
+              </p>
+            </div>
+
+            <div className="communityplus-splash-actions">
+              <Button
+                onClick={handleContinue}
+                className="communityplus-cta"
+              >
+                Continue to Profile Setup
+              </Button>
+            </div>
+          </div>
+        </div>
+      </main>
     </div>
   );
 }
