@@ -102,10 +102,7 @@ export default function CommunityPlusSplash() {
               </h1>
 
               <p>
-                Build your profile,
-                verify your identity,
-                connect your participation,
-                and access the Community One ecosystem.
+                Community. Connection. Voice.
               </p>
 
             </div>

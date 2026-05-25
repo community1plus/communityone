@@ -224,7 +224,7 @@
   position: relative;
   z-index: 2;
 
-  width: min(28vw, 180px);
+  width: 120px;
 
   max-width: 180px;
   max-height: 180px;
@@ -275,6 +275,22 @@
   z-index: 2;
 }
 
+.communityplus-splash-copy p {
+  margin-top: 20px;
+
+  font-size: 1.1rem;
+
+  font-weight: 500;
+
+  letter-spacing: 0.06em;
+
+  text-transform: uppercase;
+
+  opacity: 0.72;
+
+  line-height: 1.5;
+}
+
 .communityplus-splash-copy h1 {
   margin: 0 0 34px;
 
@@ -283,10 +299,8 @@
 
   align-items: center;
 
-  font-size:
-    clamp(58px, 6vw, 96px);
-
-  line-height: 0.94;
+  font-size: clamp(3rem, 6vw, 5rem);
+  line-height: 0.95;
 
   letter-spacing: -0.045em;
 
@@ -359,8 +373,8 @@
 
 .communityplus-cta {
   min-width: 340px;
-
-  height: 68px;
+  width: 320px;
+  height: 58px;
 
   padding:
     0
