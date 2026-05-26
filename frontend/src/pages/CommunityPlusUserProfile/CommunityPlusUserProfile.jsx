@@ -1137,24 +1137,24 @@ await patchProfile(verifiedPayload);
 );
 
   const handleSaveProfile = useCallback(async () => {
-    setSavingProfile(true);
-    setProfileError("");
+  setSavingProfile(true);
+  setProfileError("");
 
-    try {
-      const payload = buildProfilePayload();
-      const nextProfile = await saveProfile(payload);
+  try {
+    const payload = buildProfilePayload();
+    const nextProfile = await saveProfile(payload);
 
-      clearStorage?.();
-      onComplete?.(nextProfile);
+    clearStorage?.();
+    onComplete?.(nextProfile);
 
-      navigate("/communityplus", { replace: true });
-    } catch (err) {
-      console.error("Profile save failed:", err);
-      setProfileError(err?.message || "Profile save failed");
-    } finally {
-      setSavingProfile(false);
-    }
-  }, [saveProfile, buildProfilePayload, clearStorage, onComplete, navigate]);
+    // Stay on profile page after save.
+  } catch (err) {
+    console.error("Profile save failed:", err);
+    setProfileError(err?.message || "Profile save failed");
+  } finally {
+    setSavingProfile(false);
+  }
+}, [saveProfile, buildProfilePayload, clearStorage, onComplete]);
 
   const handleComplete = useCallback(async () => {
     const valid = await validateAll();
@@ -1478,18 +1478,14 @@ await patchProfile(verifiedPayload);
                 )}
 
                 <Button
-                  onClick={isLastStep ? handleComplete : nextStep}
+                  onClick={handleSaveProfile}
                   disabled={
-                    isFormValidating ||
-                    savingProfile ||
-                    (isContactStep && !canContinueFromContact)
-                  }
+                  isFormValidating ||
+                  savingProfile ||
+                  (isContactStep && !canContinueFromContact)
+                }
                 >
-                  {savingProfile
-                    ? "Saving..."
-                    : isLastStep
-                    ? "Finish"
-                    : "Next"}
+                  {savingProfile ? "Saving..." : "Save"}
                 </Button>
               </div>
             </div>

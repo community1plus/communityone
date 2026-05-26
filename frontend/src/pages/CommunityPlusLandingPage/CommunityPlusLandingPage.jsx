@@ -161,15 +161,7 @@ export default function CommunityPlusLandingPage() {
               onClick={handleGuestEntry}
             >
               Continue as Guest
-            </button>
-
-            <button
-              type="button"
-              className="landing-secondary-auth"
-              onClick={openAuth}
-            >
-              Sign In
-            </button>
+            </button>            
 
             <div className="guest-pill">
               READ ONLY ACCESS
