@@ -7,48 +7,26 @@ import {
 } from "react-router-dom";
 
 import { useAuth } from "./context/AuthContext";
-
 import { ProfileProvider } from "./context/ProfileContext";
-
 import { GoogleMapsProvider } from "./context/GoogleMapsProvider";
-
 import { MapProvider } from "./context/MapContext";
-
 import { SessionProvider } from "./context/sessionContext";
-
-import {
-  IViewSessionProvider,
-} from "./context/IViewSessionContext";
-
+import { IViewSessionProvider,} from "./context/IViewSessionContext";
 import CommunityPlusLandingPage from "./pages/CommunityPlusLandingPage/CommunityPlusLandingPage";
-
 import CommunityPlusAboutPage from "./pages/CommunityPlusAboutPage/CommunityPlusAboutPage";
-
 import CommunityPlusDashboardLayout from "./components/Layout/Dashboard/CommunityPlusDashboardLayout";
-
 import CommunityPlusDashboardHome from "./pages/CommunityPlusDashboardHome/CommunityPlusDashboardHome";
-
 import CommunityPlusYellowPages from "./pages/CommunityPlusYellowPages/CommunityPlusYellowPages";
-
 import CommunityPlusUserProfile from "./pages/CommunityPlusUserProfile/CommunityPlusUserProfile";
-
 import CommunityPlusIViewPage from "./pages/CommunityPlusIViewPage/CommunityPlusIViewPage";
-
 import CommunityPlusChannels from "./pages/CommunityPlusChannels/CommunityPlusChannels";
-
 import CommunityPlusNewsPage from "./pages/CommunityPlusNewsPage/CommunityPlusNewsPage";
-
 import CommunityPlusEventsPage from "./pages/CommunityPlusEventsPage/CommunityPlusEventsPage";
-
 import CommunityPlusEventCreatePage from "./pages/CommunityPlusEventsPage/CommunityPlusEventCreatePage";
-
 import PostComposer from "./components/Layout/Sidebar/Post/PostComposer";
-
 import CommunityPlusEchoPage from "./pages/CommunityPlusEchoPage/CommunityPlusEchoPage";
-
 import CommunityPlusEchoDropPage from "./pages/CommunityPlusEchoPage/CommunityPlusEchoDropPage";
-import CommunityPlusSplash
-from "./pages/CommunityPlusSplash/CommunityPlusSplash";
+import CommunityPlusSplash from "./pages/CommunityPlusSplash/CommunityPlusSplash";
 
 /* =========================================
    STRIPE
@@ -186,7 +164,7 @@ export default function App() {
         element={<DashboardProviders />}>
 
         <Route
-            path="profile"
+            path="communityplus/profile"
             element={
               
                 <CommunityPlusUserProfile />
