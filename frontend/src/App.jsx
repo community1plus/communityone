@@ -149,44 +149,34 @@ function DashboardProviders() {
 export default function App() {
   return (
     <Routes>
-      {/* LANDING */}
-
-      <Route
-        path="/"
-        element={
-          <CommunityPlusLandingPage />
-        }
-      />
-
-      {/* DASHBOARD */}
-
-      <Route
-        element={<DashboardProviders />}>
-
+      <Route element={<DashboardProviders />}>
+        {/* LANDING */}
         <Route
-            path="communityplus/profile"
-            element={
-              
-                <CommunityPlusUserProfile />
-              
-            }
-          />
+          path="/"
+          element={<CommunityPlusLandingPage />}
+        />
+
+        {/* SPLASH / FIRST LOGIN */}
+        <Route
+          path="/communityplus/welcome"
+          element={<CommunityPlusSplash />}
+        />
+
+        {/* STANDALONE PROFILE SETUP */}
+        <Route
+          path="/communityplus/profile"
+          element={<CommunityPlusUserProfile />}
+        />
+
+        {/* DASHBOARD */}
         <Route
           path="/communityplus"
-          element={
-            <CommunityPlusDashboardLayout />
-          }
+          element={<CommunityPlusDashboardLayout />}
         >
-          {/* HOME */}
-
           <Route
             index
-            element={
-              <CommunityPlusDashboardHome />
-            }
+            element={<CommunityPlusDashboardHome />}
           />
-
-          {/* iVIEW */}
 
           <Route
             path="iview"
@@ -197,16 +187,10 @@ export default function App() {
             }
           />
 
-          {/* NEWS */}
-
           <Route
             path="news"
-            element={
-              <CommunityPlusNewsPage />
-            }
+            element={<CommunityPlusNewsPage />}
           />
-
-          {/* EVENTS */}
 
           <Route
             path="events/create"
@@ -219,70 +203,38 @@ export default function App() {
 
           <Route
             path="events"
-            element={
-              <CommunityPlusEventsPage />
-            }
+            element={<CommunityPlusEventsPage />}
           />
-
-          {/* ABOUT */}
 
           <Route
             path="about"
-            element={
-              <CommunityPlusAboutPage />
-            }
+            element={<CommunityPlusAboutPage />}
           />
-
-          {/* YELLOW PAGES */}
 
           <Route
             path="yellowpages"
-            element={
-              <CommunityPlusYellowPages />
-            }
+            element={<CommunityPlusYellowPages />}
           />
-
-          {/* CHANNELS */}
 
           <Route
             path="channels"
-            element={
-              <CommunityPlusChannels />
-            }
+            element={<CommunityPlusChannels />}
           />
-
-          {/* ECHO */}
 
           <Route
             path="echo"
-            element={
-              <CommunityPlusEchoPage />
-            }
+            element={<CommunityPlusEchoPage />}
           />
 
           <Route
             path="echo/:dropId"
-            element={
-              <CommunityPlusEchoDropPage />
-            }
+            element={<CommunityPlusEchoDropPage />}
           />
-
-          {/* HELP */}
 
           <Route
             path="help"
-            element={
-              <Placeholder title="Help" />
-            }
+            element={<Placeholder title="Help" />}
           />
-
-          {/* PROFILE */}
-
-          
-
-         
-
-          {/* COMPOSE */}
 
           <Route
             path="compose/:mode"
@@ -293,8 +245,6 @@ export default function App() {
             }
           />
 
-          {/* ACCOUNT */}
-
           <Route
             path="account"
             element={
@@ -304,8 +254,6 @@ export default function App() {
             }
           />
 
-          {/* INBOX */}
-
           <Route
             path="inbox"
             element={
@@ -314,8 +262,6 @@ export default function App() {
               </ProtectedRoute>
             }
           />
-
-          {/* FALLBACK */}
 
           <Route
             path="*"
@@ -329,21 +275,10 @@ export default function App() {
         </Route>
       </Route>
 
-      <Route
-        path="/communityplus/welcome"
-        element={<CommunityPlusSplash />}
-      />
-
       {/* ROOT FALLBACK */}
-
       <Route
         path="*"
-        element={
-          <Navigate
-            to="/"
-            replace
-          />
-        }
+        element={<Navigate to="/" replace />}
       />
     </Routes>
   );

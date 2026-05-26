@@ -1,23 +1,15 @@
-import {
-  useEffect,
-  useState,
-} from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-import {
-  useNavigate,
-} from "react-router-dom";
-
-import {
-  useAuth,
-} from "../../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
+import { useProfile } from "../../context/ProfileContext";
 
 import CommunityPlusAuthModal from "../../components/Auth/CommunityPlusAuthModal";
 
 import "./CommunityPlusLandingPage.css";
 
 export default function CommunityPlusLandingPage() {
-  const navigate =
-    useNavigate();
+  const navigate = useNavigate();
 
   const {
     loading,
@@ -25,28 +17,47 @@ export default function CommunityPlusLandingPage() {
     continueAsGuest,
   } = useAuth();
 
-  const [showAuth, setShowAuth] =
-    useState(false);
+  const {
+    profileReady,
+    profileMissing,
+    hasProfile,
+    isProfileComplete,
+  } = useProfile();
+
+  const [showAuth, setShowAuth] = useState(false);
 
   /* ======================================================
-     AUTO REDIRECT
+     AUTHENTICATED REDIRECT
   ====================================================== */
 
   useEffect(() => {
-    if (
-      !loading &&
-      isAuthenticated
-    ) {
-      navigate(
-        "/communityplus",
-        {
-          replace: true,
-        }
-      );
+    if (loading) return;
+    if (!isAuthenticated) return;
+    if (!profileReady) return;
+
+    const needsProfileSetup =
+      profileMissing ||
+      !hasProfile ||
+      !isProfileComplete;
+
+    if (needsProfileSetup) {
+      navigate("/communityplus/welcome", {
+        replace: true,
+      });
+
+      return;
     }
+
+    navigate("/communityplus", {
+      replace: true,
+    });
   }, [
     loading,
     isAuthenticated,
+    profileReady,
+    profileMissing,
+    hasProfile,
+    isProfileComplete,
     navigate,
   ]);
 
@@ -62,24 +73,32 @@ export default function CommunityPlusLandingPage() {
     setShowAuth(false);
   };
 
+  const handleAuthSuccess = () => {
+    closeAuth();
+
+    /*
+      Redirect is handled by the authenticated redirect effect above.
+      This allows ProfileContext to decide whether the user goes to:
+      - /communityplus/welcome
+      - /communityplus
+    */
+  };
+
   /* ======================================================
      GUEST ENTRY
   ====================================================== */
 
-  const handleGuestEntry =
-    () => {
-      continueAsGuest();
+  const handleGuestEntry = () => {
+    continueAsGuest();
 
-      navigate(
-        "/communityplus"
-      );
-    };
+    navigate("/communityplus");
+  };
 
   /* ======================================================
      LOADING
   ====================================================== */
 
-  if (loading) {
+  if (loading || (isAuthenticated && !profileReady)) {
     return null;
   }
 
@@ -98,7 +117,6 @@ export default function CommunityPlusLandingPage() {
         aria-hidden="true"
       >
         <div className="landing-hero-tint" />
-
         <div className="landing-hero-focus" />
       </div>
 
@@ -122,42 +140,28 @@ export default function CommunityPlusLandingPage() {
           <div className="landing-text">
             <h2 className="landing-tagline">
               Real People.{" "}
-
               <span className="accent">
                 Real News.
               </span>{" "}
-
               Real Time
             </h2>
 
             <p className="landing-sub">
-              A map-first platform
-              connecting local
-              signal, stories,
-              and services.
+              A map-first platform connecting local signal,
+              stories, and services.
             </p>
           </div>
 
           {/* ACTIONS */}
 
           <div className="landing-actions">
-            {/* ====================================
-                GUEST ENTRY
-            ==================================== */}
-
             <button
               type="button"
               className="btn primary hero-cta"
-              onClick={
-                handleGuestEntry
-              }
+              onClick={handleGuestEntry}
             >
               Continue as Guest
             </button>
-
-            {/* ====================================
-                OPTIONAL AUTH
-            ==================================== */}
 
             <button
               type="button"
@@ -167,28 +171,13 @@ export default function CommunityPlusLandingPage() {
               Sign In
             </button>
 
-            <button
-              type="button"
-              className="landing-secondary-auth"
-              onClick={() =>
-              navigate("/communityplus/welcome")
-              }
-            >
-              COMMUNITY ONE
-            </button>
-
             <div className="guest-pill">
-                READ ONLY ACCESS
-          </div>   
-
-
-            {/* ====================================
-                SUBTEXT
-            ==================================== */}
+              READ ONLY ACCESS
+            </div>
 
             <p className="guest-mode-copy">
-                Explore your local community in read-only mode.
-                Create an account later to post, comment, and contribute.
+              Explore your local community in read-only mode.
+              Create an account later to post, comment, and contribute.
             </p>
           </div>
         </section>
@@ -217,12 +206,8 @@ export default function CommunityPlusLandingPage() {
 
       {showAuth && (
         <CommunityPlusAuthModal
-          onClose={
-            closeAuth
-          }
-          onSuccess={
-            closeAuth
-          }
+          onClose={closeAuth}
+          onSuccess={handleAuthSuccess}
         />
       )}
     </div>
