@@ -17,7 +17,11 @@ import "../../styles/system.css";
 import "./CommunityPlusUserProfile.css";
 import SplashHeader from "../../components/SplashHeader/SplashHeader";
 
+const [businessEmailStatus, setBusinessEmailStatus] =
+  useState("idle");
 
+const [businessEmailError, setBusinessEmailError] =
+  useState("");
 
 
 const DEFAULT_PHONE_COUNTRY = "AU";
@@ -143,6 +147,17 @@ const ORG_STEPS = [
         required: true,
       },
       {
+      name: "organisation.email",
+      label: "Organisation Email",
+      type: "email",
+      required: true,
+      },
+      {
+      name: "businessEmailVerificationCode",
+      label: "Email Verification Code",
+      type: "text",
+      },
+      {
         name: "organisation.registration",
         label: "Registration / ABN",
         type: "text",
@@ -215,6 +230,16 @@ const MIXED_STEPS = [
         label: "Business Name",
         type: "text",
       },
+      {
+        name: "business.email",
+        label: "Business Email",
+        type: "email",
+      },
+      {
+        name: "businessEmailVerificationCode",
+        label: "Email Verification Code",
+        type: "text",
+      },           
       {
         name: "business.website",
         label: "Website",
@@ -296,6 +321,113 @@ const COMMUNITY_POLICY_STEPS = [
   },
 ];
 
+function getBusinessEmailField(userType) {
+  if (userType === "ORG") return "organisation.email";
+  if (userType === "MIXED") return "business.email";
+  return null;
+}
+
+function getBusinessEmailValue(values) {
+  if (values.userType === "ORG") {
+    return values.organisation?.email || "";
+  }
+
+  if (values.userType === "MIXED") {
+    return values.business?.email || "";
+  }
+
+  return "";
+}
+
+function getBusinessEmailField(userType) {
+  if (userType === "ORG") return "organisation.email";
+  if (userType === "MIXED") return "business.email";
+  return null;
+}
+
+function getBusinessEmailValue(values) {
+  if (values.userType === "ORG") {
+    return values.organisation?.email || "";
+  }
+
+  if (values.userType === "MIXED") {
+    return values.business?.email || "";
+  }
+
+  return "";
+}
+
+const verifyBusinessEmailCode = useCallback(async () => {
+  const email = getBusinessEmailValue(values).trim();
+  const code = values.businessEmailVerificationCode;
+
+  if (!email) {
+    setBusinessEmailError("Enter the business email first.");
+    return;
+  }
+
+  if (!code) {
+    setBusinessEmailError("Enter the verification code.");
+    return;
+  }
+
+  setBusinessEmailStatus("verifying");
+  setBusinessEmailError("");
+
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_BASE}/business-email-verification/confirm`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userType: values.userType,
+          email,
+          code,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok || !data.verified) {
+      throw new Error(
+        data?.message || "Invalid verification code"
+      );
+    }
+
+    setBusinessEmailStatus("verified");
+
+    if (values.userType === "ORG") {
+      await patchProfile({
+        organisation: {
+          ...values.organisation,
+          email,
+          emailVerified: true,
+          domainVerified: true,
+        },
+      });
+    }
+
+    if (values.userType === "MIXED") {
+      await patchProfile({
+        business: {
+          ...values.business,
+          email,
+          emailVerified: true,
+          domainVerified: data.domainVerified || false,
+        },
+      });
+    }
+  } catch (err) {
+    setBusinessEmailStatus("error");
+    setBusinessEmailError(
+      err?.message || "Business email verification failed"
+    );
+  }
+}, [values, patchProfile]);
 
 function digitsOnly(value = "") {
   return String(value).replace(/\D/g, "");
@@ -1502,6 +1634,53 @@ await patchProfile(verifiedPayload);
                     )}
                   </div>
                 )}
+
+                {["ORG", "MIXED"].includes(values.userType) && isContactStep && (
+  <div className="business-email-verification">
+    <div className="hint">
+      Verify your business email to prove authority over this profile.
+    </div>
+
+    <div className="phone-verification-row">
+      <Button
+        variant="ghost"
+        onClick={sendBusinessEmailCode}
+        disabled={businessEmailStatus === "sending"}
+      >
+        {businessEmailStatus === "sending"
+          ? "Sending..."
+          : "Send email code"}
+      </Button>
+
+      <Button
+        onClick={verifyBusinessEmailCode}
+        disabled={businessEmailStatus !== "sent"}
+      >
+        {businessEmailStatus === "verifying"
+          ? "Verifying..."
+          : "Verify email"}
+      </Button>
+    </div>
+
+    {businessEmailStatus === "sent" && (
+      <div className="success">
+        Verification code sent to the business email.
+      </div>
+    )}
+
+    {businessEmailStatus === "verified" && (
+      <div className="success">
+        Business email verified.
+      </div>
+    )}
+
+    {businessEmailError && (
+      <div className="error">
+        {businessEmailError}
+      </div>
+    )}
+  </div>
+)}
               </div>
             </Section>
 
