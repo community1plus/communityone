@@ -1,4 +1,11 @@
-import { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+  useMemo,
+} from "react";
+
 import { useNavigate } from "react-router-dom";
 import { Autocomplete } from "@react-google-maps/api";
 
@@ -13,16 +20,10 @@ import Button from "../../components/UI/Button";
 import FormBuilder from "../../components/UI/Form/FormBuilder";
 import useForm from "../../hooks/useForm";
 
-import "../../styles/system.css";
-import "./CommunityPlusUserProfile.css";
 import SplashHeader from "../../components/SplashHeader/SplashHeader";
 
-const [businessEmailStatus, setBusinessEmailStatus] =
-  useState("idle");
-
-const [businessEmailError, setBusinessEmailError] =
-  useState("");
-
+import "../../styles/system.css";
+import "./CommunityPlusUserProfile.css";
 
 const DEFAULT_PHONE_COUNTRY = "AU";
 
@@ -38,39 +39,39 @@ const PHONE_COUNTRIES = [
 ];
 
 const SOCIAL_PROVIDERS = [
-  { id: "facebook", label: "Facebook", description: "Verify business page admin access." },
-  { id: "instagram", label: "Instagram", description: "Verify professional or creator account access." },
-  { id: "youtube", label: "YouTube", description: "Verify channel ownership." },
-  { id: "x", label: "X / Twitter", description: "Verify account ownership." },
+  {
+    id: "facebook",
+    label: "Facebook",
+    description: "Verify business page admin access.",
+  },
+  {
+    id: "instagram",
+    label: "Instagram",
+    description: "Verify professional or creator account access.",
+  },
+  {
+    id: "youtube",
+    label: "YouTube",
+    description: "Verify channel ownership.",
+  },
+  {
+    id: "x",
+    label: "X / Twitter",
+    description: "Verify account ownership.",
+  },
 ];
 
 const PROFILE_TABS = [
-  {
-    id: "PERSONAL",
-    label: "Personal",
-  },
-
-  {
-    id: "ORG",
-    label: "Organisation",
-  },
-
-  {
-    id: "MIXED",
-    label: "Mixed",
-  },
-
-  {
-    id: "COMMUNITY_POLICIES",
-    label: "Community Policies",
-  },
+  { id: "PERSONAL", label: "Personal" },
+  { id: "ORG", label: "Organisation" },
+  { id: "MIXED", label: "Mixed" },
+  { id: "COMMUNITY_POLICIES", label: "Community Policies" },
 ];
 
 const PERSONAL_STEPS = [
   {
     id: "user-profile",
     title: "USER PROFILE",
-
     fields: [
       {
         name: "username",
@@ -78,7 +79,6 @@ const PERSONAL_STEPS = [
         type: "text",
         required: true,
       },
-
       {
         name: "display_name",
         label: "Display Name",
@@ -87,11 +87,9 @@ const PERSONAL_STEPS = [
       },
     ],
   },
-
   {
     id: "home-address",
     title: "HOME ADDRESS",
-
     fields: [
       {
         name: "homeLocation",
@@ -101,11 +99,9 @@ const PERSONAL_STEPS = [
       },
     ],
   },
-
   {
     id: "contact",
     title: "CONTACT",
-
     fields: [
       {
         name: "phone",
@@ -113,7 +109,6 @@ const PERSONAL_STEPS = [
         type: "tel",
         required: true,
       },
-
       {
         name: "phoneVerificationCode",
         label: "Verification Code",
@@ -121,13 +116,11 @@ const PERSONAL_STEPS = [
       },
     ],
   },
-
   {
     id: "social",
     title: "SOCIAL",
     fields: [],
   },
-
   {
     id: "payment",
     title: "PAYMENT DETAILS",
@@ -145,17 +138,6 @@ const ORG_STEPS = [
         label: "Organisation Name",
         type: "text",
         required: true,
-      },
-      {
-      name: "organisation.email",
-      label: "Organisation Email",
-      type: "email",
-      required: true,
-      },
-      {
-      name: "businessEmailVerificationCode",
-      label: "Email Verification Code",
-      type: "text",
       },
       {
         name: "organisation.registration",
@@ -200,6 +182,12 @@ const ORG_STEPS = [
         name: "organisation.email",
         label: "Organisation Email",
         type: "email",
+        required: true,
+      },
+      {
+        name: "businessEmailVerificationCode",
+        label: "Email Verification Code",
+        type: "text",
       },
     ],
   },
@@ -230,16 +218,6 @@ const MIXED_STEPS = [
         label: "Business Name",
         type: "text",
       },
-      {
-        name: "business.email",
-        label: "Business Email",
-        type: "email",
-      },
-      {
-        name: "businessEmailVerificationCode",
-        label: "Email Verification Code",
-        type: "text",
-      },           
       {
         name: "business.website",
         label: "Website",
@@ -273,6 +251,11 @@ const MIXED_STEPS = [
         label: "Business Email",
         type: "email",
       },
+      {
+        name: "businessEmailVerificationCode",
+        label: "Email Verification Code",
+        type: "text",
+      },
     ],
   },
   {
@@ -291,7 +274,6 @@ const COMMUNITY_POLICY_STEPS = [
   {
     id: "community-policies",
     title: "COMMUNITY POLICIES",
-
     fields: [
       {
         name: "policies.communityStandards",
@@ -299,19 +281,16 @@ const COMMUNITY_POLICY_STEPS = [
         type: "checkbox",
         required: true,
       },
-
       {
         name: "policies.creatorGuidelines",
         label: "Accept Creator Guidelines",
         type: "checkbox",
       },
-
       {
         name: "policies.marketplacePolicies",
         label: "Accept Marketplace Policies",
         type: "checkbox",
       },
-
       {
         name: "policies.participationFramework",
         label: "Accept Proof of Participation Framework",
@@ -321,10 +300,48 @@ const COMMUNITY_POLICY_STEPS = [
   },
 ];
 
-function getBusinessEmailField(userType) {
-  if (userType === "ORG") return "organisation.email";
-  if (userType === "MIXED") return "business.email";
-  return null;
+function digitsOnly(value = "") {
+  return String(value).replace(/\D/g, "");
+}
+
+function getPhoneCountry(code = DEFAULT_PHONE_COUNTRY) {
+  return (
+    PHONE_COUNTRIES.find((country) => country.code === code) ||
+    PHONE_COUNTRIES[0]
+  );
+}
+
+function stripDialCode(phone = "", countryCode = DEFAULT_PHONE_COUNTRY) {
+  const country = getPhoneCountry(countryCode);
+  let digits = digitsOnly(phone);
+  const dialDigits = digitsOnly(country.dialCode);
+
+  if (digits.startsWith(dialDigits)) {
+    digits = digits.slice(dialDigits.length);
+  }
+
+  if (country.code === "AU" && digits.startsWith("0")) {
+    digits = digits.slice(1);
+  }
+
+  return digits;
+}
+
+function toE164Phone(phone = "", countryCode = DEFAULT_PHONE_COUNTRY) {
+  const country = getPhoneCountry(countryCode);
+  const digits = stripDialCode(phone, countryCode);
+
+  return digits ? `${country.dialCode}${digits}` : "";
+}
+
+function isValidInternationalPhone(phone = "", countryCode = DEFAULT_PHONE_COUNTRY) {
+  const country = getPhoneCountry(countryCode);
+  const nationalDigits = stripDialCode(phone, countryCode);
+
+  return (
+    nationalDigits.length >= country.min &&
+    nationalDigits.length <= country.max
+  );
 }
 
 function getBusinessEmailValue(values) {
@@ -339,161 +356,10 @@ function getBusinessEmailValue(values) {
   return "";
 }
 
-const verifyBusinessEmailCode = useCallback(async () => {
-  const email = getBusinessEmailValue(values).trim();
-  const code = values.businessEmailVerificationCode;
-
-  if (!email) {
-    setBusinessEmailError("Enter the business email first.");
-    return;
-  }
-
-  if (!code) {
-    setBusinessEmailError("Enter the verification code.");
-    return;
-  }
-
-  setBusinessEmailStatus("verifying");
-  setBusinessEmailError("");
-
-  try {
-    const response = await fetch(
-      `${import.meta.env.VITE_API_BASE}/business-email-verification/confirm`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userType: values.userType,
-          email,
-          code,
-        }),
-      }
-    );
-
-    const data = await response.json();
-
-    if (!response.ok || !data.verified) {
-      throw new Error(
-        data?.message || "Invalid verification code"
-      );
-    }
-
-    setBusinessEmailStatus("verified");
-
-    if (values.userType === "ORG") {
-      await patchProfile({
-        organisation: {
-          ...values.organisation,
-          email,
-          emailVerified: true,
-          domainVerified: true,
-        },
-      });
-    }
-
-    if (values.userType === "MIXED") {
-      await patchProfile({
-        business: {
-          ...values.business,
-          email,
-          emailVerified: true,
-          domainVerified: data.domainVerified || false,
-        },
-      });
-    }
-  } catch (err) {
-    setBusinessEmailStatus("error");
-    setBusinessEmailError(
-      err?.message || "Business email verification failed"
-    );
-  }
-}, [values, patchProfile]);
-
-function digitsOnly(value = "") {
-  return String(value).replace(/\D/g, "");
-}
-
-function getPhoneCountry(code = DEFAULT_PHONE_COUNTRY) {
-  return PHONE_COUNTRIES.find((country) => country.code === code) || PHONE_COUNTRIES[0];
-}
-
-function stripDialCode(phone = "", countryCode = DEFAULT_PHONE_COUNTRY) {
-  const country = getPhoneCountry(countryCode);
-  let digits = digitsOnly(phone);
-  const dialDigits = digitsOnly(country.dialCode);
-
-  if (digits.startsWith(dialDigits)) digits = digits.slice(dialDigits.length);
-  if (country.code === "AU" && digits.startsWith("0")) digits = digits.slice(1);
-
-  return digits;
-}
-
-function toE164Phone(phone = "", countryCode = DEFAULT_PHONE_COUNTRY) {
-  const country = getPhoneCountry(countryCode);
-  const digits = stripDialCode(phone, countryCode);
-  return digits ? `${country.dialCode}${digits}` : "";
-}
-
-function isValidInternationalPhone(phone = "", countryCode = DEFAULT_PHONE_COUNTRY) {
-  const country = getPhoneCountry(countryCode);
-  const nationalDigits = stripDialCode(phone, countryCode);
-
-  return nationalDigits.length >= country.min && nationalDigits.length <= country.max;
-}
-
-function normaliseSocialState(
-  social = {}
-) {
-
-  const result = {};
-
-  if (
-    social?.facebook &&
-    typeof social.facebook === "object"
-  ) {
-    result.facebook =
-      social.facebook;
-  }
-
-  if (
-    social?.instagram &&
-    typeof social.instagram === "object"
-  ) {
-    result.instagram =
-      social.instagram;
-  }
-
-  if (
-    social?.youtube &&
-    typeof social.youtube === "object"
-  ) {
-    result.youtube =
-      social.youtube;
-  }
-
-  if (
-    social?.x &&
-    typeof social.x === "object"
-  ) {
-    result.x =
-      social.x;
-  }
-
-  return result;
-}
-
-function getSocialStatus(
-  social = {},
-  providerId
-) {
-
-  const provider =
-    social?.[providerId];
+function getSocialStatus(social = {}, providerId) {
+  const provider = social?.[providerId];
 
   if (!provider?.verified) {
-
     return {
       verified: false,
       text: "Not verified",
@@ -501,9 +367,7 @@ function getSocialStatus(
   }
 
   return {
-
     verified: true,
-
     text:
       provider.pageName ||
       provider.channelTitle ||
@@ -514,7 +378,12 @@ function getSocialStatus(
 }
 
 function getUserEmail(user) {
-  return user?.email || user?.attributes?.email || user?.signInDetails?.loginId || "";
+  return (
+    user?.email ||
+    user?.attributes?.email ||
+    user?.signInDetails?.loginId ||
+    ""
+  );
 }
 
 function getUserDisplayName(user) {
@@ -539,8 +408,42 @@ function getInitialProfileValues({ user, homeLocation }) {
     phoneE164: "",
     phoneVerificationCode: "",
 
+    businessEmailVerificationCode: "",
+
     homeLocation: homeLocation || null,
 
+    organisation: {
+      name: "",
+      registration: "",
+      website: "",
+      description: "",
+      phone: "",
+      email: "",
+      emailVerified: false,
+      domainVerified: false,
+      location: null,
+    },
+
+    creator: {
+      name: "",
+    },
+
+    business: {
+      name: "",
+      website: "",
+      phone: "",
+      email: "",
+      emailVerified: false,
+      domainVerified: false,
+      location: null,
+    },
+
+    policies: {
+      communityStandards: false,
+      creatorGuidelines: false,
+      marketplacePolicies: false,
+      participationFramework: false,
+    },
 
     payment: {
       cardName: "",
@@ -551,21 +454,16 @@ function getInitialProfileValues({ user, homeLocation }) {
 
 export default function CommunityPlusUserProfile({ onComplete }) {
   const navigate = useNavigate();
-  const pageLoadStartRef = useRef(
-  performance.now()
-);
 
-  const hydrationStartRef =
-  useRef(null);
-
+  const pageLoadStartRef = useRef(performance.now());
   const autoRef = useRef(null);
-  const lastHomeLocationRef = useRef("");
   const socialCallbackHandledRef = useRef(false);
   const hydratedProfileRef = useRef(false);
 
   const { isLoaded } = useGoogleMaps();
   const { user, isAuthenticated } = useAuth();
-  const { viewLocation: homeLocation, setManualLocation } = useLocationContext();
+  const { viewLocation: homeLocation, setManualLocation } =
+    useLocationContext();
 
   const {
     profile,
@@ -574,65 +472,64 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     profileError: contextProfileError,
     completionPercent,
     saveProfile,
-    patchProfile
+    patchProfile,
   } = useProfile();
 
   const form = useForm({
-    initialValues: getInitialProfileValues({ user, homeLocation }),
+    initialValues: getInitialProfileValues({
+      user,
+      homeLocation,
+    }),
   });
 
   const {
-  values,
-  validateAll,
+    values,
+    validateAll,
+    setValue,
+    setValues,
+    isFormValidating,
+    clearStorage,
+  } = form;
 
-  setValue,
-  setValues,
+  const [activeProfileTab, setActiveProfileTab] = useState("PERSONAL");
+  const [currentStep, setCurrentStep] = useState(0);
 
-  isFormValidating,
-  clearStorage,
-} = form;
-
-  const [activeProfileTab, setActiveProfileTab] =  useState("PERSONAL");
-
-  const [currentStep, setCurrentStep] =  useState(0);
   const [savingProfile, setSavingProfile] = useState(false);
   const [profileError, setProfileError] = useState("");
+
   const [phoneStatus, setPhoneStatus] = useState("idle");
-
   const [phoneError, setPhoneError] = useState("");
-
   const [editingVerifiedPhone, setEditingVerifiedPhone] = useState(false);
 
+  const [businessEmailStatus, setBusinessEmailStatus] = useState("idle");
+  const [businessEmailError, setBusinessEmailError] = useState("");
+
   const activeSteps = useMemo(() => {
+    switch (activeProfileTab) {
+      case "ORG":
+        return ORG_STEPS;
 
-  switch (activeProfileTab) {
+      case "MIXED":
+        return MIXED_STEPS;
 
-    case "ORG":
-      return ORG_STEPS;
+      case "COMMUNITY_POLICIES":
+        return COMMUNITY_POLICY_STEPS;
 
-    case "MIXED":
-      return MIXED_STEPS;
+      case "PERSONAL":
+      default:
+        return PERSONAL_STEPS;
+    }
+  }, [activeProfileTab]);
 
-    case "COMMUNITY_POLICIES":
-      return COMMUNITY_POLICY_STEPS;
+  const currentStepConfig = activeSteps[currentStep];
+  const isContactStep = currentStepConfig?.id?.includes("contact");
+  const isSocialStep = currentStepConfig?.id?.includes("social");
 
-    case "PERSONAL":
-    default:
-      return PERSONAL_STEPS;
-  }
-
-}, [activeProfileTab]);
-
-const currentStepConfig =  activeSteps[currentStep];
-const isLastStep =  currentStep === activeSteps.length - 1;
-const isContactStep =  currentStepConfig?.id === "contact";
-const isSocialStep =  currentStepConfig?.id === "social";
-
-useEffect(() => {
-
-  setCurrentStep(0);
-
-}, [activeProfileTab]);
+  useEffect(() => {
+    setCurrentStep(0);
+    setBusinessEmailStatus("idle");
+    setBusinessEmailError("");
+  }, [activeProfileTab]);
 
   const selectedPhoneCountry = useMemo(
     () => getPhoneCountry(values.phoneCountry),
@@ -649,120 +546,89 @@ useEffect(() => {
     [values.phone, values.phoneCountry]
   );
 
-  const canContinueFromContact = !isContactStep || profile?.phoneVerified;
-
-  console.log("PROFILE PAGE STATE:", {
-  profileReady,
-  profile,
-  values,
-  currentStep,
-});
+  const canSaveFromContact =
+    !isContactStep ||
+    activeProfileTab !== "PERSONAL" ||
+    profile?.phoneVerified ||
+    phoneStatus === "verified";
 
   const displayCompletion = completionPercent || 0;
 
   useEffect(() => {
+    if (!profileReady) return;
+    if (!profile) return;
+    if (hydratedProfileRef.current) return;
 
-    console.log("HYDRATION EFFECT RUNNING", {
-  profileReady,
-  profile,
-  hydratedProfileRef: hydratedProfileRef.current,});
+    const email = getUserEmail(user);
+    const emailPrefix = email.split("@")[0] || "";
+    const displayName = getUserDisplayName(user);
 
-  if (!profileReady) return;
+    setValues((prev) => ({
+      ...prev,
 
-  if (!profile) return;
+      username: profile?.username || emailPrefix || "",
+      display_name: profile?.display_name || displayName || emailPrefix || "",
+      userType: profile?.userType || "PERSONAL",
 
-  if (hydratedProfileRef.current) return;
+      phoneCountry: profile?.phoneCountry || DEFAULT_PHONE_COUNTRY,
+      phone: profile?.phoneDisplay || "",
+      phoneE164: profile?.phoneE164 || profile?.phone || "",
+      phoneVerificationCode: "",
 
-  const email = getUserEmail(user);
+      businessEmailVerificationCode: "",
 
-  const emailPrefix = email.split("@")[0] || "";
+      homeLocation: profile?.homeLocation || homeLocation || null,
 
-  const displayName = getUserDisplayName(user);
+      organisation: {
+        ...prev.organisation,
+        ...(profile?.organisation || {}),
+      },
 
-  setValues((prev) => ({
+      creator: {
+        ...prev.creator,
+        ...(profile?.creator || {}),
+      },
 
-  ...prev,
+      business: {
+        ...prev.business,
+        ...(profile?.business || {}),
+      },
 
-  username:
-    profile?.username ||
-    emailPrefix ||
-    "",
+      policies: {
+        ...prev.policies,
+        ...(profile?.policies || {}),
+      },
 
-  display_name:
-    profile?.display_name ||
-    displayName ||
-    emailPrefix ||
-    "",
+      payment: {
+        cardName: profile?.payment?.cardName || "",
+        last4: profile?.payment?.last4 || "",
+      },
+    }));
 
-  userType:
-    profile?.userType ||
-    "PERSONAL",
+    if (profile?.userType) {
+      setActiveProfileTab(profile.userType);
+    }
 
-  phoneCountry:
-    profile?.phoneCountry ||
-    DEFAULT_PHONE_COUNTRY,
-
-  phone:
-    profile?.phoneDisplay || "",
-
-  phoneE164:
-    profile?.phoneE164 ||
-    profile?.phone ||
-    "",
-
-  phoneVerificationCode:
-    "",
-
-  homeLocation:
-    profile?.homeLocation ||
-    homeLocation ||
-    null,
-
-  payment: {
-
-    cardName:
-      profile?.payment?.cardName || "",
-
-    last4:
-      profile?.payment?.last4 || "",
-  },
-}));
-
-  requestAnimationFrame(() => {
-    hydratedProfileRef.current = true;
-  });
-
-}, [
-  profileReady,
-  profile,
-  user,
-  homeLocation,
-  setValues,
-]);
+    requestAnimationFrame(() => {
+      hydratedProfileRef.current = true;
+    });
+  }, [profileReady, profile, user, homeLocation, setValues]);
 
   useEffect(() => {
-    console.log("HYDRATION EFFECT RUNNING FOR PHONE", {
-  profileReady,
-  profile,
-});
-
-  if (profile?.phoneVerified) {
-    setPhoneStatus("verified");
-    setEditingVerifiedPhone(false);
-  } else {
-    setPhoneStatus("idle");
-  }
-
-}, [profile?.phoneVerified]);
+    if (profile?.phoneVerified) {
+      setPhoneStatus("verified");
+      setEditingVerifiedPhone(false);
+    } else {
+      setPhoneStatus("idle");
+    }
+  }, [profile?.phoneVerified]);
 
   useEffect(() => {
-   
     if (!values.phone) return;
 
     const originalPhone = profile?.phoneE164 || profile?.phone || "";
 
     if (originalPhone && phoneE164 && phoneE164 !== originalPhone) {
-      
       setValue("phoneVerificationCode", "");
       setPhoneStatus("idle");
       setPhoneError("");
@@ -773,48 +639,13 @@ useEffect(() => {
     const syncSocialVerification = async () => {
       const params = new URLSearchParams(window.location.search);
 
-      const socialProvider =
-  params.get("social");
-
-const verified =
-  params.get("verified");
-
-const reason =
-  params.get("reason");
-
-/* =========================
-   YOUTUBE
-========================= */
-
-const channelId =
-  params.get("channelId");
-
-const channelTitle =
-  params.get("channelTitle");
-
-/* =========================
-   FACEBOOK
-========================= */
-
-const facebookId =
-  params.get("facebookId");
-
-const name =
-  params.get("name");
-
-const email =
-  params.get("email");
-
-const profilePicture =
-  params.get("profilePicture");
-
-const pageCount =
-  params.get("pageCount");
+      const socialProvider = params.get("social");
+      const verified = params.get("verified");
+      const reason = params.get("reason");
 
       if (!socialProvider || socialCallbackHandledRef.current) return;
 
       if (!isAuthenticated || (!user?.id && !getUserEmail(user))) {
-        console.log("Waiting for authenticated session before saving social verification...");
         return;
       }
 
@@ -825,7 +656,9 @@ const pageCount =
 
       if (verified === "false") {
         setProfileError(
-          reason ? `Social verification failed: ${reason}` : "Social verification failed."
+          reason
+            ? `Social verification failed: ${reason}`
+            : "Social verification failed."
         );
 
         window.history.replaceState({}, document.title, window.location.pathname);
@@ -836,214 +669,86 @@ const pageCount =
 
       const verifiedAt = new Date().toISOString();
 
-     
-const socialPatch = {
-  social: {},
-};
+      const socialPatch = {
+        social: {},
+      };
 
-/* =========================
-   YOUTUBE
-========================= */
+      if (socialProvider === "youtube") {
+        socialPatch.social.youtube = {
+          verified: true,
+          verifiedAt,
+          channelId: params.get("channelId") || "",
+          channelTitle: params.get("channelTitle") || "YouTube channel",
+        };
+      } else if (socialProvider === "facebook") {
+        socialPatch.social.facebook = {
+          verified: true,
+          verifiedAt,
+          facebookId: params.get("facebookId") || "",
+          accountName: params.get("name") || "Facebook Account",
+          email: params.get("email") || "",
+          profilePicture: params.get("profilePicture") || "",
+          pageCount: Number(params.get("pageCount") || 0),
+        };
+      } else if (socialProvider === "instagram") {
+        socialPatch.social.instagram = {
+          verified: true,
+          verifiedAt,
+          instagramId: params.get("instagramId") || "",
+          username: params.get("username") || "",
+          followersCount: Number(params.get("followersCount") || 0),
+          followsCount: Number(params.get("followsCount") || 0),
+          mediaCount: Number(params.get("mediaCount") || 0),
+        };
+      } else if (socialProvider === "x") {
+        socialPatch.social.x = {
+          verified: true,
+          verifiedAt,
+          username: params.get("username") || "",
+          name: params.get("name") || "",
+          profileImage: params.get("profileImage") || "",
+          followersCount: Number(params.get("followersCount") || 0),
+        };
+      } else {
+        socialPatch.social[socialProvider] = {
+          verified: true,
+          verifiedAt,
+        };
+      }
 
-if (socialProvider === "youtube") {
-
-  socialPatch.social.youtube = {
-
-    verified: true,
-
-    verifiedAt,
-
-    channelId:
-      channelId || "",
-
-    channelTitle:
-      channelTitle ||
-      "YouTube channel",
-  };
-}
-
-/* =========================
-   FACEBOOK
-========================= */
-
-else if (
-  socialProvider === "facebook"
-) {
-
-  socialPatch.social.facebook = {
-
-    verified: true,
-
-    verifiedAt,
-
-    facebookId:
-      facebookId || "",
-
-    accountName:
-      name ||
-      "Facebook Account",
-
-    email:
-      email || "",
-
-    profilePicture:
-      profilePicture || "",
-
-    pageCount:
-      Number(pageCount || 0),
-  };
-}
-
-/* =========================
-   INSTAGRAM
-========================= */
-
-else if (
-  socialProvider === "instagram"
-) {
-
-  const instagramId =
-    params.get("instagramId");
-
-  const instagramUsername =
-    params.get("username");
-
-  const followersCount =
-    Number(
-      params.get("followersCount") || 0
-    );
-
-  const followsCount =
-    Number(
-      params.get("followsCount") || 0
-    );
-
-  const mediaCount =
-    Number(
-      params.get("mediaCount") || 0
-    );
-
-  socialPatch.social.instagram = {
-
-    verified: true,
-
-    verifiedAt,
-
-    instagramId:
-      instagramId || "",
-
-    username:
-      instagramUsername || "",
-
-    followersCount,
-
-    followsCount,
-
-    mediaCount,
-  };
-}
-
-/* =========================
-   X / TWITTER
-========================= */
-
-else if (
-  socialProvider === "x"
-) {
-
-  const xUsername =
-    params.get("username");
-
-  const xName =
-    params.get("name");
-
-  const xProfileImage =
-    params.get("profileImage");
-
-  const xFollowersCount =
-    Number(
-      params.get("followersCount") || 0
-    );
-
-  socialPatch.social.x = {
-
-    verified: true,
-
-    verifiedAt,
-
-    username:
-      xUsername || "",
-
-    name:
-      xName || "",
-
-    profileImage:
-      xProfileImage || "",
-
-    followersCount:
-      xFollowersCount,
-  };
-}
-
-/* =========================
-   FALLBACK
-========================= */
-
-else {
-
-  socialPatch.social[
-    socialProvider
-  ] = {
-
-    verified: true,
-
-    verifiedAt,
-  };
-}
-
-     
       setProfileError("");
 
       try {
-        const saved =
-  await patchProfile(
-    socialPatch
-  );
-
-console.log(
-  "SOCIAL SAVED:",
-  saved
-);
-
+        await patchProfile(socialPatch);
 
         window.history.replaceState({}, document.title, window.location.pathname);
       } catch (err) {
         console.error("Social verification save failed:", err);
+
         setProfileError(
-          err?.message || "Social verification succeeded, but saving it failed."
+          err?.message ||
+            "Social verification succeeded, but saving it failed."
         );
       }
     };
 
     syncSocialVerification();
-  }, [
-  isAuthenticated,
-  user?.id,
-  profileReady,
-  patchProfile,
-]);
+  }, [isAuthenticated, user?.id, profileReady, patchProfile]);
 
-useEffect(() => {
+  useEffect(() => {
+    const total = performance.now() - pageLoadStartRef.current;
 
-  const total =
-    performance.now() -
-    pageLoadStartRef.current;
+    console.log(`[PROFILE PAGE] Total render ready: ${total.toFixed(2)}ms`);
+  }, []);
 
-  console.log(
-    `[PROFILE PAGE] Total render ready: ${total.toFixed(2)}ms`
+  const handleProfileTabChange = useCallback(
+    (tabId) => {
+      setActiveProfileTab(tabId);
+      setValue("userType", tabId);
+      setCurrentStep(0);
+    },
+    [setValue]
   );
-
-}, []);
 
   const handlePhoneCountryChange = useCallback(
     (event) => {
@@ -1052,9 +757,8 @@ useEffect(() => {
 
       setValue("phoneCountry", nextCountry);
       setValue("phoneE164", nextE164);
-      
       setValue("phoneVerificationCode", "");
-      
+
       setPhoneStatus("idle");
       setPhoneError("");
       setEditingVerifiedPhone(false);
@@ -1062,54 +766,30 @@ useEffect(() => {
     [values.phone, setValue]
   );
 
-  const startSocialVerification = useCallback(
-  (providerId) => {
-
-    const apiBase =
-      import.meta.env.VITE_API_BASE;
+  const startSocialVerification = useCallback((providerId) => {
+    const apiBase = import.meta.env.VITE_API_BASE;
 
     if (!apiBase) {
-
-      setProfileError(
-        "Backend API is not configured."
-      );
-
+      setProfileError("Backend API is not configured.");
       return;
     }
 
     const providerRoutes = {
-
-      youtube:
-        "/youtube/start",
-
-      x:
-        "/x/start",
-
-      instagram:
-        "/instagram/start",
-
-      facebook:
-        "/facebook/start",
+      youtube: "/youtube/start",
+      x: "/x/start",
+      instagram: "/instagram/start",
+      facebook: "/facebook/start",
     };
 
-    const route =
-      providerRoutes[providerId];
+    const route = providerRoutes[providerId];
 
     if (!route) {
-
-      setProfileError(
-        "Unsupported social provider."
-      );
-
+      setProfileError("Unsupported social provider.");
       return;
     }
 
-    window.location.href =
-      `${apiBase}${route}`;
-
-  },
-  []
-);
+    window.location.href = `${apiBase}${route}`;
+  }, []);
 
   const sendPhoneCode = useCallback(async () => {
     const cleanPhone = toE164Phone(values.phone, values.phoneCountry);
@@ -1133,15 +813,19 @@ useEffect(() => {
         `${import.meta.env.VITE_SMS_API_URL}/auth/send-phone-code`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ phone: cleanPhone }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            phone: cleanPhone,
+          }),
         }
       );
 
       const data = await response.json();
 
       if (!response.ok || !data.success) {
-        throw new Error("Failed to send verification code");
+        throw new Error(data?.message || "Failed to send verification code");
       }
 
       setPhoneStatus("sent");
@@ -1171,7 +855,9 @@ useEffect(() => {
         `${import.meta.env.VITE_SMS_API_URL}/auth/verify-phone-code`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify({
             phone: toE164Phone(values.phone, values.phoneCountry),
             code: values.phoneVerificationCode,
@@ -1182,54 +868,137 @@ useEffect(() => {
       const data = await response.json();
 
       if (!response.ok || !data.verified) {
-        throw new Error("Invalid verification code");
+        throw new Error(data?.message || "Invalid verification code");
       }
 
-     
-
       setPhoneStatus("verified");
-
       setEditingVerifiedPhone(false);
 
-      const verifiedPayload = {
-
-  phone:
-    toE164Phone(
-      values.phone,
-      values.phoneCountry
-    ),
-
-  phoneE164:
-    toE164Phone(
-      values.phone,
-      values.phoneCountry
-    ),
-
-  phoneDisplay:
-    values.phone,
-
-  phoneCountry:
-    values.phoneCountry,
-
-  phoneVerified:
-    true,
-};
-
-
-await patchProfile(verifiedPayload);
+      await patchProfile({
+        phone: toE164Phone(values.phone, values.phoneCountry),
+        phoneE164: toE164Phone(values.phone, values.phoneCountry),
+        phoneDisplay: values.phone,
+        phoneCountry: values.phoneCountry,
+        phoneVerified: true,
+      });
     } catch (err) {
       console.error("Verify phone code failed:", err);
-      
       setPhoneStatus("error");
       setPhoneError(err?.message || "Verification failed");
     }
-  }, [
-  phoneStatus,
-  values,
-  setValue,
-  saveProfile,
-  homeLocation,
-]);
+  }, [phoneStatus, values, patchProfile]);
+
+  const sendBusinessEmailCode = useCallback(async () => {
+    const email = getBusinessEmailValue(values).trim();
+
+    if (!email) {
+      setBusinessEmailError("Enter the business email first.");
+      return;
+    }
+
+    setBusinessEmailStatus("sending");
+    setBusinessEmailError("");
+    setValue("businessEmailVerificationCode", "");
+
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE}/business-email-verification/start`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userType: values.userType,
+            email,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data?.message || "Failed to send verification code");
+      }
+
+      setBusinessEmailStatus("sent");
+    } catch (err) {
+      setBusinessEmailStatus("error");
+      setBusinessEmailError(
+        err?.message || "Could not send verification code"
+      );
+    }
+  }, [values, setValue]);
+
+  const verifyBusinessEmailCode = useCallback(async () => {
+    const email = getBusinessEmailValue(values).trim();
+    const code = values.businessEmailVerificationCode;
+
+    if (!email) {
+      setBusinessEmailError("Enter the business email first.");
+      return;
+    }
+
+    if (!code) {
+      setBusinessEmailError("Enter the verification code.");
+      return;
+    }
+
+    setBusinessEmailStatus("verifying");
+    setBusinessEmailError("");
+
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE}/business-email-verification/confirm`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userType: values.userType,
+            email,
+            code,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok || !data.verified) {
+        throw new Error(data?.message || "Invalid verification code");
+      }
+
+      setBusinessEmailStatus("verified");
+
+      if (values.userType === "ORG") {
+        await patchProfile({
+          organisation: {
+            ...values.organisation,
+            email,
+            emailVerified: true,
+            domainVerified: data.domainVerified ?? true,
+          },
+        });
+      }
+
+      if (values.userType === "MIXED") {
+        await patchProfile({
+          business: {
+            ...values.business,
+            email,
+            emailVerified: true,
+            domainVerified: data.domainVerified || false,
+          },
+        });
+      }
+    } catch (err) {
+      setBusinessEmailStatus("error");
+      setBusinessEmailError(
+        err?.message || "Business email verification failed"
+      );
+    }
+  }, [values, patchProfile]);
 
   const onPlaceChanged = useCallback(() => {
     const place = autoRef.current?.getPlace();
@@ -1245,119 +1014,76 @@ await patchProfile(verifiedPayload);
       accuracy: "MANUAL",
     };
 
-    setManualLocation(manualLocation);
-    setValue("homeLocation", manualLocation);
-  }, [setManualLocation, setValue]);
+    if (values.userType === "ORG") {
+      setValue("organisation.location", manualLocation);
+    } else if (values.userType === "MIXED") {
+      setValue("business.location", manualLocation);
+    } else {
+      setManualLocation(manualLocation);
+      setValue("homeLocation", manualLocation);
+    }
+  }, [values.userType, setManualLocation, setValue]);
 
   const buildProfilePayload = useCallback(
-  () => ({
+    () => ({
+      username: values.username,
+      display_name: values.display_name,
+      userType: values.userType,
 
-    username:
-      values.username,
-
-    display_name:
-      values.display_name,
-
-    userType:
-      values.userType,
-
-    phone:
+      phone: phoneE164,
       phoneE164,
+      phoneDisplay: values.phone,
+      phoneCountry: values.phoneCountry,
 
-    phoneE164,
+      homeLocation: values.homeLocation || homeLocation,
 
-    phoneDisplay:
-      values.phone,
+      organisation: values.organisation,
+      creator: values.creator,
+      business: values.business,
+      policies: values.policies,
 
-    phoneCountry:
-      values.phoneCountry,
-
-  
-
-    homeLocation:
-      values.homeLocation ||
-      homeLocation,
-
-    payment: {
-
-      cardName:
-        values.payment?.cardName || "",
-
-      last4:
-        values.payment?.last4 || "",
-    },
-  }),
-
-  [
-    values,
-    phoneE164,
-    homeLocation,
-    profile,
-  ]
-);
+      payment: {
+        cardName: values.payment?.cardName || "",
+        last4: values.payment?.last4 || "",
+      },
+    }),
+    [values, phoneE164, homeLocation]
+  );
 
   const handleSaveProfile = useCallback(async () => {
-  setSavingProfile(true);
-  setProfileError("");
+    setSavingProfile(true);
+    setProfileError("");
 
-  try {
-    const payload = buildProfilePayload();
-    const nextProfile = await saveProfile(payload);
+    try {
+      const payload = buildProfilePayload();
+      const nextProfile = await saveProfile(payload);
 
-    clearStorage?.();
-    onComplete?.(nextProfile);
+      clearStorage?.();
+      onComplete?.(nextProfile);
+    } catch (err) {
+      console.error("Profile save failed:", err);
 
-    // Stay on profile page after save.
-  } catch (err) {
-    console.error("Profile save failed:", err);
-    setProfileError(err?.message || "Profile save failed");
-  } finally {
-    setSavingProfile(false);
-  }
-}, [saveProfile, buildProfilePayload, clearStorage, onComplete]);
+      setProfileError(err?.message || "Profile save failed");
+    } finally {
+      setSavingProfile(false);
+    }
+  }, [saveProfile, buildProfilePayload, clearStorage, onComplete]);
+
+  const closeProfile = useCallback(() => {
+    if (!profileReady) return;
+
+    navigate("/communityplus", {
+      replace: true,
+    });
+  }, [profileReady, navigate]);
 
   const handleComplete = useCallback(async () => {
     const valid = await validateAll();
+
     if (!valid) return;
 
     await handleSaveProfile();
   }, [validateAll, handleSaveProfile]);
-
-  const nextStep = useCallback(() => {
-
-  if (
-    isContactStep &&
-    !profile?.phoneVerified
-  ) {
-
-    setPhoneError(
-      "Verify your phone number before continuing."
-    );
-
-    return;
-  }
-
-  setCurrentStep((step) =>
-    Math.min(
-      activeSteps.length - 1,
-      step + 1
-    )
-  );
-
-}, [
-  isContactStep,
-  profile?.phoneVerified,
-  activeSteps.length,
-]);
-
-  const prevStep = useCallback(() => {
-    setCurrentStep((step) => Math.max(0, step - 1));
-  }, []);
-
-  const closeProfile = useCallback(() => {
-    if (!profileReady) return;
-    navigate("/communityplus", { replace: true });
-  }, [profileReady, navigate]);
 
   if (!profileReady) {
     return <div style={{ padding: 40 }}>Loading profile...</div>;
@@ -1372,344 +1098,337 @@ await patchProfile(verifiedPayload);
   }
 
   return (
-  <div className="profile-page">
-    <SplashHeader />
+    <div className="profile-page">
+      <SplashHeader />
 
-    <main className="profile-main">
-      <div className="profile-container">
-        <div className="profile-layout">
-          <div className="profile-left">
-            <div className="profile-page-header">
-              <div className="profile-title-row">
-                <PageHeader title="USER PROFILE" />
+      <main className="profile-main">
+        <div className="profile-container">
+          <div className="profile-layout">
+            <div className="profile-left">
+              <div className="profile-page-header">
+                <div className="profile-title-row">
+                  <PageHeader title="USER PROFILE" />
 
-                <div className="profile-type-tabs">
-                  {PROFILE_TABS.map((tab) => (
+                  <div className="profile-type-tabs">
+                    {PROFILE_TABS.map((tab) => (
+                      <button
+                        key={tab.id}
+                        type="button"
+                        className={`profile-type-tab ${
+                          activeProfileTab === tab.id ? "active" : ""
+                        }`}
+                        onClick={() => handleProfileTabChange(tab.id)}
+                      >
+                        {tab.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="profile-completion">
+                  <div className="profile-completion-header">
+                    <span>Profile completion</span>
+                    <strong>{displayCompletion}%</strong>
+                  </div>
+
+                  <div className="profile-completion-track">
+                    <div
+                      className="profile-completion-fill"
+                      style={{
+                        width: `${displayCompletion}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div className="profile-section-tabs">
+                  {activeSteps.map((step, index) => (
                     <button
-                      key={tab.id}
+                      key={step.id}
                       type="button"
-                      className={`profile-type-tab ${
-                      activeProfileTab === tab.id ? "active" : ""
-                    }`}
-                      onClick={() => {
-                      setActiveProfileTab(tab.id);
-                      setValue("userType", tab.id);
-                  }}
-                  >
-                  {tab.label}
-                  </button>
+                      className={`profile-section-tab ${
+                        currentStep === index ? "active" : ""
+                      } ${index < currentStep ? "complete" : ""}`}
+                      onClick={() => setCurrentStep(index)}
+                    >
+                      {step.title}
+                    </button>
                   ))}
                 </div>
               </div>
 
-              <div className="profile-completion">
-                <div className="profile-completion-header">
-                  <span>Profile completion</span>
-                  <strong>{displayCompletion}%</strong>
-                </div>
-
-                <div className="profile-completion-track">
-                  <div
-                    className="profile-completion-fill"
-                    style={{
-                      width: `${displayCompletion}%`,
-                    }}
-                  />
-                </div>
-              </div>
-
-              <div className="profile-section-tabs">
-                {activeSteps.map((step, index) => (
-                  <button
-                    key={step.id}
-                    type="button"
-                    className={`profile-section-tab ${
-                      currentStep === index ? "active" : ""
-                    } ${index < currentStep ? "complete" : ""}`}
-                    onClick={() => setCurrentStep(index)}
-                  >
-                    {step.title}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <Section>
-              <div className="section-inner">
-                {isContactStep && (
-                  <div className="phone-meta-inline">
-                    Selected country: {selectedPhoneCountry.label}.
-                    Verification number:{" "}
-                    {phoneE164 || selectedPhoneCountry.dialCode}
-                  </div>
-                )}
-
-                {isContactStep && (
-                  <div className="phone-country-row">
-                    <label
-                      className="phone-country-label"
-                      htmlFor="phoneCountry"
-                    >
-                      Country
-                    </label>
-
-                    <select
-                      id="phoneCountry"
-                      className="phone-country-select"
-                      value={values.phoneCountry}
-                      onChange={handlePhoneCountryChange}
-                      disabled={
-                        profile?.phoneVerified && !editingVerifiedPhone
-                      }
-                    >
-                      {PHONE_COUNTRIES.map((country) => (
-                        <option key={country.code} value={country.code}>
-                          {country.label} {country.dialCode}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                )}
-
-                {isSocialStep ? (
-                  <div className="social-verification-list">
-                    {SOCIAL_PROVIDERS.map((provider) => {
-                      const status = getSocialStatus(
-                        profile?.social,
-                        provider.id
-                      );
-
-                      return (
-                        <div
-                          className="social-verification-row"
-                          key={provider.id}
-                        >
-                          <div className="social-verification-main">
-                            <strong>{provider.label}</strong>
-                            <span>{provider.description}</span>
-
-                            <small
-                              className={status.verified ? "success" : "hint"}
-                            >
-                              {status.text}
-                            </small>
-                          </div>
-
-                          <button
-                            type="button"
-                            className={`social-verify-button ${
-                              status.verified ? "verified" : "unverified"
-                            }`}
-                            onClick={() =>
-                              startSocialVerification(provider.id)
-                            }
-                          >
-                            {status.verified ? "Verified" : "Verify"}
-                          </button>
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <FormBuilder
-                    steps={activeSteps}
-                    currentStep={currentStep}
-                    form={form}
-                    extra={{
-                      Autocomplete,
-                      autoRef,
-                      onPlaceChanged,
-                      isLoaded,
-                    }}
-                  />
-                )}
-
-                {isContactStep && (
-                  <div className="phone-verification">
-                    {profile?.phoneVerified && !editingVerifiedPhone ? (
-                      <div className="phone-verified-state">
-                        <div className="success">✓ Verified Number</div>
-
-                        <div className="verified-phone-display">
-                          {phoneE164}
-                        </div>
-
-                        <div className="hint">
-                          This number has already been verified using MFA.
-                        </div>
-
-                        <div className="phone-verification-row">
-                          <Button
-                            variant="ghost"
-                            onClick={() => {
-                              setEditingVerifiedPhone(true);
-                              setValue("phoneVerificationCode", "");
-                              setPhoneStatus("idle");
-                              setPhoneError("");
-                            }}
-                          >
-                            Change Number
-                          </Button>
-                        </div>
+              <Section>
+                <div className="section-inner">
+                  {isContactStep && activeProfileTab === "PERSONAL" && (
+                    <>
+                      <div className="phone-meta-inline">
+                        Selected country: {selectedPhoneCountry.label}.
+                        Verification number:{" "}
+                        {phoneE164 || selectedPhoneCountry.dialCode}
                       </div>
-                    ) : (
-                      <>
-                        {values.phone && !phoneIsValid && (
-                          <div className="error">
-                            Enter a valid phone number for{" "}
-                            {selectedPhoneCountry.label}.
-                          </div>
-                        )}
 
-                        {phoneStatus === "idle" && (
-                          <div className="hint">
-                            Enter your phone number and request a verification
-                            code.
-                          </div>
-                        )}
+                      <div className="phone-country-row">
+                        <label
+                          className="phone-country-label"
+                          htmlFor="phoneCountry"
+                        >
+                          Country
+                        </label>
 
-                        {phoneStatus === "sent" && (
-                          <div className="hint">
-                            Enter the verification code sent to your phone.
+                        <select
+                          id="phoneCountry"
+                          className="phone-country-select"
+                          value={values.phoneCountry}
+                          onChange={handlePhoneCountryChange}
+                          disabled={
+                            profile?.phoneVerified && !editingVerifiedPhone
+                          }
+                        >
+                          {PHONE_COUNTRIES.map((country) => (
+                            <option key={country.code} value={country.code}>
+                              {country.label} {country.dialCode}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </>
+                  )}
+
+                  {isSocialStep ? (
+                    <div className="social-verification-list">
+                      {SOCIAL_PROVIDERS.map((provider) => {
+                        const status = getSocialStatus(
+                          profile?.social,
+                          provider.id
+                        );
+
+                        return (
+                          <div
+                            className="social-verification-row"
+                            key={provider.id}
+                          >
+                            <div className="social-verification-main">
+                              <strong>{provider.label}</strong>
+                              <span>{provider.description}</span>
+
+                              <small
+                                className={
+                                  status.verified ? "success" : "hint"
+                                }
+                              >
+                                {status.text}
+                              </small>
+                            </div>
+
+                            <button
+                              type="button"
+                              className={`social-verify-button ${
+                                status.verified ? "verified" : "unverified"
+                              }`}
+                              onClick={() =>
+                                startSocialVerification(provider.id)
+                              }
+                            >
+                              {status.verified ? "Verified" : "Verify"}
+                            </button>
                           </div>
-                        )}
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <FormBuilder
+                      steps={activeSteps}
+                      currentStep={currentStep}
+                      form={form}
+                      extra={{
+                        Autocomplete,
+                        autoRef,
+                        onPlaceChanged,
+                        isLoaded,
+                      }}
+                    />
+                  )}
+
+                  {isContactStep && activeProfileTab === "PERSONAL" && (
+                    <div className="phone-verification">
+                      {profile?.phoneVerified && !editingVerifiedPhone ? (
+                        <div className="phone-verified-state">
+                          <div className="success">✓ Verified Number</div>
+
+                          <div className="verified-phone-display">
+                            {phoneE164}
+                          </div>
+
+                          <div className="hint">
+                            This number has already been verified using MFA.
+                          </div>
+
+                          <div className="phone-verification-row">
+                            <Button
+                              variant="ghost"
+                              onClick={() => {
+                                setEditingVerifiedPhone(true);
+                                setValue("phoneVerificationCode", "");
+                                setPhoneStatus("idle");
+                                setPhoneError("");
+                              }}
+                            >
+                              Change Number
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          {values.phone && !phoneIsValid && (
+                            <div className="error">
+                              Enter a valid phone number for{" "}
+                              {selectedPhoneCountry.label}.
+                            </div>
+                          )}
+
+                          {phoneStatus === "idle" && (
+                            <div className="hint">
+                              Enter your phone number and request a verification
+                              code.
+                            </div>
+                          )}
+
+                          {phoneStatus === "sent" && (
+                            <div className="hint">
+                              Enter the verification code sent to your phone.
+                            </div>
+                          )}
+
+                          <div className="phone-verification-row">
+                            <Button
+                              variant="ghost"
+                              onClick={sendPhoneCode}
+                              disabled={
+                                phoneStatus === "sending" || !phoneIsValid
+                              }
+                            >
+                              {phoneStatus === "sending"
+                                ? "Sending..."
+                                : "Send verification code"}
+                            </Button>
+
+                            <Button
+                              onClick={verifyPhoneCode}
+                              disabled={phoneStatus !== "sent"}
+                            >
+                              {phoneStatus === "verifying"
+                                ? "Verifying..."
+                                : "Verify"}
+                            </Button>
+                          </div>
+
+                          {phoneStatus === "sent" && (
+                            <div className="success">
+                              Verification code sent. Enter the code above.
+                            </div>
+                          )}
+
+                          {phoneStatus === "verified" && (
+                            <div className="success">
+                              Phone number verified successfully.
+                            </div>
+                          )}
+
+                          {phoneError && (
+                            <div className="error">{phoneError}</div>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  )}
+
+                  {["ORG", "MIXED"].includes(values.userType) &&
+                    isContactStep && (
+                      <div className="business-email-verification">
+                        <div className="hint">
+                          Verify your business email to prove authority over
+                          this profile.
+                        </div>
 
                         <div className="phone-verification-row">
                           <Button
                             variant="ghost"
-                            onClick={sendPhoneCode}
-                            disabled={
-                              phoneStatus === "sending" || !phoneIsValid
-                            }
+                            onClick={sendBusinessEmailCode}
+                            disabled={businessEmailStatus === "sending"}
                           >
-                            {phoneStatus === "sending"
+                            {businessEmailStatus === "sending"
                               ? "Sending..."
-                              : "Send verification code"}
+                              : "Send email code"}
                           </Button>
 
                           <Button
-                            onClick={verifyPhoneCode}
-                            disabled={phoneStatus !== "sent"}
+                            onClick={verifyBusinessEmailCode}
+                            disabled={businessEmailStatus !== "sent"}
                           >
-                            {phoneStatus === "verifying"
+                            {businessEmailStatus === "verifying"
                               ? "Verifying..."
-                              : "Verify"}
+                              : "Verify email"}
                           </Button>
                         </div>
 
-                        {phoneStatus === "sent" && (
+                        {businessEmailStatus === "sent" && (
                           <div className="success">
-                            Verification code sent. Enter the code above.
+                            Verification code sent to the business email.
                           </div>
                         )}
 
-                        {phoneStatus === "verified" && (
+                        {businessEmailStatus === "verified" && (
                           <div className="success">
-                            Phone number verified successfully.
+                            Business email verified.
                           </div>
                         )}
 
-                        {phoneError && (
-                          <div className="error">{phoneError}</div>
+                        {businessEmailError && (
+                          <div className="error">{businessEmailError}</div>
                         )}
-                      </>
+                      </div>
                     )}
-                  </div>
-                )}
+                </div>
+              </Section>
 
-                {["ORG", "MIXED"].includes(values.userType) && isContactStep && (
-  <div className="business-email-verification">
-    <div className="hint">
-      Verify your business email to prove authority over this profile.
-    </div>
+              {profileMissing && (
+                <div className="hint">
+                  No saved profile found yet. Complete the form and save to
+                  create your profile.
+                </div>
+              )}
 
-    <div className="phone-verification-row">
-      <Button
-        variant="ghost"
-        onClick={sendBusinessEmailCode}
-        disabled={businessEmailStatus === "sending"}
-      >
-        {businessEmailStatus === "sending"
-          ? "Sending..."
-          : "Send email code"}
-      </Button>
+              {profileError && <div className="error">{profileError}</div>}
 
-      <Button
-        onClick={verifyBusinessEmailCode}
-        disabled={businessEmailStatus !== "sent"}
-      >
-        {businessEmailStatus === "verifying"
-          ? "Verifying..."
-          : "Verify email"}
-      </Button>
-    </div>
-
-    {businessEmailStatus === "sent" && (
-      <div className="success">
-        Verification code sent to the business email.
-      </div>
-    )}
-
-    {businessEmailStatus === "verified" && (
-      <div className="success">
-        Business email verified.
-      </div>
-    )}
-
-    {businessEmailError && (
-      <div className="error">
-        {businessEmailError}
-      </div>
-    )}
-  </div>
-)}
-              </div>
-            </Section>
-
-            {profileMissing && (
-              <div className="hint">
-                No saved profile found yet. Complete the form and save to create
-                your profile.
-              </div>
-            )}
-
-            {profileError && <div className="error">{profileError}</div>}
-
-            <div className="form-navigation">
-              <Button variant="ghost" onClick={closeProfile}>
-                Close
-              </Button>
-
-              <div className="form-actions">
-                {currentStep > 0 && (
-                  <Button variant="ghost" onClick={prevStep}>
-                    Back
-                  </Button>
-                )}
-
-                <Button
-                  onClick={handleSaveProfile}
-                  disabled={
-                  isFormValidating ||
-                  savingProfile ||
-                  (isContactStep && !canContinueFromContact)
-                }
-                >
-                  {savingProfile ? "Saving..." : "Save"}
+              <div className="form-navigation">
+                <Button variant="ghost" onClick={closeProfile}>
+                  Close
                 </Button>
+
+                <div className="form-actions">
+                  <Button
+                    onClick={handleComplete}
+                    disabled={
+                      isFormValidating ||
+                      savingProfile ||
+                      !canSaveFromContact
+                    }
+                  >
+                    {savingProfile ? "Saving..." : "Save"}
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="profile-guide">
-            <Section
-              title="Profile Guide"
-              meta="Verify your social accounts to prove ownership of pages, channels, or official accounts."
-            />
+            <div className="profile-guide">
+              <Section
+                title="Profile Guide"
+                meta="Verify your social accounts to prove ownership of pages, channels, or official accounts."
+              />
+            </div>
           </div>
         </div>
-      </div>
-    </main>
-  </div>
-);
+      </main>
+    </div>
+  );
 }
