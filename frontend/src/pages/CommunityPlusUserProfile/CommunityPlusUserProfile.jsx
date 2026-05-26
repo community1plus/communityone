@@ -135,7 +135,6 @@ const ORG_STEPS = [
   {
     id: "organisation-profile",
     title: "ORGANISATION",
-
     fields: [
       {
         name: "organisation.name",
@@ -143,19 +142,16 @@ const ORG_STEPS = [
         type: "text",
         required: true,
       },
-
       {
         name: "organisation.registration",
         label: "Registration / ABN",
         type: "text",
       },
-
       {
         name: "organisation.website",
         label: "Website",
         type: "text",
       },
-
       {
         name: "organisation.description",
         label: "Description",
@@ -163,13 +159,40 @@ const ORG_STEPS = [
       },
     ],
   },
-
+  {
+    id: "organisation-address",
+    title: "ADDRESS",
+    fields: [
+      {
+        name: "organisation.location",
+        label: "Organisation Address",
+        type: "location",
+        required: true,
+      },
+    ],
+  },
+  {
+    id: "organisation-contact",
+    title: "CONTACT",
+    fields: [
+      {
+        name: "organisation.phone",
+        label: "Organisation Phone",
+        type: "tel",
+        required: true,
+      },
+      {
+        name: "organisation.email",
+        label: "Organisation Email",
+        type: "email",
+      },
+    ],
+  },
   {
     id: "organisation-social",
     title: "SOCIAL",
     fields: [],
   },
-
   {
     id: "organisation-payment",
     title: "PAYMENT DETAILS",
@@ -181,20 +204,17 @@ const MIXED_STEPS = [
   {
     id: "mixed-profile",
     title: "MIXED PROFILE",
-
     fields: [
       {
         name: "creator.name",
         label: "Creator Name",
         type: "text",
       },
-
       {
         name: "business.name",
         label: "Business Name",
         type: "text",
       },
-
       {
         name: "business.website",
         label: "Website",
@@ -202,13 +222,39 @@ const MIXED_STEPS = [
       },
     ],
   },
-
+  {
+    id: "mixed-address",
+    title: "ADDRESS",
+    fields: [
+      {
+        name: "business.location",
+        label: "Business Address",
+        type: "location",
+        required: true,
+      },
+    ],
+  },
+  {
+    id: "mixed-contact",
+    title: "CONTACT",
+    fields: [
+      {
+        name: "business.phone",
+        label: "Business Phone",
+        type: "tel",
+      },
+      {
+        name: "business.email",
+        label: "Business Email",
+        type: "email",
+      },
+    ],
+  },
   {
     id: "mixed-social",
     title: "SOCIAL",
     fields: [],
   },
-
   {
     id: "mixed-payment",
     title: "PAYMENT DETAILS",
@@ -1229,12 +1275,15 @@ await patchProfile(verifiedPayload);
                       key={tab.id}
                       type="button"
                       className={`profile-type-tab ${
-                        activeProfileTab === tab.id ? "active" : ""
-                      }`}
-                      onClick={() => setActiveProfileTab(tab.id)}
-                    >
-                      {tab.label}
-                    </button>
+                      activeProfileTab === tab.id ? "active" : ""
+                    }`}
+                      onClick={() => {
+                      setActiveProfileTab(tab.id);
+                      setValue("userType", tab.id);
+                  }}
+                  >
+                  {tab.label}
+                  </button>
                   ))}
                 </div>
               </div>
