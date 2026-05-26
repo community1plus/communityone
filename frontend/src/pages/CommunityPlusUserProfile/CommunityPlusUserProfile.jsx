@@ -321,11 +321,7 @@ const COMMUNITY_POLICY_STEPS = [
   },
 ];
 
-function getBusinessEmailField(userType) {
-  if (userType === "ORG") return "organisation.email";
-  if (userType === "MIXED") return "business.email";
-  return null;
-}
+
 
 function getBusinessEmailValue(values) {
   if (values.userType === "ORG") {
