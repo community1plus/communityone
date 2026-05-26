@@ -183,10 +183,16 @@ export default function App() {
       {/* DASHBOARD */}
 
       <Route
-        element={
-          <DashboardProviders />
-        }
-      >
+        element={<DashboardProviders />}>
+
+        <Route
+            path="profile"
+            element={
+              
+                <CommunityPlusUserProfile />
+              
+            }
+          />
         <Route
           path="/communityplus"
           element={
@@ -294,14 +300,7 @@ export default function App() {
 
           {/* PROFILE */}
 
-          <Route
-            path="profile"
-            element={
-              
-                <CommunityPlusUserProfile />
-              
-            }
-          />
+          
 
          
 
