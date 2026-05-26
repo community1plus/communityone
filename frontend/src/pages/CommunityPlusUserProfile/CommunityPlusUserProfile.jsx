@@ -321,20 +321,6 @@ const COMMUNITY_POLICY_STEPS = [
   },
 ];
 
-
-
-function getBusinessEmailValue(values) {
-  if (values.userType === "ORG") {
-    return values.organisation?.email || "";
-  }
-
-  if (values.userType === "MIXED") {
-    return values.business?.email || "";
-  }
-
-  return "";
-}
-
 function getBusinessEmailField(userType) {
   if (userType === "ORG") return "organisation.email";
   if (userType === "MIXED") return "business.email";
