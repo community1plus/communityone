@@ -297,9 +297,9 @@ export default function App() {
           <Route
             path="profile"
             element={
-              <ProtectedRoute>
+              
                 <CommunityPlusUserProfile />
-              </ProtectedRoute>
+              
             }
           />
 
