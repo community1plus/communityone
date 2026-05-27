@@ -28,6 +28,7 @@ import authMiddleware from "../middleware/authMiddleware.js";
 import meRoutes from "./routes/meRoutes.js";
 
 import paymentRoutes from "./routes/paymentRoutes.js";
+import businessRoutes from "./routes/businessRoutes.js";
 
 
 
@@ -291,6 +292,11 @@ app.get(
 ========================= */
 
 app.use("/api/payments", paymentRoutes);
+
+app.use(
+  "/api/business",
+  businessRoutes
+);
 
 app.use(
   "/api/posts/upload-url",
