@@ -572,11 +572,6 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     [values.phone, values.phoneCountry]
   );
 
-  const [
-  showBusinessRegistration,
-  setShowBusinessRegistration,
-] = useState(false);
-
   const canSaveFromContact =
     !isContactStep ||
     activeProfileTab !== "PERSONAL" ||
