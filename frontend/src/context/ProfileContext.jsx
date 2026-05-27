@@ -230,7 +230,7 @@ export function ProfileProvider({ children }) {
   const loadProfile = useCallback(
     async ({ background = false } = {}) => {
       if (loadingRef.current) {
-        return profile;
+        return null;
       }
 
       if (!isAuthenticated || !user?.id) {
@@ -325,7 +325,6 @@ export function ProfileProvider({ children }) {
       isAuthenticated,
       user?.id,
       markProfileReady,
-      profile,
     ]
   );
 
@@ -384,25 +383,21 @@ export function ProfileProvider({ children }) {
     loadProfile,
   ]);
 
-  /* =========================================
-     INITIAL HYDRATION
-  ========================================= */
+/* =========================================
+   INITIAL HYDRATION
+========================================= */
 
-  useEffect(() => {
-    if (!isAuthenticated || !user?.id) {
-      return;
-    }
+useEffect(() => {
+  if (!isAuthenticated || !user?.id) return;
 
-    if (hasLoadedRef.current) {
-      return;
-    }
+  if (hasLoadedRef.current) return;
 
-    loadProfile();
-  }, [
-    isAuthenticated,
-    user?.id,
-    loadProfile,
-  ]);
+  if (loadingRef.current) return;
+
+  loadProfile();
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [isAuthenticated, user?.id]);
 
   const saveProfile = useCallback(
     async (nextProfile) => {
