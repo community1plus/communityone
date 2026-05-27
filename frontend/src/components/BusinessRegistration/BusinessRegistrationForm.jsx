@@ -98,27 +98,46 @@ export default function BusinessRegistrationForm({
     }));
   };
 
-  const handleSearchSources = async () => {
-    setSearchStatus("searching");
+const handleSearchSources = async () => {
+  setSearchStatus("searching");
+  setMatches([]);
+  setSelectedMatchId(null);
 
-    try {
-      /*
-        MVP placeholder.
+  try {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_BASE}/business/source-check`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: business.name,
+          address: business.location.fullAddress,
+          lat: business.location.lat,
+          lng: business.location.lng,
+        }),
+      }
+    );
 
-        Later:
-        - Search Community One DB
-        - Search Google
-        - Search OSM
-      */
+    const data = await response.json();
 
-      setMatches([]);
-      setSelectedMatchId(null);
-      setSearchStatus("no-match");
-    } catch (err) {
-      console.error("Business source search failed:", err);
-      setSearchStatus("error");
+    if (!response.ok) {
+      throw new Error(data?.message || "Source check failed");
     }
-  };
+
+    const nextMatches = data?.matches || [];
+
+    setMatches(nextMatches);
+
+    setSearchStatus(
+      nextMatches.length > 0 ? "matched" : "no-match"
+    );
+  } catch (err) {
+    console.error("Business source search failed:", err);
+    setSearchStatus("error");
+  }
+};
 
   const handleSelectMatch = (match) => {
     setSelectedMatchId(match.id);
