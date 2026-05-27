@@ -461,24 +461,6 @@ export default function CommunityPlusUserProfile({ onComplete }) {
   const navigate = useNavigate();
   const [showBusinessRegistration, setShowBusinessRegistration] = useState(false);
 
-  const handleProfileTabChange = useCallback(
-  (tabId) => {
-    setActiveProfileTab(tabId);
-
-    setValue("userType", tabId);
-
-    setCurrentStep(0);
-
-    if (
-      tabId === "ORG" ||
-      tabId === "MIXED"
-    ) {
-      setShowBusinessRegistration(true);
-    }
-  },
-  [setValue]
-);
-
   const pageLoadStartRef = useRef(performance.now());
   const autoRef = useRef(null);
   const socialCallbackHandledRef = useRef(false);
@@ -588,6 +570,24 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     const email = getUserEmail(user);
     const emailPrefix = email.split("@")[0] || "";
     const displayName = getUserDisplayName(user);
+
+  const handleProfileTabChange = useCallback(
+  (tabId) => {
+    setActiveProfileTab(tabId);
+
+    setValue("userType", tabId);
+
+    setCurrentStep(0);
+
+    if (
+      tabId === "ORG" ||
+      tabId === "MIXED"
+    ) {
+      setShowBusinessRegistration(true);
+    }
+  },
+  [setValue]
+);
 
     setValues((prev) => ({
       ...prev,
