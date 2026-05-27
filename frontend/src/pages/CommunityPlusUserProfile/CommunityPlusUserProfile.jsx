@@ -1,19 +1,10 @@
-import {
-  useEffect,
-  useRef,
-  useState,
-  useCallback,
-  useMemo,
-} from "react";
-
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Autocomplete } from "@react-google-maps/api";
-
 import { useGoogleMaps } from "../../context/GoogleMapsProvider";
 import { useLocationContext } from "../../context/LocationProvider";
 import { useAuth } from "../../context/AuthContext";
 import { useProfile } from "../../context/ProfileContext";
-
 import PageHeader from "../../components/UI/PageHeader";
 import Section from "../../components/UI/Section";
 import Button from "../../components/UI/Button";
@@ -23,10 +14,6 @@ import SplashHeader from "../../components/SplashHeader/SplashHeader";
 import "../../styles/system.css";
 import "./CommunityPlusUserProfile.css";
 import BusinessRegistrationForm from "../../components/BusinessRegistration/BusinessRegistrationForm";
-
-
-
-
 
 const DEFAULT_PHONE_COUNTRY = "AU";
 
@@ -460,16 +447,13 @@ function getInitialProfileValues({ user, homeLocation }) {
 export default function CommunityPlusUserProfile({ onComplete }) {
   const navigate = useNavigate();
   const [showBusinessRegistration, setShowBusinessRegistration] = useState(false);
-
   const pageLoadStartRef = useRef(performance.now());
   const autoRef = useRef(null);
   const socialCallbackHandledRef = useRef(false);
   const hydratedProfileRef = useRef(false);
-
   const { isLoaded } = useGoogleMaps();
   const { user, isAuthenticated } = useAuth();
-  const { viewLocation: homeLocation, setManualLocation } =
-    useLocationContext();
+  const { viewLocation: homeLocation, setManualLocation } = useLocationContext();
 
   const {
     profile,
@@ -497,12 +481,10 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     clearStorage,
   } = form;
 
-  
-
   const [activeProfileTab, setActiveProfileTab] = useState("PERSONAL");
   const [currentStep, setCurrentStep] = useState(0);
 
-    const handleProfileTabChange = useCallback(
+  const handleProfileTabChange = useCallback(
   (tabId) => {
     setActiveProfileTab(tabId);
 
@@ -588,8 +570,6 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     const email = getUserEmail(user);
     const emailPrefix = email.split("@")[0] || "";
     const displayName = getUserDisplayName(user);
-
-
 
     setValues((prev) => ({
       ...prev,
@@ -768,6 +748,18 @@ export default function CommunityPlusUserProfile({ onComplete }) {
 
     console.log(`[PROFILE PAGE] Total render ready: ${total.toFixed(2)}ms`);
   }, []);
+
+  useEffect(() => {
+  if (profileReady) {
+    console.timeEnd("PROFILE_LOADING_SCREEN");
+    const totalLoadTime =
+      performance.now() - profileLoadStartRef.current;
+
+    console.log(
+      `[PROFILE PAGE] Total render ready: ${totalLoadTime.toFixed(2)}ms`
+    );
+  }
+}, [profileReady]);
 
 const handleBusinessRegistrationComplete = useCallback(
   (business) => {
@@ -1125,24 +1117,34 @@ const handleBusinessRegistrationComplete = useCallback(
     await handleSaveProfile();
   }, [validateAll, handleSaveProfile]);
 
+const profileLoadStartRef = useRef(performance.now());
+
 if (!profileReady) {
+  console.time("PROFILE_LOADING_SCREEN");
+
   return (
     <div className="profile-page">
       <SplashHeader />
-{showBusinessRegistration && (
-  <div className="business-registration-overlay">
-    <BusinessRegistrationForm
-      accountType={values.userType}
-      initialBusinessName={
-        values.userType === "ORG"
-          ? values.organisation?.name
-          : values.business?.name
-      }
-      onCancel={() => setShowBusinessRegistration(false)}
-      onComplete={handleBusinessRegistrationComplete}
-    />
-  </div>
-)}
+
+      {showBusinessRegistration && (
+        <div className="business-registration-overlay">
+          <BusinessRegistrationForm
+            accountType={values.userType}
+            initialBusinessName={
+              values.userType === "ORG"
+                ? values.organisation?.name
+                : values.business?.name
+            }
+            onCancel={() =>
+              setShowBusinessRegistration(false)
+            }
+            onComplete={
+              handleBusinessRegistrationComplete
+            }
+          />
+        </div>
+      )}
+
       <main className="profile-main">
         <div className="profile-loading-card">
           Loading your profile...

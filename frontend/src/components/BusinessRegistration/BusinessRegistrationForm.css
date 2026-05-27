@@ -427,3 +427,38 @@ RESPONSIVE
     flex-direction: column;
   }
 }
+
+.business-map-panel {
+  min-height: 520px;
+}
+
+.business-map-box {
+  height: 300px;
+  overflow: hidden;
+  border-radius: 20px;
+  border: 1px solid #ece5dc;
+  background: #f8f4ee;
+}
+
+.business-google-map,
+.business-map-placeholder {
+  width: 100%;
+  height: 100%;
+}
+
+.business-map-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6d6259;
+  font-weight: 700;
+}
+
+.inline-actions {
+  justify-content: flex-start;
+  margin-top: 18px;
+}
+
+.match-dropdown {
+  margin-top: 18px;
+}
