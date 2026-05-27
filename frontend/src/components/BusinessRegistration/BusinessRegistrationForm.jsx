@@ -100,14 +100,8 @@ export default function BusinessRegistrationForm({
 
 const handleSearchSources = async () => {
   if (searchStatus === "searching") return;
-    setSearchStatus("searching");
-    setMatches([]);
-    setSelectedMatchId(null);
-    setSearchStatus("searching");
-    setMatches([]);
-    setSelectedMatchId(null);
 
-   setSearchStatus("searching");
+  setSearchStatus("searching");
   setMatches([]);
   setSelectedMatchId(null);
 
@@ -148,7 +142,7 @@ const handleSearchSources = async () => {
 };
 
  
-};
+
 
   const handleSelectMatch = (match) => {
     setSelectedMatchId(match.id);
