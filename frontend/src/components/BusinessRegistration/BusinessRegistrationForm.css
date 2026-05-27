@@ -336,7 +336,9 @@ MESSAGES
 
   background: #f8f4ee;
 
-  color: #6d6259;
+  margin-top: 10px;
+  font-size: 13px;
+  color: #7a6f66;
 }
 
 .business-registration-error {

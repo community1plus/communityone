@@ -414,8 +414,7 @@ export default function BusinessRegistrationForm({
 
             {searchStatus === "matched" && (
               <div className="business-registration-hint">
-                Select a matching business below, or choose manual
-                entry.
+                Select a matching business below, or choose manual entry.
               </div>
             )}
 
@@ -461,7 +460,7 @@ export default function BusinessRegistrationForm({
             )}
           </section>
 
-          {(selectedMatchId || manualEntryMode || business.name) && (
+          {(selectedMatchId || manualEntryMode) && (
             <>
               <section className="business-registration-section">
                 <h3>3. Confirm Business Profile</h3>
