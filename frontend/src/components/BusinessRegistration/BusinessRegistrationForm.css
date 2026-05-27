@@ -4,7 +4,7 @@ BUSINESS REGISTRATION
 
 .business-registration-form {
  width: min(1400px, 92vw);
-  height: min(780px, 84vh);
+  height: min(860px, 88vh);
   overflow: hidden;
 
   background: #ffffff;
@@ -215,7 +215,7 @@ DETAILS
   overflow-y: auto;
 
   padding-right: 12px;
-  padding-bottom: 160px;
+  padding-bottom: 48px;
 
   display: flex;
   flex-direction: column;
