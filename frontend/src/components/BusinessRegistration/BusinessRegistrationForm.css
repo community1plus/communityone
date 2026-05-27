@@ -4,8 +4,7 @@ BUSINESS REGISTRATION
 
 .business-registration-form {
   width: min(1400px, 92vw);
-  height: min(860px, 88vh);
-
+  height: min(780px, 84vh);
   overflow: hidden;
 
   background: #ffffff;
@@ -216,6 +215,7 @@ DETAILS
   overflow-y: auto;
 
   padding-right: 12px;
+  padding-bottom: 120px;
 
   display: flex;
   flex-direction: column;
@@ -356,18 +356,21 @@ FOOTER
 .business-registration-actions {
   position: sticky;
   bottom: 0;
+  z-index: 5;
+
+  margin-top: auto;
 
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.86),
-    #ffffff
+    rgba(255, 255, 255, 0.1),
+    #ffffff 35%
   );
 
   display: flex;
   justify-content: flex-end;
   gap: 14px;
 
-  padding: 20px 0 0;
+  padding: 24px 0 0;
 }
 
 /* =====================================
