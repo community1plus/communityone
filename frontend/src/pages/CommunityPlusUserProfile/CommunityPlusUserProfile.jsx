@@ -26,8 +26,7 @@ import BusinessRegistrationForm from "../../components/BusinessRegistration/Busi
 
 
 
-const [showBusinessRegistration, setShowBusinessRegistration] =
-  useState(false);
+
 
 const DEFAULT_PHONE_COUNTRY = "AU";
 
@@ -460,7 +459,7 @@ function getInitialProfileValues({ user, homeLocation }) {
 
 export default function CommunityPlusUserProfile({ onComplete }) {
   const navigate = useNavigate();
-
+  const [showBusinessRegistration, setShowBusinessRegistration] = useState(false);
 
   const handleProfileTabChange = useCallback(
   (tabId) => {
