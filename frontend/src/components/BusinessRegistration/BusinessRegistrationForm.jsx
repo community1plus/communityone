@@ -99,7 +99,15 @@ export default function BusinessRegistrationForm({
   };
 
 const handleSearchSources = async () => {
-  setSearchStatus("searching");
+  if (searchStatus === "searching") return;
+    setSearchStatus("searching");
+    setMatches([]);
+    setSelectedMatchId(null);
+    setSearchStatus("searching");
+    setMatches([]);
+    setSelectedMatchId(null);
+
+   setSearchStatus("searching");
   setMatches([]);
   setSelectedMatchId(null);
 
@@ -137,6 +145,9 @@ const handleSearchSources = async () => {
     console.error("Business source search failed:", err);
     setSearchStatus("error");
   }
+};
+
+ 
 };
 
   const handleSelectMatch = (match) => {
