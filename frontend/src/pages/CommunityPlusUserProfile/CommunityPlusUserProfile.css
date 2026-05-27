@@ -17,6 +17,25 @@ PROFILE PAGE
   background: #f8f6f3;
 }
 
+.profile-loading-card {
+  width: min(720px, 92vw);
+  min-height: 220px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #fff;
+  border: 1px solid #e7dfd6;
+  border-radius: 28px;
+
+  font-weight: 700;
+  color: #4a0d0d;
+
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.08);
+}
+
+
 .profile-container *,
 .profile-container *::before,
 .profile-container *::after {

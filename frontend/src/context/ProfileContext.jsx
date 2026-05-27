@@ -428,6 +428,15 @@ export function ProfileProvider({
       ]
     );
 
+
+    localStorage.setItem(
+      "communityone_profile_cache",
+      JSON.stringify({
+      profile: nextProfile,
+      providers: nextProviders,
+      cachedAt: Date.now(),
+      })
+    );
   /* =========================================
      RESET ON AUTH CHANGE
   ========================================= */

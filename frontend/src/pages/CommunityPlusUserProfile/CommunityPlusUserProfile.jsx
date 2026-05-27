@@ -1125,9 +1125,19 @@ const handleBusinessRegistrationComplete =
     await handleSaveProfile();
   }, [validateAll, handleSaveProfile]);
 
-  if (!profileReady) {
-    return <div style={{ padding: 40 }}>Loading profile...</div>;
-  }
+if (!profileReady) {
+  return (
+    <div className="profile-page">
+      <SplashHeader />
+
+      <main className="profile-main">
+        <div className="profile-loading-card">
+          Loading your profile...
+        </div>
+      </main>
+    </div>
+  );
+}
 
   if (contextProfileError && !profileMissing) {
     return (
