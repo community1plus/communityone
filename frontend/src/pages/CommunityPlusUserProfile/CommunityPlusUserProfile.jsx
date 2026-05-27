@@ -19,11 +19,10 @@ import Section from "../../components/UI/Section";
 import Button from "../../components/UI/Button";
 import FormBuilder from "../../components/UI/Form/FormBuilder";
 import useForm from "../../hooks/useForm";
-
 import SplashHeader from "../../components/SplashHeader/SplashHeader";
-
 import "../../styles/system.css";
 import "./CommunityPlusUserProfile.css";
+import BusinessRegistrationForm from "../../components/BusinessRegistration/BusinessRegistrationForm";
 
 const DEFAULT_PHONE_COUNTRY = "AU";
 
@@ -269,6 +268,8 @@ const MIXED_STEPS = [
     customComponent: "stripe-payment",
   },
 ];
+
+
 
 const COMMUNITY_POLICY_STEPS = [
   {
@@ -546,6 +547,11 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     [values.phone, values.phoneCountry]
   );
 
+  const [
+  showBusinessRegistration,
+  setShowBusinessRegistration,
+] = useState(false);
+
   const canSaveFromContact =
     !isContactStep ||
     activeProfileTab !== "PERSONAL" ||
@@ -741,13 +747,47 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     console.log(`[PROFILE PAGE] Total render ready: ${total.toFixed(2)}ms`);
   }, []);
 
-  const handleProfileTabChange = useCallback(
-    (tabId) => {
-      setActiveProfileTab(tabId);
-      setValue("userType", tabId);
-      setCurrentStep(0);
+const handleProfileTabChange = useCallback(
+  (tabId) => {
+    setActiveProfileTab(tabId);
+
+    setValue("userType", tabId);
+
+    setCurrentStep(0);
+
+    if (
+      tabId === "ORG" ||
+      tabId === "MIXED"
+    ) {
+      setShowBusinessRegistration(true);
+    }
+  },
+  [setValue]
+);
+
+const handleBusinessRegistrationComplete =
+  useCallback(
+    (business) => {
+      if (values.userType === "ORG") {
+        setValue("organisation", {
+          ...values.organisation,
+          ...business,
+        });
+      }
+
+      if (values.userType === "MIXED") {
+        setValue("business", {
+          ...values.business,
+          ...business,
+        });
+      }
+
+      setShowBusinessRegistration(false);
     },
-    [setValue]
+    [
+      values,
+      setValue,
+    ]
   );
 
   const handlePhoneCountryChange = useCallback(
@@ -1100,7 +1140,28 @@ export default function CommunityPlusUserProfile({ onComplete }) {
   return (
     <div className="profile-page">
       <SplashHeader />
+{showBusinessRegistration && (
+  <div className="business-registration-overlay">
 
+    <BusinessRegistrationForm
+      accountType={values.userType}
+      initialBusinessName={
+        values.userType === "ORG"
+          ? values.organisation?.name
+          : values.business?.name
+      }
+
+      onCancel={() =>
+        setShowBusinessRegistration(false)
+      }
+
+      onComplete={
+        handleBusinessRegistrationComplete
+      }
+    />
+
+  </div>
+)}
       <main className="profile-main">
         <div className="profile-container">
           <div className="profile-layout">
