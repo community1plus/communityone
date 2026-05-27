@@ -4,6 +4,31 @@ import Button from "../UI/Button";
 
 import "./BusinessRegistrationForm.css";
 
+const businessPayload = {
+  ...business,
+
+  source: "USER_SUBMITTED",
+
+  canonicalStatus: "DRAFT",
+
+  verificationStatus: "PENDING_VERIFICATION",
+
+  location: {
+    ...business.location,
+    source: business.location.source || "USER_ENTERED",
+  },
+
+  verification: {
+    emailVerified: business.emailVerified || false,
+    phoneVerified: business.phoneVerified || false,
+    domainVerified: business.domainVerified || false,
+    ownerVerified: false,
+  },
+
+  updatedAt: new Date().toISOString(),
+};
+
+
 const EMPTY_BUSINESS = {
   name: "",
   registration: "",
@@ -97,16 +122,37 @@ export default function BusinessRegistrationForm({
     }));
   };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
+ const handleSubmit = (event) => {
+  event.preventDefault();
 
-    onComplete?.({
-      ...business,
-      registrationStatus: "DRAFT",
-      verifiedAt: null,
-      updatedAt: new Date().toISOString(),
-    });
-  };
+  onComplete?.({
+    ...business,
+
+    source: "USER_SUBMITTED",
+
+    canonicalStatus: "DRAFT",
+
+    verificationStatus: "PENDING_VERIFICATION",
+
+    location: {
+      ...business.location,
+      source: business.location.source || "USER_ENTERED",
+    },
+
+    verification: {
+      emailVerified: business.emailVerified || false,
+      phoneVerified: business.phoneVerified || false,
+      domainVerified: business.domainVerified || false,
+      ownerVerified: false,
+    },
+
+    googlePlaceId: null,
+    osmId: null,
+
+    verifiedAt: null,
+    updatedAt: new Date().toISOString(),
+  });
+};
 
   return (
     <form

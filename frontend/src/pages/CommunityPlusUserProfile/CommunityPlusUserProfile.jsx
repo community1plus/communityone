@@ -24,6 +24,22 @@ import "../../styles/system.css";
 import "./CommunityPlusUserProfile.css";
 import BusinessRegistrationForm from "../../components/BusinessRegistration/BusinessRegistrationForm";
 
+const handleProfileTabChange = useCallback(
+  (tabId) => {
+    setActiveProfileTab(tabId);
+    setValue("userType", tabId);
+    setCurrentStep(0);
+
+    if (tabId === "ORG" || tabId === "MIXED") {
+      setShowBusinessRegistration(true);
+    }
+  },
+  [setValue]
+);
+
+const [showBusinessRegistration, setShowBusinessRegistration] =
+  useState(false);
+
 const DEFAULT_PHONE_COUNTRY = "AU";
 
 const PHONE_COUNTRIES = [
@@ -765,30 +781,26 @@ const handleProfileTabChange = useCallback(
   [setValue]
 );
 
-const handleBusinessRegistrationComplete =
-  useCallback(
-    (business) => {
-      if (values.userType === "ORG") {
-        setValue("organisation", {
-          ...values.organisation,
-          ...business,
-        });
-      }
+const handleBusinessRegistrationComplete = useCallback(
+  (business) => {
+    if (values.userType === "ORG") {
+      setValue("organisation", {
+        ...values.organisation,
+        ...business,
+      });
+    }
 
-      if (values.userType === "MIXED") {
-        setValue("business", {
-          ...values.business,
-          ...business,
-        });
-      }
+    if (values.userType === "MIXED") {
+      setValue("business", {
+        ...values.business,
+        ...business,
+      });
+    }
 
-      setShowBusinessRegistration(false);
-    },
-    [
-      values,
-      setValue,
-    ]
-  );
+    setShowBusinessRegistration(false);
+  },
+  [values, setValue]
+);
 
   const handlePhoneCountryChange = useCallback(
     (event) => {
@@ -1129,7 +1141,20 @@ if (!profileReady) {
   return (
     <div className="profile-page">
       <SplashHeader />
-
+{showBusinessRegistration && (
+  <div className="business-registration-overlay">
+    <BusinessRegistrationForm
+      accountType={values.userType}
+      initialBusinessName={
+        values.userType === "ORG"
+          ? values.organisation?.name
+          : values.business?.name
+      }
+      onCancel={() => setShowBusinessRegistration(false)}
+      onComplete={handleBusinessRegistrationComplete}
+    />
+  </div>
+)}
       <main className="profile-main">
         <div className="profile-loading-card">
           Loading your profile...
