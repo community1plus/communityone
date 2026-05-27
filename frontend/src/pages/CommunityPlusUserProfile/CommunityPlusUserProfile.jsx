@@ -462,20 +462,6 @@ export default function CommunityPlusUserProfile({ onComplete }) {
   const navigate = useNavigate();
 
 
-
-  const handleProfileTabChange = useCallback(
-  (tabId) => {
-    setActiveProfileTab(tabId);
-    setValue("userType", tabId);
-    setCurrentStep(0);
-
-    if (tabId === "ORG" || tabId === "MIXED") {
-      setShowBusinessRegistration(true);
-    }
-  },
-  [setValue]
-);
-
   const handleProfileTabChange = useCallback(
   (tabId) => {
     setActiveProfileTab(tabId);
