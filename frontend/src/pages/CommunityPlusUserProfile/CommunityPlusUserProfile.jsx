@@ -472,6 +472,15 @@ function getInitialProfileValues({ user, homeLocation }) {
 export default function CommunityPlusUserProfile({ onComplete }) {
   const navigate = useNavigate();
 
+  const {
+    values,
+    validateAll,
+    setValue,
+    setValues,
+    isFormValidating,
+    clearStorage,
+  } = form;
+  
   const pageLoadStartRef = useRef(performance.now());
   const autoRef = useRef(null);
   const socialCallbackHandledRef = useRef(false);
@@ -499,14 +508,7 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     }),
   });
 
-  const {
-    values,
-    validateAll,
-    setValue,
-    setValues,
-    isFormValidating,
-    clearStorage,
-  } = form;
+  
 
   const [activeProfileTab, setActiveProfileTab] = useState("PERSONAL");
   const [currentStep, setCurrentStep] = useState(0);
