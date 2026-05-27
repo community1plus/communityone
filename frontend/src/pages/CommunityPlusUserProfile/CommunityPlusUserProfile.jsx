@@ -1118,6 +1118,18 @@ const handleBusinessRegistrationComplete = useCallback(
   }, [validateAll, handleSaveProfile]);
 
 const profileLoadStartRef = useRef(performance.now());
+const [slowProfileLoad, setSlowProfileLoad] =
+  useState(false);
+
+useEffect(() => {
+  if (profileReady) return;
+
+  const timer = setTimeout(() => {
+    setSlowProfileLoad(true);
+  }, 3000);
+
+  return () => clearTimeout(timer);
+}, [profileReady]);
 
 if (!profileReady) {
   console.time("PROFILE_LOADING_SCREEN");
@@ -1147,7 +1159,9 @@ if (!profileReady) {
 
       <main className="profile-main">
         <div className="profile-loading-card">
-          Loading your profile...
+          {slowProfileLoad
+              ? "Still loading your profile. Starting secure session..."
+              : "Loading your profile..."}
         </div>
       </main>
     </div>
