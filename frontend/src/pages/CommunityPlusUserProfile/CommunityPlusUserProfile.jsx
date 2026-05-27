@@ -24,18 +24,7 @@ import "../../styles/system.css";
 import "./CommunityPlusUserProfile.css";
 import BusinessRegistrationForm from "../../components/BusinessRegistration/BusinessRegistrationForm";
 
-const handleProfileTabChange = useCallback(
-  (tabId) => {
-    setActiveProfileTab(tabId);
-    setValue("userType", tabId);
-    setCurrentStep(0);
 
-    if (tabId === "ORG" || tabId === "MIXED") {
-      setShowBusinessRegistration(true);
-    }
-  },
-  [setValue]
-);
 
 const [showBusinessRegistration, setShowBusinessRegistration] =
   useState(false);
@@ -472,14 +461,20 @@ function getInitialProfileValues({ user, homeLocation }) {
 export default function CommunityPlusUserProfile({ onComplete }) {
   const navigate = useNavigate();
 
-  const {
-    values,
-    validateAll,
-    setValue,
-    setValues,
-    isFormValidating,
-    clearStorage,
-  } = form;
+
+
+  const handleProfileTabChange = useCallback(
+  (tabId) => {
+    setActiveProfileTab(tabId);
+    setValue("userType", tabId);
+    setCurrentStep(0);
+
+    if (tabId === "ORG" || tabId === "MIXED") {
+      setShowBusinessRegistration(true);
+    }
+  },
+  [setValue]
+);
 
   const handleProfileTabChange = useCallback(
   (tabId) => {
@@ -525,6 +520,15 @@ export default function CommunityPlusUserProfile({ onComplete }) {
       homeLocation,
     }),
   });
+
+    const {
+    values,
+    validateAll,
+    setValue,
+    setValues,
+    isFormValidating,
+    clearStorage,
+  } = form;
 
   
 
