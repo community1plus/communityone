@@ -70,7 +70,7 @@ LAYOUT
   display: grid;
   grid-template-columns: minmax(320px, 360px) minmax(0, 1fr);
   gap: 32px;
-
+  margin-top: -4px;
   overflow: hidden;
 }
 
@@ -386,34 +386,41 @@ OVERLAY
 /* =====================================
 RESPONSIVE
 ===================================== */
-
-@media (max-width: 1024px) {
-  .business-registration-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .business-registration-source-panel {
-    position: relative;
-
-    top: auto;
+@media (min-height: 850px) {
+  .business-registration-form {
+    height: min(920px, 90vh);
   }
 }
 
 @media (max-width: 768px) {
+  .business-registration-overlay {
+    padding: 0;
+  }
+
   .business-registration-form {
+    width: 100%;
+    height: 100vh;
+
     padding: 24px;
 
-    border-radius: 20px;
+    border-radius: 0;
   }
 
   .business-registration-header {
     flex-direction: column;
-
     align-items: flex-start;
   }
 
   .business-registration-header h2 {
     font-size: 26px;
+  }
+
+  .business-registration-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .business-registration-details {
+    padding-bottom: 40px;
   }
 
   .business-registration-actions {
