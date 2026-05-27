@@ -4,31 +4,6 @@ import Button from "../UI/Button";
 
 import "./BusinessRegistrationForm.css";
 
-const businessPayload = {
-  ...business,
-
-  source: "USER_SUBMITTED",
-
-  canonicalStatus: "DRAFT",
-
-  verificationStatus: "PENDING_VERIFICATION",
-
-  location: {
-    ...business.location,
-    source: business.location.source || "USER_ENTERED",
-  },
-
-  verification: {
-    emailVerified: business.emailVerified || false,
-    phoneVerified: business.phoneVerified || false,
-    domainVerified: business.domainVerified || false,
-    ownerVerified: false,
-  },
-
-  updatedAt: new Date().toISOString(),
-};
-
-
 const EMPTY_BUSINESS = {
   name: "",
   registration: "",
@@ -55,6 +30,36 @@ const EMPTY_BUSINESS = {
   source: "USER_SUBMITTED",
 };
 
+function buildBusinessPayload(business) {
+  return {
+    ...business,
+
+    source: business.source || "USER_SUBMITTED",
+
+    canonicalStatus: "DRAFT",
+
+    verificationStatus: "PENDING_VERIFICATION",
+
+    location: {
+      ...business.location,
+      source: business.location?.source || "USER_ENTERED",
+    },
+
+    verification: {
+      emailVerified: business.emailVerified || false,
+      phoneVerified: business.phoneVerified || false,
+      domainVerified: business.domainVerified || false,
+      ownerVerified: false,
+    },
+
+    googlePlaceId: business.googlePlaceId || null,
+    osmId: business.osmId || null,
+
+    verifiedAt: null,
+    updatedAt: new Date().toISOString(),
+  };
+}
+
 export default function BusinessRegistrationForm({
   initialBusinessName = "",
   accountType = "ORG",
@@ -63,7 +68,7 @@ export default function BusinessRegistrationForm({
 }) {
   const [business, setBusiness] = useState({
     ...EMPTY_BUSINESS,
-    name: initialBusinessName,
+    name: initialBusinessName || "",
   });
 
   const [searchStatus, setSearchStatus] = useState("idle");
@@ -98,6 +103,8 @@ export default function BusinessRegistrationForm({
 
     try {
       /*
+        MVP placeholder.
+
         Later:
         - Search Community One DB
         - Search Google
@@ -105,6 +112,7 @@ export default function BusinessRegistrationForm({
       */
 
       setMatches([]);
+      setSelectedMatchId(null);
       setSearchStatus("no-match");
     } catch (err) {
       console.error("Business source search failed:", err);
@@ -117,42 +125,39 @@ export default function BusinessRegistrationForm({
 
     setBusiness((prev) => ({
       ...prev,
-      ...match,
+
+      name: match.name || prev.name,
+      registration: match.registration || prev.registration,
+      website: match.website || prev.website,
+      description: match.description || prev.description,
+
+      location: {
+        ...prev.location,
+        ...(match.location || {}),
+        source: match.location?.source || match.source || "IMPORTED",
+      },
+
+      phone: match.phone || prev.phone,
+      email: match.email || prev.email,
+
+      emailVerified: Boolean(match.emailVerified),
+      phoneVerified: Boolean(match.phoneVerified),
+      domainVerified: Boolean(match.domainVerified),
+
+      googlePlaceId: match.googlePlaceId || null,
+      osmId: match.osmId || null,
+
       source: match.source || "IMPORTED",
     }));
   };
 
- const handleSubmit = (event) => {
-  event.preventDefault();
+  const handleSubmit = (event) => {
+    event.preventDefault();
 
-  onComplete?.({
-    ...business,
+    const payload = buildBusinessPayload(business);
 
-    source: "USER_SUBMITTED",
-
-    canonicalStatus: "DRAFT",
-
-    verificationStatus: "PENDING_VERIFICATION",
-
-    location: {
-      ...business.location,
-      source: business.location.source || "USER_ENTERED",
-    },
-
-    verification: {
-      emailVerified: business.emailVerified || false,
-      phoneVerified: business.phoneVerified || false,
-      domainVerified: business.domainVerified || false,
-      ownerVerified: false,
-    },
-
-    googlePlaceId: null,
-    osmId: null,
-
-    verifiedAt: null,
-    updatedAt: new Date().toISOString(),
-  });
-};
+    onComplete?.(payload);
+  };
 
   return (
     <form
@@ -187,7 +192,9 @@ export default function BusinessRegistrationForm({
           </p>
 
           <div className="business-source-summary">
-            <strong>{business.name || "Unnamed business"}</strong>
+            <strong>
+              {business.name || "Unnamed business"}
+            </strong>
 
             <span>
               {business.location.fullAddress ||
@@ -198,7 +205,10 @@ export default function BusinessRegistrationForm({
           <Button
             type="button"
             onClick={handleSearchSources}
-            disabled={!business.name || searchStatus === "searching"}
+            disabled={
+              !business.name ||
+              searchStatus === "searching"
+            }
           >
             {searchStatus === "searching"
               ? "Searching..."
@@ -225,13 +235,23 @@ export default function BusinessRegistrationForm({
                   key={match.id}
                   type="button"
                   className={`business-match-card ${
-                    selectedMatchId === match.id ? "active" : ""
+                    selectedMatchId === match.id
+                      ? "active"
+                      : ""
                   }`}
-                  onClick={() => handleSelectMatch(match)}
+                  onClick={() =>
+                    handleSelectMatch(match)
+                  }
                 >
                   <strong>{match.name}</strong>
-                  <span>{match.location?.fullAddress}</span>
-                  <small>{match.source}</small>
+
+                  <span>
+                    {match.location?.fullAddress}
+                  </span>
+
+                  <small>
+                    {match.source}
+                  </small>
                 </button>
               ))}
             </div>
@@ -248,7 +268,10 @@ export default function BusinessRegistrationForm({
                 <input
                   value={business.name}
                   onChange={(event) =>
-                    updateBusiness("name", event.target.value)
+                    updateBusiness(
+                      "name",
+                      event.target.value
+                    )
                   }
                   required
                 />
@@ -259,7 +282,10 @@ export default function BusinessRegistrationForm({
                 <input
                   value={business.registration}
                   onChange={(event) =>
-                    updateBusiness("registration", event.target.value)
+                    updateBusiness(
+                      "registration",
+                      event.target.value
+                    )
                   }
                 />
               </label>
@@ -269,7 +295,10 @@ export default function BusinessRegistrationForm({
                 <input
                   value={business.website}
                   onChange={(event) =>
-                    updateBusiness("website", event.target.value)
+                    updateBusiness(
+                      "website",
+                      event.target.value
+                    )
                   }
                 />
               </label>
@@ -279,7 +308,10 @@ export default function BusinessRegistrationForm({
                 <textarea
                   value={business.description}
                   onChange={(event) =>
-                    updateBusiness("description", event.target.value)
+                    updateBusiness(
+                      "description",
+                      event.target.value
+                    )
                   }
                   rows={4}
                 />
@@ -296,7 +328,10 @@ export default function BusinessRegistrationForm({
                 <input
                   value={business.location.fullAddress}
                   onChange={(event) =>
-                    updateLocation("fullAddress", event.target.value)
+                    updateLocation(
+                      "fullAddress",
+                      event.target.value
+                    )
                   }
                   required
                 />
@@ -305,9 +340,16 @@ export default function BusinessRegistrationForm({
               <label>
                 Latitude
                 <input
-                  value={business.location.lat || ""}
+                  type="number"
+                  step="any"
+                  value={business.location.lat ?? ""}
                   onChange={(event) =>
-                    updateLocation("lat", Number(event.target.value))
+                    updateLocation(
+                      "lat",
+                      event.target.value
+                        ? Number(event.target.value)
+                        : null
+                    )
                   }
                 />
               </label>
@@ -315,9 +357,16 @@ export default function BusinessRegistrationForm({
               <label>
                 Longitude
                 <input
-                  value={business.location.lng || ""}
+                  type="number"
+                  step="any"
+                  value={business.location.lng ?? ""}
                   onChange={(event) =>
-                    updateLocation("lng", Number(event.target.value))
+                    updateLocation(
+                      "lng",
+                      event.target.value
+                        ? Number(event.target.value)
+                        : null
+                    )
                   }
                 />
               </label>
@@ -333,7 +382,10 @@ export default function BusinessRegistrationForm({
                 <input
                   value={business.phone}
                   onChange={(event) =>
-                    updateBusiness("phone", event.target.value)
+                    updateBusiness(
+                      "phone",
+                      event.target.value
+                    )
                   }
                 />
               </label>
@@ -344,7 +396,10 @@ export default function BusinessRegistrationForm({
                   type="email"
                   value={business.email}
                   onChange={(event) =>
-                    updateBusiness("email", event.target.value)
+                    updateBusiness(
+                      "email",
+                      event.target.value
+                    )
                   }
                 />
               </label>
