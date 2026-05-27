@@ -352,17 +352,29 @@ export function ProfileProvider({
             res
           );
 
-          const nextProfile =
-            res?.profile || null;
+const nextProfile = res?.profile || null;
 
-          const nextProviders =
-            res?.providers || {};
+const nextProviders =
+  res?.providers || {};
 
-          markProfileReady(
-            nextProfile,
-            nextProviders,
-            !nextProfile
-          );
+try {
+  localStorage.setItem(
+    "communityone_profile_cache",
+    JSON.stringify({
+      profile: nextProfile,
+      providers: nextProviders,
+      cachedAt: Date.now(),
+    })
+  );
+} catch {
+  // ignore cache failure
+}
+
+markProfileReady(
+  nextProfile,
+  nextProviders,
+  !nextProfile
+);
 
           return nextProfile;
 
@@ -428,15 +440,6 @@ export function ProfileProvider({
       ]
     );
 
-
-    localStorage.setItem(
-      "communityone_profile_cache",
-      JSON.stringify({
-      profile: nextProfile,
-      providers: nextProviders,
-      cachedAt: Date.now(),
-      })
-    );
   /* =========================================
      RESET ON AUTH CHANGE
   ========================================= */
