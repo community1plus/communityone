@@ -480,7 +480,25 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     isFormValidating,
     clearStorage,
   } = form;
-  
+
+  const handleProfileTabChange = useCallback(
+  (tabId) => {
+    setActiveProfileTab(tabId);
+
+    setValue("userType", tabId);
+
+    setCurrentStep(0);
+
+    if (
+      tabId === "ORG" ||
+      tabId === "MIXED"
+    ) {
+      setShowBusinessRegistration(true);
+    }
+  },
+  [setValue]
+);
+
   const pageLoadStartRef = useRef(performance.now());
   const autoRef = useRef(null);
   const socialCallbackHandledRef = useRef(false);
@@ -764,24 +782,6 @@ export default function CommunityPlusUserProfile({ onComplete }) {
 
     console.log(`[PROFILE PAGE] Total render ready: ${total.toFixed(2)}ms`);
   }, []);
-
-const handleProfileTabChange = useCallback(
-  (tabId) => {
-    setActiveProfileTab(tabId);
-
-    setValue("userType", tabId);
-
-    setCurrentStep(0);
-
-    if (
-      tabId === "ORG" ||
-      tabId === "MIXED"
-    ) {
-      setShowBusinessRegistration(true);
-    }
-  },
-  [setValue]
-);
 
 const handleBusinessRegistrationComplete = useCallback(
   (business) => {
