@@ -352,24 +352,26 @@ return {
               <label className="business-form-full">
                 Business Location
                 {isLoaded ? (
-                  <Autocomplete
-                    onLoad={(autocomplete) => {
-                      locationAutoRef.current = autocomplete;
-                    }}
-                    onPlaceChanged={handleLocationChanged}
-                  >
-                    <input
-                      value={business.location.fullAddress}
-                      onChange={(event) =>
-                        updateLocation(
-                          "fullAddress",
-                          event.target.value
-                        )
-                      }
-                      placeholder="Search address, suburb, or business location"
-                      required
-                    />
-                  </Autocomplete>
+<Autocomplete
+  onLoad={(autocomplete) => {
+    locationAutoRef.current = autocomplete;
+  }}
+  onPlaceChanged={handleLocationChanged}
+  options={{
+    componentRestrictions: { country: "au" },
+    fields: ["formatted_address", "geometry", "name"],
+  }}
+>
+  <input
+    value={business.location.fullAddress}
+    onChange={(event) =>
+      updateLocation("fullAddress", event.target.value)
+    }
+    placeholder="Search address, suburb, or business location"
+    autoComplete="off"
+    required
+  />
+</Autocomplete>
                 ) : (
                   <input
                     value={business.location.fullAddress}
