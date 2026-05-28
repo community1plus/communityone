@@ -1,44 +1,59 @@
 import express from "express";
 
+import {
+  searchCommunityOneBusinesses,
+} from "../services/sources/communityOneBusinessSearch.js";
+
 const router = express.Router();
+
+/* =========================================================
+   SOURCE CHECK
+========================================================= */
 
 router.post(
   "/source-check",
   async (req, res) => {
     try {
       const {
+        query,
         name,
         address,
         lat,
         lng,
+        radiusMeters = 1500,
       } = req.body;
 
-      console.log("SOURCE CHECK:", {
-        name,
-        address,
-        lat,
-        lng,
-      });
+      console.log(
+        "[SOURCE_CHECK]",
+        {
+          query,
+          name,
+          address,
+          lat,
+          lng,
+          radiusMeters,
+        }
+      );
 
-return res.status(200).json({
-  matches: [
-    {
-      id: "db:test-kfc",
-      source: "COMMUNITY_ONE",
-      name: "KFC Melbourne",
-      phone: "03 0000 0000",
-      email: "",
-      website: "https://www.kfc.com.au",
-      location: {
-        fullAddress: "Melbourne VIC 3000",
-        lat: -37.8136,
-        lng: 144.9631,
-        source: "COMMUNITY_ONE",
-      },
-      confidence: 0.85,
-    },
-  ],
-});
+      /* =====================================================
+         COMMUNITY ONE DB SEARCH
+      ===================================================== */
+
+      const matches =
+        await searchCommunityOneBusinesses({
+          query: query || name,
+          lat,
+          lng,
+          radiusMeters,
+        });
+
+      /* =====================================================
+         RESPONSE
+      ===================================================== */
+
+      return res.status(200).json({
+        matches,
+      });
     } catch (err) {
       console.error(
         "Business source check failed:",
