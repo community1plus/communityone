@@ -217,7 +217,9 @@ DETAILS
 .business-registration-details {
   min-height: 0;
   overflow-y: auto;
-
+ .business-registration-details {
+  scroll-behavior: smooth;
+}
   padding-right: 12px;
   padding-bottom: 48px;
 
