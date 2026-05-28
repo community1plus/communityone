@@ -7,7 +7,7 @@ import {
 
 import { useGoogleMaps } from "../../context/GoogleMapsProvider";
 import Button from "../UI/Button";
-
+import { useProfile } from "../../context/ProfileContext";
 import "./BusinessRegistrationForm.css";
 
 const EMPTY_BUSINESS = {
@@ -77,11 +77,19 @@ export default function BusinessRegistrationForm({
   const { isLoaded } = useGoogleMaps();
 
   const locationAutoRef = useRef(null);
+  const { profile } = useProfile();
+const [business, setBusiness] = useState({
+  ...EMPTY_BUSINESS,
+  name: initialBusinessName || "",
 
-  const [business, setBusiness] = useState({
-    ...EMPTY_BUSINESS,
-    name: initialBusinessName || "",
-  });
+  location: {
+    fullAddress:
+      profile?.homeLocation?.fullAddress || "",
+    lat: profile?.homeLocation?.lat || null,
+    lng: profile?.homeLocation?.lng || null,
+    source: "PROFILE_HOME_LOCATION",
+  },
+});
 
   const [businessSearchTerm, setBusinessSearchTerm] =
     useState(initialBusinessName || "");
@@ -105,7 +113,15 @@ export default function BusinessRegistrationForm({
       };
     }
 
-    return DEFAULT_CENTER;
+return {
+  lat:
+    profile?.homeLocation?.lat ||
+    DEFAULT_CENTER.lat,
+
+  lng:
+    profile?.homeLocation?.lng ||
+    DEFAULT_CENTER.lng,
+};
   }, [business.location.lat, business.location.lng]);
 
   const updateBusiness = (field, value) => {

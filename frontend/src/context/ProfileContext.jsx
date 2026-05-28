@@ -12,6 +12,7 @@ import { fetchAuthSession } from "aws-amplify/auth";
 import { useAuth } from "./AuthContext";
 import useAPI from "../../hooks/useAPI";
 
+
 const ProfileContext = createContext(null);
 
 const PROFILE_CACHE_KEY = "communityone_profile_cache";
