@@ -225,7 +225,7 @@ const BusinessSchema = new mongoose.Schema(
    AUTO-GENERATE GEO POINT
 ========================================= */
 
-BusinessSchema.pre("validate", function (next) {
+BusinessSchema.pre("validate", function () {
   if (
     this.location?.lat != null &&
     this.location?.lng != null
@@ -238,8 +238,6 @@ BusinessSchema.pre("validate", function (next) {
       ],
     };
   }
-
-  next();
 });
 
 /* =========================================
