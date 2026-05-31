@@ -10,6 +10,7 @@ const BusinessSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+      index: true,
     },
 
     description: {
@@ -20,11 +21,13 @@ const BusinessSchema = new mongoose.Schema(
     category: {
       type: String,
       default: "",
+      index: true,
     },
 
     abn: {
       type: String,
       default: "",
+      index: true,
     },
 
     website: {
@@ -69,21 +72,42 @@ const BusinessSchema = new mongoose.Schema(
       postcode: {
         type: String,
         default: "",
+        index: true,
       },
 
       suburb: {
         type: String,
         default: "",
+        index: true,
       },
 
       state: {
         type: String,
         default: "",
+        index: true,
       },
 
       country: {
         type: String,
         default: "Australia",
+      },
+    },
+
+    /* =========================================
+       GEOJSON POINT
+       Mongo expects [lng, lat]
+    ========================================= */
+
+    geo: {
+      type: {
+        type: String,
+        enum: ["Point"],
+        default: "Point",
+      },
+
+      coordinates: {
+        type: [Number],
+        required: true,
       },
     },
 
@@ -101,6 +125,7 @@ const BusinessSchema = new mongoose.Schema(
             "OSM",
             "USER",
           ],
+          required: true,
         },
 
         externalId: {
@@ -113,12 +138,21 @@ const BusinessSchema = new mongoose.Schema(
           default: 0,
         },
 
-        lastCheckedAt: Date,
+        lastCheckedAt: {
+          type: Date,
+          default: Date.now,
+        },
       },
     ],
 
     canonicalSource: {
       type: String,
+      enum: [
+        "COMMUNITY_ONE",
+        "GOOGLE",
+        "OSM",
+        "USER",
+      ],
       default: "COMMUNITY_ONE",
     },
 
@@ -179,6 +213,7 @@ const BusinessSchema = new mongoose.Schema(
     isActive: {
       type: Boolean,
       default: true,
+      index: true,
     },
   },
   {
@@ -187,12 +222,44 @@ const BusinessSchema = new mongoose.Schema(
 );
 
 /* =========================================
-   GEO INDEX
+   AUTO-GENERATE GEO POINT
+========================================= */
+
+BusinessSchema.pre("validate", function (next) {
+  if (
+    this.location?.lat != null &&
+    this.location?.lng != null
+  ) {
+    this.geo = {
+      type: "Point",
+      coordinates: [
+        Number(this.location.lng),
+        Number(this.location.lat),
+      ],
+    };
+  }
+
+  next();
+});
+
+/* =========================================
+   INDEXES
 ========================================= */
 
 BusinessSchema.index({
-  "location.lat": 1,
-  "location.lng": 1,
+  geo: "2dsphere",
+});
+
+BusinessSchema.index({
+  name: "text",
+  category: "text",
+  description: "text",
+  "location.fullAddress": "text",
+});
+
+BusinessSchema.index({
+  canonicalSource: 1,
+  isActive: 1,
 });
 
 const Business =

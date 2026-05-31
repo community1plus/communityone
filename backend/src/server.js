@@ -389,7 +389,13 @@ console.log(
 console.log(
   "   → /api/instagram"
 );
+app.get("/", (req, res) => {
+  res.status(200).send("Community One backend is running");
+});
 
+app.head("/", (req, res) => {
+  res.sendStatus(200);
+});
 /* =========================
    404 FALLBACK
 ========================= */
