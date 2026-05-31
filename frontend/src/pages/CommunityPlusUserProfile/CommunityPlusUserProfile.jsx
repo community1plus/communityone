@@ -1122,21 +1122,7 @@ const handleBusinessRegistrationComplete = useCallback(
 const [slowProfileLoad, setSlowProfileLoad] =
   useState(false);
 
-useEffect(() => {
-  setBusiness((prev) => ({
-    ...prev,
-    location: {
-      fullAddress:
-        "Wheelers Hill VIC",
 
-      lat: -37.9050596,
-      lng: 145.1685784,
-
-      source:
-        "PROFILE_HOME_LOCATION",
-    },
-  }));
-}, []);
 
 useEffect(() => {
   if (profileReady) return;
@@ -1156,20 +1142,17 @@ if (!profileReady) {
 
       {showBusinessRegistration && (
         <div className="business-registration-overlay">
-          <BusinessRegistrationForm
-            accountType={values.userType}
-            initialBusinessName={
-              values.userType === "ORG"
-                ? values.organisation?.name
-                : values.business?.name
-            }
-            onCancel={() =>
-              setShowBusinessRegistration(false)
-            }
-            onComplete={
-              handleBusinessRegistrationComplete
-            }
-          />
+<BusinessRegistrationForm
+  accountType={values.userType}
+  initialBusinessName={
+    values.userType === "ORG"
+      ? values.organisation?.name
+      : values.business?.name
+  }
+  initialLocation={values.homeLocation || homeLocation}
+  onCancel={() => setShowBusinessRegistration(false)}
+  onComplete={handleBusinessRegistrationComplete}
+/>
         </div>
       )}
 

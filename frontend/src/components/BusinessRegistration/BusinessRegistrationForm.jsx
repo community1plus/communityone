@@ -193,6 +193,22 @@ export default function BusinessRegistrationForm({
     setManualEntryMode,
   ] = useState(false);
 
+  useEffect(() => {
+    setBusiness((prev) => ({
+      ...prev,
+      location: {
+        fullAddress:
+          "Wheelers Hill VIC",
+  
+        lat: -37.9050596,
+        lng: 145.1685784,
+  
+        source:
+          "PROFILE_HOME_LOCATION",
+      },
+    }));
+  }, []);
+
 useEffect(() => {
   console.log("[BUSINESS REG] profile homeLocation:", profile?.homeLocation);
   console.log("[BUSINESS REG] business location:", business.location);
