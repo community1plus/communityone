@@ -23,7 +23,7 @@ export async function connectDB() {
       "❌ MongoDB connection failed:",
       err
     );
-
+    console.log("🔍 MONGODB_URI present:", Boolean(process.env.MONGODB_URI));
     process.exit(1);
   }
 }
