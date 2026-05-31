@@ -466,6 +466,11 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     patchProfile,
   } = useProfile();
 
+  console.log(
+  "[PROFILE]",
+  profile
+);
+
   const form = useForm({
     initialValues: getInitialProfileValues({
       user,
