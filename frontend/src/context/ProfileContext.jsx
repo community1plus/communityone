@@ -233,6 +233,9 @@ export function ProfileProvider({ children }) {
       if (loadingRef.current) {
         return null;
       }
+console.log(
+  "[ProfileContext] loadProfile()"
+);
 
       if (!isAuthenticated || !user?.id) {
         loadingRef.current = false;
@@ -336,7 +339,9 @@ export function ProfileProvider({ children }) {
   useEffect(() => {
     hasLoadedRef.current = false;
     loadingRef.current = false;
-
+console.log(
+  "[ProfileContext] mounted"
+);
     if (!isAuthenticated || !user?.id) {
       setProfile(null);
       setProviders(normaliseProviders());
