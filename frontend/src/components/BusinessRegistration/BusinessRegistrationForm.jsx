@@ -1,4 +1,10 @@
-import { useMemo, useRef, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+
 import {
   Autocomplete,
   GoogleMap,
@@ -6,8 +12,9 @@ import {
 } from "@react-google-maps/api";
 
 import { useGoogleMaps } from "../../context/GoogleMapsProvider";
-import Button from "../UI/Button";
 import { useProfile } from "../../context/ProfileContext";
+import Button from "../UI/Button";
+
 import "./BusinessRegistrationForm.css";
 
 const EMPTY_BUSINESS = {
@@ -41,30 +48,75 @@ const DEFAULT_CENTER = {
   lng: 144.9631,
 };
 
+function getProfileLocation(profile) {
+  const homeLocation = profile?.homeLocation;
+
+  if (!homeLocation) return null;
+
+  return {
+    fullAddress:
+      homeLocation.fullAddress ||
+      homeLocation.address ||
+      homeLocation.label ||
+      "",
+
+    lat:
+      homeLocation.lat ?? null,
+
+    lng:
+      homeLocation.lng ?? null,
+
+    source:
+      "PROFILE_HOME_LOCATION",
+  };
+}
+
 function buildBusinessPayload(business) {
   return {
     ...business,
-    source: business.source || "USER_SUBMITTED",
-    canonicalStatus: "DRAFT",
-    verificationStatus: "PENDING_VERIFICATION",
+
+    source:
+      business.source ||
+      "USER_SUBMITTED",
+
+    canonicalStatus:
+      "DRAFT",
+
+    verificationStatus:
+      "PENDING_VERIFICATION",
 
     location: {
       ...business.location,
-      source: business.location?.source || "USER_ENTERED",
+      source:
+        business.location?.source ||
+        "USER_ENTERED",
     },
 
     verification: {
-      emailVerified: business.emailVerified || false,
-      phoneVerified: business.phoneVerified || false,
-      domainVerified: business.domainVerified || false,
-      ownerVerified: false,
+      emailVerified:
+        business.emailVerified || false,
+
+      phoneVerified:
+        business.phoneVerified || false,
+
+      domainVerified:
+        business.domainVerified || false,
+
+      ownerVerified:
+        false,
     },
 
-    googlePlaceId: business.googlePlaceId || null,
-    osmId: business.osmId || null,
+    googlePlaceId:
+      business.googlePlaceId || null,
 
-    verifiedAt: null,
-    updatedAt: new Date().toISOString(),
+    osmId:
+      business.osmId || null,
+
+    verifiedAt:
+      null,
+
+    updatedAt:
+      new Date().toISOString(),
   };
 }
 
@@ -74,30 +126,87 @@ export default function BusinessRegistrationForm({
   onCancel,
   onComplete,
 }) {
-  const { isLoaded } = useGoogleMaps();
+  const { isLoaded } =
+    useGoogleMaps();
 
-  const locationAutoRef = useRef(null);
-  const { profile } = useProfile();
-const [business, setBusiness] = useState({
-  ...EMPTY_BUSINESS,
-  name: initialBusinessName || "",
+  const { profile } =
+    useProfile();
 
-  location: {
-    fullAddress:
-      profile?.homeLocation?.fullAddress || "",
-    lat: profile?.homeLocation?.lat || null,
-    lng: profile?.homeLocation?.lng || null,
-    source: "PROFILE_HOME_LOCATION",
-  },
-});
+  const locationAutoRef =
+    useRef(null);
 
-  const [businessSearchTerm, setBusinessSearchTerm] =
-    useState(initialBusinessName || "");
+  const initialProfileLocation =
+    getProfileLocation(profile);
 
-  const [searchStatus, setSearchStatus] = useState("idle");
-  const [matches, setMatches] = useState([]);
-  const [selectedMatchId, setSelectedMatchId] = useState(null);
-  const [manualEntryMode, setManualEntryMode] = useState(false);
+  const [
+    business,
+    setBusiness,
+  ] = useState({
+    ...EMPTY_BUSINESS,
+
+    name:
+      initialBusinessName || "",
+
+    location:
+      initialProfileLocation ||
+      EMPTY_BUSINESS.location,
+  });
+
+  const [
+    businessSearchTerm,
+    setBusinessSearchTerm,
+  ] = useState(
+    initialBusinessName || ""
+  );
+
+  const [
+    searchStatus,
+    setSearchStatus,
+  ] = useState("idle");
+
+  const [
+    matches,
+    setMatches,
+  ] = useState([]);
+
+  const [
+    selectedMatchId,
+    setSelectedMatchId,
+  ] = useState(null);
+
+  const [
+    manualEntryMode,
+    setManualEntryMode,
+  ] = useState(false);
+
+  /* =========================================
+     HYDRATE LOCATION FROM PROFILE
+     Runs after profile loads/cache hydrates
+  ========================================= */
+
+  useEffect(() => {
+    const profileLocation =
+      getProfileLocation(profile);
+
+    if (!profileLocation) return;
+
+    setBusiness((prev) => {
+      const alreadyHasLocation =
+        Boolean(prev.location?.lat) &&
+        Boolean(prev.location?.lng);
+
+      if (alreadyHasLocation) {
+        return prev;
+      }
+
+      return {
+        ...prev,
+
+        location:
+          profileLocation,
+      };
+    });
+  }, [profile?.homeLocation]);
 
   const title = useMemo(() => {
     return accountType === "MIXED"
@@ -106,34 +215,59 @@ const [business, setBusiness] = useState({
   }, [accountType]);
 
   const mapCenter = useMemo(() => {
-    if (business.location.lat && business.location.lng) {
+    if (
+      business.location.lat &&
+      business.location.lng
+    ) {
       return {
-        lat: business.location.lat,
-        lng: business.location.lng,
+        lat:
+          Number(business.location.lat),
+
+        lng:
+          Number(business.location.lng),
       };
     }
 
-return {
-  lat:
-    profile?.homeLocation?.lat ||
-    DEFAULT_CENTER.lat,
+    const profileLocation =
+      getProfileLocation(profile);
 
-  lng:
-    profile?.homeLocation?.lng ||
-    DEFAULT_CENTER.lng,
-};
-  }, [business.location.lat, business.location.lng]);
+    if (
+      profileLocation?.lat &&
+      profileLocation?.lng
+    ) {
+      return {
+        lat:
+          Number(profileLocation.lat),
 
-  const updateBusiness = (field, value) => {
+        lng:
+          Number(profileLocation.lng),
+      };
+    }
+
+    return DEFAULT_CENTER;
+  }, [
+    business.location.lat,
+    business.location.lng,
+    profile?.homeLocation,
+  ]);
+
+  const updateBusiness = (
+    field,
+    value
+  ) => {
     setBusiness((prev) => ({
       ...prev,
       [field]: value,
     }));
   };
 
-  const updateLocation = (field, value) => {
+  const updateLocation = (
+    field,
+    value
+  ) => {
     setBusiness((prev) => ({
       ...prev,
+
       location: {
         ...prev.location,
         [field]: value,
@@ -142,21 +276,36 @@ return {
   };
 
   const handleLocationChanged = () => {
-    const place = locationAutoRef.current?.getPlace();
+    const place =
+      locationAutoRef.current?.getPlace();
 
     if (!place?.geometry) return;
 
     const nextLocation = {
-      fullAddress: place.formatted_address || place.name || "",
-      lat: place.geometry.location.lat(),
-      lng: place.geometry.location.lng(),
-      source: "GOOGLE_AUTOCOMPLETE",
+      fullAddress:
+        place.formatted_address ||
+        place.name ||
+        "",
+
+      lat:
+        place.geometry.location.lat(),
+
+      lng:
+        place.geometry.location.lng(),
+
+      source:
+        "GOOGLE_AUTOCOMPLETE",
     };
 
     setBusiness((prev) => ({
       ...prev,
-      location: nextLocation,
+      location:
+        nextLocation,
     }));
+
+    setMatches([]);
+    setSelectedMatchId(null);
+    setSearchStatus("idle");
   };
 
   const handleSearchSources = async () => {
@@ -172,74 +321,131 @@ return {
         `${import.meta.env.VITE_API_BASE}/business/source-check`,
         {
           method: "POST",
+
           headers: {
-            "Content-Type": "application/json",
+            "Content-Type":
+              "application/json",
           },
+
           body: JSON.stringify({
-            query: businessSearchTerm,
-            name: businessSearchTerm,
-            address: business.location.fullAddress,
-            lat: business.location.lat,
-            lng: business.location.lng,
-            radiusMeters: 1500,
+            query:
+              businessSearchTerm,
+
+            name:
+              businessSearchTerm,
+
+            address:
+              business.location.fullAddress,
+
+            lat:
+              business.location.lat,
+
+            lng:
+              business.location.lng,
+
+            radiusMeters:
+              1500,
           }),
         }
       );
 
-      const data = await response.json();
+      const data =
+        await response.json();
 
       if (!response.ok) {
-        throw new Error(data?.message || "Source check failed");
+        throw new Error(
+          data?.message ||
+            "Source check failed"
+        );
       }
 
-      const nextMatches = data?.matches || [];
+      const nextMatches =
+        data?.matches || [];
 
       setMatches(nextMatches);
+
       setSearchStatus(
-        nextMatches.length > 0 ? "matched" : "no-match"
+        nextMatches.length > 0
+          ? "matched"
+          : "no-match"
       );
     } catch (err) {
-      console.error("Business source search failed:", err);
+      console.error(
+        "Business source search failed:",
+        err
+      );
+
       setSearchStatus("error");
     }
   };
 
-  const handleSelectMatch = (match) => {
+  const handleSelectMatch = (
+    match
+  ) => {
     setSelectedMatchId(match.id);
     setManualEntryMode(false);
 
     setBusiness((prev) => ({
       ...prev,
 
-      name: match.name || prev.name,
-      registration: match.registration || prev.registration,
-      website: match.website || prev.website,
-      description: match.description || prev.description,
+      name:
+        match.name || prev.name,
+
+      registration:
+        match.registration ||
+        prev.registration,
+
+      website:
+        match.website ||
+        prev.website,
+
+      description:
+        match.description ||
+        prev.description,
 
       location: {
         fullAddress:
           match.location?.fullAddress ||
           prev.location.fullAddress ||
           "",
-        lat: match.location?.lat ?? prev.location.lat,
-        lng: match.location?.lng ?? prev.location.lng,
+
+        lat:
+          match.location?.lat ??
+          prev.location.lat,
+
+        lng:
+          match.location?.lng ??
+          prev.location.lng,
+
         source:
           match.location?.source ||
           match.source ||
           "IMPORTED",
       },
 
-      phone: match.phone || prev.phone,
-      email: match.email || prev.email,
+      phone:
+        match.phone || prev.phone,
 
-      emailVerified: Boolean(match.emailVerified),
-      phoneVerified: Boolean(match.phoneVerified),
-      domainVerified: Boolean(match.domainVerified),
+      email:
+        match.email || prev.email,
 
-      googlePlaceId: match.googlePlaceId || null,
-      osmId: match.osmId || null,
+      emailVerified:
+        Boolean(match.emailVerified),
 
-      source: match.source || "IMPORTED",
+      phoneVerified:
+        Boolean(match.phoneVerified),
+
+      domainVerified:
+        Boolean(match.domainVerified),
+
+      googlePlaceId:
+        match.googlePlaceId || null,
+
+      osmId:
+        match.osmId || null,
+
+      source:
+        match.source || "IMPORTED",
     }));
   };
 
@@ -249,17 +455,31 @@ return {
 
     setBusiness((prev) => ({
       ...prev,
-      name: businessSearchTerm || prev.name,
-      source: "USER_SUBMITTED",
-      googlePlaceId: null,
-      osmId: null,
+
+      name:
+        businessSearchTerm ||
+        prev.name,
+
+      source:
+        "USER_SUBMITTED",
+
+      googlePlaceId:
+        null,
+
+      osmId:
+        null,
     }));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = (
+    event
+  ) => {
     event.preventDefault();
 
-    const payload = buildBusinessPayload(business);
+    const payload =
+      buildBusinessPayload(
+        business
+      );
 
     onComplete?.(payload);
   };
@@ -267,7 +487,9 @@ return {
   const canSearchBusiness =
     Boolean(business.location.lat) &&
     Boolean(business.location.lng) &&
-    Boolean(businessSearchTerm.trim());
+    Boolean(
+      businessSearchTerm.trim()
+    );
 
   return (
     <form
@@ -297,8 +519,8 @@ return {
           <h3>Business Location</h3>
 
           <p>
-            Start with the location. Community One will search
-            nearby sources for matching businesses.
+            Start with the location. Community One will search nearby
+            sources for matching businesses.
           </p>
 
           <div className="business-map-box">
@@ -306,7 +528,11 @@ return {
               <GoogleMap
                 mapContainerClassName="business-google-map"
                 center={mapCenter}
-                zoom={business.location.lat ? 16 : 11}
+                zoom={
+                  business.location.lat
+                    ? 16
+                    : 11
+                }
                 options={{
                   disableDefaultUI: true,
                   zoomControl: true,
@@ -314,14 +540,19 @@ return {
                   mapTypeControl: false,
                 }}
               >
-                {business.location.lat && business.location.lng && (
-                  <Marker
-                    position={{
-                      lat: business.location.lat,
-                      lng: business.location.lng,
-                    }}
-                  />
-                )}
+                {business.location.lat &&
+                  business.location.lng && (
+                    <Marker
+                      position={{
+                        lat: Number(
+                          business.location.lat
+                        ),
+                        lng: Number(
+                          business.location.lng
+                        ),
+                      }}
+                    />
+                  )}
               </GoogleMap>
             ) : (
               <div className="business-map-placeholder">
@@ -337,8 +568,13 @@ return {
             </strong>
 
             <span>
-              {business.location.lat && business.location.lng
-                ? `${business.location.lat.toFixed(5)}, ${business.location.lng.toFixed(5)}`
+              {business.location.lat &&
+              business.location.lng
+                ? `${Number(
+                    business.location.lat
+                  ).toFixed(5)}, ${Number(
+                    business.location.lng
+                  ).toFixed(5)}`
                 : "Select a location to begin"}
             </span>
           </div>
@@ -351,30 +587,49 @@ return {
             <div className="business-form-grid">
               <label className="business-form-full">
                 Business Location
+
                 {isLoaded ? (
-<Autocomplete
-  onLoad={(autocomplete) => {
-    locationAutoRef.current = autocomplete;
-  }}
-  onPlaceChanged={handleLocationChanged}
-  options={{
-    componentRestrictions: { country: "au" },
-    fields: ["formatted_address", "geometry", "name"],
-  }}
->
-  <input
-    value={business.location.fullAddress}
-    onChange={(event) =>
-      updateLocation("fullAddress", event.target.value)
-    }
-    placeholder="Search address, suburb, or business location"
-    autoComplete="off"
-    required
-  />
-</Autocomplete>
+                  <Autocomplete
+                    onLoad={(autocomplete) => {
+                      locationAutoRef.current =
+                        autocomplete;
+                    }}
+                    onPlaceChanged={
+                      handleLocationChanged
+                    }
+                    options={{
+                      componentRestrictions: {
+                        country: "au",
+                      },
+                      fields: [
+                        "formatted_address",
+                        "geometry",
+                        "name",
+                      ],
+                    }}
+                  >
+                    <input
+                      value={
+                        business.location
+                          .fullAddress
+                      }
+                      onChange={(event) =>
+                        updateLocation(
+                          "fullAddress",
+                          event.target.value
+                        )
+                      }
+                      placeholder="Search address, suburb, or business location"
+                      autoComplete="off"
+                      required
+                    />
+                  </Autocomplete>
                 ) : (
                   <input
-                    value={business.location.fullAddress}
+                    value={
+                      business.location
+                        .fullAddress
+                    }
                     onChange={(event) =>
                       updateLocation(
                         "fullAddress",
@@ -395,11 +650,18 @@ return {
             <div className="business-form-grid">
               <label className="business-form-full">
                 Business Name
+
                 <input
                   value={businessSearchTerm}
                   onChange={(event) => {
-                    setBusinessSearchTerm(event.target.value);
-                    updateBusiness("name", event.target.value);
+                    setBusinessSearchTerm(
+                      event.target.value
+                    );
+
+                    updateBusiness(
+                      "name",
+                      event.target.value
+                    );
                   }}
                   placeholder="Example: KFC, pharmacy, cafe, accountant"
                   required
@@ -413,7 +675,8 @@ return {
                 onClick={handleSearchSources}
                 disabled={
                   !canSearchBusiness ||
-                  searchStatus === "searching"
+                  searchStatus ===
+                    "searching"
                 }
               >
                 {searchStatus === "searching"
@@ -432,14 +695,15 @@ return {
 
             {searchStatus === "matched" && (
               <div className="business-registration-hint">
-                Select a matching business below, or choose manual entry.
+                Select a matching business below, or choose manual
+                entry.
               </div>
             )}
 
             {searchStatus === "no-match" && (
               <div className="business-registration-hint">
-                No matching business was found at this location.
-                You can create a new Community One listing.
+                No matching business was found at this location. You
+                can create a new Community One listing.
               </div>
             )}
 
@@ -456,20 +720,33 @@ return {
                     key={match.id}
                     type="button"
                     className={`business-match-card ${
-                      selectedMatchId === match.id ? "active" : ""
+                      selectedMatchId ===
+                      match.id
+                        ? "active"
+                        : ""
                     }`}
-                    onClick={() => handleSelectMatch(match)}
+                    onClick={() =>
+                      handleSelectMatch(match)
+                    }
                   >
-                    <strong>{match.name}</strong>
+                    <strong>
+                      {match.name}
+                    </strong>
 
                     <span>
-                      {match.location?.fullAddress}
+                      {
+                        match.location
+                          ?.fullAddress
+                      }
                     </span>
 
                     <small>
                       {match.source}
                       {match.confidence
-                        ? ` · ${Math.round(match.confidence * 100)}% match`
+                        ? ` · ${Math.round(
+                            match.confidence *
+                              100
+                          )}% match`
                         : ""}
                     </small>
                   </button>
@@ -478,7 +755,8 @@ return {
             )}
           </section>
 
-          {(selectedMatchId || manualEntryMode) && (
+          {(selectedMatchId ||
+            manualEntryMode) && (
             <>
               <section className="business-registration-section">
                 <h3>3. Confirm Business Profile</h3>
@@ -486,6 +764,7 @@ return {
                 <div className="business-form-grid">
                   <label>
                     Business Name
+
                     <input
                       value={business.name}
                       onChange={(event) =>
@@ -500,8 +779,11 @@ return {
 
                   <label>
                     Registration / ABN
+
                     <input
-                      value={business.registration}
+                      value={
+                        business.registration
+                      }
                       onChange={(event) =>
                         updateBusiness(
                           "registration",
@@ -513,6 +795,7 @@ return {
 
                   <label>
                     Website
+
                     <input
                       value={business.website}
                       onChange={(event) =>
@@ -526,8 +809,11 @@ return {
 
                   <label className="business-form-full">
                     Description
+
                     <textarea
-                      value={business.description}
+                      value={
+                        business.description
+                      }
                       onChange={(event) =>
                         updateBusiness(
                           "description",
@@ -546,8 +832,12 @@ return {
                 <div className="business-form-grid">
                   <label className="business-form-full">
                     Full Address
+
                     <input
-                      value={business.location.fullAddress}
+                      value={
+                        business.location
+                          .fullAddress
+                      }
                       onChange={(event) =>
                         updateLocation(
                           "fullAddress",
@@ -560,15 +850,22 @@ return {
 
                   <label>
                     Latitude
+
                     <input
                       type="number"
                       step="any"
-                      value={business.location.lat ?? ""}
+                      value={
+                        business.location.lat ??
+                        ""
+                      }
                       onChange={(event) =>
                         updateLocation(
                           "lat",
                           event.target.value
-                            ? Number(event.target.value)
+                            ? Number(
+                                event.target
+                                  .value
+                              )
                             : null
                         )
                       }
@@ -577,15 +874,22 @@ return {
 
                   <label>
                     Longitude
+
                     <input
                       type="number"
                       step="any"
-                      value={business.location.lng ?? ""}
+                      value={
+                        business.location.lng ??
+                        ""
+                      }
                       onChange={(event) =>
                         updateLocation(
                           "lng",
                           event.target.value
-                            ? Number(event.target.value)
+                            ? Number(
+                                event.target
+                                  .value
+                              )
                             : null
                         )
                       }
@@ -600,6 +904,7 @@ return {
                 <div className="business-form-grid">
                   <label>
                     Business Phone
+
                     <input
                       value={business.phone}
                       onChange={(event) =>
@@ -613,6 +918,7 @@ return {
 
                   <label>
                     Business Email
+
                     <input
                       type="email"
                       value={business.email}
@@ -634,21 +940,27 @@ return {
                   <span>
                     Email Verified:{" "}
                     <strong>
-                      {business.emailVerified ? "Yes" : "No"}
+                      {business.emailVerified
+                        ? "Yes"
+                        : "No"}
                     </strong>
                   </span>
 
                   <span>
                     Phone Verified:{" "}
                     <strong>
-                      {business.phoneVerified ? "Yes" : "No"}
+                      {business.phoneVerified
+                        ? "Yes"
+                        : "No"}
                     </strong>
                   </span>
 
                   <span>
                     Domain Verified:{" "}
                     <strong>
-                      {business.domainVerified ? "Yes" : "No"}
+                      {business.domainVerified
+                        ? "Yes"
+                        : "No"}
                     </strong>
                   </span>
                 </div>
