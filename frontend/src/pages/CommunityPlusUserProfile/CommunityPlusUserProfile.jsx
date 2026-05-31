@@ -454,7 +454,7 @@ export default function CommunityPlusUserProfile({ onComplete }) {
   const { isLoaded } = useGoogleMaps();
   const { user, isAuthenticated } = useAuth();
   const { viewLocation: homeLocation, setManualLocation } = useLocationContext();
-  const pageLoadStartRef = useRef(performance.now());
+
 
   const {
     profile,
