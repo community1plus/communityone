@@ -49,25 +49,39 @@ const DEFAULT_CENTER = {
 };
 
 function getProfileLocation(profile) {
-  const homeLocation = profile?.homeLocation;
+  const homeLocation =
+    profile?.homeLocation ||
+    profile?.location ||
+    null;
 
   if (!homeLocation) return null;
+
+  const lat =
+    homeLocation.lat ??
+    homeLocation.latitude ??
+    homeLocation.coords?.lat ??
+    null;
+
+  const lng =
+    homeLocation.lng ??
+    homeLocation.longitude ??
+    homeLocation.coords?.lng ??
+    null;
+
+  if (lat == null || lng == null) return null;
 
   return {
     fullAddress:
       homeLocation.fullAddress ||
       homeLocation.address ||
       homeLocation.label ||
-      "",
+      homeLocation.name ||
+      "Current location",
 
-    lat:
-      homeLocation.lat ?? null,
+    lat: Number(lat),
+    lng: Number(lng),
 
-    lng:
-      homeLocation.lng ?? null,
-
-    source:
-      "PROFILE_HOME_LOCATION",
+    source: "PROFILE_HOME_LOCATION",
   };
 }
 
@@ -178,6 +192,11 @@ export default function BusinessRegistrationForm({
     manualEntryMode,
     setManualEntryMode,
   ] = useState(false);
+
+useEffect(() => {
+  console.log("[BUSINESS REG] profile homeLocation:", profile?.homeLocation);
+  console.log("[BUSINESS REG] business location:", business.location);
+}, [profile?.homeLocation, business.location]);
 
   /* =========================================
      HYDRATE LOCATION FROM PROFILE

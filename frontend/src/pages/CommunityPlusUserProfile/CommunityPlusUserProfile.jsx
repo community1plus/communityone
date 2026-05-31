@@ -454,6 +454,7 @@ export default function CommunityPlusUserProfile({ onComplete }) {
   const { isLoaded } = useGoogleMaps();
   const { user, isAuthenticated } = useAuth();
   const { viewLocation: homeLocation, setManualLocation } = useLocationContext();
+  const pageLoadStartRef = useRef(performance.now());
 
   const {
     profile,
@@ -561,6 +562,17 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     phoneStatus === "verified";
 
   const displayCompletion = completionPercent || 0;
+
+  useEffect(() => {
+  if (!profileReady) return;
+
+  const elapsed =
+    performance.now() - pageLoadStartRef.current;
+
+  console.log(
+    `[PROFILE PAGE] Total render ready: ${elapsed.toFixed(2)}ms`
+  );
+}, [profileReady]);
 
   useEffect(() => {
     if (!profileReady) return;
@@ -743,23 +755,7 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     syncSocialVerification();
   }, [isAuthenticated, user?.id, profileReady, patchProfile]);
 
-  useEffect(() => {
-    const total = performance.now() - pageLoadStartRef.current;
-
-    console.log(`[PROFILE PAGE] Total render ready: ${total.toFixed(2)}ms`);
-  }, []);
-
-  useEffect(() => {
-  if (profileReady) {
-    console.timeEnd("PROFILE_LOADING_SCREEN");
-    const totalLoadTime =
-      performance.now() - profileLoadStartRef.current;
-
-    console.log(
-      `[PROFILE PAGE] Total render ready: ${totalLoadTime.toFixed(2)}ms`
-    );
-  }
-}, [profileReady]);
+  
 
 const handleBusinessRegistrationComplete = useCallback(
   (business) => {
@@ -1117,7 +1113,7 @@ const handleBusinessRegistrationComplete = useCallback(
     await handleSaveProfile();
   }, [validateAll, handleSaveProfile]);
 
-const profileLoadStartRef = useRef(performance.now());
+
 const [slowProfileLoad, setSlowProfileLoad] =
   useState(false);
 
@@ -1132,8 +1128,7 @@ useEffect(() => {
 }, [profileReady]);
 
 if (!profileReady) {
-  console.time("PROFILE_LOADING_SCREEN");
-
+  
   return (
     <div className="profile-page">
       <SplashHeader />
