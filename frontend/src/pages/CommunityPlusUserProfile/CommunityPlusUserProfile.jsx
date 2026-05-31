@@ -1123,6 +1123,22 @@ const [slowProfileLoad, setSlowProfileLoad] =
   useState(false);
 
 useEffect(() => {
+  setBusiness((prev) => ({
+    ...prev,
+    location: {
+      fullAddress:
+        "Wheelers Hill VIC",
+
+      lat: -37.9050596,
+      lng: 145.1685784,
+
+      source:
+        "PROFILE_HOME_LOCATION",
+    },
+  }));
+}, []);
+
+useEffect(() => {
   if (profileReady) return;
 
   const timer = setTimeout(() => {
