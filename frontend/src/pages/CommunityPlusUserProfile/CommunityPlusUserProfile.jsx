@@ -1087,20 +1087,35 @@ const handleBusinessRegistrationComplete = useCallback(
     setSavingProfile(true);
     setProfileError("");
 
-    try {
-      const payload = buildProfilePayload();
-      const nextProfile = await saveProfile(payload);
+try {
+  const payload = buildProfilePayload();
+  const nextProfile = await saveProfile(payload);
 
-      clearStorage?.();
-      onComplete?.(nextProfile);
-    } catch (err) {
-      console.error("Profile save failed:", err);
+  clearStorage?.();
+  onComplete?.(nextProfile);
 
-      setProfileError(err?.message || "Profile save failed");
-    } finally {
-      setSavingProfile(false);
-    }
-  }, [saveProfile, buildProfilePayload, clearStorage, onComplete]);
+  if (payload.userType === "ORG") {
+    navigate("/communityplus/yellowpages", {
+      replace: true,
+    });
+
+    return;
+  }
+
+  if (payload.userType === "MIXED") {
+    navigate("/communityplus", {
+      replace: true,
+    });
+
+    return;
+  }
+} catch (err) {
+  console.error("Profile save failed:", err);
+
+  setProfileError(err?.message || "Profile save failed");
+} finally {
+  setSavingProfile(false);
+}
 
   const closeProfile = useCallback(() => {
     if (!profileReady) return;
