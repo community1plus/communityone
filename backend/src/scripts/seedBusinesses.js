@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 import mongoose from "mongoose";
-import Business from "../src/models/Business.js";
+import Business from "../scripts/Business.js";
 
 dotenv.config();
 
