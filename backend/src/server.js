@@ -5,6 +5,9 @@ import cors from "cors";
 import pkg from "pg";
 import session from "express-session";
 import { pool } from "./db/pool.js";
+import { connectDB } from "./config/db.js";
+
+await connectDB();
 
 /* =========================
    ROUTES
