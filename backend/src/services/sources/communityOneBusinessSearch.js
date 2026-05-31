@@ -1,52 +1,59 @@
+import Business from "../../models/Business.js";
+
 export async function searchCommunityOneBusinesses({
   query,
   lat,
   lng,
   radiusMeters = 1500,
 }) {
-  console.log(
-    "[COMMUNITY_ONE_SEARCH]",
-    {
-      query,
-      lat,
-      lng,
-      radiusMeters,
-    }
-  );
+  if (!lat || !lng) {
+    return [];
+  }
 
-  /*
-    TEMP:
-    Replace later with real DB query
-  */
+  const searchRegex = query
+    ? new RegExp(query, "i")
+    : null;
 
-  return [
-    {
-      id: `db:${query}:${lat}:${lng}`,
+  const filters = {
+    isActive: true,
 
-      source: "COMMUNITY_ONE",
-
-      name:
-        query || "Unnamed Business",
-
-      phone: "03 0000 0000",
-
-      email: "",
-
-      website:
-        "https://communityone.com",
-
-      location: {
-        fullAddress:
-          "Community One Test Location",
-
-        lat,
-        lng,
-
-        source:
-          "COMMUNITY_ONE",
+    geo: {
+      $near: {
+        $geometry: {
+          type: "Point",
+          coordinates: [
+            Number(lng),
+            Number(lat),
+          ],
+        },
+        $maxDistance: Number(radiusMeters),
       },
-
-      confidence: 0.95,
     },
-  ];
+  };
+
+  if (searchRegex) {
+    filters.$or = [
+      { name: searchRegex },
+      { category: searchRegex },
+      { description: searchRegex },
+    ];
+  }
+
+  const businesses = await Business.find(filters).limit(10);
+
+  return businesses.map((business) => ({
+    id: `db:${business._id}`,
+    source: "COMMUNITY_ONE",
+    name: business.name,
+    phone: business.phone || "",
+    email: business.email || "",
+    website: business.website || "",
+    location: {
+      fullAddress: business.location?.fullAddress || "",
+      lat: business.location?.lat,
+      lng: business.location?.lng,
+      source: "COMMUNITY_ONE",
+    },
+    confidence: 0.95,
+  }));
 }
