@@ -1116,6 +1116,7 @@ try {
 } finally {
   setSavingProfile(false);
 }
+  }, [saveProfile, buildProfilePayload, clearStorage, onComplete]);
 
   const closeProfile = useCallback(() => {
     if (!profileReady) return;
@@ -1157,17 +1158,20 @@ if (!profileReady) {
 
       {showBusinessRegistration && (
         <div className="business-registration-overlay">
-<BusinessRegistrationForm
-  accountType={values.userType}
-  initialBusinessName={
-    values.userType === "ORG"
-      ? values.organisation?.name
-      : values.business?.name
-  }
-  initialLocation={values.homeLocation || homeLocation}
-  onCancel={() => setShowBusinessRegistration(false)}
-  onComplete={handleBusinessRegistrationComplete}
-/>
+          <BusinessRegistrationForm
+            accountType={values.userType}
+            initialBusinessName={
+              values.userType === "ORG"
+                ? values.organisation?.name
+                : values.business?.name
+            }
+            onCancel={() =>
+              setShowBusinessRegistration(false)
+            }
+            onComplete={
+              handleBusinessRegistrationComplete
+            }
+          />
         </div>
       )}
 
