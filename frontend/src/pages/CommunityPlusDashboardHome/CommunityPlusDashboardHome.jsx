@@ -9,11 +9,8 @@ import {
 import "./CommunityPlusDashboardHome.css";
 
 import { useMap } from "../../context/MapContext";
-
 import CommunityMap from "../../components/Map/CommunityMap";
-
 import FeedCard from "../../components/FeedCard/CommunityPlusFeedCard";
-
 
 /* =========================================================
    FILTERS
@@ -28,36 +25,102 @@ const FILTERS = [
   { id: "beacon", label: "Beacons" },
 ];
 
+const DEFAULT_FEED_CARD = {
+  id: "default-feed-card",
+  type: "welcome",
+  title: "👋 Welcome to Community One",
+  content:
+    "No community activity has been posted yet. Be the first to share news, events, alerts or updates with your local area.",
+  author: "Community One",
+  created_at: new Date().toISOString(),
+  expires_at: null,
+  system: true,
+  location: null,
+  media: [],
+};
+
 /* =========================================================
    HELPERS
 ========================================================= */
 
 function formatRelativeTime(value) {
-
   if (!value) return "Just now";
 
-  const now = Date.now();
+  const then = new Date(value).getTime();
 
-  const then =
-    new Date(value).getTime();
+  if (Number.isNaN(then)) return "Just now";
 
-  const diff =
-    Math.floor((now - then) / 60000);
+  const diff = Math.floor((Date.now() - then) / 60000);
 
-  if (diff < 1) {
-    return "Just now";
-  }
-
-  if (diff < 60) {
-    return `${diff}m ago`;
-  }
-
-  if (diff < 1440) {
-    return `${Math.floor(diff / 60)}h ago`;
-  }
+  if (diff < 1) return "Just now";
+  if (diff < 60) return `${diff}m ago`;
+  if (diff < 1440) return `${Math.floor(diff / 60)}h ago`;
 
   return `${Math.floor(diff / 1440)}d ago`;
+}
 
+function isCurrentActivity(item) {
+  if (!item?.expires_at) return true;
+
+  return new Date(item.expires_at).getTime() > Date.now();
+}
+
+function sortByMostRecent(items = []) {
+  return [...items].sort(
+    (a, b) =>
+      new Date(b.created_at || 0).getTime() -
+      new Date(a.created_at || 0).getTime()
+  );
+}
+
+function applyFeedFilter(items = [], activeFilter = "all") {
+  if (activeFilter === "all") {
+    return items;
+  }
+
+  if (activeFilter === "now") {
+    return items.filter((item) =>
+      ["now", "incident", "event", "beacon"].includes(item.type)
+    );
+  }
+
+  return items.filter((item) => item.type === activeFilter);
+}
+
+function resolveDashboardFeed(items = []) {
+  if (!items.length) {
+    return {
+      mode: "empty",
+      items: [DEFAULT_FEED_CARD],
+    };
+  }
+
+  const currentItems = items.filter(isCurrentActivity);
+
+  if (currentItems.length) {
+    return {
+      mode: "active",
+      items: sortByMostRecent(currentItems),
+    };
+  }
+
+  const latestItem = sortByMostRecent(items)[0];
+
+  return {
+    mode: "fallback",
+    items: latestItem ? [latestItem] : [DEFAULT_FEED_CARD],
+  };
+}
+
+function getPostImage(item) {
+  const firstMedia = item?.media?.[0];
+
+  return (
+    firstMedia?.signedUrl ||
+    firstMedia?.publicUrl ||
+    item?.image ||
+    null
+  );
 }
 
 /* =========================================================
@@ -65,7 +128,6 @@ function formatRelativeTime(value) {
 ========================================================= */
 
 export default function CommunityPlusDashboardHome() {
-
   const {
     addMarkers,
     focusOnMarker,
@@ -74,86 +136,26 @@ export default function CommunityPlusDashboardHome() {
     clearSelection,
   } = useMap();
 
-  /* =======================================================
-     STATE
-  ======================================================= */
-const [posts, setPosts] = useState([]);
-const [postsLoading, setPostsLoading] = useState(true);
-const [postsError, setPostsError] = useState("");
+  const [posts, setPosts] = useState([]);
+  const [postsLoading, setPostsLoading] = useState(true);
+  const [postsError, setPostsError] = useState("");
 
-  const [
-    activeFilter,
-    setActiveFilter,
-  ] = useState("all");
+  const [activeFilter, setActiveFilter] = useState("all");
 
-  const [
-    searchQuery,
-    setSearchQuery,
-  ] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchMode, setSearchMode] = useState("local");
+  const [searchResults, setSearchResults] = useState([]);
 
-  const [
-    searchMode,
-    setSearchMode,
-  ] = useState("local");
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
 
-  const [
-    searchResults,
-    setSearchResults,
-  ] = useState([]);
-
-  const [
-    canScrollLeft,
-    setCanScrollLeft,
-  ] = useState(false);
-
-  const [
-    canScrollRight,
-    setCanScrollRight,
-  ] = useState(true);
+  const filterRailRef = useRef(null);
 
   /* =======================================================
-     REFS
+     LOAD POSTS
   ======================================================= */
 
-  const filterRailRef =
-    useRef(null);
-
-  /* =======================================================
-     FILTERED FEED
-  ======================================================= */
-
-  const filteredFeed =
-    useMemo(() => {
-
-      if (activeFilter === "all") {
-        return FEED_ITEMS;
-      }
-
-      if (activeFilter === "now") {
-
-        return FEED_ITEMS.filter(
-          (item) =>
-            [
-              "incident",
-              "event",
-              "beacon",
-            ].includes(item.type)
-        );
-
-      }
-
-      return FEED_ITEMS.filter(
-        (item) =>
-          item.type === activeFilter
-      );
-
-    }, [activeFilter]);
-
-  /* =======================================================
-     MAP MARKERS
-  ======================================================= */
-useEffect(() => {
-  async function loadPosts() {
+  const loadPosts = useCallback(async () => {
     try {
       setPostsLoading(true);
       setPostsError("");
@@ -175,484 +177,321 @@ useEffect(() => {
     } finally {
       setPostsLoading(false);
     }
-  }
-
-  loadPosts();
-}, []);
+  }, []);
 
   useEffect(() => {
+    loadPosts();
+  }, [loadPosts]);
 
-    addMarkers(
-      filteredFeed,
-      "feed"
+  /* =======================================================
+     FILTERED FEED
+  ======================================================= */
+
+  const resolvedFeed = useMemo(() => {
+    const filteredItems = applyFeedFilter(posts, activeFilter);
+
+    return resolveDashboardFeed(filteredItems);
+  }, [posts, activeFilter]);
+
+  const feedItems = resolvedFeed.items;
+
+  const itemsToRender = useMemo(() => {
+    if (resolvedFeed.mode === "empty") {
+      return feedItems;
+    }
+
+    if (!visibleMarkers.length) {
+      return feedItems;
+    }
+
+    return feedItems.filter((item) =>
+      visibleMarkers.some((marker) => marker.id === item.id)
+    );
+  }, [visibleMarkers, feedItems, resolvedFeed.mode]);
+
+  /* =======================================================
+     MAP MARKERS
+  ======================================================= */
+
+  useEffect(() => {
+    const markerItems = feedItems.filter(
+      (item) => item.location && !item.system
     );
 
-  }, [
-    filteredFeed,
-    addMarkers,
-  ]);
+    addMarkers(markerItems, "feed");
+  }, [feedItems, addMarkers]);
 
   /* =======================================================
      RAIL STATE
   ======================================================= */
 
-  const updateRailState =
-    useCallback(() => {
-
-      if (!filterRailRef.current) {
-        return;
-      }
-
-      const rail =
-        filterRailRef.current;
-
-      setCanScrollLeft(
-        rail.scrollLeft > 4
-      );
-
-      setCanScrollRight(
-        rail.scrollLeft <
-          rail.scrollWidth -
-            rail.clientWidth -
-            4
-      );
-
-    }, []);
-
-  useEffect(() => {
-
-    updateRailState();
-
-    const rail =
-      filterRailRef.current;
+  const updateRailState = useCallback(() => {
+    const rail = filterRailRef.current;
 
     if (!rail) return;
 
-    rail.addEventListener(
-      "scroll",
-      updateRailState
+    setCanScrollLeft(rail.scrollLeft > 4);
+
+    setCanScrollRight(
+      rail.scrollLeft < rail.scrollWidth - rail.clientWidth - 4
     );
+  }, []);
+
+  useEffect(() => {
+    updateRailState();
+
+    const rail = filterRailRef.current;
+
+    if (!rail) return;
+
+    rail.addEventListener("scroll", updateRailState);
 
     return () => {
-
-      rail.removeEventListener(
-        "scroll",
-        updateRailState
-      );
-
+      rail.removeEventListener("scroll", updateRailState);
     };
-
   }, [updateRailState]);
 
   /* =======================================================
      FILTER SHIFT
   ======================================================= */
 
-  const shiftFiltersLeft =
-    useCallback(() => {
+  const shiftFiltersLeft = useCallback(() => {
+    filterRailRef.current?.scrollBy({
+      left: -220,
+      behavior: "smooth",
+    });
+  }, []);
 
-      filterRailRef.current?.scrollBy({
-        left: -220,
-        behavior: "smooth",
-      });
-
-    }, []);
-
-  const shiftFiltersRight =
-    useCallback(() => {
-
-      filterRailRef.current?.scrollBy({
-        left: 220,
-        behavior: "smooth",
-      });
-
-    }, []);
+  const shiftFiltersRight = useCallback(() => {
+    filterRailRef.current?.scrollBy({
+      left: 220,
+      behavior: "smooth",
+    });
+  }, []);
 
   /* =======================================================
      SEARCH
   ======================================================= */
 
-  const handleSearch =
-    useCallback((event) => {
-
-      const value =
-        event.target.value;
+  const handleSearch = useCallback(
+    (event) => {
+      const value = event.target.value;
 
       setSearchQuery(value);
 
       if (!value.trim()) {
-
         setSearchResults([]);
-
         return;
       }
 
-      const results =
-        FEED_ITEMS.filter((item) => {
+      const query = value.toLowerCase();
 
-          const haystack =
-            `
-              ${item.title}
-              ${item.content}
-              ${item.type}
-            `.toLowerCase();
+      const results = posts.filter((item) => {
+        const haystack = `
+          ${item.title || ""}
+          ${item.content || ""}
+          ${item.type || ""}
+          ${item.category || ""}
+          ${item.author || ""}
+        `.toLowerCase();
 
-          return haystack.includes(
-            value.toLowerCase()
-          );
-
-        });
+        return haystack.includes(query);
+      });
 
       setSearchResults(results);
-
-    }, []);
+    },
+    [posts]
+  );
 
   /* =======================================================
      SEARCH SELECT
   ======================================================= */
 
-  const handleSearchSelect =
-    useCallback(
-      (item) => {
+  const handleSearchSelect = useCallback(
+    (item) => {
+      if (item?.location) {
+        focusOnMarker(item.location, item.id);
+      }
 
-        if (!item?.location) {
-          return;
-        }
-
-        focusOnMarker(
-          item.location,
-          item.id
-        );
-
-        setSearchQuery(
-          item.title
-        );
-
-        setSearchResults([]);
-
-      },
-      [focusOnMarker]
-    );
+      setSearchQuery(item.title || item.content || "");
+      setSearchResults([]);
+    },
+    [focusOnMarker]
+  );
 
   /* =======================================================
      FEED SELECT
   ======================================================= */
 
-  const handleFeedSelect =
-    useCallback(
-      ({ id, location }) => {
+  const handleFeedSelect = useCallback(
+    ({ id, location }) => {
+      if (!location) return;
 
-        if (!location) return;
-
-        focusOnMarker(
-          location,
-          id
-        );
-
-      },
-      [focusOnMarker]
-    );
-
-  /* =======================================================
-     ECHO
-  ======================================================= */
-
-  const handleEchoClick =
-    useCallback(() => {
-
-      console.log(
-        "Echo activated"
-      );
-
-    }, []);
+      focusOnMarker(location, id);
+    },
+    [focusOnMarker]
+  );
 
   /* =======================================================
      RENDER
   ======================================================= */
 
   return (
-
     <div className="dashboard-home-page">
-
       <div className="dashboard-home">
-
-        {/* =================================================
-            FEED PANEL
-        ================================================== */}
-
         <section className="dashboard-home-feed">
-
-          {/* =============================================
-              FILTER RAIL
-          ============================================== */}
-
           <div className="feed-filters-wrapper">
-
             {canScrollLeft && (
-
               <button
                 type="button"
                 className="filter-shift left"
-                onClick={
-                  shiftFiltersLeft
-                }
+                onClick={shiftFiltersLeft}
               >
                 ←
               </button>
-
             )}
 
-            <div
-              ref={filterRailRef}
-              className="feed-filters"
-            >
-
+            <div ref={filterRailRef} className="feed-filters">
               {FILTERS.map((filter) => (
-
                 <button
                   key={filter.id}
                   type="button"
                   className={`feed-filter ${
-                    activeFilter ===
-                    filter.id
-                      ? "active"
-                      : ""
+                    activeFilter === filter.id ? "active" : ""
                   }`}
-                  onClick={() =>
-                    setActiveFilter(
-                      filter.id
-                    )
-                  }
+                  onClick={() => setActiveFilter(filter.id)}
                 >
-
                   {filter.label}
-
                 </button>
-
               ))}
-
             </div>
 
             {canScrollRight && (
-
               <button
                 type="button"
                 className="filter-shift right"
-                onClick={
-                  shiftFiltersRight
-                }
+                onClick={shiftFiltersRight}
               >
                 →
               </button>
-
             )}
-
           </div>
-
-          {/* =============================================
-              FEED LIST
-          ============================================== */}
 
           <div className="feed-list">
+            {postsLoading && (
+              <div className="feed-empty">Loading posts...</div>
+            )}
 
-            {filteredFeed.map((item) => (
+            {!postsLoading && postsError && (
+              <div className="feed-empty">{postsError}</div>
+            )}
 
-              <div
-                key={item.id}
-                onMouseLeave={() => {
+            {!postsLoading &&
+              !postsError &&
+              resolvedFeed.mode === "fallback" && (
+                <div className="feed-empty">
+                  No current activity. Showing the most recent update.
+                </div>
+              )}
 
-                  if (
-                    selectedMarkerId !==
-                    item.id
-                  ) {
-                    clearSelection();
-                  }
+            {!postsLoading &&
+              !postsError &&
+              itemsToRender.map((item) => (
+                <div
+                  key={item.id}
+                  onMouseLeave={() => {
+                    if (item.system) return;
 
-                }}
-              >
-
-                <FeedCard
-                  id={item.id}
-                  type={item.type}
-                  name={item.author}
-                  text={
-                    item.content
-                  }
-                  time={formatRelativeTime(
-                    item.created_at
-                  )}
-                  location={
-                    item.location
-                  }
-                  active={
-                    selectedMarkerId ===
-                    item.id
-                  }
-                  onSelect={
-                    handleFeedSelect
-                  }
-                />
-
-              </div>
-
-            ))}
-
+                    if (selectedMarkerId !== item.id) {
+                      clearSelection();
+                    }
+                  }}
+                >
+                  <FeedCard
+                    id={item.id}
+                    type={item.type}
+                    name={
+                      item.author ||
+                      item.user_id ||
+                      "Community Member"
+                    }
+                    text={item.content || item.title}
+                    time={formatRelativeTime(item.created_at)}
+                    image={getPostImage(item)}
+                    media={item.media || []}
+                    location={item.location}
+                    active={selectedMarkerId === item.id}
+                    onSelect={handleFeedSelect}
+                  />
+                </div>
+              ))}
           </div>
-
         </section>
 
-        {/* =================================================
-            MAP PANEL
-        ================================================== */}
-
         <section className="dashboard-home-map">
-
-          {/* =============================================
-              TOP TOOLBAR
-          ============================================== */}
-
           <div className="dashboard-map-toolbar">
-
             <div className="dashboard-search-controls">
-
-              {/* SEARCH */}
-
               <div className="dashboard-search-box">
-
                 <input
                   type="text"
                   value={searchQuery}
-                  onChange={
-                    handleSearch
-                  }
+                  onChange={handleSearch}
                   placeholder={`Search ${
-                    searchMode ===
-                    "local"
-                      ? "your community"
-                      : "the world"
+                    searchMode === "local" ? "your community" : "the world"
                   }...`}
                 />
 
-                <span className="dashboard-search-icon">
-                  ⌕
-                </span>
+                <span className="dashboard-search-icon">⌕</span>
 
                 {!!searchResults.length && (
-
                   <div className="dashboard-search-results">
+                    {searchResults.map((item) => (
+                      <button
+                        key={item.id}
+                        type="button"
+                        className="dashboard-search-result"
+                        onClick={() => handleSearchSelect(item)}
+                      >
+                        <div className="dashboard-search-result-meta">
+                          <span>{item.type}</span>
+                          <strong>{item.title}</strong>
+                        </div>
 
-                    {searchResults.map(
-                      (item) => (
-
-                        <button
-                          key={item.id}
-                          type="button"
-                          className="dashboard-search-result"
-                          onClick={() =>
-                            handleSearchSelect(
-                              item
-                            )
-                          }
-                        >
-
-                          <div className="dashboard-search-result-meta">
-
-                            <span>
-                              {item.type}
-                            </span>
-
-                            <strong>
-                              {item.title}
-                            </strong>
-
-                          </div>
-
-                          <p>
-                            {item.content}
-                          </p>
-
-                        </button>
-
-                      )
-                    )}
-
+                        <p>{item.content}</p>
+                      </button>
+                    ))}
                   </div>
-
                 )}
-
               </div>
 
-              {/* MODE */}
-
               <div className="dashboard-search-mode">
-
                 <button
                   type="button"
-                  className={
-                    searchMode ===
-                    "local"
-                      ? "active"
-                      : ""
-                  }
-                  onClick={() =>
-                    setSearchMode(
-                      "local"
-                    )
-                  }
+                  className={searchMode === "local" ? "active" : ""}
+                  onClick={() => setSearchMode("local")}
                 >
                   Local
                 </button>
 
                 <button
                   type="button"
-                  className={
-                    searchMode ===
-                    "global"
-                      ? "active"
-                      : ""
-                  }
-                  onClick={() =>
-                    setSearchMode(
-                      "global"
-                    )
-                  }
+                  className={searchMode === "global" ? "active" : ""}
+                  onClick={() => setSearchMode("global")}
                 >
                   Global
                 </button>
-
               </div>
-
             </div>
-
           </div>
-
-          {/* =============================================
-              MAP
-          ============================================== */}
 
           <div className="dashboard-map-canvas">
-
             <CommunityMap
-              searchQuery={
-                searchQuery
-              }
-              searchMode={
-                searchMode
-              }
+              searchQuery={searchQuery}
+              searchMode={searchMode}
             />
-
           </div>
-
-          {/* =============================================
-              ECHO ORB
-          ============================================== */}
-
         </section>
-
       </div>
-
     </div>
-
   );
-
 }

@@ -5,48 +5,7 @@ import { useMap } from "../../context/MapContext";
 import CommunityMap from "../../components/Map/CommunityMap";
 import FeedCard from "../../components/FeedCard/CommunityPlusFeedCard";
 
-const FEED_ITEMS = [
-  {
-    id: 1,
-    type: "incident",
-    title: "🚨 Incident reported nearby",
-    content: "Incident reported nearby.",
-    author: "Community One",
-    created_at: "2026-05-12T08:00:00.000Z",
-    expires_at: "2026-05-13T08:00:00.000Z",
-    location: { lat: -37.8136, lng: 144.9631 },
-  },
-  {
-    id: 2,
-    type: "event",
-    title: "📅 Community event tonight",
-    content: "Community event tonight.",
-    author: "Community One",
-    created_at: "2026-05-11T08:00:00.000Z",
-    expires_at: null,
-    location: { lat: -37.81, lng: 144.97 },
-  },
-  {
-    id: 3,
-    type: "beacon",
-    title: "📡 Beacon alert triggered",
-    content: "Beacon alert triggered.",
-    author: "Community One",
-    created_at: "2026-05-10T08:00:00.000Z",
-    expires_at: "2026-05-11T08:00:00.000Z",
-    location: { lat: -37.82, lng: 144.95 },
-  },
-  {
-    id: 4,
-    type: "blob",
-    title: "🛍️ Local business promotion",
-    content: "Local business promotion.",
-    author: "Community One",
-    created_at: "2026-05-09T08:00:00.000Z",
-    expires_at: null,
-    location: { lat: -37.815, lng: 144.98 },
-  },
-];
+
 
 const DEFAULT_FEED_CARD = {
   id: "default-feed-card",
