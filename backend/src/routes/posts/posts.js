@@ -292,29 +292,7 @@ router.post("/", async (req, res) => {
 
     const post = postResult.rows[0];
 
-    for (const post of posts) {
-        post.media = await Promise.all(
-            (post.media || []).map(async (item) => {
-                 if (!item.s3Key || !item.s3Bucket) return item;
 
-                 const command = new GetObjectCommand({
-                 Bucket: item.s3Bucket,
-                 Key: item.s3Key,
-             });
-
-            const signedUrl = await getSignedUrl(s3, command, {
-            expiresIn: 900,
-        });
-
-            return {
-             ...item,
-             signedUrl,
-            };
-            })
-        );
-    }
-
-    res.json({ posts });
 
     const insertedMedia = [];
 
