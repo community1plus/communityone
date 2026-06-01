@@ -152,7 +152,7 @@ function Feed({ activeFilter }) {
   } = useMap();
 
   const resolvedFeed = useMemo(() => {
-    const filteredItems = applyFeedFilter(FEED_ITEMS, activeFilter);
+const filteredItems = applyFeedFilter(items, activeFilter);
     return resolveDashboardFeed(filteredItems);
   }, [activeFilter]);
 
@@ -194,14 +194,17 @@ function Feed({ activeFilter }) {
   if (!itemsToRender.length) {
     return (
       <FeedCard
-        id={DEFAULT_FEED_CARD.id}
-        type={DEFAULT_FEED_CARD.type}
-        name={DEFAULT_FEED_CARD.author}
-        time="Just now"
-        text={DEFAULT_FEED_CARD.content}
-        location={DEFAULT_FEED_CARD.location}
-        active={false}
-      />
+  id={item.id}
+  type={item.type}
+  name={item.author || item.user_id || "Community Member"}
+  time={formatRelativeTime(item.created_at)}
+  text={item.content || item.title}
+  image={item.media?.[0]?.signedUrl || item.image || null}
+  media={item.media || []}
+  location={item.location}
+  active={selectedMarkerId === item.id}
+  onSelect={handleSelect}
+/>
     );
   }
 
@@ -249,7 +252,7 @@ export default function CommunityPlusDashboardHome() {
       return;
     }
 
-    const results = FEED_ITEMS.filter((item) => {
+const results = posts.filter((item) => {
       const haystack = `${item.title} ${item.content} ${item.type}`.toLowerCase();
       return haystack.includes(value.toLowerCase());
     });
