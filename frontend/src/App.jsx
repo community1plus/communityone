@@ -11,7 +11,8 @@ import { ProfileProvider } from "./context/ProfileContext";
 import { GoogleMapsProvider } from "./context/GoogleMapsProvider";
 import { MapProvider } from "./context/MapContext";
 import { SessionProvider } from "./context/sessionContext";
-import { IViewSessionProvider,} from "./context/IViewSessionContext";
+import { IViewSessionProvider } from "./context/IViewSessionContext";
+
 import CommunityPlusLandingPage from "./pages/CommunityPlusLandingPage/CommunityPlusLandingPage";
 import CommunityPlusAboutPage from "./pages/CommunityPlusAboutPage/CommunityPlusAboutPage";
 import CommunityPlusDashboardLayout from "./components/Layout/Dashboard/CommunityPlusDashboardLayout";
@@ -23,43 +24,43 @@ import CommunityPlusChannels from "./pages/CommunityPlusChannels/CommunityPlusCh
 import CommunityPlusNewsPage from "./pages/CommunityPlusNewsPage/CommunityPlusNewsPage";
 import CommunityPlusEventsPage from "./pages/CommunityPlusEventsPage/CommunityPlusEventsPage";
 import CommunityPlusEventCreatePage from "./pages/CommunityPlusEventsPage/CommunityPlusEventCreatePage";
-import PostComposer from "./components/Layout/Sidebar/Post/PostComposer";
 import CommunityPlusEchoPage from "./pages/CommunityPlusEchoPage/CommunityPlusEchoPage";
 import CommunityPlusEchoDropPage from "./pages/CommunityPlusEchoPage/CommunityPlusEchoDropPage";
 import CommunityPlusSplash from "./pages/CommunityPlusSplash/CommunityPlusSplash";
+
+import PostComposer from "./components/Layout/Sidebar/Post/PostComposer";
+
+/* =========================================
+   COMMUNITY ONE EDGE
+========================================= */
+
+import CommunityOneLayout from "./communityone/CommunityOneLayout";
+import CommunityOneDashboard from "./communityone/CommunityOneDashboard";
+import CommunityOneSES from "./communityone/ses/CommunityOneSES";
+import CommunityOneSHS from "./communityone/shs/CommunityOneSHS";
+import CommunityOneXChange from "./communityone/xchange/CommunityOneXChange";
 
 /* =========================================
    STRIPE
 ========================================= */
 
-import {
-  Elements,
-} from "@stripe/react-stripe-js";
-
-import {
-  loadStripe,
-} from "@stripe/stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
 
 const stripePromise = loadStripe(
-  import.meta.env
-    .VITE_STRIPE_PUBLISHABLE_KEY
+  import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
 );
 
 /* =========================================
    PLACEHOLDER
 ========================================= */
 
-function Placeholder({
-  title,
-}) {
+function Placeholder({ title }) {
   return (
     <div className="dashboard-view">
       <h1>{title}</h1>
 
-      <p>
-        {title} page coming
-        soon.
-      </p>
+      <p>{title} page coming soon.</p>
     </div>
   );
 }
@@ -68,11 +69,8 @@ function Placeholder({
    PROTECTED ROUTE
 ========================================= */
 
-function ProtectedRoute({
-  children,
-}) {
-  const location =
-    useLocation();
+function ProtectedRoute({ children }) {
+  const location = useLocation();
 
   const {
     isAuthenticated,
@@ -83,21 +81,13 @@ function ProtectedRoute({
   const isAuthChecking =
     loading || authLoading;
 
-  /* LOADING */
-
   if (isAuthChecking) {
     return (
-      <div
-        style={{
-          padding: 40,
-        }}
-      >
+      <div style={{ padding: 40 }}>
         Loading...
       </div>
     );
   }
-
-  /* BLOCK */
 
   if (!isAuthenticated) {
     return (
@@ -106,7 +96,6 @@ function ProtectedRoute({
         replace
         state={{
           loginRequired: true,
-
           returnTo:
             location.pathname +
             location.search,
@@ -115,24 +104,20 @@ function ProtectedRoute({
     );
   }
 
-  /* ALLOW */
-
   return children;
 }
 
 /* =========================================
-   DASHBOARD PROVIDERS
+   APP PROVIDERS
 ========================================= */
 
-function DashboardProviders() {
+function AppProviders() {
   return (
     <GoogleMapsProvider>
       <MapProvider>
         <SessionProvider>
           <ProfileProvider>
-            <Elements
-              stripe={stripePromise}
-            >
+            <Elements stripe={stripePromise}>
               <Outlet />
             </Elements>
           </ProfileProvider>
@@ -149,26 +134,34 @@ function DashboardProviders() {
 export default function App() {
   return (
     <Routes>
-      <Route element={<DashboardProviders />}>
-        {/* LANDING */}
+      <Route element={<AppProviders />}>
+        {/* =========================================
+            PUBLIC LANDING
+        ========================================== */}
+
         <Route
           path="/"
           element={<CommunityPlusLandingPage />}
         />
 
-        {/* SPLASH / FIRST LOGIN */}
+        {/* =========================================
+            FIRST LOGIN / PROFILE SETUP
+        ========================================== */}
+
         <Route
           path="/communityplus/welcome"
           element={<CommunityPlusSplash />}
         />
 
-        {/* STANDALONE PROFILE SETUP */}
         <Route
           path="/communityplus/profile"
           element={<CommunityPlusUserProfile />}
         />
 
-        {/* DASHBOARD */}
+        {/* =========================================
+            COMMUNITY+ CORE
+        ========================================== */}
+
         <Route
           path="/communityplus"
           element={<CommunityPlusDashboardLayout />}
@@ -193,22 +186,17 @@ export default function App() {
           />
 
           <Route
+            path="events"
+            element={<CommunityPlusEventsPage />}
+          />
+
+          <Route
             path="events/create"
             element={
               <ProtectedRoute>
                 <CommunityPlusEventCreatePage />
               </ProtectedRoute>
             }
-          />
-
-          <Route
-            path="events"
-            element={<CommunityPlusEventsPage />}
-          />
-
-          <Route
-            path="about"
-            element={<CommunityPlusAboutPage />}
           />
 
           <Route
@@ -229,6 +217,11 @@ export default function App() {
           <Route
             path="echo/:dropId"
             element={<CommunityPlusEchoDropPage />}
+          />
+
+          <Route
+            path="about"
+            element={<CommunityPlusAboutPage />}
           />
 
           <Route
@@ -273,9 +266,70 @@ export default function App() {
             }
           />
         </Route>
+
+        {/* =========================================
+            COMMUNITY ONE EDGE SERVICES
+        ========================================== */}
+
+        <Route
+          path="/communityone"
+          element={
+            <ProtectedRoute>
+              <CommunityOneLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route
+            index
+            element={<CommunityOneDashboard />}
+          />
+
+          <Route
+            path="ses"
+            element={<CommunityOneSES />}
+          />
+
+          <Route
+            path="shs"
+            element={<CommunityOneSHS />}
+          />
+
+          <Route
+            path="xchange"
+            element={<CommunityOneXChange />}
+          />
+
+          <Route
+            path="requests"
+            element={<Placeholder title="My Requests" />}
+          />
+
+          <Route
+            path="responses"
+            element={<Placeholder title="My Responses" />}
+          />
+
+          <Route
+            path="transactions"
+            element={<Placeholder title="My Transactions" />}
+          />
+
+          <Route
+            path="*"
+            element={
+              <Navigate
+                to="/communityone"
+                replace
+              />
+            }
+          />
+        </Route>
       </Route>
 
-      {/* ROOT FALLBACK */}
+      {/* =========================================
+          ROOT FALLBACK
+      ========================================== */}
+
       <Route
         path="*"
         element={<Navigate to="/" replace />}

@@ -1,6 +1,6 @@
 export const NAVIGATION = [
   /* =====================================================
-     HEADER
+     HEADER — TOP LEVEL ROUTING
   ===================================================== */
   {
     group: "main",
@@ -10,45 +10,46 @@ export const NAVIGATION = [
         label: "Home",
         type: "route",
         path: "/communityplus",
+        product: "core",
       },
       {
         id: "iview",
         label: "iVIEW",
         type: "route",
         path: "/communityplus/iview",
-      },
-      {
-        id: "news",
-        label: "News",
-        type: "route",
-        path: "/communityplus/news",
-      },
-      {
-        id: "events",
-        label: "Events",
-        type: "route",
-        path: "/communityplus/events",
+        product: "core",
       },
       {
         id: "yellowpages",
         label: "Yellow Pages",
         type: "route",
         path: "/communityplus/yellowpages",
+        product: "core",
+      },
+      {
+        id: "community-one",
+        label: "Community One",
+        type: "route",
+        path: "/communityone",
+        product: "edge",
       },
       {
         id: "about",
         label: "About Us",
         type: "route",
         path: "/communityplus/about",
+        product: "core",
       },
     ],
   },
 
   /* =====================================================
-     SIDEBAR
+     COMMUNITY+ CORE SIDEBAR
   ===================================================== */
   {
-    group: "sidebar",
+    group: "communityplus-sidebar",
+    product: "core",
+    title: "COMMUNITY+",
     sections: [
       {
         id: "create",
@@ -113,7 +114,7 @@ export const NAVIGATION = [
             label: "Events",
             icon: "📆",
             type: "route",
-            path: "/communityplus/events/create",
+            path: "/communityplus/events",
           },
           {
             id: "yellowpages",
@@ -136,12 +137,102 @@ export const NAVIGATION = [
             type: "route",
             path: "/communityplus/help",
           },
+        ],
+      },
+
+      {
+        id: "account",
+        title: "ACCOUNT",
+        items: [
           {
-            id: "about-platform",
-            label: "About Community One",
-            icon: "ℹ️",
+            id: "logout",
+            label: "Logout",
+            icon: "🚪",
+            type: "action",
+            action: "logout",
+          },
+        ],
+      },
+    ],
+  },
+
+  /* =====================================================
+     COMMUNITY ONE EDGE SIDEBAR
+  ===================================================== */
+  {
+    group: "communityone-sidebar",
+    product: "edge",
+    title: "COMMUNITY ONE",
+    sections: [
+      {
+        id: "edge-home",
+        title: "EDGE",
+        items: [
+          {
+            id: "communityone-dashboard",
+            label: "Dashboard",
+            icon: "🌐",
             type: "route",
-            path: "/communityplus/about",
+            path: "/communityone",
+          },
+        ],
+      },
+
+      {
+        id: "edge-services",
+        title: "EDGE SERVICES",
+        items: [
+          {
+            id: "ses",
+            label: "SES",
+            description: "Simple Employment Services",
+            icon: "💼",
+            type: "route",
+            path: "/communityone/ses",
+          },
+          {
+            id: "shs",
+            label: "SHS",
+            description: "Simple Housing Services",
+            icon: "🏠",
+            type: "route",
+            path: "/communityone/shs",
+          },
+          {
+            id: "xchange",
+            label: "XChange",
+            description: "Broadcast Transactions",
+            icon: "🔁",
+            type: "route",
+            path: "/communityone/xchange",
+          },
+        ],
+      },
+
+      {
+        id: "edge-activity",
+        title: "MY ACTIVITY",
+        items: [
+          {
+            id: "my-requests",
+            label: "My Requests",
+            icon: "📣",
+            type: "route",
+            path: "/communityone/requests",
+          },
+          {
+            id: "my-responses",
+            label: "My Responses",
+            icon: "📨",
+            type: "route",
+            path: "/communityone/responses",
+          },
+          {
+            id: "my-transactions",
+            label: "My Transactions",
+            icon: "🤝",
+            type: "route",
+            path: "/communityone/transactions",
           },
         ],
       },
