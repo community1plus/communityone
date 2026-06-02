@@ -30,20 +30,6 @@ import CommunityPlusSplash from "./pages/CommunityPlusSplash/CommunityPlusSplash
 
 import PostComposer from "./components/Layout/Sidebar/Post/PostComposer";
 
-/* =========================================
-   COMMUNITY ONE EDGE
-========================================= */
-
-import CommunityOneLayout from "./communityone/CommunityOneLayout";
-import CommunityOneDashboard from "./communityone/CommunityOneDashboard";
-import CommunityOneSES from "./communityone/ses/CommunityOneSES";
-import CommunityOneSHS from "./communityone/shs/CommunityOneSHS";
-import CommunityOneXChange from "./communityone/xchange/CommunityOneXChange";
-
-/* =========================================
-   STRIPE
-========================================= */
-
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 
@@ -51,42 +37,22 @@ const stripePromise = loadStripe(
   import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
 );
 
-/* =========================================
-   PLACEHOLDER
-========================================= */
-
-function Placeholder({ title }) {
+function Placeholder({ title, subtitle }) {
   return (
     <div className="dashboard-view">
       <h1>{title}</h1>
-
-      <p>{title} page coming soon.</p>
+      <p>{subtitle || `${title} page coming soon.`}</p>
     </div>
   );
 }
 
-/* =========================================
-   PROTECTED ROUTE
-========================================= */
-
 function ProtectedRoute({ children }) {
   const location = useLocation();
 
-  const {
-    isAuthenticated,
-    loading,
-    authLoading,
-  } = useAuth();
+  const { isAuthenticated, loading, authLoading } = useAuth();
 
-  const isAuthChecking =
-    loading || authLoading;
-
-  if (isAuthChecking) {
-    return (
-      <div style={{ padding: 40 }}>
-        Loading...
-      </div>
-    );
+  if (loading || authLoading) {
+    return <div style={{ padding: 40 }}>Loading...</div>;
   }
 
   if (!isAuthenticated) {
@@ -96,9 +62,7 @@ function ProtectedRoute({ children }) {
         replace
         state={{
           loginRequired: true,
-          returnTo:
-            location.pathname +
-            location.search,
+          returnTo: location.pathname + location.search,
         }}
       />
     );
@@ -106,10 +70,6 @@ function ProtectedRoute({ children }) {
 
   return children;
 }
-
-/* =========================================
-   APP PROVIDERS
-========================================= */
 
 function AppProviders() {
   return (
@@ -127,26 +87,19 @@ function AppProviders() {
   );
 }
 
-/* =========================================
-   APP
-========================================= */
+function CommunityOneShell() {
+  return (
+    <div className="dashboard-view">
+      <Outlet />
+    </div>
+  );
+}
 
 export default function App() {
   return (
     <Routes>
       <Route element={<AppProviders />}>
-        {/* =========================================
-            PUBLIC LANDING
-        ========================================== */}
-
-        <Route
-          path="/"
-          element={<CommunityPlusLandingPage />}
-        />
-
-        {/* =========================================
-            FIRST LOGIN / PROFILE SETUP
-        ========================================== */}
+        <Route path="/" element={<CommunityPlusLandingPage />} />
 
         <Route
           path="/communityplus/welcome"
@@ -158,18 +111,11 @@ export default function App() {
           element={<CommunityPlusUserProfile />}
         />
 
-        {/* =========================================
-            COMMUNITY+ CORE
-        ========================================== */}
-
         <Route
           path="/communityplus"
           element={<CommunityPlusDashboardLayout />}
         >
-          <Route
-            index
-            element={<CommunityPlusDashboardHome />}
-          />
+          <Route index element={<CommunityPlusDashboardHome />} />
 
           <Route
             path="iview"
@@ -180,15 +126,8 @@ export default function App() {
             }
           />
 
-          <Route
-            path="news"
-            element={<CommunityPlusNewsPage />}
-          />
-
-          <Route
-            path="events"
-            element={<CommunityPlusEventsPage />}
-          />
+          <Route path="news" element={<CommunityPlusNewsPage />} />
+          <Route path="events" element={<CommunityPlusEventsPage />} />
 
           <Route
             path="events/create"
@@ -199,35 +138,12 @@ export default function App() {
             }
           />
 
-          <Route
-            path="yellowpages"
-            element={<CommunityPlusYellowPages />}
-          />
-
-          <Route
-            path="channels"
-            element={<CommunityPlusChannels />}
-          />
-
-          <Route
-            path="echo"
-            element={<CommunityPlusEchoPage />}
-          />
-
-          <Route
-            path="echo/:dropId"
-            element={<CommunityPlusEchoDropPage />}
-          />
-
-          <Route
-            path="about"
-            element={<CommunityPlusAboutPage />}
-          />
-
-          <Route
-            path="help"
-            element={<Placeholder title="Help" />}
-          />
+          <Route path="yellowpages" element={<CommunityPlusYellowPages />} />
+          <Route path="channels" element={<CommunityPlusChannels />} />
+          <Route path="echo" element={<CommunityPlusEchoPage />} />
+          <Route path="echo/:dropId" element={<CommunityPlusEchoDropPage />} />
+          <Route path="about" element={<CommunityPlusAboutPage />} />
+          <Route path="help" element={<Placeholder title="Help" />} />
 
           <Route
             path="compose/:mode"
@@ -256,84 +172,67 @@ export default function App() {
             }
           />
 
-          <Route
-            path="*"
-            element={
-              <Navigate
-                to="/communityplus"
-                replace
-              />
-            }
-          />
+          <Route path="*" element={<Navigate to="/communityplus" replace />} />
         </Route>
-
-        {/* =========================================
-            COMMUNITY ONE EDGE SERVICES
-        ========================================== */}
 
         <Route
           path="/communityone"
           element={
             <ProtectedRoute>
-              <CommunityOneLayout />
+              <CommunityOneShell />
             </ProtectedRoute>
           }
         >
           <Route
             index
-            element={<CommunityOneDashboard />}
+            element={
+              <Placeholder
+                title="Community One"
+                subtitle="Edge Services Dashboard"
+              />
+            }
           />
 
           <Route
             path="ses"
-            element={<CommunityOneSES />}
+            element={
+              <Placeholder
+                title="SES"
+                subtitle="Simple Employment Services"
+              />
+            }
           />
 
           <Route
             path="shs"
-            element={<CommunityOneSHS />}
+            element={
+              <Placeholder
+                title="SHS"
+                subtitle="Simple Housing Services"
+              />
+            }
           />
 
           <Route
             path="xchange"
-            element={<CommunityOneXChange />}
-          />
-
-          <Route
-            path="requests"
-            element={<Placeholder title="My Requests" />}
-          />
-
-          <Route
-            path="responses"
-            element={<Placeholder title="My Responses" />}
-          />
-
-          <Route
-            path="transactions"
-            element={<Placeholder title="My Transactions" />}
-          />
-
-          <Route
-            path="*"
             element={
-              <Navigate
-                to="/communityone"
-                replace
+              <Placeholder
+                title="XChange"
+                subtitle="Broadcast Transactions"
               />
             }
           />
+
+          <Route path="feature-requests" element={<Placeholder title="Feature Requests" />} />
+          <Route path="requests" element={<Placeholder title="My Requests" />} />
+          <Route path="responses" element={<Placeholder title="My Responses" />} />
+          <Route path="transactions" element={<Placeholder title="My Transactions" />} />
+
+          <Route path="*" element={<Navigate to="/communityone" replace />} />
         </Route>
       </Route>
 
-      {/* =========================================
-          ROOT FALLBACK
-      ========================================== */}
-
-      <Route
-        path="*"
-        element={<Navigate to="/" replace />}
-      />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
