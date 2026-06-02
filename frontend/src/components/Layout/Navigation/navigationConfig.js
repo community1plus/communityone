@@ -52,8 +52,8 @@ export const NAVIGATION = [
     title: "COMMUNITY+",
     sections: [
       {
-        id: "create",
-        title: "CREATE",
+        id: "core-content",
+        title: "COMMUNITY+ CORE",
         variant: "modes",
         items: [
           {
@@ -65,31 +65,22 @@ export const NAVIGATION = [
             mode: "now",
           },
           {
-            id: "compose-blob",
-            label: "BLOB",
-            icon: "🧠",
-            type: "compose",
-            path: "/communityplus/compose/blob",
-            mode: "blob",
-          },
-          {
-            id: "compose-news",
-            label: "News Article",
+            id: "news-page",
+            label: "News",
             icon: "📰",
-            type: "compose",
-            path: "/communityplus/compose/news",
-            mode: "news",
+            type: "route",
+            path: "/communityplus/news",
           },
           {
-            id: "create-event",
-            label: "Event Listing",
+            id: "events-page",
+            label: "Events",
             icon: "📅",
             type: "route",
-            path: "/communityplus/events/create",
+            path: "/communityplus/events",
           },
           {
             id: "compose-beacon",
-            label: "Beacon",
+            label: "Beacons",
             icon: "📡",
             type: "compose",
             path: "/communityplus/compose/beacon",
@@ -99,23 +90,9 @@ export const NAVIGATION = [
       },
 
       {
-        id: "platform",
+        id: "core-platform",
         title: "PLATFORM",
         items: [
-          {
-            id: "news-page",
-            label: "News",
-            icon: "🗞️",
-            type: "route",
-            path: "/communityplus/news",
-          },
-          {
-            id: "events-page",
-            label: "Events",
-            icon: "📆",
-            type: "route",
-            path: "/communityplus/events",
-          },
           {
             id: "yellowpages",
             label: "Yellow Pages",
@@ -180,31 +157,75 @@ export const NAVIGATION = [
 
       {
         id: "edge-services",
-        title: "EDGE SERVICES",
+        title: "COMMUNITY ONE EDGE",
         items: [
           {
-            id: "ses",
-            label: "SES",
+            id: "ses-jobs",
+            label: "SES Jobs",
             description: "Simple Employment Services",
             icon: "💼",
             type: "route",
-            path: "/communityone/ses",
+            path: "/communityone/ses/jobs",
           },
           {
-            id: "shs",
-            label: "SHS",
+            id: "shs-housing",
+            label: "SHS Housing",
             description: "Simple Housing Services",
             icon: "🏠",
             type: "route",
-            path: "/communityone/shs",
+            path: "/communityone/shs/housing",
           },
           {
-            id: "xchange",
+            id: "xchange-transactions",
             label: "XChange",
             description: "Broadcast Transactions",
             icon: "🔁",
             type: "route",
-            path: "/communityone/xchange",
+            path: "/communityone/xchange/transactions",
+          },
+          {
+            id: "business-requests",
+            label: "Business Requests",
+            description: "Requests from verified businesses",
+            icon: "🏢",
+            type: "route",
+            path: "/communityone/business-requests",
+          },
+          {
+            id: "community-requests",
+            label: "Community Requests",
+            description: "Requests from local communities",
+            icon: "📣",
+            type: "route",
+            path: "/communityone/community-requests",
+          },
+        ],
+      },
+
+      {
+        id: "product",
+        title: "PRODUCT",
+        items: [
+          {
+            id: "feature-requests",
+            label: "Feature Requests",
+            icon: "💡",
+            type: "route",
+            path: "/communityone/feature-requests",
+          },
+          {
+            id: "roadmap",
+            label: "Roadmap",
+            icon: "🧭",
+            type: "route",
+            path: "/communityone/roadmap",
+          },
+          {
+            id: "feedback",
+            label: "Feedback",
+            icon: "📝",
+            type: "route",
+            path: "/communityone/feedback",
           },
         ],
       },
