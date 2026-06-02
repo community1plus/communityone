@@ -14,6 +14,10 @@ const pool = new Pool({
   },
 });
 
+/* =====================================================
+   HELPERS
+===================================================== */
+
 function safeArray(value) {
   return Array.isArray(value) ? value : [];
 }
@@ -23,7 +27,36 @@ function toTimestamp(value) {
   return new Date(value);
 }
 
- async function hydrateMediaWithSignedUrls(posts = []) {
+function moderateTextContent({ title = "", content = "" }) {
+  const text = `${title} ${content}`.toLowerCase();
+
+  const blockedTerms = [
+    "kill yourself",
+    "terrorist attack",
+  ];
+
+  const matchedTerms = blockedTerms.filter((term) =>
+    text.includes(term)
+  );
+
+  if (matchedTerms.length) {
+    return {
+      status: "rejected",
+      requiresReview: true,
+      reason: "Blocked text content detected.",
+      labels: matchedTerms,
+    };
+  }
+
+  return {
+    status: "approved",
+    requiresReview: false,
+    reason: "",
+    labels: [],
+  };
+}
+
+async function hydrateMediaWithSignedUrls(posts = []) {
   return Promise.all(
     posts.map(async (post) => {
       const media = Array.isArray(post.media) ? post.media : [];
@@ -57,6 +90,10 @@ function toTimestamp(value) {
     })
   );
 }
+
+/* =====================================================
+   GET POSTS
+===================================================== */
 
 router.get("/", async (req, res) => {
   try {
@@ -120,19 +157,22 @@ router.get("/", async (req, res) => {
 
     const posts = await hydrateMediaWithSignedUrls(result.rows);
 
-    res.json({
-    posts,
+    return res.json({
+      posts,
     });
   } catch (error) {
-    console.error("Fetch posts failed:");
-    console.error(error);
+    console.error("Fetch posts failed:", error);
 
-    res.status(500).json({
+    return res.status(500).json({
       error: "Could not fetch posts.",
       detail: error.message,
     });
   }
 });
+
+/* =====================================================
+   GET COMMENTS
+===================================================== */
 
 router.get("/:postId/comments", async (req, res) => {
   try {
@@ -156,17 +196,21 @@ router.get("/:postId/comments", async (req, res) => {
       [postId]
     );
 
-    res.json({
+    return res.json({
       comments: result.rows,
     });
   } catch (error) {
     console.error("Fetch comments failed:", error);
 
-    res.status(500).json({
+    return res.status(500).json({
       error: "Could not fetch comments.",
     });
   }
 });
+
+/* =====================================================
+   CREATE COMMENT
+===================================================== */
 
 router.post("/:postId/comments", async (req, res) => {
   try {
@@ -200,17 +244,21 @@ router.post("/:postId/comments", async (req, res) => {
       [postId, userId, String(comment).trim()]
     );
 
-    res.status(201).json({
+    return res.status(201).json({
       comment: result.rows[0],
     });
   } catch (error) {
     console.error("Create comment failed:", error);
 
-    res.status(500).json({
+    return res.status(500).json({
       error: "Could not create comment.",
     });
   }
 });
+
+/* =====================================================
+   CREATE POST
+===================================================== */
 
 router.post("/", async (req, res) => {
   const client = await pool.connect();
@@ -232,8 +280,6 @@ router.post("/", async (req, res) => {
       },
       socialShareTargets = [],
       media = [],
-      status = "published",
-      requiresReview = false,
       expiresAt = null,
     } = payload;
 
@@ -243,10 +289,27 @@ router.post("/", async (req, res) => {
       });
     }
 
-    /*
-      Replace this later with Cognito auth user:
-      const userId = req.user.sub;
-    */
+    const textModeration = moderateTextContent({
+      title,
+      content,
+    });
+
+    if (textModeration.status === "rejected") {
+      return res.status(400).json({
+        error: "Post rejected by moderation.",
+        moderation: textModeration,
+      });
+    }
+
+    const mediaItems = safeArray(media);
+    const hasMedia = mediaItems.length > 0;
+
+    const nextStatus = hasMedia
+      ? "pending_review"
+      : "published";
+
+    const nextRequiresReview = hasMedia;
+
     const userId = req.user?.sub || "test-user";
 
     await client.query("BEGIN");
@@ -284,19 +347,17 @@ router.post("/", async (req, res) => {
         scope,
         JSON.stringify(distribution),
         JSON.stringify(safeArray(socialShareTargets)),
-        status,
-        Boolean(requiresReview),
+        nextStatus,
+        nextRequiresReview,
         toTimestamp(expiresAt),
       ]
     );
 
     const post = postResult.rows[0];
 
-
-
     const insertedMedia = [];
 
-    for (const item of safeArray(media)) {
+    for (const item of mediaItems) {
       const mediaResult = await client.query(
         `
         insert into post_media (
@@ -356,7 +417,7 @@ router.post("/", async (req, res) => {
           JSON.stringify({
             title,
             content,
-            media,
+            media: mediaItems,
             postId: post.id,
           }),
         ]
@@ -371,18 +432,29 @@ router.post("/", async (req, res) => {
       post,
       media: insertedMedia,
       socialJobs,
+      moderation: {
+        text: textModeration,
+        media: hasMedia
+          ? {
+              status: "pending_review",
+              reason:
+                "Media requires moderation before publication.",
+            }
+          : {
+              status: "not_required",
+            },
+      },
     });
   } catch (error) {
     await client.query("ROLLBACK");
-    console.error("Create post failed:");
-    console.error(error);
+
     console.error("Create post failed:", error);
 
     return res.status(500).json({
       error: "Could not create post.",
+      detail: error.message,
     });
   } finally {
-    
     client.release();
   }
 });
