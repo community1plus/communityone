@@ -141,6 +141,25 @@ export default function App() {
             element={<CommunityPlusYellowPages />}
           />
 
+          <Route
+            path="/communityone/ses"
+            element={<SESPage />}
+          />
+
+          <Route
+            path="/communityone/shs"
+            element={<SHSPage />}
+          />
+
+          <Route
+             path="/communityone/xchange"
+             element={<XChangePage />}
+          />
+          <Route
+            path="/communityone"
+            element={<CommunityOneDashboard />}
+          />
+
           <Route path="/communityplus/channels" element={<CommunityPlusChannels />} />
           <Route path="/communityplus/echo" element={<CommunityPlusEchoPage />} />
           <Route path="/communityplus/echo/:dropId" element={<CommunityPlusEchoDropPage />} />
