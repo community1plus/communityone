@@ -1,6 +1,9 @@
 import { Outlet, useLocation } from "react-router-dom";
+
 import CommunityPlusHeader from "../Header/CommunityPlusHeader";
 import CommunityPlusSidebar from "../Sidebar/CommunityPlusSidebar";
+
+import "./CommunityPlusDashboardLayout.css";
 
 export default function AppDashboardLayout() {
   const location = useLocation();
@@ -13,16 +16,20 @@ export default function AppDashboardLayout() {
     : "communityplus-sidebar";
 
   return (
-    <div className="app-shell">
-      <CommunityPlusHeader />
+    <div className="dashboard-root">
+      <header className="dashboard-header">
+        <CommunityPlusHeader />
+      </header>
 
-      <main className="app-main">
-        <CommunityPlusSidebar sidebarGroup={sidebarGroup} />
+      <div className="dashboard-body">
+        <aside className="dashboard-sidebar">
+          <CommunityPlusSidebar sidebarGroup={sidebarGroup} />
+        </aside>
 
-        <section className="app-content">
-          <Outlet />
-        </section>
-      </main>
+        <main className="dashboard-content">
+          <Outlet key={location.pathname} />
+        </main>
+      </div>
     </div>
   );
 }

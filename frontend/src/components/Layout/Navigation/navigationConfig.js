@@ -8,10 +8,17 @@ export const NAVIGATION = [
   items: [
     {
       id: "home",
-      label: "Home",
+      label: "Community+",
       type: "route",
       path: "/communityplus",
       product: "core",
+    },
+    {
+      id: "community-one",
+      label: "Community One",
+      type: "route",
+      path: "/communityone",
+      product: "edge",
     },
     {
       id: "iview",
@@ -48,13 +55,7 @@ export const NAVIGATION = [
       path: "/communityplus/about",
       product: "core",
     },
-    {
-      id: "community-one",
-      label: "Community One",
-      type: "route",
-      path: "/communityone",
-      product: "edge",
-    },
+    
   ],
 },
 
