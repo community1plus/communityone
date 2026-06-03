@@ -1,10 +1,4 @@
-import {
-  Routes,
-  Route,
-  Navigate,
-  Outlet,
-  useLocation,
-} from "react-router-dom";
+import { Routes, Route, Navigate, Outlet, useLocation } from "react-router-dom";
 
 import { useAuth } from "./context/AuthContext";
 import { ProfileProvider } from "./context/ProfileContext";
