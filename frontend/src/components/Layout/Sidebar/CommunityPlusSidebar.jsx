@@ -6,10 +6,10 @@ import { NAVIGATION } from "../../../config/navigation/navigationConfig";
 
 import "./CommunityPlusSidebar.css";
 
-export default function CommunityPlusSidebar() {
-
+export default function CommunityPlusSidebar({
+  sidebarGroup = "communityplus-sidebar",
+}) {
   const navigate = useNavigate();
-
   const location = useLocation();
 
   const { pathname } = location;
@@ -19,17 +19,13 @@ export default function CommunityPlusSidebar() {
   ======================================================= */
 
   const sidebar = useMemo(() => {
-
     return (
-      NAVIGATION.find(
-        (item) => item.group === "sidebar"
-      ) || {
-        group: "sidebar",
+      NAVIGATION.find((item) => item.group === sidebarGroup) || {
+        group: sidebarGroup,
         sections: [],
       }
     );
-
-  }, []);
+  }, [sidebarGroup]);
 
   /* =======================================================
      ACTIVE ROUTE
@@ -37,11 +33,12 @@ export default function CommunityPlusSidebar() {
 
   const isActive = useCallback(
     (item) => {
-
       if (!item?.path) return false;
 
-      return pathname === item.path;
-
+      return (
+        pathname === item.path ||
+        pathname.startsWith(`${item.path}/`)
+      );
     },
     [pathname]
   );
@@ -51,19 +48,15 @@ export default function CommunityPlusSidebar() {
   ======================================================= */
 
   const handleLogout = useCallback(async () => {
-
     try {
-
       await signOut();
 
       navigate("/", {
         replace: true,
       });
-
     } catch (error) {
-      
+      console.error("Logout failed:", error);
     }
-
   }, [navigate]);
 
   /* =======================================================
@@ -72,10 +65,7 @@ export default function CommunityPlusSidebar() {
 
   const handleClick = useCallback(
     async (item) => {
-
       if (!item) return;
-
-      /* LOGOUT */
 
       if (
         item.type === "action" &&
@@ -85,25 +75,17 @@ export default function CommunityPlusSidebar() {
         return;
       }
 
-      /* ROUTES */
-
       if (item.path) {
-
         navigate(item.path, {
           state:
             item.type === "compose"
               ? {
-                  mode:
-                    item.mode || "now",
-
-                  composerType:
-                    item.mode || "now",
+                  mode: item.mode || "now",
+                  composerType: item.mode || "now",
                 }
               : undefined,
         });
-
       }
-
     },
     [navigate, handleLogout]
   );
@@ -113,13 +95,11 @@ export default function CommunityPlusSidebar() {
   ======================================================= */
 
   const handleEchoClick = useCallback(() => {
-
     navigate("/communityplus/echo", {
       state: {
         source: "echo",
       },
     });
-
   }, [navigate]);
 
   /* =======================================================
@@ -127,69 +107,37 @@ export default function CommunityPlusSidebar() {
   ======================================================= */
 
   return (
-
     <aside className="sidebar">
-
-      {/* ===================================================
-          MAIN
-      ==================================================== */}
-
       <div className="sidebar-main">
-
         {sidebar.sections.map((section) => (
-
           <div
             key={section.id}
-            className={`sidebar-section ${
-              section.variant || ""
-            }`}
+            className={`sidebar-section ${section.variant || ""}`}
           >
-
             <div className="sidebar-title">
               {section.title}
             </div>
 
             {section.items.map((item) => {
-
-              const active =
-                isActive(item);
+              const active = isActive(item);
 
               return (
-
                 <button
                   key={item.id}
                   type="button"
                   className={[
                     "sidebar-link",
-
                     active && "active",
-
-                    item.type === "compose" &&
-                      "compose",
-
-                    item.type === "route" &&
-                      "route",
-
-                    item.type === "action" &&
-                      "action",
-
-                    item.action === "logout" &&
-                      "logout",
+                    item.type === "compose" && "compose",
+                    item.type === "route" && "route",
+                    item.type === "action" && "action",
+                    item.action === "logout" && "logout",
                   ]
                     .filter(Boolean)
                     .join(" ")}
-
-                  onClick={() =>
-                    handleClick(item)
-                  }
-
-                  aria-current={
-                    active
-                      ? "page"
-                      : undefined
-                  }
+                  onClick={() => handleClick(item)}
+                  aria-current={active ? "page" : undefined}
                 >
-
                   <span className="icon">
                     {item.icon}
                   </span>
@@ -197,42 +145,27 @@ export default function CommunityPlusSidebar() {
                   <span className="label">
                     {item.label}
                   </span>
-
                 </button>
-
               );
-
             })}
-
           </div>
-
         ))}
-
       </div>
 
-     {/* ===================================================
-    ECHO
-=================================================== */}
-
-<div className="echo-brand">
-  <button
-    type="button"
-    className="echo-brand-button"
-    onClick={() =>
-  navigate("/communityplus/echo")
-}
-    aria-label="Echo"
-  >
-    <img
-      src="/logo/echo.png"
-      alt="Echo"
-      className="echo-brand-image"
-    />
-  </button>
-</div>
-
+      <div className="echo-brand">
+        <button
+          type="button"
+          className="echo-brand-button"
+          onClick={handleEchoClick}
+          aria-label="Echo"
+        >
+          <img
+            src="/logo/echo.png"
+            alt="Echo"
+            className="echo-brand-image"
+          />
+        </button>
+      </div>
     </aside>
-
   );
-
 }

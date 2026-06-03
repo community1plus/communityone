@@ -48,7 +48,6 @@ function Placeholder({ title, subtitle }) {
 
 function ProtectedRoute({ children }) {
   const location = useLocation();
-
   const { isAuthenticated, loading, authLoading } = useAuth();
 
   if (loading || authLoading) {
@@ -87,12 +86,14 @@ function AppProviders() {
   );
 }
 
-function CommunityOneShell() {
-  return (
-    <div className="dashboard-view">
-      <Outlet />
-    </div>
-  );
+/*
+  Temporary shared layout.
+  For now it reuses CommunityPlusDashboardLayout.
+  Next step: refactor CommunityPlusDashboardLayout so it chooses sidebarGroup
+  based on location.pathname.
+*/
+function SharedDashboardLayout() {
+  return <CommunityPlusDashboardLayout />;
 }
 
 export default function App() {
@@ -111,14 +112,11 @@ export default function App() {
           element={<CommunityPlusUserProfile />}
         />
 
-        <Route
-          path="/communityplus"
-          element={<CommunityPlusDashboardLayout />}
-        >
-          <Route index element={<CommunityPlusDashboardHome />} />
+        <Route element={<SharedDashboardLayout />}>
+          <Route path="/communityplus" element={<CommunityPlusDashboardHome />} />
 
           <Route
-            path="iview"
+            path="/communityplus/iview"
             element={
               <IViewSessionProvider>
                 <CommunityPlusIViewPage />
@@ -126,11 +124,11 @@ export default function App() {
             }
           />
 
-          <Route path="news" element={<CommunityPlusNewsPage />} />
-          <Route path="events" element={<CommunityPlusEventsPage />} />
+          <Route path="/communityplus/news" element={<CommunityPlusNewsPage />} />
+          <Route path="/communityplus/events" element={<CommunityPlusEventsPage />} />
 
           <Route
-            path="events/create"
+            path="/communityplus/events/create"
             element={
               <ProtectedRoute>
                 <CommunityPlusEventCreatePage />
@@ -138,15 +136,19 @@ export default function App() {
             }
           />
 
-          <Route path="yellowpages" element={<CommunityPlusYellowPages />} />
-          <Route path="channels" element={<CommunityPlusChannels />} />
-          <Route path="echo" element={<CommunityPlusEchoPage />} />
-          <Route path="echo/:dropId" element={<CommunityPlusEchoDropPage />} />
-          <Route path="about" element={<CommunityPlusAboutPage />} />
-          <Route path="help" element={<Placeholder title="Help" />} />
+          <Route
+            path="/communityplus/yellowpages"
+            element={<CommunityPlusYellowPages />}
+          />
+
+          <Route path="/communityplus/channels" element={<CommunityPlusChannels />} />
+          <Route path="/communityplus/echo" element={<CommunityPlusEchoPage />} />
+          <Route path="/communityplus/echo/:dropId" element={<CommunityPlusEchoDropPage />} />
+          <Route path="/communityplus/about" element={<CommunityPlusAboutPage />} />
+          <Route path="/communityplus/help" element={<Placeholder title="Help" />} />
 
           <Route
-            path="compose/:mode"
+            path="/communityplus/compose/:mode"
             element={
               <ProtectedRoute>
                 <PostComposer />
@@ -155,7 +157,7 @@ export default function App() {
           />
 
           <Route
-            path="account"
+            path="/communityplus/account"
             element={
               <ProtectedRoute>
                 <Placeholder title="Account" />
@@ -164,7 +166,7 @@ export default function App() {
           />
 
           <Route
-            path="inbox"
+            path="/communityplus/inbox"
             element={
               <ProtectedRoute>
                 <Placeholder title="Inbox" />
@@ -172,63 +174,80 @@ export default function App() {
             }
           />
 
-          <Route path="*" element={<Navigate to="/communityplus" replace />} />
-        </Route>
-
-        <Route
-          path="/communityone"
-          element={
-            <ProtectedRoute>
-              <CommunityOneShell />
-            </ProtectedRoute>
-          }
-        >
           <Route
-            index
+            path="/communityone"
             element={
-              <Placeholder
-                title="Community One"
-                subtitle="Edge Services Dashboard"
-              />
+              <ProtectedRoute>
+                <Placeholder
+                  title="Community One"
+                  subtitle="Edge Services Dashboard"
+                />
+              </ProtectedRoute>
             }
           />
 
           <Route
-            path="ses"
+            path="/communityone/ses"
             element={
-              <Placeholder
-                title="SES"
-                subtitle="Simple Employment Services"
-              />
+              <ProtectedRoute>
+                <Placeholder title="SES" subtitle="Simple Employment Services" />
+              </ProtectedRoute>
             }
           />
 
           <Route
-            path="shs"
+            path="/communityone/shs"
             element={
-              <Placeholder
-                title="SHS"
-                subtitle="Simple Housing Services"
-              />
+              <ProtectedRoute>
+                <Placeholder title="SHS" subtitle="Simple Housing Services" />
+              </ProtectedRoute>
             }
           />
 
           <Route
-            path="xchange"
+            path="/communityone/xchange"
             element={
-              <Placeholder
-                title="XChange"
-                subtitle="Broadcast Transactions"
-              />
+              <ProtectedRoute>
+                <Placeholder title="XChange" subtitle="Broadcast Transactions" />
+              </ProtectedRoute>
             }
           />
 
-          <Route path="feature-requests" element={<Placeholder title="Feature Requests" />} />
-          <Route path="requests" element={<Placeholder title="My Requests" />} />
-          <Route path="responses" element={<Placeholder title="My Responses" />} />
-          <Route path="transactions" element={<Placeholder title="My Transactions" />} />
+          <Route
+            path="/communityone/requests"
+            element={
+              <ProtectedRoute>
+                <Placeholder title="Requests" />
+              </ProtectedRoute>
+            }
+          />
 
-          <Route path="*" element={<Navigate to="/communityone" replace />} />
+          <Route
+            path="/communityone/responses"
+            element={
+              <ProtectedRoute>
+                <Placeholder title="Responses" />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/communityone/transactions"
+            element={
+              <ProtectedRoute>
+                <Placeholder title="Transactions" />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/communityone/feature-requests"
+            element={
+              <ProtectedRoute>
+                <Placeholder title="Feature Requests" />
+              </ProtectedRoute>
+            }
+          />
         </Route>
       </Route>
 

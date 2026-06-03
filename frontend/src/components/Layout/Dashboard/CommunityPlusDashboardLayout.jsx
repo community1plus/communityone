@@ -8,6 +8,13 @@ import "./CommunityPlusDashboardLayout.css";
 export default function CommunityPlusDashboardLayout() {
   const location = useLocation();
 
+  const isCommunityOne =
+    location.pathname.startsWith("/communityone");
+
+  const sidebarGroup = isCommunityOne
+    ? "communityone-sidebar"
+    : "communityplus-sidebar";
+
   return (
     <div className="dashboard-root">
       <header className="dashboard-header">
@@ -16,7 +23,7 @@ export default function CommunityPlusDashboardLayout() {
 
       <div className="dashboard-body">
         <aside className="dashboard-sidebar">
-          <CommunityPlusSidebar />
+          <CommunityPlusSidebar sidebarGroup={sidebarGroup} />
         </aside>
 
         <main className="dashboard-content">
