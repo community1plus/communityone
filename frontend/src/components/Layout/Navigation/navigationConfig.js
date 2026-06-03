@@ -3,45 +3,60 @@ export const NAVIGATION = [
      HEADER — TOP LEVEL ROUTING
   ===================================================== */
   {
-    group: "main",
-    items: [
-      {
-        id: "home",
-        label: "Home",
-        type: "route",
-        path: "/communityplus",
-        product: "core",
-      },
-      {
-        id: "iview",
-        label: "iVIEW",
-        type: "route",
-        path: "/communityplus/iview",
-        product: "core",
-      },
-      {
-        id: "yellowpages",
-        label: "Yellow Pages",
-        type: "route",
-        path: "/communityplus/yellowpages",
-        product: "core",
-      },
-      {
-        id: "community-one",
-        label: "Community One",
-        type: "route",
-        path: "/communityone",
-        product: "edge",
-      },
-      {
-        id: "about",
-        label: "About Us",
-        type: "route",
-        path: "/communityplus/about",
-        product: "core",
-      },
-    ],
-  },
+{
+  group: "main",
+  items: [
+    {
+      id: "home",
+      label: "Home",
+      type: "route",
+      path: "/communityplus",
+      product: "core",
+    },
+    {
+      id: "iview",
+      label: "iVIEW",
+      type: "route",
+      path: "/communityplus/iview",
+      product: "core",
+    },
+    {
+      id: "news",
+      label: "News",
+      type: "route",
+      path: "/communityplus/news",
+      product: "core",
+    },
+    {
+      id: "events",
+      label: "Events",
+      type: "route",
+      path: "/communityplus/events",
+      product: "core",
+    },
+    {
+      id: "yellowpages",
+      label: "Yellow Pages",
+      type: "route",
+      path: "/communityplus/yellowpages",
+      product: "core",
+    },
+    {
+      id: "about",
+      label: "About Us",
+      type: "route",
+      path: "/communityplus/about",
+      product: "core",
+    },
+    {
+      id: "community-one",
+      label: "Community One",
+      type: "route",
+      path: "/communityone",
+      product: "edge",
+    },
+  ],
+},
 
   /* =====================================================
      COMMUNITY+ CORE SIDEBAR
