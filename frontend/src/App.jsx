@@ -12,7 +12,7 @@ import { GoogleMapsProvider } from "./context/GoogleMapsProvider";
 import { MapProvider } from "./context/MapContext";
 import { SessionProvider } from "./context/sessionContext";
 import { IViewSessionProvider } from "./context/IViewSessionContext";
-
+import CommunityOneDashboard from "./pages/CommunityOneDashboard/CommunityOneDashboard";
 import CommunityPlusLandingPage from "./pages/CommunityPlusLandingPage/CommunityPlusLandingPage";
 import CommunityPlusAboutPage from "./pages/CommunityPlusAboutPage/CommunityPlusAboutPage";
 import CommunityPlusDashboardLayout from "./components/Layout/Dashboard/CommunityPlusDashboardLayout";
@@ -180,17 +180,7 @@ export default function App() {
             }
           />
 
-          <Route
-            path="/communityone"
-            element={
-              <ProtectedRoute>
-                <Placeholder
-                  title="Community One"
-                  subtitle="Edge Services Dashboard"
-                />
-              </ProtectedRoute>
-            }
-          />
+          
 
           <Route
             path="/communityone/ses"
