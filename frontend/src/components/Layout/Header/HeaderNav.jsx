@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import LocationDisplay from "./LocationDisplay";
 import { useLocationContext } from "../../../context/LocationProvider";
-import { NAVIGATION } from "../../../config/navigation/navigationConfig";
+import { NAVIGATION } from "../..//Layout/Navigation/navigationConfig";
 
 export default function HeaderNav() {
   const navigate = useNavigate();

@@ -1,67 +1,59 @@
 export const NAVIGATION = [
-  /* =====================================================
-     HEADER — TOP LEVEL ROUTING
-  ===================================================== */
   {
-{
-  group: "main",
-  items: [
-    {
-      id: "home",
-      label: "Community+",
-      type: "route",
-      path: "/communityplus",
-      product: "core",
-    },
-    {
-      id: "community-one",
-      label: "Community One",
-      type: "route",
-      path: "/communityone",
-      product: "edge",
-    },
-    {
-      id: "iview",
-      label: "iVIEW",
-      type: "route",
-      path: "/communityplus/iview",
-      product: "core",
-    },
-    {
-      id: "news",
-      label: "News",
-      type: "route",
-      path: "/communityplus/news",
-      product: "core",
-    },
-    {
-      id: "events",
-      label: "Events",
-      type: "route",
-      path: "/communityplus/events",
-      product: "core",
-    },
-    {
-      id: "yellowpages",
-      label: "Yellow Pages",
-      type: "route",
-      path: "/communityplus/yellowpages",
-      product: "core",
-    },
-    {
-      id: "about",
-      label: "About Us",
-      type: "route",
-      path: "/communityplus/about",
-      product: "core",
-    },
-    
-  ],
-},
+    group: "main",
+    items: [
+      {
+        id: "home",
+        label: "Community+",
+        type: "route",
+        path: "/communityplus",
+        product: "core",
+      },
+      {
+        id: "community-one",
+        label: "Community One",
+        type: "route",
+        path: "/communityone",
+        product: "edge",
+      },
+      {
+        id: "iview",
+        label: "iVIEW",
+        type: "route",
+        path: "/communityplus/iview",
+        product: "core",
+      },
+      {
+        id: "news",
+        label: "News",
+        type: "route",
+        path: "/communityplus/news",
+        product: "core",
+      },
+      {
+        id: "events",
+        label: "Events",
+        type: "route",
+        path: "/communityplus/events",
+        product: "core",
+      },
+      {
+        id: "yellowpages",
+        label: "Yellow Pages",
+        type: "route",
+        path: "/communityplus/yellowpages",
+        product: "core",
+      },
+      {
+        id: "about",
+        label: "About Us",
+        type: "route",
+        path: "/communityplus/about",
+        product: "core",
+      },
+    ],
+  },
 
-  /* =====================================================
-     COMMUNITY+ CORE SIDEBAR
-  ===================================================== */
   {
     group: "communityplus-sidebar",
     product: "core",
@@ -77,18 +69,18 @@ export const NAVIGATION = [
             label: "NOW",
             icon: "⚡",
             type: "compose",
-            path: "/communityplus/compose/now",
             mode: "now",
+            path: "/communityplus/compose/now",
           },
           {
-            id: "news-page",
+            id: "news",
             label: "News",
             icon: "📰",
             type: "route",
             path: "/communityplus/news",
           },
           {
-            id: "events-page",
+            id: "events",
             label: "Events",
             icon: "📅",
             type: "route",
@@ -99,14 +91,14 @@ export const NAVIGATION = [
             label: "Beacons",
             icon: "📡",
             type: "compose",
-            path: "/communityplus/compose/beacon",
             mode: "beacon",
+            path: "/communityplus/compose/beacon",
           },
         ],
       },
 
       {
-        id: "core-platform",
+        id: "platform",
         title: "PLATFORM",
         items: [
           {
@@ -149,9 +141,6 @@ export const NAVIGATION = [
     ],
   },
 
-  /* =====================================================
-     COMMUNITY ONE EDGE SIDEBAR
-  ===================================================== */
   {
     group: "communityone-sidebar",
     product: "edge",
@@ -159,7 +148,7 @@ export const NAVIGATION = [
     sections: [
       {
         id: "edge-home",
-        title: "EDGE",
+        title: "COMMUNITY ONE",
         items: [
           {
             id: "communityone-dashboard",
@@ -173,47 +162,56 @@ export const NAVIGATION = [
 
       {
         id: "edge-services",
-        title: "COMMUNITY ONE EDGE",
+        title: "EDGE SERVICES",
         items: [
           {
-            id: "ses-jobs",
-            label: "SES Jobs",
-            description: "Simple Employment Services",
+            id: "ses",
+            label: "SES",
             icon: "💼",
             type: "route",
-            path: "/communityone/ses/jobs",
+            path: "/communityone/ses",
           },
           {
-            id: "shs-housing",
-            label: "SHS Housing",
-            description: "Simple Housing Services",
+            id: "shs",
+            label: "SHS",
             icon: "🏠",
             type: "route",
-            path: "/communityone/shs/housing",
+            path: "/communityone/shs",
           },
           {
-            id: "xchange-transactions",
+            id: "xchange",
             label: "XChange",
-            description: "Broadcast Transactions",
             icon: "🔁",
             type: "route",
-            path: "/communityone/xchange/transactions",
+            path: "/communityone/xchange",
           },
+        ],
+      },
+
+      {
+        id: "edge-activity",
+        title: "MY ACTIVITY",
+        items: [
           {
-            id: "business-requests",
-            label: "Business Requests",
-            description: "Requests from verified businesses",
-            icon: "🏢",
-            type: "route",
-            path: "/communityone/business-requests",
-          },
-          {
-            id: "community-requests",
-            label: "Community Requests",
-            description: "Requests from local communities",
+            id: "requests",
+            label: "Requests",
             icon: "📣",
             type: "route",
-            path: "/communityone/community-requests",
+            path: "/communityone/requests",
+          },
+          {
+            id: "responses",
+            label: "Responses",
+            icon: "📨",
+            type: "route",
+            path: "/communityone/responses",
+          },
+          {
+            id: "transactions",
+            label: "Transactions",
+            icon: "🤝",
+            type: "route",
+            path: "/communityone/transactions",
           },
         ],
       },
@@ -228,48 +226,6 @@ export const NAVIGATION = [
             icon: "💡",
             type: "route",
             path: "/communityone/feature-requests",
-          },
-          {
-            id: "roadmap",
-            label: "Roadmap",
-            icon: "🧭",
-            type: "route",
-            path: "/communityone/roadmap",
-          },
-          {
-            id: "feedback",
-            label: "Feedback",
-            icon: "📝",
-            type: "route",
-            path: "/communityone/feedback",
-          },
-        ],
-      },
-
-      {
-        id: "edge-activity",
-        title: "MY ACTIVITY",
-        items: [
-          {
-            id: "my-requests",
-            label: "My Requests",
-            icon: "📣",
-            type: "route",
-            path: "/communityone/requests",
-          },
-          {
-            id: "my-responses",
-            label: "My Responses",
-            icon: "📨",
-            type: "route",
-            path: "/communityone/responses",
-          },
-          {
-            id: "my-transactions",
-            label: "My Transactions",
-            icon: "🤝",
-            type: "route",
-            path: "/communityone/transactions",
           },
         ],
       },
