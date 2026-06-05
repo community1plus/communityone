@@ -3,6 +3,7 @@ import pkg from "pg";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { s3 } from "../../lib/s3.js";
+import { moderateTextContent } from "../../services/moderation/textModeration.js";
 
 const { Pool } = pkg;
 const router = express.Router();
@@ -311,6 +312,37 @@ router.post("/", async (req, res) => {
     const nextRequiresReview = hasMedia;
 
     const userId = req.user?.sub || "test-user";
+const textModeration = moderateTextContent({
+  title,
+  content,
+});
+
+if (data?.post?.status === "pending_review") {
+  setSuccessMessage(
+    "Post uploaded. It will appear after moderation."
+  );
+} else {
+  setSuccessMessage(
+    "Post submitted successfully."
+  );
+}
+
+if (textModeration.status === "rejected") {
+  return res.status(400).json({
+    error: "Post rejected by moderation.",
+    moderation: textModeration,
+  });
+}
+
+const mediaItems = safeArray(media);
+const hasMedia = mediaItems.length > 0;
+
+const nextStatus = hasMedia
+  ? "pending_review"
+  : "published";
+
+const nextRequiresReview = hasMedia;
+
 
     await client.query("BEGIN");
 
