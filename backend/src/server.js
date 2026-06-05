@@ -33,7 +33,7 @@ import meRoutes from "./routes/meRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import businessRoutes from "./routes/businessRoutes.js";
 
-
+import moderationRoutes from "./routes/moderation/moderation.js";
 
 
 // import identityRoutes from "./routes/identityRoutes.js";
@@ -295,6 +295,8 @@ app.get(
 ========================= */
 
 app.use("/api/payments", paymentRoutes);
+
+app.use("/api/moderation", moderationRoutes);
 
 app.use(
   "/api/business",

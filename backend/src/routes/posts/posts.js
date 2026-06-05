@@ -2,6 +2,7 @@ import express from "express";
 import pkg from "pg";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+
 import { s3 } from "../../lib/s3.js";
 import { moderateTextContent } from "../../services/moderation/textModeration.js";
 
@@ -10,14 +11,8 @@ const router = express.Router();
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false,
-  },
+  ssl: { rejectUnauthorized: false },
 });
-
-/* =====================================================
-   HELPERS
-===================================================== */
 
 function safeArray(value) {
   return Array.isArray(value) ? value : [];
@@ -28,35 +23,6 @@ function toTimestamp(value) {
   return new Date(value);
 }
 
-function moderateTextContent({ title = "", content = "" }) {
-  const text = `${title} ${content}`.toLowerCase();
-
-  const blockedTerms = [
-    "kill yourself",
-    "terrorist attack",
-  ];
-
-  const matchedTerms = blockedTerms.filter((term) =>
-    text.includes(term)
-  );
-
-  if (matchedTerms.length) {
-    return {
-      status: "rejected",
-      requiresReview: true,
-      reason: "Blocked text content detected.",
-      labels: matchedTerms,
-    };
-  }
-
-  return {
-    status: "approved",
-    requiresReview: false,
-    reason: "",
-    labels: [],
-  };
-}
-
 async function hydrateMediaWithSignedUrls(posts = []) {
   return Promise.all(
     posts.map(async (post) => {
@@ -64,9 +30,7 @@ async function hydrateMediaWithSignedUrls(posts = []) {
 
       const hydratedMedia = await Promise.all(
         media.map(async (item) => {
-          if (!item.s3Bucket || !item.s3Key) {
-            return item;
-          }
+          if (!item.s3Bucket || !item.s3Key) return item;
 
           const command = new GetObjectCommand({
             Bucket: item.s3Bucket,
@@ -77,17 +41,11 @@ async function hydrateMediaWithSignedUrls(posts = []) {
             expiresIn: 3600,
           });
 
-          return {
-            ...item,
-            signedUrl,
-          };
+          return { ...item, signedUrl };
         })
       );
 
-      return {
-        ...post,
-        media: hydratedMedia,
-      };
+      return { ...post, media: hydratedMedia };
     })
   );
 }
@@ -98,12 +56,7 @@ async function hydrateMediaWithSignedUrls(posts = []) {
 
 router.get("/", async (req, res) => {
   try {
-    const {
-      mode,
-      type,
-      limit = 30,
-      scope,
-    } = req.query;
+    const { mode, type, limit = 30, scope } = req.query;
 
     const values = [];
     const where = ["p.status = 'published'"];
@@ -158,9 +111,7 @@ router.get("/", async (req, res) => {
 
     const posts = await hydrateMediaWithSignedUrls(result.rows);
 
-    return res.json({
-      posts,
-    });
+    return res.json({ posts });
   } catch (error) {
     console.error("Fetch posts failed:", error);
 
@@ -172,7 +123,7 @@ router.get("/", async (req, res) => {
 });
 
 /* =====================================================
-   GET COMMENTS
+   COMMENTS
 ===================================================== */
 
 router.get("/:postId/comments", async (req, res) => {
@@ -197,9 +148,7 @@ router.get("/:postId/comments", async (req, res) => {
       [postId]
     );
 
-    return res.json({
-      comments: result.rows,
-    });
+    return res.json({ comments: result.rows });
   } catch (error) {
     console.error("Fetch comments failed:", error);
 
@@ -208,10 +157,6 @@ router.get("/:postId/comments", async (req, res) => {
     });
   }
 });
-
-/* =====================================================
-   CREATE COMMENT
-===================================================== */
 
 router.post("/:postId/comments", async (req, res) => {
   try {
@@ -246,6 +191,7 @@ router.post("/:postId/comments", async (req, res) => {
     );
 
     return res.status(201).json({
+      success: true,
       comment: result.rows[0],
     });
   } catch (error) {
@@ -305,44 +251,15 @@ router.post("/", async (req, res) => {
     const mediaItems = safeArray(media);
     const hasMedia = mediaItems.length > 0;
 
-    const nextStatus = hasMedia
-      ? "pending_review"
-      : "published";
+    const nextStatus =
+      textModeration.status === "review" || hasMedia
+        ? "pending_review"
+        : "published";
 
-    const nextRequiresReview = hasMedia;
+    const nextRequiresReview =
+      textModeration.status === "review" || hasMedia;
 
     const userId = req.user?.sub || "test-user";
-const textModeration = moderateTextContent({
-  title,
-  content,
-});
-
-if (data?.post?.status === "pending_review") {
-  setSuccessMessage(
-    "Post uploaded. It will appear after moderation."
-  );
-} else {
-  setSuccessMessage(
-    "Post submitted successfully."
-  );
-}
-
-if (textModeration.status === "rejected") {
-  return res.status(400).json({
-    error: "Post rejected by moderation.",
-    moderation: textModeration,
-  });
-}
-
-const mediaItems = safeArray(media);
-const hasMedia = mediaItems.length > 0;
-
-const nextStatus = hasMedia
-  ? "pending_review"
-  : "published";
-
-const nextRequiresReview = hasMedia;
-
 
     await client.query("BEGIN");
 
@@ -361,10 +278,12 @@ const nextRequiresReview = hasMedia;
         social_share_targets,
         status,
         requires_review,
-        expires_at
+        expires_at,
+        moderation_reason,
+        moderation_labels
       )
       values (
-        $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13
+        $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15
       )
       returning *
       `,
@@ -382,6 +301,8 @@ const nextRequiresReview = hasMedia;
         nextStatus,
         nextRequiresReview,
         toTimestamp(expiresAt),
+        textModeration.reason || null,
+        JSON.stringify(textModeration.labels || []),
       ]
     );
 
@@ -461,16 +382,18 @@ const nextRequiresReview = hasMedia;
     await client.query("COMMIT");
 
     return res.status(201).json({
+      success: true,
       post,
       media: insertedMedia,
       socialJobs,
       moderation: {
+        status: nextStatus,
+        requiresReview: nextRequiresReview,
         text: textModeration,
         media: hasMedia
           ? {
               status: "pending_review",
-              reason:
-                "Media requires moderation before publication.",
+              reason: "Media requires moderation before publication.",
             }
           : {
               status: "not_required",

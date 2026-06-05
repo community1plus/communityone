@@ -3,22 +3,46 @@ const BLOCKED_TERMS = [
   "terrorist attack",
 ];
 
+const REVIEW_TERMS = [
+  "free money",
+  "click here",
+  "guaranteed profit",
+  "bitcoin giveaway",
+  "send deposit",
+  "pay upfront",
+  "wire transfer",
+  "urgent payment",
+];
+
 export function moderateTextContent({
   title = "",
   content = "",
 }) {
   const text = `${title} ${content}`.toLowerCase();
 
-  const matchedTerms = BLOCKED_TERMS.filter((term) =>
+  const blockedMatches = BLOCKED_TERMS.filter((term) =>
     text.includes(term)
   );
 
-  if (matchedTerms.length) {
+  if (blockedMatches.length) {
     return {
       status: "rejected",
       requiresReview: true,
       reason: "Blocked text content detected.",
-      labels: matchedTerms,
+      labels: blockedMatches,
+    };
+  }
+
+  const reviewMatches = REVIEW_TERMS.filter((term) =>
+    text.includes(term)
+  );
+
+  if (reviewMatches.length) {
+    return {
+      status: "review",
+      requiresReview: true,
+      reason: "Potential spam or scam language detected.",
+      labels: reviewMatches,
     };
   }
 
