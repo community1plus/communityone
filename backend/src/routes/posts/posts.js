@@ -2,9 +2,9 @@ import express from "express";
 import pkg from "pg";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-
 import { s3 } from "../../lib/s3.js";
 import { moderateTextContent } from "../../services/moderation/textModeration.js";
+import { moderateImageFromS3 } from "../../services/moderation/imageModeration.js";
 
 const { Pool } = pkg;
 const router = express.Router();
@@ -358,7 +358,52 @@ router.post("/", async (req, res) => {
         ]
       );
 
-      insertedMedia.push(mediaResult.rows[0]);
+const inserted = mediaResult.rows[0];
+
+const isImage =
+  String(
+    item.type ||
+    item.fileType ||
+    ""
+  ).startsWith("image/");
+
+if (isImage && item.key) {
+  const imageModeration =
+    await moderateImageFromS3({
+      bucket: process.env.MEDIA_BUCKET,
+      key: item.key,
+    });
+
+  await client.query(
+    `
+    update post_media
+    set
+      moderation_status = $2,
+      moderation_reason = $3,
+      moderation_labels = $4
+    where id = $1
+    `,
+    [
+      inserted.id,
+      imageModeration.status,
+      imageModeration.reason,
+      JSON.stringify(
+        imageModeration.labels || []
+      ),
+    ]
+  );
+
+  console.log(
+    "IMAGE MODERATION:",
+    imageModeration
+  );
+}
+
+insertedMedia.push(inserted);
+
+insertedMedia.push(inserted);
+      
+      
     }
 
     const socialJobs = [];
