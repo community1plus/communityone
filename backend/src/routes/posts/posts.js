@@ -19,8 +19,7 @@ function safeArray(value) {
 }
 
 function toTimestamp(value) {
-  if (!value) return null;
-  return new Date(value);
+  return value ? new Date(value) : null;
 }
 
 async function hydrateMediaWithSignedUrls(posts = []) {
@@ -243,7 +242,8 @@ router.post("/", async (req, res) => {
 
     if (textModeration.status === "rejected") {
       return res.status(400).json({
-        error: "Post rejected by moderation.",
+        success: false,
+        error: "This post violates Community One content standards.",
         moderation: textModeration,
       });
     }
@@ -251,13 +251,28 @@ router.post("/", async (req, res) => {
     const mediaItems = safeArray(media);
     const hasMedia = mediaItems.length > 0;
 
-    const nextStatus =
-      textModeration.status === "review" || hasMedia
-        ? "pending_review"
-        : "published";
-
-    const nextRequiresReview =
+    const shouldReview =
       textModeration.status === "review" || hasMedia;
+
+    const nextStatus = shouldReview
+      ? "pending_review"
+      : "published";
+
+    const nextRequiresReview = shouldReview;
+
+    const moderationReason = hasMedia
+      ? [
+          textModeration.reason,
+          "Media requires moderation before publication.",
+        ]
+          .filter(Boolean)
+          .join(" ")
+      : textModeration.reason || null;
+
+    const moderationLabels = [
+      ...(textModeration.labels || []),
+      ...(hasMedia ? ["media_pending_review"] : []),
+    ];
 
     const userId = req.user?.sub || "test-user";
 
@@ -301,8 +316,8 @@ router.post("/", async (req, res) => {
         nextStatus,
         nextRequiresReview,
         toTimestamp(expiresAt),
-        textModeration.reason || null,
-        JSON.stringify(textModeration.labels || []),
+        moderationReason,
+        JSON.stringify(moderationLabels),
       ]
     );
 
@@ -389,6 +404,8 @@ router.post("/", async (req, res) => {
       moderation: {
         status: nextStatus,
         requiresReview: nextRequiresReview,
+        reason: moderationReason,
+        labels: moderationLabels,
         text: textModeration,
         media: hasMedia
           ? {
