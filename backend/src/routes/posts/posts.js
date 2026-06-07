@@ -2,6 +2,7 @@ import express from "express";
 import pkg from "pg";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+
 import { s3 } from "../../lib/s3.js";
 import { moderateTextContent } from "../../services/moderation/textModeration.js";
 import { moderateImageFromS3 } from "../../services/moderation/imageModeration.js";
@@ -92,7 +93,10 @@ router.get("/", async (req, res) => {
               's3Bucket', pm.s3_bucket,
               's3Key', pm.s3_key,
               'publicUrl', pm.public_url,
-              'thumbnailUrl', pm.thumbnail_url
+              'thumbnailUrl', pm.thumbnail_url,
+              'moderationStatus', pm.moderation_status,
+              'moderationReason', pm.moderation_reason,
+              'moderationLabels', pm.moderation_labels
             )
           ) filter (where pm.id is not null),
           '[]'
@@ -249,32 +253,21 @@ router.post("/", async (req, res) => {
     }
 
     const mediaItems = safeArray(media);
-    const hasMedia = mediaItems.length > 0;
-
-    const shouldReview =
-      textModeration.status === "review" || hasMedia;
-
-    const nextStatus = shouldReview
-      ? "pending_review"
-      : "published";
-
-    const nextRequiresReview = shouldReview;
-
-    const moderationReason = hasMedia
-      ? [
-          textModeration.reason,
-          "Media requires moderation before publication.",
-        ]
-          .filter(Boolean)
-          .join(" ")
-      : textModeration.reason || null;
-
-    const moderationLabels = [
-      ...(textModeration.labels || []),
-      ...(hasMedia ? ["media_pending_review"] : []),
-    ];
-
     const userId = req.user?.sub || "test-user";
+
+    const initialStatus =
+      textModeration.status === "review"
+        ? "pending_review"
+        : "published";
+
+    const initialRequiresReview =
+      textModeration.status === "review";
+
+    const textModerationReason =
+      textModeration.reason || null;
+
+    const textModerationLabels =
+      textModeration.labels || [];
 
     await client.query("BEGIN");
 
@@ -313,17 +306,21 @@ router.post("/", async (req, res) => {
         scope,
         JSON.stringify(distribution),
         JSON.stringify(safeArray(socialShareTargets)),
-        nextStatus,
-        nextRequiresReview,
+        initialStatus,
+        initialRequiresReview,
         toTimestamp(expiresAt),
-        moderationReason,
-        JSON.stringify(moderationLabels),
+        textModerationReason,
+        JSON.stringify(textModerationLabels),
       ]
     );
 
     const post = postResult.rows[0];
 
     const insertedMedia = [];
+
+    let hasImageReview = false;
+    let hasImageRejected = false;
+    let hasImageModerationError = false;
 
     for (const item of mediaItems) {
       const mediaResult = await client.query(
@@ -338,10 +335,13 @@ router.post("/", async (req, res) => {
           s3_bucket,
           s3_key,
           public_url,
-          upload_status
+          upload_status,
+          moderation_status,
+          moderation_reason,
+          moderation_labels
         )
         values (
-          $1,$2,$3,$4,$5,$6,$7,$8,$9,'uploaded'
+          $1,$2,$3,$4,$5,$6,$7,$8,$9,'uploaded','pending',null,'[]'::jsonb
         )
         returning *
         `,
@@ -358,108 +358,232 @@ router.post("/", async (req, res) => {
         ]
       );
 
-const inserted = mediaResult.rows[0];
+      const inserted = mediaResult.rows[0];
 
-const isImage =
-  String(
-    item.type ||
-    item.fileType ||
-    ""
-  ).startsWith("image/");
+      const isImage = String(
+        item.type || item.fileType || ""
+      ).startsWith("image/");
 
-if (isImage && item.key) {
-  const imageModeration =
-    await moderateImageFromS3({
-      bucket: process.env.MEDIA_BUCKET,
-      key: item.key,
-    });
+      let mediaModeration = {
+        status: "not_required",
+        requiresReview: false,
+        reason: null,
+        labels: [],
+      };
 
-  await client.query(
-    `
-    update post_media
-    set
-      moderation_status = $2,
-      moderation_reason = $3,
-      moderation_labels = $4
-    where id = $1
-    `,
-    [
-      inserted.id,
-      imageModeration.status,
-      imageModeration.reason,
-      JSON.stringify(
-        imageModeration.labels || []
-      ),
-    ]
-  );
+      if (isImage && item.key) {
+        try {
+          mediaModeration = await moderateImageFromS3({
+            bucket: process.env.MEDIA_BUCKET,
+            key: item.key,
+          });
 
-  console.log(
-    "IMAGE MODERATION:",
-    imageModeration
-  );
-}
+          if (mediaModeration.status === "review") {
+            hasImageReview = true;
+          }
 
-insertedMedia.push(inserted);
+          if (mediaModeration.status === "rejected") {
+            hasImageRejected = true;
+          }
 
-insertedMedia.push(inserted);
-      
-      
+          await client.query(
+            `
+            update post_media
+            set
+              moderation_status = $2,
+              moderation_reason = $3,
+              moderation_labels = $4
+            where id = $1
+            `,
+            [
+              inserted.id,
+              mediaModeration.status,
+              mediaModeration.reason || null,
+              JSON.stringify(mediaModeration.labels || []),
+            ]
+          );
+
+          console.log("IMAGE MODERATION:", {
+            mediaId: inserted.id,
+            fileName: inserted.file_name,
+            status: mediaModeration.status,
+            reason: mediaModeration.reason,
+          });
+        } catch (error) {
+          hasImageReview = true;
+          hasImageModerationError = true;
+
+          mediaModeration = {
+            status: "review",
+            requiresReview: true,
+            reason:
+              "Image moderation failed. Manual review required.",
+            labels: [
+              {
+                name: "image_moderation_error",
+                confidence: 0,
+              },
+            ],
+          };
+
+          await client.query(
+            `
+            update post_media
+            set
+              moderation_status = 'review',
+              moderation_reason = $2,
+              moderation_labels = $3
+            where id = $1
+            `,
+            [
+              inserted.id,
+              mediaModeration.reason,
+              JSON.stringify(mediaModeration.labels),
+            ]
+          );
+
+          console.error("Image moderation failed:", error);
+        }
+      } else {
+        await client.query(
+          `
+          update post_media
+          set
+            moderation_status = 'not_required',
+            moderation_reason = null,
+            moderation_labels = '[]'::jsonb
+          where id = $1
+          `,
+          [inserted.id]
+        );
+      }
+
+      insertedMedia.push({
+        ...inserted,
+        moderation: mediaModeration,
+      });
     }
+
+    let finalStatus = "published";
+    let finalRequiresReview = false;
+
+    const finalReasons = [];
+    const finalLabels = [];
+
+    if (textModeration.status === "review") {
+      finalStatus = "pending_review";
+      finalRequiresReview = true;
+
+      if (textModeration.reason) {
+        finalReasons.push(textModeration.reason);
+      }
+
+      finalLabels.push(...textModerationLabels);
+    }
+
+    if (hasImageRejected) {
+      finalStatus = "rejected";
+      finalRequiresReview = false;
+
+      finalReasons.push("One or more images were rejected by moderation.");
+      finalLabels.push("image_rejected");
+    } else if (hasImageReview) {
+      finalStatus = "pending_review";
+      finalRequiresReview = true;
+
+      finalReasons.push("One or more images require moderation review.");
+      finalLabels.push("image_review");
+    }
+
+    if (hasImageModerationError) {
+      finalLabels.push("image_moderation_error");
+    }
+
+    const finalModerationReason =
+      finalReasons.length > 0
+        ? finalReasons.join(" ")
+        : null;
+
+    const finalModerationLabels =
+      finalLabels.length > 0
+        ? finalLabels
+        : textModerationLabels;
+
+    const finalPostResult = await client.query(
+      `
+      update posts
+      set
+        status = $2,
+        requires_review = $3,
+        moderation_reason = $4,
+        moderation_labels = $5
+      where id = $1
+      returning *
+      `,
+      [
+        post.id,
+        finalStatus,
+        finalRequiresReview,
+        finalModerationReason,
+        JSON.stringify(finalModerationLabels),
+      ]
+    );
+
+    const finalPost = finalPostResult.rows[0];
 
     const socialJobs = [];
 
-    for (const platform of safeArray(socialShareTargets)) {
-      const jobResult = await client.query(
-        `
-        insert into social_share_jobs (
-          post_id,
-          user_id,
-          platform,
-          status,
-          payload
-        )
-        values (
-          $1,$2,$3,'queued',$4
-        )
-        returning *
-        `,
-        [
-          post.id,
-          userId,
-          platform,
-          JSON.stringify({
-            title,
-            content,
-            media: mediaItems,
-            postId: post.id,
-          }),
-        ]
-      );
+    if (finalStatus !== "rejected") {
+      for (const platform of safeArray(socialShareTargets)) {
+        const jobResult = await client.query(
+          `
+          insert into social_share_jobs (
+            post_id,
+            user_id,
+            platform,
+            status,
+            payload
+          )
+          values (
+            $1,$2,$3,'queued',$4
+          )
+          returning *
+          `,
+          [
+            finalPost.id,
+            userId,
+            platform,
+            JSON.stringify({
+              title,
+              content,
+              media: mediaItems,
+              postId: finalPost.id,
+            }),
+          ]
+        );
 
-      socialJobs.push(jobResult.rows[0]);
+        socialJobs.push(jobResult.rows[0]);
+      }
     }
 
     await client.query("COMMIT");
 
     return res.status(201).json({
       success: true,
-      post,
+      post: finalPost,
       media: insertedMedia,
       socialJobs,
       moderation: {
-        status: nextStatus,
-        requiresReview: nextRequiresReview,
-        reason: moderationReason,
-        labels: moderationLabels,
+        status: finalStatus,
+        requiresReview: finalRequiresReview,
+        reason: finalModerationReason,
+        labels: finalModerationLabels,
         text: textModeration,
-        media: hasMedia
-          ? {
-              status: "pending_review",
-              reason: "Media requires moderation before publication.",
-            }
-          : {
-              status: "not_required",
-            },
+        image: {
+          hasReview: hasImageReview,
+          hasRejected: hasImageRejected,
+          hasError: hasImageModerationError,
+        },
       },
     });
   } catch (error) {
