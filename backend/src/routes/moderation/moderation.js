@@ -46,4 +46,80 @@ router.get("/posts", async (req, res) => {
   }
 });
 
+router.post("/posts/:postId/approve", async (req, res) => {
+  try {
+    const { postId } = req.params;
+
+    const result = await pool.query(
+      `
+      update posts
+      set
+        status = 'published',
+        requires_review = false,
+        moderation_reason = null
+      where id = $1
+      returning *
+      `,
+      [postId]
+    );
+
+    if (!result.rows.length) {
+      return res.status(404).json({
+        error: "Post not found.",
+      });
+    }
+
+    return res.json({
+      success: true,
+      post: result.rows[0],
+    });
+  } catch (error) {
+    console.error("Approve post failed:", error);
+
+    return res.status(500).json({
+      error: "Could not approve post.",
+      detail: error.message,
+    });
+  }
+});
+
+router.post("/posts/:postId/reject", async (req, res) => {
+  try {
+    const { postId } = req.params;
+
+    const { reason = "Rejected by moderator" } = req.body || {};
+
+    const result = await pool.query(
+      `
+      update posts
+      set
+        status = 'rejected',
+        requires_review = false,
+        moderation_reason = $2
+      where id = $1
+      returning *
+      `,
+      [postId, reason]
+    );
+
+    if (!result.rows.length) {
+      return res.status(404).json({
+        error: "Post not found.",
+      });
+    }
+
+    return res.json({
+      success: true,
+      post: result.rows[0],
+    });
+  } catch (error) {
+    console.error("Reject post failed:", error);
+
+    return res.status(500).json({
+      error: "Could not reject post.",
+      detail: error.message,
+    });
+  }
+});
+
 export default router;
