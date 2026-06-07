@@ -49,6 +49,7 @@ router.get("/posts", async (req, res) => {
 router.post("/posts/:postId/approve", async (req, res) => {
   try {
     const { postId } = req.params;
+    const moderatorId = req.user?.sub || "test-moderator";
 
     const result = await pool.query(
       `
@@ -56,17 +57,16 @@ router.post("/posts/:postId/approve", async (req, res) => {
       set
         status = 'published',
         requires_review = false,
-        moderation_reason = null
+        moderated_by = $2,
+        moderated_at = now()
       where id = $1
       returning *
       `,
-      [postId]
+      [postId, moderatorId]
     );
 
     if (!result.rows.length) {
-      return res.status(404).json({
-        error: "Post not found.",
-      });
+      return res.status(404).json({ error: "Post not found." });
     }
 
     return res.json({
@@ -86,7 +86,7 @@ router.post("/posts/:postId/approve", async (req, res) => {
 router.post("/posts/:postId/reject", async (req, res) => {
   try {
     const { postId } = req.params;
-
+    const moderatorId = req.user?.sub || "test-moderator";
     const { reason = "Rejected by moderator" } = req.body || {};
 
     const result = await pool.query(
@@ -95,17 +95,17 @@ router.post("/posts/:postId/reject", async (req, res) => {
       set
         status = 'rejected',
         requires_review = false,
-        moderation_reason = $2
+        moderation_reason = $2,
+        moderated_by = $3,
+        moderated_at = now()
       where id = $1
       returning *
       `,
-      [postId, reason]
+      [postId, reason, moderatorId]
     );
 
     if (!result.rows.length) {
-      return res.status(404).json({
-        error: "Post not found.",
-      });
+      return res.status(404).json({ error: "Post not found." });
     }
 
     return res.json({
