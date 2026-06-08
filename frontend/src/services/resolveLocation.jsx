@@ -310,7 +310,15 @@ export async function resolveLocation({
       return cached;
     }
 
-    
+    if (accuracy > 30 && accuracy < 200) {
+      const snapped = await snapToRoad(lat, lng);
+      const moved = getDistance({ lat, lng }, snapped);
+
+      if (moved < 50) {
+        lat = snapped.lat;
+        lng = snapped.lng;
+      }
+    }
 
     let result = null;
 
