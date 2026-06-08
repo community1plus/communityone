@@ -151,23 +151,58 @@ const getPrecisionLevel = ({
   locationType,
   hasStreet,
 }) => {
-  if (locationType === "ROOFTOP") return 5;
-  if (locationType === "RANGE_INTERPOLATED") return 4;
-  if (locationType === "GEOMETRIC_CENTER") return 3;
-  if (locationType === "APPROXIMATE") return 2;
 
-  if (accuracy <= 20 && hasStreet) return 5;
-  if (accuracy <= 50 && hasStreet) return 4;
-  if (accuracy <= 200) return 3;
-  if (accuracy <= 1000) return 2;
+  if (
+    locationType === "ROOFTOP" &&
+    accuracy <= 30
+  ) {
+    return 5;
+  }
+
+  if (
+    locationType === "ROOFTOP" &&
+    accuracy <= 75
+  ) {
+    return 4;
+  }
+
+  if (
+    locationType === "ROOFTOP"
+  ) {
+    return 3;
+  }
+
+  if (locationType === "RANGE_INTERPOLATED") return 3;
+  if (locationType === "GEOMETRIC_CENTER") return 2;
+  if (locationType === "APPROXIMATE") return 1;
 
   return 1;
 };
 
-const getConfidence = ({ accuracy, locationType }) => {
-  if (locationType === "ROOFTOP") return "high";
-  if (locationType === "RANGE_INTERPOLATED") return "medium";
-  if (locationType === "APPROXIMATE") return "low";
+const getConfidence = ({
+  accuracy,
+  locationType,
+}) => {
+
+  if (
+    locationType === "ROOFTOP" &&
+    accuracy <= 30
+  ) {
+    return "high";
+  }
+
+  if (
+    locationType === "ROOFTOP" &&
+    accuracy <= 75
+  ) {
+    return "medium";
+  }
+
+  if (
+    locationType === "ROOFTOP"
+  ) {
+    return "low";
+  }
 
   if (accuracy <= 25) return "high";
   if (accuracy <= 100) return "medium";
@@ -388,16 +423,23 @@ if (confidence === "low" && isMajorRoad(street)) {
     let label;
     let hint = null;
 
-if (isRooftop && result.formatted_address) {
+if (
+  isRooftop &&
+  accuracy <= 30 &&
+  result.formatted_address
+) {
   label = result.formatted_address;
-} else if (safeStreet && finalSuburb) {
+}
+else if (
+  isRooftop &&
+  accuracy <= 75 &&
+  safeStreet &&
+  finalSuburb
+) {
   label = `${safeStreet}, ${finalSuburb}`;
-} else {
-  label = `${finalSuburb || "Unknown"}, ${state || ""}`.trim();
-
-  if (street && !isMajorRoad(street)) {
-    hint = `near ${street}`;
-  }
+}
+else {
+  label = `${finalSuburb || "Unknown"}, ${state || ""}`;
 }
 
     const location = {
