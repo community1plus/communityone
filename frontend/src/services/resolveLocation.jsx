@@ -8,7 +8,7 @@ const cache = new Map();
 const CACHE_TTL = 60 * 1000;
 
 const getCacheKey = (lat, lng) =>
-  `${lat.toFixed(4)},${lng.toFixed(4)}`;
+  `${Number(lat).toFixed(5)},${Number(lng).toFixed(5)}`;
 
 const getCached = (key) => {
   const entry = cache.get(key);
@@ -27,24 +27,44 @@ const getCached = (key) => {
 =============================== */
 
 const getComponent = (components = [], types = []) => {
-  for (let type of types) {
+  for (const type of types) {
     const match = components.find((c) =>
       c?.types?.includes(type)
     );
+
     if (match) return match.long_name;
   }
+
   return null;
 };
 
 const isMajorRoad = (street = "") =>
   /highway|hwy|freeway|fwy|road|rd/i.test(street);
 
+const getLatLngFromResult = (result) => {
+  const loc = result?.geometry?.location;
+
+  return {
+    lat:
+      typeof loc?.lat === "function"
+        ? loc.lat()
+        : loc?.lat ?? null,
+
+    lng:
+      typeof loc?.lng === "function"
+        ? loc.lng()
+        : loc?.lng ?? null,
+  };
+};
+
 /* ===============================
    DISTANCE
 =============================== */
 
 const getDistance = (a, b) => {
-  if (!a || !b) return Infinity;
+  if (!a || !b || a.lat == null || b.lat == null) {
+    return Infinity;
+  }
 
   const R = 6371000;
   const dLat = ((b.lat - a.lat) * Math.PI) / 180;
@@ -93,27 +113,25 @@ const pickBestResult = (results, origin) => {
     (r) => !isBadAddress(r?.formatted_address || "")
   );
 
+  const rooftop = cleaned.filter(
+    (r) => r.geometry?.location_type === "ROOFTOP"
+  );
+
   const good = cleaned.filter((r) =>
     GOOD_TYPES.some((t) => r.types?.includes(t))
   );
 
   const pool =
-    good.length > 0
+    rooftop.length > 0
+      ? rooftop
+      : good.length > 0
       ? good
       : cleaned.length > 0
       ? cleaned
       : results;
 
   const ranked = pool.map((r) => {
-    const loc = r.geometry?.location;
-
-    const point = {
-      lat:
-        typeof loc?.lat === "function" ? loc.lat() : loc?.lat,
-      lng:
-        typeof loc?.lng === "function" ? loc.lng() : loc?.lng,
-    };
-
+    const point = getLatLngFromResult(r);
     const dist = origin ? getDistance(origin, point) : 0;
 
     return { r, dist };
@@ -128,22 +146,37 @@ const pickBestResult = (results, origin) => {
    PRECISION
 =============================== */
 
-const getPrecisionLevel = (accuracy, hasStreet) => {
+const getPrecisionLevel = ({
+  accuracy,
+  locationType,
+  hasStreet,
+}) => {
+  if (locationType === "ROOFTOP") return 5;
+  if (locationType === "RANGE_INTERPOLATED") return 4;
+  if (locationType === "GEOMETRIC_CENTER") return 3;
+  if (locationType === "APPROXIMATE") return 2;
+
   if (accuracy <= 20 && hasStreet) return 5;
   if (accuracy <= 50 && hasStreet) return 4;
   if (accuracy <= 200) return 3;
   if (accuracy <= 1000) return 2;
+
   return 1;
 };
 
-const getConfidence = (accuracy) => {
-  if (accuracy <= 20) return "high";
+const getConfidence = ({ accuracy, locationType }) => {
+  if (locationType === "ROOFTOP") return "high";
+  if (locationType === "RANGE_INTERPOLATED") return "medium";
+  if (locationType === "APPROXIMATE") return "low";
+
+  if (accuracy <= 25) return "high";
   if (accuracy <= 100) return "medium";
+
   return "low";
 };
 
 /* ===============================
-   SNAP TO ROAD (SAFE)
+   SNAP TO ROAD
 =============================== */
 
 const snapToRoad = async (lat, lng) => {
@@ -173,7 +206,7 @@ const snapToRoad = async (lat, lng) => {
    OSM FALLBACK
 =============================== */
 
-async function resolveWithOSM(lat, lng) {
+async function resolveWithOSM(lat, lng, accuracy = 999) {
   try {
     const res = await fetch(
       `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
@@ -184,11 +217,35 @@ async function resolveWithOSM(lat, lng) {
     return {
       lat,
       lng,
-      suburb: data?.address?.suburb || data?.address?.city,
-      state: data?.address?.state,
+      accuracy,
+      accuracyMeters: accuracy,
+
+      suburb:
+        data?.address?.suburb ||
+        data?.address?.city ||
+        data?.address?.town ||
+        data?.address?.village ||
+        null,
+
+      city:
+        data?.address?.city ||
+        data?.address?.town ||
+        data?.address?.village ||
+        null,
+
+      state: data?.address?.state || null,
+      country: data?.address?.country || null,
+      postcode: data?.address?.postcode || null,
+
       label: data?.display_name || "Unknown location",
-      fullLabel: data?.display_name,
-      precisionLevel: 3,
+      fullAddress: data?.display_name || "",
+      fullLabel: data?.display_name || "",
+
+      locationType: "APPROXIMATE",
+      isRooftop: false,
+      precisionSource: "osm_fallback",
+
+      precisionLevel: 2,
       confidence: "low",
       source: "osm",
       updatedAt: Date.now(),
@@ -200,7 +257,7 @@ async function resolveWithOSM(lat, lng) {
 }
 
 /* ===============================
-   MAIN RESOLVER (SAFE)
+   MAIN RESOLVER
 =============================== */
 
 export async function resolveLocation({
@@ -218,10 +275,8 @@ export async function resolveLocation({
       return cached;
     }
 
-    /* SNAP */
     if (accuracy > 30 && accuracy < 200) {
       const snapped = await snapToRoad(lat, lng);
-
       const moved = getDistance({ lat, lng }, snapped);
 
       if (moved < 50) {
@@ -232,11 +287,10 @@ export async function resolveLocation({
 
     let result = null;
 
-    /* PLACE DETAILS */
     if (placeId) {
       try {
         const res = await fetch(
-          `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&key=${GOOGLE_API_KEY}`
+          `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=address_components,formatted_address,geometry,name,types&key=${GOOGLE_API_KEY}`
         );
 
         const data = await res.json();
@@ -244,9 +298,11 @@ export async function resolveLocation({
         if (data?.status === "OK" && data?.result) {
           result = {
             ...data.result,
-            address_components: data.result.address_components || [],
-            formatted_address: data.result.formatted_address || "",
-            types: ["street_address"],
+            address_components:
+              data.result.address_components || [],
+            formatted_address:
+              data.result.formatted_address || "",
+            types: data.result.types || ["street_address"],
           };
         }
       } catch (e) {
@@ -254,11 +310,10 @@ export async function resolveLocation({
       }
     }
 
-    /* GEOCODE */
     if (!result) {
       try {
         const res = await fetch(
-          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${GOOGLE_API_KEY}`
+          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&result_type=street_address|premise|subpremise|route|locality&key=${GOOGLE_API_KEY}`
         );
 
         const data = await res.json();
@@ -271,7 +326,6 @@ export async function resolveLocation({
       }
     }
 
-    /* HARD SAFETY */
     if (!result || !result.address_components) {
       throw new Error("No valid geocode result");
     }
@@ -284,11 +338,20 @@ export async function resolveLocation({
     const suburb = getComponent(components, [
       "locality",
       "sublocality",
+      "sublocality_level_1",
       "administrative_area_level_2",
     ]);
 
-    const city = getComponent(components, ["locality"]);
-    const state = getComponent(components, ["administrative_area_level_1"]);
+    const city = getComponent(components, [
+      "locality",
+      "postal_town",
+    ]);
+
+    const state = getComponent(components, [
+      "administrative_area_level_1",
+    ]);
+
+    const country = getComponent(components, ["country"]);
     const postcode = getComponent(components, ["postal_code"]);
 
     const finalSuburb = suburb || city || state;
@@ -298,25 +361,39 @@ export async function resolveLocation({
         ? `${streetNumber} ${street}`
         : street;
 
-    const hasStreet = !!fullStreet;
-    const precisionLevel = getPrecisionLevel(accuracy, hasStreet);
-    const confidence = getConfidence(accuracy);
+    const hasStreet = Boolean(fullStreet);
+
+    const locationType =
+      result.geometry?.location_type || "UNKNOWN";
+
+    const isRooftop = locationType === "ROOFTOP";
+
+    const precisionLevel = getPrecisionLevel({
+      accuracy,
+      locationType,
+      hasStreet,
+    });
+
+    const confidence = getConfidence({
+      accuracy,
+      locationType,
+    });
 
     let safeStreet = fullStreet;
 
-    if (precisionLevel < 4 || confidence === "low") {
+    if (!isRooftop && precisionLevel < 4) {
       safeStreet = null;
     }
 
     let label;
     let hint = null;
 
-    if (precisionLevel >= 5 && confidence === "high") {
-      label = result.formatted_address || "Unknown location";
+    if (isRooftop && result.formatted_address) {
+      label = result.formatted_address;
     } else if (precisionLevel >= 4 && safeStreet) {
       label = `${safeStreet}, ${finalSuburb}`;
     } else {
-      label = `${finalSuburb || "Unknown"}, ${state || ""}`;
+      label = `${finalSuburb || "Unknown"}, ${state || ""}`.trim();
 
       if (street && !isMajorRoad(street)) {
         hint = `near ${street}`;
@@ -326,17 +403,31 @@ export async function resolveLocation({
     const location = {
       lat,
       lng,
+
       accuracy,
+      accuracyMeters: accuracy,
+
       street: safeStreet,
       suburb: finalSuburb,
       city,
       state,
+      country,
       postcode,
+
       label,
+      fullAddress: result.formatted_address || label,
       fullLabel: result.formatted_address || label,
       hint,
+
+      locationType,
+      isRooftop,
+      precisionSource: placeId
+        ? "places"
+        : "reverse_geocode",
+
       precisionLevel,
       confidence,
+
       source: placeId ? "places" : "google",
       updatedAt: Date.now(),
     };
@@ -349,22 +440,33 @@ export async function resolveLocation({
     console.log("📍 Resolved location:", location);
 
     return location;
-
   } catch (err) {
     console.error("❌ resolveLocation failed safely:", err);
 
-    const fallback = await resolveWithOSM(lat, lng);
+    const fallback = await resolveWithOSM(lat, lng, accuracy);
     if (fallback) return fallback;
 
     return {
       lat,
       lng,
       accuracy,
+      accuracyMeters: accuracy,
+
       suburb: null,
+      city: null,
       state: null,
+      country: null,
+      postcode: null,
+
       label: "Unknown location",
+      fullAddress: "",
       fullLabel: null,
       hint: null,
+
+      locationType: "UNKNOWN",
+      isRooftop: false,
+      precisionSource: "fallback",
+
       precisionLevel: 1,
       confidence: "low",
       source: "fallback",

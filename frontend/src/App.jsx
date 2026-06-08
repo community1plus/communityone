@@ -146,7 +146,7 @@ export default function App() {
           <Route path="/communityplus/echo/:dropId" element={<CommunityPlusEchoDropPage />} />
           <Route path="/communityplus/about" element={<CommunityPlusAboutPage />} />
           <Route path="/communityplus/help" element={<Placeholder title="Help" />} />
-
+          <Route path="/communityplus/moderation" element={<CommunityPlusModerationPage />} />
           <Route
             path="/communityplus/compose/:mode"
             element={

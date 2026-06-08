@@ -42,7 +42,9 @@ const readStorage = (key, respectTTL = false) => {
 
     if (!respectTTL) return parsed.data;
 
-    return Date.now() - parsed.timestamp < CACHE_TTL ? parsed.data : null;
+    return Date.now() - parsed.timestamp < CACHE_TTL
+      ? parsed.data
+      : null;
   } catch {
     localStorage.removeItem(key);
     return null;
@@ -63,6 +65,46 @@ const writeStorage = (key, data) => {
   }
 };
 
+const resolveAccuracyLevel = ({
+  type,
+  accuracyMeters,
+  locationType,
+}) => {
+  if (type === "manual") {
+    return "MANUAL";
+  }
+
+  if (locationType === "ROOFTOP") {
+    return "LEVEL_4";
+  }
+
+  if (locationType === "RANGE_INTERPOLATED") {
+    return "LEVEL_3";
+  }
+
+  if (locationType === "GEOMETRIC_CENTER") {
+    return "LEVEL_2";
+  }
+
+  if (locationType === "APPROXIMATE") {
+    return "LEVEL_1";
+  }
+
+  if (accuracyMeters && accuracyMeters <= 25) {
+    return "LEVEL_4";
+  }
+
+  if (accuracyMeters && accuracyMeters <= 100) {
+    return "LEVEL_3";
+  }
+
+  if (accuracyMeters && accuracyMeters <= 1000) {
+    return "LEVEL_2";
+  }
+
+  return "LEVEL_1";
+};
+
 const normalizeLocation = (loc = {}, fallbackType = "auto") => {
   const lat = loc.lat ?? loc.latitude ?? null;
   const lng = loc.lng ?? loc.longitude ?? null;
@@ -74,14 +116,37 @@ const normalizeLocation = (loc = {}, fallbackType = "auto") => {
     loc.region_code ||
     loc.administrative_area_level_2 ||
     "";
+
   const state =
     loc.state ||
     loc.administrative_area_level_1 ||
     loc.region_code ||
     "";
 
+  const country = loc.country || "";
+
   const type = fallbackType;
-  const accuracyMeters = loc.accuracyMeters ?? loc.accuracy ?? null;
+
+  const accuracyMeters =
+    loc.accuracyMeters ?? loc.accuracy ?? null;
+
+  const locationType =
+    loc.locationType ||
+    loc.geocodeLocationType ||
+    loc.geometry?.location_type ||
+    "";
+
+  const precisionSource =
+    loc.precisionSource ||
+    (locationType ? "reverse_geocode" : "browser_geolocation");
+
+  const isRooftop = locationType === "ROOFTOP";
+
+  const accuracy = resolveAccuracyLevel({
+    type,
+    accuracyMeters,
+    locationType,
+  });
 
   const label =
     loc.label ||
@@ -95,20 +160,25 @@ const normalizeLocation = (loc = {}, fallbackType = "auto") => {
   return {
     lat,
     lng,
+
     suburb,
     city,
     region,
     state,
+    country,
+
     label,
     fullAddress: loc.fullAddress || loc.formatted_address || "",
+
     type,
+
+    accuracy,
     accuracyMeters,
-    accuracy:
-      type === "manual"
-        ? "MANUAL"
-        : accuracyMeters && accuracyMeters <= 100
-        ? "LEVEL_4"
-        : "LEVEL_3",
+
+    locationType,
+    precisionSource,
+    isRooftop,
+
     updatedAt: Date.now(),
   };
 };
@@ -127,7 +197,8 @@ export function LocationProvider({ children }) {
   );
 
   const [locationLoading, setLocationLoading] = useState(
-    initialMode === "auto" && !readStorage(AUTO_LOCATION_KEY, true)
+    initialMode === "auto" &&
+      !readStorage(AUTO_LOCATION_KEY, true)
   );
 
   const [locationError, setLocationError] = useState(null);
@@ -137,12 +208,14 @@ export function LocationProvider({ children }) {
   const viewLocation = useMemo(() => {
     if (locationMode === "manual") return manualLocation;
     if (locationMode === "auto") return autoLocation;
+
     return null;
   }, [locationMode, manualLocation, autoLocation]);
 
   const displayLocation = useMemo(() => {
     if (locationMode === "manual") return manualLocation;
     if (locationMode === "auto") return autoLocation || manualLocation;
+
     return null;
   }, [locationMode, autoLocation, manualLocation]);
 
@@ -220,6 +293,16 @@ export function LocationProvider({ children }) {
             const normalized = saveAutoLocation({
               ...resolved,
               ...coords,
+            });
+
+            console.log("[LOCATION] resolved:", {
+              label: normalized.label,
+              fullAddress: normalized.fullAddress,
+              accuracy: normalized.accuracy,
+              accuracyMeters: normalized.accuracyMeters,
+              locationType: normalized.locationType,
+              precisionSource: normalized.precisionSource,
+              isRooftop: normalized.isRooftop,
             });
 
             resolve(normalized);
@@ -303,6 +386,7 @@ export function LocationProvider({ children }) {
       setViewLocation,
       enableLiveLocation: useAutoLocation,
       enableHomeLocation: useAutoLocation,
+
       homeLocation: null,
       liveLocation: autoLocation,
       ipLocation: null,
