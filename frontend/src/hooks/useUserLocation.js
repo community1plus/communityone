@@ -1,11 +1,4 @@
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { resolveLocation } from "../services/resolveLocation";
 
 const MODE_KEY = "user_location_mode";
@@ -16,19 +9,13 @@ const CACHE_TTL = 1000 * 60 * 10;
 
 const readCache = (key, respectTTL = true) => {
   try {
-    const raw = localStorage.getItem(key);
-    if (!raw) return null;
-
-    const cached = JSON.parse(raw);
+    const cached = JSON.parse(localStorage.getItem(key));
     if (!cached?.data) return null;
 
     if (!respectTTL) return cached.data;
 
-    return Date.now() - cached.timestamp < CACHE_TTL
-      ? cached.data
-      : null;
+    return Date.now() - cached.timestamp < CACHE_TTL ? cached.data : null;
   } catch {
-    localStorage.removeItem(key);
     return null;
   }
 };
@@ -47,63 +34,13 @@ const writeCache = (key, data) => {
   }
 };
 
-const buildSuburbLabel = (loc = {}) => {
-  const suburb = loc.suburb || loc.city || loc.region;
-  const state = loc.state;
-
-  if (suburb && state) return `${suburb}, ${state}`;
-  if (suburb) return suburb;
-  if (state) return state;
-
-  return loc.label || "Enter location";
-};
-
-const buildSafeAutoLocation = (loc) => {
-  if (!loc) return null;
-
-  const suburbLabel = buildSuburbLabel(loc);
-
-  const safeLabel =
-    loc.hint && loc.suburb
-      ? `${loc.hint}, ${loc.suburb}`
-      : suburbLabel;
-
-  return {
-    ...loc,
-
-    // Keep raw address internally but don't show it as trusted.
-    rawLabel: loc.label,
-    rawFullAddress: loc.fullAddress,
-
-    label: safeLabel,
-    fullAddress: "",
-
-    displayLabel: safeLabel,
-    isVerifiedAddress: false,
-    isHomeVerificationGrade: false,
-  };
-};
-
-const buildSafeManualLocation = (loc) => {
-  if (!loc) return null;
-
-  return {
-    ...loc,
-    displayLabel: loc.label || loc.fullAddress || buildSuburbLabel(loc),
-    isVerifiedAddress: true,
-    isHomeVerificationGrade: true,
-  };
-};
-
 export function useUserLocation() {
   const initialMode = localStorage.getItem(MODE_KEY) || "auto";
 
   const [mode, setMode] = useState(initialMode);
-
   const [autoLocation, setAutoLocation] = useState(() =>
     readCache(AUTO_CACHE_KEY)
   );
-
   const [manualLocation, setManualLocation] = useState(() =>
     readCache(MANUAL_CACHE_KEY, false)
   );
@@ -117,29 +54,19 @@ export function useUserLocation() {
   const requestIdRef = useRef(0);
   const hasFetchedOnLoadRef = useRef(false);
 
-  const safeAutoLocation = useMemo(
-    () => buildSafeAutoLocation(autoLocation),
-    [autoLocation]
-  );
-
-  const safeManualLocation = useMemo(
-    () => buildSafeManualLocation(manualLocation),
-    [manualLocation]
-  );
-
   const location = useMemo(() => {
-    if (mode === "manual") return safeManualLocation;
+    if (mode === "manual") return manualLocation;
 
     return autoLocation;
-  }, [mode, safeManualLocation, autoLocation]);
+  }, [mode, manualLocation, autoLocation]);
 
   const displayLocation = useMemo(() => {
     if (mode === "auto") {
-      return safeAutoLocation || safeManualLocation;
+      return autoLocation || manualLocation;
     }
 
-    return safeManualLocation;
-  }, [mode, safeAutoLocation, safeManualLocation]);
+    return manualLocation;
+  }, [mode, autoLocation, manualLocation]);
 
   const fetchAutoLocation = useCallback(({ force = false } = {}) => {
     const requestId = ++requestIdRef.current;
@@ -170,7 +97,6 @@ export function useUserLocation() {
             lat: pos.coords.latitude,
             lng: pos.coords.longitude,
             accuracy: pos.coords.accuracy,
-            accuracyMeters: pos.coords.accuracy,
           };
 
           const resolved = await resolveLocation(coords);
@@ -181,25 +107,8 @@ export function useUserLocation() {
 
           if (requestId !== requestIdRef.current) return;
 
-          const nextAutoLocation = {
-            ...resolved,
-            ...coords,
-            sourceMode: "auto",
-            isVerifiedAddress: false,
-            isHomeVerificationGrade: false,
-          };
-
-          setAutoLocation(nextAutoLocation);
-          writeCache(AUTO_CACHE_KEY, nextAutoLocation);
-
-          console.log("[USER LOCATION] auto:", {
-            label: nextAutoLocation.label,
-            fullAddress: nextAutoLocation.fullAddress,
-            locationType: nextAutoLocation.locationType,
-            isRooftop: nextAutoLocation.isRooftop,
-            accuracyMeters: nextAutoLocation.accuracyMeters,
-            safeDisplay: buildSafeAutoLocation(nextAutoLocation)?.label,
-          });
+          setAutoLocation(resolved);
+          writeCache(AUTO_CACHE_KEY, resolved);
         } catch (err) {
           console.error("Auto location resolve failed:", err);
 
@@ -233,7 +142,6 @@ export function useUserLocation() {
 
   useEffect(() => {
     if (hasFetchedOnLoadRef.current) return;
-
     hasFetchedOnLoadRef.current = true;
 
     if (mode === "auto") {
@@ -254,16 +162,9 @@ export function useUserLocation() {
   const setManualMode = useCallback((nextManualLocation) => {
     requestIdRef.current += 1;
 
-    const normalizedManual = {
-      ...nextManualLocation,
-      sourceMode: "manual",
-      isVerifiedAddress: true,
-      isHomeVerificationGrade: true,
-    };
-
     setMode("manual");
-    setManualLocation(normalizedManual);
-    writeCache(MANUAL_CACHE_KEY, normalizedManual);
+    setManualLocation(nextManualLocation);
+    writeCache(MANUAL_CACHE_KEY, nextManualLocation);
 
     setLoading(false);
     setError(null);
@@ -281,10 +182,8 @@ export function useUserLocation() {
   return {
     location,
     displayLocation,
-
     autoLocation,
     manualLocation,
-
     mode,
     loading,
     error,
