@@ -14,21 +14,43 @@ router.get("/posts", async (req, res) => {
     const result = await pool.query(
       `
       select
-        id,
-        user_id,
-        mode,
-        type,
-        title,
-        content,
-        category,
-        status,
-        requires_review,
-        moderation_reason,
-        moderation_labels,
-        created_at
-      from posts
-      where status = 'pending_review'
-      order by created_at desc
+        p.id,
+        p.user_id,
+        p.mode,
+        p.type,
+        p.title,
+        p.content,
+        p.category,
+        p.status,
+        p.requires_review,
+        p.moderation_reason,
+        coalesce(p.moderation_labels, '[]'::jsonb) as moderation_labels,
+        p.created_at,
+        coalesce(
+          json_agg(
+            json_build_object(
+              'id', pm.id,
+              'fileName', pm.file_name,
+              'fileType', pm.file_type,
+              'fileSize', pm.file_size,
+              'mediaType', pm.media_type,
+              's3Bucket', pm.s3_bucket,
+              's3Key', pm.s3_key,
+              'publicUrl', pm.public_url,
+              'thumbnailUrl', pm.thumbnail_url,
+              'moderationStatus', pm.moderation_status,
+              'moderationReason', pm.moderation_reason,
+              'moderationLabels', coalesce(pm.moderation_labels, '[]'::jsonb)
+            )
+          ) filter (where pm.id is not null),
+          '[]'
+        ) as media
+      from posts p
+      left join post_media pm
+        on pm.post_id = p.id
+      where p.status = 'pending_review'
+      group by p.id
+      order by p.created_at desc
       limit 100
       `
     );
@@ -66,7 +88,9 @@ router.post("/posts/:postId/approve", async (req, res) => {
     );
 
     if (!result.rows.length) {
-      return res.status(404).json({ error: "Post not found." });
+      return res.status(404).json({
+        error: "Post not found.",
+      });
     }
 
     return res.json({
@@ -105,7 +129,9 @@ router.post("/posts/:postId/reject", async (req, res) => {
     );
 
     if (!result.rows.length) {
-      return res.status(404).json({ error: "Post not found." });
+      return res.status(404).json({
+        error: "Post not found.",
+      });
     }
 
     return res.json({
