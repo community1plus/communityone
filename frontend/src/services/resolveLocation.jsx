@@ -109,37 +109,51 @@ const isBadAddress = (formatted = "") =>
 const pickBestResult = (results, origin) => {
   if (!results?.length) return null;
 
-  const cleaned = results.filter(
-    (r) => !isBadAddress(r?.formatted_address || "")
+  const candidates = results
+    .filter((r) => !isBadAddress(r?.formatted_address || ""))
+    .map((r) => {
+      const point = getLatLngFromResult(r);
+      const dist = origin ? getDistance(origin, point) : 0;
+
+      const types = r.types || [];
+      const locationType = r.geometry?.location_type || "";
+
+      let score = 0;
+
+      if (types.includes("street_address")) score += 50;
+      if (types.includes("premise")) score += 45;
+      if (types.includes("subpremise")) score += 40;
+      if (types.includes("route")) score += 25;
+      if (types.includes("locality")) score += 5;
+
+      if (locationType === "ROOFTOP") score += 20;
+      if (locationType === "RANGE_INTERPOLATED") score += 10;
+
+      score -= Math.min(dist, 500) / 5;
+
+      return {
+        r,
+        dist,
+        score,
+      };
+    });
+
+  if (!candidates.length) return results[0];
+
+  candidates.sort((a, b) => b.score - a.score);
+
+  console.log(
+    "📍 Geocode candidates:",
+    candidates.map((c) => ({
+      address: c.r.formatted_address,
+      types: c.r.types,
+      locationType: c.r.geometry?.location_type,
+      dist: Math.round(c.dist),
+      score: Math.round(c.score),
+    }))
   );
 
-  const rooftop = cleaned.filter(
-    (r) => r.geometry?.location_type === "ROOFTOP"
-  );
-
-  const good = cleaned.filter((r) =>
-    GOOD_TYPES.some((t) => r.types?.includes(t))
-  );
-
-  const pool =
-    rooftop.length > 0
-      ? rooftop
-      : good.length > 0
-      ? good
-      : cleaned.length > 0
-      ? cleaned
-      : results;
-
-  const ranked = pool.map((r) => {
-    const point = getLatLngFromResult(r);
-    const dist = origin ? getDistance(origin, point) : 0;
-
-    return { r, dist };
-  });
-
-  ranked.sort((a, b) => a.dist - b.dist);
-
-  return ranked[0]?.r || null;
+  return candidates[0]?.r || null;
 };
 
 /* ===============================
@@ -298,10 +312,7 @@ export async function resolveLocation({
     }
 
     if (!result) {
-      try {
-        const res = await fetch(
-          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&result_type=street_address|premise|subpremise|route|locality&key=${GOOGLE_API_KEY}`
-        );
+      
 
         const data = await res.json();
 
