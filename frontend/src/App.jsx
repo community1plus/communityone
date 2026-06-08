@@ -21,6 +21,7 @@ import CommunityPlusEventCreatePage from "./pages/CommunityPlusEventsPage/Commun
 import CommunityPlusEchoPage from "./pages/CommunityPlusEchoPage/CommunityPlusEchoPage";
 import CommunityPlusEchoDropPage from "./pages/CommunityPlusEchoPage/CommunityPlusEchoDropPage";
 import CommunityPlusSplash from "./pages/CommunityPlusSplash/CommunityPlusSplash";
+import CommunityPlusModerationPage from "./pages/CommunityPlusModerationPage/CommunityPlusModerationPage";
 
 import PostComposer from "./components/Layout/Sidebar/Post/PostComposer";
 

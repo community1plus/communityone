@@ -1,0 +1,28 @@
+.moderation-page {
+  padding: 32px;
+}
+
+.moderation-card {
+  background: #fff;
+  border: 1px solid #e6e6e6;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.moderation-card h3 {
+  margin-bottom: 12px;
+}
+
+.moderation-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.moderation-actions button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
