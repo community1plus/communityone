@@ -330,7 +330,7 @@ export function LocationProvider({ children }) {
         },
         {
           enableHighAccuracy: true,
-          timeout: 0000,
+          timeout: 10000,
           maximumAge: 0,
         }
       );
