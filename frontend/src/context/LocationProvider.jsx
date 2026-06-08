@@ -268,109 +268,74 @@ export function LocationProvider({ children }) {
       return null;
     }
 
-return new Promise((resolve) => {
-  let watchId = null;
-  let hasResolved = false;
+    return new Promise((resolve) => {
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          try {
+            const coords = {
+              lat: pos.coords.latitude,
+              lng: pos.coords.longitude,
+              accuracyMeters: pos.coords.accuracy,
+            };
 
-  const options = {
-    enableHighAccuracy: true,
-    timeout: 15000,           // 15s timeout per discrete stream update
-    maximumAge: 0,            // Force fresh data
-  };
+            const resolved = await resolveLocation({
+              lat: coords.lat,
+              lng: coords.lng,
+              accuracy: coords.accuracyMeters,
+            });
 
-  const handleSuccess = async (pos) => {
-    try {
-      const coords = {
-        lat: pos.coords.latitude,
-        lng: pos.coords.longitude,
-        accuracyMeters: pos.coords.accuracy,
-      };
+            if (!resolved) {
+              throw new Error("No location returned");
+            }
 
-      // Optimisation: Skip backend API call if accuracy is terrible (e.g. > 5000m IP location)
-      // while allowing your laptop's 143m Wi-Fi precision to pass through.
-      if (coords.accuracyMeters > 1000) {
-        console.log(`[LOCATION] Accuracy too wide (${coords.accuracyMeters}m). Waiting for a better Wi-Fi lock...`);
-        return; 
-      }
+            if (requestId !== requestIdRef.current) return;
 
-      const resolved = await resolveLocation({
-        lat: coords.lat,
-        lng: coords.lng,
-        accuracy: coords.accuracyMeters,
-      });
+            const normalized = saveAutoLocation({
+              ...resolved,
+              ...coords,
+            });
 
-      if (!resolved) {
-        throw new Error("No location returned");
-      }
+            console.log("[LOCATION] resolved:", {
+              label: normalized.label,
+              fullAddress: normalized.fullAddress,
+              accuracy: normalized.accuracy,
+              accuracyMeters: normalized.accuracyMeters,
+              locationType: normalized.locationType,
+              precisionSource: normalized.precisionSource,
+              isRooftop: normalized.isRooftop,
+            });
 
-      if (requestId !== requestIdRef.current) {
-        cleanup();
-        return;
-      }
+            resolve(normalized);
+          } catch (err) {
+            console.error("Auto location failed:", err);
 
-      const normalized = saveAutoLocation({
-        ...resolved,
-        ...coords,
-      });
+            if (requestId !== requestIdRef.current) return;
 
-      console.log("[LOCATION] resolved:", {
-        label: normalized.label,
-        fullAddress: normalized.fullAddress,
-        accuracyMeters: normalized.accuracyMeters,
-        isRooftop: normalized.isRooftop,
-      });
+            setLocationError("Location resolution failed");
+            resolve(null);
+          } finally {
+            if (requestId === requestIdRef.current) {
+              setLocationLoading(false);
+            }
+          }
+        },
+        (err) => {
+          if (requestId !== requestIdRef.current) return;
 
-      // Once we get a highly precise rooftop match, resolve the promise and stop watching
-      if (normalized.isRooftop || normalized.locationType === "ROOFTOP") {
-        hasResolved = true;
-        cleanup();
-        resolve(normalized);
-      }
-    } catch (err) {
-      console.error("Auto location stream processing failed:", err);
-      // Don't kill the watcher on a single API failure; let the next stream try again
-    }
-  };
+          console.warn("Geolocation unavailable:", err);
 
-  const handleError = (err) => {
-    if (requestId !== requestIdRef.current) {
-      cleanup();
-      return;
-    }
-
-    console.warn("Geolocation stream error:", err);
-
-    // Only fail completely if we haven't resolved anything and it's a hard denial
-    if (!hasResolved && err.code === 1) { // Permission Denied
-      cleanup();
-      setLocationError("Permission denied");
-      setLocationLoading(false);
-      resolve(null);
-    }
-  };
-
-  const cleanup = () => {
-    if (watchId !== null) {
-      navigator.geolocation.clearWatch(watchId);
-      watchId = null;
-    }
-  };
-
-  // Start actively streaming the location while they are in the app
-  watchId = navigator.geolocation.watchPosition(handleSuccess, handleError, options);
-
-  // Safeguard: If no high-accuracy lock is found after 20s, resolve with whatever we have
-  setTimeout(() => {
-    if (!hasResolved && requestId === requestIdRef.current) {
-      console.warn("[LOCATION] Stream timeout reached. Cleaning up listener.");
-      cleanup();
-      setLocationLoading(false);
-      // Resolve as null or fallback to a standard single check if desired
-      if (!hasResolved) resolve(null);
-    }
-  }, 20000);
-});
-}, [persistMode, saveAutoLocation]);
+          setLocationError(err.message || "Permission denied");
+          setLocationLoading(false);
+          resolve(null);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 0000,
+          maximumAge: 0,
+        }
+      );
+    });
+  }, [persistMode, saveAutoLocation]);
 
   useEffect(() => {
     if (locationMode !== "auto") return;
