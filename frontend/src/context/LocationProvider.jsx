@@ -268,74 +268,103 @@ export function LocationProvider({ children }) {
       return null;
     }
 
-    return new Promise((resolve) => {
-      navigator.geolocation.getCurrentPosition(
-        async (pos) => {
-          try {
-            const coords = {
-              lat: pos.coords.latitude,
-              lng: pos.coords.longitude,
-              accuracyMeters: pos.coords.accuracy,
-            };
+return new Promise((resolve) => {
+  const MAX_ACCEPTABLE_ACCURACY = 150; // Maximum allowed radius in meters for Wi-Fi
 
-            const resolved = await resolveLocation({
-              lat: coords.lat,
-              lng: coords.lng,
-              accuracy: coords.accuracyMeters,
-            });
+  const options = {
+    enableHighAccuracy: true,
+    timeout: 20000,           // Increased to 20s to give the Wi-Fi scan enough time
+    maximumAge: 0,             // Force a fresh scan
+  };
 
-            if (!resolved) {
-              throw new Error("No location returned");
-            }
+  const handleSuccess = async (pos) => {
+    try {
+      const coords = {
+        lat: pos.coords.latitude,
+        lng: pos.coords.longitude,
+        accuracyMeters: pos.coords.accuracy,
+      };
 
-            if (requestId !== requestIdRef.current) return;
-
-            const normalized = saveAutoLocation({
-              ...resolved,
-              ...coords,
-            });
-
-            console.log("[LOCATION] resolved:", {
-              label: normalized.label,
-              fullAddress: normalized.fullAddress,
-              accuracy: normalized.accuracy,
-              accuracyMeters: normalized.accuracyMeters,
-              locationType: normalized.locationType,
-              precisionSource: normalized.precisionSource,
-              isRooftop: normalized.isRooftop,
-            });
-
-            resolve(normalized);
-          } catch (err) {
-            console.error("Auto location failed:", err);
-
-            if (requestId !== requestIdRef.current) return;
-
-            setLocationError("Location resolution failed");
-            resolve(null);
-          } finally {
-            if (requestId === requestIdRef.current) {
-              setLocationLoading(false);
-            }
-          }
-        },
-        (err) => {
-          if (requestId !== requestIdRef.current) return;
-
-          console.warn("Geolocation unavailable:", err);
-
-          setLocationError(err.message || "Permission denied");
-          setLocationLoading(false);
-          resolve(null);
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 0,
+      // 1. Accuracy Threshold Check
+      if (coords.accuracyMeters > MAX_ACCEPTABLE_ACCURACY) {
+        console.warn(`[LOCATION] Rejected. Accuracy (${coords.accuracyMeters}m) exceeds threshold (${MAX_ACCEPTABLE_ACCURACY}m).`);
+        
+        // Fallback: If initial precise attempt is too wide, downgrade and try once more
+        if (options.enableHighAccuracy) {
+          triggerFallback("Location precision too low");
+          return;
         }
-      );
-    });
-  }, [persistMode, saveAutoLocation]);
+        throw new Error("Location accuracy insufficient");
+      }
+
+      const resolved = await resolveLocation({
+        lat: coords.lat,
+        lng: coords.lng,
+        accuracy: coords.accuracyMeters,
+      });
+
+      if (!resolved) {
+        throw new Error("No location returned");
+      }
+
+      if (requestId !== requestIdRef.current) return;
+
+      const normalized = saveAutoLocation({
+        ...resolved,
+        ...coords,
+      });
+
+      console.log("[LOCATION] resolved:", {
+        label: normalized.label,
+        fullAddress: normalized.fullAddress,
+        accuracy: normalized.accuracy,
+        accuracyMeters: normalized.accuracyMeters,
+        locationType: normalized.locationType,
+        precisionSource: normalized.precisionSource,
+        isRooftop: normalized.isRooftop,
+      });
+
+      resolve(normalized);
+    } catch (err) {
+      console.error("Auto location failed:", err);
+
+      if (requestId !== requestIdRef.current) return;
+
+      setLocationError(err.message || "Location resolution failed");
+      resolve(null);
+    } finally {
+      if (requestId === requestIdRef.current) {
+        setLocationLoading(false);
+      }
+    }
+  };
+
+  const triggerFallback = (reason) => {
+    console.warn(`${reason}. Retrying with standard options...`);
+    options.enableHighAccuracy = false;
+    options.timeout = 10000; // 10 seconds for standard network/IP fallback
+    navigator.geolocation.getCurrentPosition(handleSuccess, handleError, options);
+  };
+
+  const handleError = (err) => {
+    // 2. Timeout Fallback
+    if (err.code === 3 && options.enableHighAccuracy) {
+      triggerFallback("High accuracy timed out");
+      return;
+    }
+
+    if (requestId !== requestIdRef.current) return;
+
+    console.warn("Geolocation unavailable:", err);
+    setLocationError(err.message || "Permission denied");
+    setLocationLoading(false);
+    resolve(null);
+  };
+
+  // Initial high-accuracy attempt
+  navigator.geolocation.getCurrentPosition(handleSuccess, handleError, options);
+});
+}, [persistMode, saveAutoLocation]);
 
   useEffect(() => {
     if (locationMode !== "auto") return;
