@@ -1,4 +1,59 @@
-{
+export const NAVIGATION = [
+  {
+    group: "main",
+    items: [
+      {
+        id: "home",
+        label: "Community+",
+        type: "route",
+        path: "/communityplus",
+        product: "core",
+      },
+      {
+        id: "community-one",
+        label: "Community One",
+        type: "route",
+        path: "/communityone",
+        product: "edge",
+      },
+      {
+        id: "iview",
+        label: "iVIEW",
+        type: "route",
+        path: "/communityplus/iview",
+        product: "core",
+      },
+      {
+        id: "news",
+        label: "News",
+        type: "route",
+        path: "/communityplus/news",
+        product: "core",
+      },
+      {
+        id: "events",
+        label: "Events",
+        type: "route",
+        path: "/communityplus/events",
+        product: "core",
+      },
+      {
+        id: "yellowpages",
+        label: "Yellow Pages",
+        type: "route",
+        path: "/communityplus/yellowpages",
+        product: "core",
+      },
+      {
+        id: "about",
+        label: "About Us",
+        type: "route",
+        path: "/communityplus/about",
+        product: "core",
+      },
+    ],
+  },
+  {
   group: "communityplus-sidebar",
   product: "core",
   title: "COMMUNITY+",
@@ -101,3 +156,108 @@
     },
   ],
 },
+  {
+    group: "communityone-sidebar",
+    product: "edge",
+    title: "COMMUNITY ONE",
+    sections: [
+      {
+        id: "edge-home",
+        title: "COMMUNITY ONE",
+        items: [
+          {
+            id: "communityone-dashboard",
+            label: "Dashboard",
+            icon: "🌐",
+            type: "route",
+            path: "/communityone",
+          },
+        ],
+      },
+
+      {
+        id: "edge-services",
+        title: "EDGE SERVICES",
+        items: [
+          {
+            id: "ses",
+            label: "SES",
+            icon: "💼",
+            type: "route",
+            path: "/communityone/ses",
+          },
+          {
+            id: "shs",
+            label: "SHS",
+            icon: "🏠",
+            type: "route",
+            path: "/communityone/shs",
+          },
+          {
+            id: "xchange",
+            label: "XChange",
+            icon: "🔁",
+            type: "route",
+            path: "/communityone/xchange",
+          },
+        ],
+      },
+
+      {
+        id: "edge-activity",
+        title: "MY ACTIVITY",
+        items: [
+          {
+            id: "requests",
+            label: "Requests",
+            icon: "📣",
+            type: "route",
+            path: "/communityone/requests",
+          },
+          {
+            id: "responses",
+            label: "Responses",
+            icon: "📨",
+            type: "route",
+            path: "/communityone/responses",
+          },
+          {
+            id: "transactions",
+            label: "Transactions",
+            icon: "🤝",
+            type: "route",
+            path: "/communityone/transactions",
+          },
+        ],
+      },
+
+      {
+        id: "product",
+        title: "PRODUCT",
+        items: [
+          {
+            id: "feature-requests",
+            label: "Feature Requests",
+            icon: "💡",
+            type: "route",
+            path: "/communityone/feature-requests",
+          },
+        ],
+      },
+
+      {
+        id: "account",
+        title: "ACCOUNT",
+        items: [
+          {
+            id: "logout",
+            label: "Logout",
+            icon: "🚪",
+            type: "action",
+            action: "logout",
+          },
+        ],
+      },
+    ],
+  },
+];
