@@ -9,7 +9,7 @@ import {
 import { resolveLocation } from "../services/resolveLocation";
 
 const MODE_KEY = "user_location_mode";
-const AUTO_CACHE_KEY = "user_auto_location_cache";
+const AUTO_CACHE_KEY = "user_auto_location_cache_v2";
 const MANUAL_CACHE_KEY = "user_manual_location_cache";
 
 const CACHE_TTL = 1000 * 60 * 10;
@@ -55,7 +55,7 @@ const buildSuburbLabel = (loc = {}) => {
   if (suburb) return suburb;
   if (state) return state;
 
-  return loc.label || "Enter location";
+  return "Enter location";
 };
 
 const buildSafeAutoLocation = (loc) => {
@@ -63,15 +63,19 @@ const buildSafeAutoLocation = (loc) => {
 
   const suburbLabel = buildSuburbLabel(loc);
 
-  const safeLabel =
-    loc.hint && loc.suburb
-      ? `${loc.hint}, ${loc.suburb}`
-      : suburbLabel;
+  let safeLabel = suburbLabel;
+
+  if (
+    loc.locationType !== "ROOFTOP" &&
+    loc.hint &&
+    loc.suburb
+  ) {
+    safeLabel = `${loc.hint}, ${loc.suburb}`;
+  }
 
   return {
     ...loc,
 
-    // Keep raw address internally but don't show it as trusted.
     rawLabel: loc.label,
     rawFullAddress: loc.fullAddress,
 
@@ -79,6 +83,7 @@ const buildSafeAutoLocation = (loc) => {
     fullAddress: "",
 
     displayLabel: safeLabel,
+
     isVerifiedAddress: false,
     isHomeVerificationGrade: false,
   };
@@ -87,16 +92,25 @@ const buildSafeAutoLocation = (loc) => {
 const buildSafeManualLocation = (loc) => {
   if (!loc) return null;
 
+  const label =
+    loc.label ||
+    loc.fullAddress ||
+    buildSuburbLabel(loc);
+
   return {
     ...loc,
-    displayLabel: loc.label || loc.fullAddress || buildSuburbLabel(loc),
+
+    label,
+    displayLabel: label,
+
     isVerifiedAddress: true,
     isHomeVerificationGrade: true,
   };
 };
 
 export function useUserLocation() {
-  const initialMode = localStorage.getItem(MODE_KEY) || "auto";
+  const initialMode =
+    localStorage.getItem(MODE_KEY) || "auto";
 
   const [mode, setMode] = useState(initialMode);
 
@@ -128,104 +142,114 @@ export function useUserLocation() {
   );
 
   const location = useMemo(() => {
-    if (mode === "manual") return safeManualLocation;
-
-    return autoLocation;
-  }, [mode, safeManualLocation, autoLocation]);
-
-  const displayLocation = useMemo(() => {
-    if (mode === "auto") {
-      return safeAutoLocation || safeManualLocation;
+    if (mode === "manual") {
+      return safeManualLocation;
     }
 
-    return safeManualLocation;
+    return safeAutoLocation;
+  }, [mode, safeManualLocation, safeAutoLocation]);
+
+  const displayLocation = useMemo(() => {
+    if (mode === "manual") {
+      return safeManualLocation;
+    }
+
+    return safeAutoLocation || safeManualLocation;
   }, [mode, safeAutoLocation, safeManualLocation]);
 
-  const fetchAutoLocation = useCallback(({ force = false } = {}) => {
-    const requestId = ++requestIdRef.current;
+  const fetchAutoLocation = useCallback(
+    ({ force = false } = {}) => {
+      const requestId = ++requestIdRef.current;
 
-    setLoading(true);
-    setError(null);
+      setLoading(true);
+      setError(null);
 
-    if (!force) {
-      const cachedAuto = readCache(AUTO_CACHE_KEY);
+      if (!force) {
+        const cachedAuto = readCache(AUTO_CACHE_KEY);
 
-      if (cachedAuto) {
-        setAutoLocation(cachedAuto);
+        if (cachedAuto) {
+          setAutoLocation(cachedAuto);
+          setLoading(false);
+          return;
+        }
+      }
+
+      if (!navigator.geolocation) {
+        setError("Geolocation not supported");
         setLoading(false);
         return;
       }
-    }
 
-    if (!navigator.geolocation) {
-      setError("Geolocation not supported");
-      setLoading(false);
-      return;
-    }
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          try {
+            const coords = {
+              lat: pos.coords.latitude,
+              lng: pos.coords.longitude,
+              accuracy: pos.coords.accuracy,
+              accuracyMeters: pos.coords.accuracy,
+            };
 
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        try {
-          const coords = {
-            lat: pos.coords.latitude,
-            lng: pos.coords.longitude,
-            accuracy: pos.coords.accuracy,
-            accuracyMeters: pos.coords.accuracy,
-          };
+            const resolved = await resolveLocation(coords);
 
-          const resolved = await resolveLocation(coords);
+            if (!resolved) {
+              throw new Error("No location returned");
+            }
 
-          if (!resolved) {
-            throw new Error("No location returned");
+            if (requestId !== requestIdRef.current) return;
+
+            const nextAutoLocation = {
+              ...resolved,
+              ...coords,
+              sourceMode: "auto",
+              isVerifiedAddress: false,
+              isHomeVerificationGrade: false,
+            };
+
+            setAutoLocation(nextAutoLocation);
+            writeCache(AUTO_CACHE_KEY, nextAutoLocation);
+
+            console.log("[USER LOCATION] auto:", {
+              rawLabel: nextAutoLocation.label,
+              rawFullAddress: nextAutoLocation.fullAddress,
+              safeDisplay:
+                buildSafeAutoLocation(nextAutoLocation)?.label,
+              locationType: nextAutoLocation.locationType,
+              isRooftop: nextAutoLocation.isRooftop,
+              accuracyMeters:
+                nextAutoLocation.accuracyMeters,
+            });
+          } catch (err) {
+            console.error(
+              "Auto location resolve failed:",
+              err
+            );
+
+            if (requestId !== requestIdRef.current) return;
+
+            setError("Location resolution failed");
+          } finally {
+            if (requestId === requestIdRef.current) {
+              setLoading(false);
+            }
           }
-
+        },
+        (err) => {
           if (requestId !== requestIdRef.current) return;
 
-          const nextAutoLocation = {
-            ...resolved,
-            ...coords,
-            sourceMode: "auto",
-            isVerifiedAddress: false,
-            isHomeVerificationGrade: false,
-          };
-
-          setAutoLocation(nextAutoLocation);
-          writeCache(AUTO_CACHE_KEY, nextAutoLocation);
-
-          console.log("[USER LOCATION] auto:", {
-            label: nextAutoLocation.label,
-            fullAddress: nextAutoLocation.fullAddress,
-            locationType: nextAutoLocation.locationType,
-            isRooftop: nextAutoLocation.isRooftop,
-            accuracyMeters: nextAutoLocation.accuracyMeters,
-            safeDisplay: buildSafeAutoLocation(nextAutoLocation)?.label,
-          });
-        } catch (err) {
-          console.error("Auto location resolve failed:", err);
-
-          if (requestId !== requestIdRef.current) return;
-
-          setError("Location resolution failed");
-        } finally {
-          if (requestId === requestIdRef.current) {
-            setLoading(false);
-          }
+          console.error("Geolocation error:", err);
+          setError(err.message || "Permission denied");
+          setLoading(false);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 20000,
+          maximumAge: 0,
         }
-      },
-      (err) => {
-        if (requestId !== requestIdRef.current) return;
-
-        console.error("Geolocation error:", err);
-        setError(err.message || "Permission denied");
-        setLoading(false);
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0,
-      }
-    );
-  }, []);
+      );
+    },
+    []
+  );
 
   useEffect(() => {
     localStorage.setItem(MODE_KEY, mode);
