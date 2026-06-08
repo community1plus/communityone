@@ -3,48 +3,65 @@ import { useEffect, useState } from "react";
 export default function CommunityPlusModerationPage() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [actionLoadingId, setActionLoadingId] = useState(null);
+
+  const apiBase = import.meta.env.VITE_API_BASE;
 
   async function loadQueue() {
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE}/moderation/posts`
-      );
+      setLoading(true);
 
+      const response = await fetch(`${apiBase}/moderation/posts`);
       const data = await response.json();
 
-      setPosts(data.posts || []);
+      setPosts(Array.isArray(data?.posts) ? data.posts : []);
     } catch (error) {
-      console.error(error);
+      console.error("Failed to load moderation queue:", error);
+      setPosts([]);
     } finally {
       setLoading(false);
     }
   }
 
   async function approvePost(id) {
-    await fetch(
-      `${import.meta.env.VITE_API_BASE}/moderation/posts/${id}/approve`,
-      {
-        method: "POST",
-      }
-    );
+    try {
+      setActionLoadingId(id);
 
-    loadQueue();
+      await fetch(`${apiBase}/moderation/posts/${id}/approve`, {
+        method: "POST",
+      });
+
+      await loadQueue();
+    } finally {
+      setActionLoadingId(null);
+    }
   }
 
   async function rejectPost(id) {
-    await fetch(
-      `${import.meta.env.VITE_API_BASE}/moderation/posts/${id}/reject`,
-      {
-        method: "POST",
-      }
-    );
+    try {
+      setActionLoadingId(id);
 
-    loadQueue();
+      await fetch(`${apiBase}/moderation/posts/${id}/reject`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          reason: "Rejected by moderator",
+        }),
+      });
+
+      await loadQueue();
+    } finally {
+      setActionLoadingId(null);
+    }
   }
 
   useEffect(() => {
     loadQueue();
   }, []);
+
+  const safePosts = Array.isArray(posts) ? posts : [];
 
   return (
     <div className="moderation-page">
@@ -52,48 +69,45 @@ export default function CommunityPlusModerationPage() {
 
       {loading && <p>Loading...</p>}
 
-      {!loading && posts.length === 0 && (
+      {!loading && safePosts.length === 0 && (
         <p>No posts awaiting review.</p>
       )}
 
       {!loading &&
-        posts.map((post) => (
-          <div
-            key={post.id}
-            className="moderation-card"
-          >
-            <h3>{post.title}</h3>
+        safePosts.map((post) => (
+          <div key={post.id} className="moderation-card">
+            <h3>{post.title || "Untitled post"}</h3>
 
             <p>
               <strong>Reason:</strong>{" "}
-              {post.moderation_reason}
+              {post.moderation_reason || "No reason provided"}
             </p>
 
             <p>
               <strong>Status:</strong>{" "}
-              {post.status}
+              {post.status || "unknown"}
             </p>
 
             <p>
               <strong>Created:</strong>{" "}
-              {new Date(
-                post.created_at
-              ).toLocaleString()}
+              {post.created_at
+                ? new Date(post.created_at).toLocaleString()
+                : "Unknown"}
             </p>
 
             <div className="moderation-actions">
               <button
-                onClick={() =>
-                  approvePost(post.id)
-                }
+                type="button"
+                disabled={actionLoadingId === post.id}
+                onClick={() => approvePost(post.id)}
               >
                 Approve
               </button>
 
               <button
-                onClick={() =>
-                  rejectPost(post.id)
-                }
+                type="button"
+                disabled={actionLoadingId === post.id}
+                onClick={() => rejectPost(post.id)}
               >
                 Reject
               </button>
