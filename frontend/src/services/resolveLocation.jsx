@@ -381,24 +381,24 @@ export async function resolveLocation({
 
     let safeStreet = fullStreet;
 
-    if (!isRooftop && precisionLevel < 4) {
-      safeStreet = null;
-    }
+if (confidence === "low" && isMajorRoad(street)) {
+  safeStreet = null;
+}
 
     let label;
     let hint = null;
 
-    if (isRooftop && result.formatted_address) {
-      label = result.formatted_address;
-    } else if (precisionLevel >= 4 && safeStreet) {
-      label = `${safeStreet}, ${finalSuburb}`;
-    } else {
-      label = `${finalSuburb || "Unknown"}, ${state || ""}`.trim();
+if (isRooftop && result.formatted_address) {
+  label = result.formatted_address;
+} else if (safeStreet && finalSuburb) {
+  label = `${safeStreet}, ${finalSuburb}`;
+} else {
+  label = `${finalSuburb || "Unknown"}, ${state || ""}`.trim();
 
-      if (street && !isMajorRoad(street)) {
-        hint = `near ${street}`;
-      }
-    }
+  if (street && !isMajorRoad(street)) {
+    hint = `near ${street}`;
+  }
+}
 
     const location = {
       lat,

@@ -138,6 +138,13 @@ export const NAVIGATION = [
           },
         ],
       },
+      {
+        id: "moderation",
+        label: "Moderation",
+        icon: "🛡️",
+        type: "route",
+        path: "/communityplus/moderation",
+      },
     ],
   },
 
