@@ -93,10 +93,13 @@ export default function CommunityPlusLandingPage() {
     closeAuth();
   };
 
-  const handleGuestEntry = () => {
-    continueAsGuest();
-    navigate("/communityplus");
-  };
+const handleGuestEntry = async () => {
+  await continueAsGuest();
+
+  navigate("/communityplus", {
+    replace: true,
+  });
+};
 
   if (loading || (isAuthenticated && !profileReady)) {
     return null;
