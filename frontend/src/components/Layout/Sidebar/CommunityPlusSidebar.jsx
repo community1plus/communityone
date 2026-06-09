@@ -1,10 +1,9 @@
 import { useMemo, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { signOut } from "aws-amplify/auth";
-
 import { useAuth } from "../../../context/AuthContext";
 import { NAVIGATION } from "../../Layout/Navigation/navigationConfig";
-
+import { useProfile } from "../../../context/ProfileContext";
 import "./CommunityPlusSidebar.css";
 
 const PROTECTED_PATHS = [
