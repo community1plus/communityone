@@ -38,7 +38,14 @@ export default function CommunityPlusSidebar({
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { isAuthenticated } = useAuth();
+const { isAuthenticated } = useAuth();
+const { profileReady, hasProfile, isProfileComplete } = useProfile();
+
+const canUseProtectedActions =
+  isAuthenticated &&
+  profileReady &&
+  hasProfile &&
+  isProfileComplete;
 
   const { pathname } = location;
 
@@ -106,7 +113,7 @@ export default function CommunityPlusSidebar({
         return;
       }
 
-      if (!isAuthenticated && isProtectedItem(item)) {
+      if (!canUseProtectedActions && isProtectedItem(item)) {
         redirectToLogin(item.path);
         return;
       }
@@ -160,8 +167,7 @@ export default function CommunityPlusSidebar({
               {items.map((item) => {
                 const active = isActive(item);
                 const protectedItem = isProtectedItem(item);
-                const guestLocked =
-                  !isAuthenticated && protectedItem;
+                const guestLocked = !canUseProtectedActions && protectedItem;
 
                 return (
                   <button
