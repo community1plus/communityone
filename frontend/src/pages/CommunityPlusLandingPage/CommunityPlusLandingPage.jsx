@@ -54,7 +54,7 @@ const handleAuthSuccess = async () => {
 };
 
 useEffect(() => {
-  if (authLoading) return;
+  if (loading) return;
 
   if (user && !profile) {
     navigate("/communityplus/profile", { replace: true });
