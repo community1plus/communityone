@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
-import CommunityPlusAuthModal from "../../components/Auth/CommunityPlusAuthModal";
+import CommunityPlusAuthModal from "../../Auth/CommunityPlusAuthModal";
 
 import Header from "../Header/Header";
 import CommunityPlusSidebar from "../Sidebar/CommunityPlusSidebar";
