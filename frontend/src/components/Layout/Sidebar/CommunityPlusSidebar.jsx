@@ -160,6 +160,15 @@ export default function CommunityPlusSidebar({
     ]
   );
 
+ console.log("SIDEBAR AUTH STATE:", {
+  isAuthenticated,
+  isGuest,
+  profileReady,
+  hasProfile,
+  isProfileComplete,
+  itemPath: item?.path,
+}); 
+
   const handleEchoClick = useCallback(() => {
     navigate("/communityplus/echo", {
       state: {
