@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
+import CommunityPlusAuthModal from "../../components/Auth/CommunityPlusAuthModal";
 
 import Header from "../Header/Header";
 import CommunityPlusSidebar from "../Sidebar/CommunityPlusSidebar";
@@ -7,6 +9,8 @@ import "./CommunityPlusDashboardLayout.css";
 
 export default function CommunityPlusDashboardLayout() {
   const location = useLocation();
+
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   const isCommunityOne =
     location.pathname.startsWith("/communityone");
@@ -18,7 +22,9 @@ export default function CommunityPlusDashboardLayout() {
   return (
     <div className="dashboard-root">
       <header className="dashboard-header">
-        <Header />
+        <Header
+          onOpenAuthModal={() => setShowAuthModal(true)}
+        />
       </header>
 
       <div className="dashboard-body">
@@ -30,6 +36,12 @@ export default function CommunityPlusDashboardLayout() {
           <Outlet key={location.pathname} />
         </main>
       </div>
+
+      {showAuthModal && (
+        <AuthModal
+          onClose={() => setShowAuthModal(false)}
+        />
+      )}
     </div>
   );
 }

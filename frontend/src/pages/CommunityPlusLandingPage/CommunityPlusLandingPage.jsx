@@ -6,6 +6,12 @@ import { useProfile } from "../../context/ProfileContext";
 import CommunityPlusAuthModal from "../../components/Auth/CommunityPlusAuthModal";
 
 import "./CommunityPlusLandingPage.css";
+import { signOut } from "aws-amplify/auth";
+
+const handleSwitchAccount = async () => {
+  await signOut({ global: true });
+  window.location.href = "/";
+};
 
 const RETURN_TO_KEY = "communityone_return_to";
 
@@ -37,6 +43,28 @@ export default function CommunityPlusLandingPage() {
       "/communityplus"
     );
   }, [location.state]);
+
+const handleAuthSuccess = async () => {
+  if (!profile) {
+    navigate("/communityplus/profile", { replace: true });
+    return;
+  }
+
+  navigate("/communityplus", { replace: true });
+};
+
+useEffect(() => {
+  if (authLoading) return;
+
+  if (user && !profile) {
+    navigate("/communityplus/profile", { replace: true });
+    return;
+  }
+
+  if (user && profile) {
+    navigate("/communityplus", { replace: true });
+  }
+}, [authLoading, user, profile, navigate]);
 
   useEffect(() => {
     if (location.state?.returnTo) {
