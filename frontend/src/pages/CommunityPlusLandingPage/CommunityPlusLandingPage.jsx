@@ -47,6 +47,14 @@ export default function CommunityPlusLandingPage() {
     if (!isAuthenticated) return;
     if (!profileReady) return;
 
+    const cameFromProtectedRoute =
+      Boolean(location.state?.loginRequired) ||
+      Boolean(sessionStorage.getItem(RETURN_TO_KEY));
+
+      if (!cameFromProtectedRoute) {
+        return;
+      }
+
     const needsProfileSetup =
       profileMissing || !hasProfile || !isProfileComplete;
 
