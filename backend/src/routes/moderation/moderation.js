@@ -1,5 +1,6 @@
 import express from "express";
 import pkg from "pg";
+import { requireAuth } from "../../middleware/requireAuth.js";
 
 const { Pool } = pkg;
 const router = express.Router();
@@ -9,7 +10,7 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false },
 });
 
-router.get("/posts", async (req, res) => {
+router.get("/posts", requireAuth, async (req, res) => {
   try {
     const result = await pool.query(
       `
@@ -68,7 +69,7 @@ router.get("/posts", async (req, res) => {
   }
 });
 
-router.post("/posts/:postId/approve", async (req, res) => {
+router.get("/posts/:postId", requireAuth, async (req, res) => {
   try {
     const { postId } = req.params;
     const moderatorId = req.user?.sub || "test-moderator";
@@ -107,7 +108,7 @@ router.post("/posts/:postId/approve", async (req, res) => {
   }
 });
 
-router.post("/posts/:postId/reject", async (req, res) => {
+router.post("/posts/:postId/reject", requireAuth, async (req, res) => {
   try {
     const { postId } = req.params;
     const moderatorId = req.user?.sub || "test-moderator";

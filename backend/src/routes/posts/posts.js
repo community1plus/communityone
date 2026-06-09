@@ -6,6 +6,7 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { s3 } from "../../lib/s3.js";
 import { moderateTextContent } from "../../services/moderation/textModeration.js";
 import { moderateImageFromS3 } from "../../services/moderation/imageModeration.js";
+import { requireAuth } from "../../middleware/requireAuth.js";
 
 const { Pool } = pkg;
 const router = express.Router();
@@ -129,7 +130,7 @@ router.get("/", async (req, res) => {
    COMMENTS
 ===================================================== */
 
-router.get("/:postId/comments", async (req, res) => {
+router.post("/:postId/comments", requireAuth, async (req, res) => {
   try {
     const { postId } = req.params;
 
@@ -210,7 +211,7 @@ router.post("/:postId/comments", async (req, res) => {
    CREATE POST
 ===================================================== */
 
-router.post("/", async (req, res) => {
+router.post("/", requireAuth, async (req, res) => {
   const client = await pool.connect();
 
   try {
