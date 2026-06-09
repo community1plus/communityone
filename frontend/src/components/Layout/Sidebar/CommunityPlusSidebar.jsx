@@ -112,10 +112,22 @@ const canUseProtectedActions =
         return;
       }
 
-      if (!canUseProtectedActions && isProtectedItem(item)) {
-        redirectToLogin(item.path);
-        return;
-      }
+if (isProtectedItem(item)) {
+  if (!isAuthenticated) {
+    redirectToLogin(item.path);
+    return;
+  }
+
+  if (!profileReady || !hasProfile || !isProfileComplete) {
+    navigate("/communityplus/welcome", {
+      state: {
+        returnTo: item.path,
+        profileRequired: true,
+      },
+    });
+    return;
+  }
+}
 
       if (item.path) {
         navigate(item.path, {
