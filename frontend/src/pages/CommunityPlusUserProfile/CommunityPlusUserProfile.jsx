@@ -348,6 +348,26 @@ function getBusinessEmailValue(values) {
   return "";
 }
 
+function calculateProfileLevel(profile) {
+  const hasBasicProfile =
+    Boolean(profile?.username?.trim()) &&
+    Boolean(profile?.display_name?.trim()) &&
+    Boolean(profile?.account_type);
+
+  if (!hasBasicProfile) return 0;
+
+  if (profile.account_type === "PERSONAL") return 1;
+
+  if (
+    ["ORG", "MIXED"].includes(profile.account_type) &&
+    profile.business_verification_status === "verified"
+  ) {
+    return 3;
+  }
+
+  return 1;
+}
+
 function getSocialStatus(social = {}, providerId) {
   const provider = social?.[providerId];
 
