@@ -1,21 +1,17 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 import { useAuth } from "../../context/AuthContext";
 import { useProfile } from "../../context/ProfileContext";
-
 import CommunityPlusAuthModal from "../../components/Auth/CommunityPlusAuthModal";
 
 import "./CommunityPlusLandingPage.css";
 
 export default function CommunityPlusLandingPage() {
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const {
-    loading,
-    isAuthenticated,
-    continueAsGuest,
-  } = useAuth();
+  const { loading, isAuthenticated, continueAsGuest } = useAuth();
 
   const {
     profileReady,
@@ -26,9 +22,14 @@ export default function CommunityPlusLandingPage() {
 
   const [showAuth, setShowAuth] = useState(false);
 
-  /* ======================================================
-     AUTHENTICATED REDIRECT
-  ====================================================== */
+  const returnTo =
+    location.state?.returnTo || "/communityplus";
+
+  useEffect(() => {
+    if (location.state?.loginRequired) {
+      setShowAuth(true);
+    }
+  }, [location.state]);
 
   useEffect(() => {
     if (loading) return;
@@ -36,19 +37,16 @@ export default function CommunityPlusLandingPage() {
     if (!profileReady) return;
 
     const needsProfileSetup =
-      profileMissing ||
-      !hasProfile ||
-      !isProfileComplete;
+      profileMissing || !hasProfile || !isProfileComplete;
 
     if (needsProfileSetup) {
       navigate("/communityplus/welcome", {
         replace: true,
       });
-
       return;
     }
 
-    navigate("/communityplus", {
+    navigate(returnTo, {
       replace: true,
     });
   }, [
@@ -59,11 +57,8 @@ export default function CommunityPlusLandingPage() {
     hasProfile,
     isProfileComplete,
     navigate,
+    returnTo,
   ]);
-
-  /* ======================================================
-     AUTH MODAL
-  ====================================================== */
 
   const openAuth = () => {
     setShowAuth(true);
@@ -75,18 +70,7 @@ export default function CommunityPlusLandingPage() {
 
   const handleAuthSuccess = () => {
     closeAuth();
-
-    /*
-      Redirect is handled by the authenticated redirect effect above.
-      This allows ProfileContext to decide whether the user goes to:
-      - /communityplus/welcome
-      - /communityplus
-    */
   };
-
-  /* ======================================================
-     GUEST ENTRY
-  ====================================================== */
 
   const handleGuestEntry = () => {
     continueAsGuest();
@@ -94,65 +78,35 @@ export default function CommunityPlusLandingPage() {
     navigate("/communityplus");
   };
 
-  /* ======================================================
-     LOADING
-  ====================================================== */
-
   if (loading || (isAuthenticated && !profileReady)) {
     return null;
   }
 
-  /* ======================================================
-     RENDER
-  ====================================================== */
-
   return (
     <div className="cpl-root">
-      {/* ============================================
-          VISUAL LAYER
-      ============================================ */}
-
-      <div
-        className="landing-visual-layer"
-        aria-hidden="true"
-      >
+      <div className="landing-visual-layer" aria-hidden="true">
         <div className="landing-hero-tint" />
         <div className="landing-hero-focus" />
       </div>
-
-      {/* ============================================
-          HERO
-      ============================================ */}
 
       <main className="landing-container">
         <section
           className="landing-hero"
           aria-label="Community.One landing"
         >
-          {/* BRAND */}
-
-          <h1 className="brand-title">
-            Community.One
-          </h1>
-
-          {/* COPY */}
+          <h1 className="brand-title">Community.One</h1>
 
           <div className="landing-text">
             <h2 className="landing-tagline">
-              Real People.{" "}
-              <span className="accent">
-                Real News.
-              </span>{" "}
+              Real People. <span className="accent">Real News.</span>{" "}
               Real Time
             </h2>
 
             <p className="landing-sub">
-              A map-first platform connecting local signal,
-              stories, and services.
+              A map-first platform connecting local signal, stories,
+              and services.
             </p>
           </div>
-
-          {/* ACTIONS */}
 
           <div className="landing-actions">
             <button
@@ -161,23 +115,17 @@ export default function CommunityPlusLandingPage() {
               onClick={handleGuestEntry}
             >
               Continue as Guest
-            </button>            
+            </button>
 
-            <div className="guest-pill">
-              READ ONLY ACCESS
-            </div>
+            <div className="guest-pill">READ ONLY ACCESS</div>
 
             <p className="guest-mode-copy">
-              Explore your local community in read-only mode.
-              Create an account later to post, comment, and contribute.
+              Explore your local community in read-only mode. Create an
+              account later to post, comment, and contribute.
             </p>
           </div>
         </section>
       </main>
-
-      {/* ============================================
-          FLOATING AUTH BUTTON
-      ============================================ */}
 
       <button
         type="button"
@@ -186,15 +134,8 @@ export default function CommunityPlusLandingPage() {
         aria-label="Login"
         title="Login"
       >
-        <img
-          src="/logo/echo.png"
-          alt=""
-        />
+        <img src="/logo/echo.png" alt="" />
       </button>
-
-      {/* ============================================
-          AUTH MODAL
-      ============================================ */}
 
       {showAuth && (
         <CommunityPlusAuthModal
