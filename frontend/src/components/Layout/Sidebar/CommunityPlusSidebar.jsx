@@ -1,9 +1,11 @@
 import { useMemo, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { signOut } from "aws-amplify/auth";
+
 import { useAuth } from "../../../context/AuthContext";
-import { NAVIGATION } from "../../Layout/Navigation/navigationConfig";
 import { useProfile } from "../../../context/ProfileContext";
+import { NAVIGATION } from "../../Layout/Navigation/navigationConfig";
+
 import "./CommunityPlusSidebar.css";
 
 const PROTECTED_PATHS = [
@@ -23,7 +25,6 @@ const PROTECTED_PATHS = [
 
 function isProtectedItem(item) {
   if (!item?.path) return false;
-
   if (item.type === "compose") return true;
 
   return PROTECTED_PATHS.some((protectedPath) =>
@@ -36,17 +37,22 @@ export default function CommunityPlusSidebar({
 }) {
   const navigate = useNavigate();
   const location = useLocation();
-
-const { isAuthenticated } = useAuth();
-const { profileReady, hasProfile, isProfileComplete } = useProfile();
-
-const canUseProtectedActions =
-  isAuthenticated &&
-  profileReady &&
-  hasProfile &&
-  isProfileComplete;
-
   const { pathname } = location;
+
+  const { isAuthenticated, isGuest } = useAuth();
+
+  const {
+    profileReady,
+    hasProfile,
+    isProfileComplete,
+  } = useProfile();
+
+  const canUseProtectedActions =
+    isAuthenticated &&
+    !isGuest &&
+    profileReady &&
+    hasProfile &&
+    isProfileComplete;
 
   const sidebar = useMemo(() => {
     return (
@@ -103,7 +109,7 @@ const canUseProtectedActions =
       if (!item) return;
 
       if (item.type === "action" && item.action === "logout") {
-        if (!isAuthenticated) {
+        if (!isAuthenticated || isGuest) {
           redirectToLogin(pathname);
           return;
         }
@@ -112,22 +118,22 @@ const canUseProtectedActions =
         return;
       }
 
-if (isProtectedItem(item)) {
-  if (!isAuthenticated) {
-    redirectToLogin(item.path);
-    return;
-  }
+      if (isProtectedItem(item)) {
+        if (!isAuthenticated || isGuest) {
+          redirectToLogin(item.path);
+          return;
+        }
 
-  if (!profileReady || !hasProfile || !isProfileComplete) {
-    navigate("/communityplus/welcome", {
-      state: {
-        returnTo: item.path,
-        profileRequired: true,
-      },
-    });
-    return;
-  }
-}
+        if (!profileReady || !hasProfile || !isProfileComplete) {
+          navigate("/communityplus/welcome", {
+            state: {
+              returnTo: item.path,
+              profileRequired: true,
+            },
+          });
+          return;
+        }
+      }
 
       if (item.path) {
         navigate(item.path, {
@@ -145,6 +151,10 @@ if (isProtectedItem(item)) {
       navigate,
       pathname,
       isAuthenticated,
+      isGuest,
+      profileReady,
+      hasProfile,
+      isProfileComplete,
       redirectToLogin,
       handleLogout,
     ]
@@ -171,14 +181,13 @@ if (isProtectedItem(item)) {
               key={section.id}
               className={`sidebar-section ${section.variant || ""}`}
             >
-              <div className="sidebar-title">
-                {section.title}
-              </div>
+              <div className="sidebar-title">{section.title}</div>
 
               {items.map((item) => {
                 const active = isActive(item);
                 const protectedItem = isProtectedItem(item);
-                const guestLocked = !canUseProtectedActions && protectedItem;
+                const guestLocked =
+                  !canUseProtectedActions && protectedItem;
 
                 return (
                   <button
@@ -197,21 +206,10 @@ if (isProtectedItem(item)) {
                       .join(" ")}
                     onClick={() => handleClick(item)}
                     aria-current={active ? "page" : undefined}
-                    title={
-                      guestLocked
-                        ? "Sign in required"
-                        : item.label
-                    }
+                    title={guestLocked ? "Sign in required" : item.label}
                   >
-                    <span className="icon">
-                      {item.icon}
-                    </span>
-
-                    <span className="label">
-                      {guestLocked
-                        ? `${item.label}`
-                        : item.label}
-                    </span>
+                    <span className="icon">{item.icon}</span>
+                    <span className="label">{item.label}</span>
 
                     {guestLocked && (
                       <span className="lock" aria-hidden="true">
