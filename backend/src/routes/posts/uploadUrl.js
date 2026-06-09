@@ -7,7 +7,7 @@ import { buildS3Key } from "../../utils/buildS3Key.js";
 
 const router = express.Router();
 
-router.post("/", async (req, res) => {
+router.post("/", requireAuth, async (req, res) => {
   try {
     const {
       fileName,
