@@ -13,7 +13,13 @@ export default function CommunityPlusLandingPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { loading, isAuthenticated, continueAsGuest } = useAuth();
+  const {
+    loading,
+    isAuthenticated,
+    isGuest,
+    continueAsGuest,
+    logout,
+  } = useAuth();
 
   const {
     profileReady,
@@ -37,13 +43,14 @@ export default function CommunityPlusLandingPage() {
       sessionStorage.setItem(RETURN_TO_KEY, location.state.returnTo);
     }
 
-    if (location.state?.loginRequired) {
+    if (location.state?.loginRequired && (!isAuthenticated || isGuest)) {
       setShowAuth(true);
     }
-  }, [location.state]);
+  }, [location.state, isAuthenticated, isGuest]);
 
   useEffect(() => {
     if (loading) return;
+    if (isGuest) return;
     if (!isAuthenticated) return;
     if (!profileReady) return;
 
@@ -51,9 +58,9 @@ export default function CommunityPlusLandingPage() {
       Boolean(location.state?.loginRequired) ||
       Boolean(sessionStorage.getItem(RETURN_TO_KEY));
 
-      if (!cameFromProtectedRoute) {
-        return;
-      }
+    if (!cameFromProtectedRoute) {
+      return;
+    }
 
     const needsProfileSetup =
       profileMissing || !hasProfile || !isProfileComplete;
@@ -61,6 +68,10 @@ export default function CommunityPlusLandingPage() {
     if (needsProfileSetup) {
       navigate("/communityplus/welcome", {
         replace: true,
+        state: {
+          returnTo,
+          profileRequired: true,
+        },
       });
       return;
     }
@@ -72,16 +83,25 @@ export default function CommunityPlusLandingPage() {
     });
   }, [
     loading,
+    isGuest,
     isAuthenticated,
     profileReady,
     profileMissing,
     hasProfile,
     isProfileComplete,
+    location.state,
     navigate,
     returnTo,
   ]);
 
   const openAuth = () => {
+    if (isAuthenticated && !isGuest) {
+      navigate("/communityplus", {
+        replace: true,
+      });
+      return;
+    }
+
     setShowAuth(true);
   };
 
@@ -90,18 +110,27 @@ export default function CommunityPlusLandingPage() {
   };
 
   const handleAuthSuccess = () => {
-    closeAuth();
+    setShowAuth(false);
   };
 
-const handleGuestEntry = async () => {
-  await continueAsGuest();
+  const handleGuestEntry = async () => {
+    await continueAsGuest();
 
-  navigate("/communityplus", {
-    replace: true,
-  });
-};
+    sessionStorage.removeItem(RETURN_TO_KEY);
 
-  if (loading || (isAuthenticated && !profileReady)) {
+    navigate("/communityplus", {
+      replace: true,
+    });
+  };
+
+  const handleSwitchAccount = async () => {
+    sessionStorage.removeItem(RETURN_TO_KEY);
+    localStorage.removeItem("community_guest");
+
+    await logout();
+  };
+
+  if (loading || (isAuthenticated && !isGuest && !profileReady)) {
     return null;
   }
 
@@ -135,6 +164,16 @@ const handleGuestEntry = async () => {
             >
               Continue as Guest
             </button>
+
+            {isAuthenticated && !isGuest && (
+              <button
+                type="button"
+                className="btn secondary"
+                onClick={handleSwitchAccount}
+              >
+                Switch account
+              </button>
+            )}
 
             <div className="guest-pill">READ ONLY ACCESS</div>
 
