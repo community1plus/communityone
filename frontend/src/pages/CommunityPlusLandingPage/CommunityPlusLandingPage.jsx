@@ -137,9 +137,6 @@ useEffect(() => {
     setShowAuth(false);
   };
 
-  const handleAuthSuccess = () => {
-    setShowAuth(false);
-  };
 
   const handleGuestEntry = async () => {
     await continueAsGuest();
