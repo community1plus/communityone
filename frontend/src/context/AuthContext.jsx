@@ -303,19 +303,25 @@ export function AuthProvider({
      CONTINUE AS GUEST
   ====================================================== */
 
-  const continueAsGuest =
-    useCallback(() => {
-      console.log(
-        "👀 Guest mode enabled"
-      );
+const continueAsGuest = useCallback(async () => {
+  console.log("👀 Guest mode enabled");
 
-      localStorage.setItem(
-        "community_guest",
-        "true"
-      );
+  try {
+    await signOut({
+      global: false,
+    });
+  } catch (err) {
+    console.warn(
+      "Guest mode signOut warning:",
+      err?.message || err
+    );
+  }
 
-      setIsGuest(true);
-    }, []);
+  clearAuth();
+
+  localStorage.setItem("community_guest", "true");
+  setIsGuest(true);
+}, [clearAuth]);
 
   /* ======================================================
      LOGOUT

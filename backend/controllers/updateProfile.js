@@ -338,6 +338,7 @@ export async function putProfile(req, res) {
 
         updated_at:
           now,
+          
       };
 
       console.log(
