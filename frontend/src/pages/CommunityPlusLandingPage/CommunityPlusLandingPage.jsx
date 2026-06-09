@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 import { useAuth } from "../../context/AuthContext";
@@ -6,6 +6,8 @@ import { useProfile } from "../../context/ProfileContext";
 import CommunityPlusAuthModal from "../../components/Auth/CommunityPlusAuthModal";
 
 import "./CommunityPlusLandingPage.css";
+
+const RETURN_TO_KEY = "communityone_return_to";
 
 export default function CommunityPlusLandingPage() {
   const navigate = useNavigate();
@@ -22,10 +24,19 @@ export default function CommunityPlusLandingPage() {
 
   const [showAuth, setShowAuth] = useState(false);
 
-  const returnTo =
-    location.state?.returnTo || "/communityplus";
+  const returnTo = useMemo(() => {
+    return (
+      location.state?.returnTo ||
+      sessionStorage.getItem(RETURN_TO_KEY) ||
+      "/communityplus"
+    );
+  }, [location.state]);
 
   useEffect(() => {
+    if (location.state?.returnTo) {
+      sessionStorage.setItem(RETURN_TO_KEY, location.state.returnTo);
+    }
+
     if (location.state?.loginRequired) {
       setShowAuth(true);
     }
@@ -45,6 +56,8 @@ export default function CommunityPlusLandingPage() {
       });
       return;
     }
+
+    sessionStorage.removeItem(RETURN_TO_KEY);
 
     navigate(returnTo, {
       replace: true,
@@ -74,7 +87,6 @@ export default function CommunityPlusLandingPage() {
 
   const handleGuestEntry = () => {
     continueAsGuest();
-
     navigate("/communityplus");
   };
 
@@ -90,21 +102,17 @@ export default function CommunityPlusLandingPage() {
       </div>
 
       <main className="landing-container">
-        <section
-          className="landing-hero"
-          aria-label="Community.One landing"
-        >
+        <section className="landing-hero" aria-label="Community.One landing">
           <h1 className="brand-title">Community.One</h1>
 
           <div className="landing-text">
             <h2 className="landing-tagline">
-              Real People. <span className="accent">Real News.</span>{" "}
-              Real Time
+              Real People. <span className="accent">Real News.</span> Real Time
             </h2>
 
             <p className="landing-sub">
-              A map-first platform connecting local signal, stories,
-              and services.
+              A map-first platform connecting local signal, stories, and
+              services.
             </p>
           </div>
 
@@ -120,8 +128,8 @@ export default function CommunityPlusLandingPage() {
             <div className="guest-pill">READ ONLY ACCESS</div>
 
             <p className="guest-mode-copy">
-              Explore your local community in read-only mode. Create an
-              account later to post, comment, and contribute.
+              Explore your local community in read-only mode. Create an account
+              later to post, comment, and contribute.
             </p>
           </div>
         </section>
