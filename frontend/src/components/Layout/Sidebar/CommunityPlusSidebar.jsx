@@ -118,6 +118,60 @@ const handleClick = useCallback(
       protectedItem: isProtectedItem(item),
     });
 
+      if (item.type === "action" && item.action === "logout") {
+        if (!isAuthenticated || isGuest) {
+          redirectToLogin(pathname);
+          return;
+        }
+
+        await handleLogout();
+        return;
+      }
+
+      if (isProtectedItem(item)) {
+        if (!isAuthenticated || isGuest) {
+          redirectToLogin(item.path);
+          return;
+        }
+
+        if (!profileReady || !hasProfile || !isProfileComplete) {
+          navigate("/communityplus/welcome", {
+            state: {
+              returnTo: item.path,
+              profileRequired: true,
+            },
+          });
+          return;
+        }
+      }
+
+      if (item.path) {
+        navigate(item.path, {
+          state:
+            item.type === "compose"
+              ? {
+                  mode: item.mode || "now",
+                  composerType: item.mode || "now",
+                }
+              : undefined,
+        });
+
+        
+      }
+    },
+    [
+      navigate,
+      pathname,
+      isAuthenticated,
+      isGuest,
+      profileReady,
+      hasProfile,
+      isProfileComplete,
+      redirectToLogin,
+      handleLogout,
+    ]
+  );
+
   
 
   const handleEchoClick = useCallback(() => {
