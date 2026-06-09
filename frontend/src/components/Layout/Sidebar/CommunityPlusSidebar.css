@@ -374,3 +374,12 @@
     height: 36px;
   }
 }
+
+.sidebar-link.guest-locked {
+  opacity: 0.72;
+}
+
+.sidebar-link .lock {
+  margin-left: auto;
+  font-size: 0.8rem;
+}

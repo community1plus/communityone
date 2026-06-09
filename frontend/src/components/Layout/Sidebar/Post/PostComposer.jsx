@@ -11,21 +11,11 @@ const API_BASE =
 const DEFAULT_VIDEO_AUDIO_SIZE = 300 * 1024 * 1024;
 
 const MODE_MEDIA_LIMITS = {
-  now: {
-    maxVideoAudioSize: DEFAULT_VIDEO_AUDIO_SIZE,
-  },
-  news: {
-    maxVideoAudioSize: DEFAULT_VIDEO_AUDIO_SIZE,
-  },
-  blob: {
-    maxVideoAudioSize: null,
-  },
-  event: {
-    maxVideoAudioSize: DEFAULT_VIDEO_AUDIO_SIZE,
-  },
-  beacon: {
-    maxVideoAudioSize: DEFAULT_VIDEO_AUDIO_SIZE,
-  },
+  now: { maxVideoAudioSize: DEFAULT_VIDEO_AUDIO_SIZE },
+  news: { maxVideoAudioSize: DEFAULT_VIDEO_AUDIO_SIZE },
+  blob: { maxVideoAudioSize: null },
+  event: { maxVideoAudioSize: DEFAULT_VIDEO_AUDIO_SIZE },
+  beacon: { maxVideoAudioSize: DEFAULT_VIDEO_AUDIO_SIZE },
 };
 
 const ALLOWED_FILE_EXTENSIONS = [
@@ -388,7 +378,13 @@ async function apiFetch(path, options = {}) {
   return data;
 }
 
-export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
+export default function PostComposer({
+  mode: propMode,
+  onSubmit,
+  onCancel,
+  user,
+  onRequireAuth,
+}) {
   const params = useParams();
   const location = useLocation();
 
@@ -421,6 +417,19 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
   const showDetails = config.showDetails;
   const hasFiles = files.length > 0;
   const isBlobMode = mode === "blob";
+
+  const requireSignedIn = () => {
+    if (user) return true;
+
+    setError("Please sign in to create posts, upload media, or submit content.");
+    setSubmitSuccess("");
+
+    if (typeof onRequireAuth === "function") {
+      onRequireAuth();
+    }
+
+    return false;
+  };
 
   const selectedSocialTargets = useMemo(
     () =>
@@ -499,6 +508,8 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
   const isMediaLoaded = (fileId) => Boolean(loadedMediaIds[fileId]);
 
   const handleFiles = (incomingFiles = []) => {
+    if (!requireSignedIn()) return;
+
     const validFiles = [];
 
     for (const file of incomingFiles) {
@@ -564,6 +575,8 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
 
     setDragActive(false);
 
+    if (!requireSignedIn()) return;
+
     const droppedFiles = Array.from(event.dataTransfer.files || []);
 
     if (droppedFiles.length) {
@@ -588,6 +601,8 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
   };
 
   const removeFile = (fileId) => {
+    if (!requireSignedIn()) return;
+
     setFiles((prev) => {
       const target = prev.find((item) => item.id === fileId);
 
@@ -641,6 +656,8 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
   };
 
   const handleSocialTargetChange = async (providerId, checked) => {
+    if (!requireSignedIn()) return;
+
     if (!checked) {
       setSocialTargets((prev) => ({
         ...prev,
@@ -778,6 +795,8 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
   };
 
   const handleSubmit = async () => {
+    if (!requireSignedIn()) return;
+
     if (!sanitizeText(title)) {
       setError("Add a title first.");
       setSubmitSuccess("");
@@ -918,13 +937,18 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
                   <button
                     type="button"
                     className={`upload-drop-zone ${dragActive ? "active" : ""}`}
-                    onClick={() => fileInputRef.current?.click()}
+                    onClick={() => {
+                      if (!requireSignedIn()) return;
+                      fileInputRef.current?.click();
+                    }}
                     disabled={submitting}
                   >
                     <span className="upload-icon">⬆</span>
 
                     <span className="upload-title">
-                      {dragActive
+                      {!user
+                        ? "Sign in to upload media"
+                        : dragActive
                         ? "Drop files here"
                         : "Upload media or drag files here"}
                     </span>
@@ -952,6 +976,11 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
                   multiple
                   ref={fileInputRef}
                   onChange={(event) => {
+                    if (!requireSignedIn()) {
+                      event.target.value = "";
+                      return;
+                    }
+
                     handleFiles(Array.from(event.target.files || []));
                     event.target.value = "";
                   }}
@@ -963,7 +992,10 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
                       <input
                         type="checkbox"
                         checked={isAd}
-                        onChange={() => setIsAd((prev) => !prev)}
+                        onChange={() => {
+                          if (!requireSignedIn()) return;
+                          setIsAd((prev) => !prev);
+                        }}
                         disabled={submitting}
                       />
                       Promote
@@ -981,6 +1013,8 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
                                 : "btn-secondary"
                             }`}
                             onClick={() => {
+                              if (!requireSignedIn()) return;
+
                               setSelectedSlots((prev) =>
                                 prev.includes(hour)
                                   ? prev.filter((item) => item !== hour)
@@ -1131,11 +1165,17 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
                   className="composer-icon-action primary"
                   onClick={handleSubmit}
                   disabled={submitting}
-                  title="Submit"
-                  aria-label="Submit post"
+                  title={user ? "Submit" : "Sign in to submit"}
+                  aria-label={user ? "Submit post" : "Sign in to submit"}
                 >
                   ➤
-                  <span>{submitting ? "Submitting..." : "Submit"}</span>
+                  <span>
+                    {!user
+                      ? "Sign in"
+                      : submitting
+                      ? "Submitting..."
+                      : "Submit"}
+                  </span>
                 </button>
               </div>
             </div>
@@ -1283,7 +1323,8 @@ export default function PostComposer({ mode: propMode, onSubmit, onCancel }) {
               )}
 
               <div className="meta">
-                Media uploads are sent to S3 using backend-generated signed URLs.
+                Media uploads are sent to S3 using backend-generated signed
+                URLs.
               </div>
             </>
           )}

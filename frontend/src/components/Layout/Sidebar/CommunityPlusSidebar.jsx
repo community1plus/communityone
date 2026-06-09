@@ -2,9 +2,35 @@ import { useMemo, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { signOut } from "aws-amplify/auth";
 
+import { useAuth } from "../../../context/AuthContext";
 import { NAVIGATION } from "../../Layout/Navigation/navigationConfig";
 
 import "./CommunityPlusSidebar.css";
+
+const PROTECTED_PATHS = [
+  "/communityplus/compose",
+  "/communityplus/profile",
+  "/communityplus/moderation",
+  "/communityplus/account",
+  "/communityplus/inbox",
+  "/communityone/ses",
+  "/communityone/shs",
+  "/communityone/xchange",
+  "/communityone/requests",
+  "/communityone/responses",
+  "/communityone/transactions",
+  "/communityone/feature-requests",
+];
+
+function isProtectedItem(item) {
+  if (!item?.path) return false;
+
+  if (item.type === "compose") return true;
+
+  return PROTECTED_PATHS.some((protectedPath) =>
+    item.path.startsWith(protectedPath)
+  );
+}
 
 export default function CommunityPlusSidebar({
   sidebarGroup = "communityplus-sidebar",
@@ -12,11 +38,9 @@ export default function CommunityPlusSidebar({
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { pathname } = location;
+  const { isAuthenticated } = useAuth();
 
-  /* =======================================================
-     SIDEBAR CONFIG
-  ======================================================= */
+  const { pathname } = location;
 
   const sidebar = useMemo(() => {
     return (
@@ -27,9 +51,9 @@ export default function CommunityPlusSidebar({
     );
   }, [sidebarGroup]);
 
-  /* =======================================================
-     ACTIVE ROUTE
-  ======================================================= */
+  const sections = Array.isArray(sidebar.sections)
+    ? sidebar.sections
+    : [];
 
   const isActive = useCallback(
     (item) => {
@@ -43,9 +67,18 @@ export default function CommunityPlusSidebar({
     [pathname]
   );
 
-  /* =======================================================
-     LOGOUT
-  ======================================================= */
+  const redirectToLogin = useCallback(
+    (returnTo) => {
+      navigate("/", {
+        replace: false,
+        state: {
+          loginRequired: true,
+          returnTo: returnTo || pathname,
+        },
+      });
+    },
+    [navigate, pathname]
+  );
 
   const handleLogout = useCallback(async () => {
     try {
@@ -59,19 +92,22 @@ export default function CommunityPlusSidebar({
     }
   }, [navigate]);
 
-  /* =======================================================
-     NAVIGATION
-  ======================================================= */
-
   const handleClick = useCallback(
     async (item) => {
       if (!item) return;
 
-      if (
-        item.type === "action" &&
-        item.action === "logout"
-      ) {
+      if (item.type === "action" && item.action === "logout") {
+        if (!isAuthenticated) {
+          redirectToLogin(pathname);
+          return;
+        }
+
         await handleLogout();
+        return;
+      }
+
+      if (!isAuthenticated && isProtectedItem(item)) {
+        redirectToLogin(item.path);
         return;
       }
 
@@ -87,12 +123,14 @@ export default function CommunityPlusSidebar({
         });
       }
     },
-    [navigate, handleLogout]
+    [
+      navigate,
+      pathname,
+      isAuthenticated,
+      redirectToLogin,
+      handleLogout,
+    ]
   );
-
-  /* =======================================================
-     ECHO
-  ======================================================= */
 
   const handleEchoClick = useCallback(() => {
     navigate("/communityplus/echo", {
@@ -102,54 +140,73 @@ export default function CommunityPlusSidebar({
     });
   }, [navigate]);
 
-  /* =======================================================
-     RENDER
-  ======================================================= */
-
   return (
     <aside className="sidebar">
       <div className="sidebar-main">
-        {sidebar.sections.map((section) => (
-          <div
-            key={section.id}
-            className={`sidebar-section ${section.variant || ""}`}
-          >
-            <div className="sidebar-title">
-              {section.title}
+        {sections.map((section) => {
+          const items = Array.isArray(section.items)
+            ? section.items
+            : [];
+
+          return (
+            <div
+              key={section.id}
+              className={`sidebar-section ${section.variant || ""}`}
+            >
+              <div className="sidebar-title">
+                {section.title}
+              </div>
+
+              {items.map((item) => {
+                const active = isActive(item);
+                const protectedItem = isProtectedItem(item);
+                const guestLocked =
+                  !isAuthenticated && protectedItem;
+
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    className={[
+                      "sidebar-link",
+                      active && "active",
+                      item.type === "compose" && "compose",
+                      item.type === "route" && "route",
+                      item.type === "action" && "action",
+                      item.action === "logout" && "logout",
+                      guestLocked && "guest-locked",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
+                    onClick={() => handleClick(item)}
+                    aria-current={active ? "page" : undefined}
+                    title={
+                      guestLocked
+                        ? "Sign in required"
+                        : item.label
+                    }
+                  >
+                    <span className="icon">
+                      {item.icon}
+                    </span>
+
+                    <span className="label">
+                      {guestLocked
+                        ? `${item.label}`
+                        : item.label}
+                    </span>
+
+                    {guestLocked && (
+                      <span className="lock" aria-hidden="true">
+                        🔒
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
             </div>
-
-            {section.items.map((item) => {
-              const active = isActive(item);
-
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  className={[
-                    "sidebar-link",
-                    active && "active",
-                    item.type === "compose" && "compose",
-                    item.type === "route" && "route",
-                    item.type === "action" && "action",
-                    item.action === "logout" && "logout",
-                  ]
-                    .filter(Boolean)
-                    .join(" ")}
-                  onClick={() => handleClick(item)}
-                  aria-current={active ? "page" : undefined}
-                >
-                  <span className="icon">
-                    {item.icon}
-                  </span>
-
-                  <span className="label">
-                    {item.label}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <div className="echo-brand">
