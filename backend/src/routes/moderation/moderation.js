@@ -1,6 +1,6 @@
 import express from "express";
 import pkg from "pg";
-import { requireAuth } from "../../../middleware/requireAuth.js";
+import requireAuth from "../../../middleware/requireAuth.js";
 
 const { Pool } = pkg;
 const router = express.Router();
