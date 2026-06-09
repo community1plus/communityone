@@ -64,7 +64,7 @@ useEffect(() => {
   if (user && profile) {
     navigate("/communityplus", { replace: true });
   }
-}, [authLoading, user, profile, navigate]);
+}, [loading, user, profile, navigate]);
 
   useEffect(() => {
     if (location.state?.returnTo) {
