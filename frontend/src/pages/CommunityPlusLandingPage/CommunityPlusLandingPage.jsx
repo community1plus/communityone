@@ -1,17 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../../context/AuthContext";
 import { useProfile } from "../../context/ProfileContext";
 import CommunityPlusAuthModal from "../../components/Auth/CommunityPlusAuthModal";
 
 import "./CommunityPlusLandingPage.css";
-import { signOut } from "aws-amplify/auth";
-
-const handleSwitchAccount = async () => {
-  await signOut({ global: true });
-  window.location.href = "/";
-};
 
 const RETURN_TO_KEY = "communityone_return_to";
 
@@ -44,31 +38,16 @@ export default function CommunityPlusLandingPage() {
     );
   }, [location.state]);
 
-const handleAuthSuccess = async () => {
-  if (!profile) {
-    navigate("/communityplus/profile", { replace: true });
-    return;
-  }
-
-  navigate("/communityplus", { replace: true });
-};
-
-useEffect(() => {
-  if (loading) return;
-
-  if (user && !profile) {
-    navigate("/communityplus/profile", { replace: true });
-    return;
-  }
-
-  if (user && profile) {
-    navigate("/communityplus", { replace: true });
-  }
-}, [loading, user, profile, navigate]);
+  const needsProfileSetup =
+    profileMissing || !hasProfile || !isProfileComplete;
 
   useEffect(() => {
     if (location.state?.returnTo) {
       sessionStorage.setItem(RETURN_TO_KEY, location.state.returnTo);
+    }
+
+    if (location.state?.openAuthModal) {
+      setShowAuth(true);
     }
 
     if (location.state?.loginRequired && (!isAuthenticated || isGuest)) {
@@ -86,12 +65,37 @@ useEffect(() => {
       Boolean(location.state?.loginRequired) ||
       Boolean(sessionStorage.getItem(RETURN_TO_KEY));
 
-    if (!cameFromProtectedRoute) {
+    if (needsProfileSetup) {
+      navigate("/communityplus/welcome", {
+        replace: true,
+        state: {
+          returnTo,
+          profileRequired: true,
+        },
+      });
       return;
     }
 
-    const needsProfileSetup =
-      profileMissing || !hasProfile || !isProfileComplete;
+    sessionStorage.removeItem(RETURN_TO_KEY);
+
+    navigate(cameFromProtectedRoute ? returnTo : "/communityplus", {
+      replace: true,
+    });
+  }, [
+    loading,
+    isGuest,
+    isAuthenticated,
+    profileReady,
+    needsProfileSetup,
+    location.state,
+    navigate,
+    returnTo,
+  ]);
+
+  const handleAuthSuccess = () => {
+    setShowAuth(false);
+
+    if (!profileReady) return;
 
     if (needsProfileSetup) {
       navigate("/communityplus/welcome", {
@@ -106,24 +110,24 @@ useEffect(() => {
 
     sessionStorage.removeItem(RETURN_TO_KEY);
 
-    navigate(returnTo, {
+    navigate(returnTo || "/communityplus", {
       replace: true,
     });
-  }, [
-    loading,
-    isGuest,
-    isAuthenticated,
-    profileReady,
-    profileMissing,
-    hasProfile,
-    isProfileComplete,
-    location.state,
-    navigate,
-    returnTo,
-  ]);
+  };
 
   const openAuth = () => {
     if (isAuthenticated && !isGuest) {
+      if (profileReady && needsProfileSetup) {
+        navigate("/communityplus/welcome", {
+          replace: true,
+          state: {
+            returnTo,
+            profileRequired: true,
+          },
+        });
+        return;
+      }
+
       navigate("/communityplus", {
         replace: true,
       });
@@ -136,7 +140,6 @@ useEffect(() => {
   const closeAuth = () => {
     setShowAuth(false);
   };
-
 
   const handleGuestEntry = async () => {
     await continueAsGuest();
@@ -153,6 +156,8 @@ useEffect(() => {
     localStorage.removeItem("community_guest");
 
     await logout();
+
+    setShowAuth(true);
   };
 
   if (loading || (isAuthenticated && !isGuest && !profileReady)) {
@@ -182,22 +187,42 @@ useEffect(() => {
           </div>
 
           <div className="landing-actions">
-            <button
-              type="button"
-              className="btn primary hero-cta"
-              onClick={handleGuestEntry}
-            >
-              Continue as Guest
-            </button>
+            {!isAuthenticated || isGuest ? (
+              <>
+                <button
+                  type="button"
+                  className="btn primary hero-cta"
+                  onClick={handleGuestEntry}
+                >
+                  Continue as Guest
+                </button>
 
-            {isAuthenticated && !isGuest && (
-              <button
-                type="button"
-                className="btn secondary"
-                onClick={handleSwitchAccount}
-              >
-                Switch account
-              </button>
+                <button
+                  type="button"
+                  className="btn secondary"
+                  onClick={openAuth}
+                >
+                  Sign in
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  className="btn primary hero-cta"
+                  onClick={openAuth}
+                >
+                  Continue
+                </button>
+
+                <button
+                  type="button"
+                  className="btn secondary"
+                  onClick={handleSwitchAccount}
+                >
+                  Switch account
+                </button>
+              </>
             )}
 
             <div className="guest-pill">READ ONLY ACCESS</div>
