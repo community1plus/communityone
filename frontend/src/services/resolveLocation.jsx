@@ -28,10 +28,7 @@ const getCached = (key) => {
 
 const getComponent = (components = [], types = []) => {
   for (const type of types) {
-    const match = components.find((c) =>
-      c?.types?.includes(type)
-    );
-
+    const match = components.find((c) => c?.types?.includes(type));
     if (match) return match.long_name;
   }
 
@@ -55,6 +52,16 @@ const getLatLngFromResult = (result) => {
         ? loc.lng()
         : loc?.lng ?? null,
   };
+};
+
+const getSafeSuburbLabel = ({ suburb, city, state }) => {
+  const place = suburb || city;
+
+  if (place && state) return `${place}, ${state}`;
+  if (place) return place;
+  if (state) return state;
+
+  return "Unknown location";
 };
 
 /* ===============================
@@ -86,12 +93,6 @@ const getDistance = (a, b) => {
    RESULT FILTERING
 =============================== */
 
-const GOOD_TYPES = [
-  "street_address",
-  "premise",
-  "subpremise",
-];
-
 const BAD_KEYWORDS = [
   "service road",
   "service rd",
@@ -109,46 +110,50 @@ const isBadAddress = (formatted = "") =>
 const pickBestResult = (results, origin) => {
   if (!results?.length) return null;
 
-  const candidates = results
-    .filter((r) => !isBadAddress(r?.formatted_address || ""))
-    .map((r) => {
-      const point = getLatLngFromResult(r);
-      const dist = origin ? getDistance(origin, point) : 0;
+  const candidates = results.map((r) => {
+    const point = getLatLngFromResult(r);
+    const dist = origin ? getDistance(origin, point) : 0;
 
-      const types = r.types || [];
-      const locationType = r.geometry?.location_type || "";
+    const types = r.types || [];
+    const locationType = r.geometry?.location_type || "";
+    const formatted = r.formatted_address || "";
 
-      let score = 0;
+    let score = 0;
 
-      if (types.includes("street_address")) score += 50;
-      if (types.includes("premise")) score += 45;
-      if (types.includes("subpremise")) score += 40;
-      if (types.includes("route")) score += 25;
-      if (types.includes("locality")) score += 5;
+    if (types.includes("street_address")) score += 60;
+    if (types.includes("premise")) score += 50;
+    if (types.includes("subpremise")) score += 45;
+    if (types.includes("route")) score += 25;
+    if (types.includes("locality")) score += 5;
+    if (types.includes("postal_code")) score += 3;
 
-      if (locationType === "ROOFTOP") score += 20;
-      if (locationType === "RANGE_INTERPOLATED") score += 10;
+    if (locationType === "ROOFTOP") score += 20;
+    if (locationType === "RANGE_INTERPOLATED") score += 10;
+    if (locationType === "APPROXIMATE") score -= 10;
 
-      score -= Math.min(dist, 500) / 5;
+    if (isBadAddress(formatted)) score -= 40;
 
-      return {
-        r,
-        dist,
-        score,
-      };
-    });
+    score -= Math.min(dist, 500) / 5;
 
-  if (!candidates.length) return results[0];
+    return {
+      r,
+      dist,
+      score,
+      formatted,
+      types,
+      locationType,
+    };
+  });
 
   candidates.sort((a, b) => b.score - a.score);
 
   console.log(
-    "📍 Geocode candidates:",
+    "📍 GOOGLE GEOCODE CANDIDATES:",
     candidates.map((c) => ({
-      address: c.r.formatted_address,
-      types: c.r.types,
-      locationType: c.r.geometry?.location_type,
-      dist: Math.round(c.dist),
+      address: c.formatted,
+      types: c.types,
+      locationType: c.locationType,
+      distMeters: Math.round(c.dist),
       score: Math.round(c.score),
     }))
   );
@@ -157,30 +162,36 @@ const pickBestResult = (results, origin) => {
 };
 
 /* ===============================
-   PRECISION & CONFIDENCE HANDLERS
+   PRECISION & CONFIDENCE
 =============================== */
 
-// FIX: Expanded to safely bucket Wi-Fi testing thresholds (like 143m) as LEVEL_4
 const getPrecisionLevel = ({ accuracy, locationType }) => {
   if (locationType === "ROOFTOP") {
-    if (accuracy <= 30) return 5;
-    if (accuracy <= 200) return 4; // Safely catches your 143m laptop Wi-Fi signature
-    return 3;
+    if (accuracy <= 30) return "LEVEL_5";
+    if (accuracy <= 200) return "LEVEL_4";
+    return "LEVEL_3";
   }
 
-  if (locationType === "RANGE_INTERPOLATED") return 3;
-  if (locationType === "GEOMETRIC_CENTER") return 2;
-  if (locationType === "APPROXIMATE") return 1;
+  if (locationType === "RANGE_INTERPOLATED") return "LEVEL_3";
+  if (locationType === "GEOMETRIC_CENTER") return "LEVEL_2";
+  if (locationType === "APPROXIMATE") return "LEVEL_1";
 
-  return 1;
+  if (accuracy <= 25) return "LEVEL_4";
+  if (accuracy <= 150) return "LEVEL_3";
+  if (accuracy <= 1000) return "LEVEL_2";
+
+  return "LEVEL_1";
 };
 
 const getConfidence = ({ accuracy, locationType }) => {
   if (locationType === "ROOFTOP") {
     if (accuracy <= 30) return "high";
-    if (accuracy <= 200) return "medium"; // Standard classification for validated Wi-Fi clusters
+    if (accuracy <= 200) return "medium";
     return "low";
   }
+
+  if (locationType === "RANGE_INTERPOLATED") return "medium";
+  if (locationType === "APPROXIMATE") return "low";
 
   if (accuracy <= 25) return "high";
   if (accuracy <= 100) return "medium";
@@ -189,43 +200,48 @@ const getConfidence = ({ accuracy, locationType }) => {
 };
 
 /* ===============================
-   SNAP TO ROAD
-=============================== */
-
-const snapToRoad = async (lat, lng) => {
-  try {
-    const res = await fetch(
-      `https://roads.googleapis.com/v1/nearestRoads?points=${lat},${lng}&key=${GOOGLE_API_KEY}`
-    );
-
-    const data = await res.json();
-
-    if (data?.snappedPoints?.length) {
-      const p = data.snappedPoints[0].location;
-
-      return {
-        lat: p.latitude,
-        lng: p.longitude,
-      };
-    }
-  } catch (err) {
-    console.warn("⚠️ snapToRoad failed:", err);
-  }
-
-  return { lat, lng };
-};
-
-/* ===============================
    OSM FALLBACK
 =============================== */
 
 async function resolveWithOSM(lat, lng, accuracy = 999) {
   try {
+    console.log("🟠 OSM FALLBACK START:", {
+      lat,
+      lng,
+      accuracy,
+    });
+
     const res = await fetch(
       `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
     );
 
     const data = await res.json();
+
+    console.log("🟠 OSM RESPONSE:", {
+      displayName: data?.display_name,
+      address: data?.address,
+    });
+
+    const suburb =
+      data?.address?.suburb ||
+      data?.address?.city ||
+      data?.address?.town ||
+      data?.address?.village ||
+      null;
+
+    const city =
+      data?.address?.city ||
+      data?.address?.town ||
+      data?.address?.village ||
+      suburb;
+
+    const state = data?.address?.state || null;
+
+    const safeLabel = getSafeSuburbLabel({
+      suburb,
+      city,
+      state,
+    });
 
     return {
       lat,
@@ -233,38 +249,31 @@ async function resolveWithOSM(lat, lng, accuracy = 999) {
       accuracy,
       accuracyMeters: accuracy,
 
-      suburb:
-        data?.address?.suburb ||
-        data?.address?.city ||
-        data?.address?.town ||
-        data?.address?.village ||
-        null,
-
-      city:
-        data?.address?.city ||
-        data?.address?.town ||
-        data?.address?.village ||
-        null,
-
-      state: data?.address?.state || null,
+      suburb,
+      city,
+      state,
       country: data?.address?.country || null,
       postcode: data?.address?.postcode || null,
 
-      label: data?.display_name || "Unknown location",
-      fullAddress: data?.display_name || "",
+      // Safe public display
+      label: safeLabel,
+      fullAddress: "",
+
+      // Internal diagnostic only
       fullLabel: data?.display_name || "",
 
       locationType: "APPROXIMATE",
       isRooftop: false,
       precisionSource: "osm_fallback",
 
-      precisionLevel: 2,
+      precisionLevel: "LEVEL_1",
       confidence: "low",
+
       source: "osm",
       updatedAt: Date.now(),
     };
   } catch (e) {
-    console.error("❌ OSM fallback failed", e);
+    console.error("❌ OSM fallback failed:", e);
     return null;
   }
 }
@@ -280,55 +289,99 @@ export async function resolveLocation({
   placeId = null,
 }) {
   try {
+    console.log("🧭 RESOLVE LOCATION START:", {
+      lat,
+      lng,
+      accuracy,
+      placeId,
+      hasGoogleKey: Boolean(GOOGLE_API_KEY),
+    });
+
     const cacheKey = getCacheKey(lat, lng);
     const cached = getCached(cacheKey);
 
     if (cached) {
-      console.log("📦 Using cached location");
+      console.log("📦 Using cached in-memory location:", cached);
       return cached;
     }
 
     let result = null;
+    let precisionSource = "reverse_geocode";
 
     if (placeId) {
       try {
-        const res = await fetch(
-          `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=address_components,formatted_address,geometry,name,types&key=${GOOGLE_API_KEY}`
-        );
+        const url =
+          `https://maps.googleapis.com/maps/api/place/details/json` +
+          `?place_id=${placeId}` +
+          `&fields=address_components,formatted_address,geometry,name,types` +
+          `&key=${GOOGLE_API_KEY}`;
 
+        console.log("🔵 GOOGLE PLACE DETAILS REQUEST:", {
+          placeId,
+        });
+
+        const res = await fetch(url);
         const data = await res.json();
+
+        console.log("🔵 GOOGLE PLACE DETAILS RESPONSE:", {
+          status: data?.status,
+          errorMessage: data?.error_message || null,
+          hasResult: Boolean(data?.result),
+          result: data?.result,
+        });
 
         if (data?.status === "OK" && data?.result) {
           result = {
             ...data.result,
-            address_components: data.result.address_components || [],
-            formatted_address: data.result.formatted_address || "",
+            address_components:
+              data.result.address_components || [],
+            formatted_address:
+              data.result.formatted_address || "",
             types: data.result.types || ["street_address"],
           };
+
+          precisionSource = "places";
         }
       } catch (e) {
-        console.warn("⚠️ place details failed", e);
+        console.warn("⚠️ Place details failed:", e);
       }
     }
 
     if (!result) {
       try {
-        const res = await fetch(
-          `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${GOOGLE_API_KEY}`
-        );
+        const url =
+          `https://maps.googleapis.com/maps/api/geocode/json` +
+          `?latlng=${lat},${lng}` +
+          `&key=${GOOGLE_API_KEY}`;
 
+        console.log("🔵 GOOGLE GEOCODE REQUEST:", {
+          lat,
+          lng,
+          accuracy,
+        });
+
+        const res = await fetch(url);
         const data = await res.json();
+
+        console.log("🔵 GOOGLE GEOCODE RESPONSE:", {
+          status: data?.status,
+          errorMessage: data?.error_message || null,
+          resultsCount: data?.results?.length || 0,
+        });
 
         if (data?.status === "OK" && data?.results?.length) {
           result = pickBestResult(data.results, { lat, lng });
         }
       } catch (e) {
-        console.warn("⚠️ geocode failed", e);
+        console.warn("⚠️ Google geocode failed:", e);
       }
     }
 
     if (!result || !result.address_components) {
-      // Fallback directly to OpenStreetMap instead of throwing hard app breaking errors
+      console.warn(
+        "⚠️ No valid Google geocode result. Falling back to OSM."
+      );
+
       return await resolveWithOSM(lat, lng, accuracy);
     }
 
@@ -349,41 +402,84 @@ export async function resolveLocation({
     const country = getComponent(components, ["country"]);
     const postcode = getComponent(components, ["postal_code"]);
 
-    const finalSuburb = suburb || city || state || "Unknown Area";
-    const streetLabel = streetNumber && street ? `${streetNumber} ${street}` : street || "";
-    const displayLabel = streetLabel ? `${streetLabel}, ${finalSuburb}` : finalSuburb;
+    const finalSuburb =
+      suburb ||
+      city ||
+      state ||
+      "Unknown Area";
 
-    const locType = result.geometry?.location_type || "APPROXIMATE";
-    const isRooftop = locType === "ROOFTOP";
+    const streetLabel =
+      streetNumber && street
+        ? `${streetNumber} ${street}`
+        : street || "";
+
+    const locationType =
+      result.geometry?.location_type || "APPROXIMATE";
+
+    const isRooftop = locationType === "ROOFTOP";
+
+    const safeLabel = getSafeSuburbLabel({
+      suburb: finalSuburb,
+      city,
+      state,
+    });
+
+    const fullDisplayLabel =
+      streetLabel && finalSuburb
+        ? `${streetLabel}, ${finalSuburb}`
+        : safeLabel;
 
     const output = {
       lat,
       lng,
+
       accuracy,
       accuracyMeters: accuracy,
+
       suburb: finalSuburb,
       city: city || finalSuburb,
       state,
       country,
       postcode,
-      label: displayLabel,
-      fullAddress: result.formatted_address || displayLabel,
-      fullLabel: result.formatted_address || displayLabel,
-      locationType: locType,
-      isRooftop: isRooftop,
-      precisionSource: "reverse_geocode",
-      precisionLevel: `LEVEL_${getPrecisionLevel({ accuracy, locationType: locType })}`,
-      confidence: getConfidence({ accuracy, locationType: locType }),
-      source: "google",
+
+      // Safe default public display
+      label: safeLabel,
+
+      // Detailed diagnostic display only
+      fullAddress: result.formatted_address || fullDisplayLabel,
+      fullLabel: result.formatted_address || fullDisplayLabel,
+
+      street: streetLabel || null,
+
+      locationType,
+      isRooftop,
+      precisionSource,
+
+      precisionLevel: getPrecisionLevel({
+        accuracy,
+        locationType,
+      }),
+
+      confidence: getConfidence({
+        accuracy,
+        locationType,
+      }),
+
+      source: precisionSource === "places" ? "places" : "google",
       updatedAt: Date.now(),
     };
 
-    // Store completed data structure inside memory cache
-    cache.set(cacheKey, { timestamp: Date.now(), value: output });
-    return output;
+    console.log("✅ RESOLVE LOCATION OUTPUT:", output);
 
+    cache.set(cacheKey, {
+      timestamp: Date.now(),
+      value: output,
+    });
+
+    return output;
   } catch (err) {
-    console.error("❌ main resolver crash:", err);
+    console.error("❌ resolveLocation crash:", err);
+
     return await resolveWithOSM(lat, lng, accuracy);
   }
 }
