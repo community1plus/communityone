@@ -145,6 +145,15 @@ export default function CommunityPlusSidebar({
                 }
               : undefined,
         });
+
+        console.log("SIDEBAR AUTH STATE:", {
+  isAuthenticated,
+  isGuest,
+  profileReady,
+  hasProfile,
+  isProfileComplete,
+  itemPath: item?.path,
+});
       }
     },
     [
@@ -160,14 +169,7 @@ export default function CommunityPlusSidebar({
     ]
   );
 
- console.log("SIDEBAR AUTH STATE:", {
-  isAuthenticated,
-  isGuest,
-  profileReady,
-  hasProfile,
-  isProfileComplete,
-  itemPath: item?.path,
-}); 
+  
 
   const handleEchoClick = useCallback(() => {
     navigate("/communityplus/echo", {
