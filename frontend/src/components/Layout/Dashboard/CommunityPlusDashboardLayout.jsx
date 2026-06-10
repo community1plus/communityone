@@ -37,11 +37,12 @@ export default function CommunityPlusDashboardLayout() {
         </main>
       </div>
 
-      {showAuthModal && (
-        <AuthModal
-          onClose={() => setShowAuthModal(false)}
-        />
-      )}
+{showAuthModal && (
+  <CommunityPlusAuthModal
+    onClose={() => setShowAuthModal(false)}
+    onSuccess={() => setShowAuthModal(false)}
+  />
+)}
     </div>
   );
 }
