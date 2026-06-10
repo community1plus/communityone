@@ -25,18 +25,24 @@ const REQUIRED_PROFILE_FIELDS = [
 ];
 
 function getUserKey(user) {
+  if (!user) return null;
+  if (typeof user === "string") return user;
+
   return (
     user?.id ||
     user?.userId ||
     user?.username ||
     user?.sub ||
+    user?.attributes?.sub ||
+    user?.attributes?.email ||
     user?.signInDetails?.loginId ||
+    user?.email ||
     null
   );
 }
 
 function getProfileCacheKey(userKey) {
-  return `${PROFILE_CACHE_PREFIX}:${userKey || "anonymous"}`;
+  return `${PROFILE_CACHE_PREFIX}:${userKey}`;
 }
 
 function readProfileCache(userKey) {
@@ -49,9 +55,9 @@ function readProfileCache(userKey) {
 
     if (!cached?.cachedAt) return null;
 
-    const fresh = Date.now() - cached.cachedAt < PROFILE_CACHE_TTL;
-
-    return fresh ? cached : null;
+    return Date.now() - cached.cachedAt < PROFILE_CACHE_TTL
+      ? cached
+      : null;
   } catch {
     return null;
   }
@@ -150,29 +156,19 @@ function normaliseApiResponse(res) {
 }
 
 function profileHasMinimumFields(profile) {
-  if (!profile) return false;
-
-  return Boolean(
-    profile?.id ||
-      profile?.userId ||
-      profile?.user_id ||
-      profile?.username ||
-      profile?.displayName ||
-      profile?.display_name ||
-      profile?.accountType ||
-      profile?.userType
-  );
+  return Boolean(profile && Object.keys(profile).length > 0);
 }
 
 export function ProfileProvider({ children }) {
   const api = useAPI();
-
   const { user, isAuthenticated } = useAuth();
 
   const userKey = getUserKey(user);
 
   const cachedOnRender =
-    isAuthenticated && userKey ? readProfileCache(userKey) : null;
+    isAuthenticated && userKey
+      ? readProfileCache(userKey)
+      : null;
 
   const apiRef = useRef(api);
   const loadingRef = useRef(false);
@@ -184,7 +180,7 @@ export function ProfileProvider({ children }) {
   );
 
   const [profileLoading, setProfileLoading] = useState(
-    Boolean(isAuthenticated && userKey && !cachedOnRender)
+    Boolean(isAuthenticated && !cachedOnRender)
   );
 
   const [profileSaving, setProfileSaving] = useState(false);
@@ -195,27 +191,27 @@ export function ProfileProvider({ children }) {
     apiRef.current = api;
   }, [api]);
 
-const markProfileReady = useCallback(
-  (nextProfile = null, nextProviders = {}, missing = false) => {
-    console.log("markProfileReady()", {
-      nextProfile,
-      missing,
-    });
+  const markProfileReady = useCallback(
+    (nextProfile = null, nextProviders = {}, missing = false) => {
+      console.log("markProfileReady()", {
+        nextProfile,
+        missing,
+      });
 
-    setProfile(nextProfile);
-    setProviders(normaliseProviders(nextProviders));
-    setProfileMissing(missing);
-    setProfileError(null);
-    setProfileLoading(false);
-  },
-  []
-);
+      setProfile(nextProfile);
+      setProviders(normaliseProviders(nextProviders));
+      setProfileMissing(missing);
+      setProfileError(null);
+      setProfileLoading(false);
+    },
+    []
+  );
 
   const loadProfile = useCallback(
     async ({ background = false } = {}) => {
       if (loadingRef.current) return null;
 
-      if (!isAuthenticated || !userKey) {
+      if (!isAuthenticated) {
         loadingRef.current = false;
 
         setProfile(null);
@@ -244,15 +240,15 @@ const markProfileReady = useCallback(
           headers,
         });
 
-const payload = normaliseApiResponse(res);
+        const payload = normaliseApiResponse(res);
 
-console.log("RAW /me RESPONSE", res);
-console.log("NORMALISED PAYLOAD", payload);
+        console.log("RAW /me RESPONSE", res);
+        console.log("NORMALISED PAYLOAD", payload);
 
-const nextProfile = payload?.profile || null;
-const nextProviders = payload?.providers || {};
+        const nextProfile = payload?.profile || null;
+        const nextProviders = payload?.providers || {};
 
-console.log("PROFILE FROM API", nextProfile);
+        console.log("PROFILE FROM API", nextProfile);
 
         writeProfileCache(userKey, nextProfile, nextProviders);
 
@@ -284,7 +280,7 @@ console.log("PROFILE FROM API", nextProfile);
   useEffect(() => {
     loadingRef.current = false;
 
-    if (!isAuthenticated || !userKey) {
+    if (!isAuthenticated) {
       setProfile(null);
       setProviders(normaliseProviders());
       setProfileMissing(false);
@@ -296,7 +292,7 @@ console.log("PROFILE FROM API", nextProfile);
       return;
     }
 
-    const cached = readProfileCache(userKey);
+    const cached = userKey ? readProfileCache(userKey) : null;
 
     if (cached) {
       setProfile(cached.profile || null);
@@ -325,7 +321,7 @@ console.log("PROFILE FROM API", nextProfile);
 
   const saveProfile = useCallback(
     async (nextProfile) => {
-      if (!isAuthenticated || !userKey) {
+      if (!isAuthenticated) {
         throw new Error("User is not authenticated");
       }
 
@@ -389,7 +385,7 @@ console.log("PROFILE FROM API", nextProfile);
 
   const patchProfile = useCallback(
     async (patch) => {
-      if (!isAuthenticated || !userKey) {
+      if (!isAuthenticated) {
         throw new Error("User is not authenticated");
       }
 
@@ -407,10 +403,11 @@ console.log("PROFILE FROM API", nextProfile);
 
         const payload = normaliseApiResponse(res);
 
-        const savedProfile = payload?.profile || {
-          ...profile,
-          ...patch,
-        };
+        const savedProfile =
+          payload?.profile || {
+            ...profile,
+            ...patch,
+          };
 
         const nextProviders = payload?.providers || providers;
 
@@ -442,21 +439,37 @@ console.log("PROFILE FROM API", nextProfile);
 
   const profileReady = !profileLoading;
 
-const hasProfile = profileHasMinimumFields(profile);
+  const hasProfile = profileHasMinimumFields(profile);
 
-console.log("PROFILE CONTEXT STATE", {
-  userKey,
-  profile,
-  hasProfile,
-  profileMissing,
-  profileLoading,
-  profileReady: !profileLoading,
-  completionPercent,
-});
+  const isProfileComplete =
+    hasProfile &&
+    completionPercent >= 80;
 
-const isProfileComplete =
-  hasProfile &&
-  completionPercent >= 80;
+  console.log("PROFILE CONTEXT STATE", {
+    userKey,
+    profile,
+    hasProfile,
+    profileMissing,
+    profileLoading,
+    profileReady,
+    completionPercent,
+  });
+
+  useEffect(() => {
+    console.log("PROFILE STATE CHANGED", {
+      profile,
+      hasProfile,
+      profileMissing,
+      profileLoading,
+      profileReady,
+    });
+  }, [
+    profile,
+    hasProfile,
+    profileMissing,
+    profileLoading,
+    profileReady,
+  ]);
 
   const value = useMemo(
     () => ({
@@ -499,21 +512,6 @@ const isProfileComplete =
       patchProfile,
     ]
   );
-useEffect(() => {
-  console.log("PROFILE STATE CHANGED", {
-    profile,
-    hasProfile,
-    profileMissing,
-    profileLoading,
-    profileReady,
-  });
-}, [
-  profile,
-  hasProfile,
-  profileMissing,
-  profileLoading,
-  profileReady,
-]);
 
   return (
     <ProfileContext.Provider value={value}>
