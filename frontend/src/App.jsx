@@ -25,9 +25,6 @@ import CommunityPlusModerationPage from "./pages/CommunityPlusModerationPage/Com
 import PostComposer from "./components/Layout/Sidebar/Post/PostComposer";
 
 
-
-
-
 function Placeholder({ title, subtitle }) {
   return (
     <div className="dashboard-view">
@@ -66,9 +63,9 @@ function AppProviders() {
     <GoogleMapsProvider>
       <MapProvider>
         <SessionProvider>        
-            <Elements stripe={stripePromise}>
+            
               <Outlet />
-            </Elements>
+            
         </SessionProvider>
       </MapProvider>
     </GoogleMapsProvider>
