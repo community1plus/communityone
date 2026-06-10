@@ -70,7 +70,7 @@ function writeProfileCache(userKey, profile, providers) {
       })
     );
   } catch {
-    // ignore
+    // ignore cache failure
   }
 }
 
@@ -87,7 +87,7 @@ function clearProfileCache(userKey) {
       }
     });
   } catch {
-    // ignore
+    // ignore cache failure
   }
 }
 
@@ -175,7 +175,6 @@ export function ProfileProvider({ children }) {
     isAuthenticated && userKey ? readProfileCache(userKey) : null;
 
   const apiRef = useRef(api);
-  const hasLoadedRef = useRef(Boolean(cachedOnRender));
   const loadingRef = useRef(false);
 
   const [profile, setProfile] = useState(cachedOnRender?.profile || null);
@@ -202,7 +201,7 @@ export function ProfileProvider({ children }) {
       setProviders(normaliseProviders(nextProviders));
       setProfileMissing(missing);
       setProfileError(null);
-      hasLoadedRef.current = true;
+      setProfileLoading(false);
     },
     []
   );
@@ -221,8 +220,6 @@ export function ProfileProvider({ children }) {
         setProfileLoading(false);
 
         clearProfileCache();
-
-        hasLoadedRef.current = true;
 
         return null;
       }
@@ -244,10 +241,6 @@ export function ProfileProvider({ children }) {
 
         const payload = normaliseApiResponse(res);
 
-console.log("RAW /me RESPONSE", res);
-console.log("NORMALISED PAYLOAD", payload);
-console.log("PROFILE FROM API", payload?.profile);
-
         const nextProfile = payload?.profile || null;
         const nextProviders = payload?.providers || {};
 
@@ -268,19 +261,17 @@ console.log("PROFILE FROM API", payload?.profile);
         console.error("Profile load failed:", err);
 
         setProfileError(err?.message || "Profile load failed");
-        hasLoadedRef.current = true;
+        setProfileLoading(false);
 
         return null;
       } finally {
         loadingRef.current = false;
-        setProfileLoading(false);
       }
     },
     [isAuthenticated, userKey, markProfileReady]
   );
 
   useEffect(() => {
-    hasLoadedRef.current = false;
     loadingRef.current = false;
 
     if (!isAuthenticated || !userKey) {
@@ -304,8 +295,6 @@ console.log("PROFILE FROM API", payload?.profile);
       setProfileError(null);
       setProfileLoading(false);
 
-      hasLoadedRef.current = true;
-
       loadProfile({
         background: true,
       });
@@ -318,14 +307,10 @@ console.log("PROFILE FROM API", payload?.profile);
     setProfileMissing(false);
     setProfileError(null);
     setProfileLoading(true);
-  }, [isAuthenticated, userKey, loadProfile]);
 
-  useEffect(() => {
-    if (!isAuthenticated || !userKey) return;
-    if (hasLoadedRef.current) return;
-    if (loadingRef.current) return;
-
-    loadProfile();
+    loadProfile({
+      background: false,
+    });
   }, [isAuthenticated, userKey, loadProfile]);
 
   const saveProfile = useCallback(
@@ -358,7 +343,7 @@ console.log("PROFILE FROM API", payload?.profile);
         setProfile(savedProfile);
         setProviders(normaliseProviders(nextProviders));
         setProfileMissing(false);
-        hasLoadedRef.current = true;
+        setProfileLoading(false);
 
         writeProfileCache(userKey, savedProfile, nextProviders);
 
@@ -372,7 +357,7 @@ console.log("PROFILE FROM API", payload?.profile);
           if (serverProfile) {
             setProfile(serverProfile);
             setProfileMissing(false);
-            hasLoadedRef.current = true;
+            setProfileLoading(false);
 
             writeProfileCache(userKey, serverProfile, providers);
 
@@ -422,7 +407,7 @@ console.log("PROFILE FROM API", payload?.profile);
         setProfile(savedProfile);
         setProviders(normaliseProviders(nextProviders));
         setProfileMissing(false);
-        hasLoadedRef.current = true;
+        setProfileLoading(false);
 
         writeProfileCache(userKey, savedProfile, nextProviders);
 
@@ -446,9 +431,6 @@ console.log("PROFILE FROM API", payload?.profile);
   );
 
   const profileReady = !profileLoading;
-
-  console.log("PROFILE OBJECT", profile);
-  console.log("PROFILE TYPE", typeof profile);
 
   const hasProfile = profileHasMinimumFields(profile);
 
