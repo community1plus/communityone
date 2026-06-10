@@ -1,23 +1,29 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import Button from "../../components/UI/Button";
 import LocationDisplay from "../../components/Layout/Header/LocationDisplay";
-/**/ 
+
 import { useUserLocation } from "../../hooks/useUserLocation";
-import SplashHeader from "../../components/SplashHeader/SplashHeader";
+import { useAuth } from "../../context/AuthContext";
+import { useProfile } from "../../context/ProfileContext";
 
 import "./CommunityPlusSplash.css";
 
 export default function CommunityPlusSplash() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [visible, setVisible] = useState(false);
   const [logoLoaded, setLogoLoaded] = useState(false);
 
-  const handleContinue = () => {
-  navigate("/communityplus/profile");
-  };
+  const { isAuthenticated, isGuest } = useAuth();
+
+  const {
+    profileReady,
+    profileMissing,
+    hasProfile,
+  } = useProfile();
 
   const {
     displayLocation,
@@ -27,6 +33,28 @@ export default function CommunityPlusSplash() {
     setAutoMode,
     setManualMode,
   } = useUserLocation();
+
+  const hasMinimumProfile =
+    hasProfile &&
+    !profileMissing;
+
+  useEffect(() => {
+    if (!isAuthenticated || isGuest) return;
+    if (!profileReady) return;
+
+    if (hasMinimumProfile) {
+      navigate(location.state?.returnTo || "/communityplus", {
+        replace: true,
+      });
+    }
+  }, [
+    isAuthenticated,
+    isGuest,
+    profileReady,
+    hasMinimumProfile,
+    location.state,
+    navigate,
+  ]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -44,11 +72,18 @@ export default function CommunityPlusSplash() {
     return () => clearTimeout(timer);
   }, []);
 
+  const handleContinue = () => {
+    navigate("/communityplus/profile", {
+      state: {
+        returnTo: location.state?.returnTo || "/communityplus",
+        profileRequired: true,
+      },
+    });
+  };
+
   return (
     <div className="communityplus-splash-page">
-
       <header className="communityplus-splash-header">
-
         <div className="communityplus-brand">
           <img
             src="/logo/echo_splash.png"
@@ -71,21 +106,16 @@ export default function CommunityPlusSplash() {
             onAutoSet={setAutoMode}
           />
         </div>
-
       </header>
 
       <main className="communityplus-main">
-
         <div
           className={`communityplus-splash-card ${
             visible ? "visible" : ""
           }`}
         >
-
           <div className="communityplus-hero">
-
             <div className="communityplus-visual">
-
               <img
                 src="/logo/echo_splash.png"
                 alt="Echo"
@@ -93,11 +123,9 @@ export default function CommunityPlusSplash() {
                   logoLoaded ? " loaded" : ""
                 }`}
               />
-
             </div>
 
             <div className="communityplus-splash-copy">
-
               <h1>
                 Welcome to
                 <span>Community One</span>
@@ -106,26 +134,19 @@ export default function CommunityPlusSplash() {
               <p>
                 Community. Connection. Voice.
               </p>
-
             </div>
 
             <div className="communityplus-splash-actions">
-
-            <Button
+              <Button
                 onClick={handleContinue}
                 className="communityplus-cta"
               >
                 Continue to Profile Setup
               </Button>
-
             </div>
-
           </div>
-
         </div>
-
       </main>
-
     </div>
   );
 }
