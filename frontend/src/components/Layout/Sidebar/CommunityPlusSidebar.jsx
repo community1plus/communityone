@@ -41,16 +41,25 @@ export default function CommunityPlusSidebar({
 
   const { isAuthenticated, isGuest } = useAuth();
 
-  const { profileReady, profileMissing, hasProfile } = useProfile();
+  const {
+    profileReady,
+    profileMissing,
+    hasProfile,
+  } = useProfile();
+
+  const profileIsStillResolving =
+    isAuthenticated &&
+    !isGuest &&
+    !profileReady;
 
   const hasMinimumProfile =
-    profileReady &&
     hasProfile &&
     !profileMissing;
 
   const canUseProtectedActions =
     isAuthenticated &&
     !isGuest &&
+    !profileIsStillResolving &&
     hasMinimumProfile;
 
   const sidebar = useMemo(() => {
@@ -115,6 +124,7 @@ export default function CommunityPlusSidebar({
         profileReady,
         profileMissing,
         hasProfile,
+        profileIsStillResolving,
         hasMinimumProfile,
         itemPath: item?.path,
         protectedItem,
@@ -136,7 +146,7 @@ export default function CommunityPlusSidebar({
           return;
         }
 
-        if (!profileReady) {
+        if (profileIsStillResolving) {
           return;
         }
 
@@ -171,6 +181,7 @@ export default function CommunityPlusSidebar({
       profileReady,
       profileMissing,
       hasProfile,
+      profileIsStillResolving,
       hasMinimumProfile,
       redirectToLogin,
       handleLogout,
@@ -212,10 +223,12 @@ export default function CommunityPlusSidebar({
                   protectedItem &&
                   isAuthenticated &&
                   !isGuest &&
-                  profileReady &&
+                  !profileIsStillResolving &&
                   !hasMinimumProfile;
 
-                const locked = guestLocked || profileLocked;
+                const locked =
+                  guestLocked ||
+                  profileLocked;
 
                 return (
                   <button

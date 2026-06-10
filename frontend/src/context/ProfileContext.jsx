@@ -195,16 +195,21 @@ export function ProfileProvider({ children }) {
     apiRef.current = api;
   }, [api]);
 
-  const markProfileReady = useCallback(
-    (nextProfile = null, nextProviders = {}, missing = false) => {
-      setProfile(nextProfile);
-      setProviders(normaliseProviders(nextProviders));
-      setProfileMissing(missing);
-      setProfileError(null);
-      setProfileLoading(false);
-    },
-    []
-  );
+const markProfileReady = useCallback(
+  (nextProfile = null, nextProviders = {}, missing = false) => {
+    console.log("markProfileReady()", {
+      nextProfile,
+      missing,
+    });
+
+    setProfile(nextProfile);
+    setProviders(normaliseProviders(nextProviders));
+    setProfileMissing(missing);
+    setProfileError(null);
+    setProfileLoading(false);
+  },
+  []
+);
 
   const loadProfile = useCallback(
     async ({ background = false } = {}) => {
@@ -239,10 +244,15 @@ export function ProfileProvider({ children }) {
           headers,
         });
 
-        const payload = normaliseApiResponse(res);
+const payload = normaliseApiResponse(res);
 
-        const nextProfile = payload?.profile || null;
-        const nextProviders = payload?.providers || {};
+console.log("RAW /me RESPONSE", res);
+console.log("NORMALISED PAYLOAD", payload);
+
+const nextProfile = payload?.profile || null;
+const nextProviders = payload?.providers || {};
+
+console.log("PROFILE FROM API", nextProfile);
 
         writeProfileCache(userKey, nextProfile, nextProviders);
 
@@ -432,16 +442,21 @@ export function ProfileProvider({ children }) {
 
   const profileReady = !profileLoading;
 
-  const hasProfile = profileHasMinimumFields(profile);
+const hasProfile = profileHasMinimumFields(profile);
 
-  console.log("PROFILE CONTEXT FINAL STATE", {
+console.log("PROFILE CONTEXT STATE", {
+  userKey,
   profile,
   hasProfile,
   profileMissing,
-  profileReady,
+  profileLoading,
+  profileReady: !profileLoading,
+  completionPercent,
 });
 
-  const isProfileComplete = hasProfile && completionPercent >= 80;
+const isProfileComplete =
+  hasProfile &&
+  completionPercent >= 80;
 
   const value = useMemo(
     () => ({
@@ -484,6 +499,21 @@ export function ProfileProvider({ children }) {
       patchProfile,
     ]
   );
+useEffect(() => {
+  console.log("PROFILE STATE CHANGED", {
+    profile,
+    hasProfile,
+    profileMissing,
+    profileLoading,
+    profileReady,
+  });
+}, [
+  profile,
+  hasProfile,
+  profileMissing,
+  profileLoading,
+  profileReady,
+]);
 
   return (
     <ProfileContext.Provider value={value}>
