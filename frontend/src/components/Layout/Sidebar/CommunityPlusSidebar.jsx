@@ -41,18 +41,17 @@ export default function CommunityPlusSidebar({
 
   const { isAuthenticated, isGuest } = useAuth();
 
-  const {
-    profileReady,
-    hasProfile,
-    isProfileComplete,
-  } = useProfile();
+  const { profileReady, profileMissing, hasProfile } = useProfile();
+
+  const hasMinimumProfile =
+    profileReady &&
+    hasProfile &&
+    !profileMissing;
 
   const canUseProtectedActions =
     isAuthenticated &&
     !isGuest &&
-    profileReady &&
-    hasProfile &&
-    isProfileComplete;
+    hasMinimumProfile;
 
   const sidebar = useMemo(() => {
     return (
@@ -104,19 +103,22 @@ export default function CommunityPlusSidebar({
     }
   }, [navigate]);
 
-const handleClick = useCallback(
-  async (item) => {
-    if (!item) return;
+  const handleClick = useCallback(
+    async (item) => {
+      if (!item) return;
 
-    console.log("SIDEBAR AUTH STATE:", {
-      isAuthenticated,
-      isGuest,
-      profileReady,
-      hasProfile,
-      isProfileComplete,
-      itemPath: item?.path,
-      protectedItem: isProtectedItem(item),
-    });
+      const protectedItem = isProtectedItem(item);
+
+      console.log("SIDEBAR AUTH STATE:", {
+        isAuthenticated,
+        isGuest,
+        profileReady,
+        profileMissing,
+        hasProfile,
+        hasMinimumProfile,
+        itemPath: item?.path,
+        protectedItem,
+      });
 
       if (item.type === "action" && item.action === "logout") {
         if (!isAuthenticated || isGuest) {
@@ -128,13 +130,17 @@ const handleClick = useCallback(
         return;
       }
 
-      if (isProtectedItem(item)) {
+      if (protectedItem) {
         if (!isAuthenticated || isGuest) {
           redirectToLogin(item.path);
           return;
         }
 
-        if (!profileReady || !hasProfile || !isProfileComplete) {
+        if (!profileReady) {
+          return;
+        }
+
+        if (!hasMinimumProfile) {
           navigate("/communityplus/welcome", {
             state: {
               returnTo: item.path,
@@ -155,8 +161,6 @@ const handleClick = useCallback(
                 }
               : undefined,
         });
-
-        
       }
     },
     [
@@ -165,14 +169,13 @@ const handleClick = useCallback(
       isAuthenticated,
       isGuest,
       profileReady,
+      profileMissing,
       hasProfile,
-      isProfileComplete,
+      hasMinimumProfile,
       redirectToLogin,
       handleLogout,
     ]
   );
-
-  
 
   const handleEchoClick = useCallback(() => {
     navigate("/communityplus/echo", {
@@ -200,8 +203,19 @@ const handleClick = useCallback(
               {items.map((item) => {
                 const active = isActive(item);
                 const protectedItem = isProtectedItem(item);
+
                 const guestLocked =
-                  !canUseProtectedActions && protectedItem;
+                  protectedItem &&
+                  (!isAuthenticated || isGuest);
+
+                const profileLocked =
+                  protectedItem &&
+                  isAuthenticated &&
+                  !isGuest &&
+                  profileReady &&
+                  !hasMinimumProfile;
+
+                const locked = guestLocked || profileLocked;
 
                 return (
                   <button
@@ -214,18 +228,24 @@ const handleClick = useCallback(
                       item.type === "route" && "route",
                       item.type === "action" && "action",
                       item.action === "logout" && "logout",
-                      guestLocked && "guest-locked",
+                      locked && "guest-locked",
                     ]
                       .filter(Boolean)
                       .join(" ")}
                     onClick={() => handleClick(item)}
                     aria-current={active ? "page" : undefined}
-                    title={guestLocked ? "Sign in required" : item.label}
+                    title={
+                      guestLocked
+                        ? "Sign in required"
+                        : profileLocked
+                        ? "Profile setup required"
+                        : item.label
+                    }
                   >
                     <span className="icon">{item.icon}</span>
                     <span className="label">{item.label}</span>
 
-                    {guestLocked && (
+                    {locked && (
                       <span className="lock" aria-hidden="true">
                         🔒
                       </span>
