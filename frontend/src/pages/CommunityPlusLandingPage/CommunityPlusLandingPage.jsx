@@ -44,8 +44,11 @@ export default function CommunityPlusLandingPage() {
     );
   }, [location.state]);
 
-  const needsProfileSetup =
-    profileMissing || !hasProfile || !isProfileComplete;
+const needsProfileSetup =
+  profileReady &&
+  isAuthenticated &&
+  !isGuest &&
+  (!hasProfile || !isProfileComplete);
 
   useEffect(() => {
     if (location.state?.returnTo) {
@@ -61,65 +64,42 @@ export default function CommunityPlusLandingPage() {
     }
   }, [location.state, isAuthenticated, isGuest]);
 
-  useEffect(() => {
-    if (loading) return;
-    if (isGuest) return;
-    if (!isAuthenticated) return;
-    if (!profileReady) return;
+useEffect(() => {
+  if (loading) return;
+  if (!isAuthenticated) return;
+  if (isGuest) return;
+  if (!profileReady) return;
 
-    const cameFromProtectedRoute =
-      Boolean(location.state?.loginRequired) ||
-      Boolean(sessionStorage.getItem(RETURN_TO_KEY));
-
-    if (needsProfileSetup) {
-      navigate("/communityplus/welcome", {
-        replace: true,
-        state: {
-          returnTo,
-          profileRequired: true,
-        },
-      });
-      return;
-    }
-
-    sessionStorage.removeItem(RETURN_TO_KEY);
-
-    navigate(cameFromProtectedRoute ? returnTo : "/communityplus", {
+  if (!hasProfile || !isProfileComplete) {
+    navigate("/communityplus/welcome", {
       replace: true,
+      state: {
+        returnTo,
+        profileRequired: true,
+      },
     });
-  }, [
-    loading,
-    isGuest,
-    isAuthenticated,
-    profileReady,
-    needsProfileSetup,
-    location.state,
-    navigate,
-    returnTo,
-  ]);
+    return;
+  }
 
-  const handleAuthSuccess = () => {
-    setShowAuth(false);
+  sessionStorage.removeItem(RETURN_TO_KEY);
 
-    if (!profileReady) return;
+  navigate(returnTo || "/communityplus", {
+    replace: true,
+  });
+}, [
+  loading,
+  isAuthenticated,
+  isGuest,
+  profileReady,
+  hasProfile,
+  isProfileComplete,
+  navigate,
+  returnTo,
+]);
 
-    if (needsProfileSetup) {
-      navigate("/communityplus/welcome", {
-        replace: true,
-        state: {
-          returnTo,
-          profileRequired: true,
-        },
-      });
-      return;
-    }
-
-    sessionStorage.removeItem(RETURN_TO_KEY);
-
-    navigate(returnTo || "/communityplus", {
-      replace: true,
-    });
-  };
+const handleAuthSuccess = () => {
+  setShowAuth(false);
+};
 
   const openAuth = () => {
     if (isAuthenticated && !isGuest) {
