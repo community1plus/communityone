@@ -19,7 +19,7 @@ const PROFILE_CACHE_TTL = 1000 * 60 * 10;
 
 const REQUIRED_PROFILE_FIELDS = [
   "userType",
-  "display_name",
+  "displayName",
   "homeLocation",
   "phone",
 ];
@@ -154,8 +154,10 @@ function profileHasMinimumFields(profile) {
 
   return Boolean(
     profile?.id ||
+      profile?.userId ||
       profile?.user_id ||
       profile?.username ||
+      profile?.displayName ||
       profile?.display_name ||
       profile?.accountType ||
       profile?.userType
