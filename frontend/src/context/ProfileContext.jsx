@@ -242,6 +242,10 @@ export function ProfileProvider({ children }) {
 
         const payload = normaliseApiResponse(res);
 
+console.log("RAW /me RESPONSE", res);
+console.log("NORMALISED PAYLOAD", payload);
+console.log("PROFILE FROM API", payload?.profile);
+
         const nextProfile = payload?.profile || null;
         const nextProviders = payload?.providers || {};
 
@@ -440,6 +444,9 @@ export function ProfileProvider({ children }) {
   );
 
   const profileReady = !profileLoading;
+
+  console.log("PROFILE OBJECT", profile);
+  console.log("PROFILE TYPE", typeof profile);
 
   const hasProfile = profileHasMinimumFields(profile);
 
