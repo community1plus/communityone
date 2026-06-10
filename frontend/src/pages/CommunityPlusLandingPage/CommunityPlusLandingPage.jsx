@@ -28,6 +28,12 @@ export default function CommunityPlusLandingPage() {
     isProfileComplete,
   } = useProfile();
 
+  console.log({
+  profileReady,
+  profileMissing,
+  hasProfile,
+  isProfileComplete,
+});
   const [showAuth, setShowAuth] = useState(false);
 
   const returnTo = useMemo(() => {
