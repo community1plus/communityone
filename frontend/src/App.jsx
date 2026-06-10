@@ -1,7 +1,6 @@
 import { Routes, Route, Navigate, Outlet, useLocation } from "react-router-dom";
 
 import { useAuth } from "./context/AuthContext";
-import { ProfileProvider } from "./context/ProfileContext";
 import { GoogleMapsProvider } from "./context/GoogleMapsProvider";
 import { MapProvider } from "./context/MapContext";
 import { SessionProvider } from "./context/sessionContext";
@@ -69,12 +68,10 @@ function AppProviders() {
   return (
     <GoogleMapsProvider>
       <MapProvider>
-        <SessionProvider>
-          <ProfileProvider>
+        <SessionProvider>        
             <Elements stripe={stripePromise}>
               <Outlet />
             </Elements>
-          </ProfileProvider>
         </SessionProvider>
       </MapProvider>
     </GoogleMapsProvider>
