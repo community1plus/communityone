@@ -434,6 +434,13 @@ export function ProfileProvider({ children }) {
 
   const hasProfile = profileHasMinimumFields(profile);
 
+  console.log("PROFILE CONTEXT FINAL STATE", {
+  profile,
+  hasProfile,
+  profileMissing,
+  profileReady,
+});
+
   const isProfileComplete = hasProfile && completionPercent >= 80;
 
   const value = useMemo(
