@@ -188,51 +188,29 @@ const PERSONAL_STEPS = [
 ];
 
 const ORG_STEPS = [
-  {
-    id: "organisation-profile",
-    title: "ORGANISATION",
-    fields: [
-      {
-        name: "username",
-        label: "Username",
-        type: "text",
-        required: true,
-      },
-      {
-        name: "display_name",
-        label: "Real Name",
-        type: "text",
-        required: true,
-      },
-      {
-        name: "email",
-        label: "Email Address",
-        type: "email",
-        readOnly: true,
-      },
-      {
-        name: "organisation.name",
-        label: "Organisation Name",
-        type: "text",
-        required: true,
-      },
-      {
-        name: "organisation.registration",
-        label: "Registration / ABN",
-        type: "text",
-      },
-      {
-        name: "organisation.website",
-        label: "Website",
-        type: "text",
-      },
-      {
-        name: "organisation.description",
-        label: "Description",
-        type: "text",
-      },
-    ],
-  },
+{
+  id: "organisation-contact",
+  title: "CONTACT",
+  fields: [
+    {
+      name: "organisation.phone",
+      label: "Organisation Phone",
+      type: "tel",
+      required: true,
+    },
+    {
+      name: "organisation.email",
+      label: "Organisation Email",
+      type: "email",
+      required: true,
+    },
+    {
+      name: "businessEmailVerificationCode",
+      label: "Email Verification Code",
+      type: "text",
+    },
+  ],
+},
   {
     id: "organisation-address",
     title: "ADDRESS",
@@ -281,45 +259,27 @@ const ORG_STEPS = [
 ];
 
 const MIXED_STEPS = [
-  {
-    id: "mixed-profile",
-    title: "MIXED PROFILE",
-fields: [
-  {
-    name: "username",
-    label: "Username",
-    type: "text",
-    required: true,
-  },
-  {
-    name: "display_name",
-    label: "Real Name",
-    type: "text",
-    required: true,
-  },
-  {
-    name: "email",
-    label: "Email Address",
-    type: "email",
-    readOnly: true,
-  },
-  {
-    name: "creator.name",
-    label: "Creator Name",
-    type: "text",
-  },
-  {
-    name: "business.name",
-    label: "Business Name",
-    type: "text",
-  },
-  {
-    name: "business.website",
-    label: "Website",
-    type: "text",
-  },
-],
-  },
+{
+  id: "mixed-contact",
+  title: "CONTACT",
+  fields: [
+    {
+      name: "business.phone",
+      label: "Business Phone",
+      type: "tel",
+    },
+    {
+      name: "business.email",
+      label: "Business Email",
+      type: "email",
+    },
+    {
+      name: "businessEmailVerificationCode",
+      label: "Email Verification Code",
+      type: "text",
+    },
+  ],
+},  
   {
     id: "mixed-address",
     title: "ADDRESS",
@@ -1504,12 +1464,10 @@ if (!profileReady) {
     />
 
 {["ORG", "MIXED"].includes(values.userType) && isContactStep && (
-  <>
+  <div className="business-verification-stack">
     <div className="business-email-verification">
       <div className="business-email-status">
-        <span className="business-email-label">
-          Business Phone
-        </span>
+        <span className="business-email-label">Business Phone</span>
 
         <span className="verification-pill unverified">
           ✕ Unverified
@@ -1527,71 +1485,69 @@ if (!profileReady) {
       </div>
     </div>
 
-<div className="business-email-verification">
-  <div className="business-email-status">
-    <span className="business-email-label">
-      Business Email
-    </span>
+    <div className="business-email-verification">
+      <div className="business-email-status">
+        <span className="business-email-label">Business Email</span>
 
-    <span
-      className={`verification-pill ${
-        values.userType === "ORG"
-          ? values.organisation?.emailVerified
-            ? "verified"
-            : "unverified"
-          : values.business?.emailVerified
-          ? "verified"
-          : "unverified"
-      }`}
-    >
-      {(
-        values.userType === "ORG"
-          ? values.organisation?.emailVerified
-          : values.business?.emailVerified
-      )
-        ? "✓ Verified"
-        : "✕ Unverified"}
-    </span>
-  </div>
+        <span
+          className={`verification-pill ${
+            values.userType === "ORG"
+              ? values.organisation?.emailVerified
+                ? "verified"
+                : "unverified"
+              : values.business?.emailVerified
+              ? "verified"
+              : "unverified"
+          }`}
+        >
+          {(
+            values.userType === "ORG"
+              ? values.organisation?.emailVerified
+              : values.business?.emailVerified
+          )
+            ? "✓ Verified"
+            : "✕ Unverified"}
+        </span>
+      </div>
 
-  <div className="phone-verification-row">
-    <Button
-      variant="ghost"
-      onClick={sendBusinessEmailCode}
-      disabled={businessEmailStatus === "sending"}
-    >
-      {businessEmailStatus === "sending"
-        ? "Sending..."
-        : "Send email code"}
-    </Button>
+      <div className="phone-verification-row">
+        <Button
+          variant="ghost"
+          onClick={sendBusinessEmailCode}
+          disabled={businessEmailStatus === "sending"}
+        >
+          {businessEmailStatus === "sending"
+            ? "Sending..."
+            : "Send email code"}
+        </Button>
 
-    <Button
-      onClick={verifyBusinessEmailCode}
-      disabled={businessEmailStatus !== "sent"}
-    >
-      {businessEmailStatus === "verifying"
-        ? "Verifying..."
-        : "Verify email"}
-    </Button>
-  </div>
+        <Button
+          onClick={verifyBusinessEmailCode}
+          disabled={businessEmailStatus !== "sent"}
+        >
+          {businessEmailStatus === "verifying"
+            ? "Verifying..."
+            : "Verify email"}
+        </Button>
+      </div>
 
-  {businessEmailStatus === "sent" && (
-    <div className="success">
-      Verification code sent to the business email.
+      {businessEmailStatus === "sent" && (
+        <div className="success">
+          Verification code sent to the business email.
+        </div>
+      )}
+
+      {businessEmailStatus === "verified" && (
+        <div className="success">
+          Business email verified.
+        </div>
+      )}
+
+      {businessEmailError && (
+        <div className="error">{businessEmailError}</div>
+      )}
     </div>
-  )}
-
-  {businessEmailStatus === "verified" && (
-    <div className="success">
-      Business email verified.
-    </div>
-  )}
-
-  {businessEmailError && (
-    <div className="error">{businessEmailError}</div>
-  )}
-</div>
-  </>
+  </div>
 )}
   </>
 )}

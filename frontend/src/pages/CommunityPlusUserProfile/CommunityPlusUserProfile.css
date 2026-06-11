@@ -876,30 +876,6 @@ RESPONSIVE
   color: #1f2937;
 }
 
-.verification-pill {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 4px 10px;
-
-  border-radius: 999px;
-
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.verification-pill.verified {
-  background: #dcfce7;
-  color: #166534;
-  border: 1px solid #22c55e;
-}
-
-.verification-pill.unverified {
-  background: #fee2e2;
-  color: #991b1b;
-  border: 1px solid #dc2626;
-}
 .field-label {
   display: flex;
   align-items: center;
@@ -946,4 +922,11 @@ RESPONSIVE
 .phone-verification-row {
   margin-top: 8px;
   margin-bottom: 8px;
+}
+
+.business-verification-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 4px;
 }
