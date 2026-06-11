@@ -14,28 +14,15 @@ function cleanString(value = "") {
 
 function normaliseAccountType(value = "PERSONAL") {
   const clean = cleanString(value).toUpperCase();
-
   return ACCOUNT_TYPES.includes(clean) ? clean : "PERSONAL";
 }
 
 function mergeSocialState(existing = {}, incoming = {}) {
   return {
-    facebook: {
-      ...(existing.facebook || {}),
-      ...(incoming.facebook || {}),
-    },
-    instagram: {
-      ...(existing.instagram || {}),
-      ...(incoming.instagram || {}),
-    },
-    youtube: {
-      ...(existing.youtube || {}),
-      ...(incoming.youtube || {}),
-    },
-    x: {
-      ...(existing.x || {}),
-      ...(incoming.x || {}),
-    },
+    facebook: { ...(existing.facebook || {}), ...(incoming.facebook || {}) },
+    instagram: { ...(existing.instagram || {}), ...(incoming.instagram || {}) },
+    youtube: { ...(existing.youtube || {}), ...(incoming.youtube || {}) },
+    x: { ...(existing.x || {}), ...(incoming.x || {}) },
   };
 }
 
@@ -43,6 +30,35 @@ function mergePaymentState(existing = {}, incoming = {}) {
   return {
     ...existing,
     ...incoming,
+  };
+}
+
+function mergeEndpointState(existing = {}, incoming = {}) {
+  return {
+    ...existing,
+    ...incoming,
+  };
+}
+
+function getEndpointDetails(req, bodyEndpoint = {}) {
+  const forwardedFor =
+    req.headers["x-forwarded-for"]?.split(",")[0]?.trim();
+
+  return {
+    ...(bodyEndpoint || {}),
+
+    ipAddress:
+      forwardedFor ||
+      req.headers["x-real-ip"] ||
+      req.ip ||
+      "",
+
+    serverUserAgent:
+      req.headers["user-agent"] || "",
+
+    capturedAt:
+      bodyEndpoint?.capturedAt ||
+      new Date().toISOString(),
   };
 }
 
@@ -147,6 +163,10 @@ function pickProfileFields(body = {}) {
     data.payment = body.payment || {};
   }
 
+  if (body.endpoint !== undefined) {
+    data.endpoint = body.endpoint || {};
+  }
+
   return data;
 }
 
@@ -164,12 +184,10 @@ function applyAccountTypeRules(existing = {}, incoming = {}) {
     incoming.user_type || existing.user_type || "PERSONAL"
   );
 
-  const currentType = normaliseAccountType(existing.user_type || "PERSONAL");
+  const currentType = normaliseAccountType(
+    existing.user_type || "PERSONAL"
+  );
 
-  /*
-    PERSONAL commits immediately.
-    This is Level 1 onboarding.
-  */
   if (requestedType === "PERSONAL") {
     next.user_type = "PERSONAL";
     next.pending_account_type = null;
@@ -177,10 +195,6 @@ function applyAccountTypeRules(existing = {}, incoming = {}) {
     return next;
   }
 
-  /*
-    ORG/MIXED should not replace an already usable PERSONAL profile
-    until business verification is completed.
-  */
   if (["ORG", "MIXED"].includes(requestedType)) {
     const hasVerifiedBusiness =
       existing.business_verification_status === "verified" ||
@@ -240,6 +254,7 @@ function normaliseProfile(profile) {
 
     social: profile.social || {},
     payment: profile.payment || {},
+    endpoint: profile.endpoint || {},
 
     profileLevel: profile.profile_level || 0,
     profile_level: profile.profile_level || 0,
@@ -324,9 +339,8 @@ export async function getProfile(req, res) {
    SAVE PROFILE
 ========================= */
 
-async function saveProfile({ userId, incoming, mode = "put" }) {
+async function saveProfile({ userId, incoming }) {
   const now = new Date();
-
   const existing = await fetchProfileByUserId(userId);
 
   const base = existing || {
@@ -342,6 +356,7 @@ async function saveProfile({ userId, incoming, mode = "put" }) {
     home_location: null,
     social: {},
     payment: {},
+    endpoint: {},
     profile_level: 0,
     profile_status: "incomplete",
     pending_account_type: null,
@@ -360,17 +375,22 @@ async function saveProfile({ userId, incoming, mode = "put" }) {
     incoming.payment || {}
   );
 
+  const mergedEndpoint = mergeEndpointState(
+    base.endpoint || {},
+    incoming.endpoint || {}
+  );
+
   const merged = {
     ...base,
     ...incoming,
     social: mergedSocial,
     payment: mergedPayment,
+    endpoint: mergedEndpoint,
     version: (base.version || 0) + 1,
     updated_at: now,
   };
 
   const accountResolved = applyAccountTypeRules(base, merged);
-
   const profileState = calculateProfileState(accountResolved);
 
   const finalProfile = {
@@ -396,6 +416,7 @@ async function saveProfile({ userId, incoming, mode = "put" }) {
           home_location,
           social,
           payment,
+          endpoint,
           profile_level,
           profile_status,
           pending_account_type,
@@ -409,8 +430,9 @@ async function saveProfile({ userId, incoming, mode = "put" }) {
           $6,$7,$8,$9,$10,
           $11::jsonb,
           $12::jsonb,
-          $13,$14,$15,$16,
-          $17,$18,$19
+          $13::jsonb,
+          $14,$15,$16,$17,
+          $18,$19,$20
         )
         RETURNING *
       `,
@@ -429,6 +451,7 @@ async function saveProfile({ userId, incoming, mode = "put" }) {
           : null,
         JSON.stringify(finalProfile.social || {}),
         JSON.stringify(finalProfile.payment || {}),
+        JSON.stringify(finalProfile.endpoint || {}),
         finalProfile.profile_level,
         finalProfile.profile_status,
         finalProfile.pending_account_type,
@@ -457,13 +480,14 @@ async function saveProfile({ userId, incoming, mode = "put" }) {
         home_location = $9::jsonb,
         social = $10::jsonb,
         payment = $11::jsonb,
-        profile_level = $12,
-        profile_status = $13,
-        pending_account_type = $14,
-        business_verification_status = $15,
-        version = $16,
-        updated_at = $17
-      WHERE user_id = $18
+        endpoint = $12::jsonb,
+        profile_level = $13,
+        profile_status = $14,
+        pending_account_type = $15,
+        business_verification_status = $16,
+        version = $17,
+        updated_at = $18
+      WHERE user_id = $19
       RETURNING *
     `,
     [
@@ -480,6 +504,7 @@ async function saveProfile({ userId, incoming, mode = "put" }) {
         : null,
       JSON.stringify(finalProfile.social || {}),
       JSON.stringify(finalProfile.payment || {}),
+      JSON.stringify(finalProfile.endpoint || {}),
       finalProfile.profile_level,
       finalProfile.profile_status,
       finalProfile.pending_account_type,
@@ -509,10 +534,14 @@ export async function putProfile(req, res) {
 
     const incoming = pickProfileFields(req.body);
 
+    incoming.endpoint = getEndpointDetails(
+      req,
+      req.body.endpoint
+    );
+
     const saved = await saveProfile({
       userId,
       incoming,
-      mode: "put",
     });
 
     return res.json({
@@ -543,8 +572,6 @@ export async function patchProfile(req, res) {
       });
     }
 
-    const incoming = pickProfileFields(req.body);
-
     const existing = await fetchProfileByUserId(userId);
 
     if (!existing) {
@@ -553,10 +580,16 @@ export async function patchProfile(req, res) {
       });
     }
 
+    const incoming = pickProfileFields(req.body);
+
+    incoming.endpoint = getEndpointDetails(
+      req,
+      req.body.endpoint
+    );
+
     const saved = await saveProfile({
       userId,
       incoming,
-      mode: "patch",
     });
 
     return res.json({

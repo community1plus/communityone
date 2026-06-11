@@ -159,6 +159,48 @@ function profileHasMinimumFields(profile) {
   return Boolean(profile && Object.keys(profile).length > 0);
 }
 
+function getClientEndpointDetails() {
+  const endpoint = {
+    deviceName: navigator.platform || "",
+
+    deviceType: /Mobi|Android|iPhone|iPad/i.test(
+      navigator.userAgent
+    )
+      ? "mobile"
+      : "desktop",
+
+    userAgent: navigator.userAgent || "",
+
+    platform: navigator.platform || "",
+
+    language: navigator.language || "",
+
+    timezone:
+      Intl.DateTimeFormat()
+        .resolvedOptions()
+        .timeZone || "",
+
+    screen: {
+      width: window.screen?.width || null,
+      height: window.screen?.height || null,
+    },
+
+    viewport: {
+      width: window.innerWidth || null,
+      height: window.innerHeight || null,
+    },
+
+    capturedAt: new Date().toISOString(),
+  };
+
+  console.log(
+    "🖥️ CLIENT ENDPOINT DETAILS",
+    endpoint
+  );
+
+  return endpoint;
+}
+
 export function ProfileProvider({ children }) {
   const api = useAPI();
   const { user, isAuthenticated } = useAuth();
@@ -236,9 +278,25 @@ export function ProfileProvider({ children }) {
       try {
         const headers = await getAuthHeaders();
 
-        const res = await apiRef.current.get("/me", {
-          headers,
-        });
+const payloadToSave = {
+  ...nextProfile,
+  endpoint: getClientEndpointDetails(),
+};
+
+console.log(
+  "💾 PROFILE SAVE PAYLOAD",
+  payloadToSave
+);
+
+const res = await apiRef.current.put(
+  "/profile",
+  payloadToSave,
+  { headers }
+);
+
+const res = await apiRef.current.put("/profile", payloadToSave, {
+  headers,
+});
 
         const payload = normaliseApiResponse(res);
 
@@ -397,9 +455,25 @@ export function ProfileProvider({ children }) {
           "x-version": profile?.version ? String(profile.version) : "",
         });
 
-        const res = await apiRef.current.patch("/profile", patch, {
-          headers,
-        });
+const payloadToPatch = {
+  ...patch,
+  endpoint: getClientEndpointDetails(),
+};
+
+console.log(
+  "🩹 PROFILE PATCH PAYLOAD",
+  payloadToPatch
+);
+
+const res = await apiRef.current.patch(
+  "/profile",
+  payloadToPatch,
+  { headers }
+);
+
+const res = await apiRef.current.patch("/profile", payloadToPatch, {
+  headers,
+});
 
         const payload = normaliseApiResponse(res);
 
