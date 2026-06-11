@@ -1506,64 +1506,7 @@ if (!profileReady) {
       }}
     />
 
-{["ORG", "MIXED"].includes(values.userType) && isContactStep && (
-  <>
-    <div className="business-email-verification">
-      <div className="business-email-status">
-        <span className="business-email-label">
-          Business Phone
-        </span>
 
-        <span className="verification-pill unverified">
-          ✕ Unverified
-        </span>
-      </div>
-
-      <div className="phone-verification-row">
-        <Button variant="ghost">
-          Send phone code
-        </Button>
-
-        <Button>
-          Verify phone
-        </Button>
-      </div>
-    </div>
-
-    <div className="business-email-verification">
-      <div className="business-email-status">
-        <span className="business-email-label">
-          Business Email
-        </span>
-
-        <span className="verification-pill unverified">
-          ✕ Unverified
-        </span>
-      </div>
-
-      <div className="phone-verification-row">
-        <Button
-          variant="ghost"
-          onClick={sendBusinessEmailCode}
-          disabled={businessEmailStatus === "sending"}
-        >
-          {businessEmailStatus === "sending"
-            ? "Sending..."
-            : "Send email code"}
-        </Button>
-
-        <Button
-          onClick={verifyBusinessEmailCode}
-          disabled={businessEmailStatus !== "sent"}
-        >
-          {businessEmailStatus === "verifying"
-            ? "Verifying..."
-            : "Verify email"}
-        </Button>
-      </div>
-    </div>
-  </>
-)}
 
     {["ORG", "MIXED"].includes(values.userType) && isContactStep && (
       <div className="business-email-verification">
