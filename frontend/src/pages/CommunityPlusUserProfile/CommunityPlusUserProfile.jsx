@@ -17,6 +17,14 @@ import BusinessRegistrationForm from "../../components/BusinessRegistration/Busi
 
 const DEFAULT_PHONE_COUNTRY = "AU";
 
+const businessPhone =
+  values.userType === "ORG"
+    ? values.organisation?.phone
+    : values.business?.phone;
+
+const [businessPhoneStatus, setBusinessPhoneStatus] = useState("idle");
+const [businessPhoneError, setBusinessPhoneError] = useState("");
+
 const PHONE_COUNTRIES = [
   { code: "AU", label: "Australia", dialCode: "+61", min: 9, max: 9 },
   { code: "NZ", label: "New Zealand", dialCode: "+64", min: 8, max: 10 },
@@ -395,6 +403,25 @@ const COMMUNITY_POLICY_STEPS = [
     ],
   },
 ];
+
+const sendBusinessPhoneCode = useCallback(async () => {
+  const rawPhone =
+    values.userType === "ORG"
+      ? values.organisation?.phone
+      : values.business?.phone;
+
+  const cleanPhone = toE164Phone(rawPhone, values.phoneCountry);
+
+  if (!cleanPhone) {
+    setBusinessPhoneError("Enter the contact number first.");
+    return;
+  }
+
+  setBusinessPhoneStatus("sending");
+  setBusinessPhoneError("");
+
+  // call /auth/send-phone-code like your personal phone flow
+}, [values]);
 
 function digitsOnly(value = "") {
   return String(value).replace(/\D/g, "");
@@ -1175,6 +1202,7 @@ const handleBusinessRegistrationComplete = useCallback(
         await patchProfile({
           organisation: {
             ...values.organisation,
+            phoneVerified: true,
             email,
             emailVerified: true,
             domainVerified: data.domainVerified ?? true,
@@ -1186,6 +1214,7 @@ const handleBusinessRegistrationComplete = useCallback(
         await patchProfile({
           business: {
             ...values.business,
+            phoneVerified: true,
             email,
             emailVerified: true,
             domainVerified: data.domainVerified || false,
