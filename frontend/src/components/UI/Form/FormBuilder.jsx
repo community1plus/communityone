@@ -99,7 +99,6 @@ const fieldProps = {
   error,
   required,
   valid,
-  verificationStatus,
 };
 
     /* =========================================
