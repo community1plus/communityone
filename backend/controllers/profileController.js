@@ -539,6 +539,11 @@ export async function putProfile(req, res) {
       req.body.endpoint
     );
 
+    console.log(
+  "🖥️ ENDPOINT CAPTURED",
+  incoming.endpoint
+);
+
     const saved = await saveProfile({
       userId,
       incoming,

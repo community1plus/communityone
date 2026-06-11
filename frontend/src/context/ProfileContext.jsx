@@ -471,9 +471,7 @@ const res = await apiRef.current.patch(
   { headers }
 );
 
-const res = await apiRef.current.patch("/profile", payloadToPatch, {
-  headers,
-});
+
 
         const payload = normaliseApiResponse(res);
 
