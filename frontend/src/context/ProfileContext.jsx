@@ -294,9 +294,6 @@ const res = await apiRef.current.put(
   { headers }
 );
 
-const res = await apiRef.current.put("/profile", payloadToSave, {
-  headers,
-});
 
         const payload = normaliseApiResponse(res);
 
