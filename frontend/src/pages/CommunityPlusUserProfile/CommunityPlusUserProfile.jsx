@@ -17,10 +17,7 @@ import BusinessRegistrationForm from "../../components/BusinessRegistration/Busi
 
 const DEFAULT_PHONE_COUNTRY = "AU";
 
-const businessPhone =
-  values.userType === "ORG"
-    ? values.organisation?.phone
-    : values.business?.phone;
+
 
 const [businessPhoneStatus, setBusinessPhoneStatus] = useState("idle");
 const [businessPhoneError, setBusinessPhoneError] = useState("");
@@ -404,24 +401,7 @@ const COMMUNITY_POLICY_STEPS = [
   },
 ];
 
-const sendBusinessPhoneCode = useCallback(async () => {
-  const rawPhone =
-    values.userType === "ORG"
-      ? values.organisation?.phone
-      : values.business?.phone;
 
-  const cleanPhone = toE164Phone(rawPhone, values.phoneCountry);
-
-  if (!cleanPhone) {
-    setBusinessPhoneError("Enter the contact number first.");
-    return;
-  }
-
-  setBusinessPhoneStatus("sending");
-  setBusinessPhoneError("");
-
-  // call /auth/send-phone-code like your personal phone flow
-}, [values]);
 
 function digitsOnly(value = "") {
   return String(value).replace(/\D/g, "");
@@ -693,6 +673,9 @@ useEffect(() => {
 
   const [businessEmailStatus, setBusinessEmailStatus] = useState("idle");
   const [businessEmailError, setBusinessEmailError] = useState("");
+
+  const [businessPhoneStatus, setBusinessPhoneStatus] = useState("idle");
+  const [businessPhoneError, setBusinessPhoneError] = useState("");
 
   const activeSteps = useMemo(() => {
     switch (activeProfileTab) {
@@ -1509,9 +1492,7 @@ if (!profileReady) {
                   )}
 
                   {isSocialStep ? (
-  <div className="social-verification-list">
-    ...
-  </div>
+ <div className="social-verification-list" />
 ) : (
   <>
     <FormBuilder
