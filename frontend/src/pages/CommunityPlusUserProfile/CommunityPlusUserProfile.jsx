@@ -1480,59 +1480,95 @@ if (!profileReady) {
                   )}
 
                   {isSocialStep ? (
-                    <div className="social-verification-list">
-                      {SOCIAL_PROVIDERS.map((provider) => {
-                        const status = getSocialStatus(
-                          profile?.social,
-                          provider.id
-                        );
+  <div className="social-verification-list">
+    ...
+  </div>
+) : (
+  <>
+    <FormBuilder
+      steps={activeSteps}
+      currentStep={currentStep}
+      form={form}
+      extra={{
+        Autocomplete,
+        autoRef,
+        onPlaceChanged,
+        isLoaded,
+      }}
+    />
 
-                        return (
-                          <div
-                            className="social-verification-row"
-                            key={provider.id}
-                          >
-                            <div className="social-verification-main">
-                              <strong>{provider.label}</strong>
-                              <span>{provider.description}</span>
+    {["ORG", "MIXED"].includes(values.userType) && isContactStep && (
+      <div className="business-email-verification">
+        <div className="business-email-status">
+          <span className="business-email-label">
+            Business Email
+          </span>
 
-                              <small
-                                className={
-                                  status.verified ? "success" : "hint"
-                                }
-                              >
-                                {status.text}
-                              </small>
-                            </div>
+          <span
+            className={`verification-pill ${
+              values.userType === "ORG"
+                ? values.organisation?.emailVerified
+                  ? "verified"
+                  : "unverified"
+                : values.business?.emailVerified
+                ? "verified"
+                : "unverified"
+            }`}
+          >
+            {(
+              values.userType === "ORG"
+                ? values.organisation?.emailVerified
+                : values.business?.emailVerified
+            )
+              ? "✓ Verified"
+              : "✕ Unverified"}
+          </span>
+        </div>
 
-                            <button
-                              type="button"
-                              className={`social-verify-button ${
-                                status.verified ? "verified" : "unverified"
-                              }`}
-                              onClick={() =>
-                                startSocialVerification(provider.id)
-                              }
-                            >
-                              {status.verified ? "Verified" : "Verify"}
-                            </button>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    <FormBuilder
-                      steps={activeSteps}
-                      currentStep={currentStep}
-                      form={form}
-                      extra={{
-                        Autocomplete,
-                        autoRef,
-                        onPlaceChanged,
-                        isLoaded,
-                      }}
-                    />
-                  )}
+        <div className="hint">
+          Verify your business email to prove authority over this profile.
+        </div>
+
+        <div className="phone-verification-row">
+          <Button
+            variant="ghost"
+            onClick={sendBusinessEmailCode}
+            disabled={businessEmailStatus === "sending"}
+          >
+            {businessEmailStatus === "sending"
+              ? "Sending..."
+              : "Send email code"}
+          </Button>
+
+          <Button
+            onClick={verifyBusinessEmailCode}
+            disabled={businessEmailStatus !== "sent"}
+          >
+            {businessEmailStatus === "verifying"
+              ? "Verifying..."
+              : "Verify email"}
+          </Button>
+        </div>
+
+        {businessEmailStatus === "sent" && (
+          <div className="success">
+            Verification code sent to the business email.
+          </div>
+        )}
+
+        {businessEmailStatus === "verified" && (
+          <div className="success">
+            Business email verified.
+          </div>
+        )}
+
+        {businessEmailError && (
+          <div className="error">{businessEmailError}</div>
+        )}
+      </div>
+    )}
+  </>
+)}
 
                   {isContactStep && activeProfileTab === "PERSONAL" && (
                     <div className="phone-verification">
@@ -1626,77 +1662,7 @@ if (!profileReady) {
                       )}
                     </div>
                   )}
-{["ORG", "MIXED"].includes(values.userType) && isContactStep && (
-  <div className="business-email-verification">
-    <div className="business-email-status">
-      <span className="business-email-label">
-        Business Email
-      </span>
-
-      <span
-        className={`verification-pill ${
-          values.userType === "ORG"
-            ? values.organisation?.emailVerified
-              ? "verified"
-              : "unverified"
-            : values.business?.emailVerified
-            ? "verified"
-            : "unverified"
-        }`}
-      >
-        {(
-          values.userType === "ORG"
-            ? values.organisation?.emailVerified
-            : values.business?.emailVerified
-        )
-          ? "✓ Verified"
-          : "✕ Unverified"}
-      </span>
-    </div>
-
-    <div className="hint">
-      Verify your business email to prove authority over this profile.
-    </div>
-
-    <div className="phone-verification-row">
-      <Button
-        variant="ghost"
-        onClick={sendBusinessEmailCode}
-        disabled={businessEmailStatus === "sending"}
-      >
-        {businessEmailStatus === "sending"
-          ? "Sending..."
-          : "Send email code"}
-      </Button>
-
-      <Button
-        onClick={verifyBusinessEmailCode}
-        disabled={businessEmailStatus !== "sent"}
-      >
-        {businessEmailStatus === "verifying"
-          ? "Verifying..."
-          : "Verify email"}
-      </Button>
-    </div>
-
-    {businessEmailStatus === "sent" && (
-      <div className="success">
-        Verification code sent to the business email.
-      </div>
-    )}
-
-    {businessEmailStatus === "verified" && (
-      <div className="success">
-        Business email verified.
-      </div>
-    )}
-
-    {businessEmailError && (
-      <div className="error">{businessEmailError}</div>
-    )}
-  </div>
-)}
-                </div>
+           </div>
               </Section>
 
               {profileMissing && (
