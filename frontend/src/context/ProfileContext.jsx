@@ -275,24 +275,11 @@ export function ProfileProvider({ children }) {
 
       setProfileError(null);
 
-      try {
-        const headers = await getAuthHeaders();
+const headers = await getAuthHeaders();
 
-const payloadToSave = {
-  ...nextProfile,
-  endpoint: getClientEndpointDetails(),
-};
-
-console.log(
-  "💾 PROFILE SAVE PAYLOAD",
-  payloadToSave
-);
-
-const res = await apiRef.current.put(
-  "/profile",
-  payloadToSave,
-  { headers }
-);
+const res = await apiRef.current.get("/me", {
+  headers,
+});
 
 
         const payload = normaliseApiResponse(res);
@@ -392,9 +379,16 @@ const res = await apiRef.current.put(
             : "",
         });
 
-        const res = await apiRef.current.put("/profile", nextProfile, {
-          headers,
-        });
+const payloadToSave = {
+  ...nextProfile,
+  endpoint: getClientEndpointDetails(),
+};
+
+console.log("💾 PROFILE SAVE PAYLOAD", payloadToSave);
+
+const res = await apiRef.current.put("/profile", payloadToSave, {
+  headers,
+});
 
         const payload = normaliseApiResponse(res);
 
