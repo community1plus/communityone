@@ -12,15 +12,24 @@ router.get("/", async (req, res) => {
   try {
     console.log("📡 GET /api/me");
 
+    /* =========================
+       AUTH CHECK
+    ========================= */
+
     if (!req.user) {
       return res.status(401).json({
         authenticated: false,
       });
     }
 
+    /* =========================
+       TOKEN USER
+    ========================= */
+
     const user = req.user;
 
     const tokenSub = user.sub || "";
+
     const tokenEmail =
       user.email ||
       user.attributes?.email ||
@@ -30,21 +39,24 @@ router.get("/", async (req, res) => {
       user.username ||
       user["cognito:username"] ||
       user.attributes?.preferred_username ||
-      tokenEmail.split("@")[0] ||
       "";
+
+    const emailLocalPart =
+      tokenEmail && tokenEmail.includes("@")
+        ? tokenEmail.split("@")[0]
+        : "";
 
     console.log("🔐 /api/me token user:", {
       tokenSub,
       tokenEmail,
       tokenUsername,
+      emailLocalPart,
     });
 
-    /*
-      First try exact Cognito sub match.
-      Then fall back through the users table by email.
-      This handles social login where the current Cognito sub
-      differs from the original profile user_id.
-    */
+    /* =========================
+       PROFILE QUERY
+    ========================= */
+
     const profileResult = await pool.query(
       `
       SELECT up.*
@@ -56,17 +68,26 @@ router.get("/", async (req, res) => {
         OR LOWER(u.email) = LOWER($2)
         OR LOWER(up.username) = LOWER($3)
         OR LOWER(up.display_name) = LOWER($3)
+        OR LOWER(up.username) = LOWER($4)
+        OR LOWER(up.display_name) = LOWER($4)
       ORDER BY
         CASE
           WHEN up.user_id = $1 THEN 1
           WHEN LOWER(u.email) = LOWER($2) THEN 2
-          WHEN LOWER(up.username) = LOWER($3) THEN 3
-          WHEN LOWER(up.display_name) = LOWER($3) THEN 4
-          ELSE 5
+          WHEN LOWER(up.username) = LOWER($4) THEN 3
+          WHEN LOWER(up.display_name) = LOWER($4) THEN 4
+          WHEN LOWER(up.username) = LOWER($3) THEN 5
+          WHEN LOWER(up.display_name) = LOWER($3) THEN 6
+          ELSE 7
         END
       LIMIT 1
       `,
-      [tokenSub, tokenEmail, tokenUsername]
+      [
+        tokenSub,
+        tokenEmail,
+        tokenUsername,
+        emailLocalPart,
+      ]
     );
 
     const rawProfile = profileResult.rows[0] || null;
@@ -80,6 +101,10 @@ router.get("/", async (req, res) => {
 
     const profile = normalizeProfile(rawProfile);
 
+    /* =========================
+       PROVIDERS
+    ========================= */
+
     const social = profile?.social || {};
 
     const providers = {
@@ -89,22 +114,36 @@ router.get("/", async (req, res) => {
       x: !!social?.x?.verified,
     };
 
+    /* =========================
+       RESPONSE
+    ========================= */
+
     return res.json({
       authenticated: true,
 
       user: {
         id: tokenSub,
+
         email: tokenEmail,
-        username: profile?.username || tokenUsername || "",
+
+        username:
+          profile?.username ||
+          emailLocalPart ||
+          tokenUsername ||
+          "",
+
         displayName:
           profile?.displayName ||
           profile?.display_name ||
+          emailLocalPart ||
           tokenUsername ||
           "",
+
         profileCompleted: !!profile,
       },
 
       profile,
+
       providers,
     });
   } catch (err) {
@@ -115,5 +154,5 @@ router.get("/", async (req, res) => {
     });
   }
 });
-/* */
+
 export default router;
