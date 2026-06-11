@@ -69,6 +69,29 @@ function getEmailDomain(email = "") {
   return String(email).split("@")[1]?.toLowerCase() || "";
 }
 
+function validateBusinessEmailDomain(email = "") {
+  const domain = getEmailDomain(email);
+
+  if (!email.includes("@")) {
+    return {
+      valid: false,
+      message: "Enter a valid business email address.",
+    };
+  }
+
+  if (isPersonalEmail(email)) {
+    return {
+      valid: false,
+      message: "Use a business or organisation email, not a personal email domain.",
+    };
+  }
+
+  return {
+    valid: true,
+    domain,
+  };
+}
+
 function isPersonalEmail(email = "") {
   const domain = getEmailDomain(email);
 
@@ -1064,6 +1087,14 @@ const handleBusinessRegistrationComplete = useCallback(
       setBusinessEmailError("Enter the business email first.");
       return;
     }
+
+  const domainCheck = validateBusinessEmailDomain(email);
+
+  if (!domainCheck.valid) {
+    setBusinessEmailStatus("error");
+    setBusinessEmailError(domainCheck.message);
+    return;
+  }
 
     setBusinessEmailStatus("sending");
     setBusinessEmailError("");
