@@ -73,6 +73,18 @@ function getEmailDomain(email = "") {
   return String(email).split("@")[1]?.toLowerCase() || "";
 }
 
+function getBusinessPhoneValue(values) {
+  if (values.userType === "ORG") {
+    return values.organisation?.phone || "";
+  }
+
+  if (values.userType === "MIXED") {
+    return values.business?.phone || "";
+  }
+
+  return "";
+}
+
 function validateBusinessEmailDomain(email = "") {
   const domain = getEmailDomain(email);
 
@@ -747,15 +759,14 @@ userType: profile?.userType || "PERSONAL",
         ...(profile?.creator || {}),
       },
 
-      business: {
-        ...prev.business,
-        ...(profile?.business || {}),
-      },
-
-      policies: {
-        ...prev.policies,
-        ...(profile?.policies || {}),
-      },
+business: {
+  ...prev.business,
+  ...(profile?.business || {}),
+  email:
+    profile?.business?.email ||
+    prev.business?.email ||
+    email,
+},
 
       payment: {
         cardName: profile?.payment?.cardName || "",
@@ -1204,31 +1215,54 @@ const handleBusinessRegistrationComplete = useCallback(
     }
   }, [values.userType, setManualLocation, setValue]);
 
-  const buildProfilePayload = useCallback(
-    () => ({
-      username: values.username,
-      display_name: values.display_name,
-      userType: values.userType,
-
-      phone: phoneE164,
-      phoneE164,
-      phoneDisplay: values.phone,
-      phoneCountry: values.phoneCountry,
-
-      homeLocation: values.homeLocation || homeLocation,
-
-      organisation: values.organisation,
-      creator: values.creator,
-      business: values.business,
-      policies: values.policies,
-
-      payment: {
-        cardName: values.payment?.cardName || "",
-        last4: values.payment?.last4 || "",
-      },
-    }),
-    [values, phoneE164, homeLocation]
+  const buildProfilePayload = useCallback(() => {
+  const businessPhoneE164 = toE164Phone(
+    getBusinessPhoneValue(values),
+    values.phoneCountry
   );
+
+  return {
+    username: values.username,
+    display_name: values.display_name,
+    userType: values.userType,
+
+    phone: phoneE164,
+    phoneE164,
+    phoneDisplay: values.phone,
+    phoneCountry: values.phoneCountry,
+
+    homeLocation: values.homeLocation || homeLocation,
+
+    organisation: {
+      ...values.organisation,
+      phone:
+        values.userType === "ORG"
+          ? businessPhoneE164
+          : values.organisation?.phone,
+      phoneDisplay: values.organisation?.phone || "",
+      phoneCountry: values.phoneCountry,
+    },
+
+    creator: values.creator,
+
+    business: {
+      ...values.business,
+      phone:
+        values.userType === "MIXED"
+          ? businessPhoneE164
+          : values.business?.phone,
+      phoneDisplay: values.business?.phone || "",
+      phoneCountry: values.phoneCountry,
+    },
+
+    policies: values.policies,
+
+    payment: {
+      cardName: values.payment?.cardName || "",
+      last4: values.payment?.last4 || "",
+    },
+  };
+}, [values, phoneE164, homeLocation]);
 
   const handleSaveProfile = useCallback(async () => {
     setSavingProfile(true);
@@ -1478,7 +1512,7 @@ if (!profileReady) {
 {["ORG", "MIXED"].includes(values.userType) && isContactStep && (
   <div className="business-verification-stack">
     <div className="verification-inline">
-      <span className="verification-label">Business Phone</span>
+      <span className="verification-label">Phone Verification</span>
 
       <span
         className={`verification-pill ${
@@ -1519,7 +1553,7 @@ if (!profileReady) {
     </div>
 
     <div className="verification-inline">
-      <span className="verification-label">Business Email</span>
+      <span className="verification-label">Email Verification</span>
 
       <span
         className={`verification-pill ${
