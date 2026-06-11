@@ -1564,7 +1564,8 @@ if (!profileReady) {
     </div>
   </>
 )}
-
+  </>
+)}
 
                   {isContactStep && activeProfileTab === "PERSONAL" && (
                     <div className="phone-verification">
