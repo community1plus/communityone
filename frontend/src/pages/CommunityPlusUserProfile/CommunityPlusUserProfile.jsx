@@ -1483,25 +1483,76 @@ if (!profileReady) {
 
 {["ORG", "MIXED"].includes(values.userType) && isContactStep && (
   <div className="business-verification-stack">
-    <div className="business-email-verification">
-      <div className="business-email-status">
-        <span className="business-email-label">Business Phone</span>
+  <div className="verification-row">
 
-        <span className="verification-pill unverified">
-          ✕ Unverified
-        </span>
-      </div>
+  <div className="verification-info">
+    <span className="business-email-label">
+      Business Phone
+    </span>
 
-      <div className="phone-verification-row">
-        <Button variant="ghost">
-          Send phone code
-        </Button>
+    <span className="verification-pill unverified">
+      ✕ Unverified
+    </span>
+  </div>
 
-        <Button>
-          Verify phone
-        </Button>
-      </div>
-    </div>
+  <div className="verification-actions">
+    <Button variant="ghost">
+      Send phone code
+    </Button>
+
+    <Button>
+      Verify phone
+    </Button>
+  </div>
+
+</div>
+
+<div className="verification-row">
+
+  <div className="verification-info">
+    <span className="business-email-label">
+      Business Email
+    </span>
+
+    <span
+      className={`verification-pill ${
+        values.userType === "ORG"
+          ? values.organisation?.emailVerified
+            ? "verified"
+            : "unverified"
+          : values.business?.emailVerified
+          ? "verified"
+          : "unverified"
+      }`}
+    >
+      {(
+        values.userType === "ORG"
+          ? values.organisation?.emailVerified
+          : values.business?.emailVerified
+      )
+        ? "✓ Verified"
+        : "✕ Unverified"}
+    </span>
+  </div>
+
+  <div className="verification-actions">
+    <Button
+      variant="ghost"
+      onClick={sendBusinessEmailCode}
+      disabled={businessEmailStatus === "sending"}
+    >
+      Send email code
+    </Button>
+
+    <Button
+      onClick={verifyBusinessEmailCode}
+      disabled={businessEmailStatus !== "sent"}
+    >
+      Verify email
+    </Button>
+  </div>
+
+</div>
 
     <div className="business-email-verification">
       <div className="business-email-status">

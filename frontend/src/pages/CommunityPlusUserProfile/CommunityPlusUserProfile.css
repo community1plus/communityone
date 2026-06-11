@@ -930,3 +930,29 @@ RESPONSIVE
   gap: 14px;
   margin-top: 4px;
 }
+
+.business-verification-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.verification-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 6px 0;
+}
+
+.verification-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.verification-actions {
+  display: flex;
+  gap: 10px;
+}
