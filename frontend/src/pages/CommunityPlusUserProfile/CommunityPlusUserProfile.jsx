@@ -75,6 +75,12 @@ const PERSONAL_STEPS = [
         type: "text",
         required: true,
       },
+      {
+        name: "email",
+        label: "Email Address",
+        type: "email",
+        readOnly: true,
+      },
     ],
   },
   {
@@ -410,7 +416,14 @@ function getUserDisplayName(user) {
 }
 
 function getInitialProfileValues({ user, homeLocation }) {
+  const email = getUserEmail(user);
+  const emailPrefix = email.split("@")[0] || "";
+
   return {
+    username: emailPrefix,
+    display_name: getUserDisplayName(user) || emailPrefix,
+    email,
+    userType: "PERSONAL",
     username: getUserEmail(user).split("@")[0] || "",
     display_name: getUserDisplayName(user) || "",
     userType: "PERSONAL",
@@ -611,9 +624,15 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     setValues((prev) => ({
       ...prev,
 
-      username: profile?.username || emailPrefix || "",
-      display_name: profile?.display_name || displayName || emailPrefix || "",
-      userType: profile?.userType || "PERSONAL",
+username: profile?.username || emailPrefix || "",
+display_name:
+  profile?.display_name ||
+  profile?.displayName ||
+  displayName ||
+  emailPrefix ||
+  "",
+email,
+userType: profile?.userType || "PERSONAL",
 
       phoneCountry: profile?.phoneCountry || DEFAULT_PHONE_COUNTRY,
       phone: profile?.phoneDisplay || "",
