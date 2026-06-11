@@ -19,8 +19,7 @@ const DEFAULT_PHONE_COUNTRY = "AU";
 
 
 
-const [businessPhoneStatus, setBusinessPhoneStatus] = useState("idle");
-const [businessPhoneError, setBusinessPhoneError] = useState("");
+
 
 const PHONE_COUNTRIES = [
   { code: "AU", label: "Australia", dialCode: "+61", min: 9, max: 9 },
