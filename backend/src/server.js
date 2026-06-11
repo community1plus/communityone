@@ -34,6 +34,8 @@ import paymentRoutes from "./routes/paymentRoutes.js";
 import businessRoutes from "./routes/businessRoutes.js";
 
 import moderationRoutes from "./routes/moderation/moderation.js";
+import businessEmailVerificationRoutes from "./routes/businessEmailVerificationRoutes.js";
+
 
 
 // import identityRoutes from "./routes/identityRoutes.js";
@@ -295,6 +297,9 @@ app.get(
 ========================= */
 
 app.use("/api/payments", paymentRoutes);
+
+app.use("/api/business-email-verification",  businessEmailVerificationRoutes
+);
 
 app.use("/api/moderation", moderationRoutes);
 
