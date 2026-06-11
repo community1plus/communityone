@@ -188,29 +188,37 @@ const PERSONAL_STEPS = [
 ];
 
 const ORG_STEPS = [
-{
-  id: "organisation-contact",
-  title: "CONTACT",
-  fields: [
-    {
-      name: "organisation.phone",
-      label: "Organisation Phone",
-      type: "tel",
-      required: true,
-    },
-    {
-      name: "organisation.email",
-      label: "Organisation Email",
-      type: "email",
-      required: true,
-    },
-    {
-      name: "businessEmailVerificationCode",
-      label: "Email Verification Code",
-      type: "text",
-    },
-  ],
-},
+  {
+    id: "organisation-profile",
+    title: "ORGANISATION",
+    fields: [
+      {
+        name: "username",
+        label: "Username",
+        type: "text",
+        required: true,
+      },
+      {
+        name: "display_name",
+        label: "Real Name",
+        type: "text",
+        required: true,
+      },
+      {
+        name: "email",
+        label: "Email Address",
+        type: "email",
+        readOnly: true,
+      },
+      {
+        name: "organisation.name",
+        label: "Organisation Name",
+        type: "text",
+        required: true,
+      },
+    ],
+  },
+
   {
     id: "organisation-address",
     title: "ADDRESS",
@@ -223,6 +231,7 @@ const ORG_STEPS = [
       },
     ],
   },
+
   {
     id: "organisation-contact",
     title: "CONTACT",
@@ -246,11 +255,13 @@ const ORG_STEPS = [
       },
     ],
   },
+
   {
     id: "organisation-social",
     title: "SOCIAL",
     fields: [],
   },
+
   {
     id: "organisation-payment",
     title: "PAYMENT DETAILS",
@@ -259,27 +270,31 @@ const ORG_STEPS = [
 ];
 
 const MIXED_STEPS = [
-{
-  id: "mixed-contact",
-  title: "CONTACT",
-  fields: [
-    {
-      name: "business.phone",
-      label: "Business Phone",
-      type: "tel",
-    },
-    {
-      name: "business.email",
-      label: "Business Email",
-      type: "email",
-    },
-    {
-      name: "businessEmailVerificationCode",
-      label: "Email Verification Code",
-      type: "text",
-    },
-  ],
-},  
+  {
+    id: "mixed-profile",
+    title: "MIXED PROFILE",
+    fields: [
+      {
+        name: "username",
+        label: "Username",
+        type: "text",
+        required: true,
+      },
+      {
+        name: "display_name",
+        label: "Real Name",
+        type: "text",
+        required: true,
+      },
+      {
+        name: "email",
+        label: "Email Address",
+        type: "email",
+        readOnly: true,
+      },
+    ],
+  },
+
   {
     id: "mixed-address",
     title: "ADDRESS",
@@ -292,6 +307,7 @@ const MIXED_STEPS = [
       },
     ],
   },
+
   {
     id: "mixed-contact",
     title: "CONTACT",
@@ -301,11 +317,11 @@ const MIXED_STEPS = [
         label: "Business Phone",
         type: "tel",
       },
-{
-  name: "business.email",
-  label: "Business Email",
-  type: "email",
-},
+      {
+        name: "business.email",
+        label: "Business Email",
+        type: "email",
+      },
       {
         name: "businessEmailVerificationCode",
         label: "Email Verification Code",
@@ -313,11 +329,13 @@ const MIXED_STEPS = [
       },
     ],
   },
+
   {
     id: "mixed-social",
     title: "SOCIAL",
     fields: [],
   },
+
   {
     id: "mixed-payment",
     title: "PAYMENT DETAILS",
