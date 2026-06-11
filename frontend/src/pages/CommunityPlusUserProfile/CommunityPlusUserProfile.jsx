@@ -248,11 +248,7 @@ const ORG_STEPS = [
         type: "email",
         required: true,
       },
-      {
-        name: "businessEmailVerificationCode",
-        label: "Email Verification Code",
-        type: "text",
-      },
+
     ],
   },
 
@@ -322,11 +318,7 @@ const MIXED_STEPS = [
         label: "Business Email",
         type: "email",
       },
-      {
-        name: "businessEmailVerificationCode",
-        label: "Email Verification Code",
-        type: "text",
-      },
+
     ],
   },
 
@@ -517,31 +509,33 @@ function getInitialProfileValues({ user, homeLocation }) {
 
     homeLocation: homeLocation || null,
 
-    organisation: {
-      name: "",
-      registration: "",
-      website: "",
-      description: "",
-      phone: "",
-      email: "",
-      emailVerified: false,
-      domainVerified: false,
-      location: null,
-    },
+  organisation: {
+  name: "",
+  registration: "",
+  website: "",
+  description: "",
+  phone: "",
+  phoneVerified: false,
+  email: "",
+  emailVerified: false,
+  domainVerified: false,
+  location: null,
+},
 
     creator: {
       name: "",
     },
 
-    business: {
-      name: "",
-      website: "",
-      phone: "",
-      email: "",
-      emailVerified: false,
-      domainVerified: false,
-      location: null,
-    },
+  business: {
+  name: "",
+  website: "",
+  phone: "",
+  phoneVerified: false,
+  email: "",
+  emailVerified: false,
+  domainVerified: false,
+  location: null,
+},
 
     policies: {
       communityStandards: false,
@@ -1483,77 +1477,110 @@ if (!profileReady) {
 
 {["ORG", "MIXED"].includes(values.userType) && isContactStep && (
   <div className="business-verification-stack">
-  <div className="verification-row">
+    <div className="verification-inline">
+      <span className="verification-label">Business Phone</span>
 
-  <div className="verification-info">
-    <span className="business-email-label">
-      Business Phone
-    </span>
-
-    <span className="verification-pill unverified">
-      ✕ Unverified
-    </span>
-  </div>
-
-  <div className="verification-actions">
-    <Button variant="ghost">
-      Send phone code
-    </Button>
-
-    <Button>
-      Verify phone
-    </Button>
-  </div>
-
-</div>
-
-<div className="verification-row">
-
-  <div className="verification-info">
-    <span className="business-email-label">
-      Business Email
-    </span>
-
-    <span
-      className={`verification-pill ${
-        values.userType === "ORG"
-          ? values.organisation?.emailVerified
+      <span
+        className={`verification-pill ${
+          values.userType === "ORG"
+            ? values.organisation?.phoneVerified
+              ? "verified"
+              : "unverified"
+            : values.business?.phoneVerified
             ? "verified"
             : "unverified"
-          : values.business?.emailVerified
-          ? "verified"
-          : "unverified"
-      }`}
-    >
-      {(
-        values.userType === "ORG"
-          ? values.organisation?.emailVerified
-          : values.business?.emailVerified
-      )
-        ? "✓ Verified"
-        : "✕ Unverified"}
-    </span>
-  </div>
+        }`}
+      >
+        {(
+          values.userType === "ORG"
+            ? values.organisation?.phoneVerified
+            : values.business?.phoneVerified
+        )
+          ? "✓ Verified"
+          : "✕ Unverified"}
+      </span>
 
-  <div className="verification-actions">
-    <Button
-      variant="ghost"
-      onClick={sendBusinessEmailCode}
-      disabled={businessEmailStatus === "sending"}
-    >
-      Send email code
-    </Button>
+      <Button variant="ghost">
+        Send Code
+      </Button>
 
-    <Button
-      onClick={verifyBusinessEmailCode}
-      disabled={businessEmailStatus !== "sent"}
-    >
-      Verify email
-    </Button>
-  </div>
+      <input
+        className="verification-code-input"
+        value={values.businessPhoneVerificationCode || ""}
+        placeholder="Code"
+        onChange={(e) =>
+          setValue("businessPhoneVerificationCode", e.target.value)
+        }
+      />
 
-</div>
+      <Button>
+        Verify
+      </Button>
+    </div>
 
+    <div className="verification-inline">
+      <span className="verification-label">Business Email</span>
+
+      <span
+        className={`verification-pill ${
+          values.userType === "ORG"
+            ? values.organisation?.emailVerified
+              ? "verified"
+              : "unverified"
+            : values.business?.emailVerified
+            ? "verified"
+            : "unverified"
+        }`}
+      >
+        {(
+          values.userType === "ORG"
+            ? values.organisation?.emailVerified
+            : values.business?.emailVerified
+        )
+          ? "✓ Verified"
+          : "✕ Unverified"}
+      </span>
+
+      <Button
+        variant="ghost"
+        onClick={sendBusinessEmailCode}
+        disabled={businessEmailStatus === "sending"}
+      >
+        Send Code
+      </Button>
+
+      <input
+        className="verification-code-input"
+        value={values.businessEmailVerificationCode || ""}
+        placeholder="Code"
+        onChange={(e) =>
+          setValue("businessEmailVerificationCode", e.target.value)
+        }
+      />
+
+      <Button
+        onClick={verifyBusinessEmailCode}
+        disabled={businessEmailStatus !== "sent"}
+      >
+        Verify
+      </Button>
+    </div>
+
+    {businessEmailStatus === "sent" && (
+      <div className="success">
+        Verification code sent to the business email.
+      </div>
+    )}
+
+    {businessEmailStatus === "verified" && (
+      <div className="success">
+        Business email verified.
+      </div>
+    )}
+
+    {businessEmailError && (
+      <div className="error">{businessEmailError}</div>
+    )}
   </div>
 )}
   </>

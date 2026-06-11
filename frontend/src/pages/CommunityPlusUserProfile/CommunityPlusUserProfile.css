@@ -956,3 +956,27 @@ RESPONSIVE
   display: flex;
   gap: 10px;
 }
+
+.business-verification-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.verification-inline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.verification-label {
+  width: 140px;
+  font-weight: 700;
+}
+
+.verification-code-input {
+  width: 110px !important;
+  height: 44px !important;
+}
