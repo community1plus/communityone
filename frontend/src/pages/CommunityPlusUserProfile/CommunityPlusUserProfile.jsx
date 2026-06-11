@@ -161,34 +161,28 @@ const PERSONAL_STEPS = [
 ];
 
 const ORG_STEPS = [
-   {
-    name: "username",
-    label: "Username",
-    type: "text",
-    required: true,
-  },
-  {
-    name: "display_name",
-    label: "Real Name",
-    type: "text",
-    required: true,
-  },
-  {
-    name: "email",
-    label: "Email Address",
-    type: "email",
-    readOnly: true,
-  },
-  {
-    name: "organisation.name",
-    label: "Organisation Name",
-    type: "text",
-    required: true,
-  },
   {
     id: "organisation-profile",
     title: "ORGANISATION",
     fields: [
+      {
+        name: "username",
+        label: "Username",
+        type: "text",
+        required: true,
+      },
+      {
+        name: "display_name",
+        label: "Real Name",
+        type: "text",
+        required: true,
+      },
+      {
+        name: "email",
+        label: "Email Address",
+        type: "email",
+        readOnly: true,
+      },
       {
         name: "organisation.name",
         label: "Organisation Name",
@@ -228,15 +222,12 @@ const ORG_STEPS = [
     id: "organisation-contact",
     title: "CONTACT",
     fields: [
-{
-  name: "organisation.email",
-  label: "Organisation Email",
-  type: "email",
-  required: true,
-  verificationStatus: {
-    status: "unverified",
-  },
-},
+      {
+        name: "organisation.phone",
+        label: "Organisation Phone",
+        type: "tel",
+        required: true,
+      },
       {
         name: "organisation.email",
         label: "Organisation Email",
@@ -266,23 +257,41 @@ const MIXED_STEPS = [
   {
     id: "mixed-profile",
     title: "MIXED PROFILE",
-    fields: [
-      {
-        name: "creator.name",
-        label: "Creator Name",
-        type: "text",
-      },
-      {
-        name: "business.name",
-        label: "Business Name",
-        type: "text",
-      },
-      {
-        name: "business.website",
-        label: "Website",
-        type: "text",
-      },
-    ],
+fields: [
+  {
+    name: "username",
+    label: "Username",
+    type: "text",
+    required: true,
+  },
+  {
+    name: "display_name",
+    label: "Real Name",
+    type: "text",
+    required: true,
+  },
+  {
+    name: "email",
+    label: "Email Address",
+    type: "email",
+    readOnly: true,
+  },
+  {
+    name: "creator.name",
+    label: "Creator Name",
+    type: "text",
+  },
+  {
+    name: "business.name",
+    label: "Business Name",
+    type: "text",
+  },
+  {
+    name: "business.website",
+    label: "Website",
+    type: "text",
+  },
+],
   },
   {
     id: "mixed-address",
