@@ -298,8 +298,7 @@ app.get(
 
 app.use("/api/payments", paymentRoutes);
 
-app.use("/api/business-email-verification",  businessEmailVerificationRoutes
-);
+app.use("/api/business-email-verification",  businessEmailVerificationRoutes);
 
 app.use("/api/moderation", moderationRoutes);
 
