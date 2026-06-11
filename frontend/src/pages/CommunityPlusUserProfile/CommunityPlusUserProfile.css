@@ -960,3 +960,16 @@ RESPONSIVE
   border: 1px solid #dc2626;
 }
 
+.business-email-verification {
+  margin-top: 14px;
+  padding-top: 0;
+}
+
+.business-email-status {
+  margin-bottom: 10px;
+}
+
+.phone-verification-row {
+  margin-top: 8px;
+  margin-bottom: 8px;
+}

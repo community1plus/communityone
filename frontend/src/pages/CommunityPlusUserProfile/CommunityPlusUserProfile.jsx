@@ -345,9 +345,6 @@ fields: [
   name: "business.email",
   label: "Business Email",
   type: "email",
-  verificationStatus: {
-    status: "unverified",
-  },
 },
       {
         name: "businessEmailVerificationCode",
