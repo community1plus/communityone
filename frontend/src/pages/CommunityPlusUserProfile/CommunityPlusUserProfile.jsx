@@ -1586,7 +1586,7 @@ if (!profileReady) {
                       )}
                     </div>
                   )}
-                  {["ORG", "MIXED"].includes(values.userType) && isContactStep && (
+{["ORG", "MIXED"].includes(values.userType) && isContactStep && (
   <div className="business-email-verification">
     <div className="business-email-status">
       <span className="business-email-label">
@@ -1656,50 +1656,6 @@ if (!profileReady) {
     )}
   </div>
 )}
-                      <div className="business-email-verification">
-                        <div className="hint">
-                          Verify your business email to prove authority over
-                          this profile.
-                        </div>
-
-                        <div className="phone-verification-row">
-                          <Button
-                            variant="ghost"
-                            onClick={sendBusinessEmailCode}
-                            disabled={businessEmailStatus === "sending"}
-                          >
-                            {businessEmailStatus === "sending"
-                              ? "Sending..."
-                              : "Send email code"}
-                          </Button>
-
-                          <Button
-                            onClick={verifyBusinessEmailCode}
-                            disabled={businessEmailStatus !== "sent"}
-                          >
-                            {businessEmailStatus === "verifying"
-                              ? "Verifying..."
-                              : "Verify email"}
-                          </Button>
-                        </div>
-
-                        {businessEmailStatus === "sent" && (
-                          <div className="success">
-                            Verification code sent to the business email.
-                          </div>
-                        )}
-
-                        {businessEmailStatus === "verified" && (
-                          <div className="success">
-                            Business email verified.
-                          </div>
-                        )}
-
-                        {businessEmailError && (
-                          <div className="error">{businessEmailError}</div>
-                        )}
-                      </div>
-                    )}
                 </div>
               </Section>
 
