@@ -161,6 +161,30 @@ const PERSONAL_STEPS = [
 ];
 
 const ORG_STEPS = [
+   {
+    name: "username",
+    label: "Username",
+    type: "text",
+    required: true,
+  },
+  {
+    name: "display_name",
+    label: "Real Name",
+    type: "text",
+    required: true,
+  },
+  {
+    name: "email",
+    label: "Email Address",
+    type: "email",
+    readOnly: true,
+  },
+  {
+    name: "organisation.name",
+    label: "Organisation Name",
+    type: "text",
+    required: true,
+  },
   {
     id: "organisation-profile",
     title: "ORGANISATION",
@@ -204,12 +228,15 @@ const ORG_STEPS = [
     id: "organisation-contact",
     title: "CONTACT",
     fields: [
-      {
-        name: "organisation.phone",
-        label: "Organisation Phone",
-        type: "tel",
-        required: true,
-      },
+{
+  name: "organisation.email",
+  label: "Organisation Email",
+  type: "email",
+  required: true,
+  verificationStatus: {
+    status: "unverified",
+  },
+},
       {
         name: "organisation.email",
         label: "Organisation Email",
@@ -278,11 +305,14 @@ const MIXED_STEPS = [
         label: "Business Phone",
         type: "tel",
       },
-      {
-        name: "business.email",
-        label: "Business Email",
-        type: "email",
-      },
+{
+  name: "business.email",
+  label: "Business Email",
+  type: "email",
+  verificationStatus: {
+    status: "unverified",
+  },
+},
       {
         name: "businessEmailVerificationCode",
         label: "Email Verification Code",
@@ -455,14 +485,15 @@ function getInitialProfileValues({ user, homeLocation }) {
   const email = getUserEmail(user);
   const emailPrefix = email.split("@")[0] || "";
 
+  const initialUserType = isPersonalEmail(email)
+    ? "PERSONAL"
+    : "ORG";
+
   return {
     username: emailPrefix,
     display_name: getUserDisplayName(user) || emailPrefix,
     email,
-    userType: isPersonalEmail(email) ? "PERSONAL" : "ORG",
-    username: getUserEmail(user).split("@")[0] || "",
-    display_name: getUserDisplayName(user) || "",
-    userType: "PERSONAL",
+    userType: initialUserType,
 
     phoneCountry: DEFAULT_PHONE_COUNTRY,
     phone: "",
@@ -1555,9 +1586,42 @@ if (!profileReady) {
                       )}
                     </div>
                   )}
-
                   {["ORG", "MIXED"].includes(values.userType) &&
-                    isContactStep && (
+  isContactStep && (
+    <div className="business-email-verification">
+
+      <div className="business-email-status">
+        <span className="business-email-label">
+          Business Email
+        </span>
+
+        <span
+          className={`verification-pill ${
+            values.userType === "ORG"
+              ? values.organisation?.emailVerified
+                ? "verified"
+                : "unverified"
+              : values.business?.emailVerified
+              ? "verified"
+              : "unverified"
+          }`}
+        >
+          {(
+            values.userType === "ORG"
+              ? values.organisation?.emailVerified
+              : values.business?.emailVerified
+          )
+            ? "✓ Verified"
+            : "✕ Unverified"}
+        </span>
+      </div>
+
+      <div className="hint">
+        Verify your business email to prove authority over
+        this profile.
+      </div>
+
+      ...
                       <div className="business-email-verification">
                         <div className="hint">
                           Verify your business email to prove authority over

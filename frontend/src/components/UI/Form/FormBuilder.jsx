@@ -93,13 +93,14 @@ export default function FormBuilder({
     const valid =
       isFieldValid?.(name);
 
-    const fieldProps = {
-      key: name,
-      label,
-      error,
-      required,
-      valid,
-    };
+const fieldProps = {
+  key: name,
+  label,
+  error,
+  required,
+  valid,
+  verificationStatus,
+};
 
     /* =========================================
        SELECT
