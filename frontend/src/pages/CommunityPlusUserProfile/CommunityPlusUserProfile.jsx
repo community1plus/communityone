@@ -1586,42 +1586,76 @@ if (!profileReady) {
                       )}
                     </div>
                   )}
-                  {["ORG", "MIXED"].includes(values.userType) &&
-  isContactStep && (
-    <div className="business-email-verification">
+                  {["ORG", "MIXED"].includes(values.userType) && isContactStep && (
+  <div className="business-email-verification">
+    <div className="business-email-status">
+      <span className="business-email-label">
+        Business Email
+      </span>
 
-      <div className="business-email-status">
-        <span className="business-email-label">
-          Business Email
-        </span>
-
-        <span
-          className={`verification-pill ${
-            values.userType === "ORG"
-              ? values.organisation?.emailVerified
-                ? "verified"
-                : "unverified"
-              : values.business?.emailVerified
+      <span
+        className={`verification-pill ${
+          values.userType === "ORG"
+            ? values.organisation?.emailVerified
               ? "verified"
               : "unverified"
-          }`}
-        >
-          {(
-            values.userType === "ORG"
-              ? values.organisation?.emailVerified
-              : values.business?.emailVerified
-          )
-            ? "✓ Verified"
-            : "✕ Unverified"}
-        </span>
-      </div>
+            : values.business?.emailVerified
+            ? "verified"
+            : "unverified"
+        }`}
+      >
+        {(
+          values.userType === "ORG"
+            ? values.organisation?.emailVerified
+            : values.business?.emailVerified
+        )
+          ? "✓ Verified"
+          : "✕ Unverified"}
+      </span>
+    </div>
 
-      <div className="hint">
-        Verify your business email to prove authority over
-        this profile.
-      </div>
+    <div className="hint">
+      Verify your business email to prove authority over this profile.
+    </div>
 
-      ...
+    <div className="phone-verification-row">
+      <Button
+        variant="ghost"
+        onClick={sendBusinessEmailCode}
+        disabled={businessEmailStatus === "sending"}
+      >
+        {businessEmailStatus === "sending"
+          ? "Sending..."
+          : "Send email code"}
+      </Button>
+
+      <Button
+        onClick={verifyBusinessEmailCode}
+        disabled={businessEmailStatus !== "sent"}
+      >
+        {businessEmailStatus === "verifying"
+          ? "Verifying..."
+          : "Verify email"}
+      </Button>
+    </div>
+
+    {businessEmailStatus === "sent" && (
+      <div className="success">
+        Verification code sent to the business email.
+      </div>
+    )}
+
+    {businessEmailStatus === "verified" && (
+      <div className="success">
+        Business email verified.
+      </div>
+    )}
+
+    {businessEmailError && (
+      <div className="error">{businessEmailError}</div>
+    )}
+  </div>
+)}
                       <div className="business-email-verification">
                         <div className="hint">
                           Verify your business email to prove authority over
