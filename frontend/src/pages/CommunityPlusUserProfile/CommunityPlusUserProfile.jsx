@@ -51,6 +51,42 @@ const SOCIAL_PROVIDERS = [
   },
 ];
 
+const PERSONAL_EMAIL_DOMAINS = new Set([
+  "gmail.com",
+  "hotmail.com",
+  "outlook.com",
+  "live.com",
+  "yahoo.com",
+  "icloud.com",
+  "proton.me",
+  "protonmail.com",
+  "aol.com",
+  "me.com",
+  "msn.com",
+]);
+
+function getEmailDomain(email = "") {
+  return String(email).split("@")[1]?.toLowerCase() || "";
+}
+
+function isPersonalEmail(email = "") {
+  const domain = getEmailDomain(email);
+
+  return PERSONAL_EMAIL_DOMAINS.has(domain);
+}
+
+function getAllowedProfileTabs(email = "") {
+  if (isPersonalEmail(email)) {
+    return PROFILE_TABS.filter((tab) =>
+      ["PERSONAL", "MIXED", "COMMUNITY_POLICIES"].includes(tab.id)
+    );
+  }
+
+  return PROFILE_TABS.filter((tab) =>
+    ["ORG", "MIXED", "COMMUNITY_POLICIES"].includes(tab.id)
+  );
+}
+
 const PROFILE_TABS = [
   { id: "PERSONAL", label: "Personal" },
   { id: "ORG", label: "Organisation" },
@@ -423,7 +459,7 @@ function getInitialProfileValues({ user, homeLocation }) {
     username: emailPrefix,
     display_name: getUserDisplayName(user) || emailPrefix,
     email,
-    userType: "PERSONAL",
+    userType: isPersonalEmail(email) ? "PERSONAL" : "ORG",
     username: getUserEmail(user).split("@")[0] || "",
     display_name: getUserDisplayName(user) || "",
     userType: "PERSONAL",
@@ -486,6 +522,12 @@ export default function CommunityPlusUserProfile({ onComplete }) {
   const hydratedProfileRef = useRef(false);
   const { isLoaded } = useGoogleMaps();
   const { user, isAuthenticated } = useAuth();
+  const userEmail = getUserEmail(user);
+
+const allowedProfileTabs = useMemo(
+  () => getAllowedProfileTabs(userEmail),
+  [userEmail]
+);
   const { viewLocation: homeLocation, setManualLocation } = useLocationContext();
 
 
@@ -521,6 +563,17 @@ export default function CommunityPlusUserProfile({ onComplete }) {
   } = form;
 
   const [activeProfileTab, setActiveProfileTab] = useState("PERSONAL");
+
+useEffect(() => {
+  if (!allowedProfileTabs.some((tab) => tab.id === activeProfileTab)) {
+    const fallbackTab = allowedProfileTabs[0]?.id || "PERSONAL";
+
+    setActiveProfileTab(fallbackTab);
+    setValue("userType", fallbackTab);
+    setCurrentStep(0);
+  }
+}, [allowedProfileTabs, activeProfileTab, setValue]);
+
   const [currentStep, setCurrentStep] = useState(0);
 
   const handleProfileTabChange = useCallback(
@@ -669,9 +722,13 @@ userType: profile?.userType || "PERSONAL",
       },
     }));
 
-    if (profile?.userType) {
-      setActiveProfileTab(profile.userType);
-    }
+ const nextUserType =
+  allowedProfileTabs.some((tab) => tab.id === profile?.userType)
+    ? profile.userType
+    : allowedProfileTabs[0]?.id || "PERSONAL";
+
+setActiveProfileTab(nextUserType);
+setValue("userType", nextUserType);
 
     requestAnimationFrame(() => {
       hydratedProfileRef.current = true;
@@ -1267,7 +1324,7 @@ if (!profileReady) {
                   <PageHeader title="USER PROFILE" />
 
                   <div className="profile-type-tabs">
-                    {PROFILE_TABS.map((tab) => (
+                    {allowedProfileTabs.map((tab) => (
                       <button
                         key={tab.id}
                         type="button"
