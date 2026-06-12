@@ -210,6 +210,8 @@ export function ProfileProvider({ children }) {
   authLoading,
 } = useAuth();
 
+const userKey = getUserKey(user);
+
 const authReady = !loading && !authLoading;
 
 const authSettled =
@@ -223,7 +225,7 @@ const waitingForUserKey =
 const profileShouldWait =
   !authSettled || waitingForUserKey;
 
-  const userKey = getUserKey(user);
+  
 
   const cachedOnRender =
     isAuthenticated && userKey
