@@ -75,7 +75,7 @@ export const NAVIGATION = [
         },
         {
           id: "BLOB",
-          label: "blob",
+          label: "BLOB",
           icon: "📅",
           mode: "BLOB",
           image: "community festival crowd outdoor event",
