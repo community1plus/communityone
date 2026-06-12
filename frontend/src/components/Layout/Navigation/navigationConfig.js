@@ -74,8 +74,8 @@ export const NAVIGATION = [
           path: "/communityplus/compose/now",
         },
         {
-          id: "event",
-          label: "Events",
+          id: "BLOB",
+          label: "blob",
           icon: "📅",
           mode: "BLOB",
           image: "community festival crowd outdoor event",
@@ -143,6 +143,20 @@ export const NAVIGATION = [
         {
           id: "moderation",
           label: "Moderation",
+          icon: "🛡️",
+          type: "route",
+          path: "/communityplus/moderation",
+        },
+        {
+          id: "Request Feature",
+          label: "request feature",
+          icon: "🛡️",
+          type: "route",
+          path: "/communityplus/request-feature",
+        },
+        {
+          id: "Report Bug",
+          label: "bugreport",
           icon: "🛡️",
           type: "route",
           path: "/communityplus/moderation",
