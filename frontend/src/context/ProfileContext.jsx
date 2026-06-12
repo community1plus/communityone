@@ -212,6 +212,17 @@ export function ProfileProvider({ children }) {
 
 const authReady = !loading && !authLoading;
 
+const authSettled =
+  !loading && !authLoading;
+
+const waitingForUserKey =
+  authSettled &&
+  isAuthenticated &&
+  !userKey;
+
+const profileShouldWait =
+  !authSettled || waitingForUserKey;
+
   const userKey = getUserKey(user);
 
   const cachedOnRender =
@@ -260,6 +271,18 @@ const [profileLoading, setProfileLoading] = useState(
 
     
     async ({ background = false } = {}) => {
+
+      if (profileShouldWait) {
+        loadingRef.current = false;
+
+        setProfile(null);
+        setProviders(normaliseProviders());
+        setProfileMissing(false);
+        setProfileError(null);
+        setProfileLoading(true);
+
+        return null;
+}
 
       if (!authReady) {
         setProfile(null);
@@ -336,10 +359,22 @@ try {
         loadingRef.current = false;
       }
     },
-    [authReady,isAuthenticated, userKey, markProfileReady]
+    [profileShouldWait,isAuthenticated, userKey, markProfileReady]
   );
 
   useEffect(() => {
+
+    if (profileShouldWait) {
+  loadingRef.current = false;
+
+  setProfile(null);
+  setProviders(normaliseProviders());
+  setProfileMissing(false);
+  setProfileError(null);
+  setProfileLoading(true);
+
+  return;
+}
     loadingRef.current = false;
 
     if (!isAuthenticated) {
@@ -379,7 +414,7 @@ try {
     loadProfile({
       background: false,
     });
-  }, [authReady, isAuthenticated, userKey, loadProfile]);
+  }, [profileShouldWait, isAuthenticated, userKey, loadProfile]);
 
   const saveProfile = useCallback(
     async (nextProfile) => {
