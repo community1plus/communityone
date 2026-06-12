@@ -93,6 +93,30 @@ export const NAVIGATION = [
         },
 
         {
+          id: "compose-beacon",
+          label: "Beacons",
+          icon: "📡",
+          type: "compose",
+          mode: "beacon",
+          path: "/communityplus/compose/beacon",
+        },
+      ],
+    },
+
+    {
+      id: "discover",
+      title: "DISCOVER",
+
+      items: [
+        {
+          id: "iview",
+          label: "iVIEW",
+          icon: "📺",
+          type: "route",
+          path: "/communityplus/iview",
+        },
+
+        {
           id: "news",
           label: "News",
           icon: "📰",
@@ -109,12 +133,19 @@ export const NAVIGATION = [
         },
 
         {
-          id: "compose-beacon",
-          label: "Beacons",
+          id: "yellowpages",
+          label: "Yellow Pages",
+          icon: "📒",
+          type: "route",
+          path: "/communityplus/yellowpages",
+        },
+
+        {
+          id: "channels",
+          label: "Channels",
           icon: "📡",
-          type: "compose",
-          mode: "beacon",
-          path: "/communityplus/compose/beacon",
+          type: "route",
+          path: "/communityplus/channels",
         },
       ],
     },
@@ -124,14 +155,6 @@ export const NAVIGATION = [
       title: "COMMUNITY ONE - EDGE",
 
       items: [
-        {
-          id: "channels",
-          label: "Channels",
-          icon: "📺",
-          type: "route",
-          path: "/communityplus/channels",
-        },
-
         {
           id: "helpdesk",
           label: "Helpdesk",
