@@ -53,7 +53,7 @@ export const NAVIGATION = [
       },
     ],
   },
-  {
+{
   group: "communityplus-sidebar",
   product: "core",
   title: "COMMUNITY+",
@@ -73,20 +73,25 @@ export const NAVIGATION = [
           mode: "now",
           path: "/communityplus/compose/now",
         },
+
         {
-          id: "BLOB",
+          id: "compose-blob",
           label: "BLOB",
-          icon: "📅",
-          mode: "BLOB",
-          image: "community festival crowd outdoor event",
+          icon: "🟣",
+          type: "compose",
+          mode: "blob",
+          path: "/communityplus/compose/blob",
         },
+
         {
-          id: "incident",
+          id: "compose-incident",
           label: "Incidents",
           icon: "🚨",
-          mode: "NOW",
-          image: "emergency lights police response city night",
+          type: "compose",
+          mode: "incident",
+          path: "/communityplus/compose/incident",
         },
+
         {
           id: "news",
           label: "News",
@@ -94,6 +99,7 @@ export const NAVIGATION = [
           type: "route",
           path: "/communityplus/news",
         },
+
         {
           id: "events",
           label: "Events",
@@ -125,6 +131,7 @@ export const NAVIGATION = [
           type: "route",
           path: "/communityplus/channels",
         },
+
         {
           id: "helpdesk",
           label: "Helpdesk",
@@ -147,20 +154,23 @@ export const NAVIGATION = [
           type: "route",
           path: "/communityplus/moderation",
         },
+
         {
           id: "request-feature",
           label: "Request Feature",
-          icon: "🛡️",
+          icon: "💡",
           type: "route",
           path: "/communityplus/request-feature",
         },
+
         {
           id: "report-bug",
           label: "Report Bug",
-          icon: "🛡️",
+          icon: "🐞",
           type: "route",
-          path: "/communityplus/moderation",
+          path: "/communityplus/report-bug",
         },
+
         {
           id: "logout",
           label: "Logout",
