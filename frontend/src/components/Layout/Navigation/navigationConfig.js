@@ -4,7 +4,7 @@ export const NAVIGATION = [
     items: [
       {
         id: "home",
-        label: "Community+",
+        label: "Home",
         type: "route",
         path: "/communityplus",
         product: "core",
@@ -24,6 +24,13 @@ export const NAVIGATION = [
         product: "core",
       },
       {
+        id: "yellowpages",
+        label: "Yellow Pages",
+        type: "route",
+        path: "/communityplus/yellowpages",
+        product: "core",
+      },
+      {
         id: "news",
         label: "News",
         type: "route",
@@ -35,13 +42,6 @@ export const NAVIGATION = [
         label: "Events",
         type: "route",
         path: "/communityplus/events",
-        product: "core",
-      },
-      {
-        id: "yellowpages",
-        label: "Yellow Pages",
-        type: "route",
-        path: "/communityplus/yellowpages",
         product: "core",
       },
       {
@@ -73,7 +73,20 @@ export const NAVIGATION = [
           mode: "now",
           path: "/communityplus/compose/now",
         },
-
+        {
+          id: "event",
+          label: "Events",
+          icon: "📅",
+          mode: "BLOB",
+          image: "community festival crowd outdoor event",
+        },
+        {
+          id: "incident",
+          label: "Incidents",
+          icon: "🚨",
+          mode: "NOW",
+          image: "emergency lights police response city night",
+        },
         {
           id: "news",
           label: "News",
@@ -81,7 +94,6 @@ export const NAVIGATION = [
           type: "route",
           path: "/communityplus/news",
         },
-
         {
           id: "events",
           label: "Events",
@@ -103,17 +115,9 @@ export const NAVIGATION = [
 
     {
       id: "platform",
-      title: "PLATFORM",
+      title: "COMMUNITY ONE - EDGE",
 
       items: [
-        {
-          id: "yellowpages",
-          label: "Yellow Pages",
-          icon: "📒",
-          type: "route",
-          path: "/communityplus/yellowpages",
-        },
-
         {
           id: "channels",
           label: "Channels",
@@ -121,7 +125,6 @@ export const NAVIGATION = [
           type: "route",
           path: "/communityplus/channels",
         },
-
         {
           id: "helpdesk",
           label: "Helpdesk",
@@ -144,7 +147,6 @@ export const NAVIGATION = [
           type: "route",
           path: "/communityplus/moderation",
         },
-
         {
           id: "logout",
           label: "Logout",
