@@ -273,30 +273,32 @@ export function ProfileProvider({ children }) {
         setProfileLoading(true);
       }
 
-      setProfileError(null);
+try {
+  const headers = await getAuthHeaders();
 
-const headers = await getAuthHeaders();
+  const res = await apiRef.current.get("/me", {
+    headers,
+  });
 
-const res = await apiRef.current.get("/me", {
-  headers,
-});
+  const payload = normaliseApiResponse(res);
 
+  console.log("RAW /me RESPONSE", res);
+  console.log("NORMALISED PAYLOAD", payload);
 
-        const payload = normaliseApiResponse(res);
+  const nextProfile = payload?.profile || null;
+  const nextProviders = payload?.providers || {};
 
-        console.log("RAW /me RESPONSE", res);
-        console.log("NORMALISED PAYLOAD", payload);
+  console.log("PROFILE FROM API", nextProfile);
 
-        const nextProfile = payload?.profile || null;
-        const nextProviders = payload?.providers || {};
+  writeProfileCache(userKey, nextProfile, nextProviders);
 
-        console.log("PROFILE FROM API", nextProfile);
+  markProfileReady(
+    nextProfile,
+    nextProviders,
+    !nextProfile
+  );
 
-        writeProfileCache(userKey, nextProfile, nextProviders);
-
-        markProfileReady(nextProfile, nextProviders, !nextProfile);
-
-        return nextProfile;
+  return nextProfile;
       } catch (err) {
         if (isNotFoundError(err)) {
           clearProfileCache(userKey);
