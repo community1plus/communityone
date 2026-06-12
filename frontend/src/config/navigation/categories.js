@@ -7,11 +7,11 @@ export const CATEGORIES = [
     image: "emergency lights police response city night",
   },
   {
-    id: "alert",
-    label: "Alerts",
-    icon: "📡",
-    mode: "NOW",
-    image: "warning alert emergency siren",
+    id: "blob",
+    label: "BLOB",
+    icon: "💬",
+    mode: "BLOB",
+    image: "community meeting diverse group discussion",
   },
   {
     id: "event",
