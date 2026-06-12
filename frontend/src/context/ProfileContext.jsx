@@ -203,7 +203,14 @@ function getClientEndpointDetails() {
 
 export function ProfileProvider({ children }) {
   const api = useAPI();
-  const { user, isAuthenticated } = useAuth();
+  const {
+  user,
+  isAuthenticated,
+  loading,
+  authLoading,
+} = useAuth();
+
+const authReady = !loading && !authLoading;
 
   const userKey = getUserKey(user);
 
@@ -221,9 +228,9 @@ export function ProfileProvider({ children }) {
     normaliseProviders(cachedOnRender?.providers || {})
   );
 
-  const [profileLoading, setProfileLoading] = useState(
-    Boolean(isAuthenticated && !cachedOnRender)
-  );
+const [profileLoading, setProfileLoading] = useState(
+  Boolean(!authReady || (isAuthenticated && !cachedOnRender))
+);
 
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileError, setProfileError] = useState(null);
@@ -250,7 +257,18 @@ export function ProfileProvider({ children }) {
   );
 
   const loadProfile = useCallback(
+
+    
     async ({ background = false } = {}) => {
+
+      if (!authReady) {
+        setProfile(null);
+        setProviders(normaliseProviders());
+        setProfileMissing(false);
+        setProfileError(null);
+        setProfileLoading(true);
+      return null;
+}
       if (loadingRef.current) return null;
 
       if (!isAuthenticated) {
@@ -318,7 +336,7 @@ try {
         loadingRef.current = false;
       }
     },
-    [isAuthenticated, userKey, markProfileReady]
+    [authReady,isAuthenticated, userKey, markProfileReady]
   );
 
   useEffect(() => {
@@ -361,7 +379,7 @@ try {
     loadProfile({
       background: false,
     });
-  }, [isAuthenticated, userKey, loadProfile]);
+  }, [authReady, isAuthenticated, userKey, loadProfile]);
 
   const saveProfile = useCallback(
     async (nextProfile) => {
