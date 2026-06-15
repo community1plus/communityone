@@ -29,13 +29,17 @@
         "FACEBOOK"
       ],
       "redirect_sign_in_uri": [
-        "http://localhost:5173/",
-        "https://main.d1ss8rtrtimogr.amplifyapp.com/"
-      ],
-      "redirect_sign_out_uri": [
-        "http://localhost:5173/",
-        "https://main.d1ss8rtrtimogr.amplifyapp.com/"
-      ],
+  "http://localhost:5173/",
+  "https://main.d1ss8rtrtimogr.amplifyapp.com/",
+  "https://www.comm-unity.one/",
+  "https://comm-unity.one/"
+],
+"redirect_sign_out_uri": [
+  "http://localhost:5173/",
+  "https://main.d1ss8rtrtimogr.amplifyapp.com/",
+  "https://www.comm-unity.one/",
+  "https://comm-unity.one/"
+],
       "response_type": "code",
       "scopes": [
         "email",

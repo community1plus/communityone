@@ -183,13 +183,6 @@ const handleAuthSuccess = () => {
                   Continue as Guest
                 </button>
 
-                <button
-                  type="button"
-                  className="btn secondary"
-                  onClick={openAuth}
-                >
-                  Sign in
-                </button>
               </>
             ) : (
               <>
