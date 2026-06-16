@@ -100,6 +100,8 @@ app.use(
     origin: [
       "https://main.d1ss8rtrtimogr.amplifyapp.com",
       "http://localhost:5173",
+      "https://www.comm-unity.one",
+      "https://comm-unity.one"
     ],
 
     credentials: true,
