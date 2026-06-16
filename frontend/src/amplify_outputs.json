@@ -32,13 +32,15 @@
   "http://localhost:5173/",
   "https://main.d1ss8rtrtimogr.amplifyapp.com/",
   "https://www.comm-unity.one/",
-  "https://comm-unity.one/"
+  "https://comm-unity.one/",
+  "https://develop.d1ss8rtrtimogr.amplifyapp.com/"
 ],
 "redirect_sign_out_uri": [
   "http://localhost:5173/",
   "https://main.d1ss8rtrtimogr.amplifyapp.com/",
   "https://www.comm-unity.one/",
-  "https://comm-unity.one/"
+  "https://comm-unity.one/",
+  "https://develop.d1ss8rtrtimogr.amplifyapp.com/"
 ],
       "response_type": "code",
       "scopes": [
