@@ -16,14 +16,6 @@ import {
 
 import { useUserLocation } from "../../hooks/useUserLocation";
 
-const {
-  displayLocation,
-  loading: locationLoading,
-} = useUserLocation();
-
-const lat = displayLocation?.lat;
-const lng = displayLocation?.lng;
-
 const API_BASE =
   import.meta.env.VITE_API_BASE ||
   (import.meta.env.VITE_API_URL
@@ -43,8 +35,7 @@ const MEDIA_LOAD_TIMEOUT_MS =
 ========================================================= */
 
 function getMediaUrl(post) {
-  const firstMedia =
-    post.media?.[0];
+  const firstMedia = post.media?.[0];
 
   return (
     firstMedia?.signedUrl ||
@@ -55,77 +46,45 @@ function getMediaUrl(post) {
 }
 
 function getMediaType(post) {
-  return (
-    post.media?.[0]
-      ?.mediaType || "text"
-  );
+  return post.media?.[0]?.mediaType || "text";
 }
 
-function formatViews(
-  value = 0
-) {
-  return Number(
-    value || 0
-  ).toLocaleString();
+function formatViews(value = 0) {
+  return Number(value || 0).toLocaleString();
 }
 
 function formatDate(value) {
-  if (!value)
-    return "Unknown";
+  if (!value) return "Unknown";
 
-  return new Intl.DateTimeFormat(
-    undefined,
-    {
-      year: "numeric",
-      month: "short",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-    }
-  ).format(
-    new Date(value)
-  );
+  return new Intl.DateTimeFormat(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(value));
 }
 
-function formatCommentTime(
-  value
-) {
-  if (!value)
-    return "Just now";
+function formatCommentTime(value) {
+  if (!value) return "Just now";
 
-  const created =
-    new Date(value).getTime();
-
+  const created = new Date(value).getTime();
   const now = Date.now();
 
-  if (
-    Number.isNaN(created)
-  ) {
+  if (Number.isNaN(created)) {
     return "Just now";
   }
 
-  const minutes =
-    Math.floor(
-      (now - created) /
-        60000
-    );
+  const minutes = Math.floor((now - created) / 60000);
 
-  if (minutes < 1)
-    return "Just now";
+  if (minutes < 1) return "Just now";
+  if (minutes < 60) return `${minutes}m ago`;
 
-  if (minutes < 60)
-    return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
 
-  const hours =
-    Math.floor(
-      minutes / 60
-    );
+  if (hours < 24) return `${hours}h ago`;
 
-  if (hours < 24)
-    return `${hours}h ago`;
-
-  const days =
-    Math.floor(hours / 24);
+  const days = Math.floor(hours / 24);
 
   return `${days}d ago`;
 }
@@ -140,57 +99,29 @@ function IViewMedia({
   onMediaExpired,
   priority = false,
 }) {
-  const mediaUrl =
-    getMediaUrl(post);
+  const mediaUrl = getMediaUrl(post);
+  const mediaType = getMediaType(post);
 
-  const mediaType =
-    getMediaType(post);
-
-  const [
-    mediaLoaded,
-    setMediaLoaded,
-  ] = useState(false);
-
-  const [
-    mediaFailed,
-    setMediaFailed,
-  ] = useState(false);
-
-  /* RESET */
+  const [mediaLoaded, setMediaLoaded] = useState(false);
+  const [mediaFailed, setMediaFailed] = useState(false);
 
   useEffect(() => {
     setMediaLoaded(false);
-
     setMediaFailed(false);
   }, [mediaUrl]);
 
-  /* TIMEOUT */
-
   useEffect(() => {
-    if (
-      !mediaUrl ||
-      mediaLoaded ||
-      mediaFailed
-    ) {
+    if (!mediaUrl || mediaLoaded || mediaFailed) {
       return;
     }
 
-    const timer =
-      setTimeout(() => {
-        console.warn(
-          "MEDIA LOAD TIMEOUT:",
-          post.id
-        );
+    const timer = setTimeout(() => {
+      console.warn("MEDIA LOAD TIMEOUT:", post.id);
+      setMediaFailed(true);
+      onMediaExpired?.(post.id);
+    }, MEDIA_LOAD_TIMEOUT_MS);
 
-        setMediaFailed(true);
-
-        onMediaExpired?.(
-          post.id
-        );
-      }, MEDIA_LOAD_TIMEOUT_MS);
-
-    return () =>
-      clearTimeout(timer);
+    return () => clearTimeout(timer);
   }, [
     mediaUrl,
     mediaLoaded,
@@ -199,41 +130,19 @@ function IViewMedia({
     post.id,
   ]);
 
-  /* ERROR */
+  const handleMediaError = () => {
+    console.error("MEDIA FAILED:", post.id);
+    setMediaFailed(true);
+    onMediaExpired?.(post.id);
+  };
 
-  const handleMediaError =
-    () => {
-      console.error(
-        "MEDIA FAILED:",
-        post.id
-      );
+  const handleMediaLoaded = () => {
+    console.log("MEDIA READY:", post.id);
 
-      setMediaFailed(true);
-
-      onMediaExpired?.(
-        post.id
-      );
-    };
-
-  /* LOADED */
-
-  const handleMediaLoaded =
-    () => {
-      console.log(
-        "MEDIA READY:",
-        post.id
-      );
-
-      requestAnimationFrame(
-        () => {
-          setMediaLoaded(
-            true
-          );
-        }
-      );
-    };
-
-  /* RENDER */
+    requestAnimationFrame(() => {
+      setMediaLoaded(true);
+    });
+  };
 
   return (
     <div
@@ -243,83 +152,45 @@ function IViewMedia({
           : "iview-media"
       }
     >
-      {/* SKELETON */}
+      {!mediaLoaded && !mediaFailed && (
+        <div className="iview-media-skeleton">
+          <div className="iview-media-shimmer" />
+        </div>
+      )}
 
-      {!mediaLoaded &&
-        !mediaFailed && (
-          <div className="iview-media-skeleton">
-            <div className="iview-media-shimmer" />
-          </div>
-        )}
+      {mediaUrl && mediaType === "image" && !mediaFailed && (
+        <img
+          src={mediaUrl}
+          alt={post.title}
+          loading={priority ? "eager" : "lazy"}
+          decoding="async"
+          className={`iview-image ${
+            mediaLoaded ? "loaded" : ""
+          }`}
+          onLoad={handleMediaLoaded}
+          onError={handleMediaError}
+        />
+      )}
 
-      {/* IMAGE */}
+      {mediaUrl && mediaType === "video" && !mediaFailed && (
+        <video
+          src={mediaUrl}
+          className={`iview-image ${
+            mediaLoaded ? "loaded" : ""
+          }`}
+          muted={!detail}
+          playsInline
+          controls={detail}
+          autoPlay={detail}
+          preload={priority ? "auto" : "metadata"}
+          onLoadedData={handleMediaLoaded}
+          onError={handleMediaError}
+        />
+      )}
 
-      {mediaUrl &&
-        mediaType ===
-          "image" &&
-        !mediaFailed && (
-          <img
-            src={mediaUrl}
-            alt={post.title}
-            loading={
-              priority
-                ? "eager"
-                : "lazy"
-            }
-            decoding="async"
-            className={`iview-image ${
-              mediaLoaded
-                ? "loaded"
-                : ""
-            }`}
-            onLoad={
-              handleMediaLoaded
-            }
-            onError={
-              handleMediaError
-            }
-          />
-        )}
-
-      {/* VIDEO */}
-
-      {mediaUrl &&
-        mediaType ===
-          "video" &&
-        !mediaFailed && (
-          <video
-            src={mediaUrl}
-            className={`iview-image ${
-              mediaLoaded
-                ? "loaded"
-                : ""
-            }`}
-            muted={!detail}
-            playsInline
-            controls={detail}
-            autoPlay={detail}
-            preload={
-              priority
-                ? "auto"
-                : "metadata"
-            }
-            onLoadedData={
-              handleMediaLoaded
-            }
-            onError={
-              handleMediaError
-            }
-          />
-        )}
-
-      {/* EMPTY */}
-
-      {(!mediaUrl ||
-        mediaFailed) && (
+      {(!mediaUrl || mediaFailed) && (
         <div className="iview-empty-media">
-          <span>
-            COMMUNITY ONE
-          </span>
+          <span>COMMUNITY ONE</span>
         </div>
       )}
     </div>
@@ -339,27 +210,20 @@ function IViewCard({
   return (
     <article
       className="iview-card"
-      onClick={() =>
-        onOpen(item)
-      }
+      onClick={() => onOpen(item)}
     >
       <IViewMedia
         post={item}
         priority={priority}
-        onMediaExpired={
-          onMediaExpired
-        }
+        onMediaExpired={onMediaExpired}
       />
 
       <div className="iview-meta">
         <button
           type="button"
           className="iview-title"
-          onClick={(
-            event
-          ) => {
+          onClick={(event) => {
             event.stopPropagation();
-
             onOpen(item);
           }}
         >
@@ -376,21 +240,14 @@ function IViewCard({
           <span>•</span>
 
           <span>
-            {formatViews(
-              item.views
-            )}{" "}
-            views
+            {formatViews(item.views)} views
           </span>
         </div>
 
         <button
           type="button"
           className="iview-track"
-          onClick={(
-            event
-          ) =>
-            event.stopPropagation()
-          }
+          onClick={(event) => event.stopPropagation()}
         >
           track
         </button>
@@ -408,107 +265,51 @@ function IViewDetailPanel({
   onClose,
   onMediaExpired,
 }) {
-  const [
-    commentText,
-    setCommentText,
-  ] = useState("");
-
-  const [comments, setComments] =
-    useState([]);
-
-  const [
-    commentsLoading,
-    setCommentsLoading,
-  ] = useState(true);
-
-  const [
-    commentsError,
-    setCommentsError,
-  ] = useState("");
-
-  const [
-    postingComment,
-    setPostingComment,
-  ] = useState(false);
+  const [commentText, setCommentText] = useState("");
+  const [comments, setComments] = useState([]);
+  const [commentsLoading, setCommentsLoading] = useState(true);
+  const [commentsError, setCommentsError] = useState("");
+  const [postingComment, setPostingComment] = useState(false);
 
   const uploader =
     post.uploader ||
     post.user_id ||
     "Community Member";
 
-  /* ESC */
-
   useEffect(() => {
-    const handleKeyDown = (
-      event
-    ) => {
-      if (
-        event.key ===
-        "Escape"
-      ) {
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
         onClose();
       }
     };
 
-    window.addEventListener(
-      "keydown",
-      handleKeyDown
-    );
+    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      window.removeEventListener(
-        "keydown",
-        handleKeyDown
-      );
+      window.removeEventListener("keydown", handleKeyDown);
     };
   }, [onClose]);
-
-  /* FETCH COMMENTS */
 
   useEffect(() => {
     let cancelled = false;
 
     async function fetchComments() {
-      if (
-        !API_BASE ||
-        !post?.id
-      ) {
+      if (!API_BASE || !post?.id) {
         return;
       }
 
       try {
-        setCommentsLoading(
-          true
-        );
-
+        setCommentsLoading(true);
         setCommentsError("");
 
-if (!lat || !lng) {
-  setError("Waiting for your local area...");
-  setLoading(false);
-  return;
-}
+        const response = await fetch(
+          `${API_BASE}/posts/${post.id}/comments`,
+          {
+            cache: "no-store",
+          }
+        );
 
-const params = new URLSearchParams({
-  limit: String(FEED_LIMIT),
-  scope: "LOCAL",
-  lat: String(lat),
-  lng: String(lng),
-  radiusKm: "5",
-  windowMinutes: "60",
-});
-
-
-const response =
-  await fetch(
-    `${API_BASE}/posts/iview?${params.toString()}`,
-    {
-      cache: "no-store",
-    }
-  );
-
-        const data =
-          await response.json();
+        const data = await response.json();
 
         if (!response.ok) {
           throw new Error(
@@ -519,31 +320,21 @@ const response =
 
         if (!cancelled) {
           setComments(
-            Array.isArray(
-              data.comments
-            )
+            Array.isArray(data.comments)
               ? data.comments
               : []
           );
         }
       } catch (error) {
-        console.error(
-          "Fetch comments failed:",
-          error
-        );
+        console.error("Fetch comments failed:", error);
 
         if (!cancelled) {
           setComments([]);
-
-          setCommentsError(
-            "Could not load comments."
-          );
+          setCommentsError("Could not load comments.");
         }
       } finally {
         if (!cancelled) {
-          setCommentsLoading(
-            false
-          );
+          setCommentsLoading(false);
         }
       }
     }
@@ -555,94 +346,61 @@ const response =
     };
   }, [post.id]);
 
-  /* POST COMMENT */
+  const handlePostComment = async () => {
+    const cleanComment = commentText.trim();
 
-  const handlePostComment =
-    async () => {
-      const cleanComment =
-        commentText.trim();
+    if (!cleanComment || postingComment) {
+      return;
+    }
 
-      if (
-        !cleanComment ||
-        postingComment
-      ) {
-        return;
-      }
+    try {
+      setPostingComment(true);
+      setCommentsError("");
 
-      try {
-        setPostingComment(
-          true
-        );
+      const response = await fetch(
+        `${API_BASE}/posts/${post.id}/comments`,
+        {
+          method: "POST",
 
-        setCommentsError("");
+          headers: {
+            "Content-Type": "application/json",
+          },
 
-        const response =
-          await fetch(
-            `${API_BASE}/posts/${post.id}/comments`,
-            {
-              method: "POST",
-
-              headers: {
-                "Content-Type":
-                  "application/json",
-              },
-
-              body: JSON.stringify(
-                {
-                  comment:
-                    cleanComment,
-                }
-              ),
-            }
-          );
-
-        const data =
-          await response.json();
-
-        if (!response.ok) {
-          throw new Error(
-            data?.error ||
-              "Could not post comment."
-          );
+          body: JSON.stringify({
+            comment: cleanComment,
+          }),
         }
+      );
 
-        setComments(
-          (prev) => [
-            data.comment,
-            ...prev,
-          ]
-        );
+      const data = await response.json();
 
-        setCommentText("");
-      } catch (error) {
-        console.error(
-          "Post comment failed:",
-          error
-        );
-
-        setCommentsError(
-          "Could not post comment."
-        );
-      } finally {
-        setPostingComment(
-          false
+      if (!response.ok) {
+        throw new Error(
+          data?.error ||
+            "Could not post comment."
         );
       }
-    };
 
-  /* RENDER */
+      setComments((prev) => [
+        data.comment,
+        ...prev,
+      ]);
+
+      setCommentText("");
+    } catch (error) {
+      console.error("Post comment failed:", error);
+      setCommentsError("Could not post comment.");
+    } finally {
+      setPostingComment(false);
+    }
+  };
 
   return (
     <section
       className="iview-detail-shell"
       aria-label="iVIEW content panel"
-      onMouseDown={(
-        event
-      ) => {
-        if (
-          event.target ===
-          event.currentTarget
-        ) {
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) {
           onClose();
         }
       }}
@@ -657,27 +415,18 @@ const response =
 
       <div
         className="iview-detail-layout"
-        onMouseDown={(
-          event
-        ) =>
-          event.stopPropagation()
-        }
+        onMouseDown={(event) => event.stopPropagation()}
       >
         <main className="iview-detail-main">
           <IViewMedia
             post={post}
             detail
-            onMediaExpired={
-              onMediaExpired
-            }
+            onMediaExpired={onMediaExpired}
           />
 
           <div className="iview-detail-actions">
             <span>
-              {formatViews(
-                post.views
-              )}{" "}
-              views
+              {formatViews(post.views)} views
             </span>
 
             <button type="button">
@@ -690,9 +439,7 @@ const response =
           </div>
 
           <section className="iview-detail-description">
-            <h1>
-              {post.title}
-            </h1>
+            <h1>{post.title}</h1>
 
             <p>
               {post.content ||
@@ -700,24 +447,11 @@ const response =
             </p>
 
             <div className="iview-detail-meta">
-              <span>
-                {uploader}
-              </span>
-
+              <span>{uploader}</span>
               <span>•</span>
-
-              <span>
-                {post.category ||
-                  "Community"}
-              </span>
-
+              <span>{post.category || "Community"}</span>
               <span>•</span>
-
-              <span>
-                {formatDate(
-                  post.created_at
-                )}
-              </span>
+              <span>{formatDate(post.created_at)}</span>
             </div>
           </section>
         </main>
@@ -729,13 +463,8 @@ const response =
             </div>
 
             <p>
-              Community
-              discussion
-              will be
-              summarised
-              here as
-              comments are
-              added.
+              Community discussion will be summarised here as
+              comments are added.
             </p>
           </section>
 
@@ -746,16 +475,9 @@ const response =
 
             <div className="iview-comment-box">
               <textarea
-                value={
-                  commentText
-                }
-                onChange={(
-                  event
-                ) =>
-                  setCommentText(
-                    event.target
-                      .value
-                  )
+                value={commentText}
+                onChange={(event) =>
+                  setCommentText(event.target.value)
                 }
                 placeholder="Respond to this post..."
               />
@@ -766,9 +488,7 @@ const response =
                   !commentText.trim() ||
                   postingComment
                 }
-                onClick={
-                  handlePostComment
-                }
+                onClick={handlePostComment}
               >
                 {postingComment
                   ? "posting..."
@@ -779,63 +499,45 @@ const response =
             <div className="iview-comment-list">
               {commentsLoading && (
                 <div className="iview-comment-loading">
-                  Loading
-                  comments...
+                  Loading comments...
+                </div>
+              )}
+
+              {!commentsLoading && commentsError && (
+                <div className="iview-comment-loading error">
+                  {commentsError}
                 </div>
               )}
 
               {!commentsLoading &&
-                commentsError && (
-                  <div className="iview-comment-loading error">
-                    {
-                      commentsError
-                    }
-                  </div>
-                )}
-
-              {!commentsLoading &&
                 !commentsError &&
-                comments.length ===
-                  0 && (
+                comments.length === 0 && (
                   <div className="iview-comment-loading">
-                    No comments
-                    yet.
+                    No comments yet.
                   </div>
                 )}
 
               {!commentsLoading &&
                 !commentsError &&
-                comments.map(
-                  (
-                    comment
-                  ) => (
-                    <article
-                      key={
-                        comment.id
-                      }
-                      className="iview-comment"
-                    >
-                      <div className="iview-comment-header">
-                        <strong>
-                          {comment.user_id ||
-                            "Community Member"}
-                        </strong>
+                comments.map((comment) => (
+                  <article
+                    key={comment.id}
+                    className="iview-comment"
+                  >
+                    <div className="iview-comment-header">
+                      <strong>
+                        {comment.user_id ||
+                          "Community Member"}
+                      </strong>
 
-                        <span>
-                          {formatCommentTime(
-                            comment.created_at
-                          )}
-                        </span>
-                      </div>
+                      <span>
+                        {formatCommentTime(comment.created_at)}
+                      </span>
+                    </div>
 
-                      <p>
-                        {
-                          comment.comment
-                        }
-                      </p>
-                    </article>
-                  )
-                )}
+                    <p>{comment.comment}</p>
+                  </article>
+                ))}
             </div>
           </section>
         </aside>
@@ -849,7 +551,13 @@ const response =
 ========================================================= */
 
 export default function CommunityPlusIViewPage() {
-  /* SESSION */
+  const {
+    displayLocation,
+    loading: locationLoading,
+  } = useUserLocation();
+
+  const lat = displayLocation?.lat;
+  const lng = displayLocation?.lng;
 
   const {
     cachedFeed,
@@ -861,222 +569,153 @@ export default function CommunityPlusIViewPage() {
     scrollPosition,
   } = useIViewSession();
 
-  /* LOCAL */
+  const [posts, setPosts] = useState(cachedFeed || []);
+  const [loading, setLoading] = useState(!cachedFeed?.length);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState("");
 
-  const [posts, setPosts] =
-    useState(
-      cachedFeed || []
-    );
-
-  const [loading, setLoading] =
-    useState(
-      !cachedFeed?.length
-    );
-
-  const [
-    refreshing,
-    setRefreshing,
-  ] = useState(false);
-
-  const [error, setError] =
-    useState("");
-
-  /* REFS */
-
-  const containerRef =
-    useRef(null);
-
-  /* RESTORE SCROLL */
+  const containerRef = useRef(null);
 
   useEffect(() => {
-    const container =
-      containerRef.current;
+    const container = containerRef.current;
 
-    if (!container)
-      return;
+    if (!container) return;
 
-    requestAnimationFrame(
-      () => {
-        container.scrollTop =
-          scrollPosition.current;
+    requestAnimationFrame(() => {
+      container.scrollTop = scrollPosition.current;
 
-        console.log(
-          "SCROLL RESTORED:",
-          scrollPosition.current
-        );
-      }
-    );
+      console.log(
+        "SCROLL RESTORED:",
+        scrollPosition.current
+      );
+    });
   }, [scrollPosition]);
 
-  /* SAVE SCROLL */
+  const handleScroll = useCallback(() => {
+    if (!containerRef.current) {
+      return;
+    }
 
-  const handleScroll =
-    useCallback(() => {
-      if (
-        !containerRef.current
-      ) {
+    scrollPosition.current =
+      containerRef.current.scrollTop;
+  }, [scrollPosition]);
+
+  const fetchPosts = useCallback(
+    async ({ silent = false } = {}) => {
+      if (!API_BASE) {
+        setError("Backend API is not configured.");
+        setLoading(false);
         return;
       }
 
-      scrollPosition.current =
-        containerRef.current.scrollTop;
-    }, [scrollPosition]);
-
-  /* FETCH POSTS */
-
-  const fetchPosts =
-    useCallback(
-      async ({
-        silent = false,
-      } = {}) => {
-        if (!API_BASE) {
-          setError(
-            "Backend API is not configured."
-          );
-
-          setLoading(false);
-
-          return;
-        }
-
-        try {
-          if (silent) {
-            setRefreshing(
-              true
-            );
-          } else if (
-            !cachedFeed?.length
-          ) {
-            setLoading(true);
-          }
-
+      if (!lat || !lng) {
+        if (!silent) {
           setError("");
+          setLoading(true);
+        }
 
-          const response =
-            await fetch(
-              `${API_BASE}/posts?limit=${FEED_LIMIT}`,
-              {
-                cache:
-                  "no-store",
-              }
-            );
+        return;
+      }
 
-          const data =
-            await response.json();
+      try {
+        if (silent) {
+          setRefreshing(true);
+        } else if (!cachedFeed?.length) {
+          setLoading(true);
+        }
 
-          if (!response.ok) {
-            throw new Error(
-              data?.error ||
-                "Could not fetch posts."
-            );
+        setError("");
+
+        const params = new URLSearchParams({
+          limit: String(FEED_LIMIT),
+          scope: "LOCAL",
+          lat: String(lat),
+          lng: String(lng),
+          radiusKm: "5",
+          windowMinutes: "60",
+        });
+
+        const response = await fetch(
+          `${API_BASE}/posts/iview?${params.toString()}`,
+          {
+            cache: "no-store",
           }
+        );
 
-          const nextPosts =
-            Array.isArray(
-              data.posts
-            )
-              ? data.posts
-              : [];
+        const data = await response.json();
 
-          setPosts(
-            nextPosts
-          );
-
-          setCachedFeed(
-            nextPosts
-          );
-
-          setSelectedPost(
-            (current) => {
-              if (!current)
-                return null;
-
-              return (
-                nextPosts.find(
-                  (
-                    post
-                  ) =>
-                    post.id ===
-                    current.id
-                ) || current
-              );
-            }
-          );
-        } catch (err) {
-          console.error(
-            "iVIEW FETCH ERROR:",
-            err
-          );
-
-          setError(
-            err?.message ||
-              "Could not load iVIEW feed."
-          );
-        } finally {
-          setLoading(false);
-
-          setRefreshing(
-            false
+        if (!response.ok) {
+          throw new Error(
+            data?.error ||
+              "Could not fetch posts."
           );
         }
-      },
-      [
-        cachedFeed,
-        setCachedFeed,
-        setSelectedPost,
-        lat,
-        lng,
-      ]
-    );
 
-  /* INITIAL */
+        const nextPosts =
+          Array.isArray(data.posts)
+            ? data.posts
+            : [];
+
+        setPosts(nextPosts);
+        setCachedFeed(nextPosts);
+
+        setSelectedPost((current) => {
+          if (!current) return null;
+
+          return (
+            nextPosts.find(
+              (post) => post.id === current.id
+            ) || current
+          );
+        });
+      } catch (err) {
+        console.error("iVIEW FETCH ERROR:", err);
+
+        setError(
+          err?.message ||
+            "Could not load iVIEW feed."
+        );
+      } finally {
+        setLoading(false);
+        setRefreshing(false);
+      }
+    },
+    [
+      cachedFeed,
+      setCachedFeed,
+      setSelectedPost,
+      lat,
+      lng,
+    ]
+  );
 
   useEffect(() => {
-    if (
-      cachedFeed?.length
-    ) {
-      setPosts(
-        cachedFeed
-      );
-
+    if (cachedFeed?.length) {
+      setPosts(cachedFeed);
       return;
     }
 
     fetchPosts();
-  }, [
-    cachedFeed,
-    fetchPosts,
-  ]);
-
-  /* INTERVAL */
+  }, [cachedFeed, fetchPosts]);
 
   useEffect(() => {
-    const interval =
-      setInterval(() => {
+    const interval = setInterval(() => {
+      fetchPosts({
+        silent: true,
+      });
+    }, FEED_REFRESH_MS);
+
+    return () => clearInterval(interval);
+  }, [fetchPosts]);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
         fetchPosts({
           silent: true,
         });
-      }, FEED_REFRESH_MS);
-
-    return () =>
-      clearInterval(
-        interval
-      );
-  }, [fetchPosts]);
-
-  /* VISIBILITY */
-
-  useEffect(() => {
-    const handleVisibilityChange =
-      () => {
-        if (
-          !document.hidden
-        ) {
-          fetchPosts({
-            silent: true,
-          });
-        }
-      };
+      }
+    };
 
     document.addEventListener(
       "visibilitychange",
@@ -1091,148 +730,88 @@ export default function CommunityPlusIViewPage() {
     };
   }, [fetchPosts]);
 
-  /* MEDIA EXPIRED */
+  const handleMediaExpired = useCallback(() => {
+    fetchPosts({
+      silent: true,
+    });
+  }, [fetchPosts]);
 
-  const handleMediaExpired =
-    useCallback(() => {
-      fetchPosts({
-        silent: true,
-      });
-    }, [fetchPosts]);
-
-  /* FEED */
-
-  const feedItems =
-    useMemo(
-      () =>
-        posts.slice(
-          0,
-          FEED_LIMIT
-        ),
-      [posts]
-    );
-
-  /* RENDER */
+  const feedItems = useMemo(
+    () => posts.slice(0, FEED_LIMIT),
+    [posts]
+  );
 
   return (
     <div
       ref={containerRef}
       className="iview-page"
-      onScroll={
-        handleScroll
-      }
+      onScroll={handleScroll}
     >
-      {/* LOADING */}
+      {loading && (
+        <div className="iview-state">
+          {locationLoading
+            ? "Finding your local area..."
+            : "Loading local iVIEW..."}
+        </div>
+      )}
 
-{loading && (
-  <div className="iview-state">
-    {locationLoading
-      ? "Finding your local area..."
-      : "Loading local iVIEW..."}
-  </div>
-)}
+      {!loading && error && (
+        <div className="iview-state error">
+          {error}
+        </div>
+      )}
 
-      {/* ERROR */}
+      {!loading && !error && !selectedPost && (
+        <div className="iview-grid">
+          {feedItems.map((post, index) => (
+            <IViewCard
+              key={post.id}
+              item={post}
+              priority={index < 2}
+              onOpen={setSelectedPost}
+              onMediaExpired={handleMediaExpired}
+            />
+          ))}
 
-      {!loading &&
-        error && (
-          <div className="iview-state error">
-            {error}
-          </div>
-        )}
-
-      {/* FEED */}
-
-      {!loading &&
-        !error &&
-        !selectedPost && (
-          <div className="iview-grid">
-            {feedItems.map(
-              (
-                post,
-                index
-              ) => (
-                <IViewCard
-                  key={post.id}
-                  item={post}
-                  priority={
-                    index < 2
-                  }
-                  onOpen={
-                    setSelectedPost
-                  }
-                  onMediaExpired={
-                    handleMediaExpired
-                  }
-                />
-              )
-            )}
-
-            {/* EMPTY */}
-
-            {Array.from({
-              length:
-                Math.max(
-                  0,
-                  FEED_LIMIT -
-                    feedItems.length
-                ),
-            }).map(
-              (_, index) => (
-                <div
-                  key={`empty-${index}`}
-                  className="iview-card empty"
-                >
-                  <div className="iview-empty-media">
-                    <span>
-                      No content
-                      yet
-                    </span>
-                  </div>
-                </div>
-              )
-            )}
-
-            {/* AD */}
-
-            <div className="iview-ad-slot">
-              <CommunityPlusAdTv
-                mode="page"
-                context="iview"
-                tvMode="idle"
-              />
-            </div>
-
-            {/* REFRESH */}
-
-            {refreshing && (
-              <div className="iview-refresh-indicator">
-                Refreshing
-                media...
+          {Array.from({
+            length: Math.max(
+              0,
+              FEED_LIMIT - feedItems.length
+            ),
+          }).map((_, index) => (
+            <div
+              key={`empty-${index}`}
+              className="iview-card empty"
+            >
+              <div className="iview-empty-media">
+                <span>No content yet</span>
               </div>
-            )}
+            </div>
+          ))}
+
+          <div className="iview-ad-slot">
+            <CommunityPlusAdTv
+              mode="page"
+              context="iview"
+              tvMode="idle"
+            />
           </div>
-        )}
 
-      {/* DETAIL */}
+          {refreshing && (
+            <div className="iview-refresh-indicator">
+              Refreshing media...
+            </div>
+          )}
+        </div>
+      )}
 
-      {!loading &&
-        !error &&
-        selectedPost && (
-          <IViewDetailPanel
-            post={
-              selectedPost
-            }
-            onClose={() =>
-              setSelectedPost(
-                null
-              )
-            }
-            onMediaExpired={
-              handleMediaExpired
-            }
-          />
-        )}
+      {!loading && !error && selectedPost && (
+        <IViewDetailPanel
+          post={selectedPost}
+          onClose={() => setSelectedPost(null)}
+          onMediaExpired={handleMediaExpired}
+        />
+      )}
     </div>
   );
 }
