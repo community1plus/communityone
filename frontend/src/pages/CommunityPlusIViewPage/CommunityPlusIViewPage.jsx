@@ -94,6 +94,9 @@ function IViewMedia({
   const mediaUrl = getMediaUrl(post);
   const mediaType = getMediaType(post);
 
+  const [mediaLoaded, setMediaLoaded] = useState(false);
+  const [mediaFailed, setMediaFailed] = useState(false);
+
   // TEXT ONLY POSTS
   if (!mediaUrl) {
     return (
@@ -109,16 +112,13 @@ function IViewMedia({
     );
   }
 
-  const [mediaLoaded, setMediaLoaded] = useState(false);
-  const [mediaFailed, setMediaFailed] = useState(false);
-
   useEffect(() => {
     setMediaLoaded(false);
     setMediaFailed(false);
   }, [mediaUrl]);
 
   useEffect(() => {
-    if (!mediaUrl || mediaLoaded || mediaFailed) return;
+    if (mediaLoaded || mediaFailed) return;
 
     const timer = setTimeout(() => {
       console.warn("MEDIA LOAD TIMEOUT:", post.id);
@@ -128,7 +128,6 @@ function IViewMedia({
 
     return () => clearTimeout(timer);
   }, [
-    mediaUrl,
     mediaLoaded,
     mediaFailed,
     onMediaExpired,
@@ -161,7 +160,7 @@ function IViewMedia({
         </div>
       )}
 
-      {mediaUrl && mediaType === "image" && !mediaFailed && (
+      {mediaType === "image" && !mediaFailed && (
         <img
           src={mediaUrl}
           alt={post.title || "Community One post"}
@@ -173,7 +172,7 @@ function IViewMedia({
         />
       )}
 
-      {mediaUrl && mediaType === "video" && !mediaFailed && (
+      {mediaType === "video" && !mediaFailed && (
         <video
           src={mediaUrl}
           className={`iview-image ${mediaLoaded ? "loaded" : ""}`}
@@ -187,7 +186,7 @@ function IViewMedia({
         />
       )}
 
-      {(!mediaUrl || mediaFailed) && (
+      {mediaFailed && (
         <div className="iview-empty-media">
           <span>COMMUNITY ONE</span>
         </div>
