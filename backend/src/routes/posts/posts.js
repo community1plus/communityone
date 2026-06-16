@@ -102,6 +102,13 @@ const POST_WITH_MEDIA_SELECT = `
    - scope LOCAL by default
    - no lat/lng radius filtering yet
 ===================================================== */
+router.get("/route-test", (req, res) => {
+  res.json({
+    ok: true,
+    route: "/api/posts/route-test",
+    version: "posts-router-iview-2026-06-16",
+  });
+});
 
 router.get("/iview", async (req, res) => {
   try {

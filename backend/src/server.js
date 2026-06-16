@@ -213,6 +213,7 @@ if (!dbUrl) {
 
 })();
 
+
 /* =========================
    HEALTH
 ========================= */
@@ -410,6 +411,18 @@ app.head("/", (req, res) => {
 /* =========================
    404 FALLBACK
 ========================= */
+app.get("/api/debug/routes", (req, res) => {
+  res.json({
+    ok: true,
+    postsMounted: true,
+    expected: [
+      "/api/posts",
+      "/api/posts/iview",
+      "/api/posts/:postId/comments",
+    ],
+    version: "posts-iview-2026-06-16",
+  });
+});
 
 app.use((req, res) => {
 
