@@ -98,8 +98,11 @@ process.on("unhandledRejection", (err) => {
 app.use(
   cors({
     origin: [
-      "https://main.d1ss8rtrtimogr.amplifyapp.com",
-      "http://localhost:5173",
+  "http://localhost:5173/",
+  "https://main.d1ss8rtrtimogr.amplifyapp.com/",
+  "https://develop.d1ss8rtrtimogr.amplifyapp.com/",
+  "https://www.comm-unity.one/",
+  "https://comm-unity.one/"
     ],
 
     credentials: true,
