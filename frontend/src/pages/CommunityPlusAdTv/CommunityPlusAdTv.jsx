@@ -2,8 +2,10 @@ import React, { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import "./CommunityPlusAdTv.css";
 
+const EMPTY_ADS = [];
+
 export default function CommunityPlusAdTv({
-  ads = [],
+ads = EMPTY_ADS,
   context = "feed",
   mode = "floating", // floating | page
   tvMode = "live",   // live | schedule | upload | idle
@@ -22,7 +24,7 @@ export default function CommunityPlusAdTv({
       mode,
       path: location.pathname,
       visible,
-      ads,
+      adCount: ads.length,
     });
   }, [mode, location.pathname, visible, ads]);
 
@@ -42,7 +44,7 @@ export default function CommunityPlusAdTv({
     }, 15000);
 
     return () => clearInterval(interval);
-  }, [ads]);
+  }, [ads.length]);
 
   const currentAd = ads[currentIndex];
 
