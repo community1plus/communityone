@@ -11,14 +11,6 @@ import requireAuth from "../../../middleware/requireAuth.js";
 const { Pool } = pkg;
 const router = express.Router();
 
-router.get("/route-test", (req, res) => {
-  res.json({
-    ok: true,
-    route: "/api/posts/route-test",
-    version: "iview-route-check-2026-06-16",
-  });
-});
-
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false },
@@ -131,15 +123,16 @@ router.get("/iview", async (req, res) => {
     const result = await pool.query(
       `
       ${POST_WITH_MEDIA_SELECT}
-      where
-      p.status = 'published'
-      and coalesce(p.requires_review, false) = false
-      and coalesce(p.moderation_status, 'approved') not in (
-      'review',
-      'pending_review',
-      'rejected'
-      )
-      and upper(coalesce(p.scope, 'LOCAL')) = $1
+where
+  p.status = 'published'
+  and coalesce(p.requires_review, false) = false
+  and lower(coalesce(p.moderation_status, 'approved')) not in (
+    'review',
+    'pending_review',
+    'pending',
+    'rejected'
+  )
+  and upper(coalesce(p.scope, 'LOCAL')) = $1
       group by p.id
       order by p.created_at desc
       limit $2
