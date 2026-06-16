@@ -680,7 +680,6 @@ export default function CommunityPlusIViewPage() {
       }
     },
     [
-      cachedFeed,
       setCachedFeed,
       setSelectedPost,
       lat,
@@ -688,24 +687,23 @@ export default function CommunityPlusIViewPage() {
     ]
   );
 
-  useEffect(() => {
-    if (cachedFeed?.length) {
-      setPosts(cachedFeed);
-      return;
-    }
+useEffect(() => {
+  if (!lat || !lng) return;
 
-    fetchPosts();
-  }, [cachedFeed, fetchPosts]);
+  fetchPosts();
+}, [lat, lng]);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      fetchPosts({
-        silent: true,
-      });
-    }, FEED_REFRESH_MS);
+useEffect(() => {
+  if (!lat || !lng) return;
 
-    return () => clearInterval(interval);
-  }, [fetchPosts]);
+  const interval = setInterval(() => {
+    fetchPosts({
+      silent: true,
+    });
+  }, FEED_REFRESH_MS);
+
+  return () => clearInterval(interval);
+}, [lat, lng, fetchPosts]);
 
   useEffect(() => {
     const handleVisibilityChange = () => {
