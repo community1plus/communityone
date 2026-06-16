@@ -498,50 +498,6 @@ const params = new URLSearchParams({
   windowMinutes: "60",
 });
 
-if (!lat || !lng) {
-  setError("Waiting for your local area...");
-  setLoading(false);
-  return;
-}
-
-const params = new URLSearchParams({
-  limit: String(FEED_LIMIT),
-  scope: "LOCAL",
-  lat: String(lat),
-  lng: String(lng),
-  radiusKm: "5",
-  windowMinutes: "60",
-});
-
-if (!lat || !lng) {
-  setError("Waiting for your local area...");
-  setLoading(false);
-  return;
-}
-
-const params = new URLSearchParams({
-  limit: String(FEED_LIMIT),
-  scope: "LOCAL",
-  lat: String(lat),
-  lng: String(lng),
-  radiusKm: "5",
-  windowMinutes: "60",
-});
-
-if (!lat || !lng) {
-  setError("Waiting for your local area...");
-  setLoading(false);
-  return;
-}
-
-const params = new URLSearchParams({
-  limit: String(FEED_LIMIT),
-  scope: "LOCAL",
-  lat: String(lat),
-  lng: String(lng),
-  radiusKm: "5",
-  windowMinutes: "60",
-});
 
 const response =
   await fetch(
