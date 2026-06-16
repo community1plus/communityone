@@ -54,6 +54,101 @@ async function hydrateMediaWithSignedUrls(posts = []) {
 /* =====================================================
    GET POSTS
 ===================================================== */
+router.get("/iview", async (req, res) => {
+  try {
+    const {
+      limit = 5,
+      scope = "LOCAL",
+      lat,
+      lng,
+      radiusKm = 5,
+      windowMinutes = 60,
+    } = req.query;
+
+    const safeLimit = Math.min(Math.max(Number(limit) || 5, 1), 20);
+    const safeScope = String(scope || "LOCAL").toUpperCase();
+
+    const latitude = Number(lat);
+    const longitude = Number(lng);
+
+    const safeRadiusKm = Math.min(Math.max(Number(radiusKm) || 5, 1), 50);
+    const safeWindowMinutes = Math.min(Math.max(Number(windowMinutes) || 60, 5), 1440);
+
+    if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+      return res.status(400).json({
+        error: "Valid lat and lng are required.",
+      });
+    }
+
+    const result = await pool.query(
+      `
+      SELECT
+        p.*,
+        COALESCE(
+          json_agg(
+            json_build_object(
+              'id', pm.id,
+              'mediaType', pm.media_type,
+              'publicUrl', pm.public_url,
+              'thumbnailUrl', pm.thumbnail_url
+            )
+          ) FILTER (WHERE pm.id IS NOT NULL),
+          '[]'
+        ) AS media
+      FROM posts p
+      LEFT JOIN post_media pm
+        ON pm.post_id = p.id
+      WHERE
+        UPPER(COALESCE(p.scope, 'LOCAL')) = $1
+        AND p.created_at >= NOW() - ($2::int * INTERVAL '1 minute')
+        AND p.distribution->'location'->>'lat' IS NOT NULL
+        AND p.distribution->'location'->>'lng' IS NOT NULL
+        AND (
+          6371 * acos(
+            cos(radians($3)) *
+            cos(radians((p.distribution->'location'->>'lat')::double precision)) *
+            cos(
+              radians((p.distribution->'location'->>'lng')::double precision) -
+              radians($4)
+            ) +
+            sin(radians($3)) *
+            sin(radians((p.distribution->'location'->>'lat')::double precision))
+          )
+        ) <= $5
+      GROUP BY p.id
+      ORDER BY p.created_at DESC
+      LIMIT $6
+      `,
+      [
+        safeScope,
+        safeWindowMinutes,
+        latitude,
+        longitude,
+        safeRadiusKm,
+        safeLimit,
+      ]
+    );
+
+    return res.json({
+      posts: result.rows,
+      filters: {
+        scope: safeScope,
+        lat: latitude,
+        lng: longitude,
+        radiusKm: safeRadiusKm,
+        windowMinutes: safeWindowMinutes,
+        limit: safeLimit,
+      },
+    });
+  } catch (err) {
+    console.error("❌ GET /api/posts/iview failed:", err);
+
+    return res.status(500).json({
+      error: "Could not fetch iVIEW posts.",
+      detail: err.message,
+    });
+  }
+});
 
 router.get("/", async (req, res) => {
   try {
