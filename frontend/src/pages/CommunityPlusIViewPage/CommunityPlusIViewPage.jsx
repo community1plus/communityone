@@ -14,6 +14,16 @@ import {
   useIViewSession,
 } from "../../context/IViewSessionContext";
 
+import { useUserLocation } from "../../hooks/useUserLocation";
+
+const {
+  displayLocation,
+  loading: locationLoading,
+} = useUserLocation();
+
+const lat = displayLocation?.lat;
+const lng = displayLocation?.lng;
+
 const API_BASE =
   import.meta.env.VITE_API_BASE ||
   (import.meta.env.VITE_API_URL
@@ -473,14 +483,73 @@ function IViewDetailPanel({
 
         setCommentsError("");
 
-        const response =
-          await fetch(
-            `${API_BASE}/posts/${post.id}/comments`,
-            {
-              cache:
-                "no-store",
-            }
-          );
+if (!lat || !lng) {
+  setError("Waiting for your local area...");
+  setLoading(false);
+  return;
+}
+
+const params = new URLSearchParams({
+  limit: String(FEED_LIMIT),
+  scope: "LOCAL",
+  lat: String(lat),
+  lng: String(lng),
+  radiusKm: "5",
+  windowMinutes: "60",
+});
+
+if (!lat || !lng) {
+  setError("Waiting for your local area...");
+  setLoading(false);
+  return;
+}
+
+const params = new URLSearchParams({
+  limit: String(FEED_LIMIT),
+  scope: "LOCAL",
+  lat: String(lat),
+  lng: String(lng),
+  radiusKm: "5",
+  windowMinutes: "60",
+});
+
+if (!lat || !lng) {
+  setError("Waiting for your local area...");
+  setLoading(false);
+  return;
+}
+
+const params = new URLSearchParams({
+  limit: String(FEED_LIMIT),
+  scope: "LOCAL",
+  lat: String(lat),
+  lng: String(lng),
+  radiusKm: "5",
+  windowMinutes: "60",
+});
+
+if (!lat || !lng) {
+  setError("Waiting for your local area...");
+  setLoading(false);
+  return;
+}
+
+const params = new URLSearchParams({
+  limit: String(FEED_LIMIT),
+  scope: "LOCAL",
+  lat: String(lat),
+  lng: String(lng),
+  radiusKm: "5",
+  windowMinutes: "60",
+});
+
+const response =
+  await fetch(
+    `${API_BASE}/posts/iview?${params.toString()}`,
+    {
+      cache: "no-store",
+    }
+  );
 
         const data =
           await response.json();
@@ -999,6 +1068,8 @@ export default function CommunityPlusIViewPage() {
         cachedFeed,
         setCachedFeed,
         setSelectedPost,
+        lat,
+        lng,
       ]
     );
 
@@ -1097,12 +1168,13 @@ export default function CommunityPlusIViewPage() {
     >
       {/* LOADING */}
 
-      {loading && (
-        <div className="iview-state">
-          Loading
-          iVIEW...
-        </div>
-      )}
+{loading && (
+  <div className="iview-state">
+    {locationLoading
+      ? "Finding your local area..."
+      : "Loading local iVIEW..."}
+  </div>
+)}
 
       {/* ERROR */}
 
