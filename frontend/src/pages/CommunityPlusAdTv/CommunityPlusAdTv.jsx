@@ -19,14 +19,7 @@ ads = EMPTY_ADS,
   /* =========================
      DEBUG (SAFE)
   ========================= */
-  useEffect(() => {
-    console.log("AD.TV:", {
-      mode,
-      path: location.pathname,
-      visible,
-      adCount: ads.length,
-    });
-  }, [mode, location.pathname, visible, ads]);
+  
 
   /* =========================
      HIDE FLOATING ON /adtv
@@ -160,7 +153,9 @@ ads = EMPTY_ADS,
       <div className="adtv-controls-bar">
 
         {/* Close */}
+        {mode !== "page" && (
         <button onClick={() => setVisible(false)}>×</button>
+)}
 
         {/* Floating controls only */}
         {mode !== "page" && (
