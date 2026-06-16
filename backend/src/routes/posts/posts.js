@@ -11,6 +11,14 @@ import requireAuth from "../../../middleware/requireAuth.js";
 const { Pool } = pkg;
 const router = express.Router();
 
+router.get("/route-test", (req, res) => {
+  res.json({
+    ok: true,
+    route: "/api/posts/route-test",
+    version: "iview-route-check-2026-06-16",
+  });
+});
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false },
