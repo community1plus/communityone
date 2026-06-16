@@ -4,7 +4,7 @@ import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 import { s3 } from "../../lib/s3.js";
-import { moderateTextContent } from "../../services/moderation/textModeration.js";
+import { moderateTextContent } from "../../services/modation/textModeration.js";
 import { moderateImageFromS3 } from "../../services/moderation/imageModeration.js";
 import requireAuth from "../../../middleware/requireAuth.js";
 
@@ -24,6 +24,14 @@ function toTimestamp(value) {
   return value ? new Date(value) : null;
 }
 
+function safeLimit(value, fallback = 30, max = 100) {
+  return Math.min(Math.max(Number(value) || fallback, 1), max);
+}
+
+function normalizeScope(value = "LOCAL") {
+  return String(value || "LOCAL").toUpperCase();
+}
+
 async function hydrateMediaWithSignedUrls(posts = []) {
   return Promise.all(
     posts.map(async (post) => {
@@ -31,7 +39,9 @@ async function hydrateMediaWithSignedUrls(posts = []) {
 
       const hydratedMedia = await Promise.all(
         media.map(async (item) => {
-          if (!item.s3Bucket || !item.s3Key) return item;
+          if (!item.s3Bucket || !item.s3Key) {
+            return item;
+          }
 
           const command = new GetObjectCommand({
             Bucket: item.s3Bucket,
@@ -42,14 +52,100 @@ async function hydrateMediaWithSignedUrls(posts = []) {
             expiresIn: 3600,
           });
 
-          return { ...item, signedUrl };
+          return {
+            ...item,
+            signedUrl,
+          };
         })
       );
 
-      return { ...post, media: hydratedMedia };
+      return {
+        ...post,
+        media: hydratedMedia,
+      };
     })
   );
 }
+
+const POST_WITH_MEDIA_SELECT = `
+  select
+    p.*,
+    coalesce(
+      json_agg(
+        json_build_object(
+          'id', pm.id,
+          'fileName', pm.file_name,
+          'fileType', pm.file_type,
+          'fileSize', pm.file_size,
+          'mediaType', pm.media_type,
+          's3Bucket', pm.s3_bucket,
+          's3Key', pm.s3_key,
+          'publicUrl', pm.public_url,
+          'thumbnailUrl', pm.thumbnail_url,
+          'moderationStatus', pm.moderation_status,
+          'moderationReason', pm.moderation_reason,
+          'moderationLabels', pm.moderation_labels
+        )
+      ) filter (where pm.id is not null),
+      '[]'
+    ) as media
+  from posts p
+  left join post_media pm
+    on pm.post_id = p.id
+`;
+
+/* =====================================================
+   IVIEW FEED
+   MVP behaviour:
+   - published posts only
+   - hides posts requiring review
+   - scope LOCAL by default
+   - no lat/lng radius filtering yet
+===================================================== */
+
+router.get("/iview", async (req, res) => {
+  try {
+    const {
+      limit = 20,
+      scope = "LOCAL",
+    } = req.query;
+
+    const safeScope = normalizeScope(scope);
+    const safeFeedLimit = safeLimit(limit, 20, 100);
+
+    const result = await pool.query(
+      `
+      ${POST_WITH_MEDIA_SELECT}
+      where
+        p.status = 'published'
+        and coalesce(p.requires_review, false) = false
+        and upper(coalesce(p.scope, 'LOCAL')) = $1
+      group by p.id
+      order by p.created_at desc
+      limit $2
+      `,
+      [safeScope, safeFeedLimit]
+    );
+
+    const posts = await hydrateMediaWithSignedUrls(result.rows);
+
+    return res.json({
+      posts,
+      filters: {
+        scope: safeScope,
+        limit: safeFeedLimit,
+        locationFiltering: false,
+      },
+    });
+  } catch (error) {
+    console.error("IVIEW FETCH FAILED:", error);
+
+    return res.status(500).json({
+      error: "Could not fetch iVIEW feed.",
+      detail: error.message,
+    });
+  }
+});
 
 /* =====================================================
    GET POSTS
@@ -57,10 +153,18 @@ async function hydrateMediaWithSignedUrls(posts = []) {
 
 router.get("/", async (req, res) => {
   try {
-    const { mode, type, limit = 30, scope } = req.query;
+    const {
+      mode,
+      type,
+      limit = 30,
+      scope,
+    } = req.query;
 
     const values = [];
-    const where = ["p.status = 'published'"];
+    const where = [
+      "p.status = 'published'",
+      "coalesce(p.requires_review, false) = false",
+    ];
 
     if (mode) {
       values.push(mode);
@@ -73,38 +177,19 @@ router.get("/", async (req, res) => {
     }
 
     if (scope) {
-      values.push(scope);
-      where.push(`p.scope = $${values.length}`);
+      values.push(normalizeScope(scope));
+      where.push(
+        `upper(coalesce(p.scope, 'LOCAL')) = $${values.length}`
+      );
     }
 
-    values.push(Number(limit));
+    const safeFeedLimit = safeLimit(limit, 30, 100);
+
+    values.push(safeFeedLimit);
 
     const result = await pool.query(
       `
-      select
-        p.*,
-        coalesce(
-          json_agg(
-            json_build_object(
-              'id', pm.id,
-              'fileName', pm.file_name,
-              'fileType', pm.file_type,
-              'fileSize', pm.file_size,
-              'mediaType', pm.media_type,
-              's3Bucket', pm.s3_bucket,
-              's3Key', pm.s3_key,
-              'publicUrl', pm.public_url,
-              'thumbnailUrl', pm.thumbnail_url,
-              'moderationStatus', pm.moderation_status,
-              'moderationReason', pm.moderation_reason,
-              'moderationLabels', pm.moderation_labels
-            )
-          ) filter (where pm.id is not null),
-          '[]'
-        ) as media
-      from posts p
-      left join post_media pm
-        on pm.post_id = p.id
+      ${POST_WITH_MEDIA_SELECT}
       where ${where.join(" and ")}
       group by p.id
       order by p.created_at desc
@@ -115,7 +200,9 @@ router.get("/", async (req, res) => {
 
     const posts = await hydrateMediaWithSignedUrls(result.rows);
 
-    return res.json({ posts });
+    return res.json({
+      posts,
+    });
   } catch (error) {
     console.error("Fetch posts failed:", error);
 
@@ -130,7 +217,7 @@ router.get("/", async (req, res) => {
    COMMENTS
 ===================================================== */
 
-router.post("/:postId/comments", requireAuth, async (req, res) => {
+router.get("/:postId/comments", async (req, res) => {
   try {
     const { postId } = req.params;
 
@@ -152,7 +239,9 @@ router.post("/:postId/comments", requireAuth, async (req, res) => {
       [postId]
     );
 
-    return res.json({ comments: result.rows });
+    return res.json({
+      comments: result.rows,
+    });
   } catch (error) {
     console.error("Fetch comments failed:", error);
 
@@ -162,7 +251,7 @@ router.post("/:postId/comments", requireAuth, async (req, res) => {
   }
 });
 
-router.post("/:postId/comments", async (req, res) => {
+router.post("/:postId/comments", requireAuth, async (req, res) => {
   try {
     const { postId } = req.params;
     const { comment } = req.body || {};
@@ -173,7 +262,11 @@ router.post("/:postId/comments", async (req, res) => {
       });
     }
 
-    const userId = req.user?.sub || "test-user";
+    const userId =
+      req.user?.sub ||
+      req.user?.id ||
+      req.user?.username ||
+      "test-user";
 
     const result = await pool.query(
       `
@@ -224,10 +317,10 @@ router.post("/", requireAuth, async (req, res) => {
       content,
       category,
       tags = [],
-      scope = "Local",
+      scope = "LOCAL",
       distribution = {
-        scope: "Local",
-        feeds: ["Local"],
+        scope: "LOCAL",
+        feeds: ["LOCAL"],
       },
       socialShareTargets = [],
       media = [],
@@ -239,6 +332,18 @@ router.post("/", requireAuth, async (req, res) => {
         error: "mode, type, title, content and category are required.",
       });
     }
+
+    const normalizedScope = normalizeScope(scope);
+
+    const normalizedDistribution = {
+      ...distribution,
+      scope: normalizeScope(distribution?.scope || normalizedScope),
+      feeds: safeArray(distribution?.feeds).length
+        ? safeArray(distribution.feeds).map((feed) =>
+            normalizeScope(feed)
+          )
+        : [normalizedScope],
+    };
 
     const textModeration = moderateTextContent({
       title,
@@ -254,7 +359,12 @@ router.post("/", requireAuth, async (req, res) => {
     }
 
     const mediaItems = safeArray(media);
-    const userId = req.user?.sub || "test-user";
+
+    const userId =
+      req.user?.sub ||
+      req.user?.id ||
+      req.user?.username ||
+      "test-user";
 
     const initialStatus =
       textModeration.status === "review"
@@ -304,8 +414,8 @@ router.post("/", requireAuth, async (req, res) => {
         content,
         category,
         JSON.stringify(safeArray(tags)),
-        scope,
-        JSON.stringify(distribution),
+        normalizedScope,
+        JSON.stringify(normalizedDistribution),
         JSON.stringify(safeArray(socialShareTargets)),
         initialStatus,
         initialRequiresReview,
@@ -486,13 +596,19 @@ router.post("/", requireAuth, async (req, res) => {
       finalStatus = "rejected";
       finalRequiresReview = false;
 
-      finalReasons.push("One or more images were rejected by moderation.");
+      finalReasons.push(
+        "One or more images were rejected by moderation."
+      );
+
       finalLabels.push("image_rejected");
     } else if (hasImageReview) {
       finalStatus = "pending_review";
       finalRequiresReview = true;
 
-      finalReasons.push("One or more images require moderation review.");
+      finalReasons.push(
+        "One or more images require moderation review."
+      );
+
       finalLabels.push("image_review");
     }
 
