@@ -996,3 +996,26 @@
     bottom: 14px;
   }
 }
+
+.iview-no-media {
+  height: 180px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: #f7f5f2;
+  border-bottom: 1px solid #ece7e1;
+}
+
+.iview-no-media-logo {
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #8b0000;
+}
+
+.iview-no-media-text {
+  margin-top: 10px;
+  font-size: 0.8rem;
+  color: #666;
+}

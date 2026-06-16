@@ -94,6 +94,21 @@ function IViewMedia({
   const mediaUrl = getMediaUrl(post);
   const mediaType = getMediaType(post);
 
+  // TEXT ONLY POSTS
+  if (!mediaUrl) {
+    return (
+      <div className="iview-no-media">
+        <div className="iview-no-media-logo">
+          COMMUNITY ONE
+        </div>
+
+        <div className="iview-no-media-text">
+          Local community update
+        </div>
+      </div>
+    );
+  }
+
   const [mediaLoaded, setMediaLoaded] = useState(false);
   const [mediaFailed, setMediaFailed] = useState(false);
 
