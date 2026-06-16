@@ -4,7 +4,7 @@ import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 import { s3 } from "../../lib/s3.js";
-import { moderateTextContent } from "../../services/modation/textModeration.js";
+import { moderateTextContent } from "../../services/moderation/textModeration.js";
 import { moderateImageFromS3 } from "../../services/moderation/imageModeration.js";
 import requireAuth from "../../../middleware/requireAuth.js";
 
