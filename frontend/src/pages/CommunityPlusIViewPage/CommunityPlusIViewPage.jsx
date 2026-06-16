@@ -632,7 +632,6 @@ export default function CommunityPlusIViewPage() {
           lat: String(lat),
           lng: String(lng),
           radiusKm: "5",
-          windowMinutes: "60",
         });
 
         const response = await fetch(
