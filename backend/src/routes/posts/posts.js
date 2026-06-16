@@ -125,13 +125,6 @@ router.get("/iview", async (req, res) => {
       ${POST_WITH_MEDIA_SELECT}
 where
   p.status = 'published'
-  and coalesce(p.requires_review, false) = false
-  and lower(coalesce(p.moderation_status, 'approved')) not in (
-    'review',
-    'pending_review',
-    'pending',
-    'rejected'
-  )
   and upper(coalesce(p.scope, 'LOCAL')) = $1
       group by p.id
       order by p.created_at desc
