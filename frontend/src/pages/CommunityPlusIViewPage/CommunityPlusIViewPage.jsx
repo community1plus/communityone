@@ -23,12 +23,8 @@ const API_BASE =
     : "");
 
 const FEED_LIMIT = 5;
-
-const FEED_REFRESH_MS =
-  5 * 60 * 1000;
-
-const MEDIA_LOAD_TIMEOUT_MS =
-  8000;
+const FEED_REFRESH_MS = 10 * 60 * 1000;
+const MEDIA_LOAD_TIMEOUT_MS = 8000;
 
 /* =========================================================
    HELPERS
@@ -71,9 +67,7 @@ function formatCommentTime(value) {
   const created = new Date(value).getTime();
   const now = Date.now();
 
-  if (Number.isNaN(created)) {
-    return "Just now";
-  }
+  if (Number.isNaN(created)) return "Just now";
 
   const minutes = Math.floor((now - created) / 60000);
 
@@ -84,9 +78,7 @@ function formatCommentTime(value) {
 
   if (hours < 24) return `${hours}h ago`;
 
-  const days = Math.floor(hours / 24);
-
-  return `${days}d ago`;
+  return `${Math.floor(hours / 24)}d ago`;
 }
 
 /* =========================================================
@@ -111,9 +103,7 @@ function IViewMedia({
   }, [mediaUrl]);
 
   useEffect(() => {
-    if (!mediaUrl || mediaLoaded || mediaFailed) {
-      return;
-    }
+    if (!mediaUrl || mediaLoaded || mediaFailed) return;
 
     const timer = setTimeout(() => {
       console.warn("MEDIA LOAD TIMEOUT:", post.id);
@@ -137,8 +127,6 @@ function IViewMedia({
   };
 
   const handleMediaLoaded = () => {
-    console.log("MEDIA READY:", post.id);
-
     requestAnimationFrame(() => {
       setMediaLoaded(true);
     });
@@ -161,12 +149,10 @@ function IViewMedia({
       {mediaUrl && mediaType === "image" && !mediaFailed && (
         <img
           src={mediaUrl}
-          alt={post.title}
+          alt={post.title || "Community One post"}
           loading={priority ? "eager" : "lazy"}
           decoding="async"
-          className={`iview-image ${
-            mediaLoaded ? "loaded" : ""
-          }`}
+          className={`iview-image ${mediaLoaded ? "loaded" : ""}`}
           onLoad={handleMediaLoaded}
           onError={handleMediaError}
         />
@@ -175,9 +161,7 @@ function IViewMedia({
       {mediaUrl && mediaType === "video" && !mediaFailed && (
         <video
           src={mediaUrl}
-          className={`iview-image ${
-            mediaLoaded ? "loaded" : ""
-          }`}
+          className={`iview-image ${mediaLoaded ? "loaded" : ""}`}
           muted={!detail}
           playsInline
           controls={detail}
@@ -278,9 +262,7 @@ function IViewDetailPanel({
 
   useEffect(() => {
     const handleKeyDown = (event) => {
-      if (event.key === "Escape") {
-        onClose();
-      }
+      if (event.key === "Escape") onClose();
     };
 
     window.addEventListener("keydown", handleKeyDown);
@@ -294,9 +276,7 @@ function IViewDetailPanel({
     let cancelled = false;
 
     async function fetchComments() {
-      if (!API_BASE || !post?.id) {
-        return;
-      }
+      if (!API_BASE || !post?.id) return;
 
       try {
         setCommentsLoading(true);
@@ -349,9 +329,7 @@ function IViewDetailPanel({
   const handlePostComment = async () => {
     const cleanComment = commentText.trim();
 
-    if (!cleanComment || postingComment) {
-      return;
-    }
+    if (!cleanComment || postingComment) return;
 
     try {
       setPostingComment(true);
@@ -361,11 +339,9 @@ function IViewDetailPanel({
         `${API_BASE}/posts/${post.id}/comments`,
         {
           method: "POST",
-
           headers: {
             "Content-Type": "application/json",
           },
-
           body: JSON.stringify({
             comment: cleanComment,
           }),
@@ -562,10 +538,8 @@ export default function CommunityPlusIViewPage() {
   const {
     cachedFeed,
     setCachedFeed,
-
     selectedPost,
     setSelectedPost,
-
     scrollPosition,
   } = useIViewSession();
 
@@ -575,6 +549,7 @@ export default function CommunityPlusIViewPage() {
   const [error, setError] = useState("");
 
   const containerRef = useRef(null);
+  const hasFetchedRef = useRef(false);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -583,18 +558,11 @@ export default function CommunityPlusIViewPage() {
 
     requestAnimationFrame(() => {
       container.scrollTop = scrollPosition.current;
-
-      console.log(
-        "SCROLL RESTORED:",
-        scrollPosition.current
-      );
     });
   }, [scrollPosition]);
 
   const handleScroll = useCallback(() => {
-    if (!containerRef.current) {
-      return;
-    }
+    if (!containerRef.current) return;
 
     scrollPosition.current =
       containerRef.current.scrollTop;
@@ -620,7 +588,7 @@ export default function CommunityPlusIViewPage() {
       try {
         if (silent) {
           setRefreshing(true);
-        } else if (!cachedFeed?.length) {
+        } else {
           setLoading(true);
         }
 
@@ -687,27 +655,30 @@ export default function CommunityPlusIViewPage() {
     ]
   );
 
-useEffect(() => {
-  if (!lat || !lng) return;
+  useEffect(() => {
+    if (!lat || !lng) return;
+    if (hasFetchedRef.current) return;
 
-  fetchPosts();
-}, [lat, lng]);
+    hasFetchedRef.current = true;
 
-useEffect(() => {
-  if (!lat || !lng) return;
+    fetchPosts();
+  }, [lat, lng, fetchPosts]);
 
-  const interval = setInterval(() => {
-    fetchPosts({
-      silent: true,
-    });
-  }, FEED_REFRESH_MS);
+  useEffect(() => {
+    if (!lat || !lng) return;
 
-  return () => clearInterval(interval);
-}, [lat, lng, fetchPosts]);
+    const interval = setInterval(() => {
+      fetchPosts({
+        silent: true,
+      });
+    }, FEED_REFRESH_MS);
+
+    return () => clearInterval(interval);
+  }, [lat, lng, fetchPosts]);
 
   useEffect(() => {
     const handleVisibilityChange = () => {
-      if (!document.hidden) {
+      if (!document.hidden && lat && lng) {
         fetchPosts({
           silent: true,
         });
@@ -725,7 +696,7 @@ useEffect(() => {
         handleVisibilityChange
       );
     };
-  }, [fetchPosts]);
+  }, [fetchPosts, lat, lng]);
 
   const handleMediaExpired = useCallback(() => {
     fetchPosts({
