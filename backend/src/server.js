@@ -101,6 +101,8 @@ app.use(
   "http://localhost:5173/",
   "https://main.d1ss8rtrtimogr.amplifyapp.com/",
   "https://develop.d1ss8rtrtimogr.amplifyapp.com/",
+  "https://main.d1ss8rtrtimogr.amplifyapp.com",
+  "https://develop.d1ss8rtrtimogr.amplifyapp.com",
   "https://www.comm-unity.one/",
   "https://comm-unity.one/"
     ],
