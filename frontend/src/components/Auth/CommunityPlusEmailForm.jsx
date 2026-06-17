@@ -1,12 +1,10 @@
-import { useRef, useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { signIn } from "aws-amplify/auth";
-
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 export default function CommunityPlusEmailForm({ onSuccess }) {
-  
-
-  
+  const navigate = useNavigate();
   const { refreshAuth } = useAuth();
 
   const isMountedRef = useRef(true);
@@ -33,36 +31,47 @@ export default function CommunityPlusEmailForm({ onSuccess }) {
     }));
   };
 
+  const resetSubmitState = () => {
+    if (!isMountedRef.current) return;
+
+    setAuthLoading(false);
+    submittingRef.current = false;
+  };
+
   const handleEmailLogin = async (event) => {
     event.preventDefault();
 
     if (submittingRef.current) return;
 
+    const username = formData.email.trim();
+
+    if (!username || !formData.password) {
+      setAuthError("Please enter your email and password.");
+      return;
+    }
+
     submittingRef.current = true;
     setAuthLoading(true);
     setAuthError("");
 
-try {
-  const username = formData.email.trim();
+    try {
+      await signIn({
+        username,
+        password: formData.password,
+      });
 
-  await signIn({
-  username,
-  password: formData.password,
-});
+      await refreshAuth();
 
-await refreshAuth();
+      if (typeof onSuccess === "function") {
+        onSuccess();
+      }
 
-navigate(
-  "/communityplus/auth/resolve",
-  { replace: true }
-);
-
-} catch (err) {
+      navigate("/communityplus/auth/resolve", { replace: true });
+    } catch (err) {
       if (!isMountedRef.current) return;
 
       setAuthError(err?.message || "Login failed");
-      setAuthLoading(false);
-      submittingRef.current = false;
+      resetSubmitState();
     }
   };
 
