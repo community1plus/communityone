@@ -33,7 +33,11 @@
   "https://main.d1ss8rtrtimogr.amplifyapp.com/",
   "https://www.comm-unity.one/",
   "https://comm-unity.one/",
-  "https://develop.d1ss8rtrtimogr.amplifyapp.com/"
+  "https://develop.d1ss8rtrtimogr.amplifyapp.com/",
+  "http://localhost:5173/communityplus/auth/resolve",
+  "https://develop.d1ss8rtrtimogr.amplifyapp.com/communityplus/auth/resolve",
+  "https://www.comm-unity.one/communityplus/auth/resolve",
+  "https://comm-unity.one/communityplus/auth/resolve"
 ],
 "redirect_sign_out_uri": [
   "http://localhost:5173/",

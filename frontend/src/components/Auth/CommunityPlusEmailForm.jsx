@@ -52,10 +52,10 @@ try {
 
 await refreshAuth();
 
-setAuthLoading(false);
-submittingRef.current = false;
-
-onSuccess?.();
+navigate(
+  "/communityplus/auth/resolve",
+  { replace: true }
+);
 
 } catch (err) {
       if (!isMountedRef.current) return;

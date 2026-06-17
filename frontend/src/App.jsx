@@ -23,7 +23,7 @@ import CommunityPlusSplash from "./pages/CommunityPlusSplash/CommunityPlusSplash
 import CommunityPlusModerationPage from "./pages/CommunityPlusModerationPage/CommunityPlusModerationPage";
 import { useProfile } from "./context/ProfileContext";
 import PostComposer from "./components/Layout/Sidebar/Post/PostComposer";
-
+import CommunityPlusAuthResolve from "./pages/CommunityPlusAuthResolve/CommunityPlusAuthResolve";
 
 function Placeholder({ title, subtitle }) {
   return (
@@ -137,7 +137,11 @@ export default function App() {
           path="/communityplus/welcome"
           element={<CommunityPlusSplash />}
         />
-
+      <Route
+          path="/communityplus/auth/resolve"
+          element={<CommunityPlusAuthResolve />}
+      />
+      
     <Route
         path="/communityplus/profile"
         element={
