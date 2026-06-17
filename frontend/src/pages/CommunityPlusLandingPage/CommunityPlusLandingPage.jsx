@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useProfile } from "../../context/ProfileContext";
 import CommunityPlusAuthModal from "../../components/Auth/CommunityPlusAuthModal";
@@ -70,7 +70,12 @@ useEffect(() => {
   if (isGuest) return;
   if (!profileReady) return;
 
-  if (!hasProfile || !isProfileComplete || profile === null) {
+  const needsSetup =
+    !hasProfile ||
+    !isProfileComplete ||
+    profile === null;
+
+  if (needsSetup) {
     navigate("/communityplus/profile", {
       replace: true,
       state: {
@@ -95,8 +100,8 @@ useEffect(() => {
   hasProfile,
   isProfileComplete,
   profile,
-  navigate,
   returnTo,
+  navigate,
 ]);
 
 const handleAuthSuccess = () => {
