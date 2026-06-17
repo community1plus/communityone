@@ -125,12 +125,23 @@ router.get("/iview", async (req, res) => {
       ${POST_WITH_MEDIA_SELECT}
 where
   p.status = 'published'
+  and coalesce(p.requires_review, false) = false
   and upper(coalesce(p.scope, 'LOCAL')) = $1
-      group by p.id
-      order by p.created_at desc
-      limit $2
+  and p.lat is not null
+  and p.lng is not null
+  and (
+    6371 * acos(
+      cos(radians($2)) *
+      cos(radians(p.lat)) *
+      cos(radians(p.lng) - radians($3)) +
+      sin(radians($2)) *
+      sin(radians(p.lat))
+    )
+  ) <= $4
+order by p.created_at desc
+limit $5
       `,
-      [safeScope, safeFeedLimit]
+      [ safeScope, latitude, longitude, safeRadiusKm, safeFeedLimit,]
     );
 
     const posts = await hydrateMediaWithSignedUrls(result.rows);
