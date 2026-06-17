@@ -70,7 +70,10 @@ async function hydrateMediaWithSignedUrls(posts = []) {
 const POST_WITH_MEDIA_SELECT = `
   select
     p.*,
-    coalesce(
+    coalesce(media_data.media, '[]'::json) as media
+  from posts p
+  left join lateral (
+    select
       json_agg(
         json_build_object(
           'id', pm.id,
@@ -86,12 +89,10 @@ const POST_WITH_MEDIA_SELECT = `
           'moderationReason', pm.moderation_reason,
           'moderationLabels', pm.moderation_labels
         )
-      ) filter (where pm.id is not null),
-      '[]'
-    ) as media
-  from posts p
-  left join post_media pm
-    on pm.post_id = p.id
+      ) as media
+    from post_media pm
+    where pm.post_id = p.id
+  ) media_data on true
 `;
 
 /* =====================================================
@@ -211,7 +212,6 @@ router.get("/", async (req, res) => {
       `
       ${POST_WITH_MEDIA_SELECT}
       where ${where.join(" and ")}
-      group by p.id
       order by p.created_at desc
       limit $${values.length}
       `,
