@@ -79,20 +79,15 @@ function ProfileGate({ children }) {
     return <div style={{ padding: 40 }}>Loading...</div>;
   }
 
-  if (
-    isAuthenticated &&
-    !isGuest &&
-    !profileReady
-  ) {
+  if (!isAuthenticated || isGuest) {
+    return children;
+  }
+
+  if (!profileReady) {
     return <div style={{ padding: 40 }}>Loading profile...</div>;
   }
 
-  if (
-    isAuthenticated &&
-    !isGuest &&
-    profileReady &&
-    (!hasProfile || !isProfileComplete || profile === null)
-  ) {
+  if (!hasProfile || !isProfileComplete || profile === null) {
     return (
       <Navigate
         to="/communityplus/profile"

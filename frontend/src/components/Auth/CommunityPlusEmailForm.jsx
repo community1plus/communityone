@@ -1,11 +1,12 @@
 import { useRef, useState, useEffect } from "react";
 import { signIn } from "aws-amplify/auth";
-import { useNavigate } from "react-router-dom";
 
 import { useAuth } from "../../context/AuthContext";
 
 export default function CommunityPlusEmailForm({ onSuccess }) {
-  const navigate = useNavigate();
+  
+
+
   const { refreshAuth } = useAuth();
 
   const isMountedRef = useRef(true);
@@ -41,27 +42,18 @@ export default function CommunityPlusEmailForm({ onSuccess }) {
     setAuthLoading(true);
     setAuthError("");
 
-    try {
-      const username = formData.email.trim();
+try {
+  const username = formData.email.trim();
 
-      await signIn({
-        username,
-        password: formData.password,
-      });
+  await signIn({
+    username,
+    password: formData.password,
+  });
 
-      await refreshAuth();
+  await refreshAuth();
 
-      onSuccess?.();
-
-      navigate("/communityplus", { replace: true });
-    } catch (err) {
-      if (!isMountedRef.current) return;
-
-      setAuthError(err?.message || "Login failed");
-      setAuthLoading(false);
-      submittingRef.current = false;
-    }
-  };
+  onSuccess?.();
+} catch (err) {
 
   return (
     <form className="auth-email-form" onSubmit={handleEmailLogin}>
