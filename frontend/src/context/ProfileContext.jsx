@@ -98,8 +98,15 @@ function clearProfileCache(userKey) {
 }
 
 async function getAuthHeaders(extraHeaders = {}) {
-  const session = await fetchAuthSession();
-  const token = session.tokens?.idToken?.toString();
+  const session = await fetchAuthSession({
+    forceRefresh: false,
+  });
+
+  const token = session.tokens?.accessToken?.toString();
+
+  if (!token) {
+    throw new Error("No access token found");
+  }
 
   return {
     "Content-Type": "application/json",
