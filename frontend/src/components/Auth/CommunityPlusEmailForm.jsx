@@ -1,5 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { signIn } from "aws-amplify/auth";
+import {
+  signIn,
+  fetchAuthSession,
+  getCurrentUser,
+} from "aws-amplify/auth";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
@@ -44,8 +48,9 @@ export default function CommunityPlusEmailForm({ onSuccess }) {
     if (submittingRef.current) return;
 
     const username = formData.email.trim();
+    const password = formData.password;
 
-    if (!username || !formData.password) {
+    if (!username || !password) {
       setAuthError("Please enter your email and password.");
       return;
     }
@@ -55,19 +60,52 @@ export default function CommunityPlusEmailForm({ onSuccess }) {
     setAuthError("");
 
     try {
-      await signIn({
+      const signInResult = await signIn({
         username,
-        password: formData.password,
+        password,
       });
 
-      await refreshAuth();
+      console.log("EMAIL SIGN IN RESULT:", signInResult);
+
+      if (!signInResult?.isSignedIn) {
+        const nextStep =
+          signInResult?.nextStep?.signInStep ||
+          "UNKNOWN_STEP";
+
+        throw new Error(
+          `Sign in requires another step: ${nextStep}`
+        );
+      }
+
+      const currentUser = await getCurrentUser();
+
+      const session = await fetchAuthSession({
+        forceRefresh: true,
+      });
+
+      console.log("SIGNED IN USER:", currentUser);
+      console.log("SIGNED IN SESSION:", session);
+
+      if (!session.tokens?.accessToken) {
+        throw new Error(
+          "Signed in, but no access token was found."
+        );
+      }
+
+      await refreshAuth({
+        forceRefresh: true,
+      });
 
       if (typeof onSuccess === "function") {
         onSuccess();
       }
 
-      navigate("/communityplus/auth/resolve", { replace: true });
+      navigate("/communityplus/auth/resolve", {
+        replace: true,
+      });
     } catch (err) {
+      console.error("Email login failed:", err);
+
       if (!isMountedRef.current) return;
 
       setAuthError(err?.message || "Login failed");
@@ -100,7 +138,9 @@ export default function CommunityPlusEmailForm({ onSuccess }) {
       </button>
 
       {authLoading && (
-        <div className="auth-inline-loading">Signing you in…</div>
+        <div className="auth-inline-loading">
+          Signing you in…
+        </div>
       )}
 
       {authError && <div className="error">{authError}</div>}
