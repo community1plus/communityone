@@ -1,10 +1,18 @@
+import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 
 import { useAuth } from "../../context/AuthContext";
 import { useProfile } from "../../context/ProfileContext";
 
 export default function CommunityPlusAuthResolve() {
-  const { loading, isAuthenticated, isGuest } = useAuth();
+  const [checkedAuth, setCheckedAuth] = useState(false);
+
+  const {
+    loading,
+    isAuthenticated,
+    isGuest,
+    refreshAuth,
+  } = useAuth();
 
   const {
     profileReady,
@@ -12,8 +20,36 @@ export default function CommunityPlusAuthResolve() {
     isProfileComplete,
   } = useProfile();
 
-  if (loading) {
-    return <div style={{ padding: 40 }}>Loading...</div>;
+  useEffect(() => {
+    let active = true;
+
+    async function resolveAuth() {
+      try {
+        await refreshAuth?.();
+      } finally {
+        if (active) {
+          setCheckedAuth(true);
+        }
+      }
+    }
+
+    resolveAuth();
+console.log("AUTH RESOLVE:", {
+  loading,
+  checkedAuth,
+  isAuthenticated,
+  isGuest,
+  profileReady,
+  hasProfile,
+  isProfileComplete,
+});
+    return () => {
+      active = false;
+    };
+  }, [refreshAuth]);
+
+  if (loading || !checkedAuth) {
+    return <div style={{ padding: 40 }}>Checking session...</div>;
   }
 
   if (!isAuthenticated) {
