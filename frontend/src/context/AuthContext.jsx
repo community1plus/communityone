@@ -1,11 +1,11 @@
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
-  useState,
-  useCallback,
   useMemo,
   useRef,
+  useState,
 } from "react";
 
 import {
@@ -17,27 +17,19 @@ import {
 
 const AuthContext = createContext(null);
 
-/* =========================================================
-   NORMALISE USER
-========================================================= */
+const GUEST_KEY = "community_guest";
 
-function normaliseUser(
-  amplifyUser,
-  tokens
-) {
+function normaliseUser(amplifyUser, tokens) {
   if (!amplifyUser) return null;
 
-  const idPayload =
-    tokens?.idToken?.payload || {};
+  const idPayload = tokens?.idToken?.payload || {};
 
   const email =
     idPayload.email ||
-    amplifyUser.signInDetails
-      ?.loginId ||
+    amplifyUser.signInDetails?.loginId ||
     "";
 
-  const name =
-    idPayload.name || "";
+  const name = idPayload.name || "";
 
   const username =
     amplifyUser.username ||
@@ -49,373 +41,207 @@ function normaliseUser(
     username ||
     "User";
 
-  const displayName =
-    name || fallback;
+  const displayName = name || fallback;
 
-  const initials =
-    displayName
-      .split(/[\s._-]+/)
-      .filter(Boolean)
-      .map((part) => part[0])
-      .join("")
-      .slice(0, 2)
-      .toUpperCase();
+  const initials = displayName
+    .split(/[\s._-]+/)
+    .filter(Boolean)
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 
   return {
-    id: amplifyUser.userId,
+    id:
+      amplifyUser.userId ||
+      idPayload.sub ||
+      amplifyUser.username ||
+      email,
+
+    sub: idPayload.sub || amplifyUser.userId || null,
 
     username,
     email,
     name,
-
     displayName,
     initials,
+
+    raw: amplifyUser,
   };
 }
 
-/* =========================================================
-   PROVIDER
-========================================================= */
+export function AuthProvider({ children }) {
+  const mountedRef = useRef(true);
 
-export function AuthProvider({
-  children,
-}) {
-  const mountedRef =
-    useRef(false);
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
+  const [tokens, setTokens] = useState(null);
 
-  /* ======================================================
-     USER STATE
-  ====================================================== */
+  const [isGuest, setIsGuest] = useState(() => {
+    return localStorage.getItem(GUEST_KEY) === "true";
+  });
 
-  const [user, setUser] =
-    useState(null);
-
-  const [token, setToken] =
-    useState(null);
-
-  const [tokens, setTokens] =
-    useState(null);
-
-  /* ======================================================
-     GUEST STATE
-  ====================================================== */
-
-  const [isGuest, setIsGuest] =
-    useState(() => {
-      return (
-        localStorage.getItem(
-          "community_guest"
-        ) === "true"
-      );
-    });
-
-  /* ======================================================
-     LOADING
-  ====================================================== */
-
-  const [loading, setLoading] =
-    useState(true);
-
-  const [
-    hydrating,
-    setHydrating,
-  ] = useState(false);
-
-  /* ======================================================
-     CLEAR AUTH
-  ====================================================== */
-
-  const clearAuth =
-    useCallback(() => {
-      if (!mountedRef.current)
-        return;
-
-      setUser(null);
-
-      setToken(null);
-
-      setTokens(null);
-    }, []);
-
-  /* ======================================================
-     REFRESH AUTH
-  ====================================================== */
-
-  const refreshAuth =
-    useCallback(
-      async ({
-        forceRefresh = false,
-      } = {}) => {
-        if (mountedRef.current) {
-          setHydrating(true);
-        }
-
-        try {
-          let amplifyUser;
-
-          try {
-            amplifyUser =
-              await getCurrentUser();
-          } catch {
-            clearAuth();
-
-            return null;
-          }
-
-          const session =
-            await fetchAuthSession({
-              forceRefresh,
-            });
-
-          const accessToken =
-            session.tokens?.accessToken?.toString();
-
-          if (!accessToken) {
-            clearAuth();
-
-            return null;
-          }
-
-          const normalisedUser =
-            normaliseUser(
-              amplifyUser,
-              session.tokens
-            );
-
-          if (
-            !mountedRef.current
-          ) {
-            return normalisedUser;
-          }
-
-          /* ============================================
-             AUTH USER RESTORED
-          ============================================ */
-
-          setUser(
-            normalisedUser
-          );
-
-          setToken(
-            accessToken
-          );
-
-          setTokens(
-            session.tokens
-          );
-
-          /* ============================================
-             REMOVE GUEST MODE
-          ============================================ */
-
-          localStorage.removeItem(
-            "community_guest"
-          );
-
-          setIsGuest(false);
-
-          return normalisedUser;
-        } catch (err) {
-          if (
-            err?.name !==
-            "UserUnAuthenticatedException"
-          ) {
-            console.warn(
-              "Auth refresh skipped:",
-              err?.name ||
-                err?.message ||
-                err
-            );
-          }
-
-          clearAuth();
-
-          return null;
-        } finally {
-          if (
-            mountedRef.current
-          ) {
-            setHydrating(false);
-          }
-        }
-      },
-      [clearAuth]
-    );
-
-  /* ======================================================
-     INIT
-  ====================================================== */
+  const [loading, setLoading] = useState(true);
+  const [hydrating, setHydrating] = useState(false);
 
   useEffect(() => {
     mountedRef.current = true;
 
-    async function initAuth() {
-      try {
-        const currentUser =
-          await refreshAuth();
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
-        if (currentUser) {
-          console.log(
-            "✅ Auth restored:",
-            currentUser.displayName
-          );
-        } else if (isGuest) {
-          console.log(
-            "👀 Guest session restored"
+  const clearAuth = useCallback(() => {
+    if (!mountedRef.current) return;
+
+    setUser(null);
+    setToken(null);
+    setTokens(null);
+  }, []);
+
+  const refreshAuth = useCallback(
+    async ({ forceRefresh = false } = {}) => {
+      if (mountedRef.current) {
+        setHydrating(true);
+      }
+
+      try {
+        const amplifyUser = await getCurrentUser();
+
+        const session = await fetchAuthSession({
+          forceRefresh,
+        });
+
+        const accessToken =
+          session.tokens?.accessToken?.toString();
+
+        if (!accessToken) {
+          clearAuth();
+          return null;
+        }
+
+        const normalisedUser = normaliseUser(
+          amplifyUser,
+          session.tokens
+        );
+
+        if (mountedRef.current) {
+          setUser(normalisedUser);
+          setToken(accessToken);
+          setTokens(session.tokens);
+
+          localStorage.removeItem(GUEST_KEY);
+          setIsGuest(false);
+        }
+
+        return normalisedUser;
+      } catch (err) {
+        if (
+          err?.name !== "UserUnAuthenticatedException" &&
+          err?.name !== "NotAuthorizedException"
+        ) {
+          console.warn(
+            "Auth refresh failed:",
+            err?.name || err?.message || err
           );
         }
+
+        clearAuth();
+
+        return null;
       } finally {
-        if (
-          mountedRef.current
-        ) {
+        if (mountedRef.current) {
+          setHydrating(false);
+        }
+      }
+    },
+    [clearAuth]
+  );
+
+  useEffect(() => {
+    async function initAuth() {
+      try {
+        await refreshAuth();
+      } finally {
+        if (mountedRef.current) {
           setLoading(false);
         }
       }
     }
 
     initAuth();
+  }, [refreshAuth]);
 
-    return () => {
-      mountedRef.current =
-        false;
-    };
-  }, [
-    refreshAuth,
-    isGuest,
-  ]);
+  const login = useCallback(async () => {
+    localStorage.removeItem(GUEST_KEY);
+    setIsGuest(false);
 
-  /* ======================================================
-     LOGIN
-  ====================================================== */
+    await signInWithRedirect();
+  }, []);
 
-  const login =
-    useCallback(async () => {
-      localStorage.removeItem(
-        "community_guest"
+  const continueAsGuest = useCallback(async () => {
+    try {
+      await signOut({ global: false });
+    } catch (err) {
+      console.warn(
+        "Guest mode signOut warning:",
+        err?.message || err
       );
+    }
 
+    clearAuth();
+
+    localStorage.setItem(GUEST_KEY, "true");
+    setIsGuest(true);
+    setLoading(false);
+    setHydrating(false);
+  }, [clearAuth]);
+
+  const logout = useCallback(async () => {
+    try {
+      await signOut({ global: true });
+    } catch (err) {
+      console.warn(
+        "Logout warning:",
+        err?.message || err
+      );
+    } finally {
+      clearAuth();
+
+      localStorage.removeItem(GUEST_KEY);
       setIsGuest(false);
 
-      await signInWithRedirect();
-    }, []);
+      window.location.assign("/");
+    }
+  }, [clearAuth]);
 
-  /* ======================================================
-     CONTINUE AS GUEST
-  ====================================================== */
+  const isAuthenticated = Boolean(user && token);
 
-const continueAsGuest = useCallback(async () => {
-  console.log("👀 Guest mode enabled");
+  const authLoading = loading || hydrating;
 
-  try {
-    await signOut({
-      global: false,
-    });
-  } catch (err) {
-    console.warn(
-      "Guest mode signOut warning:",
-      err?.message || err
-    );
-  }
-
-  clearAuth();
-
-  localStorage.setItem("community_guest", "true");
-  setIsGuest(true);
-}, [clearAuth]);
-
-  /* ======================================================
-     LOGOUT
-  ====================================================== */
-
-  const logout =
-    useCallback(async () => {
-      try {
-        await signOut({
-          global: true,
-        });
-      } catch (err) {
-        console.warn(
-          "Logout warning:",
-          err?.message || err
-        );
-      } finally {
-        /* ============================================
-           CLEAR AUTH
-        ============================================ */
-
-        clearAuth();
-
-        /* ============================================
-           CLEAR GUEST
-        ============================================ */
-
-        localStorage.removeItem(
-          "community_guest"
-        );
-
-        setIsGuest(false);
-
-        /* ============================================
-           REDIRECT
-        ============================================ */
-
-        window.location.assign(
-          "/"
-        );
-      }
-    }, [clearAuth]);
-
-  /* ======================================================
-     AUTH STATE
-  ====================================================== */
-
-  const isAuthenticated =
-    Boolean(user && token);
-
-  /* ======================================================
-     ROLE
-  ====================================================== */
-
-  const role =
-    isAuthenticated
-      ? "member"
-      : isGuest
-      ? "guest"
-      : "anonymous";
-
-  /* ======================================================
-     CONTEXT VALUE
-  ====================================================== */
+  const role = isAuthenticated
+    ? "member"
+    : isGuest
+    ? "guest"
+    : "anonymous";
 
   const value = useMemo(
     () => ({
-      /* ============================================
-         USER
-      ============================================ */
-
       user,
       token,
       tokens,
 
-      /* ============================================
-         FLAGS
-      ============================================ */
-
       loading,
       hydrating,
+      authLoading,
 
       isAuthenticated,
       isGuest,
-
       role,
-
-      /* ============================================
-         ACTIONS
-      ============================================ */
 
       login,
       logout,
-
       continueAsGuest,
 
       refreshAuth,
@@ -425,50 +251,32 @@ const continueAsGuest = useCallback(async () => {
       user,
       token,
       tokens,
-
       loading,
       hydrating,
-
+      authLoading,
       isAuthenticated,
       isGuest,
-
       role,
-
       login,
       logout,
-
       continueAsGuest,
-
       refreshAuth,
       clearAuth,
     ]
   );
 
-  /* ======================================================
-     PROVIDER
-  ====================================================== */
-
   return (
-    <AuthContext.Provider
-      value={value}
-    >
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
 }
 
-/* =========================================================
-   HOOK
-========================================================= */
-
 export function useAuth() {
-  const context =
-    useContext(AuthContext);
+  const context = useContext(AuthContext);
 
   if (!context) {
-    throw new Error(
-      "useAuth must be used within AuthProvider"
-    );
+    throw new Error("useAuth must be used within AuthProvider");
   }
 
   return context;

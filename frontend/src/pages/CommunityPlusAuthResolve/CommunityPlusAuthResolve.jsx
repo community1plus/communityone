@@ -11,6 +11,7 @@ export default function CommunityPlusAuthResolve() {
     loading,
     isAuthenticated,
     isGuest,
+    user,
     refreshAuth,
   } = useAuth();
 
@@ -25,13 +26,9 @@ export default function CommunityPlusAuthResolve() {
 
     async function checkAuth() {
       try {
-        await refreshAuth();
-      } catch (err) {
-        console.error("Auth resolve refresh failed:", err);
+        await refreshAuth?.();
       } finally {
-        if (active) {
-          setCheckedAuth(true);
-        }
+        if (active) setCheckedAuth(true);
       }
     }
 
@@ -43,10 +40,11 @@ export default function CommunityPlusAuthResolve() {
   }, [refreshAuth]);
 
   console.log("AUTH RESOLVE:", {
-    loading,
     checkedAuth,
+    loading,
     isAuthenticated,
     isGuest,
+    user,
     profileReady,
     hasProfile,
     isProfileComplete,
@@ -64,6 +62,12 @@ export default function CommunityPlusAuthResolve() {
     return <Navigate to="/communityplus" replace />;
   }
 
+  // Important: wait until AuthContext exposes the real user
+  if (!user) {
+    return <div style={{ padding: 40 }}>Loading account...</div>;
+  }
+
+  // Then wait for ProfileContext to resolve using that user
   if (!profileReady) {
     return <div style={{ padding: 40 }}>Loading profile...</div>;
   }

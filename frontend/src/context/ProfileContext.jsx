@@ -160,72 +160,50 @@ function profileHasMinimumFields(profile) {
 }
 
 function getClientEndpointDetails() {
-  const endpoint = {
+  return {
     deviceName: navigator.platform || "",
-
-    deviceType: /Mobi|Android|iPhone|iPad/i.test(
-      navigator.userAgent
-    )
+    deviceType: /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)
       ? "mobile"
       : "desktop",
-
     userAgent: navigator.userAgent || "",
-
     platform: navigator.platform || "",
-
     language: navigator.language || "",
-
-    timezone:
-      Intl.DateTimeFormat()
-        .resolvedOptions()
-        .timeZone || "",
-
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "",
     screen: {
       width: window.screen?.width || null,
       height: window.screen?.height || null,
     },
-
     viewport: {
       width: window.innerWidth || null,
       height: window.innerHeight || null,
     },
-
     capturedAt: new Date().toISOString(),
   };
-
-  console.log(
-    "🖥️ CLIENT ENDPOINT DETAILS",
-    endpoint
-  );
-
-  return endpoint;
 }
 
 export function ProfileProvider({ children }) {
   const api = useAPI();
+
   const {
-  user,
-  isAuthenticated,
-  loading,
-  authLoading,
-} = useAuth();
+    user,
+    isAuthenticated,
+    loading,
+    authLoading,
+    isGuest,
+  } = useAuth();
 
-const userKey = getUserKey(user);
+  const userKey = getUserKey(user);
 
-const authReady = !loading && !authLoading;
+  const authSettled = !loading && !authLoading;
 
-const authSettled =
-  !loading && !authLoading;
+  const waitingForUserKey =
+    authSettled &&
+    isAuthenticated &&
+    !isGuest &&
+    !userKey;
 
-const waitingForUserKey =
-  authSettled &&
-  isAuthenticated &&
-  !userKey;
-
-const profileShouldWait =
-  !authSettled || waitingForUserKey;
-
-  
+  const profileShouldWait =
+    !authSettled || waitingForUserKey;
 
   const cachedOnRender =
     isAuthenticated && userKey
@@ -241,9 +219,9 @@ const profileShouldWait =
     normaliseProviders(cachedOnRender?.providers || {})
   );
 
-const [profileLoading, setProfileLoading] = useState(
-  Boolean(!authReady || (isAuthenticated && !cachedOnRender))
-);
+  const [profileLoading, setProfileLoading] = useState(
+    Boolean(profileShouldWait || (isAuthenticated && !cachedOnRender))
+  );
 
   const [profileSaving, setProfileSaving] = useState(false);
   const [profileError, setProfileError] = useState(null);
@@ -255,11 +233,6 @@ const [profileLoading, setProfileLoading] = useState(
 
   const markProfileReady = useCallback(
     (nextProfile = null, nextProviders = {}, missing = false) => {
-      console.log("markProfileReady()", {
-        nextProfile,
-        missing,
-      });
-
       setProfile(nextProfile);
       setProviders(normaliseProviders(nextProviders));
       setProfileMissing(missing);
@@ -270,10 +243,7 @@ const [profileLoading, setProfileLoading] = useState(
   );
 
   const loadProfile = useCallback(
-
-    
     async ({ background = false } = {}) => {
-
       if (profileShouldWait) {
         loadingRef.current = false;
 
@@ -284,19 +254,11 @@ const [profileLoading, setProfileLoading] = useState(
         setProfileLoading(true);
 
         return null;
-}
+      }
 
-      if (!authReady) {
-        setProfile(null);
-        setProviders(normaliseProviders());
-        setProfileMissing(false);
-        setProfileError(null);
-        setProfileLoading(true);
-      return null;
-}
       if (loadingRef.current) return null;
 
-      if (!isAuthenticated) {
+      if (!isAuthenticated || isGuest) {
         loadingRef.current = false;
 
         setProfile(null);
@@ -316,38 +278,31 @@ const [profileLoading, setProfileLoading] = useState(
         setProfileLoading(true);
       }
 
-try {
-  const headers = await getAuthHeaders();
+      try {
+        const headers = await getAuthHeaders();
 
-  const res = await apiRef.current.get("/me", {
-    headers,
-  });
+        const res = await apiRef.current.get("/me", {
+          headers,
+        });
 
-  const payload = normaliseApiResponse(res);
+        const payload = normaliseApiResponse(res);
 
-  console.log("RAW /me RESPONSE", res);
-  console.log("NORMALISED PAYLOAD", payload);
+        const nextProfile = payload?.profile || null;
+        const nextProviders = payload?.providers || {};
 
-  const nextProfile = payload?.profile || null;
-  const nextProviders = payload?.providers || {};
+        writeProfileCache(userKey, nextProfile, nextProviders);
 
-  console.log("PROFILE FROM API", nextProfile);
+        markProfileReady(
+          nextProfile,
+          nextProviders,
+          !nextProfile
+        );
 
-  writeProfileCache(userKey, nextProfile, nextProviders);
-
-  markProfileReady(
-    nextProfile,
-    nextProviders,
-    !nextProfile
-  );
-
-  return nextProfile;
+        return nextProfile;
       } catch (err) {
         if (isNotFoundError(err)) {
           clearProfileCache(userKey);
-
           markProfileReady(null, {}, true);
-
           return null;
         }
 
@@ -361,25 +316,28 @@ try {
         loadingRef.current = false;
       }
     },
-    [profileShouldWait,isAuthenticated, userKey, markProfileReady]
+    [
+      profileShouldWait,
+      isAuthenticated,
+      isGuest,
+      userKey,
+      markProfileReady,
+    ]
   );
 
   useEffect(() => {
-
-    if (profileShouldWait) {
-  loadingRef.current = false;
-
-  setProfile(null);
-  setProviders(normaliseProviders());
-  setProfileMissing(false);
-  setProfileError(null);
-  setProfileLoading(true);
-
-  return;
-}
     loadingRef.current = false;
 
-    if (!isAuthenticated) {
+    if (profileShouldWait) {
+      setProfile(null);
+      setProviders(normaliseProviders());
+      setProfileMissing(false);
+      setProfileError(null);
+      setProfileLoading(true);
+      return;
+    }
+
+    if (!isAuthenticated || isGuest) {
       setProfile(null);
       setProviders(normaliseProviders());
       setProfileMissing(false);
@@ -400,9 +358,7 @@ try {
       setProfileError(null);
       setProfileLoading(false);
 
-      loadProfile({
-        background: true,
-      });
+      loadProfile({ background: true });
 
       return;
     }
@@ -413,14 +369,18 @@ try {
     setProfileError(null);
     setProfileLoading(true);
 
-    loadProfile({
-      background: false,
-    });
-  }, [profileShouldWait, isAuthenticated, userKey, loadProfile]);
+    loadProfile({ background: false });
+  }, [
+    profileShouldWait,
+    isAuthenticated,
+    isGuest,
+    userKey,
+    loadProfile,
+  ]);
 
   const saveProfile = useCallback(
     async (nextProfile) => {
-      if (!isAuthenticated) {
+      if (!isAuthenticated || isGuest) {
         throw new Error("User is not authenticated");
       }
 
@@ -436,16 +396,14 @@ try {
             : "",
         });
 
-const payloadToSave = {
-  ...nextProfile,
-  endpoint: getClientEndpointDetails(),
-};
+        const payloadToSave = {
+          ...nextProfile,
+          endpoint: getClientEndpointDetails(),
+        };
 
-console.log("💾 PROFILE SAVE PAYLOAD", payloadToSave);
-
-const res = await apiRef.current.put("/profile", payloadToSave, {
-  headers,
-});
+        const res = await apiRef.current.put("/profile", payloadToSave, {
+          headers,
+        });
 
         const payload = normaliseApiResponse(res);
 
@@ -486,12 +444,12 @@ const res = await apiRef.current.put("/profile", payloadToSave, {
         setProfileSaving(false);
       }
     },
-    [isAuthenticated, userKey, profile, providers]
+    [isAuthenticated, isGuest, userKey, profile, providers]
   );
 
   const patchProfile = useCallback(
     async (patch) => {
-      if (!isAuthenticated) {
+      if (!isAuthenticated || isGuest) {
         throw new Error("User is not authenticated");
       }
 
@@ -503,23 +461,16 @@ const res = await apiRef.current.put("/profile", payloadToSave, {
           "x-version": profile?.version ? String(profile.version) : "",
         });
 
-const payloadToPatch = {
-  ...patch,
-  endpoint: getClientEndpointDetails(),
-};
+        const payloadToPatch = {
+          ...patch,
+          endpoint: getClientEndpointDetails(),
+        };
 
-console.log(
-  "🩹 PROFILE PATCH PAYLOAD",
-  payloadToPatch
-);
-
-const res = await apiRef.current.patch(
-  "/profile",
-  payloadToPatch,
-  { headers }
-);
-
-
+        const res = await apiRef.current.patch(
+          "/profile",
+          payloadToPatch,
+          { headers }
+        );
 
         const payload = normaliseApiResponse(res);
 
@@ -549,7 +500,7 @@ const res = await apiRef.current.patch(
         setProfileSaving(false);
       }
     },
-    [isAuthenticated, userKey, profile, providers]
+    [isAuthenticated, isGuest, userKey, profile, providers]
   );
 
   const completionPercent = useMemo(
@@ -557,16 +508,24 @@ const res = await apiRef.current.patch(
     [profile]
   );
 
-  const profileReady = !profileLoading;
-
   const hasProfile = profileHasMinimumFields(profile);
 
   const isProfileComplete =
     hasProfile &&
     completionPercent >= 80;
 
+  const profileReady =
+    authSettled &&
+    !waitingForUserKey &&
+    !profileLoading;
+
   console.log("PROFILE CONTEXT STATE", {
+    user,
     userKey,
+    authSettled,
+    waitingForUserKey,
+    isAuthenticated,
+    isGuest,
     profile,
     hasProfile,
     profileMissing,
@@ -574,22 +533,6 @@ const res = await apiRef.current.patch(
     profileReady,
     completionPercent,
   });
-
-  useEffect(() => {
-    console.log("PROFILE STATE CHANGED", {
-      profile,
-      hasProfile,
-      profileMissing,
-      profileLoading,
-      profileReady,
-    });
-  }, [
-    profile,
-    hasProfile,
-    profileMissing,
-    profileLoading,
-    profileReady,
-  ]);
 
   const value = useMemo(
     () => ({
