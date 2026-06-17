@@ -46,9 +46,8 @@ export default function CommunityPlusLandingPage() {
 
 const needsProfileSetup =
   profileReady &&
-  isAuthenticated &&
   !isGuest &&
-  (!hasProfile || profileMissing || !isProfileComplete);
+  (!hasProfile || !isProfileComplete || profile === null);
 
   useEffect(() => {
     if (location.state?.returnTo) {
@@ -65,21 +64,14 @@ const needsProfileSetup =
   }, [location.state, isAuthenticated, isGuest]);
 
 useEffect(() => {
-  if (loading) return;
-  if (!isAuthenticated) return;
-  if (isGuest) return;
-  if (!profileReady) return;
+if (loading) return;
+if (!isAuthenticated) return;
+if (isGuest) return;
+if (!profileReady) return;
 
-  if (!hasProfile || profileMissing || !isProfileComplete) {
-    navigate("/communityplus/profile", {
-      replace: true,
-      state: {
-        returnTo,
-        profileRequired: true,
-      },
-    });
-    return;
-  }
+if (!hasProfile || !isProfileComplete) {
+  navigate("/communityplus/profile", { replace: true });
+}
 
   sessionStorage.removeItem(RETURN_TO_KEY);
 
