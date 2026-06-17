@@ -46,15 +46,17 @@ try {
   const username = formData.email.trim();
 
   await signIn({
-    username,
-    password: formData.password,
-  });
+  username,
+  password: formData.password,
+});
 
 await refreshAuth();
 
-onSuccess?.({
-  afterLogin: true,
-});
+setAuthLoading(false);
+submittingRef.current = false;
+console.log("EMAIL LOGIN SUCCESS");
+onSuccess?.();
+
 } catch (err) {
       if (!isMountedRef.current) return;
 
