@@ -672,26 +672,60 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     [setValue]
   );
 
-  const handleBusinessRegistrationComplete = useCallback(
-    (business) => {
-      if (values.userType === "ORG") {
-        setValue("organisation", {
-          ...values.organisation,
-          ...business,
-        });
-      }
+const handleBusinessRegistrationComplete = useCallback(
+  (business) => {
+    if (values.userType === "ORG") {
+      setValue("organisation", {
+        ...values.organisation,
+        ...business,
+        name:
+          business?.name ||
+          business?.businessName ||
+          values.organisation?.name ||
+          "",
+        location:
+          business?.location ||
+          business?.businessLocation ||
+          values.organisation?.location ||
+          null,
+      });
 
-      if (values.userType === "MIXED") {
-        setValue("business", {
-          ...values.business,
-          ...business,
-        });
+      if (business?.location || business?.businessLocation) {
+        setValue(
+          "homeLocation",
+          business.location || business.businessLocation
+        );
       }
+    }
 
-      setShowBusinessRegistration(false);
-    },
-    [values, setValue]
-  );
+    if (values.userType === "MIXED") {
+      setValue("business", {
+        ...values.business,
+        ...business,
+        name:
+          business?.name ||
+          business?.businessName ||
+          values.business?.name ||
+          "",
+        location:
+          business?.location ||
+          business?.businessLocation ||
+          values.business?.location ||
+          null,
+      });
+
+      if (business?.location || business?.businessLocation) {
+        setValue(
+          "homeLocation",
+          business.location || business.businessLocation
+        );
+      }
+    }
+
+    setShowBusinessRegistration(false);
+  },
+  [values, setValue]
+);
 
   const handlePhoneCountryChange = useCallback(
     (event) => {
@@ -946,54 +980,100 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     }
   }, [values.userType, setManualLocation, setValue]);
 
-  const buildProfilePayload = useCallback(() => {
-    const businessPhoneE164 = toE164Phone(
-      getBusinessPhoneValue(values),
-      values.phoneCountry
-    );
+const buildProfilePayload = useCallback(() => {
+  const isOrg = values.userType === "ORG";
+  const isMixed = values.userType === "MIXED";
 
-    return {
-      username: values.username,
-      display_name: values.display_name,
-      userType: values.userType,
+  const orgLocation = values.organisation?.location || null;
+  const businessLocation = values.business?.location || null;
 
-      phone: phoneE164,
-      phoneE164,
-      phoneDisplay: values.phone,
+  const businessPhoneRaw = getBusinessPhoneValue(values);
+
+  const businessPhoneE164 = toE164Phone(
+    businessPhoneRaw,
+    values.phoneCountry
+  );
+
+  const fallbackDisplayName =
+    values.display_name ||
+    values.organisation?.name ||
+    values.business?.name ||
+    values.username ||
+    userEmail?.split("@")[0] ||
+    "User";
+
+  const resolvedHomeLocation =
+    isOrg
+      ? orgLocation || values.homeLocation || homeLocation
+      : isMixed
+      ? businessLocation || values.homeLocation || homeLocation
+      : values.homeLocation || homeLocation;
+
+  const resolvedPhone =
+    isOrg || isMixed
+      ? businessPhoneE164 || phoneE164
+      : phoneE164;
+
+  return {
+    username: values.username || userEmail?.split("@")[0] || "",
+
+    // Keep both naming styles for backend/frontend compatibility
+    displayName: fallbackDisplayName,
+    display_name: fallbackDisplayName,
+
+    email: values.email || userEmail,
+    userType: values.userType,
+
+    phone: resolvedPhone,
+    phoneE164: resolvedPhone,
+    phoneDisplay:
+      isOrg || isMixed
+        ? businessPhoneRaw || values.phone
+        : values.phone,
+    phoneCountry: values.phoneCountry,
+
+    // Required by ProfileContext completion
+    homeLocation: resolvedHomeLocation,
+
+    organisation: {
+      ...values.organisation,
+      name: values.organisation?.name || fallbackDisplayName,
+      location: orgLocation,
+      phone: isOrg
+        ? businessPhoneE164
+        : values.organisation?.phone || "",
+      phoneDisplay: values.organisation?.phone || "",
       phoneCountry: values.phoneCountry,
+      email: values.organisation?.email || values.email || userEmail,
+    },
 
-      homeLocation: values.homeLocation || homeLocation,
+    creator: values.creator,
 
-      organisation: {
-        ...values.organisation,
-        phone:
-          values.userType === "ORG"
-            ? businessPhoneE164
-            : values.organisation?.phone,
-        phoneDisplay: values.organisation?.phone || "",
-        phoneCountry: values.phoneCountry,
-      },
+    business: {
+      ...values.business,
+      name: values.business?.name || fallbackDisplayName,
+      location: businessLocation,
+      phone: isMixed
+        ? businessPhoneE164
+        : values.business?.phone || "",
+      phoneDisplay: values.business?.phone || "",
+      phoneCountry: values.phoneCountry,
+      email: values.business?.email || values.email || userEmail,
+    },
 
-      creator: values.creator,
+    policies: values.policies,
 
-      business: {
-        ...values.business,
-        phone:
-          values.userType === "MIXED"
-            ? businessPhoneE164
-            : values.business?.phone,
-        phoneDisplay: values.business?.phone || "",
-        phoneCountry: values.phoneCountry,
-      },
-
-      policies: values.policies,
-
-      payment: {
-        cardName: values.payment?.cardName || "",
-        last4: values.payment?.last4 || "",
-      },
-    };
-  }, [values, phoneE164, homeLocation]);
+    payment: {
+      cardName: values.payment?.cardName || "",
+      last4: values.payment?.last4 || "",
+    },
+  };
+}, [
+  values,
+  phoneE164,
+  homeLocation,
+  userEmail,
+]);
 
   const handleSaveProfile = useCallback(async () => {
     setSavingProfile(true);
