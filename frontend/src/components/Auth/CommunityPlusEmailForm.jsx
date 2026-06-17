@@ -50,9 +50,11 @@ try {
     password: formData.password,
   });
 
-  await refreshAuth();
+await refreshAuth();
 
-  onSuccess?.();
+onSuccess?.({
+  afterLogin: true,
+});
 } catch (err) {
       if (!isMountedRef.current) return;
 
