@@ -1008,8 +1008,11 @@ const handleBusinessRegistrationComplete = useCallback(
   }, [values.userType, setManualLocation, setValue]);
 
 const buildProfilePayload = useCallback(() => {
-  const isOrg = values.userType === "ORG";
-  const isMixed = values.userType === "MIXED";
+const selectedUserType = activeProfileTab;
+
+const isOrg = selectedUserType === "ORG";
+const isMixed = selectedUserType === "MIXED";
+ 
 
   const orgLocation = values.organisation?.location || null;
   const businessLocation = values.business?.location || null;
@@ -1049,7 +1052,8 @@ const buildProfilePayload = useCallback(() => {
     display_name: fallbackDisplayName,
 
     email: values.email || userEmail,
-    userType: values.userType,
+    userType: selectedUserType,
+    user_type: selectedUserType,
 
     phone: resolvedPhone,
     phoneE164: resolvedPhone,
