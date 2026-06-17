@@ -348,6 +348,33 @@ function getInitialProfileValues({ user, homeLocation }) {
   };
 }
 
+function isLocationComplete(location) {
+  return Boolean(
+    location &&
+      (location.label || location.fullAddress || location.address) &&
+      location.lat &&
+      location.lng
+  );
+}
+
+function validateOrganisationLevel1(values) {
+  const errors = [];
+
+  if (!String(values.username || "").trim()) {
+    errors.push("Username is required.");
+  }
+
+  if (!String(values.display_name || "").trim()) {
+    errors.push("Real name is required.");
+  }
+
+  if (!String(values.organisation?.name || "").trim()) {
+    errors.push("Organisation name is required.");
+  }
+
+  return errors;
+}
+
 export default function CommunityPlusUserProfile({ onComplete }) {
   const navigate = useNavigate();
 
@@ -1075,34 +1102,51 @@ const buildProfilePayload = useCallback(() => {
   userEmail,
 ]);
 
-  const handleSaveProfile = useCallback(async () => {
-    setSavingProfile(true);
-    setProfileError("");
+const handleSaveProfile = useCallback(async () => {
+  setSavingProfile(true);
+  setProfileError("");
 
-    try {
-      const payload = buildProfilePayload();
-      const nextProfile = await saveProfile(payload);
+  try {
+    if (values.userType === "ORG") {
+      const orgErrors = validateOrganisationLevel1(values);
 
-      clearStorage?.();
-      onComplete?.(nextProfile);
-
-      if (payload.userType === "ORG") {
-        navigate("/communityplus/yellowpages", {
-          replace: true,
-        });
+      if (orgErrors.length > 0) {
+        setProfileError(orgErrors[0]);
+        setCurrentStep(0);
         return;
       }
+    }
 
-      navigate("/communityplus", {
+    const payload = buildProfilePayload();
+    const nextProfile = await saveProfile(payload);
+
+    clearStorage?.();
+    onComplete?.(nextProfile);
+
+    if (payload.userType === "ORG") {
+      navigate("/communityplus/yellowpages", {
         replace: true,
       });
-    } catch (err) {
-      console.error("Profile save failed:", err);
-      setProfileError(err?.message || "Profile save failed");
-    } finally {
-      setSavingProfile(false);
+      return;
     }
-  }, [saveProfile, buildProfilePayload, clearStorage, onComplete, navigate]);
+
+    navigate("/communityplus", {
+      replace: true,
+    });
+  } catch (err) {
+    console.error("Profile save failed:", err);
+    setProfileError(err?.message || "Profile save failed");
+  } finally {
+    setSavingProfile(false);
+  }
+}, [
+  values,
+  saveProfile,
+  buildProfilePayload,
+  clearStorage,
+  onComplete,
+  navigate,
+]);
 
   const closeProfile = useCallback(() => {
     if (!profileReady) return;
