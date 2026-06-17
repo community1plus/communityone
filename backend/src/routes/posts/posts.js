@@ -117,8 +117,11 @@ router.get("/iview", async (req, res) => {
       scope = "LOCAL",
     } = req.query;
 
-    const safeScope = normalizeScope(scope);
-    const safeFeedLimit = safeLimit(limit, 20, 100);
+const safeScope = normalizeScope(scope);
+const safeFeedLimit = safeLimit(limit, 20, 100);
+const latitude = Number(req.query.lat);
+const longitude = Number(req.query.lng);
+const safeRadiusKm = Math.min(Math.max(Number(req.query.radiusKm) || 5, 1), 50);
 
     const result = await pool.query(
       `
