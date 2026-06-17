@@ -102,7 +102,13 @@ useEffect(() => {
 const handleAuthSuccess = () => {
   setShowAuth(false);
 
-  window.location.replace("/communityplus/profile");
+  navigate("/communityplus/profile", {
+    replace: true,
+    state: {
+      profileRequired: true,
+      returnTo,
+    },
+  });
 };
 
   const openAuth = () => {

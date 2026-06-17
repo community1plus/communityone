@@ -52,10 +52,9 @@ try {
 
 await refreshAuth();
 
-setAuthLoading(false);
-submittingRef.current = false;
-console.log("EMAIL LOGIN SUCCESS");
-onSuccess?.();
+setTimeout(() => {
+  onSuccess?.();
+}, 300);
 
 } catch (err) {
       if (!isMountedRef.current) return;
