@@ -52,9 +52,10 @@ try {
 
 await refreshAuth();
 
-setTimeout(() => {
-  onSuccess?.();
-}, 300);
+setAuthLoading(false);
+submittingRef.current = false;
+
+onSuccess?.();
 
 } catch (err) {
       if (!isMountedRef.current) return;
