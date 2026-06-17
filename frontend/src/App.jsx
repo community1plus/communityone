@@ -21,7 +21,7 @@ import CommunityPlusEchoPage from "./pages/CommunityPlusEchoPage/CommunityPlusEc
 import CommunityPlusEchoDropPage from "./pages/CommunityPlusEchoPage/CommunityPlusEchoDropPage";
 import CommunityPlusSplash from "./pages/CommunityPlusSplash/CommunityPlusSplash";
 import CommunityPlusModerationPage from "./pages/CommunityPlusModerationPage/CommunityPlusModerationPage";
-
+import { useProfile } from "./context/ProfileContext";
 import PostComposer from "./components/Layout/Sidebar/Post/PostComposer";
 
 
@@ -49,6 +49,56 @@ function ProtectedRoute({ children }) {
         replace
         state={{
           loginRequired: true,
+          returnTo: location.pathname + location.search,
+        }}
+      />
+    );
+  }
+
+  return children;
+}
+
+function ProfileGate({ children }) {
+  const location = useLocation();
+
+  const {
+    isAuthenticated,
+    isGuest,
+    loading,
+    authLoading,
+  } = useAuth();
+
+  const {
+    profile,
+    profileReady,
+    hasProfile,
+    isProfileComplete,
+  } = useProfile();
+
+  if (loading || authLoading) {
+    return <div style={{ padding: 40 }}>Loading...</div>;
+  }
+
+  if (
+    isAuthenticated &&
+    !isGuest &&
+    !profileReady
+  ) {
+    return <div style={{ padding: 40 }}>Loading profile...</div>;
+  }
+
+  if (
+    isAuthenticated &&
+    !isGuest &&
+    profileReady &&
+    (!hasProfile || !isProfileComplete || profile === null)
+  ) {
+    return (
+      <Navigate
+        to="/communityplus/profile"
+        replace
+        state={{
+          profileRequired: true,
           returnTo: location.pathname + location.search,
         }}
       />
@@ -102,7 +152,13 @@ export default function App() {
         }
     />
 
-        <Route element={<SharedDashboardLayout />}>
+    <Route
+        element={
+        <ProfileGate>
+          <SharedDashboardLayout />
+        </ProfileGate>
+      }
+    >
           <Route path="/communityplus" element={<CommunityPlusDashboardHome />} />
 
           <Route
