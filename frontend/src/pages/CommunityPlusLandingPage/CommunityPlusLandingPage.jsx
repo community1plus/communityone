@@ -48,7 +48,7 @@ const needsProfileSetup =
   profileReady &&
   isAuthenticated &&
   !isGuest &&
-  (!hasProfile || profileMissing);
+  (!hasProfile || profileMissing || !isProfileComplete);
 
   useEffect(() => {
     if (location.state?.returnTo) {
@@ -70,8 +70,8 @@ useEffect(() => {
   if (isGuest) return;
   if (!profileReady) return;
 
-  if (!hasProfile || profileMissing) {
-    navigate("/communityplus/welcome", {
+  if (!hasProfile || profileMissing || !isProfileComplete) {
+    navigate("/communityplus/profile", {
       replace: true,
       state: {
         returnTo,
@@ -93,6 +93,7 @@ useEffect(() => {
   profileReady,
   hasProfile,
   profileMissing,
+  isProfileComplete,
   navigate,
   returnTo,
 ]);
@@ -104,7 +105,7 @@ const handleAuthSuccess = () => {
   const openAuth = () => {
     if (isAuthenticated && !isGuest) {
       if (profileReady && needsProfileSetup) {
-        navigate("/communityplus/welcome", {
+        navigate("/communityplus/profile", {
           replace: true,
           state: {
             returnTo,
