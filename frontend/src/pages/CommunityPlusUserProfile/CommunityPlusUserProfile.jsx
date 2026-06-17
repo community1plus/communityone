@@ -375,6 +375,42 @@ function validateOrganisationLevel1(values) {
   return errors;
 }
 
+function isFilled(value) {
+  return Boolean(String(value || "").trim());
+}
+
+function isLocationComplete(location) {
+  return Boolean(
+    location &&
+      (location.label || location.fullAddress || location.address) &&
+      location.lat &&
+      location.lng
+  );
+}
+
+function validateActiveTabLevel1(values, activeProfileTab) {
+  const errors = [];
+
+  if (activeProfileTab === "ORG") {
+    if (!isFilled(values.username)) errors.push("Username is required.");
+    if (!isFilled(values.display_name)) errors.push("Real name is required.");
+    if (!isFilled(values.organisation?.name)) errors.push("Organisation name is required.");
+  }
+
+  if (activeProfileTab === "MIXED") {
+    if (!isFilled(values.username)) errors.push("Username is required.");
+    if (!isFilled(values.display_name)) errors.push("Real name is required.");
+    if (!isFilled(values.business?.name)) errors.push("Business name is required.");
+  }
+
+  if (activeProfileTab === "PERSONAL") {
+    if (!isFilled(values.username)) errors.push("Username is required.");
+    if (!isFilled(values.display_name)) errors.push("Display name is required.");
+  }
+
+  return errors;
+}
+
 export default function CommunityPlusUserProfile({ onComplete }) {
   const navigate = useNavigate();
 
@@ -1111,14 +1147,12 @@ const handleSaveProfile = useCallback(async () => {
   setProfileError("");
 
   try {
-    if (values.userType === "ORG") {
-      const orgErrors = validateOrganisationLevel1(values);
+    const errors = validateActiveTabLevel1(values, activeProfileTab);
 
-      if (orgErrors.length > 0) {
-        setProfileError(orgErrors[0]);
-        setCurrentStep(0);
-        return;
-      }
+    if (errors.length > 0) {
+      setProfileError(errors[0]);
+      setCurrentStep(0);
+      return;
     }
 
     const payload = buildProfilePayload();
@@ -1127,16 +1161,7 @@ const handleSaveProfile = useCallback(async () => {
     clearStorage?.();
     onComplete?.(nextProfile);
 
-    if (payload.userType === "ORG") {
-      navigate("/communityplus/yellowpages", {
-        replace: true,
-      });
-      return;
-    }
-
-    navigate("/communityplus", {
-      replace: true,
-    });
+    navigate("/communityplus", { replace: true });
   } catch (err) {
     console.error("Profile save failed:", err);
     setProfileError(err?.message || "Profile save failed");
@@ -1145,6 +1170,7 @@ const handleSaveProfile = useCallback(async () => {
   }
 }, [
   values,
+  activeProfileTab,
   saveProfile,
   buildProfilePayload,
   clearStorage,
