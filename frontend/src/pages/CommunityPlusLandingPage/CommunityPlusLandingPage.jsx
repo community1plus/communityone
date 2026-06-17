@@ -22,6 +22,7 @@ export default function CommunityPlusLandingPage() {
   } = useAuth();
 
   const {
+    profile,
     profileReady,
     profileMissing,
     hasProfile,
@@ -64,14 +65,22 @@ const needsProfileSetup =
   }, [location.state, isAuthenticated, isGuest]);
 
 useEffect(() => {
-if (loading) return;
-if (!isAuthenticated) return;
-if (isGuest) return;
-if (!profileReady) return;
+  if (loading) return;
+  if (!isAuthenticated) return;
+  if (isGuest) return;
+  if (!profileReady) return;
 
-if (!hasProfile || !isProfileComplete) {
-  navigate("/communityplus/profile", { replace: true });
-}
+  if (!hasProfile || !isProfileComplete || profile === null) {
+    navigate("/communityplus/profile", {
+      replace: true,
+      state: {
+        returnTo,
+        profileRequired: true,
+      },
+    });
+
+    return;
+  }
 
   sessionStorage.removeItem(RETURN_TO_KEY);
 
@@ -84,8 +93,8 @@ if (!hasProfile || !isProfileComplete) {
   isGuest,
   profileReady,
   hasProfile,
-  profileMissing,
   isProfileComplete,
+  profile,
   navigate,
   returnTo,
 ]);
