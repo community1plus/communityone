@@ -379,15 +379,6 @@ function isFilled(value) {
   return Boolean(String(value || "").trim());
 }
 
-function isLocationComplete(location) {
-  return Boolean(
-    location &&
-      (location.label || location.fullAddress || location.address) &&
-      location.lat &&
-      location.lng
-  );
-}
-
 function validateActiveTabLevel1(values, activeProfileTab) {
   const errors = [];
 
@@ -1178,13 +1169,18 @@ const handleSaveProfile = useCallback(async () => {
   navigate,
 ]);
 
-  const closeProfile = useCallback(() => {
-    if (!profileReady) return;
+const closeProfile = useCallback(() => {
+  if (!profileReady) return;
 
-    navigate("/communityplus", {
-      replace: true,
-    });
-  }, [profileReady, navigate]);
+  const errors = validateActiveTabLevel1(values, activeProfileTab);
+
+  if (errors.length === 0) {
+    navigate("/communityplus", { replace: true });
+    return;
+  }
+
+  navigate("/", { replace: true });
+}, [profileReady, values, activeProfileTab, navigate]);
 
   const handleComplete = useCallback(async () => {
     const valid = await validateAll();
