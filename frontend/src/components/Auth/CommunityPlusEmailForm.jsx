@@ -6,7 +6,7 @@ import { useAuth } from "../../context/AuthContext";
 export default function CommunityPlusEmailForm({ onSuccess }) {
   
 
-
+  
   const { refreshAuth } = useAuth();
 
   const isMountedRef = useRef(true);
@@ -54,6 +54,13 @@ try {
 
   onSuccess?.();
 } catch (err) {
+      if (!isMountedRef.current) return;
+
+      setAuthError(err?.message || "Login failed");
+      setAuthLoading(false);
+      submittingRef.current = false;
+    }
+  };
 
   return (
     <form className="auth-email-form" onSubmit={handleEmailLogin}>
