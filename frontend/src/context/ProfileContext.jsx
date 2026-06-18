@@ -144,29 +144,6 @@ function normaliseApiResponse(res) {
   return payload;
 }
 
-  ["facebook", "instagram", "youtube", "x"].forEach((key) => {
-    if (providers?.[key] && typeof providers[key] === "object") {
-      result[key] = providers[key];
-    }
-  });
-
-  return result;
-}
-
-function normaliseApiResponse(res) {
-  alert("normaliseApiResponse called");
-  console.log(
-    "RAW API RESPONSE",
-    JSON.stringify(res, null, 2)
-  );
-
-  console.log(
-    "NORMALISED PAYLOAD",
-    JSON.stringify(payload, null, 2)
-  );
-  return res?.data || res || {};
-}
-
 function profileHasMinimumFields(profile) {
   return Boolean(
     profile?.id ||
