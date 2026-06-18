@@ -47,7 +47,7 @@ export default function CommunityPlusLandingPage() {
 const needsProfileSetup =
   profileReady &&
   !isGuest &&
-  (!hasProfile || !isProfileComplete || profile === null);
+  profileMissing;
 
   useEffect(() => {
     if (location.state?.returnTo) {
