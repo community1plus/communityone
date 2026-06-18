@@ -128,6 +128,30 @@ function isNotFoundError(err) {
   );
 }
 
+function normaliseProviders(providers = {}) {
+  return {
+    facebook:
+      typeof providers.facebook === "object"
+        ? !!providers.facebook?.verified
+        : !!providers.facebook,
+
+    instagram:
+      typeof providers.instagram === "object"
+        ? !!providers.instagram?.verified
+        : !!providers.instagram,
+
+    youtube:
+      typeof providers.youtube === "object"
+        ? !!providers.youtube?.verified
+        : !!providers.youtube,
+
+    x:
+      typeof providers.x === "object"
+        ? !!providers.x?.verified
+        : !!providers.x,
+  };
+}
+
 function normaliseApiResponse(res) {
   console.log(
     "RAW API RESPONSE",
@@ -541,7 +565,6 @@ const hasProfile =
   !profileMissing &&
   profileHasMinimumFields(profile);
 
-//const isProfileComplete = hasProfile;
 
   const profileReady =
     authSettled &&
