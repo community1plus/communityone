@@ -1200,16 +1200,22 @@ const handleSaveProfile = useCallback(async () => {
 
 const closeProfile = useCallback(() => {
   console.log("closeProfile fired");
-
+console.log({
+  profileReady,
+  profileSuccess,
+  profile,
+  profileId: profile?.id,
+  profileLevel: profile?.profileLevel,
+  profile_level: profile?.profile_level,
+});
   if (!profileReady) return;
 
-  if (profileSuccess || profile?.id) {
+  if (!profileMissing) {
     navigate("/communityplus", { replace: true });
-    return;
+  } else {
+    navigate("/", { replace: true });
   }
-
-  navigate("/", { replace: true });
-}, [profileReady, profileSuccess, profile, navigate]);
+}, [profileReady, profileMissing, navigate]);
 
   const handleComplete = useCallback(async () => {
     const valid = await validateAll();
