@@ -141,16 +141,16 @@ function normaliseProviders(providers = {}) {
 }
 
 function normaliseApiResponse(res) {
- alert("normaliseApiResponse called");
+  alert("normaliseApiResponse called");
   console.log(
-  "RAW API RESPONSE",
-  JSON.stringify(res, null, 2)
-);
+    "RAW API RESPONSE",
+    JSON.stringify(res, null, 2)
+  );
 
-console.log(
-  "NORMALISED PAYLOAD",
-  JSON.stringify(payload, null, 2)
-);
+  console.log(
+    "NORMALISED PAYLOAD",
+    JSON.stringify(payload, null, 2)
+  );
   return res?.data || res || {};
 }
 
