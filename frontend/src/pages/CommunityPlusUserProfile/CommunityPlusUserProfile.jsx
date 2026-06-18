@@ -1150,6 +1150,8 @@ return {
       : null,
 };
 
+}, [values, activeProfileTab, userEmail, phoneE164, homeLocation]);
+
 const handleSaveProfile = useCallback(async () => {
   setSavingProfile(true);
   setProfileError("");
