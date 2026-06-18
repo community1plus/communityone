@@ -92,6 +92,22 @@ router.get("/", async (req, res) => {
 
     const rawProfile = profileResult.rows[0] || null;
 
+    let organisationProfile = null;
+
+if (rawProfile?.id) {
+  const orgResult = await pool.query(
+    `
+    SELECT *
+    FROM organisation_profiles
+    WHERE user_profile_id = $1
+    LIMIT 1
+    `,
+    [rawProfile.id]
+  );
+
+  organisationProfile = orgResult.rows[0] || null;
+}
+
     console.log("👤 /api/me profile lookup:", {
       found: !!rawProfile,
       profileId: rawProfile?.id || null,
@@ -99,7 +115,23 @@ router.get("/", async (req, res) => {
       profileUsername: rawProfile?.username || null,
     });
 
-    const profile = normalizeProfile(rawProfile);
+    const profile = {
+  ...normalizeProfile(rawProfile),
+
+  organisationProfile,
+
+  organisation: organisationProfile,
+};
+
+console.log(
+  "ORG PROFILE",
+  organisationProfile
+);
+
+console.log(
+  "FINAL PROFILE",
+  profile
+);
 
     /* =========================
        PROVIDERS
