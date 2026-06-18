@@ -18,7 +18,6 @@ export default function CommunityPlusAuthResolve() {
   const {
     profileReady,
     hasProfile,
-    isProfileComplete,
   } = useProfile();
 
   useEffect(() => {
@@ -47,7 +46,6 @@ export default function CommunityPlusAuthResolve() {
     user,
     profileReady,
     hasProfile,
-    isProfileComplete,
   });
 
   if (loading || !checkedAuth) {
@@ -72,7 +70,7 @@ export default function CommunityPlusAuthResolve() {
     return <div style={{ padding: 40 }}>Loading profile...</div>;
   }
 
-  if (!hasProfile || !isProfileComplete) {
+  if (!hasProfile) {
     return <Navigate to="/communityplus/profile" replace />;
   }
 

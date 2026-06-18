@@ -533,7 +533,7 @@ const hasProfile =
   !profileMissing &&
   profileHasMinimumFields(profile);
 
-const isProfileComplete = hasProfile;
+//const isProfileComplete = hasProfile;
 
   const profileReady =
     authSettled &&
@@ -574,7 +574,6 @@ const isProfileComplete = hasProfile;
       completionPercent,
 
       hasProfile,
-      isProfileComplete,
 
       loadProfile,
       saveProfile,
@@ -590,7 +589,6 @@ const isProfileComplete = hasProfile;
       profileMissing,
       completionPercent,
       hasProfile,
-      isProfileComplete,
       loadProfile,
       saveProfile,
       patchProfile,

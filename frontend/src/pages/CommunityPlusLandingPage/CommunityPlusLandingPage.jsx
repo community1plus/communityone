@@ -25,14 +25,12 @@ export default function CommunityPlusLandingPage() {
     profileReady,
     profileMissing,
     hasProfile,
-    isProfileComplete,
   } = useProfile();
 
   console.log({
   profileReady,
   profileMissing,
   hasProfile,
-  isProfileComplete,
 });
   const [showAuth, setShowAuth] = useState(false);
 
