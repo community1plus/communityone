@@ -17,13 +17,6 @@ const ProfileContext = createContext(null);
 const PROFILE_CACHE_PREFIX = "communityone_profile_cache";
 const PROFILE_CACHE_TTL = 1000 * 60 * 10;
 
-const REQUIRED_PROFILE_FIELDS = [
-  "userType",
-  "displayName",
-  "homeLocation",
-  "phone",
-];
-
 function getUserKey(user) {
   if (!user) return null;
   if (typeof user === "string") return user;
@@ -101,21 +94,46 @@ function getValue(obj, path) {
   return path.split(".").reduce((acc, key) => acc?.[key], obj);
 }
 
-function calculateCompletion(profile) {
-  if (!profile) return 0;
+function getCompletedSections(profile, providers = {}) {
+  return {
+    organisation:
+      !!(
+        profile?.organisationProfile?.organisation_name ||
+        profile?.organisation?.organisation_name
+      ),
 
-  const completed = REQUIRED_PROFILE_FIELDS.filter((field) => {
-    const value = getValue(profile, field);
+    address:
+      !!(
+        profile?.homeLocation?.lat &&
+        profile?.homeLocation?.lng
+      ),
 
-    if (field === "homeLocation") {
-      return Boolean(value?.lat && value?.lng);
-    }
+    contact:
+      !!profile?.phone,
 
-    return Boolean(String(value || "").trim());
-  }).length;
+    social:
+      !!(
+        providers.facebook ||
+        providers.instagram ||
+        providers.youtube ||
+        providers.x
+      ),
 
-  return Math.round((completed / REQUIRED_PROFILE_FIELDS.length) * 100);
+    payment:
+      !!profile?.paymentVerified,
+  };
 }
+
+function calculateCompletion(profile, providers) {
+  const sections =
+    getCompletedSections(profile, providers);
+
+  const completed =
+    Object.values(sections).filter(Boolean).length;
+
+  return completed * 20;
+}
+
 
 function isNotFoundError(err) {
   const status = err?.response?.status || err?.status;
@@ -556,10 +574,40 @@ const getAuthHeaders = useCallback(
     [isAuthenticated, isGuest, userKey, profile, providers, getAuthHeaders]
   );
 
-  const completionPercent = useMemo(
-    () => calculateCompletion(profile),
-    [profile]
-  );
+const completionPercent = useMemo(
+  () => calculateCompletion(profile, providers),
+  [profile, providers]
+);
+
+console.log({
+  organisation:
+    !!(
+      profile?.organisationProfile?.organisation_name ||
+      profile?.organisation?.organisation_name
+    ),
+
+  address:
+    !!(
+      profile?.homeLocation?.lat &&
+      profile?.homeLocation?.lng
+    ),
+
+  contact:
+    !!profile?.phone,
+
+  social:
+    !!(
+      providers.facebook ||
+      providers.instagram ||
+      providers.youtube ||
+      providers.x
+    ),
+
+  payment:
+    !!profile?.paymentVerified,
+
+  completionPercent,
+});
 
 const hasProfile =
   !profileMissing &&
