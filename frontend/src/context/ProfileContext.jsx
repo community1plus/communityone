@@ -97,24 +97,6 @@ function clearProfileCache(userKey) {
   }
 }
 
-async function getAuthHeaders(extraHeaders = {}) {
-  const session = await fetchAuthSession({
-    forceRefresh: false,
-  });
-
-  const token = session.tokens?.accessToken?.toString();
-
-  if (!token) {
-    throw new Error("No access token found");
-  }
-
-  return {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${token}`,
-    ...extraHeaders,
-  };
-}
-
 function getValue(obj, path) {
   return path.split(".").reduce((acc, key) => acc?.[key], obj);
 }
@@ -191,13 +173,14 @@ function getClientEndpointDetails() {
 export function ProfileProvider({ children }) {
   const api = useAPI();
 
-  const {
-    user,
-    isAuthenticated,
-    loading,
-    authLoading,
-    isGuest,
-  } = useAuth();
+const {
+  user,
+  token,
+  isAuthenticated,
+  loading,
+  authLoading,
+  isGuest,
+} = useAuth();
 
   const userKey = getUserKey(user);
 
@@ -248,6 +231,31 @@ export function ProfileProvider({ children }) {
     },
     []
   );
+
+const getAuthHeaders = useCallback(
+  async (extraHeaders = {}) => {
+    let authToken = token;
+
+    if (!authToken) {
+      const session = await fetchAuthSession({
+        forceRefresh: true,
+      });
+
+      authToken = session.tokens?.accessToken?.toString();
+    }
+
+    if (!authToken) {
+      throw new Error("No access token found");
+    }
+
+    return {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${authToken}`,
+      ...extraHeaders,
+    };
+  },
+  [token]
+);
 
   const loadProfile = useCallback(
     async ({ background = false } = {}) => {
@@ -328,6 +336,7 @@ export function ProfileProvider({ children }) {
       isAuthenticated,
       isGuest,
       userKey,
+      getAuthHeaders,
       markProfileReady,
     ]
   );
@@ -507,7 +516,7 @@ export function ProfileProvider({ children }) {
         setProfileSaving(false);
       }
     },
-    [isAuthenticated, isGuest, userKey, profile, providers]
+    [isAuthenticated, isGuest, userKey, profile, providers, getAuthHeaders]
   );
 
   const completionPercent = useMemo(
