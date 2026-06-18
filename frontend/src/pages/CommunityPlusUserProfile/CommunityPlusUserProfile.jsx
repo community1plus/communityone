@@ -454,10 +454,13 @@ export default function CommunityPlusUserProfile({ onComplete }) {
 
   const [activeProfileTab, setActiveProfileTab] = useState(fallbackUserType);
   const [currentStep, setCurrentStep] = useState(0);
-  const [showBusinessRegistration, setShowBusinessRegistration] = useState(false);
+const [savingProfile, setSavingProfile] = useState(false);
 
-  const [savingProfile, setSavingProfile] = useState(false);
-  const [profileError, setProfileError] = useState("");
+const [profileError, setProfileError] = useState("");
+const [profileSuccess, setProfileSuccess] = useState("");
+
+const [showBusinessRegistration, setShowBusinessRegistration] =
+  useState(false);
 
   const [phoneStatus, setPhoneStatus] = useState("idle");
   const [phoneError, setPhoneError] = useState("");
@@ -1155,6 +1158,7 @@ return {
 const handleSaveProfile = useCallback(async () => {
   setSavingProfile(true);
   setProfileError("");
+  setProfileSuccess("");
 
   try {
     const errors = validateActiveTabLevel1(values, activeProfileTab);
@@ -1167,6 +1171,12 @@ const handleSaveProfile = useCallback(async () => {
 
     const payload = buildProfilePayload();
     const nextProfile = await saveProfile(payload);
+   setProfileSuccess("Profile saved successfully.");
+
+    setTimeout(() => {
+      setProfileSuccess("");
+    }, 3000);
+
 
     clearStorage?.();
     onComplete?.(nextProfile);
@@ -1548,6 +1558,12 @@ const closeProfile = useCallback(() => {
               {profileMissing && (
                 <div className="hint">
                   No saved profile found yet. Complete the form and save to create your profile.
+                </div>
+              )}
+
+              {profileSuccess && (
+                <div className="profile-success">
+                  {profileSuccess}
                 </div>
               )}
 
