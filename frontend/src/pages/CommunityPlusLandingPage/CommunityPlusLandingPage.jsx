@@ -47,21 +47,40 @@ export default function CommunityPlusLandingPage() {
 const needsProfileSetup =
   profileReady &&
   !isGuest &&
-  profileMissing;
+  (
+    profileMissing ||
+    !hasProfile ||
+    profile === null
+  );
 
-  useEffect(() => {
-    if (location.state?.returnTo) {
-      sessionStorage.setItem(RETURN_TO_KEY, location.state.returnTo);
-    }
+useEffect(() => {
+  const state = location.state;
 
-    if (location.state?.openAuthModal) {
-      setShowAuth(true);
-    }
+  if (!state) {
+    return;
+  }
 
-    if (location.state?.loginRequired && (!isAuthenticated || isGuest)) {
-      setShowAuth(true);
-    }
-  }, [location.state, isAuthenticated, isGuest]);
+  if (state.returnTo) {
+    sessionStorage.setItem(
+      RETURN_TO_KEY,
+      state.returnTo
+    );
+  }
+
+  if (
+    state.openAuthModal ||
+    (
+      state.loginRequired &&
+      (!isAuthenticated || isGuest)
+    )
+  ) {
+    setShowAuth(true);
+  }
+}, [
+  location.state,
+  isAuthenticated,
+  isGuest,
+]);
 
 useEffect(() => {
   if (loading) return;
