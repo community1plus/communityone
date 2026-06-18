@@ -128,8 +128,21 @@ function isNotFoundError(err) {
   );
 }
 
-function normaliseProviders(providers = {}) {
-  const result = {};
+function normaliseApiResponse(res) {
+  console.log(
+    "RAW API RESPONSE",
+    JSON.stringify(res, null, 2)
+  );
+
+  const payload = res?.data || res || {};
+
+  console.log(
+    "NORMALISED PAYLOAD",
+    JSON.stringify(payload, null, 2)
+  );
+
+  return payload;
+}
 
   ["facebook", "instagram", "youtube", "x"].forEach((key) => {
     if (providers?.[key] && typeof providers[key] === "object") {
