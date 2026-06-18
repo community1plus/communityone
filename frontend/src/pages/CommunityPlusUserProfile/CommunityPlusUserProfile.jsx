@@ -1627,17 +1627,22 @@ console.log({
               {profileError && <div className="error">{profileError}</div>}
 
               <div className="form-navigation">
-<Button
-  variant="ghost"
-  onClick={() => {
-if (editMode) {
-    hydratedProfileRef.current = false;
-    setEditMode(false);
-}
-  }}
->
-  {editMode ? "Cancel" : "Close"}
-</Button>
+              <Button
+                  variant="ghost"
+                  onClick={() => {
+
+                  if (editMode) {
+                     hydratedProfileRef.current = false;
+                      setEditMode(false);
+                      return;
+                  }
+
+                  closeProfile();
+
+                }}
+              >
+                {editMode ? "Cancel" : "Close"}
+              </Button>
 
               <div className="form-actions">
                   {editMode ? (

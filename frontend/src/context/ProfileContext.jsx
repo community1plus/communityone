@@ -141,6 +141,16 @@ function normaliseProviders(providers = {}) {
 }
 
 function normaliseApiResponse(res) {
+ alert("normaliseApiResponse called");
+  console.log(
+  "RAW API RESPONSE",
+  JSON.stringify(res, null, 2)
+);
+
+console.log(
+  "NORMALISED PAYLOAD",
+  JSON.stringify(payload, null, 2)
+);
   return res?.data || res || {};
 }
 
@@ -304,12 +314,20 @@ const getAuthHeaders = useCallback(
         const res = await apiRef.current.get("/me", {
           headers,
         });
+        
+        console.log("ABOUT TO NORMALISE", res);
 
         const payload = normaliseApiResponse(res);
+
+        console.log("ABOUT TO NORMALISE", res);
 
         const nextProfile = payload?.profile || null;
         const nextProviders = payload?.providers || {};
 
+        console.log(
+  "NEXT PROFILE",
+  JSON.stringify(nextProfile, null, 2)
+);
         writeProfileCache(userKey, nextProfile, nextProviders);
 
         markProfileReady(
