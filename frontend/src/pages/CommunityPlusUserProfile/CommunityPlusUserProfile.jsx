@@ -539,6 +539,9 @@ export default function CommunityPlusUserProfile({ onComplete }) {
   useEffect(() => {
     if (!profileReady) return;
     if (!profile) return;
+ 
+    console.log(profile);
+
     if (hydratedProfileRef.current) return;
 
     const email = getUserEmail(user);
@@ -572,14 +575,36 @@ export default function CommunityPlusUserProfile({ onComplete }) {
 
       homeLocation: profile?.homeLocation || homeLocation || null,
 
-      organisation: {
-        ...prev.organisation,
-        ...(profile?.organisation || {}),
-        email:
-          profile?.organisation?.email ||
-          prev.organisation?.email ||
-          email,
-      },
+organisation: {
+  ...prev.organisation,
+
+  ...(profile?.organisation || {}),
+
+  name:
+    profile?.organisation?.name ||
+    profile?.organisationProfile?.organisation_name ||
+    profile?.organisation_name ||
+    prev.organisation?.name ||
+    "",
+
+  phone:
+    profile?.organisation?.phone ||
+    profile?.organisationProfile?.organisation_phone ||
+    prev.organisation?.phone ||
+    "",
+
+  email:
+    profile?.organisation?.email ||
+    profile?.organisationProfile?.organisation_email ||
+    prev.organisation?.email ||
+    email,
+
+  location:
+    profile?.organisation?.location ||
+    profile?.organisationProfile?.location ||
+    prev.organisation?.location ||
+    null,
+},
 
       creator: {
         ...prev.creator,
@@ -609,9 +634,8 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     setActiveProfileTab(nextUserType);
     setValue("userType", nextUserType);
 
-    requestAnimationFrame(() => {
       hydratedProfileRef.current = true;
-    });
+  
   }, [
     profileReady,
     profile,
@@ -731,7 +755,7 @@ export default function CommunityPlusUserProfile({ onComplete }) {
         setShowBusinessRegistration(true);
       }
     },
-    [setValue]
+    [editMode,setValue]
   );
 
 const handleBusinessRegistrationComplete = useCallback(
@@ -1606,12 +1630,10 @@ console.log({
 <Button
   variant="ghost"
   onClick={() => {
-    if (editMode) {
-      reset();
-      setEditMode(false);
-    } else {
-      closeProfile();
-    }
+if (editMode) {
+    hydratedProfileRef.current = false;
+    setEditMode(false);
+}
   }}
 >
   {editMode ? "Cancel" : "Close"}
