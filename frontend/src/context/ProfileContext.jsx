@@ -145,7 +145,12 @@ function normaliseApiResponse(res) {
 }
 
 function profileHasMinimumFields(profile) {
-  return Boolean(profile && Object.keys(profile).length > 0);
+  return Boolean(
+    profile?.id ||
+    profile?.userId ||
+    profile?.profile_level ||
+    profile?.profileLevel
+  );
 }
 
 function getClientEndpointDetails() {
@@ -524,11 +529,11 @@ const getAuthHeaders = useCallback(
     [profile]
   );
 
-  const hasProfile = profileHasMinimumFields(profile);
+const hasProfile =
+  !profileMissing &&
+  profileHasMinimumFields(profile);
 
-  const isProfileComplete =
-    hasProfile &&
-    completionPercent >= 80;
+const isProfileComplete = hasProfile;
 
   const profileReady =
     authSettled &&

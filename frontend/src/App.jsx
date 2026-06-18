@@ -72,7 +72,6 @@ function ProfileGate({ children }) {
     profile,
     profileReady,
     hasProfile,
-    isProfileComplete,
   } = useProfile();
 
 console.log("PROFILE GATE", {

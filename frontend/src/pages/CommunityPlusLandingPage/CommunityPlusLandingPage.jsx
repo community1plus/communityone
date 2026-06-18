@@ -88,12 +88,7 @@ useEffect(() => {
   if (isGuest) return;
   if (!profileReady) return;
 
-  const needsSetup =
-    !hasProfile ||
-    !isProfileComplete ||
-    profile === null;
-
-  if (needsSetup) {
+  if (needsProfileSetup) {
     navigate("/communityplus/profile", {
       replace: true,
       state: {
@@ -107,17 +102,16 @@ useEffect(() => {
 
   sessionStorage.removeItem(RETURN_TO_KEY);
 
-  navigate(returnTo || "/communityplus", {
-    replace: true,
-  });
+  navigate(
+    returnTo || "/communityplus",
+    { replace: true }
+  );
 }, [
   loading,
   isAuthenticated,
   isGuest,
   profileReady,
-  hasProfile,
-  isProfileComplete,
-  profile,
+  needsProfileSetup,
   returnTo,
   navigate,
 ]);
