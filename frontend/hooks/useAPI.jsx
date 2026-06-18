@@ -6,18 +6,10 @@ import { apiFetch } from "../src/services/api";
 
 export default function useAPI() {
   const { token, user } = useAuth();
+  const ui = useUI();
 
-  let startSaving;
-  let stopSaving;
-
-  try {
-    const ui = useUI();
-    startSaving = ui?.startSaving;
-    stopSaving = ui?.stopSaving;
-  } catch {
-    startSaving = undefined;
-    stopSaving = undefined;
-  }
+  const startSaving = ui?.startSaving;
+  const stopSaving = ui?.stopSaving;
 
   const api = useMemo(() => {
     const request =
@@ -38,13 +30,12 @@ export default function useAPI() {
       };
 
     return {
-      get: async (path, options = {}) => {
-        return apiFetch(path, {
+      get: async (path, options = {}) =>
+        apiFetch(path, {
           method: "GET",
           token,
           ...options,
-        });
-      },
+        }),
 
       post: request("POST"),
       patch: request("PATCH"),

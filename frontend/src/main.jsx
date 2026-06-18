@@ -74,15 +74,15 @@ function Root() {
   return (
     <Elements stripe={stripePromise}>
       <AuthProvider>
-        <ProfileProvider>
-          <UIProvider>
+        <UIProvider>
+          <ProfileProvider>
             <LocationProvider>
               <BrowserRouter>
                 <App />
               </BrowserRouter>
             </LocationProvider>
-          </UIProvider>
-        </ProfileProvider>
+          </ProfileProvider>
+        </UIProvider>
       </AuthProvider>
     </Elements>
   );
