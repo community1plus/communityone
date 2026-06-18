@@ -1071,67 +1071,84 @@ const isMixed = selectedUserType === "MIXED";
       ? businessPhoneE164 || phoneE164
       : phoneE164;
 
-  return {
+return {
+  profile: {
     username: values.username || userEmail?.split("@")[0] || "",
-
-    // Keep both naming styles for backend/frontend compatibility
-    displayName: fallbackDisplayName,
     display_name: fallbackDisplayName,
-
+    displayName: fallbackDisplayName,
     email: values.email || userEmail,
-    userType: selectedUserType,
+
     user_type: selectedUserType,
+    userType: selectedUserType,
+
+    account_type: isOrg || isMixed ? "BUSINESS" : "PERSONAL",
+    accountType: isOrg || isMixed ? "BUSINESS" : "PERSONAL",
+
+    profile_level: 1,
+    profileLevel: 1,
 
     phone: resolvedPhone,
+    phone_e164: resolvedPhone,
     phoneE164: resolvedPhone,
+    phone_display:
+      isOrg || isMixed ? businessPhoneRaw || values.phone : values.phone,
     phoneDisplay:
-      isOrg || isMixed
-        ? businessPhoneRaw || values.phone
-        : values.phone,
+      isOrg || isMixed ? businessPhoneRaw || values.phone : values.phone,
+    phone_country: values.phoneCountry,
     phoneCountry: values.phoneCountry,
 
-    // Required by ProfileContext completion
+    home_location: resolvedHomeLocation,
     homeLocation: resolvedHomeLocation,
 
-    organisation: {
-      ...values.organisation,
-      name: values.organisation?.name || fallbackDisplayName,
-      location: orgLocation,
-      phone: isOrg
-        ? businessPhoneE164
-        : values.organisation?.phone || "",
-      phoneDisplay: values.organisation?.phone || "",
-      phoneCountry: values.phoneCountry,
-      email: values.organisation?.email || values.email || userEmail,
-    },
-
-    creator: values.creator,
-
-    business: {
-      ...values.business,
-      name: values.business?.name || fallbackDisplayName,
-      location: businessLocation,
-      phone: isMixed
-        ? businessPhoneE164
-        : values.business?.phone || "",
-      phoneDisplay: values.business?.phone || "",
-      phoneCountry: values.phoneCountry,
-      email: values.business?.email || values.email || userEmail,
-    },
-
     policies: values.policies,
-
     payment: {
       cardName: values.payment?.cardName || "",
       last4: values.payment?.last4 || "",
     },
-  };
-}, [
-  values,
-  phoneE164,
-  homeLocation,
-  userEmail,
-]);
+  },
+
+  organisationProfile:
+    isOrg || isMixed
+      ? {
+          organisation_name:
+            values.organisation?.name ||
+            values.business?.name ||
+            fallbackDisplayName,
+
+          trading_name:
+            values.organisation?.tradingName ||
+            values.business?.tradingName ||
+            "",
+
+          organisation_email:
+            values.organisation?.email ||
+            values.business?.email ||
+            values.email ||
+            userEmail,
+
+          organisation_phone: businessPhoneE164,
+
+          website:
+            values.organisation?.website ||
+            values.business?.website ||
+            "",
+
+          location: isOrg ? orgLocation : businessLocation,
+
+          email_verified: isOrg
+            ? Boolean(values.organisation?.emailVerified)
+            : Boolean(values.business?.emailVerified),
+
+          phone_verified: isOrg
+            ? Boolean(values.organisation?.phoneVerified)
+            : Boolean(values.business?.phoneVerified),
+
+          ownership_verified: false,
+          business_level: 1,
+          source: "manual",
+        }
+      : null,
+};
 
 const handleSaveProfile = useCallback(async () => {
   setSavingProfile(true);
