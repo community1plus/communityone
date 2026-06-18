@@ -4,10 +4,6 @@ const TABLE = "user_profiles";
 
 const ACCOUNT_TYPES = ["PERSONAL", "ORG", "MIXED"];
 
-/* =========================
-   HELPERS
-========================= */
-
 function cleanString(value = "") {
   return String(value || "").trim();
 }
@@ -15,6 +11,25 @@ function cleanString(value = "") {
 function normaliseAccountType(value = "PERSONAL") {
   const clean = cleanString(value).toUpperCase();
   return ACCOUNT_TYPES.includes(clean) ? clean : "PERSONAL";
+}
+
+function isBusinessType(userType) {
+  return ["ORG", "MIXED"].includes(normaliseAccountType(userType));
+}
+
+function getUserId(req) {
+  return req.user?.id || req.user?.sub;
+}
+
+function getEndpointDetails(req, bodyEndpoint = {}) {
+  const forwardedFor = req.headers["x-forwarded-for"]?.split(",")[0]?.trim();
+
+  return {
+    ...(bodyEndpoint || {}),
+    ipAddress: forwardedFor || req.headers["x-real-ip"] || req.ip || "",
+    serverUserAgent: req.headers["user-agent"] || "",
+    capturedAt: bodyEndpoint?.capturedAt || new Date().toISOString(),
+  };
 }
 
 function mergeSocialState(existing = {}, incoming = {}) {
@@ -40,39 +55,12 @@ function mergeEndpointState(existing = {}, incoming = {}) {
   };
 }
 
-function getEndpointDetails(req, bodyEndpoint = {}) {
-  const forwardedFor =
-    req.headers["x-forwarded-for"]?.split(",")[0]?.trim();
-
-  return {
-    ...(bodyEndpoint || {}),
-
-    ipAddress:
-      forwardedFor ||
-      req.headers["x-real-ip"] ||
-      req.ip ||
-      "",
-
-    serverUserAgent:
-      req.headers["user-agent"] || "",
-
-    capturedAt:
-      bodyEndpoint?.capturedAt ||
-      new Date().toISOString(),
-  };
-}
-
 function calculateProfileState(profile = {}) {
   const username = cleanString(profile.username);
   const displayName = cleanString(profile.display_name);
   const userType = normaliseAccountType(profile.user_type);
 
-  const hasBasicProfile =
-    Boolean(username) &&
-    Boolean(displayName) &&
-    Boolean(userType);
-
-  if (!hasBasicProfile) {
+  if (!username || !displayName || !userType) {
     return {
       profile_level: 0,
       profile_status: "incomplete",
@@ -86,10 +74,7 @@ function calculateProfileState(profile = {}) {
     };
   }
 
-  if (
-    ["ORG", "MIXED"].includes(userType) &&
-    profile.business_verification_status === "verified"
-  ) {
+  if (profile.business_verification_status === "verified") {
     return {
       profile_level: 3,
       profile_status: "verified",
@@ -101,10 +86,6 @@ function calculateProfileState(profile = {}) {
     profile_status: "business_pending",
   };
 }
-
-/* =========================
-   PICK PROFILE FIELDS
-========================= */
 
 function pickProfileFields(body = {}) {
   const data = {};
@@ -123,10 +104,6 @@ function pickProfileFields(body = {}) {
     data.user_type = normaliseAccountType(body.userType);
   } else if (body.user_type !== undefined) {
     data.user_type = normaliseAccountType(body.user_type);
-  } else if (body.accountType !== undefined) {
-    data.user_type = normaliseAccountType(body.accountType);
-  } else if (body.account_type !== undefined) {
-    data.user_type = normaliseAccountType(body.account_type);
   }
 
   if (body.phone !== undefined) {
@@ -135,18 +112,26 @@ function pickProfileFields(body = {}) {
 
   if (body.phoneE164 !== undefined) {
     data.phone_e164 = cleanString(body.phoneE164);
+  } else if (body.phone_e164 !== undefined) {
+    data.phone_e164 = cleanString(body.phone_e164);
   }
 
   if (body.phoneDisplay !== undefined) {
     data.phone_display = cleanString(body.phoneDisplay);
+  } else if (body.phone_display !== undefined) {
+    data.phone_display = cleanString(body.phone_display);
   }
 
   if (body.phoneCountry !== undefined) {
     data.phone_country = cleanString(body.phoneCountry || "AU");
+  } else if (body.phone_country !== undefined) {
+    data.phone_country = cleanString(body.phone_country || "AU");
   }
 
   if (body.phoneVerified !== undefined) {
     data.phone_verified = Boolean(body.phoneVerified);
+  } else if (body.phone_verified !== undefined) {
+    data.phone_verified = Boolean(body.phone_verified);
   }
 
   if (body.homeLocation !== undefined) {
@@ -167,12 +152,54 @@ function pickProfileFields(body = {}) {
     data.endpoint = body.endpoint || {};
   }
 
+  if (body.businessVerificationStatus !== undefined) {
+    data.business_verification_status = cleanString(body.businessVerificationStatus);
+  } else if (body.business_verification_status !== undefined) {
+    data.business_verification_status = cleanString(body.business_verification_status);
+  }
+
   return data;
 }
 
-/* =========================
-   ACCOUNT TYPE COMMIT RULES
-========================= */
+function pickOrganisationFields(body = {}) {
+  const org =
+    body.organisationProfile ||
+    body.organisation ||
+    body.business ||
+    null;
+
+  if (!org) return null;
+
+  const organisationName = cleanString(
+    org.organisation_name ||
+      org.organisationName ||
+      org.name
+  );
+
+  if (!organisationName) return null;
+
+  return {
+    organisation_name: organisationName,
+    trading_name: cleanString(org.trading_name || org.tradingName || org.name),
+    organisation_email: cleanString(
+      org.organisation_email ||
+        org.organisationEmail ||
+        org.email
+    ),
+    organisation_phone: cleanString(
+      org.organisation_phone ||
+        org.organisationPhone ||
+        org.phone
+    ),
+    website: cleanString(org.website),
+    location: org.location || null,
+    email_verified: Boolean(org.email_verified || org.emailVerified),
+    phone_verified: Boolean(org.phone_verified || org.phoneVerified),
+    ownership_verified: Boolean(org.ownership_verified || org.ownershipVerified),
+    business_level: org.business_level || org.businessLevel || 1,
+    source: org.source || "manual",
+  };
+}
 
 function applyAccountTypeRules(existing = {}, incoming = {}) {
   const next = {
@@ -184,10 +211,6 @@ function applyAccountTypeRules(existing = {}, incoming = {}) {
     incoming.user_type || existing.user_type || "PERSONAL"
   );
 
-  const currentType = normaliseAccountType(
-    existing.user_type || "PERSONAL"
-  );
-
   if (requestedType === "PERSONAL") {
     next.user_type = "PERSONAL";
     next.pending_account_type = null;
@@ -195,33 +218,69 @@ function applyAccountTypeRules(existing = {}, incoming = {}) {
     return next;
   }
 
-if (["ORG", "MIXED"].includes(requestedType)) {
-  next.user_type = requestedType;
-
-  next.pending_account_type = null;
-
-  next.business_verification_status =
-    incoming.business_verification_status ||
-    existing.business_verification_status ||
-    "draft";
-
-  return next;
-}
+  if (isBusinessType(requestedType)) {
+    next.user_type = requestedType;
+    next.pending_account_type = null;
+    next.business_verification_status =
+      incoming.business_verification_status ||
+      existing.business_verification_status ||
+      "draft";
+    return next;
+  }
 
   return next;
 }
 
-/* =========================
-   NORMALISE PROFILE
-========================= */
+function normaliseOrganisationProfile(org) {
+  if (!org) return null;
 
-function normaliseProfile(profile) {
+  return {
+    id: org.id,
+    userProfileId: org.user_profile_id,
+    user_profile_id: org.user_profile_id,
+
+    organisationName: org.organisation_name || "",
+    organisation_name: org.organisation_name || "",
+
+    tradingName: org.trading_name || "",
+    trading_name: org.trading_name || "",
+
+    organisationEmail: org.organisation_email || "",
+    organisation_email: org.organisation_email || "",
+
+    organisationPhone: org.organisation_phone || "",
+    organisation_phone: org.organisation_phone || "",
+
+    website: org.website || "",
+    location: org.location || null,
+
+    emailVerified: Boolean(org.email_verified),
+    email_verified: Boolean(org.email_verified),
+
+    phoneVerified: Boolean(org.phone_verified),
+    phone_verified: Boolean(org.phone_verified),
+
+    ownershipVerified: Boolean(org.ownership_verified),
+    ownership_verified: Boolean(org.ownership_verified),
+
+    businessLevel: org.business_level || 1,
+    business_level: org.business_level || 1,
+
+    source: org.source || "manual",
+
+    createdAt: org.created_at,
+    updatedAt: org.updated_at,
+  };
+}
+
+function normaliseProfile(profile, organisationProfile = null) {
   if (!profile) return null;
+
+  const accountType = isBusinessType(profile.user_type) ? "BUSINESS" : "PERSONAL";
 
   return {
     id: profile.id,
     userId: profile.user_id,
-
     username: profile.username || "",
 
     displayName: profile.display_name || "",
@@ -230,15 +289,8 @@ function normaliseProfile(profile) {
     userType: profile.user_type || "PERSONAL",
     user_type: profile.user_type || "PERSONAL",
 
-accountType:
-  ["ORG", "MIXED"].includes(profile.user_type)
-    ? "BUSINESS"
-    : "PERSONAL",
-
-account_type:
-  ["ORG", "MIXED"].includes(profile.user_type)
-    ? "BUSINESS"
-    : "PERSONAL",
+    accountType,
+    account_type: accountType,
 
     phone: profile.phone || "",
     phoneE164: profile.phone_e164 || "",
@@ -262,22 +314,17 @@ account_type:
     pendingAccountType: profile.pending_account_type || null,
     pending_account_type: profile.pending_account_type || null,
 
-    businessVerificationStatus:
-      profile.business_verification_status || "none",
+    businessVerificationStatus: profile.business_verification_status || "none",
+    business_verification_status: profile.business_verification_status || "none",
 
-    business_verification_status:
-      profile.business_verification_status || "none",
+    organisationProfile: normaliseOrganisationProfile(organisationProfile),
+    organisation: normaliseOrganisationProfile(organisationProfile),
 
     version: profile.version || 1,
-
     createdAt: profile.created_at,
     updatedAt: profile.updated_at,
   };
 }
-
-/* =========================
-   FETCH HELPERS
-========================= */
 
 async function fetchProfileByUserId(userId) {
   const result = await pool.query(
@@ -293,48 +340,80 @@ async function fetchProfileByUserId(userId) {
   return result.rows[0] || null;
 }
 
-function getUserId(req) {
-  return req.user?.id || req.user?.sub;
+async function fetchOrganisationByProfileId(userProfileId) {
+  if (!userProfileId) return null;
+
+  const result = await pool.query(
+    `
+      SELECT *
+      FROM organisational_profiles
+      WHERE user_profile_id = $1
+      LIMIT 1
+    `,
+    [userProfileId]
+  );
+
+  return result.rows[0] || null;
 }
 
-/* =========================
-   GET PROFILE
-========================= */
+async function saveOrganisationProfile({ userProfileId, organisation }) {
+  if (!userProfileId || !organisation?.organisation_name) return null;
 
-export async function getProfile(req, res) {
-  try {
-    const userId = getUserId(req);
+  const result = await pool.query(
+    `
+      INSERT INTO organisational_profiles (
+        user_profile_id,
+        organisation_name,
+        trading_name,
+        organisation_email,
+        organisation_phone,
+        website,
+        location,
+        email_verified,
+        phone_verified,
+        ownership_verified,
+        business_level,
+        source,
+        updated_at
+      )
+      VALUES (
+        $1,$2,$3,$4,$5,$6,$7::jsonb,
+        $8,$9,$10,$11,$12,NOW()
+      )
+      ON CONFLICT (user_profile_id)
+      DO UPDATE SET
+        organisation_name = EXCLUDED.organisation_name,
+        trading_name = EXCLUDED.trading_name,
+        organisation_email = EXCLUDED.organisation_email,
+        organisation_phone = EXCLUDED.organisation_phone,
+        website = EXCLUDED.website,
+        location = EXCLUDED.location,
+        email_verified = EXCLUDED.email_verified,
+        phone_verified = EXCLUDED.phone_verified,
+        ownership_verified = EXCLUDED.ownership_verified,
+        business_level = EXCLUDED.business_level,
+        source = EXCLUDED.source,
+        updated_at = NOW()
+      RETURNING *
+    `,
+    [
+      userProfileId,
+      organisation.organisation_name,
+      organisation.trading_name,
+      organisation.organisation_email,
+      organisation.organisation_phone,
+      organisation.website,
+      organisation.location ? JSON.stringify(organisation.location) : null,
+      organisation.email_verified,
+      organisation.phone_verified,
+      organisation.ownership_verified,
+      organisation.business_level,
+      organisation.source,
+    ]
+  );
 
-    if (!userId) {
-      return res.status(401).json({
-        error: "Authentication required.",
-      });
-    }
-
-    const profile = await fetchProfileByUserId(userId);
-
-    if (!profile) {
-      return res.status(404).json({
-        error: "Profile not found",
-      });
-    }
-
-    return res.json({
-      profile: normaliseProfile(profile),
-      version: profile.version,
-    });
-  } catch (err) {
-    console.error("GET PROFILE FAILED:", err);
-
-    return res.status(500).json({
-      error: "Profile load failed",
-    });
-  }
+  return result.rows[0];
 }
-
-/* =========================
-   SAVE PROFILE
-========================= */
 
 async function saveProfile({ userId, incoming }) {
   const now = new Date();
@@ -362,27 +441,12 @@ async function saveProfile({ userId, incoming }) {
     created_at: now,
   };
 
-  const mergedSocial = mergeSocialState(
-    base.social || {},
-    incoming.social || {}
-  );
-
-  const mergedPayment = mergePaymentState(
-    base.payment || {},
-    incoming.payment || {}
-  );
-
-  const mergedEndpoint = mergeEndpointState(
-    base.endpoint || {},
-    incoming.endpoint || {}
-  );
-
   const merged = {
     ...base,
     ...incoming,
-    social: mergedSocial,
-    payment: mergedPayment,
-    endpoint: mergedEndpoint,
+    social: mergeSocialState(base.social || {}, incoming.social || {}),
+    payment: mergePaymentState(base.payment || {}, incoming.payment || {}),
+    endpoint: mergeEndpointState(base.endpoint || {}, incoming.endpoint || {}),
     version: (base.version || 0) + 1,
     updated_at: now,
   };
@@ -425,11 +489,8 @@ async function saveProfile({ userId, incoming }) {
         VALUES (
           $1,$2,$3,$4,$5,
           $6,$7,$8,$9,$10,
-          $11::jsonb,
-          $12::jsonb,
-          $13::jsonb,
-          $14,$15,$16,$17,
-          $18,$19,$20
+          $11::jsonb,$12::jsonb,$13::jsonb,
+          $14,$15,$16,$17,$18,$19,$20
         )
         RETURNING *
       `,
@@ -443,9 +504,7 @@ async function saveProfile({ userId, incoming }) {
         finalProfile.phone_display,
         finalProfile.phone_country,
         finalProfile.phone_verified,
-        finalProfile.home_location
-          ? JSON.stringify(finalProfile.home_location)
-          : null,
+        finalProfile.home_location ? JSON.stringify(finalProfile.home_location) : null,
         JSON.stringify(finalProfile.social || {}),
         JSON.stringify(finalProfile.payment || {}),
         JSON.stringify(finalProfile.endpoint || {}),
@@ -496,9 +555,7 @@ async function saveProfile({ userId, incoming }) {
       finalProfile.phone_display,
       finalProfile.phone_country,
       finalProfile.phone_verified,
-      finalProfile.home_location
-        ? JSON.stringify(finalProfile.home_location)
-        : null,
+      finalProfile.home_location ? JSON.stringify(finalProfile.home_location) : null,
       JSON.stringify(finalProfile.social || {}),
       JSON.stringify(finalProfile.payment || {}),
       JSON.stringify(finalProfile.endpoint || {}),
@@ -515,39 +572,66 @@ async function saveProfile({ userId, incoming }) {
   return result.rows[0];
 }
 
-/* =========================
-   PUT PROFILE
-========================= */
+export async function getProfile(req, res) {
+  try {
+    const userId = getUserId(req);
+
+    if (!userId) {
+      return res.status(401).json({ error: "Authentication required." });
+    }
+
+    const profile = await fetchProfileByUserId(userId);
+
+    if (!profile) {
+      return res.status(404).json({ error: "Profile not found" });
+    }
+
+    const organisationProfile = await fetchOrganisationByProfileId(profile.id);
+
+    return res.json({
+      profile: normaliseProfile(profile, organisationProfile),
+      organisationProfile: normaliseOrganisationProfile(organisationProfile),
+      version: profile.version,
+    });
+  } catch (err) {
+    console.error("GET PROFILE FAILED:", err);
+
+    return res.status(500).json({
+      error: "Profile load failed",
+      detail: err.message,
+    });
+  }
+}
 
 export async function putProfile(req, res) {
   try {
     const userId = getUserId(req);
 
     if (!userId) {
-      return res.status(401).json({
-        error: "Authentication required.",
-      });
+      return res.status(401).json({ error: "Authentication required." });
     }
 
     const incoming = pickProfileFields(req.body);
+    incoming.endpoint = getEndpointDetails(req, req.body.endpoint);
 
-    incoming.endpoint = getEndpointDetails(
-      req,
-      req.body.endpoint
-    );
+    const organisation = pickOrganisationFields(req.body);
 
-    console.log(
-  "🖥️ ENDPOINT CAPTURED",
-  incoming.endpoint
-);
+    const saved = await saveProfile({ userId, incoming });
 
-    const saved = await saveProfile({
-      userId,
-      incoming,
-    });
+    let savedOrganisation = null;
+
+    if (isBusinessType(saved.user_type) && organisation) {
+      savedOrganisation = await saveOrganisationProfile({
+        userProfileId: saved.id,
+        organisation,
+      });
+    } else {
+      savedOrganisation = await fetchOrganisationByProfileId(saved.id);
+    }
 
     return res.json({
-      profile: normaliseProfile(saved),
+      profile: normaliseProfile(saved, savedOrganisation),
+      organisationProfile: normaliseOrganisationProfile(savedOrganisation),
       version: saved.version,
     });
   } catch (err) {
@@ -560,42 +644,41 @@ export async function putProfile(req, res) {
   }
 }
 
-/* =========================
-   PATCH PROFILE
-========================= */
-
 export async function patchProfile(req, res) {
   try {
     const userId = getUserId(req);
 
     if (!userId) {
-      return res.status(401).json({
-        error: "Authentication required.",
-      });
+      return res.status(401).json({ error: "Authentication required." });
     }
 
     const existing = await fetchProfileByUserId(userId);
 
     if (!existing) {
-      return res.status(404).json({
-        error: "Profile not found",
-      });
+      return res.status(404).json({ error: "Profile not found" });
     }
 
     const incoming = pickProfileFields(req.body);
+    incoming.endpoint = getEndpointDetails(req, req.body.endpoint);
 
-    incoming.endpoint = getEndpointDetails(
-      req,
-      req.body.endpoint
-    );
+    const organisation = pickOrganisationFields(req.body);
 
-    const saved = await saveProfile({
-      userId,
-      incoming,
-    });
+    const saved = await saveProfile({ userId, incoming });
+
+    let savedOrganisation = null;
+
+    if (isBusinessType(saved.user_type) && organisation) {
+      savedOrganisation = await saveOrganisationProfile({
+        userProfileId: saved.id,
+        organisation,
+      });
+    } else {
+      savedOrganisation = await fetchOrganisationByProfileId(saved.id);
+    }
 
     return res.json({
-      profile: normaliseProfile(saved),
+      profile: normaliseProfile(saved, savedOrganisation),
+      organisationProfile: normaliseOrganisationProfile(savedOrganisation),
       version: saved.version,
     });
   } catch (err) {
