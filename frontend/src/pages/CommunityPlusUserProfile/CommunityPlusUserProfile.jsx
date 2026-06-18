@@ -450,17 +450,17 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     setValues,
     isFormValidating,
     clearStorage,
+    reset,
   } = form;
 
   const [activeProfileTab, setActiveProfileTab] = useState(fallbackUserType);
   const [currentStep, setCurrentStep] = useState(0);
-const [savingProfile, setSavingProfile] = useState(false);
+  const [savingProfile, setSavingProfile] = useState(false);
 
-const [profileError, setProfileError] = useState("");
-const [profileSuccess, setProfileSuccess] = useState("");
+  const [profileError, setProfileError] = useState("");
+  const [profileSuccess, setProfileSuccess] = useState("");
 
-const [showBusinessRegistration, setShowBusinessRegistration] =
-  useState(false);
+  const [showBusinessRegistration, setShowBusinessRegistration] = useState(false);
 
   const [phoneStatus, setPhoneStatus] = useState("idle");
   const [phoneError, setPhoneError] = useState("");
@@ -470,6 +470,8 @@ const [showBusinessRegistration, setShowBusinessRegistration] =
   const [businessEmailError, setBusinessEmailError] = useState("");
 
   const [slowProfileLoad, setSlowProfileLoad] = useState(false);
+
+  const [editMode, setEditMode] = useState(false);
 
   useEffect(() => {
     if (!allowedProfileTabs.some((tab) => tab.id === activeProfileTab)) {
@@ -718,6 +720,9 @@ const [showBusinessRegistration, setShowBusinessRegistration] =
 
   const handleProfileTabChange = useCallback(
     (tabId) => {
+
+      if (editMode) return;
+
       setActiveProfileTab(tabId);
       setValue("userType", tabId);
       setCurrentStep(0);
@@ -1172,6 +1177,7 @@ const handleSaveProfile = useCallback(async () => {
     const payload = buildProfilePayload();
     const nextProfile = await saveProfile(payload);
     setProfileSuccess("Profile saved successfully.");
+    setEditMode(false);
 
     setTimeout(() => {
       setProfileSuccess("");
@@ -1320,7 +1326,11 @@ console.log({
                       className={`profile-section-tab ${
                         currentStep === index ? "active" : ""
                       } ${index < currentStep ? "complete" : ""}`}
-                      onClick={() => setCurrentStep(index)}
+                      onClick={() => {
+                        if (!editMode) {
+                          setCurrentStep(index);
+                        }
+          }}
                     >
                       {step.title}
                     </button>
@@ -1375,17 +1385,18 @@ console.log({
                     <div className="social-verification-list" />
                   ) : (
                     <>
-                      <FormBuilder
-                        steps={activeSteps}
-                        currentStep={currentStep}
-                        form={form}
-                        extra={{
-                          Autocomplete,
-                          autoRef,
-                          onPlaceChanged,
-                          isLoaded,
-                        }}
-                      />
+                  <FormBuilder
+                    steps={activeSteps}
+                    currentStep={currentStep}
+                    form={form}
+                    readOnly={!editMode}
+                    extra={{
+                    Autocomplete,
+                    autoRef,
+                    onPlaceChanged,
+                    isLoaded,
+                    }}
+                  />
 
                       {["ORG", "MIXED"].includes(values.userType) && isContactStep && (
                         <div className="business-verification-stack">
@@ -1592,18 +1603,40 @@ console.log({
               {profileError && <div className="error">{profileError}</div>}
 
               <div className="form-navigation">
-                <Button variant="ghost" onClick={closeProfile}>
-                  Close
-                </Button>
+<Button
+  variant="ghost"
+  onClick={() => {
+    if (editMode) {
+      reset();
+      setEditMode(false);
+    } else {
+      closeProfile();
+    }
+  }}
+>
+  {editMode ? "Cancel" : "Close"}
+</Button>
 
-                <div className="form-actions">
+              <div className="form-actions">
+                  {editMode ? (
+    <Button
+      onClick={handleComplete}
+      disabled={
+        isFormValidating ||
+        savingProfile ||
+        !canSaveFromContact
+      }
+    >
+      {savingProfile ? "Saving..." : "Save"}
+    </Button>
+                  ) : (
                   <Button
-                    onClick={handleComplete}
-                    disabled={isFormValidating || savingProfile || !canSaveFromContact}
+                    onClick={() => setEditMode(true)}
                   >
-                    {savingProfile ? "Saving..." : "Save"}
+                    Edit
                   </Button>
-                </div>
+                )}
+              </div>
               </div>
             </div>
 

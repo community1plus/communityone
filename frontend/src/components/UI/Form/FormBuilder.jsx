@@ -8,6 +8,7 @@ export default function FormBuilder({
   steps = [],
   currentStep = 0,
   form,
+  readOnly = false,
   extra = {},
 }) {
   if (
@@ -74,15 +75,17 @@ export default function FormBuilder({
     }
   };
 
-  const renderField = (field) => {
-    const {
-      name,
-      label,
-      type = "text",
-      readOnly = false,
-      options = [],
-      required = false,
-    } = field;
+const {
+  name,
+  label,
+  type = "text",
+  readOnly: fieldReadOnly = false,
+  options = [],
+  required = false,
+} = field;
+
+const disabled =
+  readOnly || fieldReadOnly;
 
     const rawValue =
       getValue?.(name);
@@ -112,7 +115,7 @@ const fieldProps = {
             name={name}
             value={rawValue ?? ""}
             options={options}
-            disabled={readOnly}
+            disabled={disabled}
             onChange={(e) =>
               updateField(
                 name,
@@ -167,8 +170,8 @@ const fieldProps = {
                 name={name}
                 value={displayValue}
                 placeholder="Enter your home address"
-                readOnly={readOnly}
-                disabled={readOnly}
+                readOnly={disabled}
+                disabled={disabled}
                 autoComplete="off"
                 onChange={(e) =>
                   updateField(
@@ -204,8 +207,8 @@ const fieldProps = {
           name={name}
           type={type}
           value={rawValue ?? ""}
-          readOnly={readOnly}
-          disabled={readOnly}
+          readOnly={disabled}
+          disabled={disabled}
           autoComplete={
             type === "tel"
               ? "new-password"
