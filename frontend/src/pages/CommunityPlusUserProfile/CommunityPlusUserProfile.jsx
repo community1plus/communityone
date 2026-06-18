@@ -1199,6 +1199,18 @@ const handleSaveProfile = useCallback(async () => {
 ]);
 
 const closeProfile = useCallback(() => {
+  const closeProfile = useCallback(() => {
+  console.log("closeProfile fired");
+
+  if (!profileReady) return;
+
+  if (profileSuccess || profile?.id) {
+    navigate("/communityplus", { replace: true });
+    return;
+  }
+
+  navigate("/", { replace: true });
+}, [profileReady, profileSuccess, profile, navigate]);
   if (!profileReady) return;
 
   if (profileSuccess || profile?.id) {
