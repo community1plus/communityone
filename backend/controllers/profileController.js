@@ -346,7 +346,7 @@ async function fetchOrganisationByProfileId(userProfileId) {
   const result = await pool.query(
     `
       SELECT *
-      FROM organisational_profiles
+      FROM organisation_profiles
       WHERE user_profile_id = $1
       LIMIT 1
     `,
@@ -361,7 +361,7 @@ async function saveOrganisationProfile({ userProfileId, organisation }) {
 
   const result = await pool.query(
     `
-      INSERT INTO organisational_profiles (
+      INSERT INTO organisation_profiles (
         user_profile_id,
         organisation_name,
         trading_name,
