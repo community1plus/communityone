@@ -195,28 +195,18 @@ function applyAccountTypeRules(existing = {}, incoming = {}) {
     return next;
   }
 
-  if (["ORG", "MIXED"].includes(requestedType)) {
-    const hasVerifiedBusiness =
-      existing.business_verification_status === "verified" ||
-      incoming.business_verification_status === "verified";
+if (["ORG", "MIXED"].includes(requestedType)) {
+  next.user_type = requestedType;
 
-    if (hasVerifiedBusiness) {
-      next.user_type = requestedType;
-      next.pending_account_type = null;
-      next.business_verification_status = "verified";
-      return next;
-    }
+  next.pending_account_type = null;
 
-    next.user_type = currentType || "PERSONAL";
-    next.pending_account_type = requestedType;
-    next.business_verification_status =
-      existing.business_verification_status &&
-      existing.business_verification_status !== "none"
-        ? existing.business_verification_status
-        : "draft";
+  next.business_verification_status =
+    incoming.business_verification_status ||
+    existing.business_verification_status ||
+    "draft";
 
-    return next;
-  }
+  return next;
+}
 
   return next;
 }
@@ -240,8 +230,15 @@ function normaliseProfile(profile) {
     userType: profile.user_type || "PERSONAL",
     user_type: profile.user_type || "PERSONAL",
 
-    accountType: profile.user_type || "PERSONAL",
-    account_type: profile.user_type || "PERSONAL",
+accountType:
+  ["ORG", "MIXED"].includes(profile.user_type)
+    ? "BUSINESS"
+    : "PERSONAL",
+
+account_type:
+  ["ORG", "MIXED"].includes(profile.user_type)
+    ? "BUSINESS"
+    : "PERSONAL",
 
     phone: profile.phone || "",
     phoneE164: profile.phone_e164 || "",
