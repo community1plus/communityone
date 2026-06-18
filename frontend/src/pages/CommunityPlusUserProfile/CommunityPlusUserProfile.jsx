@@ -1197,6 +1197,9 @@ const handleSaveProfile = useCallback(async () => {
   onComplete,
   navigate,
 ]);
+const location = useLocation();
+
+console.log("Current path:", location.pathname);
 
 const closeProfile = useCallback(() => {
   console.log("closeProfile fired");
@@ -1211,6 +1214,7 @@ console.log({
   if (!profileReady) return;
 
   if (!profileMissing) {
+    console.log("Navigating to /communityplus");
     navigate("/communityplus", { replace: true });
   } else {
     navigate("/", { replace: true });

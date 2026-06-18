@@ -75,6 +75,13 @@ function ProfileGate({ children }) {
     isProfileComplete,
   } = useProfile();
 
+console.log("PROFILE GATE", {
+  profileReady,
+  hasProfile,
+  isProfileComplete,
+  profile,
+});
+
   if (loading || authLoading) {
     return <div style={{ padding: 40 }}>Loading...</div>;
   }
@@ -87,7 +94,7 @@ function ProfileGate({ children }) {
     return <div style={{ padding: 40 }}>Loading profile...</div>;
   }
 
-  if (!hasProfile || !isProfileComplete || profile === null) {
+  if (!hasProfile || profile === null) {
     return (
       <Navigate
         to="/communityplus/profile"
