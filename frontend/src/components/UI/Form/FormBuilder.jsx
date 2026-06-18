@@ -60,8 +60,7 @@ export default function FormBuilder({
     value
   ) => {
     if (
-      typeof setValue ===
-      "function"
+      typeof setValue === "function"
     ) {
       setValue(name, value);
       return;
@@ -75,17 +74,22 @@ export default function FormBuilder({
     }
   };
 
-const {
-  name,
-  label,
-  type = "text",
-  readOnly: fieldReadOnly = false,
-  options = [],
-  required = false,
-} = field;
+  /* =========================================
+     RENDER FIELD
+  ========================================= */
 
-const disabled =
-  readOnly || fieldReadOnly;
+  const renderField = (field) => {
+    const {
+      name,
+      label,
+      type = "text",
+      readOnly: fieldReadOnly = false,
+      options = [],
+      required = false,
+    } = field;
+
+    const disabled =
+      readOnly || fieldReadOnly;
 
     const rawValue =
       getValue?.(name);
@@ -96,13 +100,13 @@ const disabled =
     const valid =
       isFieldValid?.(name);
 
-const fieldProps = {
-  key: name,
-  label,
-  error,
-  required,
-  valid,
-};
+    const fieldProps = {
+      key: name,
+      label,
+      error,
+      required,
+      valid,
+    };
 
     /* =========================================
        SELECT
@@ -144,8 +148,7 @@ const fieldProps = {
 
       const displayValue =
         rawValue &&
-        typeof rawValue ===
-          "object"
+        typeof rawValue === "object"
           ? rawValue.label ||
             rawValue.fullAddress ||
             ""
@@ -230,9 +233,7 @@ const fieldProps = {
 
   return (
     <div className="form-builder">
-      {step.fields.map(
-        renderField
-      )}
+      {step.fields.map(renderField)}
     </div>
   );
 }
