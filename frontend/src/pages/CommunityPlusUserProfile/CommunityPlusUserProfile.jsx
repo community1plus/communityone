@@ -1171,7 +1171,7 @@ const handleSaveProfile = useCallback(async () => {
 
     const payload = buildProfilePayload();
     const nextProfile = await saveProfile(payload);
-   setProfileSuccess("Profile saved successfully.");
+    setProfileSuccess("Profile saved successfully.");
 
     setTimeout(() => {
       setProfileSuccess("");
@@ -1181,7 +1181,7 @@ const handleSaveProfile = useCallback(async () => {
     clearStorage?.();
     onComplete?.(nextProfile);
 
-    navigate("/communityplus", { replace: true });
+    //navigate("/communityplus", { replace: true });
   } catch (err) {
     console.error("Profile save failed:", err);
     setProfileError(err?.message || "Profile save failed");
@@ -1201,15 +1201,13 @@ const handleSaveProfile = useCallback(async () => {
 const closeProfile = useCallback(() => {
   if (!profileReady) return;
 
-  const errors = validateActiveTabLevel1(values, activeProfileTab);
-
-  if (errors.length === 0) {
+  if (profileSuccess || profile?.id) {
     navigate("/communityplus", { replace: true });
     return;
   }
 
   navigate("/", { replace: true });
-}, [profileReady, values, activeProfileTab, navigate]);
+}, [profileReady, profileSuccess, profile, navigate]);
 
   const handleComplete = useCallback(async () => {
     const valid = await validateAll();
@@ -1317,6 +1315,18 @@ const closeProfile = useCallback(() => {
                   ))}
                 </div>
               </div>
+
+              {profileSuccess && (
+              <div className="profile-success">
+                {profileSuccess}
+              </div>
+              )}
+
+              {profileError && (
+                <div className="profile-error">
+                  {profileError}
+                </div>
+              )}
 
               <Section>
                 <div className="section-inner">
