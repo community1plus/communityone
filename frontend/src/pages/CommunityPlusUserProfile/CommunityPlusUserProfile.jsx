@@ -17,7 +17,11 @@ import BusinessRegistrationForm from "../../components/BusinessRegistration/Busi
 
 import "../../styles/system.css";
 import "./CommunityPlusUserProfile.css";
-
+import {
+  formatPhone,
+  normalisePhone,
+  validatePhone,
+} from "../../utils/phone";
 const DEFAULT_PHONE_COUNTRY = "AU";
 
 const PHONE_COUNTRIES = [
@@ -170,6 +174,7 @@ const COMMUNITY_POLICY_STEPS = [
   },
 ];
 
+
 function getEmailDomain(email = "") {
   return String(email).split("@")[1]?.toLowerCase() || "";
 }
@@ -298,7 +303,7 @@ function getInitialProfileValues({ user, homeLocation }) {
     userType: initialUserType,
 
     phoneCountry: DEFAULT_PHONE_COUNTRY,
-    phone: "",
+    phoneDisplay: "",
     phoneE164: "",
     phoneVerificationCode: "",
     businessPhoneVerificationCode: "",
@@ -499,19 +504,43 @@ export default function CommunityPlusUserProfile({ onComplete }) {
   const isContactStep = currentStepConfig?.id?.includes("contact");
   const isSocialStep = currentStepConfig?.id?.includes("social");
 
-  const selectedPhoneCountry = useMemo(
-    () => getPhoneCountry(values.phoneCountry),
-    [values.phoneCountry]
-  );
+const selectedPhoneCountry = useMemo(
+  () => getPhoneCountry(values.phoneCountry),
+  [values.phoneCountry]
+);
+
+const phoneE164 = useMemo(
+  () =>
+    normalisePhone(
+      values.phoneDisplay,
+      values.phoneCountry
+    ),
+  [
+    values.phoneDisplay,
+    values.phoneCountry,
+  ]
+);
+
+const phoneIsValid = useMemo(
+  () =>
+    validatePhone(
+      phoneE164,
+      values.phoneCountry
+    ),
+  [
+    phoneE164,
+    values.phoneCountry,
+  ]
+);
 
   const phoneE164 = useMemo(
-    () => toE164Phone(values.phone, values.phoneCountry),
-    [values.phone, values.phoneCountry]
+    () => toE164Phone(values.phoneDisplay, values.phoneCountry),
+    [values.phonedisplay, values.phonedisplayCountry]
   );
 
   const phoneIsValid = useMemo(
-    () => isValidInternationalPhone(values.phone, values.phoneCountry),
-    [values.phone, values.phoneCountry]
+    () => isValidInternationalPhone(values.phonedisplay, values.phonedisplayCountry),
+    [values.phonedisplay, values.phonedisplayCountry]
   );
 
   const canSaveFromContact =
@@ -566,9 +595,28 @@ export default function CommunityPlusUserProfile({ onComplete }) {
       email,
       userType: nextUserType,
 
-      phoneCountry: profile?.phoneCountry || DEFAULT_PHONE_COUNTRY,
-      phone: profile?.phoneDisplay || "",
-      phoneE164: profile?.phoneE164 || profile?.phone || "",
+phoneCountry:
+  profile?.phoneCountry ||
+  DEFAULT_PHONE_COUNTRY,
+
+phoneDisplay:
+  profile?.phoneDisplay ||
+  formatPhone(
+    profile?.phoneE164 ||
+    profile?.phone ||
+    "",
+    profile?.phoneCountry ||
+      DEFAULT_PHONE_COUNTRY
+  ),
+
+phoneE164:
+  profile?.phoneE164 ||
+  profile?.phone ||
+  "",
+
+phoneVerificationCode: "",
+businessPhoneVerificationCode: "",
+businessEmailVerificationCode: "",,
       phoneVerificationCode: "",
       businessPhoneVerificationCode: "",
       businessEmailVerificationCode: "",
@@ -666,7 +714,7 @@ organisation: {
   }, [profile?.phoneVerified]);
 
   useEffect(() => {
-    if (!values.phone) return;
+    if (!values.phonedisplay) return;
 
     const originalPhone = profile?.phoneE164 || profile?.phone || "";
 
