@@ -142,34 +142,7 @@ const COMMUNITY_POLICY_STEPS = [
   },
 ];
 
-const handleSaveProfile = useCallback(async () => {
-  try {
-    const payload = buildProfilePayload();
 
-    await saveProfile(payload);
-
-    clearStorage();
-
-    if (onComplete) {
-      onComplete(payload);
-    }
-
-    navigate("/communityplus", {
-      replace: true,
-    });
-  } catch (err) {
-    console.error(
-      "Profile save failed:",
-      err
-    );
-  }
-}, [
-  saveProfile,
-  buildProfilePayload,
-  clearStorage,
-  onComplete,
-  navigate,
-]);
 
 function getEmailDomain(email = "") {
   return String(email).split("@")[1]?.toLowerCase() || "";
