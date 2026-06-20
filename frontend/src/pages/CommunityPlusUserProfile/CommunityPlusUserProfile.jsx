@@ -1025,6 +1025,49 @@ const buildProfilePayload = useCallback(() => {
     values.phoneCountry
   );
 
+const handleSaveProfile = useCallback(async () => {
+  try {
+    setSaving(true);
+
+    const payload = buildProfilePayload();
+
+    console.log(
+      "Saving profile payload",
+      payload
+    );
+
+    await saveProfile(payload);
+
+    clearStorage();
+
+    if (typeof onComplete === "function") {
+      onComplete(payload);
+    }
+
+    navigate("/communityplus", {
+      replace: true,
+    });
+  } catch (err) {
+    console.error(
+      "Profile save failed:",
+      err
+    );
+
+    alert(
+      err?.message ||
+        "Unable to save profile."
+    );
+  } finally {
+    setSaving(false);
+  }
+}, [
+  buildProfilePayload,
+  saveProfile,
+  clearStorage,
+  onComplete,
+  navigate,
+]);
+
   const fallbackDisplayName =
     values.display_name ||
     values.organisation?.name ||
