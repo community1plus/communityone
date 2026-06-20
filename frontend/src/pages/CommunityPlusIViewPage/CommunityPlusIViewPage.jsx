@@ -14,7 +14,7 @@ import {
   useIViewSession,
 } from "../../context/IViewSessionContext";
 
-import { useUserLocation } from "../../context/LocationProvider
+import { useUserLocation } from "../../context/LocationProvider";
 
 const API_BASE =
   import.meta.env.VITE_API_BASE ||
