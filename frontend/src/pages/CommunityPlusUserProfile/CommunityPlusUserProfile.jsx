@@ -43,10 +43,10 @@ import useBusinessEmailVerification
   from "../../../hooks/useBusinessEmailVerification";
 
 import ProfileTabs
-  from "./components/ProfileTabs";
+  from "<div styleName={} />
 
 import ProfileNavigation
-  from "./components/ProfileNavigation";
+  from "../components/ProfileNavigation";
 
 import FormBuilder
   from "../../components/UI/Form/FormBuilder";
