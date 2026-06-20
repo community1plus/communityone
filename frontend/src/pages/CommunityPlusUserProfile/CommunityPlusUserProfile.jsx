@@ -16,7 +16,7 @@ import {
   useProfile,
 } from "../../context/ProfileContext";
 /**/
-import useAPI from "../../hooks/useAPI";
+import useAPI from "../../../hooks/useAPI";
 
 import useForm from "../../hooks/useForm";
 
@@ -37,10 +37,10 @@ import {
 } from "./profilePayload";
 
 import usePhoneVerification
-  from "../hooks/usePhoneVerification";
+  from "../../../hooks/usePhoneVerification";
 
 import useBusinessEmailVerification
-  from "../hooks/useBusinessEmailVerification";
+  from "../../../hooks/useBusinessEmailVerification";
 
 import ProfileTabs
   from "./components/ProfileTabs";
