@@ -278,12 +278,6 @@ function validateActiveTabLevel1(values, activeProfileTab) {
     if (!isFilled(values.organisation?.name)) errors.push("Organisation name is required.");
   }
 
-  if (activeProfileTab === "MIXED") {
-    if (!isFilled(values.username)) errors.push("Username is required.");
-    if (!isFilled(values.display_name)) errors.push("Real name is required.");
-    if (!isFilled(values.business?.name)) errors.push("Business name is required.");
-  }
-
   if (activeProfileTab === "PERSONAL") {
     if (!isFilled(values.username)) errors.push("Username is required.");
     if (!isFilled(values.display_name)) errors.push("Display name is required.");
@@ -371,16 +365,18 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     }
   }, [allowedProfileTabs, activeProfileTab, fallbackUserType, setValue]);
 
-switch (activeProfileTab) {
-  case "ORG":
-    return ORG_STEPS;
+const activeSteps = useMemo(() => {
+  switch (activeProfileTab) {
+    case "ORG":
+      return ORG_STEPS;
 
-  case "COMMUNITY_POLICIES":
-    return COMMUNITY_POLICY_STEPS;
+    case "COMMUNITY_POLICIES":
+      return COMMUNITY_POLICY_STEPS;
 
-  default:
-    return PERSONAL_STEPS;
-}
+    default:
+      return PERSONAL_STEPS;
+  }
+}, [activeProfileTab]);
 
   const currentStepConfig = activeSteps[currentStep];
   const isContactStep = currentStepConfig?.id?.includes("contact");
@@ -719,29 +715,6 @@ const handleBusinessRegistrationComplete = useCallback(
       }
     }
 
-    if (values.userType === "MIXED") {
-      setValue("business", {
-        ...values.business,
-        ...business,
-        name:
-          business?.name ||
-          business?.businessName ||
-          values.business?.name ||
-          "",
-        location:
-          business?.location ||
-          business?.businessLocation ||
-          values.business?.location ||
-          null,
-      });
-
-      if (business?.location || business?.businessLocation) {
-        setValue(
-          "homeLocation",
-          business.location || business.businessLocation
-        );
-      }
-    }
 
     setShowBusinessRegistration(false);
   },
@@ -852,11 +825,11 @@ if (
       setEditingVerifiedPhone(false);
 
       await patchProfile({
-phone: phoneE164,
-phoneE164,
-phoneDisplay: values.phoneDisplay,
-        phoneCountry: values.phoneCountry,
-        phoneVerified: true,
+      phone: phoneE164,
+      phoneE164,
+      phoneDisplay: values.phoneDisplay,
+      phoneCountry: values.phoneCountry,
+      phoneVerified: true,
       });
     } catch (err) {
       console.error("Verify phone code failed:", err);
@@ -954,32 +927,27 @@ phoneDisplay: values.phoneDisplay,
 
       setBusinessEmailStatus("verified");
 
-      if (values.userType === "ORG") {
-        await patchProfile({
-          organisation: {
-            ...values.organisation,
-            email,
-            emailVerified: true,
-            domainVerified: data.domainVerified ?? true,
-          },
-        });
-      }
+if (values.userType === "ORG") {
+  await patchProfile({
+    organisation: {
+      ...values.organisation,
+      email,
+      emailVerified: true,
+      domainVerified: data.domainVerified ?? true,
+    },
+  });
+}
 
-      if (values.userType === "MIXED") {
-        await patchProfile({
-          business: {
-            ...values.business,
-            email,
-            emailVerified: true,
-            domainVerified: data.domainVerified ?? true,
-          },
-        });
-      }
-    } catch (err) {
-      setBusinessEmailStatus("error");
-      setBusinessEmailError(err?.message || "Business email verification failed");
-    }
-  }, [values, patchProfile]);
+} catch (err) {
+  setBusinessEmailStatus("error");
+  setBusinessEmailError(
+    err?.message ||
+    "Business email verification failed"
+  );
+}
+
+}, [values, patchProfile]);
+
 
   const onPlaceChanged = useCallback(() => {
     const place = autoRef.current?.getPlace();
@@ -997,8 +965,6 @@ phoneDisplay: values.phoneDisplay,
 
     if (values.userType === "ORG") {
       setValue("organisation.location", manualLocation);
-    } else if (values.userType === "MIXED") {
-      setValue("business.location", manualLocation);
     } else {
       setManualLocation(manualLocation);
       setValue("homeLocation", manualLocation);
@@ -1028,17 +994,15 @@ const isOrg = selectedUserType === "ORG";
     userEmail?.split("@")[0] ||
     "User";
 
-  const resolvedHomeLocation =
-    isOrg
-      ? orgLocation || values.homeLocation || homeLocation
-      : isMixed
-      ? businessLocation || values.homeLocation || homeLocation
-      : values.homeLocation || homeLocation;
+const resolvedHomeLocation =
+  isOrg
+    ? orgLocation || values.homeLocation || homeLocation
+    : values.homeLocation || homeLocation;
 
-  const resolvedPhone =
-    isOrg || isMixed
-      ? businessPhoneE164 || phoneE164
-      : phoneE164;
+const resolvedPhone =
+  isOrg
+    ? businessPhoneE164 || phoneE164
+    : phoneE164;
 
 return {
   profile: {
@@ -1060,26 +1024,14 @@ return {
     phone_e164: resolvedPhone,
     phoneE164: resolvedPhone,
 phone_display:
-  isOrg || isMixed
+  isOrg
     ? businessPhoneRaw || values.phoneDisplay
     : values.phoneDisplay,
 
 phoneDisplay:
-  isOrg || isMixed
+  isOrg
     ? businessPhoneRaw || values.phoneDisplay
     : values.phoneDisplay,
-    phone_country: values.phoneCountry,
-    phoneCountry: values.phoneCountry,
-
-    home_location: resolvedHomeLocation,
-    homeLocation: resolvedHomeLocation,
-
-    policies: values.policies,
-    payment: {
-      cardName: values.payment?.cardName || "",
-      last4: values.payment?.last4 || "",
-    },
-  },
 
   organisationProfile:
     isOrg
