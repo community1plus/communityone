@@ -1,5 +1,5 @@
 import LocationDisplay from "../Layout/Header/LocationDisplay";
-import { useUserLocation } from "../../hooks/useUserLocation";
+import { useUserLocation } from "../../context/useUserLocation";
 
 import "./SplashHeader.css";
 
