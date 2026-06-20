@@ -305,7 +305,7 @@ function validateActiveTabLevel1(values, activeProfileTab) {
 
 export default function CommunityPlusUserProfile({ onComplete }) {
   const navigate = useNavigate();
-
+  const location = useLocation();
   const pageLoadStartRef = useRef(performance.now());
   const autoRef = useRef(null);
   const socialCallbackHandledRef = useRef(false);
@@ -764,7 +764,7 @@ const handleBusinessRegistrationComplete = useCallback(
   const handlePhoneCountryChange = useCallback(
     (event) => {
       const nextCountry = event.target.value;
-const nextE164 = normalisePhone(
+  const nextE164 = toE164Phone(
   values.phoneDisplay,
   nextCountry
 );
@@ -781,18 +781,18 @@ const nextE164 = normalisePhone(
   );
 
   const sendPhoneCode = useCallback(async () => {
-const cleanPhone =
-  normalisePhone(
-    values.phoneDisplay,
-    values.phoneCountry
-  );
+    const cleanPhone = toE164Phone(
+      normalisePhone(
+        values.phoneDisplay,
+        values.phoneCountry
+      ),
+      values.phoneCountry
+    );
 
-if (
-  !validatePhone(
-    cleanPhone,
-    values.phoneCountry
-  )
-)
+    if (!validatePhone(cleanPhone, values.phoneCountry)) {
+      setPhoneError("Enter a valid phone number.");
+      return;
+    }
 
     setPhoneStatus("sending");
     setPhoneError("");
@@ -1163,55 +1163,7 @@ const buildProfilePayload = useCallback(() => {
   homeLocation,
 ]);
 
-const handleSaveProfile = useCallback(
-  async () => {
-    try {
-      setSavingProfile(true);
 
-      const payload =
-        buildProfilePayload();
-
-      await saveProfile(
-        payload
-      );
-
-      clearStorage();
-
-      if (
-        typeof onComplete ===
-        "function"
-      ) {
-        onComplete(payload);
-      }
-
-      navigate(
-        "/communityplus",
-        {
-          replace: true,
-        }
-      );
-    } catch (err) {
-      console.error(
-        "Profile save failed:",
-        err
-      );
-
-      setProfileError(
-        err?.message ||
-          "Unable to save profile."
-      );
-    } finally {
-      setSavingProfile(false);
-    }
-  },
-  [
-    buildProfilePayload,
-    saveProfile,
-    clearStorage,
-    onComplete,
-    navigate,
-  ]
-);
 
 const closeProfile = useCallback(() => {
   console.log("closeProfile fired");
