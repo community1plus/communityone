@@ -230,17 +230,6 @@ function getInitialProfileValues({ user, homeLocation }) {
       name: "",
     },
 
-    business: {
-      name: "",
-      website: "",
-      phone: "",
-      phoneVerified: false,
-      email: "",
-      emailVerified: false,
-      domainVerified: false,
-      location: null,
-    },
-
     policies: {
       communityStandards: false,
       creatorGuidelines: false,
@@ -529,15 +518,6 @@ organisation: {
         ...(profile?.creator || {}),
       },
 
-      business: {
-        ...prev.business,
-        ...(profile?.business || {}),
-        email:
-          profile?.business?.email ||
-          prev.business?.email ||
-          email,
-      },
-
       policies: {
         ...prev.policies,
         ...(profile?.policies || {}),
@@ -703,8 +683,7 @@ const handleBusinessRegistrationComplete = useCallback(
         location:
           business?.location ||
           business?.businessLocation ||
-          values.organisation?.location ||
-          null,
+          values.organisation?.location || null,
       });
 
       if (business?.location || business?.businessLocation) {
@@ -972,12 +951,11 @@ if (values.userType === "ORG") {
   }, [values.userType, setManualLocation, setValue]);
 
 const buildProfilePayload = useCallback(() => {
-const selectedUserType = activeProfileTab;
+  const selectedUserType = activeProfileTab;
 
-const isOrg = selectedUserType === "ORG";
+  const isOrg = selectedUserType === "ORG";
 
   const orgLocation = values.organisation?.location || null;
-  const businessLocation = values.business?.location || null;
 
   const businessPhoneRaw = getBusinessPhoneValue(values);
 
@@ -989,138 +967,94 @@ const isOrg = selectedUserType === "ORG";
   const fallbackDisplayName =
     values.display_name ||
     values.organisation?.name ||
-    values.business?.name ||
     values.username ||
     userEmail?.split("@")[0] ||
     "User";
 
-const resolvedHomeLocation =
-  isOrg
-    ? orgLocation || values.homeLocation || homeLocation
-    : values.homeLocation || homeLocation;
-
-const resolvedPhone =
-  isOrg
-    ? businessPhoneE164 || phoneE164
-    : phoneE164;
-
-return {
-  profile: {
-    username: values.username || userEmail?.split("@")[0] || "",
-    display_name: fallbackDisplayName,
-    displayName: fallbackDisplayName,
-    email: values.email || userEmail,
-
-    user_type: selectedUserType,
-    userType: selectedUserType,
-
-    account_type: isOrg,
-    accountType: isOrg,
-
-    profile_level: 1,
-    profileLevel: 1,
-
-    phone: resolvedPhone,
-    phone_e164: resolvedPhone,
-    phoneE164: resolvedPhone,
-phone_display:
-  isOrg
-    ? businessPhoneRaw || values.phoneDisplay
-    : values.phoneDisplay,
-
-phoneDisplay:
-  isOrg
-    ? businessPhoneRaw || values.phoneDisplay
-    : values.phoneDisplay,
-
-  organisationProfile:
+  const resolvedHomeLocation =
     isOrg
-      ? {
-          organisation_name:
-            values.organisation?.name ||
-            values.business?.name ||
-            fallbackDisplayName,
+      ? orgLocation || values.homeLocation || homeLocation
+      : values.homeLocation || homeLocation;
 
-          trading_name:
-            values.organisation?.tradingName ||
-            values.business?.tradingName ||
-            "",
+  const resolvedPhone =
+    isOrg
+      ? businessPhoneE164 || phoneE164
+      : phoneE164;
 
-          organisation_email:
-            values.organisation?.email ||
-            values.business?.email ||
-            values.email ||
-            userEmail,
+  return {
+    profile: {
+      username: values.username || userEmail?.split("@")[0] || "",
+      display_name: fallbackDisplayName,
+      displayName: fallbackDisplayName,
+      email: values.email || userEmail,
 
-          organisation_phone: businessPhoneE164,
+      user_type: selectedUserType,
+      userType: selectedUserType,
 
-          website:
-            values.organisation?.website ||
-            values.business?.website ||
-            "",
+      account_type: isOrg,
+      accountType: isOrg,
 
-          location: isOrg ? orgLocation : businessLocation,
+      profile_level: 1,
+      profileLevel: 1,
 
-          email_verified: isOrg
-            ? Boolean(values.organisation?.emailVerified)
-            : Boolean(values.business?.emailVerified),
+      phone: resolvedPhone,
+      phone_e164: resolvedPhone,
+      phoneE164: resolvedPhone,
+      phone_display:
+        isOrg
+          ? businessPhoneRaw || values.phoneDisplay
+          : values.phoneDisplay,
 
-          phone_verified: isOrg
-            ? Boolean(values.organisation?.phoneVerified)
-            : Boolean(values.business?.phoneVerified),
+      phoneDisplay:
+        isOrg
+          ? businessPhoneRaw || values.phoneDisplay
+          : values.phoneDisplay,
 
-          ownership_verified: false,
-          business_level: 1,
-          source: "manual",
-        }
-      : null,
-};
+      organisationProfile:
+        isOrg
+          ? {
+              organisation_name:
+                values.organisation?.name ||
+                values.organisation?.name ||
+                fallbackDisplayName,
 
-}, [values, activeProfileTab, userEmail, phoneE164, homeLocation]);
+              trading_name:
+                values.organisation?.tradingName ||
+                values.organisation?.tradingName ||
+                "",
 
-const handleSaveProfile = useCallback(async () => {
-  setSavingProfile(true);
-  setProfileError("");
-  setProfileSuccess("");
+              organisation_email:
+                values.organisation?.email ||
+                values.organisation?.email ||
+                values.email ||
+                userEmail,
 
-  try {
-    const errors = validateActiveTabLevel1(values, activeProfileTab);
+              organisation_phone: businessPhoneE164,
 
-    if (errors.length > 0) {
-      setProfileError(errors[0]);
-      setCurrentStep(0);
-      return;
-    }
+              website:
+                values.organisation?.website || values.organisation?.website ||
+                "",
 
-    const payload = buildProfilePayload();
-    const nextProfile = await saveProfile(payload);
-    setProfileSuccess("Profile saved successfully.");
-    setEditMode(false);
+              location: isOrg ? orgLocation : businessLocation,
 
-    setTimeout(() => {
-      setProfileSuccess("");
-    }, 3000);
+              email_verified: isOrg
+                ? Boolean(values.organisation?.emailVerified)
+                : Boolean(values.organisation?.emailVerified),
 
-
-    clearStorage?.();
-    onComplete?.(nextProfile);
-
-    //navigate("/communityplus", { replace: true });
-  } catch (err) {
-    console.error("Profile save failed:", err);
-    setProfileError(err?.message || "Profile save failed");
-  } finally {
-    setSavingProfile(false);
-  }
+              ownership_verified: false,
+              business_level: 1,
+              source: "manual",
+            }
+          : null,
+    },
+  };
 }, [
-  values,
-  activeProfileTab,
   saveProfile,
-  buildProfilePayload,
   clearStorage,
   onComplete,
   navigate,
 ]);
+
 const location = useLocation();
 
 console.log("Current path:", location.pathname);
@@ -1188,7 +1122,7 @@ console.log({
             initialBusinessName={
               values.userType === "ORG"
                 ? values.organisation?.name
-                : values.business?.name
+                : values.organisation?.name
             }
             onCancel={() => setShowBusinessRegistration(false)}
             onComplete={handleBusinessRegistrationComplete}
@@ -1362,14 +1296,14 @@ console.log({
                                   ? values.organisation?.emailVerified
                                     ? "verified"
                                     : "unverified"
-                                  : values.business?.emailVerified
+                                  : values.organisation?.emailVerified
                                   ? "verified"
                                   : "unverified"
                               }`}
                             >
                               {(values.userType === "ORG"
                                 ? values.organisation?.emailVerified
-                                : values.business?.emailVerified)
+                                : values.organisation?.emailVerified)
                                 ? "✓ Verified"
                                 : "✕ Unverified"}
                             </span>
