@@ -1068,6 +1068,36 @@ const handleSaveProfile = useCallback(async () => {
   navigate,
 ]);
 
+const saveProfile = useCallback(
+  async (payload) => {
+    if (!payload) {
+      throw new Error("No profile payload supplied");
+    }
+
+    console.log(
+      "PATCH PROFILE PAYLOAD",
+      payload
+    );
+
+    const response = await patchProfile(
+      "/profile",
+      payload
+    );
+
+    console.log(
+      "PATCH PROFILE RESPONSE",
+      response
+    );
+
+    await refreshProfile();
+
+    return response;
+  },
+  [
+    patchProfile,
+    refreshProfile,
+  ]
+);
   const fallbackDisplayName =
     values.display_name ||
     values.organisation?.name ||
