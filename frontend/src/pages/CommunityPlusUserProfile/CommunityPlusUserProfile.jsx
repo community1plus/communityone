@@ -1011,62 +1011,7 @@ if (values.userType === "ORG") {
     }
   }, [values.userType, setManualLocation, setValue]);
 
-const buildProfilePayload = useCallback(() => {
-  const selectedUserType = activeProfileTab;
-
-  const isOrg = selectedUserType === "ORG";
-
-  const orgLocation = values.organisation?.location || null;
-
-  const businessPhoneRaw = getBusinessPhoneValue(values);
-
-  const businessPhoneE164 = toE164Phone(
-    businessPhoneRaw,
-    values.phoneCountry
-  );
-
-const handleSaveProfile = useCallback(async () => {
-  try {
-    setSaving(true);
-
-    const payload = buildProfilePayload();
-
-    console.log(
-      "Saving profile payload",
-      payload
-    );
-
-    await saveProfile(payload);
-
-    clearStorage();
-
-    if (typeof onComplete === "function") {
-      onComplete(payload);
-    }
-
-    navigate("/communityplus", {
-      replace: true,
-    });
-  } catch (err) {
-    console.error(
-      "Profile save failed:",
-      err
-    );
-
-    alert(
-      err?.message ||
-        "Unable to save profile."
-    );
-  } finally {
-    setSaving(false);
-  }
-}, [
-  buildProfilePayload,
-  saveProfile,
-  clearStorage,
-  onComplete,
-  navigate,
-]);
+console.log("Current path:", location.pathname);
 
 const saveProfile = useCallback(
   async (payload) => {
@@ -1079,25 +1024,36 @@ const saveProfile = useCallback(
       payload
     );
 
-    const response = await patchProfile(
-      "/profile",
-      payload
-    );
+    const response = await patchProfile(payload);
 
     console.log(
       "PATCH PROFILE RESPONSE",
       response
     );
 
-    await refreshProfile();
-
     return response;
   },
-  [
-    patchProfile,
-    refreshProfile,
-  ]
+  [patchProfile]
 );
+
+const buildProfilePayload = useCallback(() => {
+  const selectedUserType = activeProfileTab;
+
+  const isOrg =
+    selectedUserType === "ORG";
+
+  const orgLocation =
+    values.organisation?.location || null;
+
+  const businessPhoneRaw =
+    values.organisation?.phone || "";
+
+  const businessPhoneE164 =
+    toE164Phone(
+      businessPhoneRaw,
+      values.phoneCountry
+    );
+
   const fallbackDisplayName =
     values.display_name ||
     values.organisation?.name ||
@@ -1107,8 +1063,11 @@ const saveProfile = useCallback(
 
   const resolvedHomeLocation =
     isOrg
-      ? orgLocation || values.homeLocation || homeLocation
-      : values.homeLocation || homeLocation;
+      ? orgLocation ||
+        values.homeLocation ||
+        homeLocation
+      : values.homeLocation ||
+        homeLocation;
 
   const resolvedPhone =
     isOrg
@@ -1117,81 +1076,142 @@ const saveProfile = useCallback(
 
   return {
     profile: {
-      username: values.username || userEmail?.split("@")[0] || "",
-      display_name: fallbackDisplayName,
-      displayName: fallbackDisplayName,
-      email: values.email || userEmail,
+      username:
+        values.username ||
+        userEmail?.split("@")[0] ||
+        "",
 
-      user_type: selectedUserType,
-      userType: selectedUserType,
+      display_name:
+        fallbackDisplayName,
 
-      account_type: isOrg,
-      accountType: isOrg,
+      displayName:
+        fallbackDisplayName,
+
+      email:
+        values.email ||
+        userEmail,
+
+      user_type:
+        selectedUserType,
+
+      userType:
+        selectedUserType,
 
       profile_level: 1,
       profileLevel: 1,
 
       phone: resolvedPhone,
-      phone_e164: resolvedPhone,
       phoneE164: resolvedPhone,
-      phone_display:
-        isOrg
-          ? businessPhoneRaw || values.phoneDisplay
-          : values.phoneDisplay,
 
       phoneDisplay:
         isOrg
-          ? businessPhoneRaw || values.phoneDisplay
+          ? businessPhoneRaw
           : values.phoneDisplay,
 
-      organisationProfile:
-        isOrg
-          ? {
-              organisation_name:
-                values.organisation?.name ||
-                values.organisation?.name ||
-                fallbackDisplayName,
+      homeLocation:
+        resolvedHomeLocation,
 
-              trading_name:
-                values.organisation?.tradingName ||
-                values.organisation?.tradingName ||
-                "",
+      policies:
+        values.policies,
 
-              organisation_email:
-                values.organisation?.email ||
-                values.organisation?.email ||
-                values.email ||
-                userEmail,
-
-              organisation_phone: businessPhoneE164,
-
-              website:
-                values.organisation?.website || values.organisation?.website ||
-                "",
-
-              location: isOrg ? orgLocation : businessLocation,
-
-              email_verified: isOrg
-                ? Boolean(values.organisation?.emailVerified)
-                : Boolean(values.organisation?.emailVerified),
-
-              ownership_verified: false,
-              business_level: 1,
-              source: "manual",
-            }
-          : null,
+      payment:
+        values.payment,
     },
+
+    organisationProfile:
+      isOrg
+        ? {
+            organisation_name:
+              values.organisation?.name ||
+              fallbackDisplayName,
+
+            organisation_email:
+              values.organisation?.email ||
+              values.email ||
+              userEmail,
+
+            organisation_phone:
+              businessPhoneE164,
+
+            website:
+              values.organisation?.website ||
+              "",
+
+            location:
+              orgLocation,
+
+            email_verified:
+              Boolean(
+                values.organisation?.emailVerified
+              ),
+
+            ownership_verified:
+              false,
+
+            business_level: 1,
+
+            source:
+              "manual",
+          }
+        : null,
   };
 }, [
-  saveProfile,
-  clearStorage,
-  onComplete,
-  navigate,
+  activeProfileTab,
+  values,
+  userEmail,
+  phoneE164,
+  homeLocation,
 ]);
 
-const location = useLocation();
+const handleSaveProfile = useCallback(
+  async () => {
+    try {
+      setSavingProfile(true);
 
-console.log("Current path:", location.pathname);
+      const payload =
+        buildProfilePayload();
+
+      await saveProfile(
+        payload
+      );
+
+      clearStorage();
+
+      if (
+        typeof onComplete ===
+        "function"
+      ) {
+        onComplete(payload);
+      }
+
+      navigate(
+        "/communityplus",
+        {
+          replace: true,
+        }
+      );
+    } catch (err) {
+      console.error(
+        "Profile save failed:",
+        err
+      );
+
+      setProfileError(
+        err?.message ||
+          "Unable to save profile."
+      );
+    } finally {
+      setSavingProfile(false);
+    }
+  },
+  [
+    buildProfilePayload,
+    saveProfile,
+    clearStorage,
+    onComplete,
+    navigate,
+  ]
+);
 
 const closeProfile = useCallback(() => {
   console.log("closeProfile fired");
