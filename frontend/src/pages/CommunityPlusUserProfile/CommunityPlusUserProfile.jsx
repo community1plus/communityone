@@ -1,3 +1,56 @@
+import {
+  useState,
+  useMemo,
+  useCallback,
+} from "react";
+
+import {
+  useNavigate,
+} from "react-router-dom";
+
+import {
+  useAuth,
+} from "../../context/AuthContext";
+
+import {
+  useProfile,
+} from "../../context/ProfileContext";
+
+import useAPI from "../../hooks/useAPI";
+
+import useForm from "../../hooks/useForm";
+
+import {
+  PERSONAL_STEPS,
+  ORG_STEPS,
+  COMMUNITY_POLICY_STEPS,
+} from "./profileConstants";
+
+import {
+  getInitialProfileValues,
+  getAllowedProfileTabs,
+  getPhoneCountry,
+} from "./profileHelpers";
+
+import {
+  buildProfilePayload,
+} from "./profilePayload";
+
+import usePhoneVerification
+  from "./hooks/usePhoneVerification";
+
+import useBusinessEmailVerification
+  from "./hooks/useBusinessEmailVerification";
+
+import ProfileTabs
+  from "./components/ProfileTabs";
+
+import ProfileNavigation
+  from "./components/ProfileNavigation";
+
+import FormBuilder
+  from "../../components/UI/Form/FormBuilder";
+
 export default function CommunityPlusUserProfile({
   onComplete,
 }) {
