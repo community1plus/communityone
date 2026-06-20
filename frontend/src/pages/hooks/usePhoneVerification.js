@@ -2,7 +2,7 @@ import { useState, useCallback } from "react";
 import {
   toE164Phone,
   validatePhone,
-} from "../profileHelpers";
+} from "../CommunityPlusUserProfile/profileHelpers";
 
 export default function usePhoneVerification({
   values,

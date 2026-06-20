@@ -37,10 +37,10 @@ import {
 } from "./profilePayload";
 
 import usePhoneVerification
-  from "./hooks/usePhoneVerification";
+  from "../hooks/usePhoneVerification";
 
 import useBusinessEmailVerification
-  from "./hooks/useBusinessEmailVerification";
+  from "../hooks/useBusinessEmailVerification";
 
 import ProfileTabs
   from "./components/ProfileTabs";
