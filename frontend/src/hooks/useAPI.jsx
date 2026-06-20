@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 
-import { useAuth } from "../src/context/AuthContext";
-import { useUI } from "../src/context/UIContext";
-import { apiFetch } from "../src/services/api";
+import { useAuth } from "../context/AuthContext";
+import { useUI } from "../context/UIContext";
+import { apiFetch } from "../services/api";
 
 export default function useAPI() {
   const { token, user } = useAuth();

@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Button from "../../components/UI/Button";
 import LocationDisplay from "../../components/Layout/Header/LocationDisplay";
 
-import { useUserLocation } from "../../hooks/useUserLocation";
+import { useUserLocation } from "../hooks/useUserLocation";
 import { useAuth } from "../../context/AuthContext";
 import { useProfile } from "../../context/ProfileContext";
 

@@ -10,7 +10,7 @@ import {
 
 import { fetchAuthSession } from "aws-amplify/auth";
 import { useAuth } from "./AuthContext";
-import useAPI from "../../hooks/useAPI";
+import useAPI from "../hooks/useAPI";
 
 const ProfileContext = createContext(null);
 
