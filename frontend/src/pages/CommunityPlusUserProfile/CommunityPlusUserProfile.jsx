@@ -17,10 +17,7 @@ import BusinessRegistrationForm from "../../components/BusinessRegistration/Busi
 
 import "../../styles/system.css";
 import "./CommunityPlusUserProfile.css";
-import {
-  normalisePhone,
-  validatePhone,
-} from "../../utils/phone";
+
 const DEFAULT_PHONE_COUNTRY = "AU";
 
 const PHONE_COUNTRIES = [
