@@ -44,7 +44,7 @@ import useBusinessEmailVerification
 
 import ProfileTabs from "../../components/UI/ProfileTabs";
 
-import ProfileNavigation from "../../ProfileTabscomponents/UI/ProfileNavigation";
+import ProfileNavigation from "../../components/UI/ProfileNavigation";
 
 import FormBuilder from "../../components/UI/Form/FormBuilder";
 
