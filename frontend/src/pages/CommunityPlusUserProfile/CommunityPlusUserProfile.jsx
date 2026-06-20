@@ -218,43 +218,13 @@ function getAllowedProfileTabs(email = "") {
   );
 }
 
-function digitsOnly(value = "") {
-  return String(value).replace(/\D/g, "");
-}
+
 
 function getPhoneCountry(code = DEFAULT_PHONE_COUNTRY) {
   return PHONE_COUNTRIES.find((country) => country.code === code) || PHONE_COUNTRIES[0];
 }
 
-function stripDialCode(phone = "", countryCode = DEFAULT_PHONE_COUNTRY) {
-  const country = getPhoneCountry(countryCode);
-  let digits = digitsOnly(phone);
-  const dialDigits = digitsOnly(country.dialCode);
 
-  if (digits.startsWith(dialDigits)) {
-    digits = digits.slice(dialDigits.length);
-  }
-
-  if (country.code === "AU" && digits.startsWith("0")) {
-    digits = digits.slice(1);
-  }
-
-  return digits;
-}
-
-function toE164Phone(phone = "", countryCode = DEFAULT_PHONE_COUNTRY) {
-  const country = getPhoneCountry(countryCode);
-  const digits = stripDialCode(phone, countryCode);
-
-  return digits ? `${country.dialCode}${digits}` : "";
-}
-
-function isValidInternationalPhone(phone = "", countryCode = DEFAULT_PHONE_COUNTRY) {
-  const country = getPhoneCountry(countryCode);
-  const nationalDigits = stripDialCode(phone, countryCode);
-
-  return nationalDigits.length >= country.min && nationalDigits.length <= country.max;
-}
 
 function getBusinessPhoneValue(values) {
   if (values.userType === "ORG") return values.organisation?.phone || "";
@@ -533,15 +503,7 @@ const phoneIsValid = useMemo(
   ]
 );
 
-  const phoneE164 = useMemo(
-    () => toE164Phone(values.phoneDisplay, values.phoneCountry),
-    [values.phonedisplay, values.phonedisplayCountry]
-  );
 
-  const phoneIsValid = useMemo(
-    () => isValidInternationalPhone(values.phonedisplay, values.phonedisplayCountry),
-    [values.phonedisplay, values.phonedisplayCountry]
-  );
 
   const canSaveFromContact =
     !isContactStep ||
@@ -616,7 +578,7 @@ phoneE164:
 
 phoneVerificationCode: "",
 businessPhoneVerificationCode: "",
-businessEmailVerificationCode: "",,
+businessEmailVerificationCode: "",
       phoneVerificationCode: "",
       businessPhoneVerificationCode: "",
       businessEmailVerificationCode: "",
@@ -713,17 +675,30 @@ organisation: {
     }
   }, [profile?.phoneVerified]);
 
-  useEffect(() => {
-    if (!values.phonedisplay) return;
+useEffect(() => {
+  if (!values.phoneDisplay) return;
 
-    const originalPhone = profile?.phoneE164 || profile?.phone || "";
+  const originalPhone =
+    profile?.phoneE164 ||
+    profile?.phone ||
+    "";
 
-    if (originalPhone && phoneE164 && phoneE164 !== originalPhone) {
-      setValue("phoneVerificationCode", "");
-      setPhoneStatus("idle");
-      setPhoneError("");
-    }
-  }, [values.phone, phoneE164, profile?.phoneE164, profile?.phone, setValue]);
+  if (
+    originalPhone &&
+    phoneE164 &&
+    phoneE164 !== originalPhone
+  ) {
+    setValue("phoneVerificationCode", "");
+    setPhoneStatus("idle");
+    setPhoneError("");
+  }
+}, [
+  values.phoneDisplay,
+  phoneE164,
+  profile?.phoneE164,
+  profile?.phone,
+  setValue,
+]);
 
   useEffect(() => {
     if (profileReady) return;
@@ -864,7 +839,10 @@ const handleBusinessRegistrationComplete = useCallback(
   const handlePhoneCountryChange = useCallback(
     (event) => {
       const nextCountry = event.target.value;
-      const nextE164 = toE164Phone(values.phone, nextCountry);
+const nextE164 = normalisePhone(
+  values.phoneDisplay,
+  nextCountry
+);
 
       setValue("phoneCountry", nextCountry);
       setValue("phoneE164", nextE164);
@@ -874,21 +852,22 @@ const handleBusinessRegistrationComplete = useCallback(
       setPhoneError("");
       setEditingVerifiedPhone(false);
     },
-    [values.phone, setValue]
+    [values.phoneDisplay, setValue]
   );
 
   const sendPhoneCode = useCallback(async () => {
-    const cleanPhone = toE164Phone(values.phone, values.phoneCountry);
+const cleanPhone =
+  normalisePhone(
+    values.phoneDisplay,
+    values.phoneCountry
+  );
 
-    if (!cleanPhone) {
-      setPhoneError("Enter your phone number first.");
-      return;
-    }
-
-    if (!isValidInternationalPhone(values.phone, values.phoneCountry)) {
-      setPhoneError(`Enter a valid phone number for ${selectedPhoneCountry.label}.`);
-      return;
-    }
+if (
+  !validatePhone(
+    cleanPhone,
+    values.phoneCountry
+  )
+)
 
     setPhoneStatus("sending");
     setPhoneError("");
@@ -961,9 +940,9 @@ const handleBusinessRegistrationComplete = useCallback(
       setEditingVerifiedPhone(false);
 
       await patchProfile({
-        phone: toE164Phone(values.phone, values.phoneCountry),
-        phoneE164: toE164Phone(values.phone, values.phoneCountry),
-        phoneDisplay: values.phone,
+phone: phoneE164,
+phoneE164,
+phoneDisplay: values.phoneDisplay,
         phoneCountry: values.phoneCountry,
         phoneVerified: true,
       });
@@ -972,7 +951,7 @@ const handleBusinessRegistrationComplete = useCallback(
       setPhoneStatus("error");
       setPhoneError(err?.message || "Verification failed");
     }
-  }, [phoneStatus, values, patchProfile]);
+  }, [phoneStatus, values, patchProfile, phoneE164]);
 
   const sendBusinessEmailCode = useCallback(async () => {
     const email = getBusinessEmailValue(values).trim();
@@ -1170,10 +1149,15 @@ return {
     phone: resolvedPhone,
     phone_e164: resolvedPhone,
     phoneE164: resolvedPhone,
-    phone_display:
-      isOrg || isMixed ? businessPhoneRaw || values.phone : values.phone,
-    phoneDisplay:
-      isOrg || isMixed ? businessPhoneRaw || values.phone : values.phone,
+phone_display:
+  isOrg || isMixed
+    ? businessPhoneRaw || values.phoneDisplay
+    : values.phoneDisplay,
+
+phoneDisplay:
+  isOrg || isMixed
+    ? businessPhoneRaw || values.phoneDisplay
+    : values.phoneDisplay,
     phone_country: values.phoneCountry,
     phoneCountry: values.phoneCountry,
 
@@ -1603,7 +1587,7 @@ console.log({
                         </div>
                       ) : (
                         <>
-                          {values.phone && !phoneIsValid && (
+                          {values.phoneDisplay && !phoneIsValid && (
                             <div className="error">
                               Enter a valid phone number for {selectedPhoneCountry.label}.
                             </div>
