@@ -42,11 +42,11 @@ import usePhoneVerification
 import useBusinessEmailVerification
   from "../../hooks/useBusinessEmailVerification";
 
-import ProfileTabs from "../components/UI/ProfileTabs";
+import ProfileTabs from "../../components/UI/ProfileTabs";
 
-import ProfileNavigation from "../components/UI/ProfileNavigation";
+import ProfileNavigation from "../../ProfileTabscomponents/UI/ProfileNavigation";
 
-import FormBuilder from "../components/UI/Form/FormBuilder";
+import FormBuilder from "../../components/UI/Form/FormBuilder";
 
 export default function CommunityPlusUserProfile({
   onComplete,
