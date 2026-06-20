@@ -2,11 +2,17 @@ export default function CommunityPlusUserProfile({
   onComplete,
 }) {
 
+  /* =========================
+     NAVIGATION
+  ========================= */
+
   const navigate = useNavigate();
 
-  const {
-    user,
-  } = useAuth();
+  /* =========================
+     CONTEXTS
+  ========================= */
+
+  const { user } = useAuth();
 
   const {
     profile,
@@ -17,6 +23,10 @@ export default function CommunityPlusUserProfile({
   const {
     patchProfile,
   } = useAPI();
+
+  /* =========================
+     LOCAL STATE
+  ========================= */
 
   const [savingProfile, setSavingProfile] =
     useState(false);
@@ -30,107 +40,101 @@ export default function CommunityPlusUserProfile({
   const [currentStep, setCurrentStep] =
     useState(0);
 
-    const {
-  phoneStatus,
-  phoneError,
-  sendPhoneCode,
-  verifyPhoneCode,
-} = usePhoneVerification({
+  /* =========================
+     FORM
+  ========================= */
 
-  values,
-
-  selectedPhoneCountry:
-    getPhoneCountry(
-      values.phoneCountry
+  const form = useForm({
+    initialValues: getInitialProfileValues(
+      profile,
+      user
     ),
 
-  setValue,
+    persistKey:
+      "communityplus_profile",
+  });
 
-  patchProfile,
+  const {
+    values,
+    setValue,
+    clearStorage,
+  } = form;
 
-});
+  /* =========================
+     ALLOWED TABS
+  ========================= */
 
-const {
-
-  businessEmailStatus,
-
-  businessEmailError,
-
-  sendBusinessEmailCode,
-
-  verifyBusinessEmailCode,
-
-} = useBusinessEmailVerification({
-
-  values,
-
-  patchProfile,
-
-});
-
-const activeSteps = useMemo(() => {
-
-  switch (activeProfileTab) {
-
-    case "ORG":
-      return ORG_STEPS;
-
-    case "COMMUNITY_POLICIES":
-      return COMMUNITY_POLICY_STEPS;
-
-    default:
-      return PERSONAL_STEPS;
-
-  }
-
-}, [
-  activeProfileTab,
-]);
-
-const currentStepConfig =
-  activeSteps[currentStep];
-
-const saveProfile =
-  useCallback(
-async () => {
-
-  try {
-
-    setSavingProfile(true);
-
-    const payload =
-      buildProfilePayload({
-
-        values,
-
-        activeProfileTab,
-
-        userEmail:
-          user?.email,
-
-        homeLocation:
-          values.homeLocation,
-
-      });
-
-    await patchProfile(
-      payload
+  const allowedProfileTabs =
+    useMemo(
+      () =>
+        getAllowedProfileTabs(
+          user?.email
+        ),
+      [user]
     );
 
-    await refreshProfile();
+  /* =========================
+     PHONE VERIFICATION
+  ========================= */
 
-    clearStorage();
+  const {
+    phoneStatus,
+    phoneError,
+    sendPhoneCode,
+    verifyPhoneCode,
+  } = usePhoneVerification({
+    values,
 
-    if (
-      typeof onComplete ===
-      "function"
-    ) {
+    selectedPhoneCountry:
+      getPhoneCountry(
+        values.phoneCountry
+      ),
 
-      onComplete(
-        payload
-      );
+    setValue,
+
+    patchProfile,
+  });
+
+  /* =========================
+     BUSINESS EMAIL
+  ========================= */
+
+  const {
+    businessEmailStatus,
+    businessEmailError,
+    sendBusinessEmailCode,
+    verifyBusinessEmailCode,
+  } = useBusinessEmailVerification({
+    values,
+    patchProfile,
+  });
+
+  /* =========================
+     ACTIVE STEPS
+  ========================= */
+
+  const activeSteps = useMemo(() => {
+
+    switch (activeProfileTab) {
+
+      case "ORG":
+        return ORG_STEPS;
+
+      case "COMMUNITY_POLICIES":
+        return COMMUNITY_POLICY_STEPS;
+
+      default:
+        return PERSONAL_STEPS;
 
     }
+
+  }, [activeProfileTab]);
+
+  /* =========================
+     CLOSE PROFILE
+  ========================= */
+
+  const closeProfile = useCallback(() => {
 
     navigate(
       "/communityplus",
@@ -139,101 +143,130 @@ async () => {
       }
     );
 
-  }
-  catch (err) {
+  }, [navigate]);
 
-    console.error(
-      err
-    );
+  /* =========================
+     SAVE PROFILE
+  ========================= */
 
-  }
-  finally {
+  const handleSaveProfile =
+    useCallback(async () => {
 
-    setSavingProfile(
-      false
-    );
+      try {
 
-  }
+        setSavingProfile(true);
 
-}, [
+        const payload =
+          buildProfilePayload({
 
-  values,
+            values,
 
-  activeProfileTab,
+            activeProfileTab,
 
-  patchProfile,
+            userEmail:
+              user?.email,
 
-  refreshProfile,
+            homeLocation:
+              values.homeLocation,
 
-  clearStorage,
+          });
 
-  onComplete,
+        await patchProfile(
+          payload
+        );
 
-  navigate,
+        await refreshProfile();
 
-]);
+        clearStorage();
 
-return (
+        if (
+          typeof onComplete ===
+          "function"
+        ) {
 
-<div className="profile-page">
+          onComplete(
+            payload
+          );
 
-  <ProfileTabs
+        }
 
-    tabs={allowedProfileTabs}
+        navigate(
+          "/communityplus",
+          {
+            replace: true,
+          }
+        );
 
-    activeTab={
-      activeProfileTab
-    }
+      }
+      catch (err) {
 
-    onChange={
-      setActiveProfileTab
-    }
+        console.error(
+          "Profile save failed:",
+          err
+        );
 
-  />
+      }
+      finally {
 
-  <FormBuilder
+        setSavingProfile(
+          false
+        );
 
-    steps={activeSteps}
+      }
 
-    currentStep={
-      currentStep
-    }
+    }, [
 
-    form={form}
+      values,
 
-    readOnly={
-      !editMode
-    }
+      activeProfileTab,
 
-  />
+      user,
 
-  <ProfileNavigation
+      patchProfile,
 
-    editMode={
-      editMode
-    }
+      refreshProfile,
 
-    saving={
-      savingProfile
-    }
+      clearStorage,
 
-    onClose={
-      closeProfile
-    }
+      onComplete,
 
-    onEdit={() =>
-      setEditMode(true)
-    }
+      navigate,
 
-    onSave={
-      saveProfile
-    }
+    ]);
 
-  />
+  /* =========================
+     RENDER
+  ========================= */
 
-</div>
+  return (
 
-);
+    <div className="profile-page">
+
+      <ProfileTabs
+        tabs={allowedProfileTabs}
+        activeTab={activeProfileTab}
+        onChange={setActiveProfileTab}
+      />
+
+      <FormBuilder
+        steps={activeSteps}
+        currentStep={currentStep}
+        form={form}
+        readOnly={!editMode}
+      />
+
+      <ProfileNavigation
+        editMode={editMode}
+        saving={savingProfile}
+        onClose={closeProfile}
+        onEdit={() =>
+          setEditMode(true)
+        }
+        onSave={handleSaveProfile}
+      />
+
+    </div>
+
+  );
 
 }
-
