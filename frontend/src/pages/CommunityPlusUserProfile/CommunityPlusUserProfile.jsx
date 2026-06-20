@@ -52,7 +52,6 @@ const PERSONAL_EMAIL_DOMAINS = new Set([
 const PROFILE_TABS = [
   { id: "PERSONAL", label: "Personal" },
   { id: "ORG", label: "Organisation" },
-  { id: "MIXED", label: "Mixed" },
   { id: "COMMUNITY_POLICIES", label: "Community Policies" },
 ];
 
@@ -115,34 +114,7 @@ const ORG_STEPS = [
   { id: "organisation-payment", title: "PAYMENT DETAILS", customComponent: "stripe-payment" },
 ];
 
-const MIXED_STEPS = [
-  {
-    id: "mixed-profile",
-    title: "MIXED PROFILE",
-    fields: [
-      { name: "username", label: "Username", type: "text", required: true },
-      { name: "display_name", label: "Real Name", type: "text", required: true },
-      { name: "email", label: "Email Address", type: "email", readOnly: true },
-    ],
-  },
-  {
-    id: "mixed-address",
-    title: "ADDRESS",
-    fields: [
-      { name: "business.location", label: "Business Address", type: "location", required: true },
-    ],
-  },
-  {
-    id: "mixed-contact",
-    title: "CONTACT",
-    fields: [
-      { name: "business.phone", label: "Business Phone", type: "tel" },
-      { name: "business.email", label: "Business Email", type: "email" },
-    ],
-  },
-  { id: "mixed-social", title: "SOCIAL", fields: [] },
-  { id: "mixed-payment", title: "PAYMENT DETAILS", customComponent: "stripe-payment" },
-];
+
 
 const COMMUNITY_POLICY_STEPS = [
   {
@@ -183,38 +155,16 @@ function isPersonalEmail(email = "") {
   return PERSONAL_EMAIL_DOMAINS.has(getEmailDomain(email));
 }
 
-function validateBusinessEmailDomain(email = "") {
-  const domain = getEmailDomain(email);
-
-  if (!email.includes("@")) {
-    return {
-      valid: false,
-      message: "Enter a valid business email address.",
-    };
-  }
-
-  if (isPersonalEmail(email)) {
-    return {
-      valid: false,
-      message: "Use a business or organisation email, not a personal email domain.",
-    };
-  }
-
-  return {
-    valid: true,
-    domain,
-  };
-}
 
 function getAllowedProfileTabs(email = "") {
   if (isPersonalEmail(email)) {
-    return PROFILE_TABS.filter((tab) =>
-      ["PERSONAL", "MIXED", "COMMUNITY_POLICIES"].includes(tab.id)
+    return PROFILE_TABS.filter(tab =>
+      ["PERSONAL", "COMMUNITY_POLICIES"].includes(tab.id)
     );
   }
 
-  return PROFILE_TABS.filter((tab) =>
-    ["ORG", "MIXED", "COMMUNITY_POLICIES"].includes(tab.id)
+  return PROFILE_TABS.filter(tab =>
+    ["ORG", "COMMUNITY_POLICIES"].includes(tab.id)
   );
 }
 
@@ -225,20 +175,6 @@ function getPhoneCountry(code = DEFAULT_PHONE_COUNTRY) {
 }
 
 
-
-function getBusinessPhoneValue(values) {
-  if (values.userType === "ORG") return values.organisation?.phone || "";
-  if (values.userType === "MIXED") return values.business?.phone || "";
-
-  return "";
-}
-
-function getBusinessEmailValue(values) {
-  if (values.userType === "ORG") return values.organisation?.email || "";
-  if (values.userType === "MIXED") return values.business?.email || "";
-
-  return "";
-}
 
 function getUserEmail(user) {
   return (
@@ -332,23 +268,6 @@ function isLocationComplete(location) {
   );
 }
 
-function validateOrganisationLevel1(values) {
-  const errors = [];
-
-  if (!String(values.username || "").trim()) {
-    errors.push("Username is required.");
-  }
-
-  if (!String(values.display_name || "").trim()) {
-    errors.push("Real name is required.");
-  }
-
-  if (!String(values.organisation?.name || "").trim()) {
-    errors.push("Organisation name is required.");
-  }
-
-  return errors;
-}
 
 function isFilled(value) {
   return Boolean(String(value || "").trim());
@@ -456,19 +375,16 @@ export default function CommunityPlusUserProfile({ onComplete }) {
     }
   }, [allowedProfileTabs, activeProfileTab, fallbackUserType, setValue]);
 
-  const activeSteps = useMemo(() => {
-    switch (activeProfileTab) {
-      case "ORG":
-        return ORG_STEPS;
-      case "MIXED":
-        return MIXED_STEPS;
-      case "COMMUNITY_POLICIES":
-        return COMMUNITY_POLICY_STEPS;
-      case "PERSONAL":
-      default:
-        return PERSONAL_STEPS;
-    }
-  }, [activeProfileTab]);
+switch (activeProfileTab) {
+  case "ORG":
+    return ORG_STEPS;
+
+  case "COMMUNITY_POLICIES":
+    return COMMUNITY_POLICY_STEPS;
+
+  default:
+    return PERSONAL_STEPS;
+}
 
   const currentStepConfig = activeSteps[currentStep];
   const isContactStep = currentStepConfig?.id?.includes("contact");
@@ -774,7 +690,7 @@ useEffect(() => {
       setValue("userType", tabId);
       setCurrentStep(0);
 
-      if (tabId === "ORG" || tabId === "MIXED") {
+      if (tabId === "ORG") {
         setShowBusinessRegistration(true);
       }
     },
@@ -1097,8 +1013,6 @@ const buildProfilePayload = useCallback(() => {
 const selectedUserType = activeProfileTab;
 
 const isOrg = selectedUserType === "ORG";
-const isMixed = selectedUserType === "MIXED";
- 
 
   const orgLocation = values.organisation?.location || null;
   const businessLocation = values.business?.location || null;
@@ -1140,8 +1054,8 @@ return {
     user_type: selectedUserType,
     userType: selectedUserType,
 
-    account_type: isOrg || isMixed ? "BUSINESS" : "PERSONAL",
-    accountType: isOrg || isMixed ? "BUSINESS" : "PERSONAL",
+    account_type: isOrg,
+    accountType: isOrg,
 
     profile_level: 1,
     profileLevel: 1,
@@ -1172,7 +1086,7 @@ phoneDisplay:
   },
 
   organisationProfile:
-    isOrg || isMixed
+    isOrg
       ? {
           organisation_name:
             values.organisation?.name ||
@@ -1454,7 +1368,7 @@ console.log({
                     }}
                   />
 
-                      {["ORG", "MIXED"].includes(values.userType) && isContactStep && (
+                      {(values.userType === "ORG") && isContactStep && (
                         <div className="business-verification-stack">
                           <div className="verification-inline">
                             <span className="verification-label">Phone Verification</span>
@@ -1465,14 +1379,14 @@ console.log({
                                   ? values.organisation?.phoneVerified
                                     ? "verified"
                                     : "unverified"
-                                  : values.business?.phoneVerified
+                                  : values.organisation?.phoneVerified
                                   ? "verified"
                                   : "unverified"
                               }`}
                             >
                               {(values.userType === "ORG"
                                 ? values.organisation?.phoneVerified
-                                : values.business?.phoneVerified)
+                                : values.organisation?.phoneVerified)
                                 ? "✓ Verified"
                                 : "✕ Unverified"}
                             </span>
