@@ -18,7 +18,6 @@ import BusinessRegistrationForm from "../../components/BusinessRegistration/Busi
 import "../../styles/system.css";
 import "./CommunityPlusUserProfile.css";
 import {
-  formatPhone,
   normalisePhone,
   validatePhone,
 } from "../../utils/phone";
