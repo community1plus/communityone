@@ -376,9 +376,42 @@ const selectedPhoneCountry = useMemo(
   [values.phoneCountry]
 );
 
+function toE164Phone(value = "", countryCode = DEFAULT_PHONE_COUNTRY) {
+  const country = getPhoneCountry(countryCode);
+
+  const digits = String(value)
+    .replace(/\D/g, "")
+    .replace(/^0+/, "");
+
+  return digits
+    ? `${country.dialCode}${digits}`
+    : "";
+}
+
+function validatePhone(phone = "", countryCode = DEFAULT_PHONE_COUNTRY) {
+  const country = getPhoneCountry(countryCode);
+
+  const digits = phone
+    .replace(country.dialCode, "")
+    .replace(/\D/g, "");
+
+  return (
+    digits.length >= country.min &&
+    digits.length <= country.max
+  );
+}
+
+function formatPhone(phone = "", countryCode = DEFAULT_PHONE_COUNTRY) {
+  const country = getPhoneCountry(countryCode);
+
+  return phone.startsWith(country.dialCode)
+    ? phone.slice(country.dialCode.length)
+    : phone;
+}
+
 const phoneE164 = useMemo(
   () =>
-    normalisePhone(
+    toE164Phone(
       values.phoneDisplay,
       values.phoneCountry
     ),
