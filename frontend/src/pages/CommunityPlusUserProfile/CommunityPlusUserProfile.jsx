@@ -42,11 +42,9 @@ import usePhoneVerification
 import useBusinessEmailVerification
   from "../../../hooks/useBusinessEmailVerification";
 
-import ProfileTabs
-  from "<div styleName={} />
+import ProfileTabs from "../components/ProfileTabs";
 
-import ProfileNavigation
-  from "../components/ProfileNavigation";
+import ProfileNavigation from "./components/ProfileNavigation";
 
 import FormBuilder
   from "../../components/UI/Form/FormBuilder";
