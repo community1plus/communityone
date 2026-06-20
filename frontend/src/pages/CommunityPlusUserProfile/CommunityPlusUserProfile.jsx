@@ -16,7 +16,7 @@ import {
   useProfile,
 } from "../../context/ProfileContext";
 /**/
-import useAPI from "../hooks/useAPI";
+import useAPI from "../../hooks/useAPI";
 
 import useForm from "../../hooks/useForm";
 
