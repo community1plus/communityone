@@ -1039,3 +1039,11 @@ RESPONSIVE
   border-radius: 999px;
   transition: .25s;
 }
+
+.form-navigation {
+  margin-top: auto;
+  padding-top: 2rem;
+
+  display: flex;
+  justify-content: space-between;
+}

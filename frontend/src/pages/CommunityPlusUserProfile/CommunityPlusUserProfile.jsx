@@ -343,9 +343,39 @@ width: `${
   </div>
 
 </div>
+
+<div className="profile-section-tabs">
+
+  {activeSteps.map((step, index) => (
+
+    <button
+      key={step.id}
+      type="button"
+      className={`profile-section-tab ${
+        currentStep === index
+          ? "active"
+          : ""
+      } ${
+        index < currentStep
+          ? "complete"
+          : ""
+      }`}
+      onClick={() => {
+        if (!editMode) {
+          setCurrentStep(index);
+        }
+      }}
+    >
+      {step.title}
+    </button>
+
+  ))}
+
+</div>
+
 <FormBuilder
-  steps={activeSteps}
-  currentStep={currentStep}
+  steps={[activeSteps[currentStep]]}
+  currentStep={0}
   form={form}
   readOnly={!editMode}
 />
