@@ -1,4 +1,4 @@
-import { useLocation } from "./context/LocationProvider";
+import { useLocation } from "./LocationProvider";
 
 export default function useUserLocation() {
   const location = useLocation();
