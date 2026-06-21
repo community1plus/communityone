@@ -412,3 +412,6 @@ export function LocationProvider({ children }) {
     </LocationContext.Provider>
   );
 }
+
+export const useUserLocation = () =>
+  useContext(LocationContext);
