@@ -303,13 +303,44 @@ return (
           activeTab={activeProfileTab}
           onChange={setActiveProfileTab}
         />
+        <div className="profile-completion">
 
-        <FormBuilder
-          steps={activeSteps}
-          currentStep={currentStep}
-          form={form}
-          readOnly={!editMode}
-        />
+  <div className="profile-completion-header">
+
+    <span>Profile completion</span>
+
+    <span>
+      {Math.round(
+        ((currentStep + 1) /
+          activeSteps.length) *
+          100
+      )}%
+    </span>
+
+  </div>
+
+  <div className="profile-progress-bar">
+
+    <div
+      className="profile-progress-fill"
+      style={{
+        width: `${
+          ((currentStep + 1) /
+            activeSteps.length) *
+          100
+        }%`,
+      }}
+    />
+
+  </div>
+
+</div>
+<FormBuilder
+  steps={activeSteps}
+  currentStep={currentStep}
+  form={form}
+  readOnly={!editMode}
+/>
 
         <ProfileNavigation
           editMode={editMode}
