@@ -288,9 +288,13 @@ export default function CommunityPlusUserProfile({
      RENDER
   ========================= */
 
-  return (
+return (
 
-    <div className="profile-page">
+<div className="communityplus-user-profile">
+
+  <div className="profile-shell">
+
+    <div className="profile-main">
 
       <ProfileTabs
         tabs={allowedProfileTabs}
@@ -309,14 +313,27 @@ export default function CommunityPlusUserProfile({
         editMode={editMode}
         saving={savingProfile}
         onClose={closeProfile}
-        onEdit={() =>
-          setEditMode(true)
-        }
+        onEdit={() => setEditMode(true)}
         onSave={handleSaveProfile}
       />
 
     </div>
 
-  );
+    <aside className="profile-guide">
+
+      <h2>Profile Guide</h2>
+
+      <p>
+        Verify your social accounts and complete
+        your profile to improve trust.
+      </p>
+
+    </aside>
+
+  </div>
+
+</div>
+
+);
 
 }
