@@ -38,3 +38,27 @@ export const PROFILE_TABS = [
     label: "Community Policies",
   },
 ];
+
+export const PERSONAL_STEPS = [
+  {
+    id: "personal-profile",
+    title: "Personal Profile",
+    fields: [],
+  },
+];
+
+export const ORG_STEPS = [
+  {
+    id: "organisation-profile",
+    title: "Organisation Profile",
+    fields: [],
+  },
+];
+
+export const COMMUNITY_POLICY_STEPS = [
+  {
+    id: "community-policies",
+    title: "Community Policies",
+    fields: [],
+  },
+];
