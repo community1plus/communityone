@@ -41,24 +41,66 @@ export const PROFILE_TABS = [
 
 export const PERSONAL_STEPS = [
   {
-    id: "personal-profile",
-    title: "Personal Profile",
-    fields: [],
+    id: "personal",
+    title: "Personal",
+    fields: [
+      {
+        name: "display_name",
+        label: "Display Name",
+        type: "text",
+      },
+
+      {
+        name: "username",
+        label: "Username",
+        type: "text",
+      },
+
+      {
+        name: "phoneDisplay",
+        label: "Phone Number",
+        type: "text",
+      },
+    ],
   },
 ];
 
 export const ORG_STEPS = [
   {
-    id: "organisation-profile",
-    title: "Organisation Profile",
-    fields: [],
+    id: "organisation",
+    title: "Organisation",
+    fields: [
+      {
+        name: "organisationName",
+        label: "Organisation Name",
+        type: "text",
+      },
+
+      {
+        name: "organisationEmail",
+        label: "Organisation Email",
+        type: "email",
+      },
+
+      {
+        name: "organisationPhone",
+        label: "Organisation Phone",
+        type: "text",
+      },
+    ],
   },
 ];
 
 export const COMMUNITY_POLICY_STEPS = [
   {
-    id: "community-policies",
+    id: "community",
     title: "Community Policies",
-    fields: [],
+    fields: [
+      {
+        name: "communityAgreement",
+        label: "Agreement",
+        type: "checkbox",
+      },
+    ],
   },
 ];
