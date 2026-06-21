@@ -17,7 +17,7 @@ import {
 } from "../../context/ProfileContext";
 /**/
 import useAPI from "../../hooks/useAPI";
-
+import "./CommunityPlusUserProfile.css";
 import useForm from "../../hooks/useForm";
 
 import {
