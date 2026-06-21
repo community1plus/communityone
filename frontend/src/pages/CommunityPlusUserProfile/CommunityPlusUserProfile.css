@@ -1003,3 +1003,24 @@ RESPONSIVE
   color: #15803d;
   font-weight: 700;
 }
+
+.primary-button {
+  height: 46px;
+  min-width: 100px;
+  border: none;
+  border-radius: 12px;
+  background: #4a0f0f;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.secondary-button {
+  height: 46px;
+  min-width: 100px;
+  border: 1px solid #d8d0c8;
+  border-radius: 12px;
+  background: white;
+  font-weight: 700;
+  cursor: pointer;
+}

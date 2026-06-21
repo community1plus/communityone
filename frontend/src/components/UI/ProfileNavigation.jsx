@@ -11,11 +11,10 @@ export default function ProfileNavigation({
 
       <button
         type="button"
+        className="secondary-button"
         onClick={onClose}
       >
-        {editMode
-          ? "Cancel"
-          : "Close"}
+        {editMode ? "Cancel" : "Close"}
       </button>
 
       <div className="form-actions">
@@ -24,6 +23,7 @@ export default function ProfileNavigation({
 
           <button
             type="button"
+            className="primary-button"
             onClick={onEdit}
           >
             Edit
@@ -35,6 +35,7 @@ export default function ProfileNavigation({
 
           <button
             type="button"
+            className="primary-button"
             disabled={saving}
             onClick={onSave}
           >
