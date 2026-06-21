@@ -1,11 +1,28 @@
 import {
   PHONE_COUNTRIES,
   DEFAULT_PHONE_COUNTRY,
+  PROFILE_TABS,
 } from "./profileConstants";
+
+/* =========================
+   EMAIL
+========================= */
 
 export function getEmailDomain(email = "") {
   return email.split("@")[1]?.toLowerCase() || "";
 }
+
+/* =========================
+   PROFILE TABS
+========================= */
+
+export function getAllowedProfileTabs() {
+  return PROFILE_TABS;
+}
+
+/* =========================
+   PHONE COUNTRY
+========================= */
 
 export function getPhoneCountry(code) {
   return (
@@ -18,10 +35,15 @@ export function getPhoneCountry(code) {
   );
 }
 
+/* =========================
+   PHONE
+========================= */
+
 export function toE164Phone(
   value = "",
   countryCode = DEFAULT_PHONE_COUNTRY
 ) {
+
   const country =
     getPhoneCountry(countryCode);
 
@@ -40,6 +62,7 @@ export function validatePhone(
   phone,
   countryCode
 ) {
+
   const country =
     getPhoneCountry(countryCode);
 
@@ -51,20 +74,47 @@ export function validatePhone(
     digits.length >= country.min &&
     digits.length <= country.max
   );
+
 }
 
-export function formatPhone(
-  phone,
-  countryCode
-) {
-  const country =
-    getPhoneCountry(countryCode);
+/* =========================
+   INITIAL VALUES
+========================= */
 
-  return phone.startsWith(
-    country.dialCode
-  )
-    ? phone.slice(
-        country.dialCode.length
-      )
-    : phone;
+export function getInitialProfileValues(
+  profile,
+  user
+) {
+
+  return {
+
+    username:
+      profile?.username ||
+      user?.username ||
+      "",
+
+    display_name:
+      profile?.displayName ||
+      "",
+
+    phoneCountry:
+      profile?.phoneCountry ||
+      DEFAULT_PHONE_COUNTRY,
+
+    phoneDisplay:
+      profile?.phoneDisplay ||
+      "",
+
+    homeLocation:
+      profile?.homeLocation ||
+      null,
+
+    organisation: {
+      name:
+        profile?.organisation?.name ||
+        "",
+    },
+
+  };
+
 }
