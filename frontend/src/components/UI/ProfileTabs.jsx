@@ -3,22 +3,20 @@ export default function ProfileTabs({
   activeTab,
   onChange,
 }) {
-
   return (
-    <div className="profile-tabs">
+    <div className="profile-type-tabs">
 
-      {tabs.map(tab => (
+      {tabs.map((tab) => (
 
         <button
           key={tab.id}
-          className={
+          type="button"
+          className={`profile-type-tab ${
             activeTab === tab.id
               ? "active"
               : ""
-          }
-          onClick={() =>
-            onChange(tab.id)
-          }
+          }`}
+          onClick={() => onChange(tab.id)}
         >
           {tab.label}
         </button>

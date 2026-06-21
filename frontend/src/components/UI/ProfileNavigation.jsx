@@ -6,34 +6,48 @@ export default function ProfileNavigation({
   onSave,
 }) {
   return (
-    <div className="profile-navigation">
+
+    <div className="form-navigation">
 
       <button
         type="button"
         onClick={onClose}
       >
-        {editMode ? "Cancel" : "Close"}
+        {editMode
+          ? "Cancel"
+          : "Close"}
       </button>
 
-      {!editMode && (
-        <button
-          type="button"
-          onClick={onEdit}
-        >
-          Edit
-        </button>
-      )}
+      <div className="form-actions">
 
-      {editMode && (
-        <button
-          type="button"
-          disabled={saving}
-          onClick={onSave}
-        >
-          {saving ? "Saving..." : "Save"}
-        </button>
-      )}
+        {!editMode && (
+
+          <button
+            type="button"
+            onClick={onEdit}
+          >
+            Edit
+          </button>
+
+        )}
+
+        {editMode && (
+
+          <button
+            type="button"
+            disabled={saving}
+            onClick={onSave}
+          >
+            {saving
+              ? "Saving..."
+              : "Save"}
+          </button>
+
+        )}
+
+      </div>
 
     </div>
+
   );
 }

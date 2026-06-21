@@ -290,45 +290,50 @@ export default function CommunityPlusUserProfile({
 
 return (
 
-<div className="communityplus-user-profile">
+<div className="profile-page">
 
-  <div className="profile-shell">
+  <div className="profile-container">
 
-    <div className="profile-main">
+    <div className="profile-layout">
 
-      <ProfileTabs
-        tabs={allowedProfileTabs}
-        activeTab={activeProfileTab}
-        onChange={setActiveProfileTab}
-      />
+      <div className="profile-left">
 
-      <FormBuilder
-        steps={activeSteps}
-        currentStep={currentStep}
-        form={form}
-        readOnly={!editMode}
-      />
+        <ProfileTabs
+          tabs={allowedProfileTabs}
+          activeTab={activeProfileTab}
+          onChange={setActiveProfileTab}
+        />
 
-      <ProfileNavigation
-        editMode={editMode}
-        saving={savingProfile}
-        onClose={closeProfile}
-        onEdit={() => setEditMode(true)}
-        onSave={handleSaveProfile}
-      />
+        <FormBuilder
+          steps={activeSteps}
+          currentStep={currentStep}
+          form={form}
+          readOnly={!editMode}
+        />
+
+        <ProfileNavigation
+          editMode={editMode}
+          saving={savingProfile}
+          onClose={closeProfile}
+          onEdit={() => setEditMode(true)}
+          onSave={handleSaveProfile}
+        />
+
+      </div>
+
+      <aside className="profile-guide">
+
+        <h2>Profile Guide</h2>
+
+        <p>
+          Verify your social accounts to
+          prove ownership of pages,
+          channels and official accounts.
+        </p>
+
+      </aside>
 
     </div>
-
-    <aside className="profile-guide">
-
-      <h2>Profile Guide</h2>
-
-      <p>
-        Verify your social accounts and complete
-        your profile to improve trust.
-      </p>
-
-    </aside>
 
   </div>
 
