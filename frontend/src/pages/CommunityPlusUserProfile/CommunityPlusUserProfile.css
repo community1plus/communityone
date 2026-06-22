@@ -1047,3 +1047,42 @@ RESPONSIVE
   display: flex;
   justify-content: space-between;
 }
+
+.profile-section-tabs {
+  display: flex;
+  gap: .75rem;
+  margin: 2rem 0;
+  flex-wrap: wrap;
+}
+
+.profile-section-tab {
+
+  border: 1px solid #ddd;
+
+  background: white;
+
+  color: #666;
+
+  padding: .85rem 1.1rem;
+
+  border-radius: 12px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: .2s;
+}
+
+.profile-section-tab:hover {
+  border-color: #7b1414;
+}
+
+.profile-section-tab.active {
+  background: #7b1414;
+  color: white;
+}
+
+.profile-section-tab.complete {
+  border-color: #7b1414;
+}

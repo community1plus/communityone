@@ -1,3 +1,6 @@
+import ProfileSectionTabs
+  from "../../components/UI/ProfileSectionTabs";
+
 import {
   useState,
   useMemo,
@@ -373,8 +376,16 @@ width: `${
 
 </div>
 
+<ProfileSectionTabs
+  steps={activeSteps}
+  currentStep={currentStep}
+  setCurrentStep={setCurrentStep}
+/>
+
 <FormBuilder
-  steps={[activeSteps[currentStep]]}
+  steps={[
+    activeSteps[currentStep]
+  ]}
   currentStep={0}
   form={form}
   readOnly={!editMode}
