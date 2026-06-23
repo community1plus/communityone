@@ -50,7 +50,11 @@ LAYOUT
 HEADER
 ====================================================*/
 .profile-header{
-    margin-bottom:3rem;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+
+    margin-bottom:2rem;
 }
 
 .profile-title h1{
@@ -70,16 +74,16 @@ TOP TABS
     margin-bottom:2.5rem;
 }
 
-.profile-tabs button{
-    background:none;
-    border:none;
-    padding:0;
+.profile-tabs button {
+    background: none;
+    border: none;
+    padding: 0;
 
-    color:#7d8793;
-    font-size:1rem;
-    font-weight:600;
+    color: #7d8793;
+    font-size: 1rem;
+    font-weight: 600;
 
-    cursor:pointer;
+    cursor: pointer;
 }
 
 .profile-tabs button.active{
@@ -135,8 +139,8 @@ PROGRESS
 SECTION TABS
 ====================================================*/
 
-.profile-section-tabs{
-    margin-bottom:3rem;
+.profile-section-tab:hover {
+    color: #7b0b0b;
 }
 
 .profile-section-tab{
@@ -162,18 +166,19 @@ SECTION TABS
     color:#7b0b0b;
 }
 
-.profile-section-tab.active::after{
-    content:"";
-    display:block;
-    height:2px;
-    margin-top:.75rem;
-    width:100%;
-    background:#7b0b0b;
+.profile-section-tab.active::after {
+    content: "";
+    display: block;
+
+    height: 2px;
+
+    margin-top: .8rem;
+
+    background: #7b0b0b;
 }
 
 .profile-header-progress{
     width:220px;
-    margin-top:1rem;
 }
 
 .profile-header-progress-label{
@@ -453,20 +458,49 @@ RESPONSIVE
     letter-spacing:-1px;
 }
 
-.profile-tabs{
-    margin-left:0;
-    padding-left:0;
-    align-items:center;
+.profile-tabs {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+
+    padding-bottom: 1rem;
+
+    border-bottom: 1px solid #e6e1db;
 }
 
-  .profile-section-tabs{
-    overflow:auto;
-  }
+.profile-section-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2.5rem;
 
-  .profile-section-tab{
-    min-width:180px;
-    flex:none;
-  }
+    margin-top: 2rem;
+    margin-bottom: 3rem;
+
+    padding-bottom: 1rem;
+
+    border-bottom: 1px solid #e6e1db;
+}
+
+.profile-section-tab {
+    background: none;
+    border: none;
+    padding: 0;
+
+    color: #7d8793;
+    font-size: 1rem;
+    font-weight: 600;
+
+    letter-spacing: .02em;
+    white-space: nowrap;
+
+    cursor: pointer;
+
+    transition: .2s ease;
+}
 
   .form-navigation{
     flex-direction:column;
