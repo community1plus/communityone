@@ -31,27 +31,25 @@ background:#f8f6f3;
 
     background:#fdfcf9;
 
-    border:1px solid #e7dfd6;
+    border:1px solid #ebe4dc;
 
-    border-radius:28px;
+    border-radius:32px;
 
-    padding:40px;
+    padding:48px;
 
     position:sticky;
 
     top:2rem;
-
-    height:max-content;
 
     font-family:
         "Courier Prime",
         "Courier New",
         monospace;
 
-    line-height:1.9;
+    line-height:2;
 
     box-shadow:
-      0 2px 8px rgba(0,0,0,.04);
+      0 2px 12px rgba(0,0,0,.03);
 
 }
 
@@ -221,31 +219,27 @@ select,
 textarea{
 
     width:100%;
-    max-width:640px;
 
-    height:78px;
-    border-radius:40px;
+    max-width:560px;
 
-    padding:0 28px;
+    height:66px;
+
+    padding:0 32px;
 
     background:#fffdfa;
 
     border:1px solid #ddd4cc;
 
-    border-radius:32px;
+    border-radius:34px;
 
     font-family:
         "Courier Prime",
         "Courier New",
         monospace;
 
-    font-size:1.15rem;
-
-    letter-spacing:-0.02em;
+    font-size:1.1rem;
 
     color:#231f20;
-
-    outline:none;
 
     transition:.2s ease;
 
@@ -353,10 +347,17 @@ FOOTER BUTTONS
 ========================================= */
 
 .form-navigation{
-display:flex;
-justify-content:space-between;
-align-items:center;
-margin-top:4rem;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:flex-end;
+
+    margin-top:5rem;
+
+    padding-bottom:4rem;
+
 }
 
 .form-actions{
@@ -365,15 +366,36 @@ gap:18px;
 }
 
 .primary-button{
-min-width:170px;
-height:60px;
-border:none;
-border-radius:30px;
-background:#8f0000;
-color:white;
-font-size:1.1rem;
-font-weight:700;
-cursor:pointer;
+
+    min-width:240px;
+
+    height:76px;
+
+    border:none;
+
+    border-radius:40px;
+
+    background:#a10000;
+
+    color:white;
+
+    font-size:1.3rem;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:.2s ease;
+
+}
+
+.primary-button:hover{
+
+    transform:translateY(-1px);
+
+    box-shadow:
+        0 8px 24px rgba(161,0,0,.15);
+
 }
 
 .secondary-button{
@@ -425,16 +447,71 @@ width:100%;
 }
 
 .profile-section-tabs{
-gap:28px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:56px;
+
+    padding-bottom:18px;
+
+    margin-bottom:4rem;
+
+    border-bottom:1px solid #e3ddd6;
+
 }
 
 .profile-section-tab{
-font-size:1rem;
+
+    font-size:1.15rem;
+
+    font-weight:700;
+
+    letter-spacing:.03em;
+
 }
 
 .form-navigation{
-flex-direction:column;
-gap:20px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-top:5rem;
+
+    padding-bottom:3rem;
+
 }
+
+}
+
+.profile-close-button{
+
+    width:42px;
+
+    height:42px;
+
+    border:none;
+
+    background:transparent;
+
+    color:#8a8a8a;
+
+    font-size:2rem;
+
+    font-weight:300;
+
+    cursor:pointer;
+
+    transition:.2s ease;
+
+}
+
+.profile-close-button:hover{
+
+    color:#7b0b0b;
 
 }
