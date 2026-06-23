@@ -3,7 +3,6 @@ import ProfileHelpPanel
 
 import {
   useState,
-  useMemo,
   useCallback,
 } from "react";
 
@@ -19,67 +18,62 @@ import {
   useProfile,
 } from "../../context/ProfileContext";
 
-import useAPI from "../../hooks/useAPI";
-import useForm from "../../hooks/useForm";
+import useAPI
+  from "../../hooks/useAPI";
+
+import useForm
+  from "../../hooks/useForm";
 
 import "./CommunityPlusUserProfile.css";
 
 import {
   PERSONAL_STEPS,
-  ORG_STEPS,
-  COMMUNITY_POLICY_STEPS,
 } from "./profileConstants";
 
 import {
   getInitialProfileValues,
-  getAllowedProfileTabs,
 } from "./profileHelpers";
 
 import {
   buildProfilePayload,
 } from "./profilePayload";
 
-
-
 import ProfileSectionTabs
   from "../../components/UI/ProfileSectionTabs";
-
-import ProfileNavigation
-  from "../../components/UI/ProfileNavigation";
 
 import FormBuilder
   from "../../components/UI/Form/FormBuilder";
 
 export default function CommunityPlusUserProfile({
   onComplete,
+  editMode = false,
 }) {
 
-  const navigate = useNavigate();
+  const navigate =
+    useNavigate();
 
-  const { user } = useAuth();
+  const { user } =
+    useAuth();
 
   const {
-    profile,
     refreshProfile,
   } = useProfile();
 
-  const { patchProfile } =
-    useAPI();
+  const {
+    patchProfile,
+  } = useAPI();
 
-  const [savingProfile, setSavingProfile] =
-    useState(false);
+  const [
+    savingProfile,
+    setSavingProfile,
+  ] = useState(false);
 
+  const [
+    currentStep,
+    setCurrentStep,
+  ] = useState(0);
 
-
-  const [activeProfileTab, setActiveProfileTab] =
-    useState("PERSONAL");
-
-  const [currentStep, setCurrentStep] =
-    useState(0);
-
-  /* =========================
-     FORM
-  ========================= */
+  const activeSteps = PERSONAL_STEPS;
 
   const form = useForm({
 
@@ -96,45 +90,6 @@ export default function CommunityPlusUserProfile({
     clearStorage,
   } = form;
 
-  /* =========================
-     ACCOUNT TABS
-  ========================= */
-
-  const allowedProfileTabs =
-    useMemo(
-      () =>
-        getAllowedProfileTabs(
-          user?.email
-        ),
-      [user]
-    );
-
-  /* =========================
-     STEPS
-  ========================= */
-
-  const activeSteps =
-    useMemo(() => {
-
-      switch (activeProfileTab) {
-
-        case "ORG":
-          return ORG_STEPS;
-
-        case "COMMUNITY_POLICIES":
-          return COMMUNITY_POLICY_STEPS;
-
-        default:
-          return PERSONAL_STEPS;
-
-      }
-
-    }, [activeProfileTab]);
-
-  /* =========================
-     CLOSE
-  ========================= */
-
   const closeProfile =
     useCallback(() => {
 
@@ -146,24 +101,22 @@ export default function CommunityPlusUserProfile({
       );
 
     }, [navigate]);
-
-  /* =========================
-     SAVE
-  ========================= */
+    
 
   const handleSaveProfile =
-    useCallback(async () => {
+  useCallback(
+    async () => {
 
       try {
 
-        setSavingProfile(true);
+        setSavingProfile(
+          true
+        );
 
         const payload =
           buildProfilePayload({
 
             values,
-
-            activeProfileTab,
 
             userEmail:
               user?.email,
@@ -186,7 +139,9 @@ export default function CommunityPlusUserProfile({
           "function"
         ) {
 
-          onComplete(payload);
+          onComplete(
+            payload
+          );
 
         }
 
@@ -208,14 +163,17 @@ export default function CommunityPlusUserProfile({
       }
       finally {
 
-        setSavingProfile(false);
+        setSavingProfile(
+          false
+        );
 
       }
 
-    }, [
+    },
+
+    [
 
       values,
-      activeProfileTab,
       user,
       patchProfile,
       refreshProfile,
@@ -223,24 +181,11 @@ export default function CommunityPlusUserProfile({
       onComplete,
       navigate,
 
-    ]);
+    ]
 
+  );
 
-    const isSetupFlow = !profile?.profile_complete;
-    console.log("PROFILE COMPLETE =", profile?.profile_complete);
-    {!isSetupFlow && (
-
-  <button
-    type="button"
-    className="profile-close-button"
-    onClick={closeProfile}
-  >
-    ×
-  </button>
-
-)}
-
-return (
+  return (
 
   <div className="profile-page">
 
@@ -248,17 +193,15 @@ return (
 
       <div className="profile-layout">
 
-        {/* LEFT COLUMN */}
-
         <div className="profile-left">
-
-          {/* HEADER */}
 
           <div className="profile-header">
 
             <div className="profile-title">
 
-              <h1>USER PROFILE</h1>
+              <h1>
+                USER PROFILE
+              </h1>
 
               <div className="profile-account-type">
                 ORGANISATION ACCOUNT
@@ -272,9 +215,13 @@ return (
 
                 <div className="profile-header-progress-label">
 
-                  {Math.round(
-                    ((currentStep + 1) / activeSteps.length) * 100
-                  )}% Complete
+{Math.round(
+  activeSteps.length
+    ? ((currentStep + 1) /
+        activeSteps.length) *
+      100
+    : 0
+)}% Complete
 
                 </div>
 
@@ -283,11 +230,13 @@ return (
                   <div
                     className="profile-progress-fill"
                     style={{
-                      width: `${
-                        activeSteps.length
-                          ? ((currentStep + 1) / activeSteps.length) * 100
-                          : 0
-                      }%`
+width: `${
+  activeSteps.length
+    ? ((currentStep + 1) /
+        activeSteps.length) *
+      100
+    : 0
+}%`
                     }}
                   />
 
@@ -295,9 +244,7 @@ return (
 
               </div>
 
-              {!profile?.profile_complete && null}
-
-              {profile?.profile_complete && (
+              {editMode && (
 
                 <button
                   type="button"
@@ -313,15 +260,11 @@ return (
 
           </div>
 
-          {/* SECTION TABS */}
-
           <ProfileSectionTabs
             steps={activeSteps}
             currentStep={currentStep}
             setCurrentStep={setCurrentStep}
           />
-
-          {/* FORM */}
 
           <FormBuilder
             steps={[
@@ -332,8 +275,6 @@ return (
             readOnly={false}
           />
 
-          {/* FOOTER */}
-
           <div className="profile-footer">
 
             <button
@@ -342,18 +283,18 @@ return (
               disabled={savingProfile}
               onClick={handleSaveProfile}
             >
+
               {savingProfile
                 ? "Saving..."
-                : profile?.profile_complete
-                    ? "Save"
-                    : "Save & Continue"}
+                : editMode
+                  ? "Save"
+                  : "Save & Continue"}
+
             </button>
 
           </div>
 
         </div>
-
-        {/* GUIDE */}
 
         <aside className="profile-guide">
 

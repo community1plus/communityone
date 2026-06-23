@@ -151,7 +151,7 @@ export default function App() {
         path="/communityplus/profile"
         element={
         <ProtectedRoute>
-          <CommunityPlusUserProfile />
+          <CommunityPlusUserProfile editMode={false} />
         </ProtectedRoute>
         }
     />
