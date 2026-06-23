@@ -32,18 +32,22 @@ LAYOUT
 .profile-left,
 .profile-guide{
   background:#fff;
-  border:1px solid #e2dbd3;
+  border:1px solid #e6dfd8;
   border-radius:28px;
 }
 
 .profile-left{
-  padding:32px;
-  display:flex;
-  flex-direction:column;
+    background:#edf6f4;
+    border:none;
+    border-radius:28px;
+    padding:40px;
 }
 
 .profile-guide{
-  padding:28px;
+    background:#fff;
+    border:1px solid #e6dfd8;
+    border-radius:28px;
+    padding:32px;
 }
 
 /*====================================================
