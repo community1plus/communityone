@@ -1,5 +1,5 @@
-import ProfileSectionTabs
-  from "../../components/UI/ProfileSectionTabs";
+import ProfileSectionTabs from "../../components/UI/ProfileSectionTabs";
+import ProfileUserSection from "../../components/Profile/ProfileUserSection";
 
 import {
   useState,
