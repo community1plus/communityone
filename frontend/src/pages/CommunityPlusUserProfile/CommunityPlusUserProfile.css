@@ -182,7 +182,7 @@ FORM
 ========================================= */
 
 .form-builder{
-width:100%;
+ max-width:720px;
 }
 
 .field{
@@ -191,17 +191,20 @@ margin-bottom:2rem;
 
 .field-label{
 
+    display:block;
+
+    margin-bottom:12px;
+
     font-family:
-      Inter,
-      sans-serif;
+        Inter,
+        sans-serif;
 
-    font-weight:600;
+    font-size:1rem;
 
-    color:#333;
+    font-weight:700;
 
-    font-size:.95rem;
+    color:#231f20;
 
-    letter-spacing:.03em;
 }
 
 .required{
@@ -213,29 +216,57 @@ INPUTS
 ========================================= */
 
 .input,
-textarea,
-select{
+select,
+textarea{
+
+    width:100%;
+    max-width:640px;
+
+    height:64px;
+
+    padding:0 28px;
+
+    background:#ffffff;
+
+    border:1px solid #ddd4cc;
+
+    border-radius:32px;
 
     font-family:
-      "Courier Prime",
-      "Courier New",
-      monospace;
-
-    letter-spacing:-0.01em;
+        "Courier Prime",
+        "Courier New",
+        monospace;
 
     font-size:1.15rem;
+
+    letter-spacing:-0.02em;
+
+    color:#231f20;
+
+    outline:none;
+
+    transition:.2s ease;
+
 }
 
-textarea{
-min-height:180px;
-padding-top:24px;
-}
 
 .input:focus,
 select:focus,
 textarea:focus{
-border-color:#7b0b0b;
-box-shadow:0 0 0 4px rgba(123,11,11,.08);
+
+    border-color:#7b0b0b;
+
+    box-shadow:
+        0 0 0 4px rgba(123,11,11,.08);
+
+}
+
+textarea{
+
+    min-height:180px;
+
+    padding-top:24px;
+
 }
 
 /* =========================================
