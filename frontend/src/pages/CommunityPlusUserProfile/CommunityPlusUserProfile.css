@@ -42,28 +42,27 @@ background:#f8f6f3;
     top:2rem;
 
     height:max-content;
-
+    font-family:
+        "Courier Prime",
+        "Courier New",
+        monospace;
 }
 
 .profile-guide h2{
 
-    margin-top:0;
+    font-size:1.4rem;
 
-    margin-bottom:1.5rem;
+    font-weight:700;
 
-    font-size:1.6rem;
-
-    font-weight:800;
+    letter-spacing:.03em;
 
 }
 
 .profile-guide p{
 
-    color:#666;
+    line-height:1.9;
 
-    line-height:1.8;
-
-    margin-bottom:1rem;
+    font-size:1rem;
 
 }
 
@@ -199,15 +198,29 @@ INPUTS
 .input,
 select,
 textarea{
-width:100%;
-height:74px;
-padding:0 28px;
-border:1px solid #ddd4cc;
-border-radius:26px;
-background:white;
-font-size:1.15rem;
-outline:none;
-transition:.2s;
+    width:100%;
+
+    height:52px;
+
+    padding:0 24px;
+
+    background:white;
+
+    border:1px solid #ddd4cc;
+    border-radius:20px;
+
+    font-family:
+        "Courier Prime",
+        "Courier New",
+        monospace;
+
+    font-size:1.1rem;
+
+    letter-spacing:.03em;
+
+    color:#231f20;
+
+    transition:.2s;
 }
 
 textarea{
@@ -264,9 +277,12 @@ background:white;
 }
 
 .social-verification-main{
-display:flex;
-flex-direction:column;
-gap:8px;
+
+    font-family:
+        "Courier Prime",
+        "Courier New",
+        monospace;
+
 }
 
 .social-verification-main strong{
