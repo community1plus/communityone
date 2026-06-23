@@ -238,28 +238,15 @@ export default function CommunityPlusUserProfile({
 
             {/* HEADER */}
 
-<div className="profile-header">
+            <div className="profile-header">
 
-    <div className="profile-title">
-        ...
-    </div>
+              <div className="profile-title">
+                  <h1>USER PROFILE</h1>
 
-    <div className="profile-header-right">
-
-        <div className="profile-header-progress">
-            ...
-        </div>
-
-        <button
-            className="profile-close-button"
-            onClick={closeProfile}
-        >
-            ×
-        </button>
-
-    </div>
-
-</div>
+              <div className="profile-account-type">
+                  ORGANISATION ACCOUNT
+              </div>
+            </div>
 
               <div className="profile-header-progress">
 
@@ -340,15 +327,15 @@ export default function CommunityPlusUserProfile({
 
           {/* GUIDE */}
 
-          <aside className="profile-guide">
+<aside className="profile-guide">
 
-            <ProfileHelpPanel
-              section={
-                activeSteps[currentStep]?.id
-              }
-            />
+  <ProfileHelpPanel
+    section={
+      activeSteps[currentStep]?.id
+    }
+  />
 
-          </aside>
+</aside>
 
         </div>
 
