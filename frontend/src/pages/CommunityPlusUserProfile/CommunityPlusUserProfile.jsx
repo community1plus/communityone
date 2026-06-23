@@ -1,6 +1,3 @@
-import ProfileSectionTabs from "../../components/UI/ProfileSectionTabs";
-import ProfileUserSection from "../../components/Profile/ProfileUserSection";
-
 import {
   useState,
   useMemo,
@@ -18,10 +15,11 @@ import {
 import {
   useProfile,
 } from "../../context/ProfileContext";
-/**/
+
 import useAPI from "../../hooks/useAPI";
-import "./CommunityPlusUserProfile.css";
 import useForm from "../../hooks/useForm";
+
+import "./CommunityPlusUserProfile.css";
 
 import {
   PERSONAL_STEPS,
@@ -32,54 +30,39 @@ import {
 import {
   getInitialProfileValues,
   getAllowedProfileTabs,
-  getPhoneCountry,
 } from "./profileHelpers";
 
 import {
   buildProfilePayload,
 } from "./profilePayload";
 
-import usePhoneVerification
-  from "../../hooks/usePhoneVerification";
+import ProfileTabs
+  from "../../components/UI/ProfileTabs";
 
-import useBusinessEmailVerification
-  from "../../hooks/useBusinessEmailVerification";
+import ProfileSectionTabs
+  from "../../components/UI/ProfileSectionTabs";
 
-import ProfileTabs from "../../components/UI/ProfileTabs";
+import ProfileNavigation
+  from "../../components/UI/ProfileNavigation";
 
-import ProfileNavigation from "../../components/UI/ProfileNavigation";
-
-import FormBuilder from "../../components/UI/Form/FormBuilder";
+import FormBuilder
+  from "../../components/UI/Form/FormBuilder";
 
 export default function CommunityPlusUserProfile({
   onComplete,
 }) {
 
-  /* =========================
-     NAVIGATION
-  ========================= */
-
   const navigate = useNavigate();
-
-  /* =========================
-     CONTEXTS
-  ========================= */
 
   const { user } = useAuth();
 
   const {
     profile,
-    profileReady,
     refreshProfile,
   } = useProfile();
 
-  const {
-    patchProfile,
-  } = useAPI();
-
-  /* =========================
-     LOCAL STATE
-  ========================= */
+  const { patchProfile } =
+    useAPI();
 
   const [savingProfile, setSavingProfile] =
     useState(false);
@@ -98,23 +81,22 @@ export default function CommunityPlusUserProfile({
   ========================= */
 
   const form = useForm({
-    initialValues: getInitialProfileValues(
-      profile,
-      user
-    ),
 
-    persistKey:
-      "communityplus_profile",
+    initialValues:
+      getInitialProfileValues(
+        profile,
+        user
+      ),
+
   });
 
   const {
     values,
-    setValue,
     clearStorage,
   } = form;
 
   /* =========================
-     ALLOWED TABS
+     ACCOUNT TABS
   ========================= */
 
   const allowedProfileTabs =
@@ -127,79 +109,45 @@ export default function CommunityPlusUserProfile({
     );
 
   /* =========================
-     PHONE VERIFICATION
+     STEPS
   ========================= */
 
-  const {
-    phoneStatus,
-    phoneError,
-    sendPhoneCode,
-    verifyPhoneCode,
-  } = usePhoneVerification({
-    values,
+  const activeSteps =
+    useMemo(() => {
 
-    selectedPhoneCountry:
-      getPhoneCountry(
-        values.phoneCountry
-      ),
+      switch (activeProfileTab) {
 
-    setValue,
+        case "ORG":
+          return ORG_STEPS;
 
-    patchProfile,
-  });
+        case "COMMUNITY_POLICIES":
+          return COMMUNITY_POLICY_STEPS;
 
-  /* =========================
-     BUSINESS EMAIL
-  ========================= */
+        default:
+          return PERSONAL_STEPS;
 
-  const {
-    businessEmailStatus,
-    businessEmailError,
-    sendBusinessEmailCode,
-    verifyBusinessEmailCode,
-  } = useBusinessEmailVerification({
-    values,
-    patchProfile,
-  });
-
-  /* =========================
-     ACTIVE STEPS
-  ========================= */
-
-  const activeSteps = useMemo(() => {
-
-    switch (activeProfileTab) {
-
-      case "ORG":
-        return ORG_STEPS;
-
-      case "COMMUNITY_POLICIES":
-        return COMMUNITY_POLICY_STEPS;
-
-      default:
-        return PERSONAL_STEPS;
-
-    }
-
-  }, [activeProfileTab]);
-
-  /* =========================
-     CLOSE PROFILE
-  ========================= */
-
-  const closeProfile = useCallback(() => {
-
-    navigate(
-      "/communityplus",
-      {
-        replace: true,
       }
-    );
 
-  }, [navigate]);
+    }, [activeProfileTab]);
 
   /* =========================
-     SAVE PROFILE
+     CLOSE
+  ========================= */
+
+  const closeProfile =
+    useCallback(() => {
+
+      navigate(
+        "/communityplus",
+        {
+          replace: true,
+        }
+      );
+
+    }, [navigate]);
+
+  /* =========================
+     SAVE
   ========================= */
 
   const handleSaveProfile =
@@ -237,9 +185,7 @@ export default function CommunityPlusUserProfile({
           "function"
         ) {
 
-          onComplete(
-            payload
-          );
+          onComplete(payload);
 
         }
 
@@ -261,129 +207,155 @@ export default function CommunityPlusUserProfile({
       }
       finally {
 
-        setSavingProfile(
-          false
-        );
+        setSavingProfile(false);
 
       }
 
     }, [
 
       values,
-
       activeProfileTab,
-
       user,
-
       patchProfile,
-
       refreshProfile,
-
       clearStorage,
-
       onComplete,
-
       navigate,
 
     ]);
 
-  /* =========================
-     RENDER
-  ========================= */
+  return (
 
-return (
+    <div className="profile-page">
 
-<div className="profile-page">
+      <div className="profile-container">
 
-  <div className="profile-container">
+        <div className="profile-layout">
 
-    <div className="profile-layout">
+          <div className="profile-left">
 
-      <div className="profile-left">
-<div className="profile-header">
+            {/* HEADER */}
 
-  <div className="profile-title">
-    <h1>USER PROFILE</h1>
-  </div>
+            <div className="profile-header">
 
-  <div className="profile-header-progress">
+              <div className="profile-title">
+                <h1>
+                  USER PROFILE
+                </h1>
+              </div>
 
-    <div className="profile-header-progress-label">
-      {Math.round(
-        ((currentStep + 1) / activeSteps.length) * 100
-      )}% Complete
-    </div>
+              <div className="profile-header-progress">
 
-    <div className="profile-progress-bar">
-      <div
-        className="profile-progress-fill"
-        style={{
-          width: `${
-            activeSteps.length
-              ? ((currentStep + 1) /
-                  activeSteps.length) *
-                100
-              : 0
-          }%`,
-        }}
-      />
-    </div>
+                <div className="profile-header-progress-label">
 
-  </div>
+                  {Math.round(
 
-</div>
-        <ProfileTabs
-          tabs={allowedProfileTabs}
-          activeTab={activeProfileTab}
-          onChange={setActiveProfileTab}
-        />
+                    (
+                      (currentStep + 1)
+                      /
+                      activeSteps.length
+                    ) * 100
 
+                  )}% Complete
 
+                </div>
 
+                <div className="profile-progress-bar">
 
-<ProfileSectionTabs
-  steps={activeSteps}
-  currentStep={currentStep}
-  setCurrentStep={setCurrentStep}
-/>
+                  <div
+                    className="profile-progress-fill"
+                    style={{
 
-{currentStep === 0 && (
+                      width: `${
 
-  <ProfileUserSection
-    form={form}
-    readOnly={!editMode}
-  />
-/* */
-)}
+                        (
+                          (currentStep + 1)
+                          /
+                          activeSteps.length
+                        ) * 100
 
-        <ProfileNavigation
-          editMode={editMode}
-          saving={savingProfile}
-          onClose={closeProfile}
-          onEdit={() => setEditMode(true)}
-          onSave={handleSaveProfile}
-        />
+                      }%`
+
+                    }}
+                  />
+
+                </div>
+
+              </div>
+
+            </div>
+
+            {/* ACCOUNT TYPE */}
+
+            <ProfileTabs
+              tabs={allowedProfileTabs}
+              activeTab={activeProfileTab}
+              onChange={(tab) => {
+
+                setActiveProfileTab(
+                  tab
+                );
+
+                setCurrentStep(0);
+
+              }}
+            />
+
+            {/* SECTION TABS */}
+
+            <ProfileSectionTabs
+              steps={activeSteps}
+              currentStep={currentStep}
+              setCurrentStep={setCurrentStep}
+            />
+
+            {/* FORM */}
+
+            <FormBuilder
+              steps={[
+                activeSteps[currentStep]
+              ]}
+              currentStep={0}
+              form={form}
+              readOnly={!editMode}
+            />
+
+            {/* BUTTONS */}
+
+            <ProfileNavigation
+              editMode={editMode}
+              saving={savingProfile}
+              onClose={closeProfile}
+              onEdit={() =>
+                setEditMode(true)
+              }
+              onSave={handleSaveProfile}
+            />
+
+          </div>
+
+          {/* GUIDE */}
+
+          <aside className="profile-guide">
+
+            <h2>
+              Profile Guide
+            </h2>
+
+            <p>
+              Verify your social accounts to
+              prove ownership of pages,
+              channels and official accounts.
+            </p>
+
+          </aside>
+
+        </div>
 
       </div>
 
-      <aside className="profile-guide">
-
-        <h2>Profile Guide</h2>
-
-        <p>
-          Verify your social accounts to
-          prove ownership of pages,
-          channels and official accounts.
-        </p>
-
-      </aside>
-
     </div>
 
-  </div>
-
-</div>
-
-);
+  );
 
 }
