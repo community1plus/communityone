@@ -204,15 +204,7 @@ export default function CommunityPlusUserProfile({
                 USER PROFILE
               </h1>
 
-<div className="profile-account-type">
 
-  {user?.email?.endsWith(
-    "@comm-unity.one"
-  )
-    ? "ORGANISATION ACCOUNT"
-    : "PERSONAL ACCOUNT"}
-
-</div>
 
             </div>
 
