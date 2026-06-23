@@ -347,34 +347,7 @@ width: `${
 
 </div>
 
-<div className="profile-section-tabs">
 
-  {activeSteps.map((step, index) => (
-
-    <button
-      key={step.id}
-      type="button"
-      className={`profile-section-tab ${
-        currentStep === index
-          ? "active"
-          : ""
-      } ${
-        index < currentStep
-          ? "complete"
-          : ""
-      }`}
-      onClick={() => {
-        if (!editMode) {
-          setCurrentStep(index);
-        }
-      }}
-    >
-      {step.title}
-    </button>
-
-  ))}
-
-</div>
 
 <ProfileSectionTabs
   steps={activeSteps}
