@@ -232,7 +232,7 @@ export default function FormBuilder({
   };
 
 
-  console.log("CURRENT STEP", step);
+console.log("CURRENT STEP", step);
 console.log("FIELDS", step.fields);
 
   return (
