@@ -36,8 +36,7 @@ import {
   buildProfilePayload,
 } from "./profilePayload";
 
-import ProfileTabs
-  from "../../components/UI/ProfileTabs";
+
 
 import ProfileSectionTabs
   from "../../components/UI/ProfileSectionTabs";
@@ -238,11 +237,17 @@ export default function CommunityPlusUserProfile({
 
             <div className="profile-header">
 
-              <div className="profile-title">
-                <h1>
-                  USER PROFILE
-                </h1>
-              </div>
+<div className="profile-title">
+
+  <h1>
+    USER PROFILE
+  </h1>
+
+  <div className="profile-account-type">
+    ORGANISATION ACCOUNT
+  </div>
+
+</div>
 
               <div className="profile-header-progress">
 
@@ -287,19 +292,7 @@ export default function CommunityPlusUserProfile({
 
             {/* ACCOUNT TYPE */}
 
-            <ProfileTabs
-              tabs={allowedProfileTabs}
-              activeTab={activeProfileTab}
-              onChange={(tab) => {
-
-                setActiveProfileTab(
-                  tab
-                );
-
-                setCurrentStep(0);
-
-              }}
-            />
+            
 
             {/* SECTION TABS */}
 
