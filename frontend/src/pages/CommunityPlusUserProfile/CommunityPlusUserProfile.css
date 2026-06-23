@@ -109,6 +109,43 @@ letter-spacing:.18em;
 /* =========================================
 HEADER PROGRESS
 ========================================= */
+.profile-header-actions{
+
+    display:flex;
+
+    align-items:flex-start;
+
+    gap:32px;
+
+}
+
+.profile-close-button{
+
+    width:48px;
+
+    height:48px;
+
+    border:none;
+
+    background:none;
+
+    color:#7d8793;
+
+    font-size:2.4rem;
+
+    font-weight:300;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+.profile-close-button:hover{
+
+    color:#7b0b0b;
+
+} 
 
 .profile-header-progress{
 width:280px;
@@ -368,9 +405,9 @@ FOOTER BUTTONS
 
 .primary-button{
 
-    min-width:240px;
+    min-width:220px;
 
-    height:76px;
+    height:72px;
 
     border:none;
 
@@ -380,22 +417,22 @@ FOOTER BUTTONS
 
     color:white;
 
-    font-size:1.3rem;
+    font-size:1.25rem;
 
     font-weight:700;
 
     cursor:pointer;
 
-    transition:.2s ease;
+    transition:.2s;
 
 }
 
 .primary-button:hover{
 
-    transform:translateY(-1px);
+    transform:translateY(-2px);
 
     box-shadow:
-        0 8px 24px rgba(161,0,0,.15);
+        0 8px 20px rgba(161,0,0,.15);
 
 }
 
@@ -489,30 +526,22 @@ width:100%;
 
 }
 
-.profile-close-button{
 
-    width:42px;
-
-    height:42px;
-
-    border:none;
-
-    background:transparent;
-
-    color:#8a8a8a;
-
-    font-size:2rem;
-
-    font-weight:300;
-
-    cursor:pointer;
-
-    transition:.2s ease;
-
-}
 
 .profile-close-button:hover{
 
     color:#7b0b0b;
+
+}
+
+.profile-footer{
+
+    display:flex;
+
+    justify-content:flex-end;
+
+    margin-top:7rem;
+
+    padding-bottom:4rem;
 
 }

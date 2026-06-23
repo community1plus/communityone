@@ -238,15 +238,54 @@ export default function CommunityPlusUserProfile({
 
             {/* HEADER */}
 
-            <div className="profile-header">
+<div className="profile-header">
 
-              <div className="profile-title">
-                  <h1>USER PROFILE</h1>
+    <div className="profile-title">
 
-              <div className="profile-account-type">
-                  ORGANISATION ACCOUNT
-              </div>
+        <h1>USER PROFILE</h1>
+
+        <div className="profile-account-type">
+            ORGANISATION ACCOUNT
+        </div>
+
+    </div>
+
+    <div className="profile-header-actions">
+
+        <div className="profile-header-progress">
+
+            <div className="profile-header-progress-label">
+                {Math.round(
+                  ((currentStep + 1) / activeSteps.length) * 100
+                )}% Complete
             </div>
+
+            <div className="profile-progress-bar">
+
+                <div
+                    className="profile-progress-fill"
+                    style={{
+                      width: `${
+                        ((currentStep + 1) / activeSteps.length) * 100
+                      }%`
+                    }}
+                />
+
+            </div>
+
+        </div>
+
+        <button
+            className="profile-close-button"
+            onClick={closeProfile}
+            type="button"
+        >
+            ×
+        </button>
+
+    </div>
+
+</div>
 
               <div className="profile-header-progress">
 
@@ -316,12 +355,20 @@ export default function CommunityPlusUserProfile({
 
             
 
-            <ProfileNavigation
-              editMode={editMode}
-              saving={savingProfile}
-              onEdit={() => setEditMode(true)}
-              onSave={handleSaveProfile}
-            />
+<div className="profile-footer">
+
+    <button
+        className="primary-button"
+        type="button"
+        disabled={savingProfile}
+        onClick={handleSaveProfile}
+    >
+        {savingProfile
+          ? "Saving..."
+          : "Save"}
+    </button>
+
+</div>
 
           </div>
 
