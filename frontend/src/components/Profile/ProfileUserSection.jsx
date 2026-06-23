@@ -9,9 +9,7 @@ export default function ProfileUserSection({
 
   return (
 
-    <ProfileCard
-      title="User Profile"
-    >
+    <ProfileCard>
 
       <Field
         label="Display Name"

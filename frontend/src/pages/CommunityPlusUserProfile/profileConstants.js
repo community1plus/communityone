@@ -46,7 +46,7 @@ export const PROFILE_TABS = [
 export const PERSONAL_STEPS = [
   {
     id: "user-profile",
-    title: "USER PROFILE",
+    title: "USER",
     fields: [
       {
         name: "display_name",

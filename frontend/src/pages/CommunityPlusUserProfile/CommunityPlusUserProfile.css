@@ -52,15 +52,15 @@ HEADER
 .profile-header{
     display:flex;
     justify-content:space-between;
-    align-items:flex-start;
+    align-items:flex-end;
     margin-bottom:3rem;
 }
 
 .profile-title h1{
     margin:0;
-    font-size:5rem;
+    font-size:3.5rem;
     font-weight:900;
-    letter-spacing:-3px;
+    letter-spacing:-2px;
     line-height:1;
 }
 
@@ -70,26 +70,37 @@ TOP TABS
 ====================================================*/
 
 .profile-tabs{
-  display:flex;
-  gap:12px;
-  margin-bottom:32px;
+    display:flex;
+    gap:1rem;
+
+    padding-bottom:1rem;
+    margin-bottom:2rem;
+
+    border-bottom:1px solid #e6e1db;
 }
 
 .profile-tabs button{
-  border:none;
-  background:#f4f2ef;
-  color:#555;
-  padding:10px 18px;
-  border-radius:999px;
-  font-size:.95rem;
-  font-weight:600;
-  cursor:pointer;
-  transition:.2s;
+    background:none;
+    border:none;
+    padding:0;
+
+    color:#7d8793;
+    font-size:1rem;
+    font-weight:600;
+
+    cursor:pointer;
 }
 
 .profile-tabs button.active{
-  background:#7b0b0b;
-  color:white;
+    color:#7b0b0b;
+}
+
+.profile-tabs button.active::after{
+    content:"";
+    display:block;
+    height:2px;
+    margin-top:.75rem;
+    background:#7b0b0b;
 }
 
 /*====================================================
@@ -127,25 +138,22 @@ SECTION TABS
 
 .profile-section-tabs{
     display:flex;
-    gap:16px;
-    margin-bottom:40px;
+    gap:2rem;
+    margin-bottom:3rem;
 }
 
 .profile-section-tab{
     background:none;
     border:none;
-    color:#8b8b8b;
-    font-size:.95rem;
-    font-weight:600;
     padding:0;
+    color:#7d8793;
+    font-size:1rem;
+    font-weight:600;
+    letter-spacing:.02em;
 }
 
 .profile-section-tab:hover{
   border-color:#700808;
-}
-
-.profile-section-tab.active{
-    color:#7b0b0b;
 }
 
 .profile-section-tab.complete{
@@ -153,11 +161,16 @@ SECTION TABS
   color:#700808;
 }
 
+.profile-section-tab.active{
+    color:#7b0b0b;
+}
+
 .profile-section-tab.active::after{
     content:"";
     display:block;
     height:2px;
-    margin-top:8px;
+    margin-top:.75rem;
+    width:100%;
     background:#7b0b0b;
 }
 
@@ -461,6 +474,11 @@ RESPONSIVE
     gap:20px;
   }
 
+}
+
+.profile-card h2{
+    font-size:1.75rem;
+    margin-bottom:2rem;
 }
 
 .profile-card{
