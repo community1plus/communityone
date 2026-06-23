@@ -61,12 +61,12 @@ background:#f8f6f3;
       "Courier Prime",
       "Courier New",
       monospace;
-
-    font-size:2rem;
+    margin-bottom:3rem;
+    font-size:2.1rem;
 
     font-weight:700;
 
-    letter-spacing:.03em;
+    letter-spacing:.08em;
 }
 
 .profile-guide p{
@@ -84,7 +84,7 @@ HEADER
 .profile-header{
 display:flex;
 justify-content:space-between;
-align-items:flex-end;
+align-items:center;
 gap:40px;
 margin-bottom:3rem;
 }
@@ -112,6 +112,7 @@ HEADER PROGRESS
 
 .profile-header-progress{
 width:280px;
+margin-top:30px;
 }
 
 .profile-header-progress-label{
@@ -182,18 +183,18 @@ FORM
 ========================================= */
 
 .form-builder{
- max-width:720px;
+ max-width:760px;
 }
 
 .field{
-margin-bottom:2rem;
+    margin-bottom:3rem;
 }
 
 .field-label{
 
     display:block;
 
-    margin-bottom:12px;
+    margin-bottom:16px;
 
     font-family:
         Inter,
@@ -222,11 +223,12 @@ textarea{
     width:100%;
     max-width:640px;
 
-    height:64px;
+    height:78px;
+    border-radius:40px;
 
     padding:0 28px;
 
-    background:#ffffff;
+    background:#fffdfa;
 
     border:1px solid #ddd4cc;
 
@@ -363,13 +365,13 @@ gap:18px;
 }
 
 .primary-button{
-min-width:180px;
-height:72px;
+min-width:170px;
+height:60px;
 border:none;
-border-radius:28px;
+border-radius:30px;
 background:#8f0000;
 color:white;
-font-size:1.15rem;
+font-size:1.1rem;
 font-weight:700;
 cursor:pointer;
 }
