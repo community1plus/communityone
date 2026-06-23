@@ -8,7 +8,7 @@ export default function ProfileHelpPanel({
 
       return (
         <>
-          <h2>Profile Tips</h2>
+          <h2>PROFILE NOTES</h2>
 
           <p>
             Your display name is visible to
