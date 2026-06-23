@@ -355,14 +355,14 @@ width: `${
   setCurrentStep={setCurrentStep}
 />
 
-<FormBuilder
-  steps={[
-    activeSteps[currentStep]
-  ]}
-  currentStep={0}
-  form={form}
-  readOnly={!editMode}
-/>
+{currentStep === 0 && (
+
+  <ProfileUserSection
+    form={form}
+    readOnly={!editMode}
+  />
+
+)}
 
         <ProfileNavigation
           editMode={editMode}
