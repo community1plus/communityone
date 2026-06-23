@@ -56,6 +56,7 @@ export default function CommunityPlusUserProfile({
     useAuth();
 
   const {
+    profile,
     refreshProfile,
   } = useProfile();
 
@@ -203,9 +204,15 @@ export default function CommunityPlusUserProfile({
                 USER PROFILE
               </h1>
 
-              <div className="profile-account-type">
-                ORGANISATION ACCOUNT
-              </div>
+<div className="profile-account-type">
+
+  {user?.email?.endsWith(
+    "@comm-unity.one"
+  )
+    ? "ORGANISATION ACCOUNT"
+    : "PERSONAL ACCOUNT"}
+
+</div>
 
             </div>
 
