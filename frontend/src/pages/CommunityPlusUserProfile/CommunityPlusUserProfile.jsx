@@ -1,3 +1,6 @@
+import ProfileHelpPanel
+  from "../../components/Profile/ProfileHelpPanel";
+
 import {
   useState,
   useMemo,
@@ -329,19 +332,15 @@ export default function CommunityPlusUserProfile({
 
           {/* GUIDE */}
 
-          <aside className="profile-guide">
+<aside className="profile-guide">
 
-            <h2>
-              Profile Guide
-            </h2>
+  <ProfileHelpPanel
+    section={
+      activeSteps[currentStep]?.id
+    }
+  />
 
-            <p>
-              Verify your social accounts to
-              prove ownership of pages,
-              channels and official accounts.
-            </p>
-
-          </aside>
+</aside>
 
         </div>
 

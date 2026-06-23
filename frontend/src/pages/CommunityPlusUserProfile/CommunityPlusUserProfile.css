@@ -28,20 +28,43 @@ background:#f8f6f3;
 }
 
 .profile-guide{
-background:#f8f6f3;
+
+    background:white;
+
+    border:1px solid #e6e1db;
+
+    border-radius:28px;
+
+    padding:32px;
+
+    position:sticky;
+
+    top:2rem;
+
+    height:max-content;
+
 }
 
 .profile-guide h2{
-margin:0 0 1.5rem;
-font-size:2rem;
-font-weight:800;
+
+    margin-top:0;
+
+    margin-bottom:1.5rem;
+
+    font-size:1.6rem;
+
+    font-weight:800;
+
 }
 
 .profile-guide p{
-margin:0;
-color:#6f6f6f;
-line-height:1.8;
-font-size:1.05rem;
+
+    color:#666;
+
+    line-height:1.8;
+
+    margin-bottom:1rem;
+
 }
 
 /* =========================================
