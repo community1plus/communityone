@@ -74,17 +74,20 @@ TOP TABS
     margin-bottom:2.5rem;
 }
 
-.profile-tabs button {
-    background: none;
-    border: none;
-    padding: 0;
+.profile-tabs button{
+    background:none;
+    border:none;
 
-    color: #7d8793;
-    font-size: 1rem;
-    font-weight: 600;
+    padding:0;
 
-    cursor: pointer;
+    color:#7d8793;
+
+    font-size:1rem;
+    font-weight:600;
+
+    cursor:pointer;
 }
+
 
 .profile-tabs button.active{
     color:#7b0b0b;
@@ -98,13 +101,7 @@ TOP TABS
     background:#7b0b0b;
 }
 
-.profile-tabs button.active::after{
-    content:"";
-    display:block;
-    height:2px;
-    margin-top:.75rem;
-    background:#7b0b0b;
-}
+
 
 /*====================================================
 PROGRESS
@@ -139,42 +136,56 @@ PROGRESS
 SECTION TABS
 ====================================================*/
 
-.profile-section-tab:hover {
-    color: #7b0b0b;
+.profile-section-tabs{
+    display:flex !important;
+    flex-wrap:wrap;
+    align-items:center;
+
+    column-gap:40px;
+    row-gap:16px;
+
+    margin-top:28px;
+    margin-bottom:32px;
+
+    padding-bottom:16px;
+
+    border-bottom:1px solid #e6e1db;
 }
 
 .profile-section-tab{
+    flex:0 0 auto;
+
     background:none;
     border:none;
+
     padding:0;
+
     color:#7d8793;
+
     font-size:1rem;
     font-weight:600;
+
     letter-spacing:.02em;
-}
 
-.profile-section-tab:hover{
-  border-color:#700808;
-}
+    white-space:nowrap;
 
-.profile-section-tab.complete{
-  border-color:#700808;
-  color:#700808;
+    cursor:pointer;
 }
 
 .profile-section-tab.active{
     color:#7b0b0b;
 }
 
-.profile-section-tab.active::after {
-    content: "";
-    display: block;
+.profile-section-tab.active::after{
+    content:"";
 
-    height: 2px;
+    display:block;
 
-    margin-top: .8rem;
+    margin-top:12px;
 
-    background: #7b0b0b;
+    height:2px;
+
+    background:#7b0b0b;
 }
 
 .profile-header-progress{
@@ -458,32 +469,21 @@ RESPONSIVE
     letter-spacing:-1px;
 }
 
-.profile-tabs {
-    display: flex;
-    align-items: center;
-    gap: 2rem;
+.profile-tabs{
+    display:flex;
+    align-items:center;
 
-    margin-top: 2rem;
-    margin-bottom: 2rem;
+    gap:32px;
 
-    padding-bottom: 1rem;
+    margin-top:40px;
+    margin-bottom:28px;
 
-    border-bottom: 1px solid #e6e1db;
+    padding-bottom:16px;
+
+    border-bottom:1px solid #e6e1db;
 }
 
-.profile-section-tabs {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 2.5rem;
 
-    margin-top: 2rem;
-    margin-bottom: 3rem;
-
-    padding-bottom: 1rem;
-
-    border-bottom: 1px solid #e6e1db;
-}
 
 .profile-section-tab {
     background: none;
