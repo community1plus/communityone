@@ -49,14 +49,21 @@ LAYOUT
 /*====================================================
 HEADER
 ====================================================*/
-
-.profile-header h1{
-  margin:0 0 28px;
-  font-size:58px;
-  font-weight:800;
-  letter-spacing:-2px;
-  color:#231f20;
+.profile-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    margin-bottom:3rem;
 }
+
+.profile-title h1{
+    margin:0;
+    font-size:5rem;
+    font-weight:900;
+    letter-spacing:-3px;
+    line-height:1;
+}
+
 
 /*====================================================
 TOP TABS
@@ -154,6 +161,34 @@ SECTION TABS
     background:#7b0b0b;
 }
 
+.profile-header-progress{
+    width:220px;
+    margin-top:1rem;
+}
+
+.profile-header-progress-label{
+    display:flex;
+    justify-content:flex-end;
+    margin-bottom:.75rem;
+    font-size:.9rem;
+    font-weight:700;
+    color:#666;
+}
+
+.profile-progress-bar{
+    height:8px;
+    background:#e8e3dd;
+    border-radius:999px;
+    overflow:hidden;
+}
+
+.profile-progress-fill{
+    height:100%;
+    background:#7b0b0b;
+    border-radius:999px;
+    transition:.3s;
+}
+
 /*====================================================
 FORM
 ====================================================*/
@@ -210,6 +245,7 @@ textarea{
   min-height:140px;
   padding-top:18px;
 }
+
 
 .input:focus,
 select:focus,

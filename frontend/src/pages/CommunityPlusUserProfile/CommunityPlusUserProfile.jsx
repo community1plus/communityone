@@ -302,9 +302,34 @@ return (
       <div className="profile-left">
 <div className="profile-header">
 
-  <h1>
-    USER PROFILE
-  </h1>
+  <div className="profile-title">
+    <h1>USER PROFILE</h1>
+  </div>
+
+  <div className="profile-header-progress">
+
+    <div className="profile-header-progress-label">
+      {Math.round(
+        ((currentStep + 1) / activeSteps.length) * 100
+      )}% Complete
+    </div>
+
+    <div className="profile-progress-bar">
+      <div
+        className="profile-progress-fill"
+        style={{
+          width: `${
+            activeSteps.length
+              ? ((currentStep + 1) /
+                  activeSteps.length) *
+                100
+              : 0
+          }%`,
+        }}
+      />
+    </div>
+
+  </div>
 
 </div>
         <ProfileTabs
@@ -312,40 +337,7 @@ return (
           activeTab={activeProfileTab}
           onChange={setActiveProfileTab}
         />
-        <div className="profile-completion">
 
-  <div className="profile-completion-header">
-
-    <span>Profile completion</span>
-
-    <span>
-{Math.round(
-  ((currentStep + 1) /
-    activeSteps.length) *
-    100
-)}%
-    </span>
-
-  </div>
-
-  <div className="profile-progress-bar">
-
-    <div
-      className="profile-progress-fill"
-      style={{
-width: `${
-  activeSteps.length
-    ? ((currentStep + 1) /
-        activeSteps.length) *
-      100
-    : 0
-}%`,
-      }}
-    />
-
-  </div>
-
-</div>
 
 
 
