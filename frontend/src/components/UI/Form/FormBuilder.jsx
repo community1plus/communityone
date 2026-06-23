@@ -107,31 +107,41 @@ export default function FormBuilder({
       required,
       valid,
     };
-
+console.log(
+  "Rendering field:",
+  field
+);
     /* =========================================
        SELECT
     ========================================= */
 
     if (type === "select") {
-      return (
-        <Field {...fieldProps}>
-          <Select
-            name={name}
-            value={rawValue ?? ""}
-            options={options}
-            disabled={disabled}
-            onChange={(e) =>
-              updateField(
-                name,
-                e.target.value
-              )
-            }
-            onBlur={() =>
-              handleBlur?.(name)
-            }
-          />
-        </Field>
-      );
+return (
+
+  <div
+    key={name}
+    style={{
+      border: "2px solid red",
+      padding: "1rem",
+      marginBottom: "1rem"
+    }}
+  >
+
+    <h3>{label}</h3>
+
+    <input
+      value={rawValue ?? ""}
+      onChange={(e) =>
+        updateField(
+          name,
+          e.target.value
+        )
+      }
+    />
+
+  </div>
+
+);
     }
 
     /* =========================================
