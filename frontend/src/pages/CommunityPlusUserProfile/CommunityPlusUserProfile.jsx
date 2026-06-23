@@ -287,47 +287,6 @@ export default function CommunityPlusUserProfile({
 
 </div>
 
-              <div className="profile-header-progress">
-
-                <div className="profile-header-progress-label">
-
-                  {Math.round(
-
-                    (
-                      (currentStep + 1)
-                      /
-                      activeSteps.length
-                    ) * 100
-
-                  )}% Complete
-
-                </div>
-
-                <div className="profile-progress-bar">
-
-                  <div
-                    className="profile-progress-fill"
-                    style={{
-
-                      width: `${
-
-                        (
-                          (currentStep + 1)
-                          /
-                          activeSteps.length
-                        ) * 100
-
-                      }%`
-
-                    }}
-                  />
-
-                </div>
-
-              </div>
-
-            </div>
-
             {/* ACCOUNT TYPE */}
 
             
