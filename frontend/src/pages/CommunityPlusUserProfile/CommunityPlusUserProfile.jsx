@@ -340,15 +340,15 @@ export default function CommunityPlusUserProfile({
 
           {/* GUIDE */}
 
-<aside className="profile-guide">
+          <aside className="profile-guide">
 
-  <ProfileHelpPanel
-    section={
-      activeSteps[currentStep]?.id
-    }
-  />
+            <ProfileHelpPanel
+              section={
+                activeSteps[currentStep]?.id
+              }
+            />
 
-</aside>
+          </aside>
 
         </div>
 
