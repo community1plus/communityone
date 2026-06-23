@@ -318,18 +318,17 @@ export default function CommunityPlusUserProfile({
 
             {/* BUTTONS */}
 
+            <button
+              className="profile-close-button"
+              onClick={closeProfile}
+            >
+              ×
+            </button>
+
             <ProfileNavigation
               editMode={editMode}
               saving={savingProfile}
-              <button
-    className="profile-close-button"
-    onClick={closeProfile}
->
-    ×
-</button>
-              onEdit={() =>
-                setEditMode(true)
-              }
+              onEdit={() => setEditMode(true)}
               onSave={handleSaveProfile}
             />
 
