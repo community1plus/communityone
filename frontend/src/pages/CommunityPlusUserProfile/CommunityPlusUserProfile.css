@@ -50,9 +50,6 @@ LAYOUT
 HEADER
 ====================================================*/
 .profile-header{
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-end;
     margin-bottom:3rem;
 }
 
@@ -70,13 +67,7 @@ TOP TABS
 ====================================================*/
 
 .profile-tabs{
-    display:flex;
-    gap:1rem;
-
-    padding-bottom:1rem;
-    margin-bottom:2rem;
-
-    border-bottom:1px solid #e6e1db;
+    margin-bottom:2.5rem;
 }
 
 .profile-tabs button{
@@ -93,6 +84,14 @@ TOP TABS
 
 .profile-tabs button.active{
     color:#7b0b0b;
+}
+
+.profile-tabs button.active::after{
+    content:"";
+    display:block;
+    margin-top:.75rem;
+    height:2px;
+    background:#7b0b0b;
 }
 
 .profile-tabs button.active::after{
@@ -137,8 +136,6 @@ SECTION TABS
 ====================================================*/
 
 .profile-section-tabs{
-    display:flex;
-    gap:2rem;
     margin-bottom:3rem;
 }
 
@@ -456,9 +453,11 @@ RESPONSIVE
     letter-spacing:-1px;
 }
 
-  .profile-tabs{
-    overflow:auto;
-  }
+.profile-tabs{
+    margin-left:0;
+    padding-left:0;
+    align-items:center;
+}
 
   .profile-section-tabs{
     overflow:auto;
