@@ -64,30 +64,24 @@ TOP TABS
 
 .profile-tabs{
   display:flex;
-  gap:14px;
+  gap:12px;
   margin-bottom:32px;
 }
 
 .profile-tabs button{
-  height:48px;
-  padding:0 24px;
-
-  border:1px solid #d8d0c8;
-  border-radius:16px;
-
-  background:white;
-
-  font-size:15px;
-  font-weight:700;
-
+  border:none;
+  background:#f4f2ef;
+  color:#555;
+  padding:10px 18px;
+  border-radius:999px;
+  font-size:.95rem;
+  font-weight:600;
   cursor:pointer;
-
   transition:.2s;
 }
 
 .profile-tabs button.active{
-  background:#700808;
-  border-color:#700808;
+  background:#7b0b0b;
   color:white;
 }
 
@@ -125,32 +119,18 @@ SECTION TABS
 ====================================================*/
 
 .profile-section-tabs{
-  display:flex;
-  gap:14px;
-  margin-bottom:36px;
-  padding-bottom:24px;
-
-  border-bottom:1px solid #ece5de;
+    display:flex;
+    gap:16px;
+    margin-bottom:40px;
 }
 
 .profile-section-tab{
-  flex:1;
-
-  height:52px;
-
-  border:1px solid #ddd;
-  border-radius:16px;
-
-  background:white;
-
-  color:#5a5a5a;
-
-  font-size:14px;
-  font-weight:700;
-
-  cursor:pointer;
-
-  transition:.2s;
+    background:none;
+    border:none;
+    color:#8b8b8b;
+    font-size:.95rem;
+    font-weight:600;
+    padding:0;
 }
 
 .profile-section-tab:hover{
@@ -158,14 +138,20 @@ SECTION TABS
 }
 
 .profile-section-tab.active{
-  background:#700808;
-  border-color:#700808;
-  color:white;
+    color:#7b0b0b;
 }
 
 .profile-section-tab.complete{
   border-color:#700808;
   color:#700808;
+}
+
+.profile-section-tab.active::after{
+    content:"";
+    display:block;
+    height:2px;
+    margin-top:8px;
+    background:#7b0b0b;
 }
 
 /*====================================================
@@ -415,9 +401,11 @@ RESPONSIVE
     padding:16px;
   }
 
-  .profile-header h1{
-    font-size:42px;
-  }
+.profile-header h1{
+    font-size:2.2rem;
+    font-weight:800;
+    letter-spacing:-1px;
+}
 
   .profile-tabs{
     overflow:auto;
@@ -441,14 +429,12 @@ RESPONSIVE
 
 .profile-card{
     background:white;
+    border:none;
+    box-shadow:
+      0 1px 2px rgba(0,0,0,.04),
+      0 8px 24px rgba(0,0,0,.06);
 
-    border:1px solid #e7dfd8;
-
-    border-radius:24px;
-
-    padding:36px;
-
-    margin-bottom:32px;
+    border-radius:28px;
 }
 
 .profile-card-title{
