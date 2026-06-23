@@ -69,8 +69,7 @@ export default function CommunityPlusUserProfile({
   const [savingProfile, setSavingProfile] =
     useState(false);
 
-  const [editMode, setEditMode] =
-    useState(false);
+
 
   const [activeProfileTab, setActiveProfileTab] =
     useState("PERSONAL");
@@ -226,129 +225,140 @@ export default function CommunityPlusUserProfile({
 
     ]);
 
-  return (
 
-    <div className="profile-page">
+    const isSetupFlow = !profile?.profile_complete;
+    
+return (
 
-      <div className="profile-container">
+  <div className="profile-page">
 
-        <div className="profile-layout">
+    <div className="profile-container">
 
-          <div className="profile-left">
+      <div className="profile-layout">
 
-            {/* HEADER */}
+        {/* LEFT COLUMN */}
 
-<div className="profile-header">
+        <div className="profile-left">
 
-    <div className="profile-title">
+          {/* HEADER */}
 
-        <h1>USER PROFILE</h1>
+          <div className="profile-header">
 
-        <div className="profile-account-type">
-            ORGANISATION ACCOUNT
-        </div>
+            <div className="profile-title">
 
-    </div>
+              <h1>USER PROFILE</h1>
 
-    <div className="profile-header-actions">
+              <div className="profile-account-type">
+                ORGANISATION ACCOUNT
+              </div>
 
-        <div className="profile-header-progress">
-
-            <div className="profile-header-progress-label">
-                {Math.round(
-                  ((currentStep + 1) / activeSteps.length) * 100
-                )}% Complete
             </div>
 
-            <div className="profile-progress-bar">
+            <div className="profile-header-actions">
 
-                <div
+              <div className="profile-header-progress">
+
+                <div className="profile-header-progress-label">
+
+                  {Math.round(
+                    ((currentStep + 1) / activeSteps.length) * 100
+                  )}% Complete
+
+                </div>
+
+                <div className="profile-progress-bar">
+
+                  <div
                     className="profile-progress-fill"
                     style={{
                       width: `${
-                        ((currentStep + 1) / activeSteps.length) * 100
+                        activeSteps.length
+                          ? ((currentStep + 1) / activeSteps.length) * 100
+                          : 0
                       }%`
                     }}
-                />
+                  />
+
+                </div>
+
+              </div>
+
+              {!profile?.profile_complete && null}
+
+              {profile?.profile_complete && (
+
+                <button
+                  type="button"
+                  className="profile-close-button"
+                  onClick={closeProfile}
+                >
+                  ×
+                </button>
+
+              )}
 
             </div>
 
-        </div>
+          </div>
 
-        <button
-            className="profile-close-button"
-            onClick={closeProfile}
-            type="button"
-        >
-            ×
-        </button>
+          {/* SECTION TABS */}
 
-    </div>
+          <ProfileSectionTabs
+            steps={activeSteps}
+            currentStep={currentStep}
+            setCurrentStep={setCurrentStep}
+          />
 
-</div>
+          {/* FORM */}
 
-            {/* ACCOUNT TYPE */}
+          <FormBuilder
+            steps={[
+              activeSteps[currentStep]
+            ]}
+            currentStep={0}
+            form={form}
+            readOnly={false}
+          />
 
-            
+          {/* FOOTER */}
 
-            {/* SECTION TABS */}
+          <div className="profile-footer">
 
-            <ProfileSectionTabs
-              steps={activeSteps}
-              currentStep={currentStep}
-              setCurrentStep={setCurrentStep}
-            />
-
-            {/* FORM */}
-
-            <FormBuilder
-              steps={[
-                activeSteps[currentStep]
-              ]}
-              currentStep={0}
-              form={form}
-              readOnly={!editMode}
-            />
-
-            {/* BUTTONS */}
-
-            
-
-<div className="profile-footer">
-
-    <button
-        className="primary-button"
-        type="button"
-        disabled={savingProfile}
-        onClick={handleSaveProfile}
-    >
-        {savingProfile
-          ? "Saving..."
-          : "Save"}
-    </button>
-
-</div>
+            <button
+              type="button"
+              className="primary-button"
+              disabled={savingProfile}
+              onClick={handleSaveProfile}
+            >
+              {savingProfile
+                ? "Saving..."
+                : profile?.profile_complete
+                    ? "Save"
+                    : "Save & Continue"}
+            </button>
 
           </div>
 
-          {/* GUIDE */}
-
-<aside className="profile-guide">
-
-  <ProfileHelpPanel
-    section={
-      activeSteps[currentStep]?.id
-    }
-  />
-
-</aside>
-
         </div>
+
+        {/* GUIDE */}
+
+        <aside className="profile-guide">
+
+          <ProfileHelpPanel
+            section={
+              activeSteps[currentStep]?.id
+            }
+          />
+
+        </aside>
 
       </div>
 
     </div>
 
-  );
+  </div>
+
+);
 
 }
