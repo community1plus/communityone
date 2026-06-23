@@ -227,7 +227,7 @@ export default function CommunityPlusUserProfile({
 
 
     const isSetupFlow = !profile?.profile_complete;
-    
+    console.log("PROFILE COMPLETE =", profile?.profile_complete);
     {!isSetupFlow && (
 
   <button
