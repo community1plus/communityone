@@ -55,24 +55,26 @@ background:#f8f6f3;
 
 .profile-guide h2{
 
-    font-family:
-      "Courier Prime",
-      "Courier New",
-      monospace;
-    margin-bottom:3rem;
-    font-size:2.1rem;
+    margin:0 0 4rem;
 
-    font-weight:700;
+    font-size:3rem;
 
-    letter-spacing:.08em;
+    line-height:1.4;
+
+    letter-spacing:.25em;
+
+    text-transform:uppercase;
+
 }
 
 .profile-guide p{
 
-    line-height:1.9;
+    font-size:1.05rem;
 
-    font-size:1rem;
-    margin-bottom:2rem;
+    line-height:2.3;
+
+    color:#222;
+
 }
 
 /* =========================================
@@ -185,7 +187,7 @@ FORM
 }
 
 .field{
-    margin-bottom:3rem;
+    margin-bottom:4.5rem;
 }
 
 .field-label{
@@ -220,9 +222,9 @@ textarea{
 
     width:100%;
 
-    max-width:560px;
+    max-width:700px;
 
-    height:66px;
+    height:80px;
 
     padding:0 32px;
 
@@ -230,14 +232,14 @@ textarea{
 
     border:1px solid #ddd4cc;
 
-    border-radius:34px;
+    border-radius:40px;
 
     font-family:
         "Courier Prime",
         "Courier New",
         monospace;
 
-    font-size:1.1rem;
+    font-size:1.2rem;
 
     color:#231f20;
 
@@ -350,19 +352,18 @@ FOOTER BUTTONS
 
     display:flex;
 
-    justify-content:space-between;
+    justify-content:flex-end;
 
-    align-items:flex-end;
+    margin-top:8rem;
 
-    margin-top:5rem;
-
-    padding-bottom:4rem;
+    padding-bottom:5rem;
 
 }
 
 .form-actions{
-display:flex;
-gap:18px;
+    width:100%;
+    display:flex;
+    justify-content:flex-end;
 }
 
 .primary-button{
