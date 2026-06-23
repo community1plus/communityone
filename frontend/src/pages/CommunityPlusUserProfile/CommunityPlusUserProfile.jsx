@@ -228,6 +228,18 @@ export default function CommunityPlusUserProfile({
 
     const isSetupFlow = !profile?.profile_complete;
     
+    {!isSetupFlow && (
+
+  <button
+    type="button"
+    className="profile-close-button"
+    onClick={closeProfile}
+  >
+    ×
+  </button>
+
+)}
+
 return (
 
   <div className="profile-page">
