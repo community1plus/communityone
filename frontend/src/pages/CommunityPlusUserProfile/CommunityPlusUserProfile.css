@@ -52,19 +52,19 @@ CARD SYSTEM
 CARD HEADER
 ========================================= */
 
-.profile-card-header{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding: 20px 32px;
-    min-height: 120px;
-    margin-bottom:20px;
+.profile-card-header {
+  padding: 24px 32px;
+  min-height: 100px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .profile-card-header h1{
     margin:0;
 
-    font-size:0.5rem;
+    font-size:1.5rem;
     font-weight:600;
     line-height:1;
     letter-spacing:-0.03em;
