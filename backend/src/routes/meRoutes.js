@@ -92,6 +92,25 @@ router.get("/", async (req, res) => {
 
     const rawProfile = profileResult.rows[0] || null;
 
+console.log(
+  "RAW PROFILE",
+  JSON.stringify(rawProfile, null, 2)
+);
+
+const normalized =
+  normalizeProfile(rawProfile);
+
+console.log(
+  "NORMALIZED PROFILE",
+  JSON.stringify(normalized, null, 2)
+);
+
+const profile = {
+  ...normalized,
+  organisationProfile,
+  organisation: organisationProfile,
+};
+
     let organisationProfile = null;
 
 if (rawProfile?.id) {
