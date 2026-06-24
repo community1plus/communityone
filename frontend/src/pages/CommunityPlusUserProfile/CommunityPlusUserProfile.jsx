@@ -285,28 +285,28 @@ export default function CommunityPlusUserProfile({
           {
             sectionId === "social" ? (
 
-   <ProfileSocialSection />
+              <ProfileSocialSection />
 
             ) : sectionId === "payment" ? (
 
-   <ProfilePaymentSection />
+              <ProfilePaymentSection />
 
             ) : (
 
-   <FormBuilder
-      steps={[activeSteps[currentStep]]}
-      currentStep={0}
-      form={form}
-   />
+              <FormBuilder
+                steps={[activeSteps[currentStep]]}
+                currentStep={0}
+                form={form}
+              />
 
             )
-          }         
+          }
 
         </div>
 
-        {/* GUIDE PANEL */}
-</div>
-{/* RIGHT COLUMN */}
+      </div>
+
+      {/* RIGHT COLUMN */}
 
 <div className="profile-sidebar">
 
