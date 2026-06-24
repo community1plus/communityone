@@ -44,6 +44,10 @@ CARD SYSTEM
         0 8px 24px rgba(15,23,42,.04);
 }
 
+.profile-form-content{
+    flex:1;
+}
+
 .profile-content-card{
     min-height: calc(100vh - 260px);
     display:flex;
