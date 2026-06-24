@@ -13,36 +13,35 @@ PAGE
     padding:28px 36px;
 }
 
-.profile-container *{
-    box-sizing:border-box;
-}
-
 /* =========================================
 LAYOUT
 ========================================= */
 
 .profile-layout{
     display:grid;
-    grid-template-columns:minmax(0,1fr) 360px;
+    grid-template-columns:minmax(0,1fr) 320px;
     gap:56px;
 }
 
 .profile-left{
+    min-width:0;
+}
+
+/* =========================================
+SIDEBAR
+========================================= */
+
+.profile-sidebar{
     display:flex;
     flex-direction:column;
+    gap:24px;
 }
 
 .profile-guide{
-    display: flex;
-    flex-direction: column;
     background:#fdfcf9;
     border:1px solid #ebe4dc;
     border-radius:32px;
     padding:28px;
-    position:sticky;
-    top:2rem;
-    height:max-content;
-    width: 320px;
     font-family:
         "Courier Prime",
         "Courier New",
@@ -53,8 +52,7 @@ LAYOUT
 }
 
 .profile-guide h2{
-    margin:0 0 2rem;
-    margin-bottom:1.5rem;
+    margin:0 0 1.5rem;
 
     font-size:1.7rem;
 
@@ -66,7 +64,7 @@ LAYOUT
 }
 
 .profile-guide p{
-    margin-bottom:1rem;
+    margin:0 0 1.25rem;
 
     font-size:1rem;
 
@@ -75,74 +73,8 @@ LAYOUT
     color:#444;
 }
 
-/* =========================================
-HEADER
-========================================= */
-
-.profile-header{
-    margin-bottom:1rem;
-}
-
-.profile-title-row{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    margin-bottom:1rem;
-}
-
-.profile-guide-content{
-    flex:1;
-}
-
-.profile-guide-actions{
-    margin-top:2rem;
-}
-
-.profile-title h1{
-    margin:0;
-    font-size:3rem;
-    font-weight:800;
-    letter-spacing:-2px;
-    line-height:.9;
-}
-
-.profile-sidebar{
-    display:flex;
-    flex-direction:column;
-    gap:20px;
-}
-
 .profile-sidebar-actions{
-    display:flex;
-}
-
-.profile-save-button{
     width:100%;
-    height:56px;
-
-    border:none;
-    border-radius:28px;
-
-    background:#a10000;
-    color:#fff;
-
-    font-size:1rem;
-    font-weight:600;
-
-    cursor:pointer;
-
-    transition:.2s;
-}
-
-.profile-sidebar{
-    display:flex;
-    flex-direction:column;
-    min-height:calc(100vh - 220px);
-}
-
-.profile-sidebar-actions{
-    margin-top:auto;
-    padding-top:24px;
 }
 
 .profile-save-button{
@@ -155,7 +87,7 @@ HEADER
     background:#a10000;
     color:#fff;
 
-    font-size:1.05rem;
+    font-size:1rem;
     font-weight:600;
 
     cursor:pointer;
@@ -170,33 +102,46 @@ HEADER
         0 8px 20px rgba(161,0,0,.15);
 }
 
+/* =========================================
+HEADER
+========================================= */
+
+.profile-header{
+    margin-bottom:1rem;
+}
+
+.profile-title-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+
+.profile-title-row h1{
+    margin:0;
+
+    font-size:3rem;
+    font-weight:700;
+
+    letter-spacing:-.03em;
+
+    line-height:1;
+}
+
 .profile-close-button{
     width:48px;
     height:48px;
-    margin-top: -4px;
+
     border:none;
     background:none;
-    margin: 0;
+
     color:#7d8793;
-    font-size:2.7rem;
+
+    font-size:2.5rem;
+    line-height:1;
+
     cursor:pointer;
+
     transition:.2s;
-}
-
-.profile-save-button{
-    width:100%;
-    height:56px;
-
-    border:none;
-    border-radius:28px;
-
-    background:#a10000;
-    color:#fff;
-
-    font-size:1rem;
-    font-weight:600;
-
-    cursor:pointer;
 }
 
 .profile-close-button:hover{
@@ -204,7 +149,7 @@ HEADER
 }
 
 /* =========================================
-SECTION TABS
+TABS
 ========================================= */
 
 .profile-section-tabs{
@@ -219,15 +164,14 @@ SECTION TABS
 }
 
 .profile-section-tab{
-    background:none;
     border:none;
+    background:none;
 
     padding:0;
 
     color:#7d8793;
 
     font-size:1.1rem;
-
     font-weight:700;
 
     cursor:pointer;
@@ -256,26 +200,23 @@ PROGRESS
 ========================================= */
 
 .profile-header-progress{
-    margin-top:.5rem;
-    margin-bottom:1rem;
+    margin:0 0 1.5rem;
 }
 
 .profile-header-progress-label{
     display:flex;
-
     justify-content:flex-end;
 
-    margin-bottom:.8px;
+    margin-bottom:8px;
 
-    font-size:1rem;
+    font-size:.95rem;
+    font-weight:600;
 
-    font-weight:700;
-
-    color:#5f6770;
+    color:#6b7280;
 }
 
 .profile-progress-bar{
-    height:8px;
+    height:10px;
 
     background:#e7e2db;
 
@@ -297,6 +238,7 @@ PROGRESS
 /* =========================================
 FORM
 ========================================= */
+
 .form-builder,
 .form-builder form{
     width:100%;
@@ -307,16 +249,28 @@ FORM
 }
 
 .field{
-    width:100%;
     margin-bottom:1rem;
 }
 
 .field-label{
     display:block;
+
     margin-bottom:12px;
-    font-size:0.95rem;
+
+    font-size:1rem;
     font-weight:600;
+
     color:#222;
+}
+
+.field-grid-2{
+    display:grid;
+    grid-template-columns:1fr 220px;
+    gap:24px;
+}
+
+.field-grid-2 .field{
+    margin-bottom:0;
 }
 
 /* =========================================
@@ -327,8 +281,6 @@ INPUTS
 select,
 textarea{
     width:100%;
-
-    max-width:100%;
 
     height:48px;
 
@@ -369,138 +321,6 @@ textarea{
 SOCIAL
 ========================================= */
 
-.social-verification-list{
-    display:flex;
-    flex-direction:column;
-    gap:16px;
-}
-
-.social-verification-row{
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    padding:20px;
-
-    background:white;
-
-    border:1px solid #ebe4dc;
-
-    border-radius:24px;
-}
-
-/* =========================================
-FOOTER
-========================================= */
-
-.profile-footer{
-    position:sticky;
-    bottom:0;
-
-    display:flex;
-    justify-content:flex-end;
-
-    padding:20px 0;
-
-    background:
-        linear-gradient(
-            to top,
-            #f8f6f3 70%,
-            rgba(248,246,243,0)
-        );
-
-    margin-top:2rem;
-}
-
-.primary-button{
-    min-width:260px;
-
-    height:58px;
-
-    border:none;
-
-    border-radius:32px;
-
-    background:#a10000;
-
-    color:white;
-
-    font-size:1.1rem;
-
-    font-weight:700;
-
-    cursor:pointer;
-
-    transition:.2s;
-}
-
-.primary-button:hover{
-    transform:translateY(-2px);
-
-    box-shadow:
-        0 8px 20px rgba(161,0,0,.15);
-}
-
-/* =========================================
-RESPONSIVE
-========================================= */
-
-@media (max-width:1200px){
-
-    .profile-layout{
-        grid-template-columns:1fr;
-    }
-
-    .profile-guide{
-        display:none;
-    }
-
-}
-
-@media (max-width:768px){
-
-    .profile-container{
-        padding:20px;
-    }
-
-    .profile-title h1{
-        margin:0;
-        font-size:2.6rem;
-        font-weight:800;
-        letter-spacing:-1.5px;
-        line-height:1;
-    }
-
-.profile-title-row{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:20px;
-}
-
-    .profile-section-tab{
-        font-size:1rem;
-        font-weight: 700;
-    }
-
-    .primary-button{
-        width:100%;
-    }
-
-}
-
-.field-grid-2{
-    display:grid;
-    grid-template-columns:1fr 220px;
-    gap:24px;
-}
-
-.field-grid-2 .field{
-    margin-bottom:0;
-}
-
 .social-settings{
     display:flex;
     flex-direction:column;
@@ -509,30 +329,33 @@ RESPONSIVE
 .social-row{
     display:grid;
     grid-template-columns:
-        minmax(220px,1fr)
+        minmax(180px,1fr)
         180px
         120px;
 
     align-items:center;
-    min-height:84px;
-    padding:0 8px;
+
+    min-height:72px;
+
     border-bottom:1px solid #ece7e1;
-    transition: background .2s ease;
 }
 
 .social-provider{
     font-size:1.15rem;
     font-weight:600;
+
     color:#1f2937;
 }
 
 .social-status{
-    font-size:.95rem;
     color:#94a3b8;
+
+    font-size:.95rem;
 }
 
 .social-status.connected{
     color:#15803d;
+
     font-weight:600;
 }
 
@@ -552,4 +375,41 @@ RESPONSIVE
 
 .social-action:hover{
     opacity:.75;
+}
+
+/* =========================================
+RESPONSIVE
+========================================= */
+
+@media (max-width:1200px){
+
+    .profile-layout{
+        grid-template-columns:1fr;
+    }
+
+    .profile-sidebar{
+        display:none;
+    }
+
+}
+
+@media (max-width:768px){
+
+    .profile-container{
+        padding:20px;
+    }
+
+    .profile-title-row h1{
+        font-size:2.5rem;
+    }
+
+    .profile-section-tabs{
+        gap:24px;
+        overflow-x:auto;
+    }
+
+    .field-grid-2{
+        grid-template-columns:1fr;
+    }
+
 }
