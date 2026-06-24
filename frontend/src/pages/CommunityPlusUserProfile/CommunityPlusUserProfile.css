@@ -91,6 +91,17 @@ HEADER
     letter-spacing:-3px;
 }
 
+.profile-title-row{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:flex-start;
+
+    margin-bottom:1.5rem;
+
+}
 /* =========================================
 HEADER ACTIONS
 ========================================= */
@@ -122,18 +133,27 @@ PROGRESS
 ========================================= */
 
 .profile-header-progress{
-    width:340px;
+
     margin-top:1.5rem;
-    margin-bottom: 2rem;
+
+    margin-bottom:2rem;
+
 }
 
 .profile-header-progress-label{
+
     display:flex;
+
     justify-content:flex-end;
+
     margin-bottom:12px;
+
     font-size:1rem;
+
     font-weight:700;
-    color:#666;
+
+    color:#5f6770;
+
 }
 
 .profile-progress-bar{

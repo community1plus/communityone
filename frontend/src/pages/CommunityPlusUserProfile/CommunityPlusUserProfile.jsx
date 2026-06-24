@@ -196,13 +196,15 @@ export default function CommunityPlusUserProfile({
 
         <div className="profile-left">
 
+          {/* HEADER */}
+
           <div className="profile-header">
 
-            <div className="profile-title">
+            <div className="profile-title-row">
 
               <h1>USER PROFILE</h1>
 
-                {editMode && (
+              {editMode && (
 
                 <button
                   type="button"
@@ -213,46 +215,63 @@ export default function CommunityPlusUserProfile({
                 </button>
 
               )}
-            </div>
-            <ProfileSectionTabs
-              steps={activeSteps}
-              currentStep={currentStep}
-              setCurrentStep={setCurrentStep}
-            />
-                <div className="profile-progress-bar">
 
-                  <div
-                    className="profile-progress-fill"
-                    style={{
-                    width: `${
-                    activeSteps.length
-                    ? ((currentStep + 1) /
-                    activeSteps.length) *
-                    100
-                    : 0
-                    }%`
-                    }}
-                  />
-                </div>
-              </div>
             </div>
 
-            <div className="profile-header-actions">
+          </div>
 
-              <div className="profile-header-progress">
+          {/* TABS */}
 
-                <div className="profile-header-progress-label">
+          <ProfileSectionTabs
+            steps={activeSteps}
+            currentStep={currentStep}
+            setCurrentStep={setCurrentStep}
+          />
 
-                  {Math.round(
-                  activeSteps.length
-                  ? ((currentStep + 1) /
-                  activeSteps.length) *
-                  100
+          {/* PROGRESS */}
+
+          <div className="profile-header-progress">
+
+            <div className="profile-header-progress-label">
+
+              {Math.round(
+
+                activeSteps.length
+                  ? (
+                      (currentStep + 1)
+                      /
+                      activeSteps.length
+                    ) * 100
                   : 0
-                  )}% Complete
 
-                </div>
+              )}% Complete
+
             </div>
+
+            <div className="profile-progress-bar">
+
+              <div
+                className="profile-progress-fill"
+                style={{
+
+                  width: `${
+                    activeSteps.length
+                      ? (
+                          (currentStep + 1)
+                          /
+                          activeSteps.length
+                        ) * 100
+                      : 0
+                  }%`
+
+                }}
+              />
+
+            </div>
+
+          </div>
+
+          {/* FORM */}
 
           <FormBuilder
             steps={[
@@ -263,6 +282,8 @@ export default function CommunityPlusUserProfile({
             readOnly={false}
           />
 
+          {/* FOOTER */}
+
           <div className="profile-footer">
 
             <button
@@ -272,17 +293,23 @@ export default function CommunityPlusUserProfile({
               onClick={handleSaveProfile}
             >
 
-              {savingProfile
-                ? "Saving..."
-                : editMode
-                  ? "Save"
-                  : "Save & Continue"}
+              {
+
+                savingProfile
+                  ? "Saving..."
+                  : editMode
+                    ? "Save"
+                    : "Save & Continue"
+
+              }
 
             </button>
 
           </div>
 
         </div>
+
+        {/* GUIDE PANEL */}
 
         <aside className="profile-guide">
 
@@ -301,5 +328,4 @@ export default function CommunityPlusUserProfile({
   </div>
 
 );
-
 }
