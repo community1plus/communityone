@@ -36,11 +36,11 @@ LAYOUT
     background:#fdfcf9;
     border:1px solid #ebe4dc;
     border-radius:36px;
-    padding:30px;
+    padding:26px;
     position:sticky;
     top:2rem;
     height:max-content;
-    width: 340px;
+    width: 320px;
     font-family:
         "Courier Prime",
         "Courier New",
@@ -54,11 +54,11 @@ LAYOUT
     margin:0 0 2rem;
     margin-bottom:1.5rem;
 
-    font-size:2.2rem;
+    font-size:1.8rem;
 
     line-height:1.2;
 
-    letter-spacing:.12em;
+    letter-spacing:.15em;
 
     text-transform:uppercase;
 }
@@ -92,7 +92,7 @@ HEADER
 .profile-title h1{
     margin:0;
 
-    font-size:4rem;
+    font-size:3.5rem;
 
     font-weight:900;
 
@@ -128,7 +128,7 @@ SECTION TABS
 .profile-section-tabs{
     display:flex;
     align-items:center;
-    gap:48px;
+    gap:40px;
 
     margin-bottom:1rem;
     padding-bottom:16px;
@@ -144,7 +144,7 @@ SECTION TABS
 
     color:#7d8793;
 
-    font-size:1.2rem;
+    font-size:1.1rem;
 
     font-weight:700;
 
@@ -172,10 +172,12 @@ SECTION TABS
 /* =========================================
 PROGRESS
 ========================================= */
-
+.profile-header{
+    margin-bottom:1rem;
+}
 .profile-header-progress{
-    margin-top:.75rem;
-    margin-bottom:1.5rem;
+    margin-top:.5rem;
+    margin-bottom:1rem;
 }
 
 .profile-header-progress-label{
@@ -221,7 +223,7 @@ FORM
 }
 
 .form-builder{
-    max-width:900px;
+    max-width:980px;
 }
 
 .field{
@@ -252,7 +254,7 @@ textarea{
 
     max-width:100%;
 
-    height:52px;
+    height:48px;
 
     padding:0 22px;
 
@@ -260,7 +262,7 @@ textarea{
 
     border:1px solid #ddd4cc;
 
-    border-radius:26px;
+    border-radius:24px;
 
     font-family:
         "Courier Prime",
@@ -318,10 +320,22 @@ FOOTER
 ========================================= */
 
 .profile-footer{
+    position:sticky;
+    bottom:0;
+
     display:flex;
     justify-content:flex-end;
-    margin-top:3rem;
-    padding-bottom:3rem;
+
+    padding:20px 0;
+
+    background:
+        linear-gradient(
+            to top,
+            #f8f6f3 70%,
+            rgba(248,246,243,0)
+        );
+
+    margin-top:1rem;
 }
 
 .primary-button{
