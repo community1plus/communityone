@@ -301,44 +301,48 @@ export default function CommunityPlusUserProfile({
  )
 }
 
-          {/* FOOTER */}
 
-          <div className="profile-footer">
 
-            <button
-              type="button"
-              className="primary-button"
-              disabled={savingProfile}
-              onClick={handleSaveProfile}
-            >
-
-              {
-
-                savingProfile
-                  ? "Saving..."
-                  : editMode
-                    ? "Save"
-                    : "Save & Continue"
-
-              }
-
-            </button>
-
-          </div>
+          
 
         </div>
 
         {/* GUIDE PANEL */}
 
-        <aside className="profile-guide">
+<aside className="profile-guide">
 
-          <ProfileHelpPanel
-            section={
-              activeSteps[currentStep]?.id
-            }
-          />
+  <div className="profile-guide-content">
 
-        </aside>
+    <ProfileHelpPanel
+      section={
+        activeSteps[currentStep]?.id
+      }
+    />
+
+  </div>
+
+  <div className="profile-guide-actions">
+
+    <button
+      type="button"
+      className="profile-save-button"
+      disabled={savingProfile}
+      onClick={handleSaveProfile}
+    >
+
+      {
+        savingProfile
+          ? "Saving..."
+          : editMode
+            ? "Save Changes"
+            : "Save & Continue"
+      }
+
+    </button>
+
+  </div>
+
+</aside>
 
       </div>
 

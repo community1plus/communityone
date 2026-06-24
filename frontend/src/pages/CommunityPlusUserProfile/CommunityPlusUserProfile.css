@@ -190,9 +190,7 @@ SECTION TABS
 /* =========================================
 PROGRESS
 ========================================= */
-.profile-header{
-    margin-bottom:1rem;
-}
+
 .profile-header-progress{
     margin-top:.5rem;
     margin-bottom:1rem;
@@ -213,7 +211,7 @@ PROGRESS
 }
 
 .profile-progress-bar{
-    height:10px;
+    height:8px;
 
     background:#e7e2db;
 
@@ -252,7 +250,7 @@ FORM
 .field-label{
     display:block;
     margin-bottom:12px;
-    font-size:1rem;
+    font-size:0.95rem;
     font-weight:600;
     color:#222;
 }
@@ -405,9 +403,9 @@ RESPONSIVE
 
     .profile-title h1{
         margin:0;
-        font-size:3.4rem;
+        font-size:2.6rem;
         font-weight:800;
-        letter-spacing:-2px;
+        letter-spacing:-1.5px;
         line-height:1;
     }
 
@@ -420,6 +418,7 @@ RESPONSIVE
 
     .profile-section-tab{
         font-size:1rem;
+        font-weight: 700;
     }
 
     .primary-button{
@@ -446,17 +445,15 @@ RESPONSIVE
 .social-row{
     display:grid;
     grid-template-columns:
-        minmax(180px, 1fr)
+        minmax(220px,1fr)
         180px
         120px;
 
     align-items:center;
-
-    min-height:72px;
-
+    min-height:84px;
     padding:0 8px;
-
     border-bottom:1px solid #ece7e1;
+    transition: background .2s ease;
 }
 
 .social-provider{
@@ -467,7 +464,7 @@ RESPONSIVE
 
 .social-status{
     font-size:.95rem;
-    color:#7d8793;
+    color:#94a3b8;
 }
 
 .social-status.connected{
