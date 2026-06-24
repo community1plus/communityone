@@ -311,26 +311,30 @@ export default function CommunityPlusUserProfile({
     />
   </aside>
 
-  <div className="profile-sidebar-actions">
+<div className="profile-sidebar">
 
-    <div className="profile-action-card">
+  <aside className="profile-guide">
+    <ProfileHelpPanel
+      section={activeSteps[currentStep]?.id}
+    />
+  </aside>
 
-      <button
-        type="button"
-        className="profile-save-button"
-        disabled={savingProfile}
-        onClick={handleSaveProfile}
-      >
-        {
-          savingProfile
-            ? "Saving..."
-            : "Save Changes"
-        }
-      </button>
+</div>
 
-    </div>
+<div className="profile-floating-save">
 
-  </div>
+  <button
+    type="button"
+    className="profile-save-button"
+    disabled={savingProfile}
+    onClick={handleSaveProfile}
+  >
+    {savingProfile
+      ? "Saving..."
+      : "Save Changes"}
+  </button>
+
+</div>
 
 </div>
 
