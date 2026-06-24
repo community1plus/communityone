@@ -1,38 +1,41 @@
+/* =========================================
+PAGE
+========================================= */
+
 .profile-page{
     min-height:100vh;
     background:#f8f6f3;
 }
 
 .profile-container{
-    max-width:1600px;
+    max-width:1500px;
     margin:0 auto;
-    padding:32px;
+    padding:28px 36px;
 }
 
 .profile-container *{
     box-sizing:border-box;
 }
 
-/*================================================
+/* =========================================
 LAYOUT
-================================================*/
+========================================= */
 
 .profile-layout{
     display:grid;
     grid-template-columns:minmax(0,1fr) 360px;
-    gap:48px;
+    gap:56px;
 }
 
 .profile-left{
     display:flex;
     flex-direction:column;
-    min-width:0;
 }
 
 .profile-guide{
     background:#fdfcf9;
     border:1px solid #ebe4dc;
-    border-radius:32px;
+    border-radius:36px;
     padding:32px;
     position:sticky;
     top:2rem;
@@ -40,6 +43,7 @@ LAYOUT
 
     font-family:
         "Courier Prime",
+        "Courier New",
         monospace;
 
     box-shadow:
@@ -49,9 +53,9 @@ LAYOUT
 .profile-guide h2{
     margin:0 0 2rem;
 
-    font-size:2.3rem;
+    font-size:2.4rem;
 
-    line-height:1.3;
+    line-height:1.2;
 
     letter-spacing:.12em;
 
@@ -59,18 +63,18 @@ LAYOUT
 }
 
 .profile-guide p{
-    margin:0 0 1.75rem;
+    margin-bottom:1.2rem;
 
     font-size:1rem;
 
-    line-height:2.1;
+    line-height:1.9;
 
     color:#222;
 }
 
-/*================================================
+/* =========================================
 HEADER
-================================================*/
+========================================= */
 
 .profile-header{
     margin-bottom:1.5rem;
@@ -78,8 +82,9 @@ HEADER
 
 .profile-title-row{
     display:flex;
-    align-items:center;
+    align-items:flex-start;
     justify-content:space-between;
+
     margin-bottom:1rem;
 }
 
@@ -90,22 +95,21 @@ HEADER
 
     font-weight:900;
 
-    line-height:.9;
-
     letter-spacing:-3px;
+
+    line-height:.9;
 }
 
 .profile-close-button{
-    width:52px;
-    height:52px;
+    width:48px;
+    height:48px;
 
     border:none;
-
     background:none;
 
     color:#7d8793;
 
-    font-size:2.5rem;
+    font-size:2.7rem;
 
     cursor:pointer;
 
@@ -116,25 +120,21 @@ HEADER
     color:#7b0b0b;
 }
 
-/*================================================
-TABS
-================================================*/
+/* =========================================
+SECTION TABS
+========================================= */
 
 .profile-section-tabs{
-    display:flex;
-    flex-wrap:wrap;
-    gap:3rem;
-
-    padding-bottom:1rem;
-
-    border-bottom:1px solid #e3ddd6;
-
     margin-bottom:1.5rem;
+
+    padding-bottom:18px;
+
+    border-bottom:1px solid #e7e2db;
 }
 
 .profile-section-tab{
-    border:none;
     background:none;
+    border:none;
 
     padding:0;
 
@@ -158,16 +158,16 @@ TABS
 
     display:block;
 
-    margin-top:12px;
+    margin-top:14px;
 
     height:2px;
 
     background:#7b0b0b;
 }
 
-/*================================================
+/* =========================================
 PROGRESS
-================================================*/
+========================================= */
 
 .profile-header-progress{
     margin-bottom:2rem;
@@ -175,6 +175,7 @@ PROGRESS
 
 .profile-header-progress-label{
     display:flex;
+
     justify-content:flex-end;
 
     margin-bottom:.5rem;
@@ -189,7 +190,7 @@ PROGRESS
 .profile-progress-bar{
     height:10px;
 
-    background:#e6e1db;
+    background:#e7e2db;
 
     border-radius:999px;
 
@@ -199,23 +200,23 @@ PROGRESS
 .profile-progress-fill{
     height:100%;
 
-    background:#7b0b0b;
+    background:#8f0d0d;
 
     border-radius:999px;
 
-    transition:.3s;
+    transition:.25s;
 }
 
-/*================================================
+/* =========================================
 FORM
-================================================*/
+========================================= */
 
 .form-builder{
-    max-width:850px;
+    max-width:900px;
 }
 
 .field{
-    margin-bottom:2rem;
+    margin-bottom:1.5rem;
 }
 
 .field-label{
@@ -227,37 +228,36 @@ FORM
 
     font-weight:700;
 
-    color:#231f20;
+    color:#222;
 }
 
-/*================================================
+/* =========================================
 INPUTS
-================================================*/
+========================================= */
 
 .input,
 select,
 textarea{
     width:100%;
 
-    max-width:850px;
+    max-width:100%;
 
-    height:64px;
+    height:58px;
 
-    padding:0 30px;
+    padding:0 24px;
 
     background:#fffdfa;
 
     border:1px solid #ddd4cc;
 
-    border-radius:32px;
+    border-radius:30px;
 
     font-family:
         "Courier Prime",
+        "Courier New",
         monospace;
 
-    font-size:1rem;
-
-    color:#231f20;
+    font-size:.95rem;
 
     transition:.2s;
 }
@@ -265,8 +265,6 @@ textarea{
 .input:focus,
 select:focus,
 textarea:focus{
-    outline:none;
-
     border-color:#7b0b0b;
 
     box-shadow:
@@ -274,41 +272,44 @@ textarea:focus{
 }
 
 textarea{
-    min-height:180px;
+    min-height:140px;
 
-    padding-top:24px;
+    padding-top:20px;
 }
 
-/*================================================
+/* =========================================
 SOCIAL
-================================================*/
+========================================= */
 
 .social-verification-list{
     display:flex;
     flex-direction:column;
-    gap:18px;
+    gap:16px;
 }
 
 .social-verification-row{
     display:flex;
+
     justify-content:space-between;
+
     align-items:center;
 
-    padding:24px;
+    padding:20px;
 
     background:white;
 
-    border:1px solid #e6dfd8;
+    border:1px solid #ebe4dc;
 
     border-radius:24px;
 }
 
-/*================================================
+/* =========================================
 FOOTER
-================================================*/
+========================================= */
 
 .profile-footer{
     display:flex;
+
     justify-content:flex-end;
 
     margin-top:2rem;
@@ -319,17 +320,17 @@ FOOTER
 .primary-button{
     min-width:220px;
 
-    height:68px;
+    height:64px;
 
     border:none;
 
-    border-radius:40px;
+    border-radius:32px;
 
     background:#a10000;
 
     color:white;
 
-    font-size:1.15rem;
+    font-size:1.1rem;
 
     font-weight:700;
 
@@ -345,9 +346,9 @@ FOOTER
         0 8px 20px rgba(161,0,0,.15);
 }
 
-/*================================================
+/* =========================================
 RESPONSIVE
-================================================*/
+========================================= */
 
 @media (max-width:1200px){
 
@@ -371,16 +372,12 @@ RESPONSIVE
         font-size:3rem;
     }
 
-    .profile-section-tabs{
-        gap:2rem;
+    .profile-title-row{
+        flex-direction:row;
     }
 
     .profile-section-tab{
         font-size:1rem;
-    }
-
-    .profile-footer{
-        justify-content:stretch;
     }
 
     .primary-button{
