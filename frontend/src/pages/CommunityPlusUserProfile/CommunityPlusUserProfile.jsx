@@ -305,9 +305,11 @@ export default function CommunityPlusUserProfile({
 
         {/* GUIDE PANEL */}
 
-<div className="profile-sidebar">
+{/* RIGHT COLUMN */}
 
 <div className="profile-sidebar">
+
+  <aside className="profile-guide">
 
     <ProfileHelpPanel
       section={
@@ -315,7 +317,7 @@ export default function CommunityPlusUserProfile({
       }
     />
 
-  </div>
+  </aside>
 
   <div className="profile-sidebar-actions">
 

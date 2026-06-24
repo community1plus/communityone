@@ -134,6 +134,35 @@ HEADER
     transition:.2s;
 }
 
+.profile-sidebar{
+    display:flex;
+    flex-direction:column;
+    min-height:calc(100vh - 220px);
+}
+
+.profile-sidebar-actions{
+    margin-top:auto;
+    padding-top:24px;
+}
+
+.profile-save-button{
+    width:100%;
+    height:58px;
+
+    border:none;
+    border-radius:32px;
+
+    background:#a10000;
+    color:#fff;
+
+    font-size:1.05rem;
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.2s;
+}
+
 .profile-save-button:hover{
     transform:translateY(-1px);
 
