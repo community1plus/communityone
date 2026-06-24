@@ -220,11 +220,11 @@ export default function CommunityPlusUserProfile({
               )}
 
             </div>
-<ProfileSectionTabs
-            steps={activeSteps}
-            currentStep={currentStep}
-            setCurrentStep={setCurrentStep}
-          />
+            <ProfileSectionTabs
+              steps={activeSteps}
+              currentStep={currentStep}
+              setCurrentStep={setCurrentStep}
+            />
 
           {/* PROGRESS */}
 
