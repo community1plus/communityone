@@ -174,7 +174,7 @@ PROGRESS
 ========================================= */
 
 .profile-header-progress{
-    margin-top:75rem;
+    margin-top:.75rem;
     margin-bottom:1.5rem;
 }
 
@@ -215,13 +215,18 @@ PROGRESS
 /* =========================================
 FORM
 ========================================= */
+.form-builder,
+.form-builder form{
+    width:100%;
+}
 
 .form-builder{
     max-width:900px;
 }
 
 .field{
-    margin-bottom:1.2rem;
+    width:100%;
+    margin-bottom:1.5rem;
 }
 
 .field-label{
@@ -313,17 +318,10 @@ FOOTER
 ========================================= */
 
 .profile-footer{
-    position:sticky;
-
-    bottom:0;
-
-    background:#f8f6f3;
-
-    padding-top:20px;
-
     display:flex;
-
     justify-content:flex-end;
+    margin-top:3rem;
+    padding-bottom:3rem;
 }
 
 .primary-button{
