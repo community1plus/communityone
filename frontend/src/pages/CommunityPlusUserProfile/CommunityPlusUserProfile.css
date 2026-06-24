@@ -36,6 +36,38 @@ LAYOUT
         0 2px 12px rgba(0,0,0,.03);
 }
 
+.profile-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 28px;
+}
+
+.profile-card-header h1 {
+  margin: 0;
+
+  font-size: 3.6rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.03em;
+
+  color: #111827;
+}
+
+.profile-content-card,
+.profile-guide,
+.profile-action-card {
+  background: #fff;
+
+  border: 1px solid rgba(15,23,42,.06);
+
+  border-radius: 32px;
+
+  box-shadow:
+    0 8px 24px rgba(15,23,42,.04);
+}
+
 .profile-content-card,
 .profile-guide,
 .profile-action-card {
