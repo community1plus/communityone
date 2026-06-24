@@ -114,7 +114,7 @@ export function AuthProvider({ children }) {
         });
 
         const accessToken =
-          session.tokens?.accessToken?.toString();
+          authToken = session.tokens?.idToken?.toString();
 
         if (!accessToken) {
           clearAuth();
