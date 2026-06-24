@@ -186,6 +186,9 @@ export default function CommunityPlusUserProfile({
 
   );
 
+  const sectionId =
+  activeSteps[currentStep]?.id;
+
   return (
 
   <div className="profile-page">
@@ -273,14 +276,25 @@ export default function CommunityPlusUserProfile({
 
           {/* FORM */}
 
-          <FormBuilder
-            steps={[
-              activeSteps[currentStep]
-            ]}
-            currentStep={0}
-            form={form}
-            readOnly={false}
-          />
+{
+ sectionId === "social" ? (
+
+   <ProfileSocialSection />
+
+ ) : sectionId === "payment" ? (
+
+   <ProfilePaymentSection />
+
+ ) : (
+
+   <FormBuilder
+      steps={[activeSteps[currentStep]]}
+      currentStep={0}
+      form={form}
+   />
+
+ )
+}
 
           {/* FOOTER */}
 
