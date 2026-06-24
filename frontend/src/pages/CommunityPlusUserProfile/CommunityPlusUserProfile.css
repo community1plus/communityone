@@ -56,19 +56,18 @@ CARD HEADER
     display:flex;
     align-items:center;
     justify-content:space-between;
-
-    padding:0 0 24px;
+    padding: 20px 32px;
+    min-height: 120px;
     margin-bottom:20px;
 }
 
 .profile-card-header h1{
     margin:0;
 
-    font-size:4.5rem;
-    font-weight:800;
-
+    font-size:2.5rem;
+    font-weight:600;
     line-height:1;
-    letter-spacing:-0.04em;
+    letter-spacing:-0.03em;
 
     color:#111827;
 }
