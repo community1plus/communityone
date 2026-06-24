@@ -243,14 +243,14 @@ PROGRESS
 
     margin-bottom:8px;
 
-    font-size:.95rem;
-    font-weight:600;
+    font-size:.8rem;
+    font-weight:500;
 
     color:#6b7280;
 }
 
 .profile-progress-bar{
-    height:10px;
+    height:8px;
 
     background:#e7e2db;
 
