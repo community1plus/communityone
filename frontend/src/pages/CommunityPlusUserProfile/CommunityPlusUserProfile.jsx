@@ -200,9 +200,7 @@ export default function CommunityPlusUserProfile({
 
             <div className="profile-title">
 
-              <h1>
-                USER PROFILE
-              </h1>
+              <h1>USER PROFILE</h1>
 
                 {editMode && (
 
@@ -215,7 +213,7 @@ export default function CommunityPlusUserProfile({
                 </button>
 
               )}
-
+            </div>
             <ProfileSectionTabs
               steps={activeSteps}
               currentStep={currentStep}
@@ -254,16 +252,7 @@ export default function CommunityPlusUserProfile({
                   )}% Complete
 
                 </div>
-
-
-
-              
-
             </div>
-
-          </div>
-
-
 
           <FormBuilder
             steps={[
