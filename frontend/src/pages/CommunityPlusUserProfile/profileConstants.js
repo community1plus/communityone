@@ -46,7 +46,7 @@ export const PROFILE_TABS = [
 export const PERSONAL_STEPS = [
   {
     id: "user-profile",
-    title: "USER",
+    title: "User",
     fields: [
       {
         name: "display_name",
@@ -63,7 +63,7 @@ export const PERSONAL_STEPS = [
 
   {
     id: "home-address",
-    title: "HOME ADDRESS",
+    title: "Home Address",
     fields: [
       {
         name: "streetAddress",
@@ -85,7 +85,7 @@ export const PERSONAL_STEPS = [
 
   {
     id: "contact",
-    title: "CONTACT",
+    title: "Contact",
     fields: [
       {
         name: "phoneDisplay",
@@ -102,7 +102,7 @@ export const PERSONAL_STEPS = [
 
   {
     id: "social",
-    title: "SOCIAL",
+    title: "Social",
     fields: [
       {
         name: "facebookUrl",
@@ -129,7 +129,7 @@ export const PERSONAL_STEPS = [
 
   {
     id: "payment",
-    title: "PAYMENT DETAILS",
+    title: "Payment Details",
     fields: [],
   },
 ];
@@ -141,7 +141,7 @@ export const PERSONAL_STEPS = [
 export const ORG_STEPS = [
   {
     id: "organisation",
-    title: "ORGANISATION",
+    title: "Oganisation",
     fields: [
       {
         name: "organisationName",
@@ -153,7 +153,7 @@ export const ORG_STEPS = [
 
   {
     id: "address",
-    title: "ADDRESS",
+    title: "Address",
     fields: [
       {
         name: "organisationStreetAddress",
@@ -175,7 +175,7 @@ export const ORG_STEPS = [
 
   {
     id: "contact",
-    title: "CONTACT",
+    title: "Contact",
     fields: [
       {
         name: "organisationPhone",
@@ -192,7 +192,7 @@ export const ORG_STEPS = [
 
   {
     id: "social",
-    title: "SOCIAL",
+    title: "Social",
     fields: [
       {
         name: "organisationWebsite",
@@ -224,7 +224,7 @@ export const ORG_STEPS = [
 
   {
     id: "payment",
-    title: "PAYMENT DETAILS",
+    title: "Payment Details",
     fields: [],
   },
 ];
