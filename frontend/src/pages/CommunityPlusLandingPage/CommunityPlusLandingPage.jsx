@@ -51,6 +51,14 @@ const needsProfileSetup =
     profile === null
   );
 
+console.log("PROFILE CHECK", {
+  profileReady,
+  profileMissing,
+  hasProfile,
+  profile,
+  needsProfileSetup,
+});
+
 useEffect(() => {
   const state = location.state;
 
