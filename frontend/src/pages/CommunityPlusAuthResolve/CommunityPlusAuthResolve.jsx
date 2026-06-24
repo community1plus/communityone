@@ -70,6 +70,11 @@ export default function CommunityPlusAuthResolve() {
     return <div style={{ padding: 40 }}>Loading profile...</div>;
   }
 
+   console.log("AUTH RESOLVE FINAL", {
+  profileReady,
+  hasProfile,
+});
+
   if (!hasProfile) {
     return <Navigate to="/communityplus/profile" replace />;
   }
