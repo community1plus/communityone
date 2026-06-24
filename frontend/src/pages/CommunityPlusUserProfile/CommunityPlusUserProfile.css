@@ -45,7 +45,7 @@ CARD SYSTEM
 }
 
 .profile-content-card{
-    padding:32px;
+    padding:32px 40px;
 }
 
 /* =========================================
@@ -53,22 +53,24 @@ CARD HEADER
 ========================================= */
 
 .profile-card-header {
-  padding: 28px 36px;
-  min-height: auto;
+  padding: 0 0 20px;
+  margin-bottom: 20px;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
+
+  border-bottom: 1px solid #ece7e1;
 }
 
 .profile-card-header h1 {
   margin: 0;
 
-  font-size: 2.75rem;
+  font-size: 3rem;
   font-weight: 700;
 
   line-height: 1;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.03em;
 }
 
 .profile-close-button{
