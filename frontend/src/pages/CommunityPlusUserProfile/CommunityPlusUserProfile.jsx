@@ -188,7 +188,6 @@ export default function CommunityPlusUserProfile({
       navigate,
 
     ]
-
   );
 
   const sectionId =
@@ -197,18 +196,14 @@ export default function CommunityPlusUserProfile({
   return (
 
   <div className="profile-page">
-
     <div className="profile-container">
-
       <div className="profile-layout">
-
         <div className="profile-left">
-
           {/* HEADER */}
 
-          <div className="profile-header">
+          <div className="profile-content-card">
 
-            <div className="profile-title-row">
+            <div className="profile-card-header">
 
               <h1>USER PROFILE</h1>
 
@@ -230,7 +225,7 @@ export default function CommunityPlusUserProfile({
 
           {/* TABS */}
 
-<div className="profile-content-card">
+
           <ProfileSectionTabs
             steps={activeSteps}
             currentStep={currentStep}
@@ -298,11 +293,10 @@ export default function CommunityPlusUserProfile({
                 currentStep={0}
                 form={form}
               />
-
             )
           }
 
-        </div>
+        
 
       </div>
 
@@ -317,7 +311,6 @@ export default function CommunityPlusUserProfile({
         activeSteps[currentStep]?.id
       }
     />
-
   </aside>
 
   <div className="profile-sidebar-actions">
