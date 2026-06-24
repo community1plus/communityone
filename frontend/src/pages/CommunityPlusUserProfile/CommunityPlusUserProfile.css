@@ -36,7 +36,7 @@ LAYOUT
     background:#fdfcf9;
     border:1px solid #ebe4dc;
     border-radius:36px;
-    padding:32px;
+    padding:28px;
     position:sticky;
     top:2rem;
     height:max-content;
@@ -52,6 +52,7 @@ LAYOUT
 
 .profile-guide h2{
     margin:0 0 2rem;
+    margin-bottom:1.5rem;
 
     font-size:2.4rem;
 
@@ -103,7 +104,7 @@ HEADER
 .profile-close-button{
     width:48px;
     height:48px;
-
+    margin-top: -4px;
     border:none;
     background:none;
 
@@ -125,11 +126,14 @@ SECTION TABS
 ========================================= */
 
 .profile-section-tabs{
-    margin-bottom:1.5rem;
+    display:flex;
+    align-items:center;
+    gap:48px;
 
-    padding-bottom:18px;
+    margin-bottom:1rem;
+    padding-bottom:16px;
 
-    border-bottom:1px solid #e7e2db;
+    border-bottom:1px solid #e8e3dc;
 }
 
 .profile-section-tab{
@@ -170,7 +174,8 @@ PROGRESS
 ========================================= */
 
 .profile-header-progress{
-    margin-bottom:2rem;
+    margin-top:1rem;
+    margin-bottom:1.5rem;
 }
 
 .profile-header-progress-label{
@@ -178,7 +183,7 @@ PROGRESS
 
     justify-content:flex-end;
 
-    margin-bottom:.5rem;
+    margin-bottom:.8px;
 
     font-size:1rem;
 
@@ -242,15 +247,15 @@ textarea{
 
     max-width:100%;
 
-    height:58px;
+    height:54px;
 
-    padding:0 24px;
+    padding:0 22px;
 
     background:#fffdfa;
 
     border:1px solid #ddd4cc;
 
-    border-radius:30px;
+    border-radius:28px;
 
     font-family:
         "Courier Prime",
@@ -372,9 +377,11 @@ RESPONSIVE
         font-size:3rem;
     }
 
-    .profile-title-row{
-        flex-direction:row;
-    }
+.profile-title-row{
+    display:flex;
+    align-items:center;
+    gap:20px;
+}
 
     .profile-section-tab{
         font-size:1rem;
