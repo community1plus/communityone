@@ -203,7 +203,7 @@ export default function CommunityPlusUserProfile({
 
           <div className="profile-content-card">
 
-            
+            <div className="profile-card-header">
 
               <h1>USER PROFILE</h1>
 
@@ -219,13 +219,13 @@ export default function CommunityPlusUserProfile({
 
               )}
 
-           
+            </div>
 
           </div>
 
           {/* TABS */}
 
-
+        
           <ProfileSectionTabs
             steps={activeSteps}
             currentStep={currentStep}
@@ -296,7 +296,7 @@ export default function CommunityPlusUserProfile({
             )
           }
 
-        
+      
 
       </div>
 
