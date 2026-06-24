@@ -102,6 +102,13 @@ export default function HeaderTopRow({ onOpenAuthModal }) {
               <span className="guest-readonly">Read Only</span>
 
               <button
+                className="guest-exit"
+                onClick={() => navigate("/")}
+              >
+                Exit Guest
+              </button>
+
+              <button
                 type="button"
                 className="guest-signin"
                 onClick={handleSignInClick}

@@ -1249,3 +1249,21 @@
     translateX(2px);
 }
 
+.guest-exit{
+    border:none;
+    background:none;
+
+    color:#888;
+
+    font-size:13px;
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.2s;
+}
+
+.guest-exit:hover{
+    color:#8d1b1b;
+}
+

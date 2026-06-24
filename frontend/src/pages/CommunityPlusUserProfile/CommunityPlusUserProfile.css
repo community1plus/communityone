@@ -32,7 +32,7 @@ LAYOUT
     background:#fdfcf9;
     border:1px solid #ebe4dc;
     border-radius:32px;
-    padding:48px;
+    padding:36px;
     position:sticky;
     top:2rem;
 
@@ -51,8 +51,8 @@ LAYOUT
 
 .profile-guide h2{
     margin:0 0 3rem;
-
-    font-size:2.5rem;
+    margin-bottom:2rem;
+    font-size:2.4rem;
 
     line-height:1.25;
 
@@ -156,10 +156,10 @@ SECTION TABS
     display:flex;
     align-items:center;
     flex-wrap:wrap;
-    gap:48px;
+    gap:28px;
 
     padding-bottom:20px;
-    margin-bottom:48px;
+    margin-bottom:24px;
 
     border-bottom:1px solid #e3ddd6;
 }
@@ -198,10 +198,11 @@ FORM
 
 .form-builder{
     max-width:760px;
+    margin-top:1rem;
 }
 
 .field{
-    margin-bottom:4.5rem;
+    margin-bottom:2rem;
 }
 
 .field-label{
@@ -225,7 +226,7 @@ textarea{
     width:100%;
     max-width:700px;
 
-    height:80px;
+    height:64px;
 
     padding:0 32px;
 
@@ -233,14 +234,14 @@ textarea{
 
     border:1px solid #ddd4cc;
 
-    border-radius:40px;
+    border-radius:32px;
 
     font-family:
         "Courier Prime",
         "Courier New",
         monospace;
 
-    font-size:1.2rem;
+    font-size:1.0rem;
 
     color:#231f20;
 
@@ -361,8 +362,8 @@ RESPONSIVE
     }
 
     .profile-title h1{
-        font-size:3rem;
-        letter-spacing:-2px;
+        font-size:4rem;
+        letter-spacing:-3px;
     }
 
     .profile-header-progress{
