@@ -230,6 +230,7 @@ export default function CommunityPlusUserProfile({
 
           {/* TABS */}
 
+<div className="profile-content-card">
           <ProfileSectionTabs
             steps={activeSteps}
             currentStep={currentStep}
@@ -281,16 +282,16 @@ export default function CommunityPlusUserProfile({
 
           {/* FORM */}
 
-{
- sectionId === "social" ? (
+          {
+            sectionId === "social" ? (
 
    <ProfileSocialSection />
 
- ) : sectionId === "payment" ? (
+            ) : sectionId === "payment" ? (
 
    <ProfilePaymentSection />
 
- ) : (
+            ) : (
 
    <FormBuilder
       steps={[activeSteps[currentStep]]}
@@ -298,13 +299,13 @@ export default function CommunityPlusUserProfile({
       form={form}
    />
 
- )
-}         
+            )
+          }         
 
         </div>
 
         {/* GUIDE PANEL */}
-
+</div>
 {/* RIGHT COLUMN */}
 
 <div className="profile-sidebar">
