@@ -34,10 +34,18 @@ SIDEBAR
 .profile-sidebar{
     display:flex;
     flex-direction:column;
-    gap:24px;
+    gap:20px;
     min-height:calc(100vh - 180px);
+    width: 320px;
+    position: sticky;
+    top: 24px;
+    align-self: start;
 }
 
+.profile-guide,
+.profile-sidebar-actions{
+    width:100%;
+}
 .profile-guide{
     background:#fdfcf9;
     border:1px solid #ebe4dc;
@@ -93,6 +101,16 @@ SIDEBAR
     bottom:24px;
 
     z-index:20;
+}
+
+.profile-sidebar-actions{
+    background:#fff;
+    border:1px solid #ebe4dc;
+    border-radius:32px;
+    padding:20px;
+
+    box-shadow:
+        0 12px 32px rgba(0,0,0,.08);
 }
 
 .profile-save-button{
