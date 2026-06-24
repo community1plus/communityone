@@ -203,7 +203,7 @@ export default function CommunityPlusUserProfile({
 
           <div className="profile-content-card">
 
-            <div className="profile-card-header">
+            
 
               <h1>USER PROFILE</h1>
 
@@ -219,7 +219,7 @@ export default function CommunityPlusUserProfile({
 
               )}
 
-            </div>
+           
 
           </div>
 
