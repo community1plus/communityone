@@ -311,15 +311,7 @@ export default function CommunityPlusUserProfile({
     />
   </aside>
 
-<div className="profile-sidebar">
 
-  <aside className="profile-guide">
-    <ProfileHelpPanel
-      section={activeSteps[currentStep]?.id}
-    />
-  </aside>
-
-</div>
 
 <div className="profile-floating-save">
 
