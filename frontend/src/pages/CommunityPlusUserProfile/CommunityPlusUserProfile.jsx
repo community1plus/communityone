@@ -271,26 +271,22 @@ export default function CommunityPlusUserProfile({
 
           {/* FORM */}
 
-          {
-            sectionId === "social" ? (
+          
+<div className="profile-form-content">
 
-              <ProfileSocialSection />
+  {sectionId === "social" ? (
+    <ProfileSocialSection />
+  ) : sectionId === "payment" ? (
+    <ProfilePaymentSection />
+  ) : (
+    <FormBuilder
+      steps={[activeSteps[currentStep]]}
+      currentStep={0}
+      form={form}
+    />
+  )}
 
-            ) : sectionId === "payment" ? (
-
-              <ProfilePaymentSection />
-
-            ) : (
-
-              <FormBuilder
-                steps={[activeSteps[currentStep]]}
-                currentStep={0}
-                form={form}
-              />
-            )
-          }
-
-      
+</div>
 
           </div>
 
@@ -310,8 +306,6 @@ export default function CommunityPlusUserProfile({
       }
     />
   </aside>
-
-
 
 <div className="profile-floating-save">
 

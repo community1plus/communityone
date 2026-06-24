@@ -45,7 +45,9 @@ CARD SYSTEM
 }
 
 .profile-content-card{
-    padding:32px 40px;
+    min-height: calc(100vh - 260px);
+    display:flex;
+    flex-direction:column;
 }
 
 .profile-floating-save{
