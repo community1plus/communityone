@@ -4,6 +4,7 @@ import ProfileHelpPanel
 import ProfileSocialSection
   from "../../components/Profile/ProfileSocialSection";
 
+import ProfilePaymentSection from "../../components/Profile/ProfilePaymentSection";
 
 import {
   useState,
