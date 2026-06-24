@@ -27,57 +27,73 @@ LAYOUT
     min-width:0;
 }
 
-.profile-content-card{
-    background:#fdfcf9;
-    border:1px solid #ebe4dc;
-    border-radius:28px;
-    padding:20px;
+/* =========================================
+CARD SYSTEM
+========================================= */
+
+.profile-content-card,
+.profile-guide,
+.profile-sidebar-actions{
+    background:#fff;
+
+    border:1px solid rgba(15,23,42,.06);
+
+    border-radius:32px;
+
     box-shadow:
-        0 2px 12px rgba(0,0,0,.03);
+        0 8px 24px rgba(15,23,42,.04);
 }
 
-.profile-card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 24px 28px;
-  margin-bottom: 24px;  
-  margin-bottom: 28px;
+.profile-content-card{
+    padding:32px;
 }
 
-.profile-card-header h1 {
-  margin: 0;
-  font-size: 4rem;
-  font-weight: 800;
-  line-height: 1;
-  letter-spacing: -0.03em;
-  color: #111827;
+/* =========================================
+CARD HEADER
+========================================= */
+
+.profile-card-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    padding:0 0 24px;
+    margin-bottom:20px;
 }
 
-.profile-content-card,
-.profile-guide,
-.profile-action-card {
-  background: #fff;
+.profile-card-header h1{
+    margin:0;
 
-  border: 1px solid rgba(15,23,42,.06);
+    font-size:4.5rem;
+    font-weight:800;
 
-  border-radius: 32px;
+    line-height:1;
+    letter-spacing:-0.04em;
 
-  box-shadow:
-    0 8px 24px rgba(15,23,42,.04);
+    color:#111827;
 }
 
-.profile-content-card,
-.profile-guide,
-.profile-action-card {
-  background: #fff;
-  border: 1px solid rgba(15,23,42,.06);
+.profile-close-button{
+    width:48px;
+    height:48px;
 
-  box-shadow:
-    0 8px 30px rgba(15,23,42,.04);
+    border:none;
+    background:none;
 
-  border-radius: 32px;
+    color:#94a3b8;
+
+    font-size:2.75rem;
+    line-height:1;
+
+    cursor:pointer;
+
+    transition:.2s;
 }
+
+.profile-close-button:hover{
+    color:#7b0b0b;
+}
+
 /* =========================================
 SIDEBAR
 ========================================= */
@@ -86,31 +102,22 @@ SIDEBAR
     display:flex;
     flex-direction:column;
     gap:24px;
-    min-height:calc(100vh - 180px);
-    width: 320px;
-    position: sticky;
-    top: 24px;
-    align-self: start;
+
+    width:320px;
+
+    position:sticky;
+    top:24px;
+
+    align-self:start;
 }
 
-.profile-guide,
-.profile-sidebar-actions{
-    width:100%;
-}
 .profile-guide{
-    background:#fdfcf9;
-    border:1px solid #ebe4dc;
-    border-radius:32px;
     padding:28px;
-    width: 320px;
-    height: max-content;
+
     font-family:
         "Courier Prime",
         "Courier New",
         monospace;
-
-    box-shadow:
-        0 2px 12px rgba(0,0,0,.03);
 }
 
 .profile-guide h2{
@@ -135,45 +142,37 @@ SIDEBAR
     color:#444;
 }
 
-.profile-action-card{
-    background:#fff;
-    border:1px solid #ebe4dc;
-    border-radius:24px;
-    padding:18px;
-
-    box-shadow:
-        0 12px 32px rgba(0,0,0,.06);
-}
-
 .profile-sidebar-actions{
     margin-top:auto;
-    padding-top: 32px;
+
+    padding:20px;
+
     position:sticky;
     bottom:24px;
 
     z-index:20;
 }
 
-.profile-sidebar-actions{
-    background:#fff;
-    border:1px solid #ebe4dc;
-    border-radius:32px;
-    padding:20px;
-
-    box-shadow:
-        0 12px 32px rgba(0,0,0,.08);
-}
+/* =========================================
+SAVE BUTTON
+========================================= */
 
 .profile-save-button{
     width:100%;
     height:64px;
+
     border:none;
-    border-radius:32px;
+    border-radius:999px;
+
     background:#a10000;
+
     color:#fff;
+
     font-size:1rem;
     font-weight:600;
+
     cursor:pointer;
+
     transition:.2s;
 }
 
@@ -185,53 +184,6 @@ SIDEBAR
 }
 
 /* =========================================
-HEADER
-========================================= */
-
-.profile-header{
-    margin-bottom:20px;
-    margin-top: 20px;
-}
-
-.profile-title-row{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-}
-
-.profile-title-row h1{
-    margin:0;
-
-    font-size:3rem;
-    font-weight:700;
-
-    letter-spacing:-.03em;
-
-    line-height:1;
-}
-
-.profile-close-button{
-    width:48px;
-    height:48px;
-
-    border:none;
-    background:none;
-
-    color:#7d8793;
-
-    font-size:2.5rem;
-    line-height:1;
-
-    cursor:pointer;
-
-    transition:.2s;
-}
-
-.profile-close-button:hover{
-    color:#7b0b0b;
-}
-
-/* =========================================
 TABS
 ========================================= */
 
@@ -240,7 +192,7 @@ TABS
     align-items:center;
     gap:40px;
 
-    margin-bottom:24px;
+    margin-bottom:28px;
     padding-bottom:16px;
 
     border-bottom:1px solid #e8e3dc;
@@ -283,7 +235,7 @@ PROGRESS
 ========================================= */
 
 .profile-header-progress{
-    margin:0 0 1.5rem;
+    margin-bottom:32px;
 }
 
 .profile-header-progress-label{
@@ -365,15 +317,15 @@ select,
 textarea{
     width:100%;
 
-    height:48px;
+    height:56px;
 
-    padding:0 22px;
+    padding:0 24px;
 
     background:#fffdfa;
 
     border:1px solid #ddd4cc;
 
-    border-radius:24px;
+    border-radius:28px;
 
     font-family:
         "Courier Prime",
@@ -396,7 +348,6 @@ textarea:focus{
 
 textarea{
     min-height:140px;
-
     padding-top:20px;
 }
 
@@ -411,6 +362,7 @@ SOCIAL
 
 .social-row{
     display:grid;
+
     grid-template-columns:
         minmax(180px,1fr)
         180px
@@ -432,13 +384,11 @@ SOCIAL
 
 .social-status{
     color:#94a3b8;
-
     font-size:.95rem;
 }
 
 .social-status.connected{
     color:#15803d;
-
     font-weight:600;
 }
 
@@ -473,7 +423,6 @@ RESPONSIVE
     .profile-sidebar{
         display:none;
     }
-
 }
 
 @media (max-width:768px){
@@ -482,8 +431,8 @@ RESPONSIVE
         padding:20px;
     }
 
-    .profile-title-row h1{
-        font-size:2.5rem;
+    .profile-card-header h1{
+        font-size:3rem;
     }
 
     .profile-section-tabs{
@@ -494,5 +443,4 @@ RESPONSIVE
     .field-grid-2{
         grid-template-columns:1fr;
     }
-
 }
