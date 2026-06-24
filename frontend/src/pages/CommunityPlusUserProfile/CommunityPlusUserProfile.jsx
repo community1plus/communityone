@@ -321,18 +321,22 @@ export default function CommunityPlusUserProfile({
 
   <div className="profile-sidebar-actions">
 
-    <button
-      type="button"
-      className="profile-save-button"
-      disabled={savingProfile}
-      onClick={handleSaveProfile}
-    >
-      {
-        savingProfile
-          ? "Saving..."
-          : "Save Changes"
-      }
-    </button>
+    <div className="profile-action-card">
+
+      <button
+        type="button"
+        className="profile-save-button"
+        disabled={savingProfile}
+        onClick={handleSaveProfile}
+      >
+        {
+          savingProfile
+            ? "Saving..."
+            : "Save Changes"
+        }
+      </button>
+
+    </div>
 
   </div>
 

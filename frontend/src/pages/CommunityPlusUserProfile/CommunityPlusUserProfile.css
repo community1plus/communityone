@@ -35,6 +35,7 @@ SIDEBAR
     display:flex;
     flex-direction:column;
     gap:24px;
+    min-height:calc(100vh - 180px);
 }
 
 .profile-guide{
@@ -42,6 +43,8 @@ SIDEBAR
     border:1px solid #ebe4dc;
     border-radius:32px;
     padding:28px;
+    width: 320px;
+    height: max-content;
     font-family:
         "Courier Prime",
         "Courier New",
@@ -73,8 +76,28 @@ SIDEBAR
     color:#444;
 }
 
+.profile-action-card{
+    width:320px;
+
+    padding:16px;
+
+    background:#fdfcf9;
+
+    border:1px solid #ebe4dc;
+
+    border-radius:24px;
+
+    box-shadow:
+        0 4px 20px rgba(0,0,0,.04);
+}
+
 .profile-sidebar-actions{
-    width:100%;
+    margin-top:auto;
+
+    position:sticky;
+    bottom:24px;
+
+    z-index:20;
 }
 
 .profile-save-button{
