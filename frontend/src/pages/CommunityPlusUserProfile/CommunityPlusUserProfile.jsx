@@ -299,19 +299,15 @@ export default function CommunityPlusUserProfile({
    />
 
  )
-}
-
-
-
-          
+}         
 
         </div>
 
         {/* GUIDE PANEL */}
 
-<aside className="profile-guide">
+<div className="profile-sidebar">
 
-  <div className="profile-guide-content">
+<div className="profile-sidebar">
 
     <ProfileHelpPanel
       section={
@@ -321,7 +317,7 @@ export default function CommunityPlusUserProfile({
 
   </div>
 
-  <div className="profile-guide-actions">
+  <div className="profile-sidebar-actions">
 
     <button
       type="button"
@@ -329,20 +325,16 @@ export default function CommunityPlusUserProfile({
       disabled={savingProfile}
       onClick={handleSaveProfile}
     >
-
       {
         savingProfile
           ? "Saving..."
-          : editMode
-            ? "Save Changes"
-            : "Save & Continue"
+          : "Save Changes"
       }
-
     </button>
 
   </div>
 
-</aside>
+</div>
 
       </div>
 

@@ -106,6 +106,41 @@ HEADER
     line-height:.9;
 }
 
+.profile-sidebar{
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+}
+
+.profile-sidebar-actions{
+    display:flex;
+}
+
+.profile-save-button{
+    width:100%;
+    height:56px;
+
+    border:none;
+    border-radius:28px;
+
+    background:#a10000;
+    color:#fff;
+
+    font-size:1rem;
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.2s;
+}
+
+.profile-save-button:hover{
+    transform:translateY(-1px);
+
+    box-shadow:
+        0 8px 20px rgba(161,0,0,.15);
+}
+
 .profile-close-button{
     width:48px;
     height:48px;
