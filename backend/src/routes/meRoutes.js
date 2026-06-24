@@ -90,30 +90,18 @@ router.get("/", async (req, res) => {
       ]
     );
 
-    const rawProfile = profileResult.rows[0] || null;
+ const rawProfile =
+  profileResult.rows[0] || null;
 
 console.log(
   "RAW PROFILE",
   JSON.stringify(rawProfile, null, 2)
 );
 
-const normalized =
-  normalizeProfile(rawProfile);
-
-console.log(
-  "NORMALIZED PROFILE",
-  JSON.stringify(normalized, null, 2)
-);
-
-const profile = {
-  ...normalized,
-  organisationProfile,
-  organisation: organisationProfile,
-};
-
-    let organisationProfile = null;
+let organisationProfile = null;
 
 if (rawProfile?.id) {
+
   const orgResult = await pool.query(
     `
     SELECT *
@@ -124,34 +112,59 @@ if (rawProfile?.id) {
     [rawProfile.id]
   );
 
-  organisationProfile = orgResult.rows[0] || null;
+  organisationProfile =
+    orgResult.rows[0] || null;
 }
 
-    console.log("👤 /api/me profile lookup:", {
-      found: !!rawProfile,
-      profileId: rawProfile?.id || null,
-      profileUserId: rawProfile?.user_id || null,
-      profileUsername: rawProfile?.username || null,
-    });
+const normalizedProfile =
+  normalizeProfile(rawProfile);
 
-    const profile = {
-  ...normalizeProfile(rawProfile),
-
-  organisationProfile,
-
-  organisation: organisationProfile,
-};
+console.log(
+  "NORMALIZED PROFILE",
+  JSON.stringify(
+    normalizedProfile,
+    null,
+    2
+  )
+);
 
 console.log(
   "ORG PROFILE",
-  organisationProfile
+  JSON.stringify(
+    organisationProfile,
+    null,
+    2
+  )
 );
+
+const profile = {
+  ...normalizedProfile,
+  organisationProfile,
+  organisation:
+    organisationProfile,
+};
 
 console.log(
   "FINAL PROFILE",
-  profile
+  JSON.stringify(
+    profile,
+    null,
+    2
+  )
 );
 
+console.log(
+  "PROFILE LOOKUP",
+  {
+    found: !!rawProfile,
+    profileId:
+      rawProfile?.id || null,
+    profileUserId:
+      rawProfile?.user_id || null,
+    profileUsername:
+      rawProfile?.username || null,
+  }
+);
     /* =========================
        PROVIDERS
     ========================= */
