@@ -1249,28 +1249,3 @@
     translateX(2px);
 }
 
-/* =========================================
-   AVATAR
-========================================= */
-
-.header-avatar {
-  width: 58px;
-  height: 58px;
-
-  border-radius: 999px;
-
-  overflow: hidden;
-
-  flex-shrink: 0;
-
-  box-shadow:
-    0 10px 24px
-    rgba(0,0,0,0.16);
-}
-
-.header-avatar img {
-  width: 100%;
-  height: 100%;
-
-  object-fit: cover;
-}

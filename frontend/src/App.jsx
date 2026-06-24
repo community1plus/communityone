@@ -95,7 +95,7 @@ console.log("PROFILE GATE", {
   if (!hasProfile || profile === null) {
     return (
       <Navigate
-        to="/communityplus/profile"
+        to="/profile"
         replace
         state={{
           profileRequired: true,
@@ -148,7 +148,7 @@ export default function App() {
       />
       
     <Route
-        path="/communityplus/profile"
+        path="/profile"
         element={
         <ProtectedRoute>
           <CommunityPlusUserProfile editMode={false} />
@@ -219,6 +219,16 @@ export default function App() {
             }
           />
 
+<Route
+    path="/communityplus/profile"
+    element={
+      <ProtectedRoute>
+        <CommunityPlusUserProfile
+          editMode
+        />
+      </ProtectedRoute>
+    }
+/>
           <Route
             path="/communityplus/account"
             element={

@@ -112,7 +112,7 @@ export default function HeaderTopRow({ onOpenAuthModal }) {
 
             <button
               type="button"
-              className="header-avatar guest-avatar-button"
+              className="avatar guest-avatar-button"
               onClick={handleSignInClick}
               aria-label="Sign in"
             >
