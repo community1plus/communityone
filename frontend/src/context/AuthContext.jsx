@@ -113,9 +113,7 @@ export function AuthProvider({ children }) {
           forceRefresh,
         });
 
-        const accessToken =
-          authToken = session.tokens?.idToken?.toString();
-
+        const accessToken = session.tokens?.idToken?.toString();
         if (!accessToken) {
           clearAuth();
           return null;

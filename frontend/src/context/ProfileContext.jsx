@@ -289,12 +289,25 @@ const getAuthHeaders = useCallback(
       });
 
       authToken = session.tokens?.idToken?.toString();
+
+      console.log(
+  "TOKEN TYPE",
+  session.tokens?.idToken?.payload?.token_use,
+  session.tokens?.accessToken?.payload?.token_use
+
+  
+);
     }
 
     if (!authToken) {
       throw new Error("No access token found");
     }
 
+
+    console.log(
+  "AUTH HEADER TOKEN",
+  authToken?.slice(0, 50)
+);
     return {
       "Content-Type": "application/json",
       Authorization: `Bearer ${authToken}`,
@@ -478,6 +491,9 @@ const getAuthHeaders = useCallback(
 console.log(
   "FULL VERIFIED TOKEN",
   JSON.stringify(decoded, null, 2)
+  
+
+  
 );
         const payload = normaliseApiResponse(res);
 
