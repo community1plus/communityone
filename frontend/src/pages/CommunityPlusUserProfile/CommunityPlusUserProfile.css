@@ -64,7 +64,7 @@ CARD HEADER
 .profile-card-header h1{
     margin:0;
 
-    font-size:2.5rem;
+    font-size:0.5rem;
     font-weight:600;
     line-height:1;
     letter-spacing:-0.03em;
@@ -73,15 +73,15 @@ CARD HEADER
 }
 
 .profile-close-button{
-    width:48px;
-    height:48px;
+    width:40px;
+    height:40px;
 
     border:none;
     background:none;
 
     color:#94a3b8;
 
-    font-size:2.75rem;
+    font-size:2rem;
     line-height:1;
 
     cursor:pointer;
