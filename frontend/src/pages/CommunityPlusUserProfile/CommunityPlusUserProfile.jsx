@@ -220,13 +220,7 @@ export default function CommunityPlusUserProfile({
               )}
 
             </div>
-
-          </div>
-
-          {/* TABS */}
-
-        
-          <ProfileSectionTabs
+<ProfileSectionTabs
             steps={activeSteps}
             currentStep={currentStep}
             setCurrentStep={setCurrentStep}
@@ -298,6 +292,10 @@ export default function CommunityPlusUserProfile({
 
       
 
+          </div>
+
+          {/* TABS */}
+          
       </div>
 
       {/* RIGHT COLUMN */}

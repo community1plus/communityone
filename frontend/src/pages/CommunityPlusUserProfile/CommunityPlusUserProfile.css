@@ -53,8 +53,8 @@ CARD HEADER
 ========================================= */
 
 .profile-card-header {
-  padding: 0;
-  min-height: 100px;
+  padding: 28px 36px;
+  min-height: auto;
 
   display: flex;
   align-items: center;
