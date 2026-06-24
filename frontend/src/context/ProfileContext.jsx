@@ -288,7 +288,7 @@ const getAuthHeaders = useCallback(
         forceRefresh: true,
       });
 
-      authToken = session.tokens?.accessToken?.toString();
+      authToken = session.tokens?.idToken?.toString();
     }
 
     if (!authToken) {
@@ -475,7 +475,10 @@ const getAuthHeaders = useCallback(
         const res = await apiRef.current.put("/profile", payloadToSave, {
           headers,
         });
-
+console.log(
+  "FULL VERIFIED TOKEN",
+  JSON.stringify(decoded, null, 2)
+);
         const payload = normaliseApiResponse(res);
 
         const savedProfile = payload?.profile || nextProfile;
