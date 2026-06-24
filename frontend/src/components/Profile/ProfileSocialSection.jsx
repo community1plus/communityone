@@ -1,47 +1,53 @@
+// src/components/Profile/ProfileSocialSection.jsx
+
 export default function ProfileSocialSection() {
-
   return (
-
     <div className="social-verification-list">
 
       <div className="social-verification-row">
-
         <div>
-
           <strong>Facebook</strong>
-
-          <div>Not connected</div>
-
+          <div>Not Connected</div>
         </div>
 
-        <button className="social-connect-button">
-
-          Connect →
-
+        <button className="primary-button">
+          Connect
         </button>
-
       </div>
 
       <div className="social-verification-row">
-
         <div>
-
           <strong>Instagram</strong>
-
-          <div>Connected ✓</div>
-
+          <div>Not Connected</div>
         </div>
 
-        <button>
-
-          Manage →
-
+        <button className="primary-button">
+          Connect
         </button>
+      </div>
 
+      <div className="social-verification-row">
+        <div>
+          <strong>YouTube</strong>
+          <div>Not Connected</div>
+        </div>
+
+        <button className="primary-button">
+          Connect
+        </button>
+      </div>
+
+      <div className="social-verification-row">
+        <div>
+          <strong>X</strong>
+          <div>Not Connected</div>
+        </div>
+
+        <button className="primary-button">
+          Connect
+        </button>
       </div>
 
     </div>
-
   );
-
 }
