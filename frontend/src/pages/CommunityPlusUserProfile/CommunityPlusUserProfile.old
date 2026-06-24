@@ -63,14 +63,14 @@ const PERSONAL_STEPS = [
   },
   {
     id: "home-address",
-    title: "HOME ADDRESS",
+    title: "Home Address",
     fields: [
       { name: "homeLocation", label: "Home Address", type: "location", required: true },
     ],
   },
   {
     id: "contact",
-    title: "CONTACT",
+    title: "Contact",
     fields: [
       { name: "phone", label: "Phone Number", type: "tel", required: true },
       { name: "phoneVerificationCode", label: "Verification Code", type: "text" },
@@ -83,7 +83,7 @@ const PERSONAL_STEPS = [
 const ORG_STEPS = [
   {
     id: "organisation-profile",
-    title: "ORGANISATION",
+    title: "Organisation",
     fields: [
       { name: "username", label: "Username", type: "text", required: true },
       { name: "display_name", label: "Real Name", type: "text", required: true },
@@ -93,14 +93,14 @@ const ORG_STEPS = [
   },
   {
     id: "organisation-address",
-    title: "ADDRESS",
+    title: "Address",
     fields: [
       { name: "organisation.location", label: "Organisation Address", type: "location", required: true },
     ],
   },
   {
     id: "organisation-contact",
-    title: "CONTACT",
+    title: "Contact",
     fields: [
       { name: "organisation.phone", label: "Organisation Phone", type: "tel", required: true },
       { name: "organisation.email", label: "Organisation Email", type: "email", required: true },
@@ -115,7 +115,7 @@ const ORG_STEPS = [
 const COMMUNITY_POLICY_STEPS = [
   {
     id: "community-policies",
-    title: "COMMUNITY POLICIES",
+    title: "Community Policies ",
     fields: [
       {
         name: "policies.communityStandards",
