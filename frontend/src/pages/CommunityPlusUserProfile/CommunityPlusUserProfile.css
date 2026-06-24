@@ -80,14 +80,15 @@ HEADER
     align-items:center;
     gap:40px;
     margin-bottom:3rem;
+    margin-bottom:2rem;
 }
 
 .profile-title h1{
     margin:0;
-    font-size:5rem;
+    font-size:4rem;
     font-weight:900;
     line-height:.9;
-    letter-spacing:-4px;
+    letter-spacing:-3px;
 }
 
 /* =========================================
@@ -121,8 +122,9 @@ PROGRESS
 ========================================= */
 
 .profile-header-progress{
-    width:280px;
-    margin-top:30px;
+    width:340px;
+    margin-top:1.5rem;
+    margin-bottom: 2rem;
 }
 
 .profile-header-progress-label{
@@ -154,13 +156,9 @@ SECTION TABS
 
 .profile-section-tabs{
     display:flex;
-    align-items:center;
-    flex-wrap:wrap;
-    gap:28px;
-
-    padding-bottom:20px;
-    margin-bottom:24px;
-
+    gap:32px;
+    padding-bottom:18px;
+    margin-bottom:1.5rem;
     border-bottom:1px solid #e3ddd6;
 }
 
@@ -301,9 +299,9 @@ BUTTONS
     display:flex;
     justify-content:flex-end;
 
-    margin-top:6rem;
+    margin-top:2rem;
 
-    padding-bottom:5rem;
+    padding-bottom:2rem;
 }
 
 .primary-button{

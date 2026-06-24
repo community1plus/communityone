@@ -204,46 +204,7 @@ export default function CommunityPlusUserProfile({
                 USER PROFILE
               </h1>
 
-
-
-            </div>
-
-            <div className="profile-header-actions">
-
-              <div className="profile-header-progress">
-
-                <div className="profile-header-progress-label">
-
-{Math.round(
-  activeSteps.length
-    ? ((currentStep + 1) /
-        activeSteps.length) *
-      100
-    : 0
-)}% Complete
-
-                </div>
-
-                <div className="profile-progress-bar">
-
-                  <div
-                    className="profile-progress-fill"
-                    style={{
-width: `${
-  activeSteps.length
-    ? ((currentStep + 1) /
-        activeSteps.length) *
-      100
-    : 0
-}%`
-                    }}
-                  />
-
-                </div>
-
-              </div>
-
-              {editMode && (
+                {editMode && (
 
                 <button
                   type="button"
@@ -255,15 +216,54 @@ width: `${
 
               )}
 
+            <ProfileSectionTabs
+              steps={activeSteps}
+              currentStep={currentStep}
+              setCurrentStep={setCurrentStep}
+            />
+                <div className="profile-progress-bar">
+
+                  <div
+                    className="profile-progress-fill"
+                    style={{
+                    width: `${
+                    activeSteps.length
+                    ? ((currentStep + 1) /
+                    activeSteps.length) *
+                    100
+                    : 0
+                    }%`
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="profile-header-actions">
+
+              <div className="profile-header-progress">
+
+                <div className="profile-header-progress-label">
+
+                  {Math.round(
+                  activeSteps.length
+                  ? ((currentStep + 1) /
+                  activeSteps.length) *
+                  100
+                  : 0
+                  )}% Complete
+
+                </div>
+
+
+
+              
+
             </div>
 
           </div>
 
-          <ProfileSectionTabs
-            steps={activeSteps}
-            currentStep={currentStep}
-            setCurrentStep={setCurrentStep}
-          />
+
 
           <FormBuilder
             steps={[
