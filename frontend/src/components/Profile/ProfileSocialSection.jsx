@@ -3,6 +3,9 @@
 import useSocialVerification
   from "../../hooks/useSocialVerification";
 
+  import { API_BASE }
+  from "../../services/api";
+
 export default function ProfileSocialSection() {
 
   useSocialVerification();
@@ -18,6 +21,7 @@ export default function ProfileSocialSection() {
       icon: "ⓕ",
       name: "Facebook",
       verified: false,
+      route: "/facebook/start",
     },
 
     {
@@ -80,16 +84,25 @@ export default function ProfileSocialSection() {
 
           </div>
 
-          <button
-            type="button"
-            className="social-action"
-          >
+<button
+  type="button"
+  className="social-action"
+onClick={() => {
 
-            {provider.verified
-              ? "Verified ✓"
-              : "Verify →"}
+    if (!provider.route) return;
 
-          </button>
+    window.location.assign(
+        `${API_BASE}${provider.route}`
+    );
+
+}}
+>
+
+  {provider.verified
+    ? "Verified ✓"
+    : "Verify →"}
+
+</button>
 
         </div>
 
