@@ -575,6 +575,13 @@ async function saveProfile({ userId, incoming }) {
 export async function getProfile(req, res) {
   try {
     const userId = getUserId(req);
+    console.log("REQ.USER:", req.user);
+
+    console.log("USER ID USED:", userId);
+    const userId = getUserId(req);
+
+console.log("PATCH USER ID:", userId);
+console.log("REQ.USER:", req.user);
 
     if (!userId) {
       return res.status(401).json({ error: "Authentication required." });

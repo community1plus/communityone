@@ -251,6 +251,8 @@ export default async function authMiddleware(
       req.user
     );
 
+    console.log("AUTH MIDDLEWARE req.user =", req.user);
+
     return next();
 
   } catch (err) {
