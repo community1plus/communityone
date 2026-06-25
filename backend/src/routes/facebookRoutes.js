@@ -18,7 +18,7 @@ const FB_GRAPH_URL =
   "https://graph.facebook.com/v25.0";
 
 /* =========================
-   FRONTEND REDIRECT
+   FRONTEND REDIRECT/
 ========================= */
 
 function getFrontendRedirect(params = {}) {
