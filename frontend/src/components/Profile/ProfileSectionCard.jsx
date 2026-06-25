@@ -4,6 +4,7 @@ export default function ProfileSectionCard({
 }) {
   return (
     <section className="profile-section-card">
+
       {title && (
         <h3 className="profile-section-title">
           {title}
@@ -11,6 +12,7 @@ export default function ProfileSectionCard({
       )}
 
       {children}
+
     </section>
   );
 }
