@@ -14,6 +14,8 @@ import {
 
 export default function useSocialVerification() {
 
+
+      console.log("HOOK ENTERED");
   const [searchParams] =
     useSearchParams();
 
@@ -33,6 +35,13 @@ export default function useSocialVerification() {
 
   const verified =
     searchParams.get("verified");
+
+ console.log(
+    "PARAMS:",
+    social,
+    verified
+  );
+
 
   useEffect(() => {
 
