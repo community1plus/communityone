@@ -648,11 +648,15 @@ export async function patchProfile(req, res) {
   try {
     const userId = getUserId(req);
 
+ console.log("PATCH USER ID:", userId);
+
     if (!userId) {
       return res.status(401).json({ error: "Authentication required." });
     }
 
     const existing = await fetchProfileByUserId(userId);
+
+console.log("EXISTING PROFILE:", existing);
 
     if (!existing) {
       return res.status(404).json({ error: "Profile not found" });

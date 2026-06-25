@@ -55,7 +55,10 @@ function redirectFailure(
    START FACEBOOK OAUTH
 ========================= */
 
-router.get("/start", async (req, res) => {
+router.get(
+  "/start",
+  authMiddleware,
+  async (req, res) => {
 
   try {
 
@@ -124,7 +127,10 @@ router.get("/start", async (req, res) => {
    FACEBOOK CALLBACK
 ========================= */
 
-router.get("/callback", async (req, res) => {
+router.get(
+  "/callback",
+  authMiddleware,
+  async (req, res) => {
 
   try {
 
