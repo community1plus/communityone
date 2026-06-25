@@ -6,6 +6,7 @@ import useAPI
 import {
   useProfile,
 } from "../context/ProfileContext";
+
 import ProfileSectionCard
   from "../../components/Profile/ProfileSectionCard";
 
@@ -22,9 +23,7 @@ import {
   useCallback,
 } from "react";
 
-import {
-  useNavigate,
-} from "react-router-dom";
+
 
 import {
   useAuth,
