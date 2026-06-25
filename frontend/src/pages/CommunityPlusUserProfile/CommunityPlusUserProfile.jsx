@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 
-import useAPI
-  from "./useAPI";
+import useAPI from "../../hooks/useAPI";
 
 import {
   useProfile,
