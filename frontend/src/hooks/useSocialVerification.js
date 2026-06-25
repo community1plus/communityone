@@ -101,10 +101,7 @@ const providerData = {
           payload
         );
 
-        await patchProfile(
-          "/",
-          payload
-        );
+        await patchProfile(payload);
 
         console.log(
           "✔ Verification saved."
