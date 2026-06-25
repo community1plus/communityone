@@ -6,25 +6,25 @@ export default function ProfileSocialSection() {
       id: "facebook",
       icon: "ⓕ",
       name: "Facebook",
-      connected: false,
+      verified: false,
     },
     {
       id: "instagram",
       icon: "📸",
       name: "Instagram",
-      connected: false,
+      verified: false,
     },
     {
       id: "youtube",
       icon: "▶",
       name: "YouTube",
-      connected: false,
+      verified: false,
     },
     {
       id: "x",
       icon: "𝕏",
       name: "X",
-      connected: false,
+      verified: false,
     },
   ];
 
@@ -50,26 +50,28 @@ export default function ProfileSocialSection() {
 
           </div>
 
-          <div
-            className={
-              provider.connected
-                ? "social-status connected"
-                : "social-status"
-            }
-          >
-            {provider.connected
-              ? "Connected ✓"
-              : "Not Connected"}
-          </div>
+<div
+  className={
+    provider.verified
+      ? "social-status verified"
+      : "social-status"
+  }
+>
+  {provider.verified
+    ? "✓ Verified"
+    : "Not Verified"}
+</div>
 
-          <button
-            type="button"
-            className="social-action"
-          >
-            {provider.connected
-              ? "Manage →"
-              : "Connect →"}
-          </button>
+{!provider.verified && (
+
+  <button
+    type="button"
+    className="social-action"
+  >
+    Verify →
+  </button>
+
+)}
 
         </div>
 

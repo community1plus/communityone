@@ -415,25 +415,28 @@ SOCIAL
 }
 
 .social-row{
+
     display:grid;
 
     grid-template-columns:
-        minmax(180px,1fr)
+        minmax(280px,1fr)
         180px
-        120px;
+        140px;
 
     align-items:center;
 
-    min-height:72px;
+    min-height:88px;
 
     border-bottom:1px solid #ece7e1;
 }
 
 .social-provider{
+    display:flex;
+    align-items:center;
+    gap:20px;
+
     font-size:1.15rem;
     font-weight:600;
-
-    color:#1f2937;
 }
 
 .social-status{
@@ -441,9 +444,10 @@ SOCIAL
     font-size:.95rem;
 }
 
-.social-status.connected{
+.social-status.verified{
     color:#15803d;
-    font-weight:600;
+    font-weight:700;
+    font-weight:500;
 }
 
 .social-action{
@@ -464,6 +468,23 @@ SOCIAL
     opacity:.75;
 }
 
+.social-icon{
+
+    width:32px;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    font-size:1.4rem;
+
+    flex-shrink:0;
+}
+
+.social-name{
+
+    flex:1;
+}
 /* =========================================
 RESPONSIVE
 ========================================= */
