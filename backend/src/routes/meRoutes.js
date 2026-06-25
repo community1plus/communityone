@@ -53,6 +53,11 @@ router.get("/", async (req, res) => {
       emailLocalPart,
     });
 
+    console.log(
+  "TOKEN USE",
+  req.user.tokenUse
+);
+
     /* =========================
        PROFILE QUERY
     ========================= */
