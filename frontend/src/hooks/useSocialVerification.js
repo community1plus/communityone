@@ -1,23 +1,32 @@
+import { useEffect } from "react";
 
-import { useNavigate } from "react-router-dom";
+import {
+  useSearchParams,
+  useNavigate,
+} from "react-router-dom";
 
 import useAPI
-  from "./useAPI";
+  from "../hooks/useAPI";
 
 import {
   useProfile,
 } from "../context/ProfileContext";
 
-import { useEffect } from "react";
-
-import {
-  useSearchParams,
-} from "react-router-dom";
-
 export default function useSocialVerification() {
 
   const [searchParams] =
     useSearchParams();
+
+  const navigate =
+    useNavigate();
+
+  const {
+    patchProfile,
+  } = useAPI();
+
+  const {
+    refreshProfile,
+  } = useProfile();
 
   const social =
     searchParams.get("social");
@@ -27,83 +36,60 @@ export default function useSocialVerification() {
 
   useEffect(() => {
 
-    const navigate =
-    useNavigate();
+    async function completeVerification() {
 
-const {
-    patchProfile,
-} = useAPI();
+      if (
+        verified !== "true" ||
+        !social
+      ) {
+        return;
+      }
 
-const {
-    refreshProfile,
-} = useProfile();
+      const payload = {
 
-if (
-    verified !== "true" ||
-    !social
-){
-    return;
-}
+        social: {
 
-const payload = {
-
-    social: {
-
-        [social]: {
+          [social]: {
 
             verified: true,
 
             verifiedAt:
-                new Date().toISOString(),
+              new Date().toISOString(),
+
+          },
 
         },
 
-    },
+      };
 
-};
+      console.log(
+        "Saving social verification",
+        payload
+      );
 
-useEffect(() => {
+      await patchProfile(
+        payload
+      );
 
-    async function completeVerification() {
+      await refreshProfile();
 
-        if (
-            verified !== "true" ||
-            !social
-        ) {
-            return;
+      navigate(
+        "/communityplus/profile",
+        {
+          replace: true,
         }
-
-        const payload = {
-
-            social: {
-
-                [social]: {
-
-                    verified: true,
-
-                    verifiedAt:
-                        new Date().toISOString(),
-
-                },
-
-            },
-
-        };
-//
-        console.log(payload);
+      );
 
     }
 
     completeVerification();
 
-}, [
-    social,
-    verified,
-]);
-
   }, [
     social,
     verified,
+    patchProfile,
+    refreshProfile,
+    navigate,
   ]);
 
 }
