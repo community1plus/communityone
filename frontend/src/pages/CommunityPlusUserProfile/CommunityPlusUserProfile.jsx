@@ -280,9 +280,7 @@ export default function CommunityPlusUserProfile({
 
   {sectionId === "social" ? (
 
-    <ProfileSectionCard
-      title="Connected Accounts"
-    >
+    <ProfileSectionCard>
 
       <ProfileSocialSection />
 
@@ -290,9 +288,7 @@ export default function CommunityPlusUserProfile({
 
   ) : sectionId === "payment" ? (
 
-    <ProfileSectionCard
-      title="Payment Details"
-    >
+    <ProfileSectionCard>
 
       <ProfilePaymentSection />
 
@@ -300,9 +296,7 @@ export default function CommunityPlusUserProfile({
 
   ) : (
 
-    <ProfileSectionCard
-      title={activeSteps[currentStep].title}
-    >
+    <ProfileSectionCard>
 
       <FormBuilder
         steps={[activeSteps[currentStep]]}
