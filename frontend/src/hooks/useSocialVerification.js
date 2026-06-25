@@ -62,7 +62,44 @@ const payload = {
 
 };
 
-console.log(payload);
+useEffect(() => {
+
+    async function completeVerification() {
+
+        if (
+            verified !== "true" ||
+            !social
+        ) {
+            return;
+        }
+
+        const payload = {
+
+            social: {
+
+                [social]: {
+
+                    verified: true,
+
+                    verifiedAt:
+                        new Date().toISOString(),
+
+                },
+
+            },
+
+        };
+
+        console.log(payload);
+
+    }
+
+    completeVerification();
+
+}, [
+    social,
+    verified,
+]);
 
   }, [
     social,
