@@ -578,7 +578,7 @@ export async function getProfile(req, res) {
     console.log("REQ.USER:", req.user);
 
     console.log("USER ID USED:", userId);
-    const userId = getUserId(req);
+    
 
 console.log("PATCH USER ID:", userId);
 console.log("REQ.USER:", req.user);
