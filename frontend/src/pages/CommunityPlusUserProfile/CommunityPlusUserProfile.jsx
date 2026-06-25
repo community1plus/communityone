@@ -1,6 +1,6 @@
 
 import ProfileSectionCard
-  from "../../components/UI/ProfileSectionCard";
+  from "../../components/Profile/ProfileSectionCard";
 
 import ProfileHelpPanel
   from "../../components/Profile/ProfileHelpPanel";
