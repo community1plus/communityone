@@ -197,6 +197,18 @@ export default function CommunityPlusUserProfile({
   const sectionId =
   activeSteps[currentStep]?.id;
 
+console.log(
+  "SECTION:",
+  sectionId
+);
+
+if (sectionId === "social") {
+
+  console.log(
+    "ABOUT TO RENDER SOCIAL"
+  );
+
+}
   return (
 
   <div className="profile-page">
@@ -277,10 +289,7 @@ export default function CommunityPlusUserProfile({
 
           
 <div className="profile-form-content">
-console.log(
-  "SECTION:",
-  sectionId
-);
+
   {sectionId === "social" ? (
 
     <ProfileSectionCard>
