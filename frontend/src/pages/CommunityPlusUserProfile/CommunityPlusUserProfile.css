@@ -4,7 +4,7 @@ PAGE
 
 .profile-page{
     min-height:100vh;
-    background: #e7e2db;
+    background: #faf8f5;
 }
 
 .profile-container{
@@ -34,7 +34,7 @@ CARD SYSTEM
 .profile-content-card,
 .profile-guide,
 .profile-sidebar-actions{
-    background:#e7e2db;
+    background:#faf8f5;
 
     border:1px solid rgba(15,23,42,.06);
 
@@ -258,7 +258,7 @@ PROFILE SECTION CARDS
 ========================================= */
 
 .profile-section-card{
-    background:#e7e2db;
+    background:#faf8f5;
 
     border:1px solid rgba(15,23,42,.06);
 
