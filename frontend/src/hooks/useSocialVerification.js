@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 
 import {
-  useSearchParams,
   useNavigate,
+  useSearchParams,
 } from "react-router-dom";
 
 import useAPI
@@ -12,10 +12,34 @@ import {
   useProfile,
 } from "../context/ProfileContext";
 
+function getProviderMetadata(social, searchParams) {
+  switch (social) {
+
+    case "facebook":
+      return {
+        providerId: searchParams.get("facebookId"),
+        accountName: searchParams.get("name"),
+        email: searchParams.get("email"),
+        profilePicture: searchParams.get("profilePicture"),
+        pageCount: Number(searchParams.get("pageCount") || 0),
+      };
+
+    case "instagram":
+      // Instagram-specific fields
+
+    case "youtube":
+      // YouTube-specific fields
+
+    case "x":
+      // X-specific fields
+
+    default:
+      return {};
+  }
+}
+
 export default function useSocialVerification() {
 
-
-      console.log("HOOK ENTERED");
   const [searchParams] =
     useSearchParams();
 
@@ -36,13 +60,6 @@ export default function useSocialVerification() {
   const verified =
     searchParams.get("verified");
 
- console.log(
-    "PARAMS:",
-    social,
-    verified
-  );
-
-
   useEffect(() => {
 
     async function completeVerification() {
@@ -54,51 +71,76 @@ export default function useSocialVerification() {
         return;
       }
 
+      const now =
+        new Date().toISOString();
+
+const providerData = {
+  verified: true,
+  verifiedBy: social,
+  verificationMethod: "oauth",
+  verifiedAt: now,
+  lastVerifiedAt: now,
+  ...getProviderMetadata(social, searchParams),
+};
+
       const payload = {
 
         social: {
 
-          [social]: {
-
-            verified: true,
-
-            verifiedAt:
-              new Date().toISOString(),
-
-          },
+          [social]:
+            providerData,
 
         },
 
       };
 
-      console.log(
-        "Saving social verification",
-        payload
-      );
+      try {
 
-      await patchProfile(
-        payload
-      );
+        console.log(
+          "Saving social verification",
+          payload
+        );
 
-      await refreshProfile();
+        await patchProfile(
+          "/",
+          payload
+        );
 
-      navigate(
-        "/communityplus/profile",
-        {
-          replace: true,
-        }
-      );
+        console.log(
+          "✔ Verification saved."
+        );
+
+        await refreshProfile();
+
+        navigate(
+          "/communityplus/profile",
+          {
+            replace: true,
+          }
+        );
+
+      } catch (err) {
+
+        console.error(
+          "❌ Verification save failed",
+          err
+        );
+
+      }
 
     }
 
     completeVerification();
 
   }, [
+
     social,
     verified,
+    searchParams,
     patchProfile,
     refreshProfile,
     navigate,
+
   ]);
 
 }

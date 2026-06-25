@@ -49,10 +49,14 @@ export default function useAPI() {
   return {
     ...api,
 
-    patchProfile: (path, body, options = {}) =>
-      api.patch(path, body, {
-        version,
-        ...options,
-      }),
+patchProfile: (body, options = {}) =>
+  api.patch(
+    "/profile",
+    body,
+    {
+      version,
+      ...options,
+    }
+  ),
   };
 }
