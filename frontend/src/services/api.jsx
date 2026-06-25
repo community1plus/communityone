@@ -59,13 +59,26 @@ export async function apiFetch(path, options = {}) {
     );
   }
 
-  let data = null;
+let data = null;
 
-  try {
-    data = await response.json();
-  } catch {
-    data = null;
-  }
+try {
+
+  data = await response.json();
+
+} catch {
+
+  const text = await response.text();
+
+  console.error(
+    "RAW RESPONSE:",
+    text
+  );
+
+  data = {
+    raw: text,
+  };
+
+}
 
   console.log("📥 API RESPONSE:", {
     method,
