@@ -2,9 +2,7 @@ import { useNavigate } from "react-router-dom";
 
 import useAPI from "../../hooks/useAPI";
 
-import {
-  useProfile,
-} from "../context/ProfileContext";
+import { useProfile } from "../../context/ProfileContext";
 
 import ProfileSectionCard
   from "../../components/Profile/ProfileSectionCard";
