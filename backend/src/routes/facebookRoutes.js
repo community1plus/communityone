@@ -1,5 +1,6 @@
 import express from "express";
 import crypto from "crypto";
+import authMiddleware from "../../middleware/authMiddleware";
 
 const router = express.Router();
 
