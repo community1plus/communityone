@@ -277,7 +277,10 @@ export default function CommunityPlusUserProfile({
 
           
 <div className="profile-form-content">
-
+console.log(
+  "SECTION:",
+  sectionId
+);
   {sectionId === "social" ? (
 
     <ProfileSectionCard>
