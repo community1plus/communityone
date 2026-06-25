@@ -4,7 +4,7 @@ PAGE
 
 .profile-page{
     min-height:100vh;
-    background:#f8f6f3;
+    background:#fffdfa;
 }
 
 .profile-container{
@@ -45,7 +45,7 @@ CARD SYSTEM
 }
 
 .profile-form-content{
-    flex:1;
+    padding:0 36px 36px;
 }
 
 .profile-content-card{
