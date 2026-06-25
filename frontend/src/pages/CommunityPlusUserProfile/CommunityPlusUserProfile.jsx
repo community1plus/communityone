@@ -1,3 +1,7 @@
+
+import ProfileSectionCard
+  from "../../components/UI/ProfileSectionCard";
+
 import ProfileHelpPanel
   from "../../components/Profile/ProfileHelpPanel";
 
@@ -275,15 +279,39 @@ export default function CommunityPlusUserProfile({
 <div className="profile-form-content">
 
   {sectionId === "social" ? (
-    <ProfileSocialSection />
+
+    <ProfileSectionCard
+      title="Connected Accounts"
+    >
+
+      <ProfileSocialSection />
+
+    </ProfileSectionCard>
+
   ) : sectionId === "payment" ? (
-    <ProfilePaymentSection />
+
+    <ProfileSectionCard
+      title="Payment Details"
+    >
+
+      <ProfilePaymentSection />
+
+    </ProfileSectionCard>
+
   ) : (
-    <FormBuilder
-      steps={[activeSteps[currentStep]]}
-      currentStep={0}
-      form={form}
-    />
+
+    <ProfileSectionCard
+      title={activeSteps[currentStep].title}
+    >
+
+      <FormBuilder
+        steps={[activeSteps[currentStep]]}
+        currentStep={0}
+        form={form}
+      />
+
+    </ProfileSectionCard>
+
   )}
 
 </div>

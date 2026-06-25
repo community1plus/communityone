@@ -253,6 +253,39 @@ TABS
 /* =========================================
 PROGRESS
 ========================================= */
+/* =========================================
+PROFILE SECTION CARDS
+========================================= */
+
+.profile-section-card{
+    background:#fff;
+
+    border:1px solid rgba(15,23,42,.06);
+
+    border-radius:24px;
+
+    padding:28px 32px;
+
+    box-shadow:
+        0 4px 16px rgba(15,23,42,.04);
+
+    margin-bottom:24px;
+}
+
+.profile-section-title{
+
+    margin:0 0 24px;
+
+    font-size:1rem;
+
+    font-weight:700;
+
+    letter-spacing:.08em;
+
+    text-transform:uppercase;
+
+    color:#111827;
+}
 
 .profile-header-progress{
     padding:0 36px 28px;

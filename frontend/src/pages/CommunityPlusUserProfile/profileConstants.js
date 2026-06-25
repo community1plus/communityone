@@ -70,16 +70,6 @@ export const PERSONAL_STEPS = [
         label: "Street Address",
         type: "text",
       },
-      {
-        name: "suburb",
-        label: "Suburb",
-        type: "text",
-      },
-      {
-        name: "postcode",
-        label: "Postcode",
-        type: "text",
-      },
     ],
   },
 
@@ -129,7 +119,7 @@ export const PERSONAL_STEPS = [
 
   {
     id: "payment",
-    title: "Payment Details",
+    title: "Payment",
     fields: [],
   },
 ];
@@ -141,7 +131,7 @@ export const PERSONAL_STEPS = [
 export const ORG_STEPS = [
   {
     id: "organisation",
-    title: "Oganisation",
+    title: "Organisation",
     fields: [
       {
         name: "organisationName",
@@ -224,7 +214,7 @@ export const ORG_STEPS = [
 
   {
     id: "payment",
-    title: "Payment Details",
+    title: "Payment",
     fields: [],
   },
 ];
@@ -236,7 +226,7 @@ export const ORG_STEPS = [
 export const COMMUNITY_POLICY_STEPS = [
   {
     id: "community-policies",
-    title: "COMMUNITY POLICIES",
+    title: "Community Policies",
     fields: [
       {
         name: "communityAgreement",
@@ -246,3 +236,18 @@ export const COMMUNITY_POLICY_STEPS = [
     ],
   },
 ];
+
+/* =========================
+   PROFILE CARD TITLES
+========================= */
+
+export const PROFILE_CARD_TITLES = {
+  "user-profile": "User Details",
+  "home-address": "Home Address",
+  contact: "Contact Details",
+  social: "Connected Accounts",
+  payment: "Payment Method",
+
+  organisation: "Organisation Details",
+  address: "Business Address",
+};
