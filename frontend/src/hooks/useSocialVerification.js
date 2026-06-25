@@ -1,3 +1,13 @@
+
+import { useNavigate } from "react-router-dom";
+
+import useAPI
+  from "./useAPI";
+
+import {
+  useProfile,
+} from "../context/ProfileContext";
+
 import { useEffect } from "react";
 
 import {
@@ -17,13 +27,42 @@ export default function useSocialVerification() {
 
   useEffect(() => {
 
-    console.log(
-      "SOCIAL CALLBACK",
-      {
-        social,
-        verified,
-      }
-    );
+    const navigate =
+    useNavigate();
+
+const {
+    patchProfile,
+} = useAPI();
+
+const {
+    refreshProfile,
+} = useProfile();
+
+if (
+    verified !== "true" ||
+    !social
+){
+    return;
+}
+
+const payload = {
+
+    social: {
+
+        [social]: {
+
+            verified: true,
+
+            verifiedAt:
+                new Date().toISOString(),
+
+        },
+
+    },
+
+};
+
+console.log(payload);
 
   }, [
     social,
