@@ -4,7 +4,7 @@ PAGE
 
 .profile-page{
     min-height:100vh;
-    background:#fffdfa;
+    background:#f8f6f3;
 }
 
 .profile-container{
@@ -45,7 +45,7 @@ CARD SYSTEM
 }
 
 .profile-form-content{
-    padding:0 36px 36px;
+    flex:1;
 }
 
 .profile-content-card{
@@ -95,7 +95,7 @@ CARD HEADER
 
 .profile-close-button{
     width:40px;
-    height:350px;
+    height:40px;
 
     border:none;
     background:none;
@@ -224,10 +224,10 @@ TABS
 
     padding:0;
 
-    color:#1e1e1f;
+    color:#7d8793;
 
     font-size:1rem;
-    font-weight:500;
+    font-weight:600;
 
     cursor:pointer;
 
