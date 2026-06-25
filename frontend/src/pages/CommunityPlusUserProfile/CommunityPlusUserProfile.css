@@ -76,7 +76,7 @@ CARD HEADER
 
 .profile-card-header {
   padding:28px 36px;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 
   display: flex;
   align-items: center;
@@ -224,7 +224,7 @@ TABS
 
     padding:0;
 
-    color:#7d8793;
+    color:#1c1c1d;
 
     font-size:1rem;
     font-weight:600;
@@ -258,7 +258,7 @@ PROFILE SECTION CARDS
 ========================================= */
 
 .profile-section-card{
-    background:#fff;
+    background:#e7e2db;
 
     border:1px solid rgba(15,23,42,.06);
 
