@@ -24,7 +24,7 @@ function getFrontendRedirect(params = {}) {
 
   const baseUrl =
     process.env.FRONTEND_URL ||
-    "https://main.d1ss8rtrtimogr.amplifyapp.com";
+    "https://develop.d1ss8rtrtimogr.amplifyapp.com";
 
   const query =
     new URLSearchParams(params);
@@ -42,13 +42,27 @@ function redirectFailure(
     reason
   );
 
-  return res.redirect(
-    getFrontendRedirect({
-      social: "instagram",
-      verified: "false",
-      reason,
-    })
-  );
+return res.redirect(
+  getFrontendRedirect({
+
+    social: "instagram",
+
+    verified: "true",
+
+    instagramId: profileData.id,
+
+    username: profileData.username,
+
+    profilePicture: profileData.profile_picture_url,
+
+    followers: profileData.followers_count,
+
+    mediaCount: profileData.media_count,
+
+    pageId: selectedPageId,
+
+  })
+);
 }
 
 /* =========================
@@ -378,7 +392,13 @@ router.get("/callback", async (req, res) => {
 
     const profileResponse =
       await fetch(
-        `${FB_GRAPH_URL}/${instagramBusinessId}?fields=id,username,profile_picture_url,followers_count,follows_count,media_count&access_token=${accessToken}`
+        `${FB_GRAPH_URL}/${instagramBusinessId}?
+        fields=
+        id,
+        username,
+        profile_picture_url,
+        followers_count,
+        media_count`
       );
 
     const profileData =
@@ -408,8 +428,9 @@ router.get("/callback", async (req, res) => {
        CLEAN SESSION
     ========================= */
 
-    delete req.session
-      .igOAuthState;
+    delete req.session.igOAuthState;
+    delete req.session.userSub;
+    delete req.session.igOAuthState;
 
     /* =========================
        SUCCESS
@@ -430,8 +451,20 @@ router.get("/callback", async (req, res) => {
 
         pageId:
           selectedPageId || "",
+        profilePicture:
+          profileData.profile_picture_url || "",
+        mediaCount:
+          profileData.media_count || 0,
+        followers:
+          profileData.followers_count || 0    
       })
     );
+
+    console.log("Found Page:", selectedPageId);
+
+    console.log("Instagram Business:", instagramBusinessId);
+
+    console.log(profileData);
 
   } catch (err) {
 

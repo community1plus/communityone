@@ -33,15 +33,24 @@ router.get("/start", async (req, res) => {
       return redirectFailure(res, "youtube_oauth_not_configured");
     }
 
-    const params = new URLSearchParams({
-      client_id: process.env.GOOGLE_CLIENT_ID,
-      redirect_uri: process.env.GOOGLE_REDIRECT_URI,
-      response_type: "code",
-      access_type: "offline",
-      prompt: "consent",
-      scope:
-        "https://www.googleapis.com/auth/youtube.readonly openid email profile",
-    });
+const params = new URLSearchParams({
+
+  client_id: process.env.GOOGLE_CLIENT_ID,
+
+  redirect_uri: process.env.GOOGLE_REDIRECT_URI,
+
+  response_type: "code",
+
+  state: req.session.ytOAuthState,
+
+  access_type: "offline",
+
+  prompt: "consent",
+
+  scope:
+    "https://www.googleapis.com/auth/youtube.readonly openid email profile",
+
+});
 
     return res.redirect(`${GOOGLE_AUTH_URL}?${params.toString()}`);
   } catch (err) {
@@ -50,13 +59,53 @@ router.get("/start", async (req, res) => {
   }
 });
 
+router.post("/begin", authMiddleware, (req, res) => {
+
+  req.session.userSub = req.user.sub;
+  req.session.ytOAuthState = crypto.randomUUID();
+
+  req.session.save((err) => {
+
+    if (err) {
+      return res.status(500).json({
+        error: "Session save failed",
+      });
+    }
+
+    return res.json({
+      ok: true,
+    });
+
+  });
+
+});
+
 router.get("/callback", async (req, res) => {
+  const userSub = req.session.userSub;
+
+if (!userSub) {
+
+  return redirectFailure(
+    res,
+    "missing_user_session"
+  );
+
+}
   try {
     const code = req.query.code;
     const oauthError = req.query.error;
 
     if (oauthError) {
       return redirectFailure(res, String(oauthError));
+    }
+
+    if (state !== req.session.ytOAuthState) {
+
+      return redirectFailure(
+        res,
+        "youtube_state_mismatch"
+      );
+
     }
 
     if (!code) {
@@ -130,22 +179,35 @@ router.get("/callback", async (req, res) => {
     const country = channel.snippet?.country || "";
     const publishedAt = channel.snippet?.publishedAt || "";
 
-    return res.redirect(
-      getFrontendRedirect({
-        social: "youtube",
-        verified: "true",
-        channelId,
-        channelTitle,
-        channelDescription,
-        customUrl,
-        thumbnail,
-        subscriberCount,
-        videoCount,
-        viewCount,
-        country,
-        publishedAt,
-      })
-    );
+
+    delete req.session.userSub;
+    delete req.session.ytOAuthState;  
+return res.redirect(
+  getFrontendRedirect({
+
+    social: "youtube",
+
+    verified: "true",
+
+    channelId,
+
+    channelTitle,
+
+    profilePicture: thumbnail,
+
+    subscriberCount,
+
+    videoCount,
+
+    viewCount,
+
+    customUrl,
+
+    country,
+
+  })
+  
+);
   } catch (err) {
     console.error("❌ YOUTUBE CALLBACK ERROR:", err);
     return redirectFailure(res, "youtube_callback_failed");
