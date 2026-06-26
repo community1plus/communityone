@@ -90,7 +90,9 @@ export default function ProfileSocialSection() {
 onClick={async () => {
 
   if (!provider.route) return;
-
+  console.log(
+  "Calling /facebook/begin"
+);
   await post(
     "/facebook/begin"
   );
