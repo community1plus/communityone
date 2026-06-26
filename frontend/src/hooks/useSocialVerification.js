@@ -83,8 +83,37 @@ case "youtube":
 
   };
 
-    case "x":
-      // X-specific fields
+case "x":
+  return {
+
+    providerId:
+      searchParams.get("username"),
+
+    username:
+      searchParams.get("username"),
+
+    displayName:
+      searchParams.get("displayName"),
+
+    profileImage:
+      searchParams.get("profileImage"),
+
+    verifiedBadge:
+      searchParams.get("verifiedBadge") === "true",
+
+    description:
+      searchParams.get("description"),
+
+    followers:
+      Number(searchParams.get("followers") || 0),
+
+    following:
+      Number(searchParams.get("following") || 0),
+
+    tweets:
+      Number(searchParams.get("tweets") || 0),
+
+  };
 
     default:
       return {};

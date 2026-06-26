@@ -93,36 +93,40 @@ const providers = [
   <button
     type="button"
     className="social-action"
-    onClick={async () => {
+onClick={async () => {
 
-      if (!provider.route) return;
+  if (!provider.route || !provider.begin) {
+    return;
+  }
 
-      try {
+  try {
 
-        console.log("STEP 1");
+    console.log(
+      `Starting ${provider.id.name} verification...`
+    );
 
-        const result =
-          await post("/facebook/begin");
+    const result =
+      await post('/${provider.id}.begin');
 
-        console.log(
-          "STEP 2",
-          result
-        );
+    console.log(
+      "BEGIN RESULT:",
+      result
+    );
 
-        window.location.assign(
-          `${API_BASE}${provider.route}`
-        );
+    window.location.assign(
+      `${API_BASE}${provider.id.route}`
+    );
 
-      } catch (err) {
+  } catch (err) {
 
-        console.error(
-          "BEGIN FAILED",
-          err
-        );
+    console.error(
+      `${provider.name} BEGIN FAILED`,
+      err
+    );
 
-      }
+  }
 
-    }}
+}}
   >
     Verify →
   </button>
