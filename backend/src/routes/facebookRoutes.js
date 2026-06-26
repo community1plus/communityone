@@ -86,10 +86,17 @@ router.post(
 /* =========================
    START FACEBOOK OAUTH
 ========================= */
+if (!req.session.userSub) {
+
+  return redirectFailure(
+    res,
+    "missing_user_session"
+  );
+
+}
 
 router.get(
   "/start",
-  authMiddleware,
   async (req, res) => {
 
   try {
