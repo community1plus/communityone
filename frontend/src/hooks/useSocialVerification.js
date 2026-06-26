@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 import {
   useNavigate,
@@ -40,7 +40,10 @@ function getProviderMetadata(social, searchParams) {
 
 export default function useSocialVerification() {
 
-  const [searchParams] =
+  
+  const processedRef = useRef(false);
+
+    const [searchParams] =
     useSearchParams();
 
   const navigate =
@@ -51,7 +54,7 @@ export default function useSocialVerification() {
   } = useAPI();
 
   const {
-    refreshProfile,
+    loadProfile,
   } = useProfile();
 
   const social =
@@ -64,6 +67,11 @@ export default function useSocialVerification() {
 
     async function completeVerification() {
 
+      if (processedRef.current) {
+        return;
+      }
+
+      processedRef.current = true;
       if (
         verified !== "true" ||
         !social
@@ -107,7 +115,11 @@ const providerData = {
           "✔ Verification saved."
         );
 
-        await refreshProfile();
+        const {
+            loadProfile,
+        } = useProfile();
+
+        await loadProfile();
 
         navigate(
           "/communityplus/profile",
@@ -132,12 +144,7 @@ const providerData = {
   }, [
 
     social,
-    verified,
-    searchParams,
-    patchProfile,
-    refreshProfile,
-    navigate,
-
+    verified
   ]);
 
 }

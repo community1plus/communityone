@@ -559,13 +559,9 @@ const getAuthHeaders = useCallback(
 
         const payload = normaliseApiResponse(res);
 
-        const savedProfile =
-          payload?.profile || {
-            ...profile,
-            ...patch,
-          };
+        const savedProfile = payload?.profile || nextProfile;
 
-        const nextProviders = payload?.providers || providers;
+        const nextProviders = savedProfile?.social || {};
 
         setProfile(savedProfile);
         setProviders(normaliseProviders(nextProviders));
