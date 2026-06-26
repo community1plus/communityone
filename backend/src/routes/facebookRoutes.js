@@ -118,14 +118,23 @@ if (!req.session.userSub) {
       );
     }
 
-    const state = crypto.randomUUID();
+    const state =
+  req.session.fbOAuthState;
 
-      req.session.fbOAuthState = state;
-      req.session.userSub = req.user.sub;
+if (!state) {
 
-    console.log(
-    "Facebook verification started for:",
-    req.user.sub
+  return redirectFailure(
+    res,
+    "missing_oauth_state"
+  );
+
+}
+
+
+
+console.log(
+  "Facebook verification started for:",
+  req.session.userSub
 );
 
     const params =
