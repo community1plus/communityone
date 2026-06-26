@@ -47,8 +47,41 @@ case "instagram":
 
   };    
 
-    case "youtube":
-      // YouTube-specific fields
+case "youtube":
+
+  return {
+
+    providerId:
+      searchParams.get("channelId"),
+
+    channelTitle:
+      searchParams.get("channelTitle"),
+
+    profilePicture:
+      searchParams.get("profilePicture"),
+
+    subscriberCount:
+      Number(
+        searchParams.get("subscriberCount") || 0
+      ),
+
+    videoCount:
+      Number(
+        searchParams.get("videoCount") || 0
+      ),
+
+    viewCount:
+      Number(
+        searchParams.get("viewCount") || 0
+      ),
+
+    customUrl:
+      searchParams.get("customUrl"),
+
+    country:
+      searchParams.get("country"),
+
+  };
 
     case "x":
       // X-specific fields
