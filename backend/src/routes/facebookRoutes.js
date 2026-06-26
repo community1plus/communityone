@@ -86,6 +86,10 @@ router.post(
 /* =========================
    START FACEBOOK OAUTH
 ========================= */
+
+router.get(
+  "/start",
+  async (req, res) => {
 if (!req.session.userSub) {
 
   return redirectFailure(
@@ -94,11 +98,6 @@ if (!req.session.userSub) {
   );
 
 }
-
-router.get(
-  "/start",
-  async (req, res) => {
-
   try {
 
     if (
