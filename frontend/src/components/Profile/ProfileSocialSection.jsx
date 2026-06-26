@@ -81,7 +81,36 @@ export default function ProfileSocialSection() {
   <button
     type="button"
     className="social-action"
-    onClick={/* current handler */}
+    onClick={async () => {
+
+      if (!provider.route) return;
+
+      try {
+
+        console.log("STEP 1");
+
+        const result =
+          await post("/facebook/begin");
+
+        console.log(
+          "STEP 2",
+          result
+        );
+
+        window.location.assign(
+          `${API_BASE}${provider.route}`
+        );
+
+      } catch (err) {
+
+        console.error(
+          "BEGIN FAILED",
+          err
+        );
+
+      }
+
+    }}
   >
     Verify →
   </button>
