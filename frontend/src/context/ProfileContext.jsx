@@ -488,17 +488,12 @@ const getAuthHeaders = useCallback(
         const res = await apiRef.current.put("/profile", payloadToSave, {
           headers,
         });
-console.log(
-  "FULL VERIFIED TOKEN",
-  JSON.stringify(decoded, null, 2)
-  
 
-  
-);
         const payload = normaliseApiResponse(res);
 
-        const savedProfile = payload?.profile || nextProfile;
-        const nextProviders = payload?.providers || providers;
+        const savedProfile = payload?.profile || { ...profile, ...patch };
+
+        const nextProviders = savedProfile?.social || {};
 
         setProfile(savedProfile);
         setProviders(normaliseProviders(nextProviders));
