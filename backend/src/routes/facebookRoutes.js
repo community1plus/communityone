@@ -90,9 +90,13 @@ router.post(
 router.get(
   "/start",
   async (req, res) => {
-
+console.log("Building Facebook auth URL...");
     console.log("START SESSION ID:", req.sessionID);
 console.log("START SESSION:", req.session);
+console.log("=== FACEBOOK START ===");
+console.log("Session ID:", req.sessionID);
+console.log("Session:", req.session);
+console.log("UserSub:", req.session.userSub);
 if (!req.session.userSub) {
 
   return redirectFailure(
@@ -167,7 +171,7 @@ if (!req.session.userSub) {
     );
 
   }
-
+console.log("Redirecting to:", authUrl);
   return res.redirect(
     authUrl
   );
@@ -180,6 +184,10 @@ if (!req.session.userSub) {
       "❌ FACEBOOK START ERROR:",
       err
     );
+    console.error("❌ FACEBOOK START ERROR");
+console.error("Message:", err.message);
+console.error("Stack:", err.stack);
+console.error("Full error:", err);
 
     return redirectFailure(
       res,
