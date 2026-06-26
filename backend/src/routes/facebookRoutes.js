@@ -1,6 +1,7 @@
 import express from "express";
 import crypto from "crypto";
 import authMiddleware from "../../middleware/authMiddleware.js";
+import { saveProfile } from "../controllers/profileController.js";
 
 const router = express.Router();
 
@@ -25,7 +26,7 @@ function getFrontendRedirect(params = {}) {
 
   const baseUrl =
     process.env.FRONTEND_URL ||
-    "https://main.d1ss8rtrtimogr.amplifyapp.com";
+    "https://develop.d1ss8rtrtimogr.amplifyapp.com";
 
   const query =
     new URLSearchParams(params);
@@ -77,8 +78,15 @@ router.get(
     const state =
       crypto.randomUUID();
 
-    req.session.fbOAuthState =
-      state;
+      req.session.fbOAuthState = state;
+      req.session.userSub = req.user.sub;
+
+
+
+console.log(
+  "Facebook verification started for:",
+  req.user.sub
+);
 
     const params =
       new URLSearchParams({
@@ -108,7 +116,27 @@ router.get(
       authUrl
     );
 
-    return res.redirect(authUrl);
+    req.session.save((err) => {
+
+  if (err) {
+
+    console.error(
+      "Session save failed",
+      err
+    );
+
+    return redirectFailure(
+      res,
+      "session_save_failed"
+    );
+
+  }
+
+  return res.redirect(
+    authUrl
+  );
+
+});
 
   } catch (err) {
 
@@ -130,7 +158,6 @@ router.get(
 
 router.get(
   "/callback",
-  authMiddleware,
   async (req, res) => {
 
   try {
@@ -143,6 +170,23 @@ router.get(
       state,
     } = req.query;
 
+const userSub =
+  req.session.userSub;
+
+console.log(
+  "Facebook callback for:",
+  userSub
+);
+
+if (!userSub) {
+
+  return redirectFailure(
+    res,
+    "missing_user_session"
+  );
+
+}
+
     console.log(
       "📘 FACEBOOK CALLBACK QUERY:",
       req.query
@@ -152,24 +196,25 @@ router.get(
        OAUTH ERROR
     ========================= */
 
-    if (error) {
+if (error) {
 
-      console.error(
-        "❌ FACEBOOK OAUTH ERROR:",
-        {
-          error,
-          error_reason,
-          error_description,
-        }
-      );
-
-      return redirectFailure(
-        res,
-        error_reason ||
-        error_description ||
-        "facebook_oauth_failed"
-      );
+  console.error(
+    "❌ FACEBOOK OAUTH ERROR:",
+    {
+      error,
+      error_reason,
+      error_description,
     }
+  );
+
+  return redirectFailure(
+    res,
+    error_reason ||
+    error_description ||
+    "facebook_oauth_failed"
+  );
+
+}
 
     /* =========================
        MISSING CODE
@@ -341,39 +386,73 @@ router.get(
     const pageCount =
       pagesData?.data?.length || 0;
 
+      const incoming = {
+
+  social: {
+
+    facebook: {
+
+      verified: true,
+
+      verifiedAt:
+        new Date().toISOString(),
+
+      providerId:
+        profileData.id,
+
+      accountName:
+        profileData.name,
+
+      email:
+        profileData.email,
+
+      profilePicture:
+        profileData.picture?.data?.url,
+
+      pageCount,
+
+    },
+
+  },
+
+};
+
+console.log(
+  "Saving Facebook verification",
+  incoming
+);
+
+await saveProfile({
+
+  userId: userSub,
+
+  incoming,
+
+});
+
+console.log(
+  "Facebook verification saved."
+);
     /* =========================
        CLEAN SESSION
     ========================= */
 
-    delete req.session
-      .fbOAuthState;
+delete req.session.fbOAuthState;
+delete req.session.userSub;
 
     /* =========================
        SUCCESS REDIRECT
     ========================= */
 
-    return res.redirect(
-      getFrontendRedirect({
+return res.redirect(
+  getFrontendRedirect({
 
-        social: "facebook",
+    social: "facebook",
 
-        verified: "true",
+    verified: "true",
 
-        facebookId:
-          profileData.id || "",
-
-        name:
-          profileData.name || "",
-
-        email:
-          profileData.email || "",
-
-        profilePicture:
-          profileData.picture?.data?.url || "",
-
-        pageCount,
-      })
-    );
+  })
+);
 
   } catch (err) {
 

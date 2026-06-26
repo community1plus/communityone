@@ -326,7 +326,7 @@ function normaliseProfile(profile, organisationProfile = null) {
   };
 }
 
-async function fetchProfileByUserId(userId) {
+export async function fetchProfileByUserId(userId) {
   const result = await pool.query(
     `
       SELECT *
@@ -415,7 +415,7 @@ async function saveOrganisationProfile({ userProfileId, organisation }) {
   return result.rows[0];
 }
 
-async function saveProfile({ userId, incoming }) {
+export async function saveProfile({ userId, incoming }) {
   const now = new Date();
   const existing = await fetchProfileByUserId(userId);
 
