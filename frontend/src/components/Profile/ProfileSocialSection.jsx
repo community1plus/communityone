@@ -15,32 +15,44 @@ export default function ProfileSocialSection() {
   const { post } = useAPI();
 
   console.log("PROFILE SOCIAL SECTION LOADED");
-  const providers = [
+const providers = [
+
   {
     id: "facebook",
     icon: "ⓕ",
     name: "Facebook",
     verified: Boolean(profile?.social?.facebook?.verified),
+    begin: "/facebook/begin",
     route: "/facebook/start",
   },
+
   {
     id: "instagram",
     icon: "📸",
     name: "Instagram",
     verified: Boolean(profile?.social?.instagram?.verified),
+    begin: "/instagram/begin",
+    route: "/instagram/start",
   },
+
   {
     id: "youtube",
     icon: "▶",
     name: "YouTube",
     verified: Boolean(profile?.social?.youtube?.verified),
+    begin: "/youtube/begin",
+    route: "/youtube/start",
   },
+
   {
     id: "x",
     icon: "𝕏",
     name: "X",
     verified: Boolean(profile?.social?.x?.verified),
+    begin: "/x/begin",
+    route: "/x/start",
   },
+
 ];
 
   return (
