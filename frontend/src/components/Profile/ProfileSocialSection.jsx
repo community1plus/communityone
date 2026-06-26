@@ -101,21 +101,21 @@ onClick={async () => {
 
   try {
 
-    console.log(
-      `Starting ${provider.id.name} verification...`
-    );
+console.log(
+  `Starting ${provider.name} verification...`
+);
 
-    const result =
-      await post(provider.begin);
+const result =
+  await post(provider.begin);
 
-    console.log(
-      "BEGIN RESULT:",
-      result
-    );
+console.log(
+  "BEGIN RESULT:",
+  result
+);
 
-    window.location.assign(
-      `${API_BASE}${provider.id.route}`
-    );
+window.location.assign(
+  `${API_BASE}${provider.route}`
+);
 
   } catch (err) {
 
