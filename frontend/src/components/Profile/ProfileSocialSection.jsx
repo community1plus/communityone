@@ -1,10 +1,8 @@
 // src/components/Profile/ProfileSocialSection.jsx
 
-import useSocialVerification
-  from "../../hooks/useSocialVerification";
-
-  import { API_BASE }
-  from "../../services/api";
+import useSocialVerification from "../../hooks/useSocialVerification";
+import useAPI from "../../hooks/useAPI";
+import { API_BASE } from "../../services/api";
 
 export default function ProfileSocialSection() {
 
@@ -13,6 +11,8 @@ export default function ProfileSocialSection() {
   console.log(
     "PROFILE SOCIAL SECTION LOADED"
   );
+
+  const { post } = useAPI();
 
   const providers = [
 
@@ -87,21 +87,17 @@ export default function ProfileSocialSection() {
 <button
   type="button"
   className="social-action"
-  onClick={async () => {
+onClick={async () => {
 
-    if (!provider.route) return;
+  if (!provider.route) return;
 
-    await apiFetch(
-        "/facebook/begin",
-        {
-            method: "POST",
-            token,
-        }
-    );
+  await post(
+    "/facebook/begin"
+  );
 
-    window.location.assign(
-        `${API_BASE}${provider.route}`
-    );
+  window.location.assign(
+    `${API_BASE}${provider.route}`
+  );
 
 }}
 >
