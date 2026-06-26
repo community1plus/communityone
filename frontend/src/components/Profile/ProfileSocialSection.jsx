@@ -87,9 +87,17 @@ export default function ProfileSocialSection() {
 <button
   type="button"
   className="social-action"
-onClick={() => {
+  onClick={async () => {
 
     if (!provider.route) return;
+
+    await apiFetch(
+        "/facebook/begin",
+        {
+            method: "POST",
+            token,
+        }
+    );
 
     window.location.assign(
         `${API_BASE}${provider.route}`
