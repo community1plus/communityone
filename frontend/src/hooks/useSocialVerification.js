@@ -125,29 +125,22 @@ const providerData = {
 
       try {
 
-        console.log(
-          "Saving social verification",
-          payload
-        );
-
         await patchProfile(payload);
 
-        console.log(
-          "✔ Verification saved."
-        );
+console.log(
+  "✔ Verification saved."
+);
 
-        const {
-            loadProfile,
-        } = useProfile();
+await loadProfile({
+  background: false,
+});
 
-        await loadProfile();
-
-        navigate(
-          "/communityplus/profile",
-          {
-            replace: true,
-          }
-        );
+navigate(
+  "/communityplus/profile",
+  {
+    replace: true,
+  }
+);
 
       } catch (err) {
 
@@ -163,9 +156,12 @@ const providerData = {
     completeVerification();
 
   }, [
-
-    social,
-    verified
-  ]);
+  social,
+  verified,
+  searchParams,
+  patchProfile,
+  loadProfile,
+  navigate,
+]);
 
 }
