@@ -65,45 +65,13 @@ function redirectFailure(
 router.post(
   "/begin",
   authMiddleware,
-  async (req, res) => {
+  (req, res) => {
 
-    try {
+    console.log("=== X BEGIN REACHED ===");
 
-      const state =
-        crypto.randomUUID();
-
-const {
-  code_verifier,
-  code_challenge,
-} = await pkceChallenge();
-
-req.session.userSub =
-  req.user.sub;
-
-req.session.xOAuthState =
-  state;
-
-req.session.xCodeVerifier =
-  code_verifier;
-
-req.session.xCodeChallenge =
-  code_challenge;
-
-    } catch (err) {
-
-      console.error(
-        "❌ X BEGIN ERROR:",
-        err
-      );
-
-      return res.status(500).json({
-
-        error:
-          "x_begin_failed",
-
-      });
-
-    }
+    return res.json({
+      ok: true,
+    });
 
   }
 );
