@@ -37,6 +37,7 @@ export async function apiFetch(path, options = {}) {
   try {
     response = await fetch(url, {
       method,
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
         ...(token
