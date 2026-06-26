@@ -21,16 +21,42 @@ const X_ME_URL =
    FRONTEND REDIRECT
 ========================= */
 
-function getFrontendRedirect(params = {}) {
+return res.redirect(
+  getFrontendRedirect({
 
-  const baseUrl =
-    process.env.FRONTEND_URL ||
-    "https://main.d1ss8rtrtimogr.amplifyapp.com";
+    social: "x",
 
-  const query = new URLSearchParams(params);
+    verified: "true",
 
-  return `${baseUrl}/communityplus/profile?${query.toString()}`;
-}
+    username:
+      user.username,
+
+    displayName:
+      user.name,
+
+    profileImage:
+      user.profile_image_url,
+
+    verifiedBadge:
+      user.verified,
+
+    description:
+      user.description,
+
+    followers:
+      user.public_metrics
+        ?.followers_count,
+
+    following:
+      user.public_metrics
+        ?.following_count,
+
+    tweets:
+      user.public_metrics
+        ?.tweet_count,
+
+  })
+);
 
 function redirectFailure(
   res,
@@ -45,6 +71,43 @@ function redirectFailure(
     })
   );
 }
+
+router.post(
+  "/begin",
+  async (req, res) => {
+
+    req.session.userSub =
+      req.user.sub;
+
+    req.session.xOAuthState =
+      crypto.randomUUID();
+
+    const {
+      code_verifier,
+      code_challenge,
+    } = await pkceChallenge();
+
+    req.session.xCodeVerifier =
+      code_verifier;
+
+    req.session.save(err => {
+
+      if (err) {
+
+        return res.status(500).json({
+          error: "Session save failed",
+        });
+
+      }
+
+      res.json({
+        ok: true,
+      });
+
+    });
+
+  }
+);
 
 /* =========================
    START OAUTH
@@ -70,12 +133,21 @@ router.get("/start", async (req, res) => {
       code_challenge,
     } = await pkceChallenge();
 
-    const state = crypto.randomUUID();
+    const state =
+  req.session.xOAuthState;
+
+if (!state) {
+
+  return redirectFailure(
+    res,
+    "missing_user_session"
+  );
+
+}
 
     req.session.xCodeVerifier =
       code_verifier;
 
-    req.session.xOAuthState = state;
 
     const params = new URLSearchParams({
       response_type: "code",
@@ -120,7 +192,17 @@ router.get("/start", async (req, res) => {
 ========================= */
 
 router.get("/callback", async (req, res) => {
+const userSub =
+  req.session.userSub;
 
+if (!userSub) {
+
+    return redirectFailure(
+        res,
+        "missing_user_session"
+    );
+
+}
   try {
 
     const code = req.query.code;
@@ -163,6 +245,13 @@ router.get("/callback", async (req, res) => {
       !process.env.X_CLIENT_SECRET ||
       !process.env.X_REDIRECT_URI
     ) {
+
+
+      delete req.session.xOAuthState;
+
+delete req.session.xCodeVerifier;
+
+delete req.session.userSub;
 
       return redirectFailure(
         res,
