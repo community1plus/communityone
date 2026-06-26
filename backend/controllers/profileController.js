@@ -140,6 +140,12 @@ function pickProfileFields(body = {}) {
     data.home_location = body.home_location;
   }
 
+
+  console.log(
+  "INCOMING SOCIAL:",
+  JSON.stringify(body.social, null, 2)
+);
+
   if (body.social !== undefined) {
     data.social = body.social || {};
   }
