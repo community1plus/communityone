@@ -63,7 +63,7 @@ export default function CommunityPlusUserProfile({
 
   const {
     profile,
-    refreshProfile,
+    loadProfile,
   } = useProfile();
 
   const {
@@ -133,31 +133,16 @@ export default function CommunityPlusUserProfile({
 
           });
 
-        await patchProfile(
-          payload
-        );
+        await patchProfile(payload);
 
-        await refreshProfile();
+console.log(
+  "✔ Profile saved."
+);
 
-        clearStorage();
+await loadProfile({
+  background: false,
+});
 
-        if (
-          typeof onComplete ===
-          "function"
-        ) {
-
-          onComplete(
-            payload
-          );
-
-        }
-
-        navigate(
-          "/communityplus",
-          {
-            replace: true,
-          }
-        );
 
       }
       catch (err) {
@@ -179,15 +164,10 @@ export default function CommunityPlusUserProfile({
     },
 
     [
-
       values,
       user,
       patchProfile,
-      refreshProfile,
-      clearStorage,
-      onComplete,
-      navigate,
-
+      loadProfile,
     ]
   );
 

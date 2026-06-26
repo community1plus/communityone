@@ -20,7 +20,7 @@ export default function ProfileSocialSection() {
       id: "facebook",
       icon: "ⓕ",
       name: "Facebook",
-      verified: false,
+      verified: Boolean(profile?.social?.facebook?.verified),
       route: "/facebook/start",
     },
 

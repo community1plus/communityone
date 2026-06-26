@@ -67,17 +67,18 @@ export default function useSocialVerification() {
 
     async function completeVerification() {
 
-      if (processedRef.current) {
-        return;
-      }
+if (
+  verified !== "true" ||
+  !social
+) {
+  return;
+}
 
-      processedRef.current = true;
-      if (
-        verified !== "true" ||
-        !social
-      ) {
-        return;
-      }
+if (processedRef.current) {
+  return;
+}
+
+processedRef.current = true;
 
       const now =
         new Date().toISOString();
