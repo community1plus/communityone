@@ -106,7 +106,7 @@ onClick={async () => {
     );
 
     const result =
-      await post(`/${provider.id}/begin`);
+      await post(provider.begin);
 
     console.log(
       "BEGIN RESULT:",
