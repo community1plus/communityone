@@ -89,17 +89,25 @@ export default function ProfileSocialSection() {
   className="social-action"
 onClick={async () => {
 
-  if (!provider.route) return;
-  console.log(
-  "Calling /facebook/begin"
-);
-  await post(
-    "/facebook/begin"
-  );
+  console.log("STEP 1");
 
-  window.location.assign(
-    `${API_BASE}${provider.route}`
-  );
+  try {
+
+    const result = await post("/facebook/begin");
+
+    console.log("STEP 2", result);
+
+    console.log("Navigating...");
+
+    window.location.assign(
+      `${API_BASE}${provider.route}`
+    );
+
+  } catch (err) {
+
+    console.error("BEGIN FAILED", err);
+
+  }
 
 }}
 >
