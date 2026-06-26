@@ -1,7 +1,7 @@
 import express from "express";
 import crypto from "crypto";
 import authMiddleware from "../../middleware/authMiddleware.js";
-import { saveProfile } from "../controllers/profileController.js";
+import saveProfile from "../../controllers/profileController.js";
 
 const router = express.Router();
 
