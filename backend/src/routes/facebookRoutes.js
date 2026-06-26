@@ -57,7 +57,7 @@ router.post(
   "/begin",
   authMiddleware,
   (req, res) => {
-
+  console.log("SESSION ID:", req.sessionID);
     req.session.userSub = req.user.sub;
 
     req.session.fbOAuthState = crypto.randomUUID();
@@ -90,6 +90,9 @@ router.post(
 router.get(
   "/start",
   async (req, res) => {
+
+    console.log("START SESSION ID:", req.sessionID);
+console.log("START SESSION:", req.session);
 if (!req.session.userSub) {
 
   return redirectFailure(
