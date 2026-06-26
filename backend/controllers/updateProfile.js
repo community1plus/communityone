@@ -286,9 +286,17 @@ export async function putProfile(req, res) {
       JSON.stringify(req.body, null, 2)
     );
 
+      console.log(
+  "PATCH BODY:",
+  JSON.stringify(req.body, null, 2)
+);
     const data =
       pickProfileFields(req.body);
 
+
+      const data =
+  pickProfileFields(req.body);
+  
     console.log(
       "PUT AFTER PICK:",
       JSON.stringify(data, null, 2)
