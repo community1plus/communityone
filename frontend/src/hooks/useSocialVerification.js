@@ -24,8 +24,28 @@ function getProviderMetadata(social, searchParams) {
         pageCount: Number(searchParams.get("pageCount") || 0),
       };
 
-    case "instagram":
-      // Instagram-specific fields
+case "instagram":
+  return {
+
+    providerId:
+      searchParams.get("instagramId"),
+
+    username:
+      searchParams.get("username"),
+
+    profilePicture:
+      searchParams.get("profilePicture"),
+
+    pageId:
+      searchParams.get("pageId"),
+
+    followers:
+      Number(searchParams.get("followers") || 0),
+
+    mediaCount:
+      Number(searchParams.get("mediaCount") || 0),
+
+  };    
 
     case "youtube":
       // YouTube-specific fields
