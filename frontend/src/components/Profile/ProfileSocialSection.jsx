@@ -1,5 +1,7 @@
 // src/components/Profile/ProfileSocialSection.jsx
 
+import { useProfile } from "../../context/ProfileContext";
+
 import useSocialVerification from "../../hooks/useSocialVerification";
 import useAPI from "../../hooks/useAPI";
 import { API_BASE } from "../../services/api";
@@ -8,44 +10,38 @@ export default function ProfileSocialSection() {
 
   useSocialVerification();
 
-  console.log(
-    "PROFILE SOCIAL SECTION LOADED"
-  );
+  const { profile } = useProfile();
 
   const { post } = useAPI();
 
+  console.log("PROFILE SOCIAL SECTION LOADED");
   const providers = [
-
-    {
-      id: "facebook",
-      icon: "ⓕ",
-      name: "Facebook",
-      verified: Boolean(profile?.social?.facebook?.verified),
-      route: "/facebook/start",
-    },
-
-    {
-      id: "instagram",
-      icon: "📸",
-      name: "Instagram",
-      verified: false,
-    },
-
-    {
-      id: "youtube",
-      icon: "▶",
-      name: "YouTube",
-      verified: false,
-    },
-
-    {
-      id: "x",
-      icon: "𝕏",
-      name: "X",
-      verified: false,
-    },
-
-  ];
+  {
+    id: "facebook",
+    icon: "ⓕ",
+    name: "Facebook",
+    verified: Boolean(profile?.social?.facebook?.verified),
+    route: "/facebook/start",
+  },
+  {
+    id: "instagram",
+    icon: "📸",
+    name: "Instagram",
+    verified: Boolean(profile?.social?.instagram?.verified),
+  },
+  {
+    id: "youtube",
+    icon: "▶",
+    name: "YouTube",
+    verified: Boolean(profile?.social?.youtube?.verified),
+  },
+  {
+    id: "x",
+    icon: "𝕏",
+    name: "X",
+    verified: Boolean(profile?.social?.x?.verified),
+  },
+];
 
   return (
 
