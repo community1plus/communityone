@@ -430,6 +430,11 @@ SOCIAL
     border-bottom:1px solid #ece7e1;
 }
 
+.social-action.verified {
+  cursor: default;
+  opacity: 1;
+}
+
 .social-provider{
     display:flex;
     align-items:center;

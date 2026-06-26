@@ -54,65 +54,39 @@ export default function ProfileSocialSection() {
           className="social-row"
         >
 
-          <div className="social-provider">
+<div className="social-provider">
 
-            <span className="social-icon">
-              {provider.icon}
-            </span>
+  <span className="social-icon">
+    {provider.icon}
+  </span>
 
-            <span className="social-name">
-              {provider.name}
-            </span>
+  <span className="social-name">
+    {provider.name}
+  </span>
 
-          </div>
+</div>
 
-          <div
-            className={
-              provider.verified
-                ? "social-status verified"
-                : "social-status"
-            }
-          >
+{provider.verified ? (
 
-            {provider.verified
-              ? "Verified"
-              : "Not Verified"}
+  <button
+    type="button"
+    className="social-action verified"
+    disabled
+  >
+    Verified ✓
+  </button>
 
-          </div>
+) : (
 
-<button
-  type="button"
-  className="social-action"
-onClick={async () => {
+  <button
+    type="button"
+    className="social-action"
+    onClick={/* current handler */}
+  >
+    Verify →
+  </button>
 
-  console.log("STEP 1");
-
-  try {
-
-    const result = await post("/facebook/begin");
-
-    console.log("STEP 2", result);
-
-    console.log("Navigating...");
-
-    window.location.assign(
-      `${API_BASE}${provider.route}`
-    );
-
-  } catch (err) {
-
-    console.error("BEGIN FAILED", err);
-
-  }
-
-}}
->
-
-  {provider.verified
-    ? "Verified ✓"
-    : "Verify →"}
-
-</button>
+)}
 
         </div>
 
