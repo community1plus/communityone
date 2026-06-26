@@ -53,6 +53,36 @@ function redirectFailure(
   );
 }
 
+router.post(
+  "/begin",
+  authMiddleware,
+  (req, res) => {
+
+    req.session.userSub = req.user.sub;
+
+    req.session.fbOAuthState = crypto.randomUUID();
+
+    req.session.save((err) => {
+
+      if (err) {
+
+        return res.status(500).json({
+          error: "Session save failed",
+        });
+
+      }
+
+      return res.json({
+
+        ok: true,
+
+      });
+
+    });
+
+  }
+);
+
 /* =========================
    START FACEBOOK OAUTH
 ========================= */
@@ -75,17 +105,14 @@ router.get(
       );
     }
 
-    const state =
-      crypto.randomUUID();
+    const state = crypto.randomUUID();
 
       req.session.fbOAuthState = state;
       req.session.userSub = req.user.sub;
 
-
-
-console.log(
-  "Facebook verification started for:",
-  req.user.sub
+    console.log(
+    "Facebook verification started for:",
+    req.user.sub
 );
 
     const params =
@@ -170,20 +197,19 @@ router.get(
       state,
     } = req.query;
 
-const userSub =
-  req.session.userSub;
+const userSub = req.session.userSub;
 
 console.log(
   "Facebook callback for:",
   userSub
 );
 
-if (!userSub) {
+if (!req.session.userSub) {
 
-  return redirectFailure(
-    res,
-    "missing_user_session"
-  );
+    return redirectFailure(
+        res,
+        "missing_user_session"
+    );
 
 }
 

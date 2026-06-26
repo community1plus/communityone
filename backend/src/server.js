@@ -6,6 +6,7 @@ import pkg from "pg";
 import session from "express-session";
 import { pool } from "./db/pool.js";
 import { connectDB } from "../src/db/db.js";
+import facebookRoutes from "./routes/facebook/facebookRoutes.js";
 
 await connectDB();
 
@@ -303,6 +304,7 @@ app.get(
 ========================= */
 
 app.use("/api/payments", paymentRoutes);
+app.use("/api/facebook", facebookRoutes);
 
 app.use("/api/business-email-verification",  businessEmailVerificationRoutes);
 

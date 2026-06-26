@@ -1,8 +1,8 @@
 import express from "express";
 
-import {
-  searchCommunityOneBusinesses,
-} from "../services/sources/communityOneBusinessSearch.js";
+import { searchCommunityOneBusinesses } from "../services/sources/communityOneBusinessSearch.js";
+
+
 
 const router = express.Router();
 
