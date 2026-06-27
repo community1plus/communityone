@@ -542,3 +542,22 @@ RESPONSIVE
         grid-template-columns:1fr;
     }
 }
+
+/* TEMP DEBUG */
+
+.social-settings {
+    border: 2px solid red !important;
+}
+
+.social-row {
+    border: 2px solid blue !important;
+}
+
+.profile-section-card {
+    border: 2px solid green !important;
+    overflow: visible !important;
+}
+
+.profile-content-card {
+    overflow: visible !important;
+}
