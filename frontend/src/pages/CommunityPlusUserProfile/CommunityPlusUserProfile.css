@@ -592,20 +592,52 @@ RESPONSIVE
 
 .social-action.disconnect{
 
+    margin-top:4px;
+
+    padding:0;
+
     border:none;
 
     background:none;
 
-    color:#6b7280;
+    color:#94a3b8;
 
-    font-size:.85rem;
+    font-size:.82rem;
 
     font-weight:500;
 
+    line-height:1;
+
     cursor:pointer;
+
+    transition:
+        color .2s ease,
+        opacity .2s ease;
 }
 
 .social-action.disconnect:hover{
 
-    opacity:.75;
+    color:#8f0d0d;
+
+    opacity:1;
+}
+
+.social-actions{
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:flex-end;
+
+    gap:6px;
+}
+
+.social-status.verified{
+
+    color:#15803d;
+
+    font-size:1rem;
+
+    font-weight:700;
 }

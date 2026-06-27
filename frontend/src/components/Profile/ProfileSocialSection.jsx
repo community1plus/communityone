@@ -1,12 +1,13 @@
 // src/components/Profile/ProfileSocialSection.jsx
 
+import { useState } from "react";
+
 import { useProfile } from "../../context/ProfileContext";
 import useSocialVerification from "../../hooks/useSocialVerification";
 import useAPI from "../../hooks/useAPI";
 import { API_BASE } from "../../services/api";
 
 function getAvatar(data = {}) {
-
   return (
     data.profileImage ||
     data.profilePicture ||
@@ -14,60 +15,46 @@ function getAvatar(data = {}) {
     data.thumbnail ||
     ""
   );
-
 }
 
 function getAccountLabel(data = {}) {
-
-  const label =
+  return (
     data.username ||
     data.channelTitle ||
     data.accountName ||
     data.displayName ||
     data.email ||
-    "";
-
-  console.log(
-    "getAccountLabel()",
-    {
-      input: data,
-      output: label,
-    }
+    ""
   );
-
-  return label;
-
 }
 
 export default function ProfileSocialSection() {
-
   useSocialVerification();
 
-const {
-  profile,
-  loadProfile,
-} = useProfile();
+  const {
+    profile,
+    loadProfile,
+  } = useProfile();
 
-const {
-  post,
-  delete: deleteRequest,
-} = useAPI();
+  const {
+    post,
+    delete: deleteRequest,
+  } = useAPI();
 
-  console.log("================================");
-  console.log("PROFILE SOCIAL SECTION LOADED");
-  console.log("PROFILE");
-  console.log(profile);
-  console.log("SOCIAL OBJECT");
-  console.log(profile?.social);
+  const [
+    busyProvider,
+    setBusyProvider,
+  ] = useState(null);
 
   const providers = [
-
     {
       id: "facebook",
       icon: "ⓕ",
       name: "Facebook",
       data: profile?.social?.facebook || {},
-      verified: Boolean(profile?.social?.facebook?.verified),
+      verified: Boolean(
+        profile?.social?.facebook?.verified
+      ),
       begin: "/facebook/begin",
       route: "/facebook/start",
     },
@@ -77,7 +64,9 @@ const {
       icon: "📸",
       name: "Instagram",
       data: profile?.social?.instagram || {},
-      verified: Boolean(profile?.social?.instagram?.verified),
+      verified: Boolean(
+        profile?.social?.instagram?.verified
+      ),
       begin: "/instagram/begin",
       route: "/instagram/start",
     },
@@ -87,7 +76,9 @@ const {
       icon: "▶",
       name: "YouTube",
       data: profile?.social?.youtube || {},
-      verified: Boolean(profile?.social?.youtube?.verified),
+      verified: Boolean(
+        profile?.social?.youtube?.verified
+      ),
       begin: "/youtube/begin",
       route: "/youtube/start",
     },
@@ -97,42 +88,27 @@ const {
       icon: "𝕏",
       name: "X",
       data: profile?.social?.x || {},
-      verified: Boolean(profile?.social?.x?.verified),
+      verified: Boolean(
+        profile?.social?.x?.verified
+      ),
       begin: "/x/begin",
       route: "/x/start",
     },
-
   ];
 
-  console.log("PROVIDERS ARRAY");
-  console.table(
-    providers.map((p) => ({
-      provider: p.id,
-      verified: p.verified,
-      accountLabel: getAccountLabel(p.data),
-      rawData: JSON.stringify(p.data),
-    }))
-  );
-
   return (
-
     <div className="social-settings">
 
       {providers.map((provider) => {
 
-        console.log(
-          `----- ${provider.id.toUpperCase()} -----`
-        );
+        const avatar =
+          getAvatar(provider.data);
 
-        console.log(
-          "RAW PROVIDER DATA",
-          provider.data
-        );
+        const accountLabel =
+          getAccountLabel(provider.data);
 
-        console.log(
-          "ACCOUNT LABEL",
-          getAccountLabel(provider.data)
-        );
+        const busy =
+          busyProvider === provider.id;
 
         return (
 
@@ -143,24 +119,24 @@ const {
 
             <div className="social-provider">
 
-<div className="social-avatar">
+              <div className="social-avatar">
 
-  {getAvatar(provider.data) ? (
+                {avatar ? (
 
-    <img
-      src={getAvatar(provider.data)}
-      alt={provider.name}
-    />
+                  <img
+                    src={avatar}
+                    alt={provider.name}
+                  />
 
-  ) : (
+                ) : (
 
-    <span className="social-icon">
-      {provider.icon}
-    </span>
+                  <span className="social-icon">
+                    {provider.icon}
+                  </span>
 
-  )}
+                )}
 
-</div>
+              </div>
 
               <div className="social-details">
 
@@ -168,79 +144,85 @@ const {
                   {provider.name}
                 </div>
 
-{getAccountLabel(provider.data) && (
+                {accountLabel && (
 
-    <div className="social-account">
-        {getAccountLabel(provider.data)}
-    </div>
+                  <div className="social-account">
+                    {accountLabel}
+                  </div>
 
-)}
+                )}
 
               </div>
 
             </div>
 
-{provider.verified ? (
+            {provider.verified ? (
 
-  <div className="social-actions">
+              <div className="social-actions">
 
-  <span className="social-badge">
-    ✓ Verified
-  </span>
+                <div className="social-badge">
+                  ✓ Verified
+                </div>
 
-  <button
-    type="button"
-    className="social-action disconnect"
-    onClick={async () => {
+                <button
+                  type="button"
+                  className="social-action disconnect"
+                  disabled={busy}
+                  onClick={async () => {
 
-      const confirmed = window.confirm(
-        `Disconnect your ${provider.name} account?\n\nThis will remove its verification from your profile.`
-      );
+                    const confirmed =
+                      window.confirm(
+                        `Disconnect ${provider.name}?`
+                      );
 
-      if (!confirmed) {
-        return;
-      }
+                    if (!confirmed) {
+                      return;
+                    }
 
-      try {
+                    try {
 
-        console.log(
-          `>>> Disconnecting ${provider.id}`
-        );
+                      setBusyProvider(
+                        provider.id
+                      );
 
-        const result = await deleteRequest(
-          `/${provider.id}/disconnect`
-        );
+                      await deleteRequest(
+                        `/${provider.id}/disconnect`
+                      );
 
-        console.log(
-          "DISCONNECT RESULT:",
-          result
-        );
+                      await loadProfile({
+                        background: false,
+                      });
 
-        await loadProfile({
-          background: false,
-        });
+                    } catch (err) {
 
-      } catch (err) {
+                      console.error(
+                        `${provider.name} disconnect failed`,
+                        err
+                      );
 
-        console.error(
-          `${provider.name} disconnect failed`,
-          err
-        );
+                    } finally {
 
-      }
+                      setBusyProvider(
+                        null
+                      );
 
-    }}
-  >
-    Disconnect
-  </button>
+                    }
 
-</div>
+                  }}
+                >
+                  {busy
+                    ? "Disconnecting..."
+                    : "Disconnect"}
+                </button>
 
-) : (
+              </div>
+
+            ) : (
 
               <button
                 type="button"
                 className="social-action"
+                disabled={busy}
                 onClick={async () => {
 
                   if (
@@ -252,16 +234,12 @@ const {
 
                   try {
 
-                    console.log(
-                      `Starting ${provider.name} verification...`
+                    setBusyProvider(
+                      provider.id
                     );
 
-                    const result =
-                      await post(provider.begin);
-
-                    console.log(
-                      "BEGIN RESULT:",
-                      result
+                    await post(
+                      provider.begin
                     );
 
                     window.location.assign(
@@ -271,15 +249,21 @@ const {
                   } catch (err) {
 
                     console.error(
-                      `${provider.name} BEGIN FAILED`,
+                      `${provider.name} verification failed`,
                       err
+                    );
+
+                    setBusyProvider(
+                      null
                     );
 
                   }
 
                 }}
               >
-                Verify →
+                {busy
+                  ? "Connecting..."
+                  : "Verify →"}
               </button>
 
             )}
@@ -291,7 +275,5 @@ const {
       })}
 
     </div>
-
   );
-
 }
