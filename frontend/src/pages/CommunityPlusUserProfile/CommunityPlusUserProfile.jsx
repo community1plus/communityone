@@ -18,6 +18,7 @@ import ProfilePaymentSection from "../../components/Profile/ProfilePaymentSectio
 import {
   useState,
   useCallback,
+  useMemo,
 } from "react";
 
 import { useEffect } from "react";
@@ -76,7 +77,6 @@ export default function CommunityPlusUserProfile({
   ] = useState(false);
 
 
-
 const [currentStep, setCurrentStep] = useState(() => {
 
   const saved =
@@ -108,15 +108,18 @@ const [
   console.log("CURRENT STEP:", currentStep);
   const activeSteps = PERSONAL_STEPS;
 
-  const form = useForm({
+  const initialValues = useMemo(
+  () =>
+    getInitialProfileValues(
+      profile,
+      user
+    ),
+  [profile, user]
+);
 
-    initialValues:
-      getInitialProfileValues(
-        profile,
-        user
-      ),
-
-  });
+const form = useForm({
+  initialValues,
+});
 
   const {
     values,
