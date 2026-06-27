@@ -1,4 +1,6 @@
 import { pool } from "../src/db/db.js";
+import { profileToRow } from "./profileToRow.js";
+import { rowToProfile } from "./rowToProfile.js";
 
 const TABLE = "user_profiles";
 
@@ -75,115 +77,224 @@ function mergeEndpointState(existing = {}, incoming = {}) {
 }
 
 function calculateProfileState(profile = {}) {
-  const username = cleanString(profile.username);
-  const displayName = cleanString(profile.display_name);
-  const userType = normaliseAccountType(profile.user_type);
 
-  if (!username || !displayName || !userType) {
+  const username =
+    cleanString(profile.username);
+
+  const displayName =
+    cleanString(profile.displayName);
+
+  const userType =
+    normaliseAccountType(
+      profile.userType
+    );
+
+  if (
+    !username ||
+    !displayName ||
+    !userType
+  ) {
     return {
-      profile_level: 0,
-      profile_status: "incomplete",
+      profileLevel: 0,
+      profileStatus: "incomplete",
     };
   }
 
   if (userType === "PERSONAL") {
     return {
-      profile_level: 1,
-      profile_status: "basic_complete",
+      profileLevel: 1,
+      profileStatus: "basic_complete",
     };
   }
 
-  if (profile.business_verification_status === "verified") {
+  if (
+    profile.businessVerificationStatus ===
+    "verified"
+  ) {
     return {
-      profile_level: 3,
-      profile_status: "verified",
+      profileLevel: 3,
+      profileStatus: "verified",
     };
   }
 
   return {
-    profile_level: 1,
-    profile_status: "business_pending",
+    profileLevel: 1,
+    profileStatus: "business_pending",
   };
+
 }
 
 function pickProfileFields(body = {}) {
+
   const data = {};
 
   if (body.username !== undefined) {
     data.username = cleanString(body.username);
   }
 
+  /* =====================================
+     DISPLAY NAME
+  ===================================== */
+
   if (body.displayName !== undefined) {
-    data.display_name = cleanString(body.displayName);
+
+    data.displayName =
+      cleanString(body.displayName);
+
   } else if (body.display_name !== undefined) {
-    data.display_name = cleanString(body.display_name);
+
+    // Temporary compatibility during migration
+    data.displayName =
+      cleanString(body.display_name);
+
   }
 
+  /* =====================================
+     USER TYPE
+  ===================================== */
+
   if (body.userType !== undefined) {
-    data.user_type = normaliseAccountType(body.userType);
+
+    data.userType =
+      normaliseAccountType(body.userType);
+
   } else if (body.user_type !== undefined) {
-    data.user_type = normaliseAccountType(body.user_type);
+
+    data.userType =
+      normaliseAccountType(body.user_type);
+
   }
+
+  /* =====================================
+     PHONE
+  ===================================== */
 
   if (body.phone !== undefined) {
     data.phone = cleanString(body.phone);
   }
 
   if (body.phoneE164 !== undefined) {
-    data.phone_e164 = cleanString(body.phoneE164);
+
+    data.phoneE164 =
+      cleanString(body.phoneE164);
+
   } else if (body.phone_e164 !== undefined) {
-    data.phone_e164 = cleanString(body.phone_e164);
+
+    data.phoneE164 =
+      cleanString(body.phone_e164);
+
   }
 
   if (body.phoneDisplay !== undefined) {
-    data.phone_display = cleanString(body.phoneDisplay);
+
+    data.phoneDisplay =
+      cleanString(body.phoneDisplay);
+
   } else if (body.phone_display !== undefined) {
-    data.phone_display = cleanString(body.phone_display);
+
+    data.phoneDisplay =
+      cleanString(body.phone_display);
+
   }
 
   if (body.phoneCountry !== undefined) {
-    data.phone_country = cleanString(body.phoneCountry || "AU");
+
+    data.phoneCountry =
+      cleanString(body.phoneCountry || "AU");
+
   } else if (body.phone_country !== undefined) {
-    data.phone_country = cleanString(body.phone_country || "AU");
+
+    data.phoneCountry =
+      cleanString(body.phone_country || "AU");
+
   }
 
   if (body.phoneVerified !== undefined) {
-    data.phone_verified = Boolean(body.phoneVerified);
+
+    data.phoneVerified =
+      Boolean(body.phoneVerified);
+
   } else if (body.phone_verified !== undefined) {
-    data.phone_verified = Boolean(body.phone_verified);
+
+    data.phoneVerified =
+      Boolean(body.phone_verified);
+
   }
+
+  /* =====================================
+     HOME
+  ===================================== */
 
   if (body.homeLocation !== undefined) {
-    data.home_location = body.homeLocation;
+
+    data.homeLocation =
+      body.homeLocation;
+
   } else if (body.home_location !== undefined) {
-    data.home_location = body.home_location;
+
+    data.homeLocation =
+      body.home_location;
+
   }
 
+  /* =====================================
+     SOCIAL
+  ===================================== */
 
   console.log(
-  "INCOMING SOCIAL:",
-  JSON.stringify(body.social, null, 2)
-);
+    "INCOMING SOCIAL:",
+    JSON.stringify(body.social, null, 2)
+  );
 
   if (body.social !== undefined) {
     data.social = body.social || {};
   }
 
+  /* =====================================
+     PAYMENT
+  ===================================== */
+
   if (body.payment !== undefined) {
     data.payment = body.payment || {};
   }
+
+  /* =====================================
+     ENDPOINT
+  ===================================== */
 
   if (body.endpoint !== undefined) {
     data.endpoint = body.endpoint || {};
   }
 
+  /* =====================================
+     BUSINESS VERIFICATION
+  ===================================== */
+
   if (body.businessVerificationStatus !== undefined) {
-    data.business_verification_status = cleanString(body.businessVerificationStatus);
+
+    data.businessVerificationStatus =
+      cleanString(body.businessVerificationStatus);
+
   } else if (body.business_verification_status !== undefined) {
-    data.business_verification_status = cleanString(body.business_verification_status);
+
+    data.businessVerificationStatus =
+      cleanString(body.business_verification_status);
+
+  }
+
+  /* =====================================
+     ORGANISATION
+  ===================================== */
+
+  if (body.organisation !== undefined) {
+
+    data.organisation =
+      body.organisation || {};
+
   }
 
   return data;
+
 }
 
 function pickOrganisationFields(body = {}) {
@@ -226,34 +337,59 @@ function pickOrganisationFields(body = {}) {
   };
 }
 
-function applyAccountTypeRules(existing = {}, incoming = {}) {
+function applyAccountTypeRules(
+  existing = {},
+  incoming = {}
+) {
+
   const next = {
     ...existing,
     ...incoming,
   };
 
-  const requestedType = normaliseAccountType(
-    incoming.user_type || existing.user_type || "PERSONAL"
-  );
+  const requestedType =
+    normaliseAccountType(
+
+      incoming.userType ||
+
+      existing.userType ||
+
+      "PERSONAL"
+
+    );
 
   if (requestedType === "PERSONAL") {
-    next.user_type = "PERSONAL";
-    next.pending_account_type = null;
-    next.business_verification_status = "none";
+
+    next.userType = "PERSONAL";
+
+    next.pendingAccountType = null;
+
+    next.businessVerificationStatus = "none";
+
     return next;
+
   }
 
   if (isBusinessType(requestedType)) {
-    next.user_type = requestedType;
-    next.pending_account_type = null;
-    next.business_verification_status =
-      incoming.business_verification_status ||
-      existing.business_verification_status ||
+
+    next.userType = requestedType;
+
+    next.pendingAccountType = null;
+
+    next.businessVerificationStatus =
+
+      incoming.businessVerificationStatus ||
+
+      existing.businessVerificationStatus ||
+
       "draft";
+
     return next;
+
   }
 
   return next;
+
 }
 
 function normaliseOrganisationProfile(org) {
@@ -298,60 +434,10 @@ function normaliseOrganisationProfile(org) {
   };
 }
 
-function normaliseProfile(profile, organisationProfile = null) {
-  if (!profile) return null;
-
-  const accountType = isBusinessType(profile.user_type) ? "BUSINESS" : "PERSONAL";
-
-  return {
-    id: profile.id,
-    userId: profile.user_id,
-    username: profile.username || "",
-
-    displayName: profile.display_name || "",
-    display_name: profile.display_name || "",
-
-    userType: profile.user_type || "PERSONAL",
-    user_type: profile.user_type || "PERSONAL",
-
-    accountType,
-    account_type: accountType,
-
-    phone: profile.phone || "",
-    phoneE164: profile.phone_e164 || "",
-    phoneDisplay: profile.phone_display || "",
-    phoneCountry: profile.phone_country || "AU",
-    phoneVerified: Boolean(profile.phone_verified),
-
-    homeLocation: profile.home_location || null,
-    home_location: profile.home_location || null,
-
-    social: profile.social || {},
-    payment: profile.payment || {},
-    endpoint: profile.endpoint || {},
-
-    profileLevel: profile.profile_level || 0,
-    profile_level: profile.profile_level || 0,
-
-    profileStatus: profile.profile_status || "incomplete",
-    profile_status: profile.profile_status || "incomplete",
-
-    pendingAccountType: profile.pending_account_type || null,
-    pending_account_type: profile.pending_account_type || null,
-
-    businessVerificationStatus: profile.business_verification_status || "none",
-    business_verification_status: profile.business_verification_status || "none",
-
-    organisationProfile: normaliseOrganisationProfile(organisationProfile),
-    organisation: normaliseOrganisationProfile(organisationProfile),
-
-    version: profile.version || 1,
-    createdAt: profile.created_at,
-    updatedAt: profile.updated_at,
-  };
-}
+import { rowToProfile } from "./rowToProfile.js";
 
 export async function fetchProfileByUserId(userId) {
+
   const result = await pool.query(
     `
       SELECT *
@@ -362,7 +448,10 @@ export async function fetchProfileByUserId(userId) {
     [userId]
   );
 
-  return result.rows[0] || null;
+  return rowToProfile(
+    result.rows[0]
+  );
+
 }
 
 async function fetchOrganisationByProfileId(userProfileId) {
@@ -444,39 +533,72 @@ export async function saveProfile({ userId, incoming }) {
   const now = new Date();
   const existing = await fetchProfileByUserId(userId);
 
-  const base = existing || {
-    user_id: userId,
-    username: "",
-    display_name: "",
-    user_type: "PERSONAL",
-    phone: "",
-    phone_e164: "",
-    phone_display: "",
-    phone_country: "AU",
-    phone_verified: false,
-    home_location: null,
-    social: {},
-    payment: {},
-    endpoint: {},
-    profile_level: 0,
-    profile_status: "incomplete",
-    pending_account_type: null,
-    business_verification_status: "none",
-    version: 0,
-    created_at: now,
-  };
+const base = existing || {
+  userId: userId,
+  username: "",
+  displayName: "",
+  email: "",
+  userType: "PERSONAL",
 
-  const merged = {
-    ...base,
-    ...incoming,
-    social: mergeSocialState(base.social || {}, incoming.social || {}),
-    payment: mergePaymentState(base.payment || {}, incoming.payment || {}),
-    endpoint: mergeEndpointState(base.endpoint || {}, incoming.endpoint || {}),
-    version: (base.version || 0) + 1,
-    updated_at: now,
-  };
+  phone: "",
+  phoneE164: "",
+  phoneDisplay: "",
+  phoneCountry: "AU",
+  phoneVerified: false,
 
-  const accountResolved = applyAccountTypeRules(base, merged);
+  homeLocation: null,
+
+  organisation: {},
+
+  social: {},
+  payment: {},
+  endpoint: {},
+
+  profileLevel: 0,
+  profileStatus: "incomplete",
+  pendingAccountType: null,
+  businessVerificationStatus: "none",
+
+  version: 0,
+
+  createdAt: now,
+};
+
+const merged = {
+  ...base,
+  ...incoming,
+
+  social: mergeSocialState(
+    base.social || {},
+    incoming.social || {}
+  ),
+
+  payment: mergePaymentState(
+    base.payment || {},
+    incoming.payment || {}
+  ),
+
+  endpoint: mergeEndpointState(
+    base.endpoint || {},
+    incoming.endpoint || {}
+  ),
+
+  organisation: {
+    ...(base.organisation || {}),
+    ...(incoming.organisation || {}),
+  },
+
+  version: (base.version || 0) + 1,
+
+  updatedAt: now,
+};
+const accountResolved =
+  applyAccountTypeRules(
+    base,
+    merged
+  );
+
+
   const profileState = calculateProfileState(accountResolved);
 
   const finalProfile = {
@@ -485,6 +607,8 @@ export async function saveProfile({ userId, incoming }) {
     profile_status: profileState.profile_status,
     updated_at: now,
   };
+
+  const row = profileToRow(finalProfile);
 
   if (!existing) {
     const result = await pool.query(
@@ -519,28 +643,41 @@ export async function saveProfile({ userId, incoming }) {
         )
         RETURNING *
       `,
-      [
-        finalProfile.user_id,
-        finalProfile.username,
-        finalProfile.display_name,
-        finalProfile.user_type,
-        finalProfile.phone,
-        finalProfile.phone_e164,
-        finalProfile.phone_display,
-        finalProfile.phone_country,
-        finalProfile.phone_verified,
-        finalProfile.home_location ? JSON.stringify(finalProfile.home_location) : null,
-        JSON.stringify(finalProfile.social || {}),
-        JSON.stringify(finalProfile.payment || {}),
-        JSON.stringify(finalProfile.endpoint || {}),
-        finalProfile.profile_level,
-        finalProfile.profile_status,
-        finalProfile.pending_account_type,
-        finalProfile.business_verification_status,
-        finalProfile.version,
-        finalProfile.created_at,
-        finalProfile.updated_at,
-      ]
+[
+  row.user_id,
+  row.username,
+  row.display_name,
+  row.user_type,
+  row.phone,
+  row.phone_e164,
+  row.phone_display,
+  row.phone_country,
+  row.phone_verified,
+
+  row.home_location
+    ? JSON.stringify(row.home_location)
+    : null,
+
+  JSON.stringify(row.social),
+
+  JSON.stringify(row.payment),
+
+  JSON.stringify(row.endpoint),
+
+  row.profile_level,
+
+  row.profile_status,
+
+  row.pending_account_type,
+
+  row.business_verification_status,
+
+  row.version,
+
+  row.created_at,
+
+  row.updated_at,
+]
     );
 
     return result.rows[0];
@@ -571,27 +708,40 @@ export async function saveProfile({ userId, incoming }) {
       WHERE user_id = $19
       RETURNING *
     `,
-    [
-      finalProfile.username,
-      finalProfile.display_name,
-      finalProfile.user_type,
-      finalProfile.phone,
-      finalProfile.phone_e164,
-      finalProfile.phone_display,
-      finalProfile.phone_country,
-      finalProfile.phone_verified,
-      finalProfile.home_location ? JSON.stringify(finalProfile.home_location) : null,
-      JSON.stringify(finalProfile.social || {}),
-      JSON.stringify(finalProfile.payment || {}),
-      JSON.stringify(finalProfile.endpoint || {}),
-      finalProfile.profile_level,
-      finalProfile.profile_status,
-      finalProfile.pending_account_type,
-      finalProfile.business_verification_status,
-      finalProfile.version,
-      finalProfile.updated_at,
-      userId,
-    ]
+[
+  row.username,
+  row.display_name,
+  row.user_type,
+  row.phone,
+  row.phone_e164,
+  row.phone_display,
+  row.phone_country,
+  row.phone_verified,
+
+  row.home_location
+    ? JSON.stringify(row.home_location)
+    : null,
+
+  JSON.stringify(row.social),
+
+  JSON.stringify(row.payment),
+
+  JSON.stringify(row.endpoint),
+
+  row.profile_level,
+
+  row.profile_status,
+
+  row.pending_account_type,
+
+  row.business_verification_status,
+
+  row.version,
+
+  row.updated_at,
+
+  userId,
+]
   );
 
   return result.rows[0];

@@ -32,39 +32,15 @@ export async function createIdentity(data) {
     );
   }
 
-  const payload = {
-    display_name: displayName,
-    identity_type: identityType,
-    avatar_url: data.avatarUrl || null,
-  };
+  return await createIdentityRecord({
 
-  const identity =
-    await createIdentityRecord(payload);
+    displayName,
 
-  return normalizeIdentity(identity);
-
-}
-
-function normalizeIdentity(identity) {
-
-  return {
-    identityId:
-      identity.identity_id,
-
-    displayName:
-      identity.display_name,
-
-    identityType:
-      identity.identity_type,
+    identityType,
 
     avatarUrl:
-      identity.avatar_url,
+      data.avatarUrl || null,
 
-    status:
-      identity.status,
-
-    createdAt:
-      identity.created_at,
-  };
+  });
 
 }
