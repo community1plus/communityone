@@ -77,10 +77,27 @@ export default function CommunityPlusUserProfile({
 
 
 
-  const [
-    currentStep,
-    setCurrentStep,
-  ] = useState(0);
+const [currentStep, setCurrentStep] = useState(() => {
+
+  const saved =
+    sessionStorage.getItem(
+      "profileCurrentStep"
+    );
+
+  return saved
+    ? Number(saved)
+    : 0;
+
+});
+
+useEffect(() => {
+
+  sessionStorage.setItem(
+    "profileCurrentStep",
+    currentStep
+  );
+
+}, [currentStep]);
 
 
   console.log("CURRENT STEP:", currentStep);
