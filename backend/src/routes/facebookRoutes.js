@@ -391,6 +391,9 @@ if (error) {
         `${FB_GRAPH_URL}/me?fields=id,name,email,picture.width(400).height(400)&access_token=${accessToken}`
       );
 
+console.log("========== FACEBOOK PROFILE ==========");
+console.log(JSON.stringify(profileData, null, 2));
+
     const profileData =
       await profileResponse.json();
 
@@ -519,6 +522,8 @@ const saved = await saveProfile({
     incoming,
 });
 
+console.log("========== FACEBOOK INCOMING ==========");
+console.log(JSON.stringify(incoming, null, 2));
 console.log(
     "Saved social:"
 );
