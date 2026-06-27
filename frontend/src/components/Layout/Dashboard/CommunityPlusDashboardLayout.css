@@ -149,7 +149,8 @@ CONTENT SHELL
 
   display: block;
 
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
 
   padding-left: 0;
 }
