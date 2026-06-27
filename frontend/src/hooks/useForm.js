@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 /* =========================
    HELPERS
@@ -43,6 +43,13 @@ export default function useForm({
 }) {
   const [values, setValues] =
     useState(initialValues);
+
+useEffect(() => {
+
+  setValues(initialValues);
+
+}, [initialValues]);
+    
 
   const [errors, setErrors] =
     useState({});

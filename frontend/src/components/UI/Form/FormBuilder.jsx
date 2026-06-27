@@ -115,34 +115,33 @@ console.log(
        SELECT
     ========================================= */
 
-    if (type === "select") {
-return (
+if (type === "select") {
 
-  <div
-    key={name}
-    style={{
-      border: "2px solid red",
-      padding: "1rem",
-      marginBottom: "1rem"
-    }}
-  >
+  return (
 
-    <h3>{label}</h3>
+    <Field {...fieldProps}>
 
-    <input
-      value={rawValue ?? ""}
-      onChange={(e) =>
-        updateField(
-          name,
-          e.target.value
-        )
-      }
-    />
+      <Select
+        name={name}
+        value={rawValue ?? ""}
+        options={options}
+        disabled={disabled}
+        onChange={(e) =>
+          updateField(
+            name,
+            e.target.value
+          )
+        }
+        onBlur={() =>
+          handleBlur?.(name)
+        }
+      />
 
-  </div>
+    </Field>
 
-);
-    }
+  );
+
+}
 
     /* =========================================
        LOCATION

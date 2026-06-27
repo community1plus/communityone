@@ -103,7 +103,7 @@ useEffect(() => {
 const [
   editing,
   setEditing,
-] = useState(false);
+] = useState(!profile?.id);
 
   console.log("CURRENT STEP:", currentStep);
   const activeSteps = PERSONAL_STEPS;
@@ -347,24 +347,54 @@ if (sectionId === "social") {
 
 <div className="profile-floating-save">
 
-{sectionId !== "social" && (
-
-  <div className="profile-floating-save">
+  {!editing ? (
 
     <button
       type="button"
       className="profile-save-button"
-      disabled={savingProfile}
-      onClick={handleSaveProfile}
+      onClick={() => setEditing(true)}
     >
-      {savingProfile
-        ? "Saving..."
-        : "Save Changes"}
+      Edit Profile
     </button>
 
-  </div>
+  ) : (
 
-)}
+    <div className="profile-edit-actions">
+
+      <button
+        type="button"
+        className="profile-cancel-button"
+        onClick={() => {
+
+          form.reset?.();
+
+          setEditing(false);
+
+        }}
+      >
+        Cancel
+      </button>
+
+      <button
+        type="button"
+        className="profile-save-button"
+        disabled={savingProfile}
+        onClick={async () => {
+
+          await handleSaveProfile();
+
+          setEditing(false);
+
+        }}
+      >
+        {savingProfile
+          ? "Saving..."
+          : "Save Changes"}
+      </button>
+
+    </div>
+
+  )}
 
 </div>
 

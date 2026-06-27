@@ -641,3 +641,43 @@ RESPONSIVE
 
     font-weight:700;
 }
+
+.profile-edit-actions{
+
+    display:flex;
+
+    gap:14px;
+
+    width:100%;
+}
+
+.profile-cancel-button{
+
+    flex:1;
+
+    height:64px;
+
+    border-radius:999px;
+
+    border:1px solid #d6d6d6;
+
+    background:white;
+
+    color:#555;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.2s;
+}
+
+.profile-cancel-button:hover{
+
+    background:#f4f4f4;
+}
+
+.profile-edit-actions .profile-save-button{
+
+    flex:2;
+}
