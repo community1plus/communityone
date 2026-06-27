@@ -401,6 +401,11 @@ console.log(JSON.stringify(profileData, null, 2));
   "FACEBOOK PROFILE RAW"
 );
 
+console.log("========== FACEBOOK PROFILE ==========");
+console.log(
+  JSON.stringify(profileData, null, 2)
+);
+
 console.log(
   JSON.stringify(profileData, null, 2)
 );
