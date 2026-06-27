@@ -1,28 +1,29 @@
 // src/components/Profile/ProfileSocialSection.jsx
 
 import { useProfile } from "../../context/ProfileContext";
-
 import useSocialVerification from "../../hooks/useSocialVerification";
 import useAPI from "../../hooks/useAPI";
 import { API_BASE } from "../../services/api";
 
 function getAccountLabel(data = {}) {
 
-  return (
-
+  const label =
     data.username ||
-
     data.channelTitle ||
-
     data.accountName ||
-
     data.displayName ||
-
     data.email ||
+    "";
 
-    ""
-
+  console.log(
+    "getAccountLabel()",
+    {
+      input: data,
+      output: label,
+    }
   );
+
+  return label;
 
 }
 
@@ -34,145 +35,177 @@ export default function ProfileSocialSection() {
 
   const { post } = useAPI();
 
+  console.log("================================");
   console.log("PROFILE SOCIAL SECTION LOADED");
+  console.log("PROFILE");
+  console.log(profile);
   console.log("SOCIAL OBJECT");
-console.log(profile?.social);
-const providers = [
+  console.log(profile?.social);
 
-  {
-  id: "facebook",
-  icon: "ⓕ",
-  name: "Facebook",
-  data: profile?.social?.facebook || {},
-  verified: Boolean(profile?.social?.facebook?.verified),
-  begin: "/facebook/begin",
-  route: "/facebook/start",
-  },
-{
-  id: "instagram",
-  icon: "📸",
-  name: "Instagram",
-  data: profile?.social?.instagram || {},
-  verified: Boolean(profile?.social?.instagram?.verified),
-  begin: "/instagram/begin",
-  route: "/instagram/start",
-},
+  const providers = [
 
-  {
-    id: "youtube",
-    icon: "▶",
-    name: "YouTube",
-    data: profile?.social?.youtube || {},
-    verified: Boolean(profile?.social?.youtube?.verified),
-    begin: "/youtube/begin",
-    route: "/youtube/start",
-  },
+    {
+      id: "facebook",
+      icon: "ⓕ",
+      name: "Facebook",
+      data: profile?.social?.facebook || {},
+      verified: Boolean(profile?.social?.facebook?.verified),
+      begin: "/facebook/begin",
+      route: "/facebook/start",
+    },
 
-  {
-    id: "x",
-    icon: "𝕏",
-    name: "X",
-    data: profile?.social?.x || {},
-    verified: Boolean(profile?.social?.x?.verified),
-    begin: "/x/begin",
-    route: "/x/start",
-  },
+    {
+      id: "instagram",
+      icon: "📸",
+      name: "Instagram",
+      data: profile?.social?.instagram || {},
+      verified: Boolean(profile?.social?.instagram?.verified),
+      begin: "/instagram/begin",
+      route: "/instagram/start",
+    },
 
-];
+    {
+      id: "youtube",
+      icon: "▶",
+      name: "YouTube",
+      data: profile?.social?.youtube || {},
+      verified: Boolean(profile?.social?.youtube?.verified),
+      begin: "/youtube/begin",
+      route: "/youtube/start",
+    },
+
+    {
+      id: "x",
+      icon: "𝕏",
+      name: "X",
+      data: profile?.social?.x || {},
+      verified: Boolean(profile?.social?.x?.verified),
+      begin: "/x/begin",
+      route: "/x/start",
+    },
+
+  ];
+
+  console.log("PROVIDERS ARRAY");
+  console.table(
+    providers.map((p) => ({
+      provider: p.id,
+      verified: p.verified,
+      accountLabel: getAccountLabel(p.data),
+      rawData: JSON.stringify(p.data),
+    }))
+  );
 
   return (
 
     <div className="social-settings">
 
-      {providers.map((provider) => (
+      {providers.map((provider) => {
 
-        <div
-          key={provider.id}
-          className="social-row"
-        >
-            console.log(
-    provider.id,
-    provider.data
-  );
+        console.log(
+          `----- ${provider.id.toUpperCase()} -----`
+        );
 
-<div className="social-provider">
+        console.log(
+          "RAW PROVIDER DATA",
+          provider.data
+        );
 
-  <span className="social-icon">
-    {provider.icon}
-  </span>
+        console.log(
+          "ACCOUNT LABEL",
+          getAccountLabel(provider.data)
+        );
 
-  <div className="social-details">
+        return (
 
-    <div className="social-name">
-      {provider.name}
-    </div>
+          <div
+            key={provider.id}
+            className="social-row"
+          >
 
-<div className="social-account">
-  {getAccountLabel(provider.data)}
-</div>
+            <div className="social-provider">
 
-  </div>
+              <span className="social-icon">
+                {provider.icon}
+              </span>
 
-</div>
+              <div className="social-details">
 
-{provider.verified ? (
+                <div className="social-name">
+                  {provider.name}
+                </div>
 
-  <button
-    type="button"
-    className="social-action verified"
-    disabled
-  >
-    Verified ✓
-  </button>
+                <div className="social-account">
+                  {getAccountLabel(provider.data)}
+                </div>
 
-) : (
+              </div>
 
-  <button
-    type="button"
-    className="social-action"
-onClick={async () => {
+            </div>
 
-  if (!provider.route || !provider.begin) {
-    return;
-  }
+            {provider.verified ? (
 
-  try {
+              <button
+                type="button"
+                className="social-action verified"
+                disabled
+              >
+                Verified ✓
+              </button>
 
-console.log(
-  `Starting ${provider.name} verification...`
-);
+            ) : (
 
-const result =
-  await post(provider.begin);
+              <button
+                type="button"
+                className="social-action"
+                onClick={async () => {
 
-console.log(
-  "BEGIN RESULT:",
-  result
-);
+                  if (
+                    !provider.route ||
+                    !provider.begin
+                  ) {
+                    return;
+                  }
 
-window.location.assign(
-  `${API_BASE}${provider.route}`
-);
+                  try {
 
-  } catch (err) {
+                    console.log(
+                      `Starting ${provider.name} verification...`
+                    );
 
-    console.error(
-      `${provider.name} BEGIN FAILED`,
-      err
-    );
+                    const result =
+                      await post(provider.begin);
 
-  }
+                    console.log(
+                      "BEGIN RESULT:",
+                      result
+                    );
 
-}}
-  >
-    Verify →
-  </button>
+                    window.location.assign(
+                      `${API_BASE}${provider.route}`
+                    );
 
-)}
+                  } catch (err) {
 
-        </div>
+                    console.error(
+                      `${provider.name} BEGIN FAILED`,
+                      err
+                    );
 
-      ))}
+                  }
+
+                }}
+              >
+                Verify →
+              </button>
+
+            )}
+
+          </div>
+
+        );
+
+      })}
 
     </div>
 
