@@ -438,6 +438,18 @@ if (error) {
     const pageCount =
       pagesData?.data?.length || 0;
 
+      console.log(
+  "FACEBOOK PROFILE DATA",
+  profileData
+);
+
+console.log({
+  id: profileData.id,
+  name: profileData.name,
+  email: profileData.email,
+  picture: profileData.picture?.data?.url,
+});
+
       const incoming = {
 
   social: {
@@ -472,6 +484,11 @@ if (error) {
 console.log(
   "Saving Facebook verification",
   incoming
+);
+
+console.log(
+  "INCOMING FACEBOOK",
+  JSON.stringify(incoming, null, 2)
 );
 
 await saveProfile({
