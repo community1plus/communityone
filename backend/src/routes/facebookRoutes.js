@@ -211,16 +211,13 @@ console.error("Full error:", err);
 
 router.get("/callback", async (req, res) => {
 
-  console.log("#################################");
-  console.log("FACEBOOK CALLBACK HIT");
-  console.log("#################################");
-  router.get("/callback", async (req, res) => {
-
   console.log("########################################");
   console.log("FACEBOOK CALLBACK REACHED");
   console.log("QUERY:", req.query);
   console.log("SESSION:", req.session);
   console.log("########################################");
+
+  try {
 
     const {
       code,
