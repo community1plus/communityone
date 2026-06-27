@@ -222,10 +222,6 @@ router.get("/callback", async (req, res) => {
   console.log("SESSION:", req.session);
   console.log("########################################");
 
-  try {
-
-  try {
-
     const {
       code,
       error,
