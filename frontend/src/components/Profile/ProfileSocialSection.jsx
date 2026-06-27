@@ -1,6 +1,6 @@
 // src/components/Profile/ProfileSocialSection.jsx
 
-import { loadProfile, useProfile } from "../../context/ProfileContext";
+import { useProfile } from "../../context/ProfileContext";
 import useSocialVerification from "../../hooks/useSocialVerification";
 import useAPI from "../../hooks/useAPI";
 import { API_BASE } from "../../services/api";
