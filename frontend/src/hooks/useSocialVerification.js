@@ -12,113 +12,7 @@ import {
   useProfile,
 } from "../context/ProfileContext";
 
-function getProviderMetadata(social, searchParams) {
-  switch (social) {
 
-    case "facebook":
-      return {
-        providerId: searchParams.get("facebookId"),
-        accountName: searchParams.get("name"),
-        email: searchParams.get("email"),
-        profilePicture: searchParams.get("profilePicture"),
-        pageCount: Number(searchParams.get("pageCount") || 0),
-      };
-
-case "instagram":
-  return {
-
-    providerId:
-      searchParams.get("instagramId"),
-
-    username:
-      searchParams.get("username"),
-
-    profilePicture:
-      searchParams.get("profilePicture"),
-
-    pageId:
-      searchParams.get("pageId"),
-
-    followers:
-      Number(searchParams.get("followers") || 0),
-
-    mediaCount:
-      Number(searchParams.get("mediaCount") || 0),
-
-  };    
-
-case "youtube":
-
-  return {
-
-    providerId:
-      searchParams.get("channelId"),
-
-    channelTitle:
-      searchParams.get("channelTitle"),
-
-    profilePicture:
-      searchParams.get("profilePicture"),
-
-    subscriberCount:
-      Number(
-        searchParams.get("subscriberCount") || 0
-      ),
-
-    videoCount:
-      Number(
-        searchParams.get("videoCount") || 0
-      ),
-
-    viewCount:
-      Number(
-        searchParams.get("viewCount") || 0
-      ),
-
-    customUrl:
-      searchParams.get("customUrl"),
-
-    country:
-      searchParams.get("country"),
-
-  };
-
-case "x":
-  return {
-
-    providerId:
-      searchParams.get("username"),
-
-    username:
-      searchParams.get("username"),
-
-    displayName:
-      searchParams.get("displayName"),
-
-    profileImage:
-      searchParams.get("profileImage"),
-
-    verifiedBadge:
-      searchParams.get("verifiedBadge") === "true",
-
-    description:
-      searchParams.get("description"),
-
-    followers:
-      Number(searchParams.get("followers") || 0),
-
-    following:
-      Number(searchParams.get("following") || 0),
-
-    tweets:
-      Number(searchParams.get("tweets") || 0),
-
-  };
-
-    default:
-      return {};
-  }
-}
 
 export default function useSocialVerification() {
 
@@ -161,57 +55,33 @@ if (processedRef.current) {
 }
 
 processedRef.current = true;
+   
 
-      const now =
-        new Date().toISOString();
+try {
 
-const providerData = {
-  verified: true,
-  verifiedBy: social,
-  verificationMethod: "oauth",
-  verifiedAt: now,
-  lastVerifiedAt: now,
-  ...getProviderMetadata(social, searchParams),
-};
+  console.log(
+    `Refreshing profile after ${social} verification...`
+  );
 
-      const payload = {
+  await loadProfile({
+    background: false,
+  });
 
-        social: {
+  navigate(
+    "/communityplus/profile",
+    {
+      replace: true,
+    }
+  );
 
-          [social]:
-            providerData,
+} catch (err) {
 
-        },
+  console.error(
+    "❌ Verification refresh failed",
+    err
+  );
 
-      };
-
-      try {
-
-        await patchProfile(payload);
-
-console.log(
-  "✔ Verification saved."
-);
-
-await loadProfile({
-  background: false,
-});
-
-navigate(
-  "/communityplus/profile",
-  {
-    replace: true,
-  }
-);
-
-      } catch (err) {
-
-        console.error(
-          "❌ Verification save failed",
-          err
-        );
-
-      }
+}
 
     }
 
