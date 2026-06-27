@@ -209,9 +209,11 @@ console.error("Full error:", err);
    FACEBOOK CALLBACK
 ========================= */
 
-router.get(
-  "/callback",
-  async (req, res) => {
+router.get("/callback", async (req, res) => {
+
+  console.log("#################################");
+  console.log("FACEBOOK CALLBACK HIT");
+  console.log("#################################");
 
   try {
 
@@ -448,6 +450,9 @@ console.log({
 
     const pagesData =
       await pagesResponse.json();
+
+      console.log("FACEBOOK PAGES");
+console.log(pagesData);
 
     console.log(
       "📘 FACEBOOK PAGES:",
