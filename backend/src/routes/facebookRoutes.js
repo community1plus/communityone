@@ -574,10 +574,18 @@ return res.redirect(
 
   } catch (err) {
 
-    console.error(
-      "❌ FACEBOOK CALLBACK ERROR:",
+    console.error("❌ FACEBOOK CALLBACK ERROR:",
       err
     );
+    console.error("================================");
+  console.error("FACEBOOK CALLBACK EXCEPTION");
+  console.error("Message:", err.message);
+  console.error("Stack:", err.stack);
+  console.error(err);
+  console.error("================================");
+
+
+    
 
     return redirectFailure(
       res,
