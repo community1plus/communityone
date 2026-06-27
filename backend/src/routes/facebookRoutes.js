@@ -214,6 +214,15 @@ router.get("/callback", async (req, res) => {
   console.log("#################################");
   console.log("FACEBOOK CALLBACK HIT");
   console.log("#################################");
+  router.get("/callback", async (req, res) => {
+
+  console.log("########################################");
+  console.log("FACEBOOK CALLBACK REACHED");
+  console.log("QUERY:", req.query);
+  console.log("SESSION:", req.session);
+  console.log("########################################");
+
+  try {
 
   try {
 
@@ -399,6 +408,9 @@ console.log(JSON.stringify(profileData, null, 2));
     const profileData =
       await profileResponse.json();
 
+
+      console.log("PROFILE DATA");
+console.log(profileData);
       console.log(
   "FACEBOOK PROFILE RAW"
 );
