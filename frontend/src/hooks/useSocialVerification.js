@@ -5,8 +5,6 @@ import {
   useSearchParams,
 } from "react-router-dom";
 
-import useAPI
-  from "../hooks/useAPI";
 
 import {
   useProfile,
@@ -25,9 +23,7 @@ export default function useSocialVerification() {
   const navigate =
     useNavigate();
 
-  const {
-    patchProfile,
-  } = useAPI();
+
 
   const {
     loadProfile,
@@ -67,12 +63,14 @@ try {
     background: false,
   });
 
-  navigate(
-    "/communityplus/profile",
-    {
-      replace: true,
-    }
-  );
+processedRef.current = false;
+
+navigate(
+  "/communityplus/profile",
+  {
+    replace: true,
+  }
+);
 
 } catch (err) {
 
@@ -90,8 +88,6 @@ try {
   }, [
   social,
   verified,
-  searchParams,
-  patchProfile,
   loadProfile,
   navigate,
 ]);
