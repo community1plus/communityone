@@ -49,9 +49,11 @@ CARD SYSTEM
 }
 
 .profile-content-card{
-
     display:flex;
     flex-direction:column;
+
+    height:auto;
+    min-height:0;
 }
 
 .profile-floating-save{
