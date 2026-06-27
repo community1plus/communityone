@@ -75,13 +75,15 @@ export default function CommunityPlusUserProfile({
     setSavingProfile,
   ] = useState(false);
 
-console.log("CURRENT STEP:", currentStep);
+
 
   const [
     currentStep,
     setCurrentStep,
   ] = useState(0);
 
+
+  console.log("CURRENT STEP:", currentStep);
   const activeSteps = PERSONAL_STEPS;
 
   const form = useForm({
