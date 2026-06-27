@@ -314,22 +314,30 @@ if (sectionId === "social") {
     <ProfileHelpPanel
       section={
         activeSteps[currentStep]?.id
-      }
+      }getAccountLabel
     />
   </aside>
 
 <div className="profile-floating-save">
 
-  <button
-    type="button"
-    className="profile-save-button"
-    disabled={savingProfile}
-    onClick={handleSaveProfile}
-  >
-    {savingProfile
-      ? "Saving..."
-      : "Save Changes"}
-  </button>
+{sectionId !== "social" && (
+
+  <div className="profile-floating-save">
+
+    <button
+      type="button"
+      className="profile-save-button"
+      disabled={savingProfile}
+      onClick={handleSaveProfile}
+    >
+      {savingProfile
+        ? "Saving..."
+        : "Save Changes"}
+    </button>
+
+  </div>
+
+)}
 
 </div>
 

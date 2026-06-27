@@ -5,6 +5,18 @@ import useSocialVerification from "../../hooks/useSocialVerification";
 import useAPI from "../../hooks/useAPI";
 import { API_BASE } from "../../services/api";
 
+function getAvatar(data = {}) {
+
+  return (
+    data.profileImage ||
+    data.profilePicture ||
+    data.picture ||
+    data.thumbnail ||
+    ""
+  );
+
+}
+
 function getAccountLabel(data = {}) {
 
   const label =
@@ -131,9 +143,24 @@ const {
 
             <div className="social-provider">
 
-              <span className="social-icon">
-                {provider.icon}
-              </span>
+<div className="social-avatar">
+
+  {getAvatar(provider.data) ? (
+
+    <img
+      src={getAvatar(provider.data)}
+      alt={provider.name}
+    />
+
+  ) : (
+
+    <span className="social-icon">
+      {provider.icon}
+    </span>
+
+  )}
+
+</div>
 
               <div className="social-details">
 
@@ -151,34 +178,59 @@ const {
 
 {provider.verified ? (
 
+  <div className="social-actions">
+
+  <span className="social-badge">
+    ✓ Verified
+  </span>
+
   <button
     type="button"
-    className="social-action verified"
-onClick={async () => {
+    className="social-action disconnect"
+    onClick={async () => {
 
-  try {
-
-    const result =
-      await deleteRequest(
-        "/facebook/disconnect"
+      const confirmed = window.confirm(
+        `Disconnect your ${provider.name} account?\n\nThis will remove its verification from your profile.`
       );
 
-    console.log(result);
+      if (!confirmed) {
+        return;
+      }
 
-    await loadProfile({
-      background: false,
-    });
+      try {
 
-  } catch (err) {
+        console.log(
+          `>>> Disconnecting ${provider.id}`
+        );
 
-    console.error(err);
+        const result = await deleteRequest(
+          `/${provider.id}/disconnect`
+        );
 
-  }
+        console.log(
+          "DISCONNECT RESULT:",
+          result
+        );
 
-}}
+        await loadProfile({
+          background: false,
+        });
+
+      } catch (err) {
+
+        console.error(
+          `${provider.name} disconnect failed`,
+          err
+        );
+
+      }
+
+    }}
   >
     Disconnect
   </button>
+
+</div>
 
 ) : (
 
