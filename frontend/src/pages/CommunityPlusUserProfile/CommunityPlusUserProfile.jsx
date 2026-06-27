@@ -1,4 +1,4 @@
-import { useNavigate, useEffect } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import useAPI from "../../hooks/useAPI";
 
@@ -20,7 +20,7 @@ import {
   useCallback,
 } from "react";
 
-
+import { useEffect } from "react";
 
 import {
   useAuth,
