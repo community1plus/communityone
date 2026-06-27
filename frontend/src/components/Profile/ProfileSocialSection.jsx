@@ -6,6 +6,26 @@ import useSocialVerification from "../../hooks/useSocialVerification";
 import useAPI from "../../hooks/useAPI";
 import { API_BASE } from "../../services/api";
 
+function getAccountLabel(data = {}) {
+
+  return (
+
+    data.username ||
+
+    data.channelTitle ||
+
+    data.accountName ||
+
+    data.displayName ||
+
+    data.email ||
+
+    ""
+
+  );
+
+}
+
 export default function ProfileSocialSection() {
 
   useSocialVerification();
@@ -18,27 +38,29 @@ export default function ProfileSocialSection() {
 const providers = [
 
   {
-    id: "facebook",
-    icon: "ⓕ",
-    name: "Facebook",
-    verified: Boolean(profile?.social?.facebook?.verified),
-    begin: "/facebook/begin",
-    route: "/facebook/start",
+  id: "facebook",
+  icon: "ⓕ",
+  name: "Facebook",
+  data: profile?.social?.facebook || {},
+  verified: Boolean(profile?.social?.facebook?.verified),
+  begin: "/facebook/begin",
+  route: "/facebook/start",
   },
-
-  {
-    id: "instagram",
-    icon: "📸",
-    name: "Instagram",
-    verified: Boolean(profile?.social?.instagram?.verified),
-    begin: "/instagram/begin",
-    route: "/instagram/start",
-  },
+{
+  id: "instagram",
+  icon: "📸",
+  name: "Instagram",
+  data: profile?.social?.instagram || {},
+  verified: Boolean(profile?.social?.instagram?.verified),
+  begin: "/instagram/begin",
+  route: "/instagram/start",
+},
 
   {
     id: "youtube",
     icon: "▶",
     name: "YouTube",
+    data: profile?.social?.youtube || {},
     verified: Boolean(profile?.social?.youtube?.verified),
     begin: "/youtube/begin",
     route: "/youtube/start",
@@ -48,6 +70,7 @@ const providers = [
     id: "x",
     icon: "𝕏",
     name: "X",
+    data: profile?.social?.x || {},
     verified: Boolean(profile?.social?.x?.verified),
     begin: "/x/begin",
     route: "/x/start",
@@ -72,9 +95,17 @@ const providers = [
     {provider.icon}
   </span>
 
-  <span className="social-name">
-    {provider.name}
-  </span>
+  <div className="social-details">
+
+    <div className="social-name">
+      {provider.name}
+    </div>
+
+<div className="social-account">
+  {getAccountLabel(provider.data)}
+</div>
+
+  </div>
 
 </div>
 

@@ -414,6 +414,24 @@ SOCIAL
     flex-direction:column;
 }
 
+.social-details {
+
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+}
+
+.social-account {
+
+  font-size: 0.82rem;
+
+  color: #8b8b8b;
+
+  font-weight: 400;
+
+}
+
 .social-row{
 
     display:grid;
