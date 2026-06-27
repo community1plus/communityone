@@ -313,11 +313,12 @@ if (sectionId === "social") {
 
     <ProfileSectionCard>
 
-      <FormBuilder
-        steps={[activeSteps[currentStep]]}
-        currentStep={0}
-        form={form}
-      />
+<FormBuilder
+  steps={[activeSteps[currentStep]]}
+  currentStep={0}
+  form={form}
+  readOnly={!editing}
+/>
 
     </ProfileSectionCard>
 
