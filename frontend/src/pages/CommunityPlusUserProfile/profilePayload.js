@@ -11,9 +11,6 @@ export function buildProfilePayload({
   const isOrg =
     activeProfileTab === "ORG";
 
-  const orgLocation =
-    values.organisation?.location;
-
   const phoneE164 =
     toE164Phone(
       values.phoneDisplay,
@@ -21,25 +18,34 @@ export function buildProfilePayload({
     );
 
   return {
-    profile: {
-      username: values.username,
 
-      display_name:
-        values.display_name,
+    profile: {
+
+      /* =====================================
+         USER
+      ===================================== */
+
+      username:
+        values.username,
 
       displayName:
-        values.display_name,
+        values.displayName,
 
       email:
         values.email ||
         userEmail,
 
-      user_type:
+      userType:
         activeProfileTab,
 
-      profile_level: 1,
+      profileLevel: 1,
 
-      phone: phoneE164,
+      /* =====================================
+         CONTACT
+      ===================================== */
+
+      phone:
+        phoneE164,
 
       phoneE164,
 
@@ -49,52 +55,53 @@ export function buildProfilePayload({
       phoneCountry:
         values.phoneCountry,
 
+      /* =====================================
+         HOME
+      ===================================== */
+
       homeLocation:
         isOrg
-          ? orgLocation
+          ? null
           : homeLocation,
+
+      /* =====================================
+         OTHER
+      ===================================== */
 
       policies:
         values.policies,
 
       payment:
         values.payment,
+
     },
 
     organisationProfile:
+
       isOrg
+
         ? {
-            organisation_name:
-              values.organisation
-                ?.name,
 
-            organisation_email:
-              values.organisation
-                ?.email,
-
-            organisation_phone:
-              values.organisation
-                ?.phone,
-
-            website:
-              values.organisation
-                ?.website,
+            ...values.organisation,
 
             location:
-              orgLocation,
+              values.organisation?.location,
 
-            email_verified:
-              values.organisation
-                ?.emailVerified,
+            emailVerified:
+              values.organisation?.emailVerified,
 
-            ownership_verified:
+            ownershipVerified:
               false,
 
-            business_level: 1,
+            businessLevel: 1,
 
             source:
               "manual",
+
           }
+
         : null,
+
   };
+
 }

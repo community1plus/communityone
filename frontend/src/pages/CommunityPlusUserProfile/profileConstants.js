@@ -24,6 +24,10 @@ export const PHONE_COUNTRIES = [
   },
 ];
 
+/* =========================================
+PROFILE TYPES
+========================================= */
+
 export const PROFILE_TABS = [
   {
     id: "PERSONAL",
@@ -39,82 +43,74 @@ export const PROFILE_TABS = [
   },
 ];
 
-/* =========================
-   PERSONAL
-========================= */
+/* =========================================
+PERSONAL PROFILE
+========================================= */
 
 export const PERSONAL_STEPS = [
+
   {
-    id: "user-profile",
+    id: "user",
     title: "User",
+
     fields: [
+
       {
-        name: "display_name",
+        name: "displayName",
         label: "Display Name",
         type: "text",
       },
+
       {
         name: "username",
         label: "Username",
         type: "text",
       },
+
     ],
   },
 
   {
-    id: "home-address",
+    id: "home",
     title: "Home Address",
+
     fields: [
+
       {
-        name: "streetAddress",
-        label: "Street Address",
-        type: "text",
+        name: "homeLocation",
+        label: "Home Address",
+        type: "location",
       },
+
     ],
   },
 
   {
     id: "contact",
     title: "Contact",
+
     fields: [
+
       {
         name: "phoneDisplay",
         label: "Phone Number",
         type: "text",
       },
+
       {
         name: "email",
-        label: "Email",
+        label: "Email Address",
         type: "email",
+        readOnly: true,
       },
+
     ],
   },
 
   {
     id: "social",
     title: "Social",
-    fields: [
-      {
-        name: "facebookUrl",
-        label: "Facebook",
-        type: "text",
-      },
-      {
-        name: "instagramUrl",
-        label: "Instagram",
-        type: "text",
-      },
-      {
-        name: "youtubeUrl",
-        label: "YouTube",
-        type: "text",
-      },
-      {
-        name: "xUrl",
-        label: "X",
-        type: "text",
-      },
-    ],
+    fields: [],
   },
 
   {
@@ -122,94 +118,84 @@ export const PERSONAL_STEPS = [
     title: "Payment",
     fields: [],
   },
+
 ];
 
-/* =========================
-   ORGANISATION
-========================= */
+/* =========================================
+ORGANISATION PROFILE
+========================================= */
 
 export const ORG_STEPS = [
+
   {
     id: "organisation",
     title: "Organisation",
+
     fields: [
+
       {
-        name: "organisationName",
+        name: "organisation.name",
         label: "Organisation Name",
         type: "text",
       },
+      {
+        name: "organisation.website",
+        label: "Website",
+        type: "text",
+},
     ],
   },
 
   {
-    id: "address",
+    id: "organisation-address",
     title: "Address",
+
     fields: [
-      {
-        name: "organisationStreetAddress",
-        label: "Street Address",
-        type: "text",
-      },
-      {
-        name: "organisationSuburb",
-        label: "Suburb",
-        type: "text",
-      },
-      {
-        name: "organisationPostcode",
-        label: "Postcode",
-        type: "text",
-      },
+{
+    name: "organisation.streetAddress",
+    label: "Street Address",
+    type: "text",
+},
+
+{
+    name: "organisation.suburb",
+    label: "Suburb",
+    type: "text",
+},
+
+{
+    name: "organisation.postcode",
+    label: "Postcode",
+    type: "text",
+},
     ],
   },
-
   {
-    id: "contact",
+    id: "organisation-contact",
     title: "Contact",
+
     fields: [
+
       {
-        name: "organisationPhone",
-        label: "Organisation Phone",
+        name: "organisation.phone",
+        label: "Phone",
         type: "text",
       },
+
       {
-        name: "organisationEmail",
-        label: "Organisation Email",
+        name: "organisation.email",
+        label: "Email",
         type: "email",
+        readOnly: true,
       },
+
     ],
   },
 
   {
     id: "social",
     title: "Social",
-    fields: [
-      {
-        name: "organisationWebsite",
-        label: "Website",
-        type: "text",
-      },
-      {
-        name: "facebookUrl",
-        label: "Facebook",
-        type: "text",
-      },
-      {
-        name: "instagramUrl",
-        label: "Instagram",
-        type: "text",
-      },
-      {
-        name: "youtubeUrl",
-        label: "YouTube",
-        type: "text",
-      },
-      {
-        name: "xUrl",
-        label: "X",
-        type: "text",
-      },
-    ],
+    fields: [],
   },
 
   {
@@ -217,37 +203,99 @@ export const ORG_STEPS = [
     title: "Payment",
     fields: [],
   },
+
 ];
 
-/* =========================
-   COMMUNITY POLICIES
-========================= */
+/* =========================================
+COMMUNITY POLICIES
+========================================= */
 
 export const COMMUNITY_POLICY_STEPS = [
+
   {
     id: "community-policies",
     title: "Community Policies",
-    fields: [
-      {
-        name: "communityAgreement",
-        label: "I agree to Community One policies",
-        type: "checkbox",
-      },
-    ],
+    fields: [],
   },
+
 ];
 
-/* =========================
-   PROFILE CARD TITLES
-========================= */
+/* =========================================
+CARD TITLES
+========================================= */
 
 export const PROFILE_CARD_TITLES = {
-  "user-profile": "User Details",
-  "home-address": "Home Address",
+
+  user: "User Details",
+
+  home: "Home Address",
+
   contact: "Contact Details",
+
   social: "Connected Accounts",
+
   payment: "Payment Method",
 
   organisation: "Organisation Details",
-  address: "Business Address",
+
+  "organisation-address": "Business Address",
+
+  "organisation-contact": "Business Contact",
+
+  "community-policies": "Community Policies",
+
+};
+
+/* =========================================
+PROFILE MODES
+========================================= */
+
+export const PROFILE_MODES = {
+
+  PERSONAL: "PERSONAL",
+
+  ORG: "ORG",
+
+};
+
+/* =========================================
+PROFILE SECTIONS
+========================================= */
+
+export const PROFILE_SECTIONS = {
+
+  USER: "user",
+
+  HOME: "home",
+
+  CONTACT: "contact",
+
+  SOCIAL: "social",
+
+  PAYMENT: "payment",
+
+  ORGANISATION: "organisation",
+
+  ORGANISATION_ADDRESS: "organisation-address",
+
+  ORGANISATION_CONTACT: "organisation-contact",
+
+  COMMUNITY_POLICIES: "community-policies",
+
+};
+
+/* =========================================
+SOCIAL PROVIDERS
+========================================= */
+
+export const SOCIAL_PROVIDERS = {
+
+  FACEBOOK: "facebook",
+
+  INSTAGRAM: "instagram",
+
+  YOUTUBE: "youtube",
+
+  X: "x",
+
 };

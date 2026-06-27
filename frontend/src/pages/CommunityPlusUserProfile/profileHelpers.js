@@ -86,16 +86,33 @@ export function getInitialProfileValues(
   user
 ) {
 
+  const email =
+    user?.email || "";
+
+  const emailUsername =
+    email
+      .split("@")[0]
+      .toLowerCase();
+
   return {
+
+    /* =====================================
+       USER
+    ===================================== */
 
     username:
       profile?.username ||
-      user?.username ||
-      "",
+      emailUsername,
 
-    display_name:
+    displayName:
       profile?.displayName ||
       "",
+
+    /* =====================================
+       CONTACT
+    ===================================== */
+
+    email,
 
     phoneCountry:
       profile?.phoneCountry ||
@@ -105,14 +122,48 @@ export function getInitialProfileValues(
       profile?.phoneDisplay ||
       "",
 
+    /* =====================================
+       HOME
+    ===================================== */
+
     homeLocation:
       profile?.homeLocation ||
       null,
 
+    /* =====================================
+       ORGANISATION
+    ===================================== */
+
     organisation: {
+
       name:
         profile?.organisation?.name ||
         "",
+
+      website:
+        profile?.organisation?.website ||
+        "",
+
+      streetAddress:
+        profile?.organisation?.streetAddress ||
+        "",
+
+      suburb:
+        profile?.organisation?.suburb ||
+        "",
+
+      postcode:
+        profile?.organisation?.postcode ||
+        "",
+
+      phone:
+        profile?.organisation?.phone ||
+        "",
+
+      email:
+        profile?.organisation?.email ||
+        "",
+
     },
 
   };
