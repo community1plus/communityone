@@ -402,13 +402,13 @@ if (error) {
       await fetch(
         `${FB_GRAPH_URL}/me?fields=id,name,email,picture.width(400).height(400)&access_token=${accessToken}`
       );
+const profileData =
+      await profileResponse.json();
 
 console.log("========== FACEBOOK PROFILE ==========");
 console.log(JSON.stringify(profileData, null, 2));
 
-    const profileData =
-      await profileResponse.json();
-
+    
 
       console.log("PROFILE DATA");
 console.log(profileData);
