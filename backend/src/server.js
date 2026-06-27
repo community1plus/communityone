@@ -304,6 +304,8 @@ app.get(
 ========================= */
 
 app.use("/api/payments", paymentRoutes);
+
+console.log("Mounting Facebook routes...");
 app.use("/api/facebook", facebookRoutes);
 
 app.use("/api/business-email-verification",  businessEmailVerificationRoutes);

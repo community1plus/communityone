@@ -52,6 +52,14 @@ function redirectFailure(
     })
   );
 }
+router.use((req, res, next) => {
+  console.log(
+    "FACEBOOK ROUTER:",
+    req.method,
+    req.originalUrl
+  );
+  next();
+});
 
 router.post(
   "/begin",
