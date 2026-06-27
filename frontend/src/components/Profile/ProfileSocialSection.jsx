@@ -35,6 +35,8 @@ export default function ProfileSocialSection() {
   const { post } = useAPI();
 
   console.log("PROFILE SOCIAL SECTION LOADED");
+  console.log("SOCIAL OBJECT");
+console.log(profile?.social);
 const providers = [
 
   {
@@ -88,6 +90,10 @@ const providers = [
           key={provider.id}
           className="social-row"
         >
+            console.log(
+    provider.id,
+    provider.data
+  );
 
 <div className="social-provider">
 
