@@ -161,7 +161,10 @@ const form = useForm({
               values.homeLocation,
 
           });
-
+        console.log(
+  "PROFILE PAYLOAD",
+  JSON.stringify(payload, null, 2)
+);  
         await patchProfile(payload);
 
 console.log(
