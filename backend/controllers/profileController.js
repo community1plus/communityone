@@ -629,7 +629,23 @@ export async function putProfile(req, res) {
 
     const organisation = pickOrganisationFields(req.body);
 
+console.log(
+    "==== FACEBOOK ABOUT TO SAVE ===="
+);
+
+console.log(
+    JSON.stringify(incoming, null, 2)
+);
+
     const saved = await saveProfile({ userId, incoming });
+
+console.log(
+    "==== FACEBOOK SAVED ===="
+);
+
+console.log(
+    JSON.stringify(saved.social, null, 2)
+);
 
     let savedOrganisation = null;
 

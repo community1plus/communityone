@@ -394,6 +394,21 @@ if (error) {
     const profileData =
       await profileResponse.json();
 
+      console.log(
+  "FACEBOOK PROFILE RAW"
+);
+
+console.log(
+  JSON.stringify(profileData, null, 2)
+);
+
+console.log({
+  id: profileData.id,
+  name: profileData.name,
+  email: profileData.email,
+  picture: profileData.picture?.data?.url,
+});
+
     console.log(
       "📘 FACEBOOK PROFILE:",
       JSON.stringify(
@@ -491,13 +506,27 @@ console.log(
   JSON.stringify(incoming, null, 2)
 );
 
-await saveProfile({
+console.log(
+  "FACEBOOK INCOMING"
+);
 
-  userId: userSub,
+console.log(
+  JSON.stringify(incoming, null, 2)
+);
 
-  incoming,
-
+const saved = await saveProfile({
+    userId: userSub,
+    incoming,
 });
+
+console.log(
+    "Saved social:"
+);
+
+console.log(
+    JSON.stringify(saved.social, null, 2)
+);
+
 
 console.log(
   "Facebook verification saved."
