@@ -2,7 +2,7 @@ import express from "express";
 import crypto from "crypto";
 import authMiddleware from "../../middleware/authMiddleware.js";
 import { saveProfile } from "../../controllers/profileController.js";
-
+console.log("FACEBOOK ROUTES VERSION 27-JUN-1");
 const router = express.Router();
 
 /* =========================
