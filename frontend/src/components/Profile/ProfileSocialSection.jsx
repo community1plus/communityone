@@ -1,6 +1,6 @@
 // src/components/Profile/ProfileSocialSection.jsx
 
-import { useProfile } from "../../context/ProfileContext";
+import { loadProfile, useProfile } from "../../context/ProfileContext";
 import useSocialVerification from "../../hooks/useSocialVerification";
 import useAPI from "../../hooks/useAPI";
 import { API_BASE } from "../../services/api";
@@ -31,9 +31,15 @@ export default function ProfileSocialSection() {
 
   useSocialVerification();
 
-  const { profile } = useProfile();
+const {
+  profile,
+  loadProfile,
+} = useProfile();
 
-  const { post } = useAPI();
+const {
+  post,
+  delete: deleteRequest,
+} = useAPI();
 
   console.log("================================");
   console.log("PROFILE SOCIAL SECTION LOADED");
@@ -143,17 +149,38 @@ export default function ProfileSocialSection() {
 
             </div>
 
-            {provider.verified ? (
+{provider.verified ? (
 
-              <button
-                type="button"
-                className="social-action verified"
-                disabled
-              >
-                Verified ✓
-              </button>
+  <button
+    type="button"
+    className="social-action verified"
+onClick={async () => {
 
-            ) : (
+  try {
+
+    const result =
+      await deleteRequest(
+        "/facebook/disconnect"
+      );
+
+    console.log(result);
+
+    await loadProfile({
+      background: false,
+    });
+
+  } catch (err) {
+
+    console.error(err);
+
+  }
+
+}}
+  >
+    Disconnect
+  </button>
+
+) : (
 
               <button
                 type="button"
