@@ -100,6 +100,11 @@ useEffect(() => {
 }, [currentStep]);
 
 
+const [
+  editing,
+  setEditing,
+] = useState(false);
+
   console.log("CURRENT STEP:", currentStep);
   const activeSteps = PERSONAL_STEPS;
 
