@@ -602,4 +602,59 @@ return res.redirect(
   }
 });
 
+
+/* =========================
+   DISCONNECT FACEBOOK
+========================= */
+
+router.delete(
+  "/disconnect",
+  authMiddleware,
+  async (req, res) => {
+
+    try {
+
+      console.log(
+        "Disconnecting Facebook for",
+        req.user.sub
+      );
+
+      await saveProfile({
+
+        userId: req.user.sub,
+
+        incoming: {
+
+          social: {
+            facebook: null,
+          },
+
+        },
+
+      });
+
+      return res.json({
+
+        ok: true,
+
+      });
+
+    } catch (err) {
+
+      console.error(
+        "FACEBOOK DISCONNECT FAILED",
+        err
+      );
+
+      return res.status(500).json({
+
+        error:
+          "facebook_disconnect_failed",
+
+      });
+
+    }
+
+  }
+);
 export default router;

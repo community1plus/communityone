@@ -33,12 +33,31 @@ function getEndpointDetails(req, bodyEndpoint = {}) {
 }
 
 function mergeSocialState(existing = {}, incoming = {}) {
-  return {
-    facebook: { ...(existing.facebook || {}), ...(incoming.facebook || {}) },
-    instagram: { ...(existing.instagram || {}), ...(incoming.instagram || {}) },
-    youtube: { ...(existing.youtube || {}), ...(incoming.youtube || {}) },
-    x: { ...(existing.x || {}), ...(incoming.x || {}) },
+
+  const merged = {
+    ...existing,
   };
+
+  for (const [provider, value] of Object.entries(incoming)) {
+
+    if (value === null) {
+      delete merged[provider];
+      continue;
+    }
+
+    merged[provider] = {
+      ...(merged[provider] || {}),
+      ...value,
+    };
+
+    if (Object.keys(merged[provider]).length === 0) {
+      delete merged[provider];
+    }
+
+  }
+
+  return merged;
+
 }
 
 function mergePaymentState(existing = {}, incoming = {}) {
