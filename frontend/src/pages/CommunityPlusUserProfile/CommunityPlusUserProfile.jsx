@@ -54,7 +54,7 @@ export default function CommunityPlusUserProfile({
   onComplete,
   editMode = false,
 }) {
-
+ console.log("USER PROFILE COMPONENT MOUNTED");
   const navigate =
     useNavigate();
 
@@ -74,6 +74,8 @@ export default function CommunityPlusUserProfile({
     savingProfile,
     setSavingProfile,
   ] = useState(false);
+
+console.log("CURRENT STEP:", currentStep);
 
   const [
     currentStep,

@@ -168,9 +168,13 @@ const {
                   {provider.name}
                 </div>
 
-                <div className="social-account">
-                  {getAccountLabel(provider.data)}
-                </div>
+{getAccountLabel(provider.data) && (
+
+    <div className="social-account">
+        {getAccountLabel(provider.data)}
+    </div>
+
+)}
 
               </div>
 
