@@ -1,7 +1,6 @@
 import { fetchProfileByUserId, saveProfile, } from "../repositories/profileRepository.js";
 import { pickProfileFields, pickOrganisationFields, } from "../helpers/profileHelpers.js";
-import { getEndpointDetails, } from "../utils/endpoint.js";
-import {  isBusinessType, } from "../utils/profileRules.js";
+
 
 /* =========================================
    PATCH PROFILE
