@@ -756,6 +756,7 @@ export async function getProfile(req, res) {
     
 
 console.log("PATCH USER ID:", userId);
+console.log("REQ.USER:", JSON.stringify(req.user, null, 2));
 console.log("REQ.USER:", req.user);
 
     if (!userId) {
