@@ -5,7 +5,7 @@ import {  isBusinessType, } from "../utils/profileRules.js";
 
 /* =========================================
    PATCH PROFILE
-========================================= */
+========================================== */
 export function mergeSocialState(existing = {}, incoming = {}) {
 
   const merged = {
