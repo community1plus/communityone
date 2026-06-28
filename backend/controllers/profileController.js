@@ -434,7 +434,7 @@ function normaliseOrganisationProfile(org) {
   };
 }
 
-import { rowToProfile } from "./rowToProfile.js";
+
 
 export async function fetchProfileByUserId(userId) {
 
