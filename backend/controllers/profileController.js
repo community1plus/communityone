@@ -1,6 +1,7 @@
 import { pool } from "../src/db/db.js";
 import { profileToRow } from "../src/profile/profileToRow.js";
 import { rowToProfile } from "../src/profile/rowToProfile.js";
+import { fetchProfileByUserId } from "../repositories/profileRepository.js";
 
 const TABLE = "user_profiles";
 
@@ -435,7 +436,6 @@ function normaliseOrganisationProfile(org) {
 }
 
 
-
 export async function fetchProfileByUserId(userId) {
 
   const result = await pool.query(
@@ -448,7 +448,9 @@ export async function fetchProfileByUserId(userId) {
     [userId]
   );
 
-  return rowToProfile(result.rows[0]);
+  return rowToProfile(
+    result.rows[0]
+  );
 
 }
 
