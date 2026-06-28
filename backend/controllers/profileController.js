@@ -867,22 +867,43 @@ console.log("EXISTING PROFILE:", existing);
 
     const saved = await saveProfile({ userId, incoming });
 
-    let savedOrganisation = null;
+let savedOrganisation = null;
 
-    if (isBusinessType(saved.user_type) && organisation) {
-      savedOrganisation = await saveOrganisationProfile({
-        userProfileId: saved.id,
-        organisation,
-      });
-    } else {
-      savedOrganisation = await fetchOrganisationByProfileId(saved.id);
-    }
+if (
+  isBusinessType(saved.userType) &&
+  organisation
+) {
 
-    return res.json({
-      profile: normaliseProfile(saved, savedOrganisation),
-      organisationProfile: normaliseOrganisationProfile(savedOrganisation),
-      version: saved.version,
+  savedOrganisation =
+    await saveOrganisationProfile({
+
+      userProfileId: saved.id,
+
+      organisation,
+
     });
+
+} else {
+
+  savedOrganisation =
+    await fetchOrganisationByProfileId(
+      saved.id
+    );
+
+}
+
+return res.json({
+
+  profile: saved,
+
+  organisationProfile:
+    normaliseOrganisationProfile(
+      savedOrganisation
+    ),
+
+  version: saved.version,
+
+});
   } catch (err) {
     console.error("PATCH PROFILE FAILED:", err);
 
