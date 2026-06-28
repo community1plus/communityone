@@ -1,6 +1,6 @@
 import { pool } from "../src/db/db.js";
 import { profileToRow } from "../src/profile/profileToRow.js";
-import { rowToProfile } from "../src/profile/rowToIdentity.js";
+import { rowToProfile } from "../src/profile/rowToProfile.js";
 
 const TABLE = "user_profiles";
 
