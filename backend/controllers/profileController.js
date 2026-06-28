@@ -874,7 +874,15 @@ console.log("EXISTING PROFILE:", existing);
     if (!existing) {
       return res.status(404).json({ error: "Profile not found" });
     }
+  console.log(
+  "REQ BODY",
+  JSON.stringify(req.body, null, 2)
+);
 
+console.log(
+  "REQ BODY PROFILE",
+  JSON.stringify(req.body.profile, null, 2)
+);
     const incoming = pickProfileFields(req.body);
     console.log(
   "INCOMING PROFILE",
