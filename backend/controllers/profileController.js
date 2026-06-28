@@ -876,6 +876,10 @@ console.log("EXISTING PROFILE:", existing);
     }
 
     const incoming = pickProfileFields(req.body);
+    console.log(
+  "INCOMING PROFILE",
+  JSON.stringify(incoming, null, 2)
+);
     incoming.endpoint = getEndpointDetails(req, req.body.endpoint);
 
     const organisation = pickOrganisationFields(req.body);
