@@ -15,7 +15,6 @@ const TABLE = "user_profiles";
 const ACCOUNT_TYPES = ["PERSONAL", "ORG", "MIXED"];
 
 
-
 function getEndpointDetails(req, bodyEndpoint = {}) {
   const forwardedFor = req.headers["x-forwarded-for"]?.split(",")[0]?.trim();
 
@@ -26,8 +25,6 @@ function getEndpointDetails(req, bodyEndpoint = {}) {
     capturedAt: bodyEndpoint?.capturedAt || new Date().toISOString(),
   };
 }
-
-
 
 function applyAccountTypeRules(
   existing = {},
