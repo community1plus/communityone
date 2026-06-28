@@ -795,6 +795,17 @@ export async function putProfile(req, res) {
     }
 
     const incoming = pickProfileFields(req.body);
+
+console.log(
+  "PATCH BODY:",
+  JSON.stringify(req.body, null, 2)
+);
+
+console.log(
+  "INCOMING:",
+  JSON.stringify(incoming, null, 2)
+);
+
     incoming.endpoint = getEndpointDetails(req, req.body.endpoint);
 
     const organisation = pickOrganisationFields(req.body);
