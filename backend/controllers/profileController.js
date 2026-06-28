@@ -856,6 +856,9 @@ console.log(
 
 export async function patchProfile(req, res) {
   try {
+    console.log(
+  JSON.stringify(req.body, null, 2)
+);
     const userId = getUserId(req);
 
  console.log("PATCH USER ID:", userId);
