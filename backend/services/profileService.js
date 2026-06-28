@@ -1,5 +1,4 @@
 import { fetchProfileByUserId, saveProfile, } from "../repositories/profileRepository.js";
-import { fetchOrganisationByProfileId, saveOrganisationProfile, } from "../repositories/organisationRepository.js";
 import { pickProfileFields, pickOrganisationFields, } from "../controllers/profileControllerHelpers.js";
 import { getEndpointDetails, } from "../utils/endpoint.js";
 import {  isBusinessType, } from "../utils/profileRules.js";
