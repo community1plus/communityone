@@ -1,30 +1,13 @@
-import {
-  fetchProfileByUserId,
-  saveProfile,
-} from "../repositories/profileRepository.js";
-
-import {
-  fetchOrganisationByProfileId,
-  saveOrganisationProfile,
-} from "../repositories/organisationRepository.js";
-
-import {
-  pickProfileFields,
-  pickOrganisationFields,
-} from "../controllers/profileControllerHelpers.js";
-
-import {
-  getEndpointDetails,
-} from "../utils/endpoint.js";
-
-import {
-  isBusinessType,
-} from "../utils/profileRules.js";
+import { fetchProfileByUserId, saveProfile, } from "../repositories/profileRepository.js";
+import { fetchOrganisationByProfileId, saveOrganisationProfile, } from "../repositories/organisationRepository.js";
+import { pickProfileFields, pickOrganisationFields, } from "../controllers/profileControllerHelpers.js";
+import { getEndpointDetails, } from "../utils/endpoint.js";
+import {  isBusinessType, } from "../utils/profileRules.js";
 
 /* =========================================
    PATCH PROFILE
 ========================================= */
-function mergeSocialState(existing = {}, incoming = {}) {
+export function mergeSocialState(existing = {}, incoming = {}) {
 
   const merged = {
     ...existing,
@@ -52,21 +35,21 @@ function mergeSocialState(existing = {}, incoming = {}) {
 
 }
 
-function mergePaymentState(existing = {}, incoming = {}) {
+export function mergePaymentState(existing = {}, incoming = {}) {
   return {
     ...existing,
     ...incoming,
   };
 }
 
-function mergeEndpointState(existing = {}, incoming = {}) {
+export function mergeEndpointState(existing = {}, incoming = {}) {
   return {
     ...existing,
     ...incoming,
   };
 }
 
-function calculateProfileState(profile = {}) {
+export function calculateProfileState(profile = {}) {
 
   const username =
     cleanString(profile.username);
@@ -184,4 +167,91 @@ export async function patchProfileService({
 
   };
 
+}
+
+export async function patchProfile(req, res) {
+  try {
+    console.log(
+  JSON.stringify(req.body, null, 2)
+);
+    const userId = getUserId(req);
+
+ console.log("PATCH USER ID:", userId);
+
+    if (!userId) {
+      return res.status(401).json({ error: "Authentication required." });
+    }
+
+    const existing = await fetchProfileByUserId(userId);
+
+console.log("EXISTING PROFILE:", existing);
+
+    if (!existing) {
+      return res.status(404).json({ error: "Profile not found" });
+    }
+  console.log(
+  "REQ BODY",
+  JSON.stringify(req.body, null, 2)
+);
+
+console.log(
+  "REQ BODY PROFILE",
+  JSON.stringify(req.body.profile, null, 2)
+);
+    const incoming = pickProfileFields(req.body);
+    console.log(
+  "INCOMING PROFILE",
+  JSON.stringify(incoming, null, 2)
+);
+    incoming.endpoint = getEndpointDetails(req, req.body.endpoint);
+
+    const organisation = pickOrganisationFields(req.body);
+
+    const saved = await saveProfile({ userId, incoming });
+
+let savedOrganisation = null;
+
+if (
+  isBusinessType(saved.userType) &&
+  organisation
+) {
+
+  savedOrganisation =
+    await saveOrganisationProfile({
+
+      userProfileId: saved.id,
+
+      organisation,
+
+    });
+
+} else {
+
+  savedOrganisation =
+    await fetchOrganisationByProfileId(
+      saved.id
+    );
+
+}
+
+return res.json({
+
+  profile: saved,
+
+  organisationProfile:
+    normaliseOrganisationProfile(
+      savedOrganisation
+    ),
+
+  version: saved.version,
+
+});
+  } catch (err) {
+    console.error("PATCH PROFILE FAILED:", err);
+
+    return res.status(500).json({
+      error: "Profile update failed",
+      detail: err.message,
+    });
+  }
 }

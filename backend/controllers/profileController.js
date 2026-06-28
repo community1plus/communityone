@@ -9,11 +9,9 @@ import {
     pickProfileFields,
     pickOrganisationFields,
 } from "../helpers/profileHelpers.js";
+import { profileService } from "../services/profileService.js";
 
 const TABLE = "user_profiles";
-
-
-
 
 function getEndpointDetails(req, bodyEndpoint = {}) {
   const forwardedFor = req.headers["x-forwarded-for"]?.split(",")[0]?.trim();
@@ -542,89 +540,3 @@ console.log(
   }
 }
 
-export async function patchProfile(req, res) {
-  try {
-    console.log(
-  JSON.stringify(req.body, null, 2)
-);
-    const userId = getUserId(req);
-
- console.log("PATCH USER ID:", userId);
-
-    if (!userId) {
-      return res.status(401).json({ error: "Authentication required." });
-    }
-
-    const existing = await fetchProfileByUserId(userId);
-
-console.log("EXISTING PROFILE:", existing);
-
-    if (!existing) {
-      return res.status(404).json({ error: "Profile not found" });
-    }
-  console.log(
-  "REQ BODY",
-  JSON.stringify(req.body, null, 2)
-);
-
-console.log(
-  "REQ BODY PROFILE",
-  JSON.stringify(req.body.profile, null, 2)
-);
-    const incoming = pickProfileFields(req.body);
-    console.log(
-  "INCOMING PROFILE",
-  JSON.stringify(incoming, null, 2)
-);
-    incoming.endpoint = getEndpointDetails(req, req.body.endpoint);
-
-    const organisation = pickOrganisationFields(req.body);
-
-    const saved = await saveProfile({ userId, incoming });
-
-let savedOrganisation = null;
-
-if (
-  isBusinessType(saved.userType) &&
-  organisation
-) {
-
-  savedOrganisation =
-    await saveOrganisationProfile({
-
-      userProfileId: saved.id,
-
-      organisation,
-
-    });
-
-} else {
-
-  savedOrganisation =
-    await fetchOrganisationByProfileId(
-      saved.id
-    );
-
-}
-
-return res.json({
-
-  profile: saved,
-
-  organisationProfile:
-    normaliseOrganisationProfile(
-      savedOrganisation
-    ),
-
-  version: saved.version,
-
-});
-  } catch (err) {
-    console.error("PATCH PROFILE FAILED:", err);
-
-    return res.status(500).json({
-      error: "Profile update failed",
-      detail: err.message,
-    });
-  }
-}
