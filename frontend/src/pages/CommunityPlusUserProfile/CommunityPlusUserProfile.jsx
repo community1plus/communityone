@@ -164,19 +164,16 @@ const form = useForm({
 
           });
 
-
+          
+        console.log(
+  "PROFILE PAYLOAD",
+  JSON.stringify(payload, null, 2)
+);  
 
 console.log(
   "PATCH PAYLOAD",
   JSON.stringify(payload, null, 2)
 );
-
-await api.patch("/profile", payload);
-
-        console.log(
-  "PROFILE PAYLOAD",
-  JSON.stringify(payload, null, 2)
-);  
         await patchProfile(payload);
 
 console.log(
