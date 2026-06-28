@@ -12,7 +12,7 @@ import {
 
 const TABLE = "user_profiles";
 
-const ACCOUNT_TYPES = ["PERSONAL", "ORG", "MIXED"];
+
 
 
 function getEndpointDetails(req, bodyEndpoint = {}) {

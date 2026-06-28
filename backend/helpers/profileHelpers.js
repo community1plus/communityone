@@ -1,22 +1,24 @@
-function cleanString(value = "") {
+const ACCOUNT_TYPES = ["PERSONAL", "ORG", "MIXED"];
+
+export function cleanString(value = "") {
   return String(value || "").trim();
 }
 
-function normaliseAccountType(value = "PERSONAL") {
+export function normaliseAccountType(value = "PERSONAL") {
   const clean = cleanString(value).toUpperCase();
   return ACCOUNT_TYPES.includes(clean) ? clean : "PERSONAL";
 }
 
-function isBusinessType(userType) {
+export function isBusinessType(userType) {
   return ["ORG", "MIXED"].includes(normaliseAccountType(userType));
 }
 
-function getUserId(req) {
+export function getUserId(req) {
   return req.user?.id || req.user?.sub;
 }
 
 
-function pickProfileFields(body = {}) {
+export function pickProfileFields(body = {}) {
 
   const data = {};
 
@@ -189,7 +191,7 @@ function pickProfileFields(body = {}) {
 
 }
 
-function pickOrganisationFields(body = {}) {
+export function pickOrganisationFields(body = {}) {
   const org =
     body.organisationProfile ||
     body.organisation ||
