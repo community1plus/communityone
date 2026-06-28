@@ -90,6 +90,8 @@ const [currentStep, setCurrentStep] = useState(() => {
 
 });
 
+console.log("AUTH USER:", user); 
+
 useEffect(() => {
 
   sessionStorage.setItem(
