@@ -448,9 +448,7 @@ export async function fetchProfileByUserId(userId) {
     [userId]
   );
 
-  return rowToProfile(
-    result.rows[0]
-  );
+  return rowToProfile(result.rows[0]);
 
 }
 
