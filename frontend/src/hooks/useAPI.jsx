@@ -45,16 +45,9 @@ export default function useAPI() {
   }, [token, startSaving, stopSaving]);
 
   const version = user?.profile?.version;
+  
 
-const payload = buildProfilePayload(...);
-
-console.log(
-  "PATCH PAYLOAD",
-  JSON.stringify(payload, null, 2)
-);
-
-await api.patch("/profile", payload);
-
+  
   return {
     ...api,
 
