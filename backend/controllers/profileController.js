@@ -9,7 +9,7 @@ import {
     pickProfileFields,
     pickOrganisationFields,
 } from "../helpers/profileHelpers.js";
-import { profileService } from "../services/profileService.js";
+
 
 const TABLE = "user_profiles";
 
