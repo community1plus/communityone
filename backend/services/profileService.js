@@ -1,11 +1,13 @@
 import { fetchProfileByUserId, saveProfile, } from "../repositories/profileRepository.js";
-import { pickProfileFields, pickOrganisationFields, } from "../helpers/profileHelpers.js";
+
+import { getEndpointDetails, } from "../utils/endpoint.js";
+
 
 
 /* =========================================
    PATCH PROFILE
-========================================== */
-export function mergeSocialState(existing = {}, incoming = {}) {
+========================================= */
+function mergeSocialState(existing = {}, incoming = {}) {
 
   const merged = {
     ...existing,
@@ -33,21 +35,21 @@ export function mergeSocialState(existing = {}, incoming = {}) {
 
 }
 
-export function mergePaymentState(existing = {}, incoming = {}) {
+function mergePaymentState(existing = {}, incoming = {}) {
   return {
     ...existing,
     ...incoming,
   };
 }
 
-export function mergeEndpointState(existing = {}, incoming = {}) {
+function mergeEndpointState(existing = {}, incoming = {}) {
   return {
     ...existing,
     ...incoming,
   };
 }
 
-export function calculateProfileState(profile = {}) {
+function calculateProfileState(profile = {}) {
 
   const username =
     cleanString(profile.username);
