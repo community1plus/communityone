@@ -312,87 +312,122 @@ console.log(
 
 export async function patchProfile(req, res) {
   try {
-    console.log(
-  JSON.stringify(req.body, null, 2)
-);
+
     const userId = getUserId(req);
 
- console.log("PATCH USER ID:", userId);
-
     if (!userId) {
-      return res.status(401).json({ error: "Authentication required." });
+      return res.status(401).json({
+        error: "Authentication required.",
+      });
     }
 
-    const existing = await fetchProfileByUserId(userId);
-
-console.log("EXISTING PROFILE:", existing);
+    const existing =
+      await fetchProfileByUserId(userId);
 
     if (!existing) {
-      return res.status(404).json({ error: "Profile not found" });
+      return res.status(404).json({
+        error: "Profile not found",
+      });
     }
-  console.log(
-  "REQ BODY",
-  JSON.stringify(req.body, null, 2)
-);
 
-console.log(
-  "REQ BODY PROFILE",
-  JSON.stringify(req.body.profile, null, 2)
-);
-    const incoming = pickProfileFields(req.body);
-    console.log(
-  "INCOMING PROFILE",
-  JSON.stringify(incoming, null, 2)
-);
-    incoming.endpoint = getEndpointDetails(req, req.body.endpoint);
+    /* =====================================
+       PROFILE
+    ===================================== */
 
-    const organisation = pickOrganisationFields(req.body);
+    const incoming =
+      pickProfileFields(
+        req.body.profile || {}
+      );
 
-    const saved = await saveProfile({ userId, incoming });
+    incoming.endpoint =
+      getEndpointDetails(
+        req,
+        req.body.endpoint
+      );
 
-let savedOrganisation = null;
+    /* =====================================
+       ORGANISATION
+    ===================================== */
 
-if (
-  isBusinessType(saved.userType) &&
-  organisation
-) {
+    const organisation =
+      pickOrganisationFields(
+        req.body.organisationProfile || {}
+      );
 
-  savedOrganisation =
-    await saveOrganisationProfile({
+    /* =====================================
+       SAVE PROFILE
+    ===================================== */
 
-      userProfileId: saved.id,
+    const saved =
+      await saveProfile({
+        userId,
+        incoming,
+      });
 
-      organisation,
+    /* =====================================
+       SAVE ORGANISATION
+    ===================================== */
+
+    let savedOrganisation = null;
+
+    if (
+      isBusinessType(saved.userType) &&
+      organisation
+    ) {
+
+      savedOrganisation =
+        await saveOrganisationProfile({
+
+          userProfileId:
+            saved.id,
+
+          organisation,
+
+        });
+
+    } else {
+
+      savedOrganisation =
+        await fetchOrganisationByProfileId(
+          saved.id
+        );
+
+    }
+
+    /* =====================================
+       RESPONSE
+    ===================================== */
+
+    return res.json({
+
+      profile: saved,
+
+      organisationProfile:
+        normaliseOrganisationProfile(
+          savedOrganisation
+        ),
+
+      version:
+        saved.version,
 
     });
 
-} else {
+  } catch (err) {
 
-  savedOrganisation =
-    await fetchOrganisationByProfileId(
-      saved.id
+    console.error(
+      "PATCH PROFILE FAILED:",
+      err
     );
 
-}
-
-return res.json({
-
-  profile: saved,
-
-  organisationProfile:
-    normaliseOrganisationProfile(
-      savedOrganisation
-    ),
-
-  version: saved.version,
-
-});
-  } catch (err) {
-    console.error("PATCH PROFILE FAILED:", err);
-
     return res.status(500).json({
-      error: "Profile update failed",
-      detail: err.message,
+
+      error:
+        "Profile update failed",
+
+      detail:
+        err.message,
+
     });
+
   }
 }
