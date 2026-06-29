@@ -1,9 +1,5 @@
 import { fetchProfileByUserId, saveProfile, } from "../repositories/profileRepository.js";
 
-import { getEndpointDetails, } from "../utils/endpoint.js";
-
-
-
 /* =========================================
    PATCH PROFILE
 ========================================= */
