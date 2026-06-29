@@ -1,4 +1,4 @@
-import { fetchProfileByUserId } from "../repositories/profileRepository.js";
+import { fetchProfileByUserId, saveProfile } from "../repositories/profileRepository.js";
 
 /* =========================================
    PATCH PROFILE
