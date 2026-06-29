@@ -1,4 +1,4 @@
-import { pool } from "../src/db/pool"
+import { pool } from "../src/db/pool.js"
 
 const TABLE = "user_profiles";
 
