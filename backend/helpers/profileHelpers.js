@@ -192,11 +192,11 @@ export function pickProfileFields(body = {}) {
 }
 
 export function pickOrganisationFields(body = {}) {
-  const org =
-    body.organisationProfile ||
-    body.organisation ||
-    body.business ||
-    null;
+const org = body;
+
+if (!org) {
+  return null;
+}
 
   if (!org) return null;
 
