@@ -2,7 +2,7 @@ import { pool } from "../src/db/pool.js"
 import {
   rowToProfile,
   profileToRow,
-} from "./mappers/profileMapper.js";
+} from "../mappers/profileMappers.js";
 
 const TABLE = "user_profiles";
 
