@@ -9,6 +9,9 @@ import {
     pickProfileFields,
     pickOrganisationFields,
 } from "../helpers/profileHelpers.js";
+import {
+    fetchProfileByUserId,
+} from "../repositories/profileRepository.js";
 
 const TABLE = "user_profiles";
 
@@ -121,25 +124,6 @@ function normaliseOrganisationProfile(org) {
     createdAt: org.created_at,
     updatedAt: org.updated_at,
   };
-}
-
-
-export async function fetchProfileByUserId(userId) {
-
-  const result = await pool.query(
-    `
-      SELECT *
-      FROM ${TABLE}
-      WHERE user_id = $1
-      LIMIT 1
-    `,
-    [userId]
-  );
-
-  return rowToProfile(
-    result.rows[0]
-  );
-
 }
 
 async function fetchOrganisationByProfileId(userProfileId) {
