@@ -47,32 +47,35 @@ export const PROFILE_TABS = [
 PERSONAL PROFILE
 ========================================= */
 
-export const PERSONAL_STEPS = [
+export const PROFILE_STEPS = [
 
   {
-    id: "user",
-    title: "User",
+    id: "identity",
+    title: "Identity",
 
     fields: [
 
       {
-        name: "displayName",
-        label: "Display Name",
+        name: "username",
+        label: "Name",
         type: "text",
+        helperText:
+          "This is how people know you in Community One.",
       },
 
       {
-        name: "username",
-        label: "Username",
-        type: "text",
+        name: "email",
+        label: "Email",
+        type: "email",
+        readOnly: true,
       },
 
     ],
   },
 
   {
-    id: "home",
-    title: "Home Address",
+    id: "location",
+    title: "Location",
 
     fields: [
 
@@ -95,13 +98,6 @@ export const PERSONAL_STEPS = [
         name: "phoneDisplay",
         label: "Phone Number",
         type: "text",
-      },
-
-      {
-        name: "email",
-        label: "Email Address",
-        type: "email",
-        readOnly: true,
       },
 
     ],
@@ -226,21 +222,21 @@ CARD TITLES
 
 export const PROFILE_CARD_TITLES = {
 
-  user: "User Details",
+  identity: "Identity",
 
-  home: "Home Address",
+  location: "Location",
 
-  contact: "Contact Details",
+  contact: "Contact",
 
   social: "Connected Accounts",
 
   payment: "Payment Method",
 
-  organisation: "Organisation Details",
+  organisation: "Organisation",
 
-  "organisation-address": "Business Address",
+  "organisation-address": "Organisation Address",
 
-  "organisation-contact": "Business Contact",
+  "organisation-contact": "Organisation Contact",
 
   "community-policies": "Community Policies",
 
@@ -264,9 +260,9 @@ PROFILE SECTIONS
 
 export const PROFILE_SECTIONS = {
 
-  USER: "user",
+  IDENTITY: "identity",
 
-  HOME: "home",
+  LOCATION: "location",
 
   CONTACT: "contact",
 

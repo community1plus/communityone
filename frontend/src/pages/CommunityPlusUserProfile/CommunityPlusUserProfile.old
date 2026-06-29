@@ -153,18 +153,13 @@ function isPersonalEmail(email = "") {
 }
 
 
-function getAllowedProfileTabs(email = "") {
-  if (isPersonalEmail(email)) {
-    return PROFILE_TABS.filter(tab =>
-      ["PERSONAL", "COMMUNITY_POLICIES"].includes(tab.id)
-    );
-  }
+export const PROFILE_CAPABILITIES = {
 
-  return PROFILE_TABS.filter(tab =>
-    ["ORG", "COMMUNITY_POLICIES"].includes(tab.id)
-  );
-}
+  PERSONAL: "personal",
 
+  ORGANISATION: "organisation",
+
+};
 
 
 function getPhoneCountry(code = DEFAULT_PHONE_COUNTRY) {

@@ -239,7 +239,11 @@ if (sectionId === "social") {
 
             <div className="profile-card-header">
 
-              <h1>USER PROFILE</h1>
+              <h1>COMMUNITY PROFILE</h1>
+
+<p className="profile-subtitle">
+  Your trusted identity within Community One.
+</p>
 
               {editMode && (
 
