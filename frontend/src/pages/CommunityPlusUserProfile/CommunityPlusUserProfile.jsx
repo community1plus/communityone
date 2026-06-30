@@ -131,14 +131,7 @@ const [
 
 }, [values.capabilities]);
 
-  const initialValues = useMemo(
-  () =>
-    getInitialProfileValues(
-      profile,
-      user
-    ),
-  [profile, user]
-);
+  
 
 const form = useForm({
   initialValues,
@@ -148,6 +141,15 @@ const form = useForm({
     values,
     clearStorage,
   } = form;
+
+  const initialValues = useMemo(
+  () =>
+    getInitialProfileValues(
+      profile,
+      user
+    ),
+  [profile, user]
+);
 
   const closeProfile =
     useCallback(() => {
