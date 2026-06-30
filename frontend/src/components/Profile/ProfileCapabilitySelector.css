@@ -1,0 +1,49 @@
+.profile-capabilities{
+
+    margin:24px 0;
+
+    padding:20px;
+
+    border:1px solid #ececec;
+
+    border-radius:16px;
+
+    background:#fff;
+
+}
+
+.profile-capabilities-header h3{
+
+    margin:0;
+
+    font-size:1rem;
+
+}
+
+.profile-capabilities-header p{
+
+    margin:6px 0 18px;
+
+    color:#777;
+
+}
+
+.profile-capability{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    margin-bottom:14px;
+
+    font-weight:600;
+
+}
+
+.profile-capability:last-child{
+
+    margin-bottom:0;
+
+}

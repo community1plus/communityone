@@ -15,6 +15,9 @@ import ProfileSocialSection
 
 import ProfilePaymentSection from "../../components/Profile/ProfilePaymentSection";
 
+import ProfileCapabilitySelector
+from "../../components/Profile/ProfileCapabilitySelector";
+
 import {
   useState,
   useCallback,
@@ -108,7 +111,25 @@ const [
 ] = useState(!profile?.id);
 
   console.log("CURRENT STEP:", currentStep);
-  const activeSteps = PROFILE_STEPS;
+ const activeSteps = useMemo(() => {
+
+    const steps = [...PROFILE_STEPS];
+
+    if (
+        values.capabilities?.organisation
+    ) {
+
+        steps.splice(
+            3,
+            0,
+            ...ORG_STEPS
+        );
+
+    }
+
+    return steps;
+
+}, [values.capabilities]);
 
   const initialValues = useMemo(
   () =>
@@ -258,6 +279,11 @@ if (sectionId === "social") {
               )}
 
             </div>
+            <ProfileCapabilitySelector
+    values={values}
+    setValue={form.setValue}
+    readOnly={!editing}
+/>
             <ProfileSectionTabs
               steps={activeSteps}
               currentStep={currentStep}
