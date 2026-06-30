@@ -33,9 +33,7 @@ import useForm
 
 import "./CommunityPlusUserProfile.css";
 
-import {
-  PERSONAL_STEPS,
-} from "./profileConstants";
+
 
 import {
   getInitialProfileValues,
