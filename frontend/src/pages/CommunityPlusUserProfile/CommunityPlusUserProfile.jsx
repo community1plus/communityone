@@ -40,8 +40,9 @@ import {
 } from "./profileConstants";
 
 import {
-  getInitialProfileValues,
+  getInitialProfileValues, calculateProfileCompletion
 } from "./profileHelpers";
+
 
 import {
   buildProfilePayload,
