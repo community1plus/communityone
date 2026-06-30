@@ -257,9 +257,9 @@ if (sectionId === "social") {
 
               <h1>COMMUNITY PROFILE</h1>
 
-<p className="profile-subtitle">
+<h2><p className="profile-subtitle">
   Your trusted identity within Community One.
-</p>
+</p></h2>
 
               {editMode && (
 
@@ -275,10 +275,10 @@ if (sectionId === "social") {
 
             </div>
             <ProfileCapabilitySelector
-    values={values}
-    setValue={form.setValue}
-    readOnly={!editing}
-/>
+              values={values}
+              setValue={form.setValue}
+              readOnly={!editing}
+            />
             <ProfileSectionTabs
               steps={activeSteps}
               currentStep={currentStep}
