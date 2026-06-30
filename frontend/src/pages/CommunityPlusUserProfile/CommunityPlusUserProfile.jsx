@@ -124,8 +124,6 @@ const initialValues = useMemo(
   [profile, user]
 );
 
-const completion =
-  calculateProfileCompletion(values);
 
 /* =====================================
    FORM
@@ -139,6 +137,9 @@ const {
   values,
   clearStorage,
 } = form;
+
+const completion =
+  calculateProfileCompletion(values);
 
 /* =====================================
    PROFILE STEPS
