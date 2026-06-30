@@ -156,7 +156,85 @@ console.log(
   "SECTION:",
   sectionId
 );
+/* =====================================
+   CLOSE PROFILE
+===================================== */
+const closeProfile = useCallback(() => {
 
+  navigate("/communityplus", {
+    replace: true,
+  });
+
+}, [navigate]);
+
+/* =====================================
+   SAVE PROFILE
+===================================== */
+
+const handleSaveProfile = useCallback(
+
+  async () => {
+
+    try {
+
+      setSavingProfile(true);
+
+      const payload =
+        buildProfilePayload({
+
+          values,
+
+          userEmail:
+            user?.email,
+
+          homeLocation:
+            values.homeLocation,
+
+        });
+
+      console.log(
+        "PROFILE PAYLOAD",
+        JSON.stringify(payload, null, 2)
+      );
+
+      await patchProfile(payload);
+
+      console.log(
+        "✔ Profile saved."
+      );
+
+      await loadProfile({
+        background: false,
+      });
+
+      if (onComplete) {
+        onComplete();
+      }
+
+    } catch (err) {
+
+      console.error(
+        "Profile save failed:",
+        err
+      );
+
+    } finally {
+
+      setSavingProfile(false);
+
+    }
+
+  },
+
+  [
+    values,
+    user,
+    patchProfile,
+    loadProfile,
+    onComplete,
+  ]
+
+);
 
 if (sectionId === "social") {
 
@@ -303,7 +381,7 @@ if (sectionId === "social") {
 <ProfileHelpPanel
   section={
     activeSteps[currentStep]?.id
-  }getAccountLabel
+  }
 />
   </aside>
 
@@ -370,84 +448,7 @@ if (sectionId === "social") {
 
 );
 
-/* =====================================
-   CLOSE PROFILE
-===================================== */
 
-const closeProfile = useCallback(() => {
 
-  navigate("/communityplus", {
-    replace: true,
-  });
 
-}, [navigate]);
-
-/* =====================================
-   SAVE PROFILE
-===================================== */
-
-const handleSaveProfile = useCallback(
-
-  async () => {
-
-    try {
-
-      setSavingProfile(true);
-
-      const payload =
-        buildProfilePayload({
-
-          values,
-
-          userEmail:
-            user?.email,
-
-          homeLocation:
-            values.homeLocation,
-
-        });
-
-      console.log(
-        "PROFILE PAYLOAD",
-        JSON.stringify(payload, null, 2)
-      );
-
-      await patchProfile(payload);
-
-      console.log(
-        "✔ Profile saved."
-      );
-
-      await loadProfile({
-        background: false,
-      });
-
-      if (onComplete) {
-        onComplete();
-      }
-
-    } catch (err) {
-
-      console.error(
-        "Profile save failed:",
-        err
-      );
-
-    } finally {
-
-      setSavingProfile(false);
-
-    }
-
-  },
-
-  [
-    values,
-    user,
-    patchProfile,
-    loadProfile,
-    onComplete,
-  ]
-
-);
 }
