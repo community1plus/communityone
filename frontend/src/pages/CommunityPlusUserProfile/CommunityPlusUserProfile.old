@@ -51,7 +51,7 @@ const PROFILE_TABS = [
   { id: "COMMUNITY_POLICIES", label: "Community Policies" },
 ];
 
-const PERSONAL_STEPS = [
+const PROFILE_STEPS = [
   {
     id: "user-profile",
     title: "USER PROFILE",
@@ -359,7 +359,7 @@ const activeSteps = useMemo(() => {
       return COMMUNITY_POLICY_STEPS;
 
     default:
-      return PERSONAL_STEPS;
+      return PROFILE_STEPS;
   }
 }, [activeProfileTab]);
 

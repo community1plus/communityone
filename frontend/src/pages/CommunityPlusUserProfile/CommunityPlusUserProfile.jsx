@@ -106,7 +106,7 @@ const [
 ] = useState(!profile?.id);
 
   console.log("CURRENT STEP:", currentStep);
-  const activeSteps = PERSONAL_STEPS;
+  const activeSteps = PROFILE_STEPS;
 
   const initialValues = useMemo(
   () =>
