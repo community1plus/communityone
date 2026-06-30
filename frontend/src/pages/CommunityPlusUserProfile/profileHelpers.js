@@ -1,5 +1,31 @@
 import { DEFAULT_PHONE_COUNTRY } from "./profileConstants";
 
+
+export function calculateProfileCompletion(values) {
+
+  const checks = [
+
+    Boolean(values.username),
+
+    Boolean(values.homeLocation),
+
+    Boolean(values.phoneDisplay),
+
+    Boolean(values.social?.facebookVerified),
+    // or later: at least one verified account
+
+    Boolean(values.payment?.verified),
+
+  ];
+
+  const completed =
+    checks.filter(Boolean).length;
+
+  return Math.round(
+    (completed / checks.length) * 100
+  );
+
+}
 export function getInitialProfileValues(
   profile,
   user

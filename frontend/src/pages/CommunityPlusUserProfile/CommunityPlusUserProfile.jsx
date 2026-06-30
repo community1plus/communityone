@@ -78,6 +78,8 @@ export default function CommunityPlusUserProfile({
     setSavingProfile,
   ] = useState(false);
 
+const completion =
+  calculateProfileCompletion(values);
 
 const [currentStep, setCurrentStep] = useState(() => {
 
@@ -289,42 +291,18 @@ if (sectionId === "social") {
 
           <div className="profile-header-progress">
 
-            <div className="profile-header-progress-label">
+<div className="profile-header-progress-label">
 
-              {Math.round(
+    {completion}% Complete
 
-                activeSteps.length
-                  ? (
-                      (currentStep + 1)
-                      /
-                      activeSteps.length
-                    ) * 100
-                  : 0
+</div>
 
-              )}% Complete
-
-            </div>
-
-            <div className="profile-progress-bar">
-
-              <div
-                className="profile-progress-fill"
-                style={{
-
-                  width: `${
-                    activeSteps.length
-                      ? (
-                          (currentStep + 1)
-                          /
-                          activeSteps.length
-                        ) * 100
-                      : 0
-                  }%`
-
-                }}
-              />
-
-            </div>
+<div
+    className="profile-progress-fill"
+    style={{
+        width: `${completion}%`
+    }}
+/>
 
           </div>
 
