@@ -79,8 +79,7 @@ export default function CommunityPlusUserProfile({
     setSavingProfile,
   ] = useState(false);
 
-const completion =
-  calculateProfileCompletion(values);
+
 
 const [currentStep, setCurrentStep] = useState(() => {
 
@@ -124,6 +123,9 @@ const initialValues = useMemo(
     ),
   [profile, user]
 );
+
+const completion =
+  calculateProfileCompletion(values);
 
 /* =====================================
    FORM
