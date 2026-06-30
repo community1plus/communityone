@@ -257,9 +257,9 @@ if (sectionId === "social") {
 
               <h1>COMMUNITY PROFILE</h1>
 
-<h2><p className="profile-subtitle">
-  Your trusted identity within Community One.
-</p></h2>
+              <p className="profile-subtitle">
+                  Your trusted identity within Community One.
+              </p>
 
               {editMode && (
 
