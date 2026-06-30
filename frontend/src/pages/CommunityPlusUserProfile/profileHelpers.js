@@ -109,9 +109,7 @@ export function getEmailDomain(email = "") {
    PROFILE TABS
 ========================= */
 
-export function getAllowedProfileTabs() {
-  return PROFILE_TABS;
-}
+
 
 /* =========================
    PHONE COUNTRY
