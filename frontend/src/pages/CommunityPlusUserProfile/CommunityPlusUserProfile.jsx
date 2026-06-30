@@ -241,6 +241,8 @@ const handleSaveProfile = useCallback(
   ]
 
 );
+console.log("Completion:", completion);
+console.log("Values:", values);
 
 if (sectionId === "social") {
 
