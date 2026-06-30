@@ -87,7 +87,8 @@ const [currentStep, setCurrentStep] = useState(() => {
     sessionStorage.getItem(
       "profileCurrentStep"
     );
-
+console.log("Completion:", completion);
+console.log("Values:", values);
   return saved
     ? Number(saved)
     : 0;
@@ -241,8 +242,7 @@ const handleSaveProfile = useCallback(
   ]
 
 );
-console.log("Completion:", completion);
-console.log("Values:", values);
+
 
 if (sectionId === "social") {
 
