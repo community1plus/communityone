@@ -87,8 +87,7 @@ const [currentStep, setCurrentStep] = useState(() => {
     sessionStorage.getItem(
       "profileCurrentStep"
     );
-console.log("Completion:", completion);
-console.log("Values:", values);
+
   return saved
     ? Number(saved)
     : 0;
@@ -251,6 +250,9 @@ if (sectionId === "social") {
   );
 
 }
+console.log("Completion:", completion);
+console.log("Values:", values);
+
   return (
 
   <div className="profile-page">
@@ -295,22 +297,24 @@ if (sectionId === "social") {
 
           {/* PROGRESS */}
 
-          <div className="profile-header-progress">
+<div className="profile-header-progress">
 
-<div className="profile-header-progress-label">
-
+  <div className="profile-header-progress-label">
     {completion}% Complete
+  </div>
+
+  <div className="profile-progress-bar">
+
+    <div
+      className="profile-progress-fill"
+      style={{
+        width: `${completion}%`,
+      }}
+    />
+
+  </div>
 
 </div>
-
-<div
-    className="profile-progress-fill"
-    style={{
-        width: `${completion}%`
-    }}
-/>
-
-          </div>
 
           {/* FORM */}
 
