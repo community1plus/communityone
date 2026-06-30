@@ -15,8 +15,7 @@ import ProfileSocialSection
 
 import ProfilePaymentSection from "../../components/Profile/ProfilePaymentSection";
 
-import ProfileCapabilitySelector
-from "../../components/Profile/ProfileCapabilitySelector";
+import ProfileCapabilitySelector from "../../components/Profile/ProfileCapabilitySelector";
 
 import {
   useState,
@@ -110,39 +109,11 @@ const [
   setEditing,
 ] = useState(!profile?.id);
 
-  console.log("CURRENT STEP:", currentStep);
- const activeSteps = useMemo(() => {
+/* =====================================
+   INITIAL FORM VALUES
+===================================== */
 
-    const steps = [...PROFILE_STEPS];
-
-    if (
-        values.capabilities?.organisation
-    ) {
-
-        steps.splice(
-            3,
-            0,
-            ...ORG_STEPS
-        );
-
-    }
-
-    return steps;
-
-}, [values.capabilities]);
-
-  
-
-const form = useForm({
-  initialValues,
-});
-//
-  const {
-    values,
-    clearStorage,
-  } = form;
-
-  const initialValues = useMemo(
+const initialValues = useMemo(
   () =>
     getInitialProfileValues(
       profile,
@@ -151,97 +122,41 @@ const form = useForm({
   [profile, user]
 );
 
-  const closeProfile =
-    useCallback(() => {
+/* =====================================
+   FORM
+===================================== */
 
-      navigate(
-        "/communityplus",
-        {
-          replace: true,
-        }
-      );
-
-    }, [navigate]);
-    
-
-  const handleSaveProfile =
-  useCallback(
-    async () => {
-
-      try {
-
-        setSavingProfile(
-          true
-        );
-
-        const payload =
-          buildProfilePayload({
-
-            values,
-
-            userEmail:
-              user?.email,
-
-            homeLocation:
-              values.homeLocation,
-
-          });
-
-          
-        console.log(
-  "PROFILE PAYLOAD",
-  JSON.stringify(payload, null, 2)
-);  
-
-console.log(
-  "PATCH PAYLOAD",
-  JSON.stringify(payload, null, 2)
-);
-        await patchProfile(payload);
-
-console.log(
-  "✔ Profile saved."
-);
-
-await loadProfile({
-  background: false,
+const form = useForm({
+  initialValues,
 });
 
+const {
+  values,
+  clearStorage,
+} = form;
 
-      }
-      catch (err) {
+/* =====================================
+   PROFILE STEPS
+   (Organisation steps will be added
+   in the next commit.)
+===================================== */
 
-        console.error(
-          "Profile save failed:",
-          err
-        );
+const activeSteps =
+  PROFILE_STEPS;
 
-      }
-      finally {
+console.log(
+  "CURRENT STEP:",
+  currentStep
+);
 
-        setSavingProfile(
-          false
-        );
-
-      }
-
-    },
-
-    [
-      values,
-      user,
-      patchProfile,
-      loadProfile,
-    ]
-  );
-
-  const sectionId =
+const sectionId =
   activeSteps[currentStep]?.id;
 
 console.log(
   "SECTION:",
   sectionId
 );
+
 
 if (sectionId === "social") {
 
