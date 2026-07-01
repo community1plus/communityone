@@ -187,7 +187,11 @@ export const ORG_STEPS = [
 
     ],
   },
-
+  {
+    id: "organisation",
+    title: "Organisation",
+    fields: [],
+  },
   {
     id: "social",
     title: "Social",

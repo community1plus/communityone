@@ -1,0 +1,31 @@
+.organisation-profile{
+
+    display:flex;
+    flex-direction:column;
+    gap:24px;
+
+}
+
+.organisation-field{
+
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+
+}
+
+.organisation-field label{
+
+    font-size:1rem;
+    font-weight:600;
+
+}
+
+.organisation-field input,
+.organisation-field textarea,
+.organisation-field select{
+
+    width:100%;
+    min-height:58px;
+
+}
