@@ -36,7 +36,7 @@ import useForm
 import "./CommunityPlusUserProfile.css";
 
 import {
-  PROFILE_STEPS,
+  PROFILE_STEPS, ORG_STEPS
 } from "./profileConstants";
 
 import {
@@ -147,8 +147,25 @@ const completion =
    in the next commit.)
 ===================================== */
 
-const activeSteps =
-  PROFILE_STEPS;
+const activeSteps = useMemo(() => {
+
+    const steps = [...PROFILE_STEPS];
+
+    if (values.capabilities?.organisation) {
+
+        steps.splice(
+            3,
+            0,
+            ...ORG_STEPS
+        );
+
+    }
+
+    return steps;
+
+}, [values.capabilities]);
+
+console.log(activeSteps);
 
 console.log(
   "CURRENT STEP:",
