@@ -8,6 +8,7 @@ import {
 import ProfileHelpPanel from "../../components/Profile/ProfileHelpPanel";
 import ProfileCapabilitySelector from "../../components/Profile/ProfileCapabilitySelector";
 import ProfileSectionTabs from "../../components/UI/ProfileSectionTabs";
+import WorkspaceProgress from "../../components/Workspace/WorkspaceProgress";
 
 export default function IdentityWorkspace() {
 
