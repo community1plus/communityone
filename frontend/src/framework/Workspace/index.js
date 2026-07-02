@@ -12,3 +12,6 @@ from "./WorkspaceBody";
 
 export { default as WorkspaceGuide }
 from "./WorkspaceGuide";
+
+export { default as WorkspaceMain }
+from "./WorkspaceMain";
