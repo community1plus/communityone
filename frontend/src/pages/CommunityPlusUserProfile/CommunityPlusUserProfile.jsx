@@ -8,7 +8,7 @@ import ProfileSectionCard
   from "../../components/Profile/ProfileSectionCard";
 
 import WorkspaceShell from "../../framework/Workspace/WorkspaceShell";
-
+import WorkspaceProgress from "../../framework/Workspace/WorkspaceProgress";
 import ProfileSocialSection
   from "../../components/Profile/ProfileSocialSection";
 
