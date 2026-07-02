@@ -6,7 +6,7 @@ export default function WorkspaceBody({
 
     return (
 
-        <main className="workspace-content">
+        <main className="workspace-body">
 
             {children}
 

@@ -8,15 +8,11 @@ export default function WorkspaceShell({
 
     return (
 
-        <div className="workspace-page">
+        <div className="workspace-shell">
 
-            <div className="workspace-container">
+            <div className="workspace-layout">
 
-                <div className="workspace-layout">
-
-                    {children}
-
-                </div>
+                {children}
 
             </div>
 
