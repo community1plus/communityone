@@ -1,52 +1,22 @@
 import "./WorkspaceShell.css";
 
-import WorkspaceHeader from "./WorkspaceHeader";
-import WorkspaceWorkflow from "./WorkspaceWorkflow";
-import WorkspaceContent from "./WorkspaceContent";
-import WorkspaceGuide from "./WorkspaceGuide";
-
-
 export default function WorkspaceShell({
 
-    header,
-
-    navigation,
-
-    content,
-
-    guide,
+    children,
 
 }) {
 
     return (
 
-        <div className="workspace-shell">
+        <div className="workspace-page">
 
-            <WorkspaceHeader>
+            <div className="workspace-container">
 
-                {header}
+                <div className="workspace-layout">
 
-            </WorkspaceHeader>
+                    {children}
 
-            <div className="workspace-body">
-
-                <WorkspaceWorkflow>
-
-                    {navigation}
-
-                </WorkspaceWorkflow>
-
-                <WorkspaceContent>
-
-                    {content}
-
-                </WorkspaceContent>
-
-                <WorkspaceGuide>
-
-                    {guide}
-
-                </WorkspaceGuide>
+                </div>
 
             </div>
 

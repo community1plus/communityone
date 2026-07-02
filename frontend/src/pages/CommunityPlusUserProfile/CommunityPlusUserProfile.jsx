@@ -1,56 +1,15 @@
 import { useNavigate } from "react-router-dom";
 import IdentityWorkspace from "../../engines/Identity/IdentityWorkspace";
 import useAPI from "../../hooks/useAPI";
-
 import { useProfile } from "../../context/ProfileContext";
-
-import ProfileSectionCard
-  from "../../components/Profile/ProfileSectionCard";
-
-import WorkspaceShell from "../../framework/Workspace/WorkspaceShell";
-import WorkspaceProgress from "../../framework/Workspace/WorkspaceProgress";
-import ProfileSocialSection
-  from "../../components/Profile/ProfileSocialSection";
-
-import ProfilePaymentSection from "../../components/Profile/ProfilePaymentSection";
-
-
-
-import {
-  useState,
-  useCallback,
-  useMemo,
-} from "react";
-
+import { useState, useCallback, useMemo } from "react";
 import { useEffect } from "react";
-
-import {
-  useAuth,
-} from "../../context/AuthContext";
-
-
-import useForm
-  from "../../hooks/useForm";
-
+import { useAuth } from "../../context/AuthContext";
+import useForm from "../../hooks/useForm";
 import "./CommunityPlusUserProfile.css";
-
-import {
-  PROFILE_STEPS, ORG_STEPS
-} from "./profileConstants";
-
-import {
-  getInitialProfileValues, calculateProfileCompletion
-} from "./profileHelpers";
-
-
-import {
-  buildProfilePayload,
-} from "./profilePayload";
-
-
-
-import FormBuilder
-  from "../../components/UI/Form/FormBuilder";
+import { PROFILE_STEPS, ORG_STEPS}  from "./profileConstants";
+import { getInitialProfileValues, calculateProfileCompletion } from "./profileHelpers";
+import { buildProfilePayload } from "./profilePayload";
 
 export default function CommunityPlusUserProfile({
   onComplete,
@@ -76,8 +35,6 @@ export default function CommunityPlusUserProfile({
     savingProfile,
     setSavingProfile,
   ] = useState(false);
-
-
 
 const [currentStep, setCurrentStep] = useState(() => {
 
@@ -244,7 +201,6 @@ const handleSaveProfile = useCallback(
       setSavingProfile(false);
 
     }
-
   },
 
   [
@@ -257,7 +213,6 @@ const handleSaveProfile = useCallback(
 
 );
 
-
 if (sectionId === "social") {
 
   console.log(
@@ -268,126 +223,37 @@ if (sectionId === "social") {
 console.log("Completion:", completion);
 console.log("Values:", values);
 
-  return (
+/* =====================================
+   WORKSPACE MODEL
+===================================== */
 
-  <div className="profile-page">
-    <div className="profile-container">
-      <div className="profile-layout">
-        <div className="profile-left">
-          {/* HEADER */}
+const workspaceState = {
+  values,
+  form,
+  editing,
+  editMode,
+  savingProfile,
+  completion,
+  activeSteps,
+  currentStep,
+  sectionId,
+};
 
-          <div className="profile-content-card">
+const workspaceActions = {
+  setCurrentStep,
+  setEditing,
+  handleSaveProfile,
+  closeProfile,
+  resetForm: form.reset,
+};
 
-            <div className="profile-card-header">
+return (
 
-              <h1>COMMUNITY PROFILE</h1>
-
-              <p className="profile-subtitle">
-                  Your trusted identity within Community One.
-              </p>
-
-              {editMode && (
-
-                <button
-                  type="button"
-                  className="profile-close-button"
-                  onClick={closeProfile}
-                >
-                  ×
-                </button>
-
-              )}
-
-            </div>
-
-
-
-          {/* PROGRESS */}
-
-<WorkspaceProgress
-
-    value={completion}
-
-    label={`${completion}% Complete`}
-
+<IdentityWorkspace
+    state={workspaceState}
+    actions={workspaceActions}
 />
 
-          {/* FORM */}
-
-          </div>
-
-          {/* TABS */}
-          
-      </div>
-
-      {/* RIGHT COLUMN */}
-
-<div className="profile-sidebar">
-
-<div className="profile-floating-save">
-
-  {!editing ? (
-
-    <button
-      type="button"
-      className="profile-save-button"
-      onClick={() => setEditing(true)}
-    >
-      Edit Profile
-    </button>
-
-  ) : (
-
-    <div className="profile-edit-actions">
-
-      <button
-        type="button"
-        className="profile-cancel-button"
-        onClick={() => {
-
-          form.reset?.();
-
-          setEditing(false);
-
-        }}
-      >
-        Cancel
-      </button>
-
-      <button
-        type="button"
-        className="profile-save-button"
-        disabled={savingProfile}
-        onClick={async () => {
-
-          await handleSaveProfile();
-
-          setEditing(false);
-
-        }}
-      >
-        {savingProfile
-          ? "Saving..."
-          : "Save Changes"}
-      </button>
-
-    </div>
-
-  )}
-
-</div>
-
-</div>
-
-      </div>
-
-    </div>
-
-  </div>
-
 );
-
-
-
 
 }

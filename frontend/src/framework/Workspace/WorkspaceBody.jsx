@@ -1,4 +1,4 @@
-export default function WorkspaceContent({
+export default function WorkspaceBody({
 
     children,
 
