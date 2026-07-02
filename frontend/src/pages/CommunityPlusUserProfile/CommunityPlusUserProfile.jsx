@@ -304,7 +304,13 @@ console.log("Values:", values);
 
           {/* PROGRESS */}
 
-<div className="profile-header-progress">
+<WorkspaceProgress
+
+    value={completion}
+
+    label={`${completion}% Complete`}
+
+/>
 
   <div className="profile-header-progress-label">
     {completion}% Complete

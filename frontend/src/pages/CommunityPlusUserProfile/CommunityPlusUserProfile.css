@@ -295,6 +295,12 @@ PROFILE SECTION CARDS
 
 }
 
+.workspace-progress{
+    padding:0 36px 28px;
+     margin-top: 18px;
+
+}
+
 .profile-header-progress-label{
     display:flex;
     justify-content:flex-end;
@@ -317,7 +323,7 @@ PROFILE SECTION CARDS
     overflow:hidden;
 }
 
-.profile-progress-fill{
+.workspace-progress-fill{
     height:100%;
 
     background:#8f0d0d;

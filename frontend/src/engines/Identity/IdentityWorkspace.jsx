@@ -13,7 +13,7 @@ export default function IdentityWorkspace() {
 
     return (
 
-        <WorkspaceShell>
+<WorkspaceShell>
 
 <WorkspaceWorkflow>
             <ProfileCapabilitySelector
@@ -40,7 +40,7 @@ export default function IdentityWorkspace() {
 
 </WorkspaceGuide>
 
-        </WorkspaceShell>
+</WorkspaceShell>
 
     );
 
