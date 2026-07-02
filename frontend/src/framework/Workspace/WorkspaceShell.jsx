@@ -4,7 +4,7 @@ import WorkspaceHeader from "./WorkspaceHeader";
 import WorkspaceNavigation from "./WorkspaceNavigation";
 import WorkspaceContent from "./WorkspaceContent";
 import WorkspaceGuide from "./WorkspaceGuide";
-import ProfileHelpPanel from "../../components/Profile/ProfileHelpPanel";
+
 
 export default function WorkspaceShell({
 

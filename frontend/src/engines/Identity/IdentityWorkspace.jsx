@@ -5,6 +5,8 @@ import {
     WorkspaceGuide,
 } from "../../framework/Workspace";
 
+import ProfileHelpPanel from "../../components/Profile/ProfileHelpPanel";
+
 export default function IdentityWorkspace() {
 
     return (
