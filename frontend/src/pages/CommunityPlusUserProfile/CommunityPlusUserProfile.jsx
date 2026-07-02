@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-
+import IdentityWorkspace from "../../engines/Identity/IdentityWorkspace";
 import useAPI from "../../hooks/useAPI";
 
 import { useProfile } from "../../context/ProfileContext";
@@ -382,11 +382,7 @@ console.log("Values:", values);
 
   <aside className="profile-guide">
 
-<ProfileHelpPanel
-  section={
-    activeSteps[currentStep]?.id
-  }
-/>
+
   </aside>
 
 <div className="profile-floating-save">
