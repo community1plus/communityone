@@ -7,6 +7,8 @@ import {
 
 import ProfileHelpPanel from "../../components/Profile/ProfileHelpPanel";
 import ProfileCapabilitySelector from "../../components/Profile/ProfileCapabilitySelector";
+import ProfileSectionTabs from "../../components/UI/ProfileSectionTabs";
+
 export default function IdentityWorkspace() {
 
     return (
@@ -18,6 +20,11 @@ export default function IdentityWorkspace() {
               values={values}
               setValue={form.setValue}
               readOnly={!editing}
+            />
+            <ProfileSectionTabs
+              steps={activeSteps}
+              currentStep={currentStep}
+              setCurrentStep={setCurrentStep}
             />
 </WorkspaceNavigation>
 

@@ -47,8 +47,7 @@ import {
   buildProfilePayload,
 } from "./profilePayload";
 
-import ProfileSectionTabs
-  from "../../components/UI/ProfileSectionTabs";
+
 
 import FormBuilder
   from "../../components/UI/Form/FormBuilder";
@@ -301,11 +300,7 @@ console.log("Values:", values);
 
             </div>
 
-            <ProfileSectionTabs
-              steps={activeSteps}
-              currentStep={currentStep}
-              setCurrentStep={setCurrentStep}
-            />
+
 
           {/* PROGRESS */}
 
