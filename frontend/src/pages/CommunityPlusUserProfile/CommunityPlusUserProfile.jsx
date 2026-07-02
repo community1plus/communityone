@@ -304,13 +304,7 @@ console.log("Values:", values);
 
           {/* PROGRESS */}
 
-<WorkspaceProgress
-
-    value={completion}
-
-    label={`${completion}% Complete`}
-
-/>
+<div className="profile-header-progress">
 
   <div className="profile-header-progress-label">
     {completion}% Complete
@@ -332,40 +326,13 @@ console.log("Values:", values);
           {/* FORM */}
 
           
-<div className="profile-form-content">
+<WorkspaceProgress
 
-  {sectionId === "social" ? (
+    value={completion}
 
-    <ProfileSectionCard>
+    label={`${completion}% Complete`}
 
-      <ProfileSocialSection />
-
-    </ProfileSectionCard>
-
-  ) : sectionId === "payment" ? (
-
-    <ProfileSectionCard>
-
-      <ProfilePaymentSection />
-
-    </ProfileSectionCard>
-
-  ) : (
-
-    <ProfileSectionCard>
-
-<FormBuilder
-  steps={[activeSteps[currentStep]]}
-  currentStep={0}
-  form={form}
-  readOnly={!editing}
 />
-
-    </ProfileSectionCard>
-
-  )}
-
-</div>
 
           </div>
 
