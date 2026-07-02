@@ -7,8 +7,7 @@ import { useProfile } from "../../context/ProfileContext";
 import ProfileSectionCard
   from "../../components/Profile/ProfileSectionCard";
 
-import ProfileHelpPanel
-  from "../../components/Profile/ProfileHelpPanel";
+import WorkspaceShell from "../../framework/Workspace/WorkspaceShell";
 
 import ProfileSocialSection
   from "../../components/Profile/ProfileSocialSection";
