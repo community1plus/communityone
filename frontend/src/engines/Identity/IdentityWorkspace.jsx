@@ -1,6 +1,6 @@
 import {
     WorkspaceShell,
-    WorkspaceNavigation,
+    WorkspaceWorkflow,
     WorkspaceContent,
     WorkspaceGuide,
 } from "../../framework/Workspace";
@@ -15,7 +15,7 @@ export default function IdentityWorkspace() {
 
         <WorkspaceShell>
 
-<WorkspaceNavigation>
+<WorkspaceWorkflow>
             <ProfileCapabilitySelector
               values={values}
               setValue={form.setValue}
@@ -26,7 +26,7 @@ export default function IdentityWorkspace() {
               currentStep={currentStep}
               setCurrentStep={setCurrentStep}
             />
-</WorkspaceNavigation>
+</WorkspaceWorkflow>
 
 <WorkspaceContent>
 

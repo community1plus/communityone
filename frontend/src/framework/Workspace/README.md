@@ -93,7 +93,7 @@ Platform Framework
 ### Child Components
 
 - WorkspaceHeader
-- WorkspaceNavigation
+- WorkspaceWorkflow
 - WorkspaceContent
 - WorkspaceGuide
 

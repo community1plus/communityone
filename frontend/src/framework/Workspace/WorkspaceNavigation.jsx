@@ -1,4 +1,4 @@
-export default function WorkspaceNavigation({
+export default function WorkspaceWorkflow({
 
     children,
 
@@ -6,7 +6,7 @@ export default function WorkspaceNavigation({
 
     return (
 
-        <aside className="workspace-navigation">
+        <aside className="workspace-workflow">
 
             {children}
 
