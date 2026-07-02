@@ -1,222 +1,217 @@
 import {
-    WorkspaceShell,
-    WorkspaceMain,
-    WorkspaceSidebar,
-    WorkspaceHeader,
-    WorkspaceWorkflow,
-    WorkspaceProgress,
-    WorkspaceBody,
-    WorkspaceGuide,
-    WorkspaceActions,
+  WorkspaceShell,
+  WorkspaceMain,
+  WorkspaceSidebar,
+  WorkspaceHeader,
+  WorkspaceWorkflow,
+  WorkspaceProgress,
+  WorkspaceBody,
+  WorkspaceGuide,
+  WorkspaceActions,
 } from "../../framework/Workspace";
 
 import ProfileHelpPanel from "../../components/Profile/ProfileHelpPanel";
 import ProfileCapabilitySelector from "../../components/Profile/ProfileCapabilitySelector";
 import ProfileSectionTabs from "../../components/UI/ProfileSectionTabs";
+
 import ProfileSectionCard from "../../components/Profile/ProfileSectionCard";
 import ProfileSocialSection from "../../components/Profile/ProfileSocialSection";
 import ProfilePaymentSection from "../../components/Profile/ProfilePaymentSection";
+
 import FormBuilder from "../../components/UI/Form/FormBuilder";
 
 export default function IdentityWorkspace({
 
   state,
-
   actions,
 
 }) {
 
   const {
+
     values,
     form,
+
     editing,
+    editMode,
+    savingProfile,
+
+    completion,
+
     activeSteps,
     currentStep,
     sectionId,
+
   } = state;
 
   const {
 
     setCurrentStep,
+    setEditing,
+
+    handleSaveProfile,
+    closeProfile,
 
   } = actions;
-    <div className="profile-page">
-    <div className="profile-container">
-      <div className="profile-layout">
-        <div className="profile-left">
-          {/* HEADER */}
-
-          <div className="profile-content-card">
-
-            <div className="profile-card-header">
-
-              <h1>COMMUNITY PROFILE</h1>
-
-              <p className="profile-subtitle">
-                  Your trusted identity within Community One.
-              </p>
-
-              {editMode && (
-
-                <button
-                  type="button"
-                  className="profile-close-button"
-                  onClick={closeProfile}
-                >
-                  ×
-                </button>
-
-              )}
-
-            </div>
-
-          {/* PROGRESS */}
-
-<WorkspaceProgress
-
-    value={completion}
-
-    label={`${completion}% Complete`}
-/>
-          {/* FORM */}
-
-          </div>
-
-          {/* TABS */}
-          
-      </div>
-
-      {/* RIGHT COLUMN */}
-
-<div className="profile-sidebar">
-
-<div className="profile-floating-save">
-
-  {!editing ? (
-
-    <button
-      type="button"
-      className="profile-save-button"
-      onClick={() => setEditing(true)}
-    >
-      Edit Profile
-    </button>
-
-  ) : (
-
-    <div className="profile-edit-actions">
-
-      <button
-        type="button"
-        className="profile-cancel-button"
-        onClick={() => {
-
-          form.reset?.();
-
-          setEditing(false);
-
-        }}
-      >
-        Cancel
-      </button>
-
-      <button
-        type="button"
-        className="profile-save-button"
-        disabled={savingProfile}
-        onClick={async () => {
-
-          await handleSaveProfile();
-
-          setEditing(false);
-
-        }}
-      >
-        {savingProfile
-          ? "Saving..."
-          : "Save Changes"}
-      </button>
-
-    </div>
-
-  )}
-
-</div>
-
-</div>
-      </div>
-
-    </div>
-
-  </div>
 
   return (
 
-     
     <WorkspaceShell>
 
-      <WorkspaceWorkflow>
+      <WorkspaceMain>
 
-        <ProfileCapabilitySelector
-          values={values}
-          setValue={form.setValue}
-          readOnly={!editing}
+        <WorkspaceHeader>
+
+          <div className="profile-card-header">
+
+            <h1>COMMUNITY PROFILE</h1>
+
+            <p className="profile-subtitle">
+              Your trusted identity within Community One.
+            </p>
+
+            {editMode && (
+
+              <button
+                type="button"
+                className="profile-close-button"
+                onClick={closeProfile}
+              >
+                ×
+              </button>
+
+            )}
+
+          </div>
+
+        </WorkspaceHeader>
+
+        <WorkspaceWorkflow>
+
+          <ProfileCapabilitySelector
+            values={values}
+            setValue={form.setValue}
+            readOnly={!editing}
+          />
+
+          <ProfileSectionTabs
+            steps={activeSteps}
+            currentStep={currentStep}
+            setCurrentStep={setCurrentStep}
+          />
+
+        </WorkspaceWorkflow>
+
+        <WorkspaceProgress
+          value={completion}
+          label={`${completion}% Complete`}
         />
 
-        <ProfileSectionTabs
-          steps={activeSteps}
-          currentStep={currentStep}
-          setCurrentStep={setCurrentStep}
-        />
+        <WorkspaceBody>
 
-      </WorkspaceWorkflow>
+          <div className="profile-form-content">
 
-      <WorkspaceContent>
+            {sectionId === "social" ? (
 
-        <div className="profile-form-content">
+              <ProfileSectionCard>
 
-          {sectionId === "social" ? (
+                <ProfileSocialSection />
 
-            <ProfileSectionCard>
+              </ProfileSectionCard>
 
-              <ProfileSocialSection />
+            ) : sectionId === "payment" ? (
 
-            </ProfileSectionCard>
+              <ProfileSectionCard>
 
-          ) : sectionId === "payment" ? (
+                <ProfilePaymentSection />
 
-            <ProfileSectionCard>
+              </ProfileSectionCard>
 
-              <ProfilePaymentSection />
+            ) : (
 
-            </ProfileSectionCard>
+              <ProfileSectionCard>
+
+                <FormBuilder
+                  steps={[activeSteps[currentStep]]}
+                  currentStep={0}
+                  form={form}
+                  readOnly={!editing}
+                />
+
+              </ProfileSectionCard>
+
+            )}
+
+          </div>
+
+        </WorkspaceBody>
+
+      </WorkspaceMain>
+
+      <WorkspaceSidebar>
+
+        <WorkspaceGuide>
+
+          <ProfileHelpPanel
+            section={sectionId}
+          />
+
+        </WorkspaceGuide>
+
+        <WorkspaceActions>
+
+          {!editing ? (
+
+            <button
+              type="button"
+              className="profile-save-button"
+              onClick={() => setEditing(true)}
+            >
+              Edit Profile
+            </button>
 
           ) : (
 
-            <ProfileSectionCard>
+            <div className="profile-edit-actions">
 
-              <FormBuilder
-                steps={[activeSteps[currentStep]]}
-                currentStep={0}
-                form={form}
-                readOnly={!editing}
-              />
+              <button
+                type="button"
+                className="profile-cancel-button"
+                onClick={() => {
 
-            </ProfileSectionCard>
+                  form.reset?.();
+
+                  setEditing(false);
+
+                }}
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                className="profile-save-button"
+                disabled={savingProfile}
+                onClick={async () => {
+
+                  await handleSaveProfile();
+
+                  setEditing(false);
+
+                }}
+              >
+                {savingProfile
+                  ? "Saving..."
+                  : "Save Changes"}
+              </button>
+
+            </div>
 
           )}
 
-        </div>
+        </WorkspaceActions>
 
-      </WorkspaceContent>
-
-      <WorkspaceGuide>
-
-        <ProfileHelpPanel
-          section={sectionId}
-        />
-
-      </WorkspaceGuide>
+      </WorkspaceSidebar>
 
     </WorkspaceShell>
 

@@ -1,26 +1,40 @@
 import { useNavigate } from "react-router-dom";
-import IdentityWorkspace from "../../engines/Identity/IdentityWorkspace";
-import useAPI from "../../hooks/useAPI";
-import { useProfile } from "../../context/ProfileContext";
-import { useState, useCallback, useMemo } from "react";
-import { useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
+
 import { useAuth } from "../../context/AuthContext";
+import { useProfile } from "../../context/ProfileContext";
+
+import useAPI from "../../hooks/useAPI";
 import useForm from "../../hooks/useForm";
+
+import IdentityWorkspace from "../../workspaces/Identity/IdentityWorkspace";
+
 import "./CommunityPlusUserProfile.css";
-import { PROFILE_STEPS, ORG_STEPS}  from "./profileConstants";
-import { getInitialProfileValues, calculateProfileCompletion } from "./profileHelpers";
-import { buildProfilePayload } from "./profilePayload";
+
+import {
+  PROFILE_STEPS,
+  ORG_STEPS,
+} from "./profileConstants";
+
+import {
+  getInitialProfileValues,
+  calculateProfileCompletion,
+} from "./profileHelpers";
+
+import {
+  buildProfilePayload,
+} from "./profilePayload";
 
 export default function CommunityPlusUserProfile({
+
   onComplete,
   editMode = false,
-}) {
- console.log("USER PROFILE COMPONENT MOUNTED");
-  const navigate =
-    useNavigate();
 
-  const { user } =
-    useAuth();
+}) {
+
+  const navigate = useNavigate();
+
+  const { user } = useAuth();
 
   const {
     profile,
@@ -31,229 +45,213 @@ export default function CommunityPlusUserProfile({
     patchProfile,
   } = useAPI();
 
-  const [
-    savingProfile,
-    setSavingProfile,
-  ] = useState(false);
+  /* =====================================
+     LOCAL STATE
+  ===================================== */
 
-const [currentStep, setCurrentStep] = useState(() => {
+  const [savingProfile, setSavingProfile] =
+    useState(false);
 
-  const saved =
-    sessionStorage.getItem(
-      "profileCurrentStep"
+  const [editing, setEditing] =
+    useState(!profile?.id);
+
+  const [currentStep, setCurrentStep] =
+    useState(() => {
+
+      const saved =
+        sessionStorage.getItem(
+          "profileCurrentStep"
+        );
+
+      return saved
+        ? Number(saved)
+        : 0;
+
+    });
+
+  useEffect(() => {
+
+    sessionStorage.setItem(
+      "profileCurrentStep",
+      currentStep
     );
 
-  return saved
-    ? Number(saved)
-    : 0;
+  }, [currentStep]);
 
-});
+  /* =====================================
+     FORM
+  ===================================== */
 
-console.log("AUTH USER:", user); 
+  const initialValues = useMemo(
 
-useEffect(() => {
+    () =>
+      getInitialProfileValues(
+        profile,
+        user
+      ),
 
-  sessionStorage.setItem(
-    "profileCurrentStep",
-    currentStep
+    [profile, user]
+
   );
 
-}, [currentStep]);
+  const form = useForm({
 
+    initialValues,
 
-const [
-  editing,
-  setEditing,
-] = useState(!profile?.id);
+  });
 
-/* =====================================
-   INITIAL FORM VALUES
-===================================== */
+  const {
 
-const initialValues = useMemo(
-  () =>
-    getInitialProfileValues(
-      profile,
-      user
-    ),
-  [profile, user]
-);
+    values,
 
+  } = form;
 
-/* =====================================
-   FORM
-===================================== */
+  /* =====================================
+     WORKSPACE STATE
+  ===================================== */
 
-const form = useForm({
-  initialValues,
-});
+  const completion =
+    calculateProfileCompletion(values);
 
-const {
-  values,
-  clearStorage,
-} = form;
-
-const completion =
-  calculateProfileCompletion(values);
-
-/* =====================================
-   PROFILE STEPS
-   (Organisation steps will be added
-   in the next commit.)
-===================================== */
-
-const activeSteps = useMemo(() => {
+  const activeSteps = useMemo(() => {
 
     const steps = [...PROFILE_STEPS];
 
     if (values.capabilities?.organisation) {
 
-        steps.splice(
-            3,
-            0,
-            ...ORG_STEPS
-        );
+      steps.splice(
+
+        3,
+
+        0,
+
+        ...ORG_STEPS
+
+      );
 
     }
 
     return steps;
 
-}, [values.capabilities]);
+  }, [values.capabilities]);
 
-console.log(activeSteps);
+  const sectionId =
+    activeSteps[currentStep]?.id;
 
-console.log(
-  "CURRENT STEP:",
-  currentStep
-);
+  /* =====================================
+     ACTIONS
+  ===================================== */
 
-const sectionId =
-  activeSteps[currentStep]?.id;
+  const closeProfile = useCallback(() => {
 
-console.log(
-  "SECTION:",
-  sectionId
-);
-/* =====================================
-   CLOSE PROFILE
-===================================== */
-const closeProfile = useCallback(() => {
+    navigate(
+      "/communityplus",
+      {
+        replace: true,
+      }
+    );
 
-  navigate("/communityplus", {
-    replace: true,
-  });
+  }, [navigate]);
 
-}, [navigate]);
+  const handleSaveProfile = useCallback(
 
-/* =====================================
-   SAVE PROFILE
-===================================== */
+    async () => {
 
-const handleSaveProfile = useCallback(
+      try {
 
-  async () => {
+        setSavingProfile(true);
 
-    try {
+        const payload =
+          buildProfilePayload({
 
-      setSavingProfile(true);
+            values,
 
-      const payload =
-        buildProfilePayload({
+            userEmail:
+              user?.email,
 
-          values,
+            homeLocation:
+              values.homeLocation,
 
-          userEmail:
-            user?.email,
+          });
 
-          homeLocation:
-            values.homeLocation,
+        await patchProfile(payload);
 
+        await loadProfile({
+          background: false,
         });
 
-      console.log(
-        "PROFILE PAYLOAD",
-        JSON.stringify(payload, null, 2)
-      );
+        onComplete?.();
 
-      await patchProfile(payload);
+      } catch (err) {
 
-      console.log(
-        "✔ Profile saved."
-      );
+        console.error(
+          "Profile save failed:",
+          err
+        );
 
-      await loadProfile({
-        background: false,
-      });
+      } finally {
 
-      if (onComplete) {
-        onComplete();
+        setSavingProfile(false);
+
       }
 
-    } catch (err) {
+    },
 
-      console.error(
-        "Profile save failed:",
-        err
-      );
+    [
+      values,
+      user,
+      patchProfile,
+      loadProfile,
+      onComplete,
+    ]
 
-    } finally {
-
-      setSavingProfile(false);
-
-    }
-  },
-
-  [
-    values,
-    user,
-    patchProfile,
-    loadProfile,
-    onComplete,
-  ]
-
-);
-
-if (sectionId === "social") {
-
-  console.log(
-    "ABOUT TO RENDER SOCIAL"
   );
 
-}
-console.log("Completion:", completion);
-console.log("Values:", values);
+  /* =====================================
+     CONTROLLER MODEL
+  ===================================== */
 
-/* =====================================
-   WORKSPACE MODEL
-===================================== */
+  const state = {
 
-const workspaceState = {
-  values,
-  form,
-  editing,
-  editMode,
-  savingProfile,
-  completion,
-  activeSteps,
-  currentStep,
-  sectionId,
-};
+    values,
+    form,
 
-const workspaceActions = {
-  setCurrentStep,
-  setEditing,
-  handleSaveProfile,
-  closeProfile,
-  resetForm: form.reset,
-};
+    editing,
+    editMode,
+    savingProfile,
 
-return (
+    completion,
 
-<IdentityWorkspace
-    state={workspaceState}
-    actions={workspaceActions}
-/>
+    activeSteps,
+    currentStep,
+    sectionId,
 
-);
+  };
+
+  const actions = {
+
+    setCurrentStep,
+    setEditing,
+
+    handleSaveProfile,
+    closeProfile,
+
+  };
+
+  /* =====================================
+     RENDER
+  ===================================== */
+
+  return (
+
+    <IdentityWorkspace
+
+      state={state}
+
+      actions={actions}
+
+    />
+
+  );
 
 }
