@@ -25,5 +25,8 @@ from "./WorkspaceBody";
 export { default as WorkspaceActions }
 from "./WorkspaceActions";
 
+export { default as WorkspaceProgress }
+from "./WorkspaceProgress";
+
 
 
