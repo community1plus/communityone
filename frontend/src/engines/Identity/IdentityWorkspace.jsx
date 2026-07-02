@@ -6,20 +6,24 @@ import {
 } from "../../framework/Workspace";
 
 import ProfileHelpPanel from "../../components/Profile/ProfileHelpPanel";
-
+import ProfileCapabilitySelector from "../../components/Profile/ProfileCapabilitySelector";
 export default function IdentityWorkspace() {
 
     return (
 
         <WorkspaceShell>
 
-            <WorkspaceNavigation>
+<WorkspaceNavigation>
+            <ProfileCapabilitySelector
+              values={values}
+              setValue={form.setValue}
+              readOnly={!editing}
+            />
+</WorkspaceNavigation>
 
-            </WorkspaceNavigation>
+<WorkspaceContent>
 
-            <WorkspaceContent>
-
-            </WorkspaceContent>
+</WorkspaceContent>
 
 <WorkspaceGuide>
 

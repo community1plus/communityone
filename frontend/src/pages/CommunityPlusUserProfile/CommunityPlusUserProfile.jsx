@@ -14,7 +14,7 @@ import ProfileSocialSection
 
 import ProfilePaymentSection from "../../components/Profile/ProfilePaymentSection";
 
-import ProfileCapabilitySelector from "../../components/Profile/ProfileCapabilitySelector";
+
 
 import {
   useState,
@@ -300,11 +300,7 @@ console.log("Values:", values);
               )}
 
             </div>
-            <ProfileCapabilitySelector
-              values={values}
-              setValue={form.setValue}
-              readOnly={!editing}
-            />
+
             <ProfileSectionTabs
               steps={activeSteps}
               currentStep={currentStep}
