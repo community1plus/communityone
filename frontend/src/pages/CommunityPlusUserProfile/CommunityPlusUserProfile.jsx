@@ -380,11 +380,6 @@ console.log("Values:", values);
 
 <div className="profile-sidebar">
 
-  <aside className="profile-guide">
-
-
-  </aside>
-
 <div className="profile-floating-save">
 
   {!editing ? (
