@@ -314,15 +314,6 @@ console.log("Values:", values);
 
           {/* FORM */}
 
-          
-<WorkspaceProgress
-
-    value={completion}
-
-    label={`${completion}% Complete`}
-
-/>
-
           </div>
 
           {/* TABS */}
