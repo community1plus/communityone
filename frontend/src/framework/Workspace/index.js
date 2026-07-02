@@ -19,7 +19,7 @@ from "./WorkspaceMain";
 export { default as WorkspaceSidebar }
 from "./WorkspaceSidebar";
 
-export { default as WorkspaceProgress }
+export { default as WorkspaceBody }
 from "./WorkspaceBody";
 
 export { default as WorkspaceActions }
