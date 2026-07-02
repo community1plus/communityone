@@ -304,24 +304,13 @@ console.log("Values:", values);
 
           {/* PROGRESS */}
 
-<div className="profile-header-progress">
+<WorkspaceProgress
 
-  <div className="profile-header-progress-label">
-    {completion}% Complete
-  </div>
+    value={completion}
 
-  <div className="profile-progress-bar">
+    label={`${completion}% Complete`}
 
-    <div
-      className="profile-progress-fill"
-      style={{
-        width: `${completion}%`,
-      }}
-    />
-
-  </div>
-
-</div>
+/>
 
           {/* FORM */}
 
