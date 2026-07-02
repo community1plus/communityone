@@ -1,5 +1,10 @@
 import "./WorkspaceShell.css";
 
+import WorkspaceHeader from "./WorkspaceHeader";
+import WorkspaceNavigation from "./WorkspaceNavigation";
+import WorkspaceContent from "./WorkspaceContent";
+import WorkspaceGuide from "./WorkspaceGuide";
+
 export default function WorkspaceShell({
 
     header,
@@ -16,31 +21,31 @@ export default function WorkspaceShell({
 
         <div className="workspace-shell">
 
-            <header className="workspace-header">
+            <WorkspaceHeader>
 
                 {header}
 
-            </header>
+            </WorkspaceHeader>
 
             <div className="workspace-body">
 
-                <aside className="workspace-navigation">
+                <WorkspaceNavigation>
 
                     {navigation}
 
-                </aside>
+                </WorkspaceNavigation>
 
-                <main className="workspace-content">
+                <WorkspaceContent>
 
                     {content}
 
-                </main>
+                </WorkspaceContent>
 
-                <aside className="workspace-guide">
+                <WorkspaceGuide>
 
                     {guide}
 
-                </aside>
+                </WorkspaceGuide>
 
             </div>
 

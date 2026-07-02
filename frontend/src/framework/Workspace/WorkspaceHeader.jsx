@@ -4,6 +4,14 @@ export default function WorkspaceHeader({
 
 }) {
 
-    return children;
+    return (
+
+        <header className="workspace-header">
+
+            {children}
+
+        </header>
+
+    );
 
 }
