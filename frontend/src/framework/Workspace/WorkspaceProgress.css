@@ -1,0 +1,45 @@
+.workspace-progress {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 18px;
+
+}
+
+.workspace-progress-track {
+
+    flex: 1;
+
+    height: 10px;
+
+    background: #ece7e2;
+
+    border-radius: 999px;
+
+    overflow: hidden;
+
+}
+
+.workspace-progress-fill {
+
+    height: 100%;
+
+    background: #9b111e;
+
+    border-radius: inherit;
+
+    transition: width .3s ease;
+
+}
+
+.workspace-progress-label {
+
+    white-space: nowrap;
+
+    font-weight: 600;
+
+    color: #666;
+
+}

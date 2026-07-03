@@ -1,43 +1,33 @@
+import "./WorkspaceProgress.css";
+
 export default function WorkspaceProgress({
 
-    value = 0,
-
-    label,
+  value = 0,
+  label,
 
 }) {
 
-    return (
+  return (
 
-        <div className="workspace-progress">
+<section className="workspace-progress">
 
-            <div className="workspace-progress-header">
+    <div className="workspace-progress-track">
 
-                <span>
+        <div
+            className="workspace-progress-fill"
+            style={{ width: `${value}%` }}
+        />
 
-                    {label}
+    </div>
 
-                </span>
+    <span className="workspace-progress-label">
 
-            </div>
+        {label}
 
-            <div className="workspace-progress-track">
+    </span>
 
-                <div
+</section>
 
-                    className="workspace-progress-fill"
-
-                    style={{
-
-                        width: `${value}%`
-
-                    }}
-
-                />
-
-            </div>
-
-        </div>
-
-    );
+  );
 
 }
