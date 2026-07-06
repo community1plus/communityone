@@ -1,36 +1,18 @@
 import "./WorkspaceProgress.css";
 
-export default function WorkspaceProgress({
+export default function WorkspaceProgress() {
 
-  value = 0,
-  label,
- 
-}) {
-  console.log("WorkspaceProgress", { value, label });
-  return (
+    return (
 
-<section className="workspace-progress">
+        <div
+            style={{
+                width: "100%",
+                height: "20px",
+                background: "lime",
+                margin: "20px 0",
+            }}
+        />
 
-    <div className="workspace-progress-track">
-
-<div
-  className="workspace-progress-fill"
-  style={{
-    width: "20%",
-    height: "20px",
-  }}
-/>
-
-    </div>
-
-    <span className="workspace-progress-label">
-
-        {label}
-
-    </span>
-
-</section>
-
-  );
+    );
 
 }
