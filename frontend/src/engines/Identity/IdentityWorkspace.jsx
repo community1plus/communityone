@@ -22,26 +22,37 @@ import FormBuilder from "../../components/UI/Form/FormBuilder";
 
 export default function IdentityWorkspace({
 
-  workspaceState,
-  workspaceActions,
+    state,
+    actions,
 
 }) {
 
-  const workspaceState = {
+    const {
 
-    values,
-    form,
+        values,
+        form,
 
-    editing,
-    editMode,
-    savingProfile,
+        editing,
+        editMode,
+        savingProfile,
 
-    completion,
+        completion,
 
-    activeSteps,
-    currentStep,
-    sectionId,
+        activeSteps,
+        currentStep,
+        sectionId,
 
+    } = state;
+
+    const {
+
+        setCurrentStep,
+        setEditing,
+
+        handleSaveProfile,
+        closeProfile,
+
+    } = actions;
 };
 
 const workspaceActions = {
