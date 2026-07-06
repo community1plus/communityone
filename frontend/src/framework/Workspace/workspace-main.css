@@ -1,0 +1,17 @@
+.workspace-main {
+
+    display: flex;
+    flex-direction: column;
+
+    flex: 1;
+
+    min-width: 0;
+    min-height: 0;
+
+    padding: 32px;
+
+    overflow: hidden;
+
+    gap: 24px;
+
+}
