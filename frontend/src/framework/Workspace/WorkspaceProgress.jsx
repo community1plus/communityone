@@ -13,10 +13,13 @@ export default function WorkspaceProgress({
 
     <div className="workspace-progress-track">
 
-        <div
-            className="workspace-progress-fill"
-            style={{ width: `${value}%` }}
-        />
+<div
+  className="workspace-progress-fill"
+  style={{
+    width: "20%",
+    height: "20px",
+  }}
+/>
 
     </div>
 
