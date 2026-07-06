@@ -211,7 +211,7 @@ export default function CommunityPlusUserProfile({
      CONTROLLER MODEL
   ===================================== */
 
-  const state = {
+  const workspaceState = {
     values,
     form,
     editing,
@@ -223,7 +223,7 @@ export default function CommunityPlusUserProfile({
     sectionId,
   };
 
-  const actions = {
+  const workspaceActions = {
     setCurrentStep,
     setEditing,
     handleSaveProfile,
