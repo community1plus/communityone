@@ -1,0 +1,57 @@
+.workspace-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: flex-start;
+
+    gap: 40px;
+
+}
+
+.workspace-header-text {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 12px;
+
+}
+
+.workspace-header h1 {
+
+    margin: 0;
+
+    font-size: 3rem;
+
+    font-weight: 700;
+
+    color: #162033;
+
+}
+
+.workspace-header p {
+
+    margin: 0;
+
+    font-size: 1.5rem;
+
+    color: #162033;
+
+}
+
+.workspace-close {
+
+    border: none;
+
+    background: none;
+
+    cursor: pointer;
+
+    font-size: 2.5rem;
+
+    color: #9aa6bf;
+
+}

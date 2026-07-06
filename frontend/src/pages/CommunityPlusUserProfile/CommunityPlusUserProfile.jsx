@@ -212,27 +212,20 @@ export default function CommunityPlusUserProfile({
   ===================================== */
 
   const state = {
-
     values,
     form,
-
     editing,
     editMode,
     savingProfile,
-
     completion,
-
     activeSteps,
     currentStep,
     sectionId,
-
   };
 
   const actions = {
-
     setCurrentStep,
     setEditing,
-
     handleSaveProfile,
     closeProfile,
 
@@ -246,9 +239,9 @@ export default function CommunityPlusUserProfile({
 
     <IdentityWorkspace
 
-      state={state}
+      state={workspaceState}
 
-      actions={actions}
+      actions={workspaceActions}
 
     />
 

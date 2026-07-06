@@ -1,6 +1,10 @@
+import "./WorkspaceHeader.css";
+
 export default function WorkspaceHeader({
 
-    children,
+    title,
+    subtitle,
+    onClose,
 
 }) {
 
@@ -8,7 +12,29 @@ export default function WorkspaceHeader({
 
         <header className="workspace-header">
 
-            {children}
+            <div className="workspace-header-text">
+
+                <h1>{title}</h1>
+
+                {subtitle && (
+
+                    <p>{subtitle}</p>
+
+                )}
+
+            </div>
+
+            {onClose && (
+
+                <button
+                    type="button"
+                    className="workspace-close"
+                    onClick={onClose}
+                >
+                    ×
+                </button>
+
+            )}
 
         </header>
 

@@ -10,13 +10,13 @@ import {
   WorkspaceActions,
 } from "../../framework/Workspace";
 
-import ProfileHelpPanel from "../../components/Profile/ProfileHelpPanel";
-import ProfileCapabilitySelector from "../../components/Profile/ProfileCapabilitySelector";
+import ProfileHelpPanel from "../../components/Identity/IdentityHelpPanel";
+import ProfileCapabilitySelector from "../../components/Identity/IdentityCapabilitySelector";
 import ProfileSectionTabs from "../../components/UI/ProfileSectionTabs";
 
-import ProfileSectionCard from "../../components/Profile/ProfileSectionCard";
-import ProfileSocialSection from "../../components/Profile/ProfileSocialSection";
-import ProfilePaymentSection from "../../components/Profile/ProfilePaymentSection";
+import ProfileSectionCard from "../../components/Identity/IdentitySectionCard";
+import ProfileSocialSection from "../../components/Identity/IdentitySocialSection";
+import ProfilePaymentSection from "../../components/Identity/IdentityPaymentSection";
 
 import FormBuilder from "../../components/UI/Form/FormBuilder";
 
@@ -28,21 +28,16 @@ export default function IdentityWorkspace({
 }) {
 
   const {
-
     values,
     form,
-
     editing,
     editMode,
     savingProfile,
-
     completion,
-
     activeSteps,
     currentStep,
     sectionId,
-
-  } = state;
+  } = workspaceState;
 
   const {
 
@@ -52,7 +47,7 @@ export default function IdentityWorkspace({
     handleSaveProfile,
     closeProfile,
 
-  } = actions;
+  } = workspaceActions;
 
   return (
 
@@ -62,27 +57,15 @@ export default function IdentityWorkspace({
 
         <WorkspaceHeader>
 
-          <div className="profile-card-header">
+<WorkspaceHeader
 
-            <h1>COMMUNITY PROFILE</h1>
+    title="COMMUNITY PROFILE"
 
-            <p className="profile-subtitle">
-              Your trusted identity within Community One.
-            </p>
+    subtitle="Your trusted identity within Community One."
 
-            {editMode && (
+    onClose={editMode ? closeProfile : undefined}
 
-              <button
-                type="button"
-                className="profile-close-button"
-                onClick={closeProfile}
-              >
-                ×
-              </button>
-
-            )}
-
-          </div>
+/>
 
         </WorkspaceHeader>
 
