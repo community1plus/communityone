@@ -10,52 +10,44 @@ import {
   WorkspaceActions,
 } from "../../framework/Workspace";
 
-import ProfileHelpPanel from "../../components/Identity/IdentityHelpPanel";
-import ProfileCapabilitySelector from "../../components/Identity/IdentityCapabilitySelector";
+import IdentityHelpPanel from "../../components/Identity/IdentityHelpPanel";
+import IdentityCapabilitySelector from "../../components/Identity/IdentityCapabilitySelector";
+import IdentitySectionCard from "../../components/Identity/IdentitySectionCard";
+import IdentitySocialSection from "../../components/Identity/IdentitySocialSection";
+import IdentityPaymentSection from "../../components/Identity/IdentityPaymentSection";
+
 import ProfileSectionTabs from "../../components/UI/ProfileSectionTabs";
-
-import ProfileSectionCard from "../../components/Identity/IdentitySectionCard";
-import ProfileSocialSection from "../../components/Identity/IdentitySocialSection";
-import ProfilePaymentSection from "../../components/Identity/IdentityPaymentSection";
-
 import FormBuilder from "../../components/UI/Form/FormBuilder";
 
 export default function IdentityWorkspace({
 
-    state,
-    actions,
+  state,
+  actions,
 
 }) {
 
-    const {
+  /* =====================================
+     CONTROLLER MODEL
+  ===================================== */
 
-        values,
-        form,
+  const {
 
-        editing,
-        editMode,
-        savingProfile,
+    values,
+    form,
 
-        completion,
+    editing,
+    editMode,
+    savingProfile,
 
-        activeSteps,
-        currentStep,
-        sectionId,
+    completion,
 
-    } = state;
+    activeSteps,
+    currentStep,
+    sectionId,
 
-    const {
+  } = state;
 
-        setCurrentStep,
-        setEditing,
-
-        handleSaveProfile,
-        closeProfile,
-
-    } = actions;
-};
-
-const workspaceActions = {
+  const {
 
     setCurrentStep,
     setEditing,
@@ -63,7 +55,11 @@ const workspaceActions = {
     handleSaveProfile,
     closeProfile,
 
-};
+  } = actions;
+
+  /* =====================================
+     RENDER
+  ===================================== */
 
   return (
 
@@ -71,23 +67,19 @@ const workspaceActions = {
 
       <WorkspaceMain>
 
-        <WorkspaceHeader>
-
-<WorkspaceHeader
-
-    title="COMMUNITY PROFILE"
-
-    subtitle="Your trusted identity within Community One."
-
-    onClose={editMode ? closeProfile : undefined}
-
-/>
-
-        </WorkspaceHeader>
+        <WorkspaceHeader
+          title="COMMUNITY PROFILE"
+          subtitle="Your trusted identity within Community One."
+          onClose={
+            editMode
+              ? closeProfile
+              : undefined
+          }
+        />
 
         <WorkspaceWorkflow>
 
-          <ProfileCapabilitySelector
+          <IdentityCapabilitySelector
             values={values}
             setValue={form.setValue}
             readOnly={!editing}
@@ -112,23 +104,23 @@ const workspaceActions = {
 
             {sectionId === "social" ? (
 
-              <ProfileSectionCard>
+              <IdentitySectionCard>
 
-                <ProfileSocialSection />
+                <IdentitySocialSection />
 
-              </ProfileSectionCard>
+              </IdentitySectionCard>
 
             ) : sectionId === "payment" ? (
 
-              <ProfileSectionCard>
+              <IdentitySectionCard>
 
-                <ProfilePaymentSection />
+                <IdentityPaymentSection />
 
-              </ProfileSectionCard>
+              </IdentitySectionCard>
 
             ) : (
 
-              <ProfileSectionCard>
+              <IdentitySectionCard>
 
                 <FormBuilder
                   steps={[activeSteps[currentStep]]}
@@ -137,7 +129,7 @@ const workspaceActions = {
                   readOnly={!editing}
                 />
 
-              </ProfileSectionCard>
+              </IdentitySectionCard>
 
             )}
 
@@ -151,7 +143,7 @@ const workspaceActions = {
 
         <WorkspaceGuide>
 
-          <ProfileHelpPanel
+          <IdentityHelpPanel
             section={sectionId}
           />
 
