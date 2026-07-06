@@ -22,8 +22,8 @@ import FormBuilder from "../../components/UI/Form/FormBuilder";
 
 export default function IdentityWorkspace({
 
-  state,
-  actions,
+  workspaceState,
+  workspaceActions,
 
 }) {
 
