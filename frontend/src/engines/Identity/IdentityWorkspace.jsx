@@ -27,19 +27,24 @@ export default function IdentityWorkspace({
 
 }) {
 
-  const {
+  const workspaceState = {
+
     values,
     form,
+
     editing,
     editMode,
     savingProfile,
+
     completion,
+
     activeSteps,
     currentStep,
     sectionId,
-  } = workspaceState;
 
-  const {
+};
+
+const workspaceActions = {
 
     setCurrentStep,
     setEditing,
@@ -47,7 +52,7 @@ export default function IdentityWorkspace({
     handleSaveProfile,
     closeProfile,
 
-  } = workspaceActions;
+};
 
   return (
 
