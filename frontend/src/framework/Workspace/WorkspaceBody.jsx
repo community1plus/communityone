@@ -1,3 +1,4 @@
+import "./WorkspaceBody.css";
 export default function WorkspaceBody({
 
     children,
