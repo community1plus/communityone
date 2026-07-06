@@ -4,9 +4,9 @@ export default function WorkspaceProgress({
 
   value = 0,
   label,
-
+ 
 }) {
-
+  console.log("WorkspaceProgress", { value, label });
   return (
 
 <section className="workspace-progress">
