@@ -1,0 +1,47 @@
+.workspace-segmented {
+
+    display: inline-flex;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 999px;
+
+    overflow: hidden;
+
+    background: #fff;
+
+}
+
+.workspace-segment {
+
+    border: none;
+
+    background: transparent;
+
+    padding: 10px 22px;
+
+    cursor: pointer;
+
+    font-size: 14px;
+
+    font-weight: 500;
+
+    color: #6b7280;
+
+    transition: .2s;
+
+}
+
+.workspace-segment:hover {
+
+    background: #f8f8f8;
+
+}
+
+.workspace-segment.active {
+
+    background: #9b111e;
+
+    color: white;
+
+}

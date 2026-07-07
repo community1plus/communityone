@@ -37,17 +37,37 @@ export default function ProfileCapabilitySelector({
 
       <label className="profile-capability">
 
-        <input
-          type="checkbox"
-          checked={values.capabilities?.organisation ?? false}
-          disabled={readOnly}
-          onChange={(e) =>
-            setValue(
-              "capabilities.organisation",
-              e.target.checked
-            )
-          }
-        />
+<WorkspaceSegmentedControl
+
+    value={
+        values.capabilities?.organisation
+            ? "organisation"
+            : "personal"
+    }
+
+    onChange={(value) => {
+
+        form.setValue(
+            "capabilities.organisation",
+            value === "organisation"
+        );
+
+    }}
+
+    disabled={readOnly}
+
+    options={[
+        {
+            label: "Personal",
+            value: "personal",
+        },
+        {
+            label: "Organisation",
+            value: "organisation",
+        },
+    ]}
+
+/>
 
         <span>Organisation</span>
 

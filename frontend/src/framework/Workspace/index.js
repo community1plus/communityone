@@ -46,5 +46,6 @@ from "./WorkspaceTabs/WorkspaceTabs";
 export { default as WorkspaceRegionHeader }
 from "./Regions/WorkspaceRegionHeader";
 
-
+export { default as WorkspaceSegmentedControl }
+from "./WorkspaceSegmentedControl/WorkspaceSegmentedControl";
 
