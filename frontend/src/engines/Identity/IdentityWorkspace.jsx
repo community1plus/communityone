@@ -72,7 +72,7 @@ export default function IdentityWorkspace({
 
     <WorkspaceHeader
         title="IDENTITY"
-        subtitle="Your trusted identity within Community One."
+        subtitle="Your trusted identity."
         onClose={editMode ? closeProfile : undefined}
     />
 

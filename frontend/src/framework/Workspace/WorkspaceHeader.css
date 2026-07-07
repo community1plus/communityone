@@ -2,9 +2,7 @@
 
     display: flex;
     flex-direction: column;
-
     padding-bottom: 12px;
-
 }
 
 .workspace-header-top {
@@ -16,6 +14,16 @@
     align-items: flex-start;
 
     gap: 24px;
+
+}
+
+.workspace-header-row {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 28px;
 
 }
 
@@ -34,7 +42,7 @@
     line-height: 1;
 
     font-weight: 800;
-
+    flex-shrink: 0;
     color: #1f2a44;
 
 }
@@ -81,5 +89,35 @@
     background: #f4f4f5;
 
     color: #9b111e;
+
+}
+
+.workspace-header-subtitle {
+
+    margin: 0;
+
+    font-size: 1.4rem;
+
+    color: #374151;
+
+    flex: 1;
+
+}
+
+.workspace-close {
+
+    flex-shrink: 0;
+
+}
+
+@media (max-width: 900px) {
+
+    .workspace-header-row {
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+    }
 
 }
