@@ -10,7 +10,7 @@ import {
   WorkspaceActions,
 } from "../../framework/Workspace";
 
-import WorkspaceGuide from "../../components/Identity/WorkspaceGuide";
+
 import IdentityCapabilitySelector from "../../components/Identity/IdentityCapabilitySelector";
 import IdentitySectionCard from "../../components/Identity/IdentitySectionCard";
 import IdentitySocialSection from "../../components/Identity/IdentitySocialSection";
