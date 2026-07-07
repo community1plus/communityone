@@ -18,7 +18,9 @@
 
     background: transparent;
 
-    padding: 10px 22px;
+    padding: 10px 18px;
+
+    min-width: 130px;
 
     cursor: pointer;
 

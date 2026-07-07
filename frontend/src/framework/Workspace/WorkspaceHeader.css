@@ -3,10 +3,11 @@
     display: flex;
 
     justify-content: space-between;
+    flex-direction: column;
 
-    align-items: flex-start;
+    gap: 8px;
 
-    gap: 40px;
+    padding-bottom: 8px;
 
 }
 
@@ -25,10 +26,22 @@
     margin: 0;
 
     font-size: 3rem;
-
+    line-height: 1;
     font-weight: 700;
 
     color: #162033;
+
+}
+
+.workspace-header-top {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: flex-start;
+
+    gap: 32px;
 
 }
 
@@ -36,9 +49,9 @@
 
     margin: 0;
 
-    font-size: 1.5rem;
+    font-size: 1.1rem;
 
-    color: #162033;
+    color: #23334d;
 
 }
 
