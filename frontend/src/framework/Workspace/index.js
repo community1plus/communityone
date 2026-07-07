@@ -45,9 +45,6 @@ from "./Regions/WorkspaceRegionActions";
 export { default as WorkspaceTabs }
 from "./WorkspaceTabs/WorkspaceTabs";
 
-export { default as WorkspaceTabs }
-from "./WorkspaceTabs/WorkspaceTabs";
-
 export { default as WorkspaceRegionHeader }
 from "./Regions/WorkspaceRegionHeader";
 
