@@ -21,26 +21,6 @@ export default function ProfileCapabilitySelector({
 
       </div>
 
-      <label className="profile-capability">
-
-        <input
-          type="checkbox"
-          checked={values.capabilities?.personal ?? true}
-          disabled={readOnly}
-          onChange={(e) =>
-            setValue(
-              "capabilities.personal",
-              e.target.checked
-            )
-          }
-        />
-
-        <span>Personal</span>
-
-      </label>
-
-      <label className="profile-capability">
-
 <WorkspaceSegmentedControl
 
     value={
@@ -73,9 +53,7 @@ export default function ProfileCapabilitySelector({
 
 />
 
-        <span>Organisation</span>
 
-      </label>
 
     </section>
   );
