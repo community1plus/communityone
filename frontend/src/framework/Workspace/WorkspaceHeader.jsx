@@ -28,9 +28,7 @@ export default function WorkspaceHeader({
                 className="workspace-close"
                 onClick={onClose}
             >
-
                 ×
-
             </button>
 
         )}

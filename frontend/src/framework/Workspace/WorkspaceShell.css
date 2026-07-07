@@ -85,6 +85,35 @@
 
 }
 
+.workspace-button-primary {
+
+    width: 100%;
+
+    height: 56px;
+
+    border: none;
+
+    border-radius: 999px;
+
+    background: #9b111e;
+
+    color: white;
+
+    font-size: 20px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: all .2s ease;
+
+}
+
+.workspace-button-primary:active {
+
+    transform: translateY(0);
+
+}
 
 .workspace-body {
 
@@ -110,7 +139,12 @@
     flex-direction: column;
     border-top: 1px solid #ece7e2;
 
+    margin-top: auto;
+
     padding-top: 24px;
+
+    border-top: 1px solid #ece7e2;
+
 
     gap: 16px;
 
