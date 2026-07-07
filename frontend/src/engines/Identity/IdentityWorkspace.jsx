@@ -1,13 +1,15 @@
 import {
-  WorkspaceShell,
-  WorkspaceMain,
-  WorkspaceSidebar,
-  WorkspaceHeader,
-  WorkspaceWorkflow,
-  WorkspaceProgress,
-  WorkspaceBody,
-  WorkspaceGuide,
-  WorkspaceActions,
+    WorkspaceShell,
+    WorkspaceMain,
+    WorkspaceSidebar,
+    WorkspaceHeader,
+    WorkspaceRegionHeader,
+    WorkspaceWorkflow,
+    WorkspaceProgress,
+    WorkspaceBody,
+    WorkspaceGuide,
+    WorkspaceActions,
+    WorkspaceTabs,
 } from "../../framework/Workspace";
 import WorkspaceRegionHeader from "../../framework/Workspace/Regions/WorkspaceRegionHeader";
 import IdentityHelpPanel from "../../components/Identity/IdentityHelpPanel";
@@ -15,9 +17,12 @@ import IdentityCapabilitySelector from "../../components/Identity/IdentityCapabi
 import IdentitySectionCard from "../../components/Identity/IdentitySectionCard";
 import IdentitySocialSection from "../../components/Identity/IdentitySocialSection";
 import IdentityPaymentSection from "../../components/Identity/IdentityPaymentSection";
-
-import WorkspaceTabs from "../../components/UI/WorkspaceTabs";
 import FormBuilder from "../../components/UI/Form/FormBuilder";
+import {
+
+    WorkspaceTabs,
+
+} from "../../framework/Workspace";
 
 export default function IdentityWorkspace({
 
@@ -85,11 +90,11 @@ export default function IdentityWorkspace({
             readOnly={!editing}
           />
 
-          <WorkspaceTabs
-            steps={activeSteps}
-            currentStep={currentStep}
-            setCurrentStep={setCurrentStep}
-          />
+<WorkspaceTabs
+    tabs={activeSteps}
+    current={currentStep}
+    onChange={setCurrentStep}
+/>
 
         </WorkspaceWorkflow>
 
