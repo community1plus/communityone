@@ -18,11 +18,7 @@ import IdentitySectionCard from "../../components/Identity/IdentitySectionCard";
 import IdentitySocialSection from "../../components/Identity/IdentitySocialSection";
 import IdentityPaymentSection from "../../components/Identity/IdentityPaymentSection";
 import FormBuilder from "../../components/UI/Form/FormBuilder";
-import {
 
-    WorkspaceTabs,
-
-} from "../../framework/Workspace";
 
 export default function IdentityWorkspace({
 
