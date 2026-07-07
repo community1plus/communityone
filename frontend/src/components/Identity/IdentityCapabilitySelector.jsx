@@ -12,12 +12,12 @@ export default function ProfileCapabilitySelector({
 
       <div className="profile-capabilities-header">
 
-        <h3>Capabilities</h3>
+        <span><h3>Capabilities</h3></span>
 
-        <p>
+        <span><p>
           Select how you will use Community One.
           You can enable both at any time.
-        </p>
+        </p></span>
 
       </div>
 
