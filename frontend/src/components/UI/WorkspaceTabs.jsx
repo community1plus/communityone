@@ -1,4 +1,4 @@
-export default function ProfileSectionTabs({
+export default function WorkspaceTabs({
   steps,
   currentStep,
   setCurrentStep,

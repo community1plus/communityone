@@ -10,13 +10,13 @@ import {
   WorkspaceActions,
 } from "../../framework/Workspace";
 
-import IdentityHelpPanel from "../../components/Identity/IdentityHelpPanel";
+import WorkspaceGuide from "../../components/Identity/WorkspaceGuide";
 import IdentityCapabilitySelector from "../../components/Identity/IdentityCapabilitySelector";
 import IdentitySectionCard from "../../components/Identity/IdentitySectionCard";
 import IdentitySocialSection from "../../components/Identity/IdentitySocialSection";
 import IdentityPaymentSection from "../../components/Identity/IdentityPaymentSection";
 
-import ProfileSectionTabs from "../../components/UI/ProfileSectionTabs";
+import WorkspaceTabs from "../../components/UI/WorkspaceTabs";
 import FormBuilder from "../../components/UI/Form/FormBuilder";
 
 export default function IdentityWorkspace({
@@ -68,7 +68,7 @@ export default function IdentityWorkspace({
       <WorkspaceMain>
 
         <WorkspaceHeader
-          title="COMMUNITY PROFILE"
+          title="IDENTITY"
           subtitle="Your trusted identity within Community One."
           onClose={
             editMode
@@ -85,7 +85,7 @@ export default function IdentityWorkspace({
             readOnly={!editing}
           />
 
-          <ProfileSectionTabs
+          <WorkspaceTabs
             steps={activeSteps}
             currentStep={currentStep}
             setCurrentStep={setCurrentStep}
@@ -143,7 +143,7 @@ export default function IdentityWorkspace({
 
         <WorkspaceGuide>
 
-          <IdentityHelpPanel
+          <IdentityGuide
             section={sectionId}
           />
 

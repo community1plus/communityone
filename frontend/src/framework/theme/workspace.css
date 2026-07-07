@@ -1,0 +1,12 @@
+:root {
+
+    --workspace-gap-xs: 8px;
+    --workspace-gap-sm: 16px;
+    --workspace-gap-md: 24px;
+    --workspace-gap-lg: 32px;
+
+    --workspace-sidebar-width: 360px;
+
+    --workspace-radius: 20px;
+
+}

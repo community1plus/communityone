@@ -1,4 +1,4 @@
-export default function ProfileSectionCard({
+export default function WorkspaceCard({
   title,
   children,
 }) {
