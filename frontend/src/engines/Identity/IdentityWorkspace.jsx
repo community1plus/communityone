@@ -10,7 +10,7 @@ import {
   WorkspaceActions,
 } from "../../framework/Workspace";
 
-
+import IdentityHelpPanel from "../../components/Identity/IdentityHelpPanel";
 import IdentityCapabilitySelector from "../../components/Identity/IdentityCapabilitySelector";
 import IdentitySectionCard from "../../components/Identity/IdentitySectionCard";
 import IdentitySocialSection from "../../components/Identity/IdentitySocialSection";
@@ -143,9 +143,9 @@ export default function IdentityWorkspace({
 
         <WorkspaceGuide>
 
-          <IdentityGuide
-            section={sectionId}
-          />
+    <IdentityHelpPanel
+        section={sectionId}
+    />
 
         </WorkspaceGuide>
 
