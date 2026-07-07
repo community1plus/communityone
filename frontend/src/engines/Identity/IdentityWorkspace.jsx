@@ -9,7 +9,7 @@ import {
   WorkspaceGuide,
   WorkspaceActions,
 } from "../../framework/Workspace";
-import WorkspaceRegionHeader from "../../framework/Workspace/Regions/Workspace";
+import WorkspaceRegionHeader from "../../framework/Workspace/Regions/WorkspaceRegionHeader";
 import IdentityHelpPanel from "../../components/Identity/IdentityHelpPanel";
 import IdentityCapabilitySelector from "../../components/Identity/IdentityCapabilitySelector";
 import IdentitySectionCard from "../../components/Identity/IdentitySectionCard";
