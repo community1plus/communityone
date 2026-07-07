@@ -9,7 +9,7 @@ import {
   WorkspaceGuide,
   WorkspaceActions,
 } from "../../framework/Workspace";
-
+import WorkspaceRegionHeader from "../../framework/Workspace/Regions/Workspace";
 import IdentityHelpPanel from "../../components/Identity/IdentityHelpPanel";
 import IdentityCapabilitySelector from "../../components/Identity/IdentityCapabilitySelector";
 import IdentitySectionCard from "../../components/Identity/IdentitySectionCard";
@@ -67,15 +67,15 @@ export default function IdentityWorkspace({
 
       <WorkspaceMain>
 
-        <WorkspaceHeader
-          title="IDENTITY"
-          subtitle="Your trusted identity within Community One."
-          onClose={
-            editMode
-              ? closeProfile
-              : undefined
-          }
-        />
+<WorkspaceRegionHeader>
+
+    <WorkspaceHeader
+        title="IDENTITY"
+        subtitle="Your trusted identity within Community One."
+        onClose={editMode ? closeProfile : undefined}
+    />
+
+</WorkspaceRegionHeader>
 
         <WorkspaceWorkflow>
 

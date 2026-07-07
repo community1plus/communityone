@@ -24,6 +24,23 @@ from "./WorkspaceActions";
 
 export { default as WorkspaceProgress }
 from "./WorkspaceProgress";
+export { default as WorkspaceRegionHeader }
+from "./Regions/WorkspaceRegionHeader";
+
+export { default as WorkspaceRegionWorkflow }
+from "./Regions/WorkspaceRegionWorkflow";
+
+export { default as WorkspaceRegionProgress }
+from "./Regions/WorkspaceRegionProgress";
+
+export { default as WorkspaceRegionBody }
+from "./Regions/WorkspaceRegionBody";
+
+export { default as WorkspaceRegionGuide }
+from "./Regions/WorkspaceRegionGuide";
+
+export { default as WorkspaceRegionActions }
+from "./Regions/WorkspaceRegionActions";
 
 
 

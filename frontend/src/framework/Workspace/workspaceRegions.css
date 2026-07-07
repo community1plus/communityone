@@ -1,0 +1,53 @@
+.workspace-region-header {
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 12px;
+
+}
+
+.workspace-region-workflow {
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 20px;
+
+}
+
+.workspace-region-progress {
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 12px;
+
+}
+
+.workspace-region-body {
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 24px;
+
+}
+
+.workspace-region-guide {
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 20px;
+
+}
+
+.workspace-region-actions {
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 16px;
+
+}
