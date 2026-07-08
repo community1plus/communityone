@@ -51,3 +51,15 @@ from "./WorkspaceSegmentedControl/WorkspaceSegmentedControl";
 
 export { default as WorkspaceSectionHeader }
 from "./Regions/WorkspaceSectionHeader";
+
+export { default as WorkspaceCard }
+from "./Card/WorkspaceCard";
+
+export { default as WorkspaceCardHeader }
+from "./Card/WorkspaceCardHeader";
+
+export { default as WorkspaceCardBody }
+from "./Card/WorkspaceCardBody";
+
+export { default as WorkspaceCardFooter }
+from "./Card/WorkspaceCardFooter";
