@@ -10,6 +10,7 @@ import {
     WorkspaceGuide,
     WorkspaceActions,
     WorkspaceTabs,
+    WorkspaceSectionHeader,
 
 } from "../../framework/Workspace";
 
