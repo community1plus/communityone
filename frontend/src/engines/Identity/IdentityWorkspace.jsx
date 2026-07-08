@@ -10,7 +10,6 @@ import {
     WorkspaceGuide,
     WorkspaceActions,
     WorkspaceTabs,
-    WorkespaceSectionHeader,
 } from "../../framework/Workspace";
 
 import IdentityHelpPanel from "../../components/Identity/IdentityHelpPanel";
@@ -78,14 +77,6 @@ export default function IdentityWorkspace({
     />
 
 </WorkspaceRegionHeader>
-
-        <WorkspaceWorkflow>
-
-          <IdentityCapabilitySelector
-            values={values}
-            setValue={form.setValue}
-            readOnly={!editing}
-          />
 
 <WorkspaceWorkflow>
 

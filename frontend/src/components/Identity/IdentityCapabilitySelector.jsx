@@ -1,5 +1,6 @@
 import {
   WorkspaceSegmentedControl,
+    WorkspaceSectionHeader,
 } from "../../framework/Workspace";
 
 export default function ProfileCapabilitySelector({
@@ -19,6 +20,8 @@ export default function ProfileCapabilitySelector({
     description="Enable identity modes"
 
 />
+
+      </div>
 
 <WorkspaceSegmentedControl
 
