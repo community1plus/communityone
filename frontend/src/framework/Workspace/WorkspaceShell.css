@@ -20,7 +20,7 @@
 
     grid-template-columns:
         minmax(0, 1fr)
-        360px;
+        320px;
 
     gap: 32px;
 
