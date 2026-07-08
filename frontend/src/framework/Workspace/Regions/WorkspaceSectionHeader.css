@@ -1,0 +1,37 @@
+.workspace-section-header {
+
+    display: flex;
+
+    align-items: baseline;
+
+    gap: 18px;
+
+    margin-bottom: 20px;
+
+}
+
+.workspace-section-title {
+
+    margin: 0;
+
+    font-size: 2rem;
+
+    font-weight: 700;
+
+    color: #1f2937;
+
+    flex-shrink: 0;
+
+}
+
+.workspace-section-description {
+
+    margin: 0;
+
+    font-size: 1rem;
+
+    font-weight: 500;
+
+    color: #64748b;
+
+}

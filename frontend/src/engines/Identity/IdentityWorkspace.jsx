@@ -10,6 +10,7 @@ import {
     WorkspaceGuide,
     WorkspaceActions,
     WorkspaceTabs,
+    WorkespaceSectionHeader,
 } from "../../framework/Workspace";
 
 import IdentityHelpPanel from "../../components/Identity/IdentityHelpPanel";
@@ -86,13 +87,26 @@ export default function IdentityWorkspace({
             readOnly={!editing}
           />
 
-<WorkspaceTabs
-    tabs={activeSteps}
-    current={currentStep}
-    onChange={setCurrentStep}
-/>
+<WorkspaceWorkflow>
 
-        </WorkspaceWorkflow>
+    <WorkspaceSectionHeader
+        title="Capabilities"
+        description="Enable identity modes"
+    />
+
+    <IdentityCapabilitySelector
+        values={values}
+        setValue={form.setValue}
+        readOnly={!editing}
+    />
+
+    <WorkspaceTabs
+        steps={activeSteps}
+        currentStep={currentStep}
+        setCurrentStep={setCurrentStep}
+    />
+
+</WorkspaceWorkflow>
 
         <WorkspaceProgress
           value={completion}

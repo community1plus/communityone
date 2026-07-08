@@ -12,14 +12,13 @@ export default function ProfileCapabilitySelector({
 
       <div className="profile-capabilities-header">
 
-        <span><h3>Capabilities</h3></span>
+<WorkspaceSectionHeader
 
-        <span><p>
-          Select how you will use Community One.
-          You can enable both at any time.
-        </p></span>
+    title="Capabilities"
 
-      </div>
+    description="Enable identity modes"
+
+/>
 
 <WorkspaceSegmentedControl
 
