@@ -1,0 +1,17 @@
+.workspace-field {
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 10px;
+
+}
+
+.workspace-field-label {
+
+    font-size: .95rem;
+    font-weight: 600;
+
+    color: #334155;
+
+}
