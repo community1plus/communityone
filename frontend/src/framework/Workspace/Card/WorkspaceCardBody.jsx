@@ -1,3 +1,4 @@
+import "WorkspaceCardBody.css";
 export default function WorkspaceCardBody({
 
     children,
