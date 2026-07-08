@@ -59,7 +59,7 @@ export default function IdentityWorkspace({
     closeProfile,
 
   } = actions;
-
+console.log(activeSteps);
   /* =====================================
      RENDER
   ===================================== */
