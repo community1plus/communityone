@@ -140,7 +140,9 @@ console.log(activeSteps);
         description="Manage the information displayed on your Community One profile."
     />
 
-    <WorkspaceCardBody>
+<WorkspaceCardBody>
+
+    <WorkspaceForm>
 
         <FormBuilder
             steps={[activeSteps[currentStep]]}
@@ -149,7 +151,9 @@ console.log(activeSteps);
             readOnly={!editing}
         />
 
-    </WorkspaceCardBody>
+    </WorkspaceForm>
+
+</WorkspaceCardBody>
 
 </WorkspaceCard>
 
