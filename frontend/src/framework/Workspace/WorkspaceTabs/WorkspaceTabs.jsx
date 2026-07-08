@@ -2,9 +2,9 @@ import "./WorkspaceTabs.css";
 
 export default function WorkspaceTabs({
 
-    tabs = [],
-    current = 0,
-    onChange,
+    steps = [],
+    currentStep = 0,
+    setCurrentStep,
 
 }) {
 
@@ -12,16 +12,18 @@ export default function WorkspaceTabs({
 
         <nav className="workspace-tabs">
 
-            {tabs.map((tab, index) => (
+            {steps.map((step, index) => (
 
                 <button
-                    key={tab.id}
+                    key={step.id}
                     type="button"
-                    className={`workspace-tab ${index === current ? "active" : ""}`}
-                    onClick={() => onChange(index)}
+                    className={`workspace-tab ${
+                        index === currentStep ? "active" : ""
+                    }`}
+                    onClick={() => setCurrentStep(index)}
                 >
 
-                    {tab.label ?? tab.title}
+                    {step.title}
 
                 </button>
 
