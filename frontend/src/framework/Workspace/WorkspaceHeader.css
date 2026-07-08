@@ -2,123 +2,52 @@
 
     display: flex;
     flex-direction: column;
-    padding-bottom: 12px;
-}
 
-.workspace-header-top {
+    gap: 8px;
 
-    display: flex;
-
-    justify-content: space-between;
-
-    align-items: flex-start;
-
-    gap: 24px;
+    margin-bottom: 8px;
 
 }
 
-.workspace-header-row {
+.workspace-header-main {
 
     display: flex;
 
     align-items: center;
+    justify-content: space-between;
 
-    gap: 28px;
+    gap: 48px;
 
 }
 
 .workspace-header-text {
 
-    flex: 1;
-
-}
-
-.workspace-header h1 {
-
-    margin: 0;
-
-    font-size: 3.2rem;
-
-    line-height: 1;
-
-    font-weight: 800;
-    flex-shrink: 0;
-    color: #1f2a44;
-
-}
-
-.workspace-header p {
-
-    margin: 14px 0 0;
-
-    font-size: 1.15rem;
-
-    color: #23334d;
-
-}
-
-.workspace-close {
-
     display: flex;
 
-    justify-content: center;
+    align-items: baseline;
 
-    align-items: center;
+    gap: 32px;
 
-    width: 42px;
-    height: 42px;
+    flex: 1;
 
-    border: none;
-
-    border-radius: 50%;
-
-    background: transparent;
-
-    color: #94a3b8;
-
-    font-size: 34px;
-
-    cursor: pointer;
-
-    transition: all .2s ease;
+    min-width: 0;
 
 }
 
-.workspace-close:hover {
-
-    background: #f4f4f5;
-
-    color: #9b111e;
-
-}
-
-.workspace-header-subtitle {
+.workspace-header-text h1 {
 
     margin: 0;
 
-    font-size: 1rem;
-
-     color: #64748b;
-
-    flex: 1;
-    font-weight: 500;
-
 }
 
-.workspace-close {
+.workspace-header-text p {
 
-    flex-shrink: 0;
+    margin: 0;
 
-}
+    color: #334155;
 
-@media (max-width: 900px) {
+    font-size: 1.65rem;
 
-    .workspace-header-row {
-
-        flex-direction: column;
-
-        align-items: flex-start;
-
-    }
+    white-space: nowrap;
 
 }

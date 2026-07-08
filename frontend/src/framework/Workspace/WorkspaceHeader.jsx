@@ -12,30 +12,25 @@ export default function WorkspaceHeader({
 
 <header className="workspace-header">
 
-    <div className="workspace-header-row">
+    <div className="workspace-header-main">
 
-        <h1>{title}</h1>
+        <div className="workspace-header-text">
 
-        {subtitle && (
+            <h1>{title}</h1>
 
-            <p className="workspace-header-subtitle">
+            {subtitle && (
+                <p>{subtitle}</p>
+            )}
 
-                {subtitle}
-
-            </p>
-
-        )}
+        </div>
 
         {onClose && (
 
             <button
-                type="button"
                 className="workspace-close"
                 onClick={onClose}
             >
-
                 ×
-
             </button>
 
         )}
