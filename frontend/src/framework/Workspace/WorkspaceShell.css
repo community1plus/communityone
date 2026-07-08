@@ -18,11 +18,11 @@
 
     display: grid;
 
-grid-template-columns:
-    minmax(0,1fr)
-    340px;
+    grid-template-columns:
+        minmax(0,1fr)
+        340px;
 
-    gap: 32px;
+    gap: 40px;
 
     align-items: start;
 
@@ -37,8 +37,9 @@ grid-template-columns:
 .workspace-main {
 
     display: flex;
+
     flex-direction: column;
-    max-width: 1100px;
+
     gap: 24px;
 
     min-width: 0;
@@ -52,11 +53,13 @@ grid-template-columns:
 .workspace-sidebar {
 
     display: flex;
+
     flex-direction: column;
 
     gap: 32px;
 
     position: sticky;
+
     top: 24px;
 
     align-self: start;
@@ -78,6 +81,7 @@ grid-template-columns:
 .workspace-workflow {
 
     display: flex;
+
     flex-direction: column;
 
     gap: 16px;
@@ -135,15 +139,16 @@ grid-template-columns:
 .workspace-actions {
 
     display: flex;
+
     flex-direction: column;
+
+    gap: 16px;
 
     margin-top: auto;
 
     padding-top: 28px;
 
     border-top: 1px solid #ece7e2;
-
-    gap: 16px;
 
 }
 

@@ -3,6 +3,8 @@ import "./WorkspaceField.css";
 export default function WorkspaceField({
 
     label,
+    hint,
+    required = false,
     children,
 
 }) {
@@ -17,11 +19,31 @@ export default function WorkspaceField({
 
                     {label}
 
+                    {required && (
+
+                        <span className="workspace-required">
+
+                            *
+
+                        </span>
+
+                    )}
+
                 </label>
 
             )}
 
             {children}
+
+            {hint && (
+
+                <div className="workspace-field-hint">
+
+                    {hint}
+
+                </div>
+
+            )}
 
         </div>
 
