@@ -14,9 +14,14 @@ import {
 
 } from "../../framework/Workspace";
 
+import {
+    WorkspaceCard,
+    WorkspaceCardHeader,
+    WorkspaceCardBody,
+} from "../../framework/Workspace";
+
 import IdentityHelpPanel from "../../components/Identity/IdentityHelpPanel";
 import IdentityCapabilitySelector from "../../components/Identity/IdentityCapabilitySelector";
-import IdentitySectionCard from "../../components/Identity/IdentitySectionCard";
 import IdentitySocialSection from "../../components/Identity/IdentitySocialSection";
 import IdentityPaymentSection from "../../components/Identity/IdentityPaymentSection";
 import FormBuilder from "../../components/UI/Form/FormBuilder";
@@ -128,16 +133,25 @@ console.log(activeSteps);
 
             ) : (
 
-              <IdentitySectionCard>
+<WorkspaceCard>
 
-                <FormBuilder
-                  steps={[activeSteps[currentStep]]}
-                  currentStep={0}
-                  form={form}
-                  readOnly={!editing}
-                />
+    <WorkspaceCardHeader
+        title="Identity Information"
+        description="Manage the information displayed on your Community One profile."
+    />
 
-              </IdentitySectionCard>
+    <WorkspaceCardBody>
+
+        <FormBuilder
+            steps={[activeSteps[currentStep]]}
+            currentStep={0}
+            form={form}
+            readOnly={!editing}
+        />
+
+    </WorkspaceCardBody>
+
+</WorkspaceCard>
 
             )}
 
