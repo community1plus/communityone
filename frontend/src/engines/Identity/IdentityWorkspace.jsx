@@ -15,6 +15,11 @@ import {
 } from "../../framework/Workspace";
 
 import {
+    WorkspaceField,
+    WorkspaceInput,
+} from "../../framework/Workspace";
+
+import {
     WorkspaceCard,
     WorkspaceCardHeader,
     WorkspaceCardBody,

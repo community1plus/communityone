@@ -1,0 +1,57 @@
+.workspace-input {
+
+    width: 100%;
+
+    min-height: 52px;
+
+    padding: 0 18px;
+
+    border: 1px solid #d7dce3;
+
+    border-radius: 14px;
+
+    background: #ffffff;
+
+    font-size: 1rem;
+    font-family: inherit;
+
+    color: #1f2937;
+
+    transition:
+        border-color .2s,
+        box-shadow .2s,
+        background .2s;
+
+}
+
+.workspace-input::placeholder {
+
+    color: #94a3b8;
+
+}
+
+.workspace-input:hover {
+
+    border-color: #b8c1cc;
+
+}
+
+.workspace-input:focus {
+
+    outline: none;
+
+    border-color: #9b111e;
+
+    box-shadow: 0 0 0 4px rgba(155,17,30,.10);
+
+}
+
+.workspace-input:disabled {
+
+    background: #f6f6f6;
+
+    color: #777;
+
+    cursor: not-allowed;
+
+}
