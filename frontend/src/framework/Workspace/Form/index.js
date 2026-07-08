@@ -6,3 +6,6 @@ from "./Form/WorkspaceInput";
 
 export { default as WorkspaceForm }
 from "./Form/WorkspaceForm";
+
+export { default as WorkspaceField }
+from "./Form/WorkspaceField";
