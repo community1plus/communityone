@@ -1,9 +1,9 @@
 export { default as WorkspaceField }
-from "./Form/WorkspaceField";
+from "./WorkspaceField";
 
 export { default as WorkspaceInput }
-from "./Form/WorkspaceInput";
+from "./WorkspaceInput";
 
 export { default as WorkspaceForm }
-from "./Form/WorkspaceForm";
+from "./WorkspaceForm";
 
