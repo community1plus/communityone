@@ -13,13 +13,7 @@ export default function ProfileCapabilitySelector({
 
       <div className="profile-capabilities-header">
 
-<WorkspaceSectionHeader
 
-    title="Capabilities"
-
-    description="Enable identity modes"
-
-/>
 
       </div>
 
