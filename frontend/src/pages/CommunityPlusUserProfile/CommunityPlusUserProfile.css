@@ -98,31 +98,42 @@
    Sidebar
    ========================================================== */
 
+/* ==========================================
+   Guide Panel
+   ========================================== */
+
 .profile-help-panel {
 
-    display: flex;
-    flex-direction: column;
+    font-family:
+        "Courier New",
+        Courier,
+        monospace;
 
-    gap: 32px;
+    font-size: 1.05rem;
+
+    line-height: 1.8;
+
+    color: #2f3b4c;
 
 }
 
 .profile-help-panel h2 {
 
-    margin: 0;
+    font-family:
+        Inter,
+        sans-serif;
 
     font-size: 2rem;
+
     font-weight: 700;
+
+    margin-bottom: 32px;
 
 }
 
 .profile-help-panel p {
 
-    margin: 0;
-
-    line-height: 1.65;
-
-    color: #444;
+    margin: 0 0 28px;
 
 }
 
