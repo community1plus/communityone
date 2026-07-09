@@ -2,7 +2,7 @@
 
     width: 100%;
 
-    min-height: 52px;
+    height: 56px;
 
     padding: 0 18px;
 
@@ -12,46 +12,43 @@
 
     background: #ffffff;
 
-    font-size: 1rem;
-    font-family: inherit;
+    color: #243041;
 
-    color: #1f2937;
+    font-size: 17px;
+
+    font-weight: 500;
 
     transition:
         border-color .2s,
         box-shadow .2s,
         background .2s;
 
-}
-
-.workspace-input::placeholder {
-
-    color: #94a3b8;
-
-}
-
-.workspace-input:hover {
-
-    border-color: #b8c1cc;
+    outline: none;
 
 }
 
 .workspace-input:focus {
 
-    outline: none;
-
     border-color: #9b111e;
 
-    box-shadow: 0 0 0 4px rgba(155,17,30,.10);
+    box-shadow:
+        0 0 0 4px rgba(155,17,30,.12);
 
 }
 
-.workspace-input:disabled {
+.workspace-input:disabled,
+.workspace-input[readonly] {
 
-    background: #f6f6f6;
+    background: #f8fafc;
 
-    color: #777;
+    color: #64748b;
 
-    cursor: not-allowed;
+    cursor: default;
+
+}
+
+.workspace-input::placeholder {
+
+    color: #94a3b8;
 
 }
