@@ -1,11 +1,10 @@
 .workspace-body {
 
     display: flex;
+    flex-direction: column;
 
-    flex: 1;
+    gap: 32px;
 
-    min-height: 0;
-
-    overflow: hidden;
+    min-height: 560px;
 
 }

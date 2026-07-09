@@ -1,16 +1,9 @@
 .workspace-card {
 
-    background: #fff;
+    display: flex;
+    flex-direction: column;
 
-    border: 1px solid #ece7e2;
-
-    border-radius: 28px;
-
-    box-shadow:
-
-        0 12px 32px rgba(15,23,42,.05);
-
-    overflow: hidden;
+    flex: 1;
 
 }
 
@@ -46,7 +39,10 @@
 
 .workspace-card-body {
 
-    padding: 28px;
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
 
 }
 
