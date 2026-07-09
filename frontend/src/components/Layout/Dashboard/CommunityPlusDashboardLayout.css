@@ -1,315 +1,219 @@
-/* =========================
-ROOT / APP SHELL
-========================= */
+/* ==========================================================
+   COMMUNITY ONE DASHBOARD LAYOUT
+   ========================================================== */
+
+/* ==========================================================
+   Root
+   ========================================================== */
 
 html,
 body,
 #root {
-  width: 100%;
-  height: 100%;
 
-  margin: 0;
+    margin: 0;
 
-  overflow: hidden;
+    width: 100%;
+    height: 100%;
+
 }
 
 .dashboard-root {
-  width: 100%;
-  height: 100vh;
 
-  display: grid;
-  grid-template-rows: auto 1fr;
+    display: grid;
 
-  overflow: hidden;
+    grid-template-rows:
+        auto
+        minmax(0, 1fr);
 
-  background:
-    radial-gradient(
-      circle at top left,
-      rgba(120, 60, 40, 0.03),
-      transparent 40%
-    ),
-    #faf7f4;
+    min-height: 100vh;
+
+    background:
+        radial-gradient(
+            circle at top left,
+            rgba(120,60,40,.03),
+            transparent 40%
+        ),
+        #faf7f4;
+
 }
 
-/* =========================
-HEADER
-========================= */
+/* ==========================================================
+   Header
+   ========================================================== */
 
 .dashboard-header {
-  min-height: 0;
 
-  background: rgba(255,255,255,0.92);
+    z-index: 100;
 
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+    background: rgba(255,255,255,.92);
 
-  border-bottom:
-    1px solid #e6dfd8;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
 
-  box-shadow:
-    0 2px 6px rgba(0, 0, 0, 0.04);
+    border-bottom: 1px solid #e6dfd8;
 
-  z-index: 20;
+    box-shadow:
+        0 2px 6px rgba(0,0,0,.04);
+
 }
 
-/* =========================
-BODY
-========================= */
+/* ==========================================================
+   Main Layout
+   ========================================================== */
 
 .dashboard-body {
-  min-width: 0;
-  min-height: 0;
 
-  display: grid;
+    display: grid;
 
-  grid-template-columns:
-    240px minmax(0, 1fr);
+    grid-template-columns:
+        240px
+        minmax(0,1fr);
 
-  overflow: hidden;
+    min-height: 0;
+
 }
 
-/* =========================
-SIDEBAR
-========================= */
+/* ==========================================================
+   Navigation Sidebar
+   ========================================================== */
 
 .dashboard-sidebar {
-  position: relative;
 
-  width: 100%;
-  height: 100%;
-  min-height: 0;
+    display: flex;
+    flex-direction: column;
 
-  display: flex;
-  flex-direction: column;
+    min-width: 0;
+    min-height: 0;
 
-  overflow: hidden;
+    position: relative;
 
-  background:
-    linear-gradient(
-      180deg,
-      rgba(251,249,247,0.96),
-      rgba(246,242,238,0.96)
-    );
+    background:
+        linear-gradient(
+            180deg,
+            rgba(251,249,247,.96),
+            rgba(246,242,238,.96)
+        );
 
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
 
-  border-right:
-    1px solid rgba(230,223,216,0.9);
+    border-right:
+        1px solid rgba(230,223,216,.9);
 
-  box-shadow:
-    inset -1px 0 0 rgba(255,255,255,0.45);
+    box-shadow:
+        inset -1px 0 0 rgba(255,255,255,.45);
 
-  opacity: 0.92;
-
-  transition:
-    opacity 0.3s ease,
-    background 0.3s ease;
 }
-
-/* =========================
-SUBTLE SIDEBAR LIGHT
-========================= */
 
 .dashboard-sidebar::before {
-  content: "";
 
-  position: absolute;
+    content: "";
 
-  top: 0;
-  left: 0;
-  right: 0;
+    position: absolute;
 
-  height: 220px;
+    inset: 0 auto auto 0;
 
-  pointer-events: none;
+    width: 100%;
+    height: 220px;
 
-  background:
-    radial-gradient(
-      circle at top left,
-      rgba(255,255,255,0.65),
-      transparent 70%
-    );
+    pointer-events: none;
 
-  opacity: 0.8;
+    background:
+        radial-gradient(
+            circle at top left,
+            rgba(255,255,255,.65),
+            transparent 70%
+        );
+
 }
 
-/* =========================
-CONTENT SHELL
-========================= */
+/* ==========================================================
+   Workspace Content
+   ========================================================== */
 
 .dashboard-content {
-  position: relative;
 
-  width: 100%;
-  height: 100%;
+    min-width: 0;
+    min-height: 0;
 
-  min-width: 0;
-  min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
 
-  display: block;
+    position: relative;
 
-  overflow-y: auto;
-  overflow-x: hidden;
-
-  padding-left: 0;
 }
 
-/* =========================
-MAP CONTAINER
-========================= */
-
-.map-container {
-  position: absolute;
-
-  inset: 0;
-
-  width: 100%;
-  height: 100%;
-}
-
-.map-container > * {
-  width: 100%;
-  height: 100%;
-}
-
-/* =========================
-CONTROLLED INNER SCROLL
-========================= */
+/* ==========================================================
+   Optional Scroll Container
+   ========================================================== */
 
 .scroll-container {
-  position: relative;
 
-  min-height: 0;
+    padding: 12px;
 
-  padding:
-    10px
-    12px
-    14px
-    10px;
+    min-height: 100%;
 
-  overflow-y: auto;
-  overflow-x: hidden;
-
-  scrollbar-width: thin;
-  scrollbar-color:
-    rgba(120,110,100,0.18)
-    transparent;
 }
 
-/* =========================
-WEBKIT SCROLLBAR
-========================= */
-
-.scroll-container::-webkit-scrollbar {
-  width: 8px;
-}
-
-.scroll-container::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.scroll-container::-webkit-scrollbar-thumb {
-  background:
-    rgba(120,110,100,0.16);
-
-  border-radius: 999px;
-}
-
-.scroll-container::-webkit-scrollbar-thumb:hover {
-  background:
-    rgba(120,110,100,0.28);
-}
-
-/* =========================
-SIDEBAR TYPOGRAPHY SOFTENING
-========================= */
+/* ==========================================================
+   Sidebar Navigation Effects
+   ========================================================== */
 
 .sidebar-section-title {
-  opacity: 0.58;
 
-  transition:
-    opacity 0.2s ease;
+    opacity: .6;
+
 }
 
 .sidebar-nav-item,
 .sidebar-link,
 .sidebar-menu-item {
-  transition:
-    background 0.2s ease,
-    color 0.2s ease,
-    transform 0.2s ease,
-    opacity 0.2s ease;
+
+    transition:
+        transform .2s ease,
+        background .2s ease,
+        color .2s ease;
+
 }
 
 .sidebar-nav-item:hover,
 .sidebar-link:hover,
 .sidebar-menu-item:hover {
-  transform:
-    translateX(2px);
+
+    transform: translateX(2px);
+
 }
 
-/* =========================
-CONTENT TRANSITION SUPPORT
-========================= */
+/* ==========================================================
+   Responsive
+   ========================================================== */
 
-.dashboard-content::before {
-  content: "";
+@media (max-width:1100px) {
 
-  position: absolute;
+    .dashboard-body {
 
-  inset: 0;
+        grid-template-columns: 200px minmax(0,1fr);
 
-  pointer-events: none;
+    }
 
-  background:
-    linear-gradient(
-      90deg,
-      rgba(255,255,255,0.22),
-      transparent 18%
-    );
-
-  opacity: 0.5;
 }
 
-/* =========================
-RESPONSIVE
-========================= */
+@media (max-width:700px) {
 
-@media (max-width: 900px) {
+    .dashboard-body {
 
-  .dashboard-body {
-    grid-template-columns:
-      200px minmax(0, 1fr);
-  }
-}
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
 
-/* =========================
-MOBILE
-========================= */
+    }
 
-@media (max-width: 700px) {
+    .dashboard-sidebar {
 
-  .dashboard-root {
-    height: 100dvh;
-  }
+        border-right: none;
 
-  .dashboard-body {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr;
-  }
+        border-bottom:
+            1px solid #e6dfd8;
 
-  .dashboard-sidebar {
-    height: auto;
-    max-height: 200px;
+    }
 
-    border-right: none;
-
-    border-bottom:
-      1px solid #e6dfd8;
-  }
-
-  .dashboard-sidebar::before {
-    height: 120px;
-  }
 }

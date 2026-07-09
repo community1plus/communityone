@@ -10,18 +10,7 @@ import {
     WorkspaceGuide,
     WorkspaceActions,
     WorkspaceTabs,
-    WorkspaceSectionHeader,
-
-} from "../../framework/Workspace";
-
-import {
-    WorkspaceField,
-    WorkspaceInput,
-} from "../../framework/Workspace";
-
-import {
     WorkspaceCard,
-    WorkspaceCardHeader,
     WorkspaceCardBody,
 } from "../../framework/Workspace";
 
@@ -31,204 +20,200 @@ import IdentityHelpPanel from "../../components/Identity/IdentityHelpPanel";
 import IdentityCapabilitySelector from "../../components/Identity/IdentityCapabilitySelector";
 import IdentitySocialSection from "../../components/Identity/IdentitySocialSection";
 import IdentityPaymentSection from "../../components/Identity/IdentityPaymentSection";
-import FormBuilder from "../../components/UI/Form/FormBuilder";
 
+import FormBuilder from "../../components/UI/Form/FormBuilder";
 
 export default function IdentityWorkspace({
 
-  state,
-  actions,
+    state,
+    actions,
 
 }) {
 
-  /* =====================================
-     CONTROLLER MODEL
-  ===================================== */
+    const {
 
-  const {
+        values,
+        form,
 
-    values,
-    form,
+        editing,
+        editMode,
+        savingProfile,
 
-    editing,
-    editMode,
-    savingProfile,
+        completion,
 
-    completion,
+        activeSteps,
+        currentStep,
+        sectionId,
 
-    activeSteps,
-    currentStep,
-    sectionId,
+    } = state;
 
-  } = state;
+    const {
 
-  const {
+        setCurrentStep,
+        setEditing,
 
-    setCurrentStep,
-    setEditing,
+        handleSaveProfile,
+        closeProfile,
 
-    handleSaveProfile,
-    closeProfile,
+    } = actions;
 
-  } = actions;
-console.log(activeSteps);
-  /* =====================================
-     RENDER
-  ===================================== */
+    return (
 
-  return (
+        <WorkspaceShell>
 
-    <WorkspaceShell>
+            <WorkspaceMain>
 
-      <WorkspaceMain>
+                <WorkspaceRegionHeader>
 
-<WorkspaceRegionHeader>
+                    <WorkspaceHeader
+                        title="IDENTITY"
+                        subtitle="Your trusted identity."
+                        onClose={editMode ? closeProfile : undefined}
+                    />
 
-    <WorkspaceHeader
-        title="IDENTITY"
-        subtitle="Your trusted identity."
-        onClose={editMode ? closeProfile : undefined}
-    />
+                </WorkspaceRegionHeader>
 
-</WorkspaceRegionHeader>
+                <WorkspaceWorkflow>
 
-<WorkspaceWorkflow>
+                    <IdentityCapabilitySelector
+                        values={values}
+                        setValue={form.setValue}
+                        readOnly={!editing}
+                    />
 
-    <IdentityCapabilitySelector
-        values={values}
-        setValue={form.setValue}
-        readOnly={!editing}
-    />
+                    <WorkspaceTabs
+                        steps={activeSteps}
+                        currentStep={currentStep}
+                        setCurrentStep={setCurrentStep}
+                    />
 
-    <WorkspaceTabs
-        steps={activeSteps}
-        currentStep={currentStep}
-        setCurrentStep={setCurrentStep}
-    />
+                </WorkspaceWorkflow>
 
-</WorkspaceWorkflow>
+                <WorkspaceProgress
+                    value={completion}
+                    label={`${completion}% Complete`}
+                />
 
-        <WorkspaceProgress
-          value={completion}
-          label={`${completion}% Complete`}
-        />
+                <WorkspaceBody>
 
-        <WorkspaceBody>
+                    {sectionId === "social" ? (
 
-          <div className="profile-form-content">
+                        <WorkspaceCard>
 
-            {sectionId === "social" ? (
+                            <WorkspaceCardBody>
 
-              <IdentitySectionCard>
+                                <IdentitySocialSection />
 
-                <IdentitySocialSection />
+                            </WorkspaceCardBody>
 
-              </IdentitySectionCard>
+                        </WorkspaceCard>
 
-            ) : sectionId === "payment" ? (
+                    ) : sectionId === "payment" ? (
 
-              <IdentitySectionCard>
+                        <WorkspaceCard>
 
-                <IdentityPaymentSection />
+                            <WorkspaceCardBody>
 
-              </IdentitySectionCard>
+                                <IdentityPaymentSection />
 
-            ) : (
+                            </WorkspaceCardBody>
 
-<WorkspaceCard>
+                        </WorkspaceCard>
 
-<WorkspaceCardBody>
+                    ) : (
 
-    <WorkspaceForm>
+                        <WorkspaceCard>
 
-        <FormBuilder
-            steps={[activeSteps[currentStep]]}
-            currentStep={0}
-            form={form}
-            readOnly={!editing}
-        />
+                            <WorkspaceCardBody>
 
-    </WorkspaceForm>
+                                <WorkspaceForm>
 
-</WorkspaceCardBody>
+                                    <FormBuilder
+                                        steps={[activeSteps[currentStep]]}
+                                        currentStep={0}
+                                        form={form}
+                                        readOnly={!editing}
+                                    />
 
-</WorkspaceCard>
+                                </WorkspaceForm>
 
-            )}
+                            </WorkspaceCardBody>
 
-          </div>
+                        </WorkspaceCard>
 
-        </WorkspaceBody>
+                    )}
 
-      </WorkspaceMain>
+                </WorkspaceBody>
 
-      <WorkspaceSidebar>
+            </WorkspaceMain>
 
-        <WorkspaceGuide>
+            <WorkspaceSidebar>
 
-    <IdentityHelpPanel
-        section={sectionId}
-    />
+                <WorkspaceGuide>
 
-        </WorkspaceGuide>
+                    <IdentityHelpPanel
+                        section={sectionId}
+                    />
 
-        <WorkspaceActions>
+                </WorkspaceGuide>
 
-          {!editing ? (
+                <WorkspaceActions>
 
-            <button
-              type="button"
-              className="profile-save-button"
-              onClick={() => setEditing(true)}
-            >
-              Edit Profile
-            </button>
+                    {!editing ? (
 
-          ) : (
+                        <button
+                            type="button"
+                            className="profile-save-button"
+                            onClick={() => setEditing(true)}
+                        >
+                            Edit Profile
+                        </button>
 
-            <div className="profile-edit-actions">
+                    ) : (
 
-              <button
-                type="button"
-                className="profile-cancel-button"
-                onClick={() => {
+                        <div className="profile-edit-actions">
 
-                  form.reset?.();
+                            <button
+                                type="button"
+                                className="profile-cancel-button"
+                                onClick={() => {
 
-                  setEditing(false);
+                                    form.reset?.();
 
-                }}
-              >
-                Cancel
-              </button>
+                                    setEditing(false);
 
-              <button
-                type="button"
-                className="profile-save-button"
-                disabled={savingProfile}
-                onClick={async () => {
+                                }}
+                            >
+                                Cancel
+                            </button>
 
-                  await handleSaveProfile();
+                            <button
+                                type="button"
+                                className="profile-save-button"
+                                disabled={savingProfile}
+                                onClick={async () => {
 
-                  setEditing(false);
+                                    await handleSaveProfile();
 
-                }}
-              >
-                {savingProfile
-                  ? "Saving..."
-                  : "Save Changes"}
-              </button>
+                                    setEditing(false);
 
-            </div>
+                                }}
+                            >
+                                {savingProfile
+                                    ? "Saving..."
+                                    : "Save Changes"}
+                            </button>
 
-          )}
+                        </div>
 
-        </WorkspaceActions>
+                    )}
 
-      </WorkspaceSidebar>
+                </WorkspaceActions>
 
-    </WorkspaceShell>
+            </WorkspaceSidebar>
 
-  );
+        </WorkspaceShell>
+
+    );
 
 }
