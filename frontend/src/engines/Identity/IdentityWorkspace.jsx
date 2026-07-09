@@ -94,11 +94,6 @@ console.log(activeSteps);
 
 <WorkspaceWorkflow>
 
-    <WorkspaceSectionHeader
-        title="Capabilities"
-        description="Enable identity modes"
-    />
-
     <IdentityCapabilitySelector
         values={values}
         setValue={form.setValue}
