@@ -52,15 +52,14 @@
 
 .workspace-sidebar {
 
-    display: flex;
-    flex-direction: column;
+    display:flex;
+    flex-direction:column;
 
-    position: sticky;
-    top: 32px;
+    position:sticky;
+    top:32px;
 
-    align-self: start;
+    align-self:start;
 
-    height: 100%;
 }
 /* ==========================================================
    Workspace Regions
@@ -137,9 +136,7 @@
 
 .workspace-actions {
 
-    margin-top: auto;
-
-    padding-top: 24px;
+    margin-top:24px;
 
 }
 
