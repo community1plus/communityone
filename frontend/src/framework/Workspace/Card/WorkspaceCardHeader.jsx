@@ -1,3 +1,5 @@
+import "./WorkspaceCardHeader.css";
+
 export default function WorkspaceCardHeader({
 
     title,
@@ -9,19 +11,11 @@ export default function WorkspaceCardHeader({
 
         <header className="workspace-card-header">
 
-            <h3 className="workspace-card-title">
-
-                {title}
-
-            </h3>
+            <h2>{title}</h2>
 
             {description && (
 
-                <p className="workspace-card-description">
-
-                    {description}
-
-                </p>
+                <p>{description}</p>
 
             )}
 
