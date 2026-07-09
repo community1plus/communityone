@@ -15,16 +15,16 @@ export default function ProfileHelpPanel({
           <h2>Guide</h2>
 
           <p>
-            &gt; Your public name is visible to the community.
+            Your public name is visible to the community.
           </p>
 
           <p>
-            &gt; Your email remains private.
+            Your email remains private.
 
           </p>
 
           <p>
-            &gt; Verified identities receive additional trust indicators.
+            Verified identities receive additional trust indicators.
           </p>
         </>
       );
