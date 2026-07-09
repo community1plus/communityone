@@ -1,0 +1,80 @@
+/* =====================================
+   COMMUNITY ONE CPF GUIDE PANEL
+===================================== */
+
+.cpf-guide {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+
+  height: 100%;
+
+  padding: 1.75rem;
+
+  background: #f3eee7;
+
+  border: 1px solid #e2d7c8;
+  border-radius: 18px;
+
+  box-shadow:
+    0 6px 18px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+
+  font-family: "Courier New", Courier, monospace;
+  color: #5b5248;
+
+  box-sizing: border-box;
+}
+
+/* =====================================
+   HEADING
+===================================== */
+
+.cpf-guide h2 {
+  margin: 0;
+
+  padding-bottom: 0.9rem;
+
+  color: #8f2033;
+
+  font-size: 0.95rem;
+  font-weight: 700;
+
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* =====================================
+   PARAGRAPHS
+===================================== */
+
+.cpf-guide p {
+  margin: 0;
+
+  line-height: 1.7;
+
+  font-size: 0.95rem;
+}
+
+/* =====================================
+   EMPHASIS
+===================================== */
+
+.cpf-guide strong {
+  color: #8f2033;
+}
+
+/* =====================================
+   LINKS
+===================================== */
+
+.cpf-guide a {
+  color: #8f2033;
+  text-decoration: none;
+}
+
+.cpf-guide a:hover {
+  text-decoration: underline;
+}
