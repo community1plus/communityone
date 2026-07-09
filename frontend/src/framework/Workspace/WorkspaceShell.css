@@ -66,13 +66,26 @@
 
 .workspace-sidebar-inner {
 
-    position: relative;
-
     display: flex;
     flex-direction: column;
 
     height: 100%;
+}
 
+.workspace-guide {
+
+    flex: 1;
+
+    min-height: 0;
+
+    overflow-y: auto;
+}
+
+.workspace-actions {
+
+    flex-shrink: 0;
+
+    padding-top: 16px;
 }
 /* ==========================================================
    Workspace Regions
