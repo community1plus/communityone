@@ -4,7 +4,10 @@ export default function WorkspaceField({
 
     label,
     hint,
+    error,
     required = false,
+    valid,
+    verificationStatus,
     children,
 
 }) {
@@ -17,13 +20,31 @@ export default function WorkspaceField({
 
                 <label className="workspace-field-label">
 
-                    {label}
+                    <span>
 
-                    {required && (
+                        {label}
 
-                        <span className="workspace-required">
+                        {required && (
 
-                            *
+                            <span className="workspace-required">
+
+                                *
+
+                            </span>
+
+                        )}
+
+                    </span>
+
+                    {verificationStatus && (
+
+                        <span
+                            className={`workspace-verification-pill ${verificationStatus.status}`}
+                        >
+
+                            {verificationStatus.status === "verified"
+                                ? "✓ Verified"
+                                : "✕ Unverified"}
 
                         </span>
 
@@ -40,6 +61,16 @@ export default function WorkspaceField({
                 <div className="workspace-field-hint">
 
                     {hint}
+
+                </div>
+
+            )}
+
+            {error && (
+
+                <div className="workspace-field-error">
+
+                    {error}
 
                 </div>
 
