@@ -1,4 +1,4 @@
-import "./WorkspaceInput.css";
+import "../../../framework/Workspace/Form/WorkspaceInput.css";
 
 export default function Input({
 
