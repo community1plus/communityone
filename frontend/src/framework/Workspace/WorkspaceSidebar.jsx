@@ -1,17 +1,11 @@
-export default function WorkspaceSidebar({
-
-    children,
-
-}) {
-
+export default function WorkspaceSidebar({ children }) {
     return (
-
         <aside className="workspace-sidebar">
 
-            {children}
+            <div className="workspace-sidebar-inner">
+                {children}
+            </div>
 
         </aside>
-
     );
-
 }
