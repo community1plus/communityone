@@ -19,7 +19,7 @@
     display: grid;
 
     grid-template-columns:
-        minmax(0,1fr)
+        minmax(0, 1fr)
         340px;
 
     gap: 40px;
@@ -37,7 +37,6 @@
 .workspace-main {
 
     display: flex;
-
     flex-direction: column;
 
     gap: 24px;
@@ -51,26 +50,24 @@
    ========================================================== */
 
 .workspace-sidebar {
-    display: flex;
-    flex-direction: column;
 
     position: sticky;
     top: 32px;
 
     align-self: start;
 
-    height: calc(100vh - 64px);
-
-    position: sticky;
-}
-
-.workspace-sidebar-inner {
-
     display: flex;
     flex-direction: column;
 
-    height: 100%;
+    height: calc(100vh - 64px);
+
+    min-height: 0;
+
 }
+
+/* ==========================================================
+   Guide
+   ========================================================== */
 
 .workspace-guide {
 
@@ -79,14 +76,26 @@
     min-height: 0;
 
     overflow-y: auto;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 24px;
+
 }
+
+/* ==========================================================
+   Sidebar Actions
+   ========================================================== */
 
 .workspace-actions {
 
     flex-shrink: 0;
 
-    padding-top: 16px;
+    padding-top: 20px;
+
 }
+
 /* ==========================================================
    Workspace Regions
    ========================================================== */
@@ -103,12 +112,24 @@
 .workspace-workflow {
 
     display: flex;
-
     flex-direction: column;
 
     gap: 18px;
 
 }
+
+.workspace-body {
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 32px;
+
+}
+
+/* ==========================================================
+   Buttons
+   ========================================================== */
 
 .workspace-button-primary {
 
@@ -122,10 +143,9 @@
 
     background: #9b111e;
 
-    color: white;
+    color: #ffffff;
 
     font-size: 20px;
-
     font-weight: 700;
 
     cursor: pointer;
@@ -134,38 +154,16 @@
 
 }
 
+.workspace-button-primary:hover {
+
+    background: #820d18;
+
+}
+
 .workspace-button-primary:active {
 
     transform: translateY(0);
 
-}
-
-.workspace-body {
-
-    display: flex;
-    flex-direction: column;
-
-    gap: 32px;
-
-}
-
-.workspace-guide {
-
-    flex: 1;
-
-    overflow-y: auto;
-
-    padding-bottom: 120px;
-}
-
-.workspace-actions {
-
-    position: absolute;
-
-    left: 0;
-    right: 0;
-
-    bottom: 20px;
 }
 
 /* ==========================================================
@@ -183,6 +181,8 @@
     .workspace-sidebar {
 
         position: static;
+
+        height: auto;
 
     }
 
