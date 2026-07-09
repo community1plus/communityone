@@ -15,20 +15,16 @@ export default function ProfileHelpPanel({
           <h2>Guide</h2>
 
           <p>
-            Your identity is how you are known
-            within Community One.
+            &gt; Your public name is visible to the community.
           </p>
 
           <p>
-            Your name is visible to the
-            community and becomes your public
-            identity across the platform.
+            &gt; Your email remains private.
+
           </p>
 
           <p>
-            Your email address is private and
-            is only used for authentication,
-            notifications and account recovery.
+            &gt; Verified identities receive additional trust indicators.
           </p>
         </>
       );
