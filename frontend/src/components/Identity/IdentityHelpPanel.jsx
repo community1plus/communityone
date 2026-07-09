@@ -12,7 +12,7 @@ export default function ProfileHelpPanel({
 
       return (
         <>
-          <h2>Your Identity</h2>
+          <h2>Guide</h2>
 
           <p>
             Your identity is how you are known

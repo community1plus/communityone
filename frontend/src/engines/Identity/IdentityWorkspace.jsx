@@ -137,11 +137,6 @@ console.log(activeSteps);
 
 <WorkspaceCard>
 
-    <WorkspaceCardHeader
-        title="Identity Information"
-        description="Manage the information displayed on your Community One profile."
-    />
-
 <WorkspaceCardBody>
 
     <WorkspaceForm>
