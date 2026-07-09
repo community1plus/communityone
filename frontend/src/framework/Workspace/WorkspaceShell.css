@@ -60,8 +60,7 @@
 
     align-self: start;
 
-    height: calc(100vh - 64px);
-
+    height: 100%;
 }
 /* ==========================================================
    Workspace Regions
@@ -134,19 +133,11 @@
 
     gap: 28px;
 
-    overflow-y: auto;
-
 }
 
 .workspace-actions {
 
-    position: sticky;
-
-    bottom: 24px;
-
-    background: transparent;
-
-    border-top: none;
+    margin-top: auto;
 
     padding-top: 24px;
 
