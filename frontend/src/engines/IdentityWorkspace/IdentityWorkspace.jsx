@@ -20,7 +20,7 @@ import IdentityHelpPanel from "../../components/Identity/IdentityHelpPanel";
 import IdentityCapabilitySelector from "../../components/Identity/IdentityCapabilitySelector";
 import IdentitySocialSection from "../../components/Identity/IdentitySocialSection";
 import IdentityPaymentSection from "../../components/Identity/IdentityPaymentSection";
-
+import IdentitySectionRenderer from "../IdentityWorkspace/sections/IdentitySectionRenderer";
 import FormBuilder from "../../components/UI/Form/FormBuilder";
 
 export default function IdentityWorkspace({
