@@ -6,11 +6,8 @@ import { useProfile } from "../../context/ProfileContext";
 
 import useAPI from "../../hooks/useAPI";
 import useForm from "../../hooks/useForm";
-
-import IdentityWorkspace from "../../engines/Identity/IdentityWorkspace";
-
 import "./CommunityPlusUserProfile.css";
-
+import IdentityWorkspace from "../../engines/IdentityWorkspace/IdentityWorkspace.jsx";
 import {
   PROFILE_STEPS,
   ORG_STEPS,
