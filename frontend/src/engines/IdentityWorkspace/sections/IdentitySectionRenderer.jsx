@@ -48,7 +48,7 @@ export default function IdentitySectionRenderer({
     };
 
 const content =
-    identitySections({ form, editing })[sectionId] ??
+    IdentitySections({ form, editing })[sectionId] ??
     defaultContent;
 
     return (
