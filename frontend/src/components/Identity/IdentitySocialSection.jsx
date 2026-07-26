@@ -28,7 +28,7 @@ function getAccountLabel(data = {}) {
   );
 }
 
-export default function ProfileSocialSection() {
+export default function IdentitySocialSection() {
   useSocialVerification();
 
   const {
