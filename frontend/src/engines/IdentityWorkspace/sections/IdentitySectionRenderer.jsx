@@ -3,7 +3,7 @@ import { WorkspaceCard, WorkspaceCardBody } from "../../../framework/Workspace";
 
 import WorkspaceForm from "../../../framework/Workspace/Form/WorkspaceForm";
 
-import FormBuilder from "../../components/UI/Form/FormBuilder";
+import FormBuilder from "../../../components/UI/Form/FormBuilder";
 
 import IdentitySocialSection from "./IdentitySocialSection";
 import IdentityPaymentSection from "./IdentityPaymentSection";
