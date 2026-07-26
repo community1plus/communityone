@@ -5,8 +5,8 @@ import WorkspaceForm from "../../../framework/Workspace/Form/WorkspaceForm";
 
 import FormBuilder from "../../../components/UI/Form/FormBuilder";
 
-import IdentitySocialSection from "../../components/IdentitySocialSection";
-import IdentityPaymentSection from "../../components/IdentityPaymentSection";
+import IdentitySocialSection from "../../../components/Identity/IdentitySocialSection";
+import IdentityPaymentSection from "../../../components/Identity/IdentityPaymentSection";
 
 export default function IdentitySectionRenderer({
 
