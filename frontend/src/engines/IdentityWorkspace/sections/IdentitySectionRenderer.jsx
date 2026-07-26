@@ -1,94 +1,63 @@
 import WorkspaceSection from "../../../framework/Workspace/WorkspaceSection";
-import { WorkspaceCard, WorkspaceCardBody } from "../../../framework/Workspace";
+import {
+    WorkspaceCard,
+    WorkspaceCardBody
+} from "../../../framework/Workspace";
 
 import WorkspaceForm from "../../../framework/Workspace/Form/WorkspaceForm";
 
 import FormBuilder from "../../../components/UI/Form/FormBuilder";
 
+import IdentitySections from "./IdentitySections";
 import IdentitySocialSection from "../../../components/Identity/IdentitySocialSection";
 import IdentityPaymentSection from "../../../components/Identity/IdentityPaymentSection";
 
 export default function IdentitySectionRenderer({
-
     sectionId,
     activeSteps,
     currentStep,
     form,
     editing,
-
 }) {
 
-    switch (sectionId) {
+    const defaultContent = (
+        <WorkspaceForm>
+            <FormBuilder
+                steps={[activeSteps[currentStep]]}
+                currentStep={0}
+                form={form}
+                readOnly={!editing}
+            />
+        </WorkspaceForm>
+    );
 
-        case "social":
+    const sectionMap = {
+        social: (
+            <IdentitySocialSection
+                form={form}
+                editing={editing}
+            />
+        ),
 
-            return (
+        payment: (
+            <IdentityPaymentSection
+                form={form}
+                editing={editing}
+            />
+        ),
+    };
 
-                <WorkspaceSection>
+const content =
+    identitySections({ form, editing })[sectionId] ??
+    defaultContent;
 
-                    <WorkspaceCard>
-
-                        <WorkspaceCardBody>
-
-                            <IdentitySocialSection />
-
-                        </WorkspaceCardBody>
-
-                    </WorkspaceCard>
-
-                </WorkspaceSection>
-
-            );
-
-        case "payment":
-
-            return (
-
-                <WorkspaceSection>
-
-                    <WorkspaceCard>
-
-                        <WorkspaceCardBody>
-
-                            <IdentityPaymentSection />
-
-                        </WorkspaceCardBody>
-
-                    </WorkspaceCard>
-
-                </WorkspaceSection>
-
-            );
-
-        default:
-
-            return (
-
-                <WorkspaceSection>
-
-                    <WorkspaceCard>
-
-                        <WorkspaceCardBody>
-
-                            <WorkspaceForm>
-
-                                <FormBuilder
-                                    steps={[activeSteps[currentStep]]}
-                                    currentStep={0}
-                                    form={form}
-                                    readOnly={!editing}
-                                />
-
-                            </WorkspaceForm>
-
-                        </WorkspaceCardBody>
-
-                    </WorkspaceCard>
-
-                </WorkspaceSection>
-
-            );
-
-    }
-
+    return (
+        <WorkspaceSection>
+            <WorkspaceCard>
+                <WorkspaceCardBody>
+                    {content}
+                </WorkspaceCardBody>
+            </WorkspaceCard>
+        </WorkspaceSection>
+    );
 }
