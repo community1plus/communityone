@@ -8,7 +8,7 @@ import WorkspaceForm from "../../../framework/Workspace/Form/WorkspaceForm";
 
 import FormBuilder from "../../../components/UI/Form/FormBuilder";
 
-import IdentitySections from "./IdentitySections";
+import { identitySections } from "./IdentitySections";
 import IdentitySocialSection from "../../../components/Identity/IdentitySocialSection";
 import IdentityPaymentSection from "../../../components/Identity/IdentityPaymentSection";
 
