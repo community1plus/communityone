@@ -1,0 +1,19 @@
+.workspace-section {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.workspace-section-header {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.workspace-section-title {
+    margin: 0;
+}
+
+.workspace-section-description {
+    margin: 0;
+}

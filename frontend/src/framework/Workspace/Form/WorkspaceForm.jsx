@@ -8,11 +8,12 @@ export default function WorkspaceForm({
 
     return (
 
-        <form className="workspace-form">
-
-            {children}
-
-        </form>
+<form
+    className="workspace-form"
+    onSubmit={(e) => e.preventDefault()}
+>
+    {children}
+</form>
 
     );
 
