@@ -1,4 +1,4 @@
-export const identitySections = ({ form, editing }) => ({
+export const IdentitySections = ({ form, editing }) => ({
     social: (
         <IdentitySocialSection
             form={form}
