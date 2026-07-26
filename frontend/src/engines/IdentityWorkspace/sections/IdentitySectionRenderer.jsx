@@ -1,7 +1,7 @@
 import WorkspaceSection from "../../../framework/Workspace/WorkspaceSection";
 import { WorkspaceCard, WorkspaceCardBody } from "../../../framework/Workspace";
 
-import WorkspaceForm from "../../framework/Workspace/Form/WorkspaceForm";
+import WorkspaceForm from "../../../framework/Workspace/Form/WorkspaceForm";
 
 import FormBuilder from "../../components/UI/Form/FormBuilder";
 
