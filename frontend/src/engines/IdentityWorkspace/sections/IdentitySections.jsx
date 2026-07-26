@@ -1,6 +1,6 @@
-// IdentitySections.js
+// IdentitySections.jsx
 
-export const identitySections = ({
+export  const identitySections = ({
     form,
     editing
 }) => ({
