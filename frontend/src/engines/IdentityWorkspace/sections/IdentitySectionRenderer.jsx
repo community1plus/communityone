@@ -1,4 +1,4 @@
-import WorkspaceSection from "../../framework/Workspace/WorkspaceSection";
+import WorkspaceSection from "../../IdentityWorkspace/sections/WorkspaceSection";
 import { WorkspaceCard, WorkspaceCardBody } from "../../framework/Workspace";
 
 import WorkspaceForm from "../../framework/Workspace/Form/WorkspaceForm";
