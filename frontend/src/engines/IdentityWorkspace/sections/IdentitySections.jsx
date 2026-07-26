@@ -1,10 +1,4 @@
-// IdentitySections.jsx
-
-export const identitySections = ({
-    form,
-    editing
-}) => ({
-
+export const identitySections = ({ form, editing }) => ({
     social: (
         <IdentitySocialSection
             form={form}
@@ -17,6 +11,5 @@ export const identitySections = ({
             form={form}
             editing={editing}
         />
-    ),
-
+    )
 });
