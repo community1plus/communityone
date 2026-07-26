@@ -15,7 +15,7 @@ import {
 } from "../../framework/Workspace";
 
 import WorkspaceForm from "../../framework/Workspace/Form/WorkspaceForm";
-
+import IdentityActions from "../../components/Identity/IdentityActions";
 import IdentityHelpPanel from "../../components/Identity/IdentityHelpPanel";
 import IdentityCapabilitySelector from "../../components/Identity/IdentityCapabilitySelector";
 import IdentitySocialSection from "../../components/Identity/IdentitySocialSection";
