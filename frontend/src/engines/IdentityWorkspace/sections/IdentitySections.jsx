@@ -1,4 +1,5 @@
 import IdentitySocialSection from "../../../components/Identity/IdentitySocialSection"
+import IdentityPaymentSection from "../../../components/Identity/IdentityPaymentSection"
 export const IdentitySections = ({ form, editing }) => ({
     social: (
         <IdentitySocialSection
