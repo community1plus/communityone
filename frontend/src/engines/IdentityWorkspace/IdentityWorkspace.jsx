@@ -19,14 +19,14 @@ import {
 
 import IdentityActions from "../../components/Identity/IdentityActions";
 import IdentityHelpPanel from "../../components/Identity/IdentityHelpPanel";
-import IdentityCapabilitySelector from "../../experience/workspace/IdentityCapabilitySelector";
-import IdentitySectionRenderer from "../IdentityWorkspace/sections/IdentitySectionRenderer";
+import IdentityCapabilitySelector from "../../components/Identity/IdentityCapabilitySelector";
+import IdentitySectionRenderer from "../../components/Identity/IdentitySectionRenderer";
 import { buildIdentityWorkspace }
 from "../../experience/workspace/builders/buildIdentityWorkspace";
 
 const workspace =
     buildIdentityWorkspace(state, actions);
-    
+
 export default function IdentityWorkspace({
     state,
     actions,
