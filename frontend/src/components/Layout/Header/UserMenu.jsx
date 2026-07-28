@@ -100,7 +100,13 @@ export default function UserMenu() {
           >
             Profile
           </button>
-
+<button
+    type="button"
+    className="menu-item"
+    onClick={() => goTo("/communityplus/wallet")}
+>
+    Wallet
+</button>
           <button
             type="button"
             className="menu-item"

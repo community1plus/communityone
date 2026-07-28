@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate, Outlet, useLocation } from "react-router-dom";
-
+import WalletWorkspace from "./capabilities/Wallet/WalletWorkspace";
 import { useAuth } from "./context/AuthContext";
 import { GoogleMapsProvider } from "./context/GoogleMapsProvider";
 import { MapProvider } from "./context/MapContext";
@@ -24,6 +24,7 @@ import CommunityPlusModerationPage from "./pages/CommunityPlusModerationPage/Com
 import { useProfile } from "./context/ProfileContext";
 import PostComposer from "./components/Layout/Sidebar/Post/PostComposer";
 import CommunityPlusAuthResolve from "./pages/CommunityPlusAuthResolve/CommunityPlusAuthResolve";
+import WalletWorkspace from "./capabilities/Wallet/WalletWorkspace";
 
 function Placeholder({ title, subtitle }) {
   return (
@@ -155,6 +156,24 @@ export default function App() {
         </ProtectedRoute>
         }
     />
+
+    <Route
+        path="/communityplus/wallet"
+        element={
+        <ProtectedRoute>
+            <WalletWorkspace />
+        </ProtectedRoute>
+      }
+   />
+
+<Route
+    path="/communityplus/wallet"
+    element={
+        <ProtectedRoute>
+            <WalletWorkspace />
+        </ProtectedRoute>
+    }
+/>
 
     <Route
         element={
