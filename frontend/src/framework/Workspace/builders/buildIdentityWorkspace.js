@@ -1,4 +1,8 @@
-import { Workspace } from "../../../framework/Workspace";
+import { createWorkspace } from "../../../framework/Workspace/builders/createWorkspace";
+
+import { createWorkspaceHeaderModel } from "../../../framework/Workspace/models/WorkspaceHeaderModel";
+import { createWorkspaceSectionsModel } from "../../../framework/Workspace/models/WorkspaceSectionsModel";
+import { createWorkspaceProgressModel } from "../../../framework/Workspace/models/WorkspaceProgressModel";
 
 export function buildIdentityWorkspace(state, actions) {
 
@@ -14,19 +18,17 @@ export function buildIdentityWorkspace(state, actions) {
         setCurrentStep,
     } = actions;
 
-    return Workspace.create({
+    return createWorkspace({
 
-        header: Workspace.Header({
+        header: createWorkspaceHeaderModel({
 
             title: "IDENTITY",
             subtitle: "Your trusted identity.",
-            onClose: editMode
-                ? closeProfile
-                : undefined,
+            onClose: editMode ? closeProfile : undefined,
 
         }),
 
-        sections: Workspace.Sections({
+        sections: createWorkspaceSectionsModel({
 
             items: activeSteps,
             current: currentStep,
@@ -34,7 +36,7 @@ export function buildIdentityWorkspace(state, actions) {
 
         }),
 
-        progress: Workspace.Progress({
+        progress: createWorkspaceProgressModel({
 
             value: completion,
             label: `${completion}% Complete`,
