@@ -20,7 +20,7 @@ import {
 import IdentityActions from "../../components/Identity/IdentityActions";
 import IdentityHelpPanel from "../../components/Identity/IdentityHelpPanel";
 import IdentityCapabilitySelector from "../../components/Identity/IdentityCapabilitySelector";
-import IdentitySectionRenderer from "../../components/Identity/IdentitySectionRenderer";
+import IdentitySectionRenderer from "../IdentityWorkspace/sections/IdentitySectionRenderer";
 import { buildIdentityWorkspace }
 from "../../experience/workspace/builders/buildIdentityWorkspace";
 
