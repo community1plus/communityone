@@ -1,7 +1,7 @@
 import {
   WorkspaceSegmentedControl,
     WorkspaceSectionHeader,
-} from "../../framework/Workspace";
+} from ".";
 
 export default function ProfileCapabilitySelector({
   values,
