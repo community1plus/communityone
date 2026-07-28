@@ -1,3 +1,8 @@
+import { createWorkspace } from "../../framework/Workspace/builders/createWorkspace";
+import { createWorkspaceHeaderModel } from "../../framework/Workspace/models/WorkspaceHeaderModel";
+import { createWorkspaceProgressModel } from "../../framework/Workspace/models/WorkspaceProgressModel";
+import { createWorkspaceSectionsModel } from "../../framework/Workspace/models/WorkspaceSectionsModel";
+
 import {
     WorkspaceShell,
     WorkspaceMain,
@@ -10,28 +15,19 @@ import {
     WorkspaceGuide,
     WorkspaceActions,
     WorkspaceTabs,
-    WorkspaceCard,
-    WorkspaceCardBody,
 } from "../../framework/Workspace";
 
-import WorkspaceForm from "../../framework/Workspace/Form/WorkspaceForm";
 import IdentityActions from "../../components/Identity/IdentityActions";
 import IdentityHelpPanel from "../../components/Identity/IdentityHelpPanel";
-import IdentityCapabilitySelector from "../../components/Identity/IdentityCapabilitySelector";
-import IdentitySocialSection from "../../components/Identity/IdentitySocialSection";
-import IdentityPaymentSection from "../../components/Identity/IdentityPaymentSection";
+import IdentityCapabilitySelector from "../../experience/workspace/IdentityCapabilitySelector";
 import IdentitySectionRenderer from "../IdentityWorkspace/sections/IdentitySectionRenderer";
-import FormBuilder from "../../components/UI/Form/FormBuilder";
 
 export default function IdentityWorkspace({
-
     state,
     actions,
-
 }) {
 
     const {
-
         values,
         form,
 
@@ -44,95 +40,116 @@ export default function IdentityWorkspace({
         activeSteps,
         currentStep,
         sectionId,
-
     } = state;
 
     const {
-
         setCurrentStep,
         setEditing,
 
         handleSaveProfile,
         closeProfile,
-
     } = actions;
+
+    //
+    // Workspace Models
+    //
+
+    const workspace = createWorkspace({
+
+        header: createWorkspaceHeaderModel({
+
+            title: "IDENTITY",
+            subtitle: "Your trusted identity.",
+            onClose: editMode ? closeProfile : undefined,
+
+        }),
+
+        sections: createWorkspaceSectionsModel({
+
+            items: activeSteps,
+            current: currentStep,
+            onChange: setCurrentStep,
+
+        }),
+
+        progress: createWorkspaceProgressModel({
+
+            value: completion,
+            label: `${completion}% Complete`,
+
+        }),
+
+    });
 
     return (
 
-<WorkspaceShell>
+        <WorkspaceShell>
 
-    <WorkspaceMain>
+            <WorkspaceMain>
 
-        <WorkspaceRegionHeader>
+                <WorkspaceRegionHeader>
 
-            <WorkspaceHeader
-                title="IDENTITY"
-                subtitle="Your trusted identity."
-                onClose={editMode ? closeProfile : undefined}
-            />
+                    <WorkspaceHeader model={workspace.header} />
 
-        </WorkspaceRegionHeader>
+                </WorkspaceRegionHeader>
 
-        <WorkspaceWorkflow>
+                <WorkspaceWorkflow>
 
-            <IdentityCapabilitySelector
-                values={values}
-                setValue={form.setValue}
-                readOnly={!editing}
-            />
+                    <IdentityCapabilitySelector
+                        values={values}
+                        setValue={form.setValue}
+                        readOnly={!editing}
+                    />
 
-            <WorkspaceTabs
-                steps={activeSteps}
-                currentStep={currentStep}
-                setCurrentStep={setCurrentStep}
-            />
+                    <WorkspaceTabs
+                        model={workspace.sections}
+                    />
 
-        </WorkspaceWorkflow>
+                </WorkspaceWorkflow>
 
-        <WorkspaceProgress
-            value={completion}
-            label={`${completion}% Complete`}
-        />
+                <WorkspaceProgress
+                    model={workspace.progress}
+                />
 
-        <WorkspaceBody>
+                <WorkspaceBody>
 
-            <IdentitySectionRenderer
-                sectionId={sectionId}
-                activeSteps={activeSteps}
-                currentStep={currentStep}
-                form={form}
-                editing={editing}
-            />
+                    <IdentitySectionRenderer
+                        sectionId={sectionId}
+                        activeSteps={activeSteps}
+                        currentStep={currentStep}
+                        form={form}
+                        editing={editing}
+                    />
 
-        </WorkspaceBody>
+                </WorkspaceBody>
 
-    </WorkspaceMain>
+            </WorkspaceMain>
 
-    <WorkspaceSidebar>
+            <WorkspaceSidebar>
 
-        <WorkspaceGuide>
+                <WorkspaceGuide>
 
-            <IdentityHelpPanel
-                section={sectionId}
-            />
+                    <IdentityHelpPanel
+                        section={sectionId}
+                    />
 
-        </WorkspaceGuide>
+                </WorkspaceGuide>
 
-        <WorkspaceActions>
+                <WorkspaceActions>
 
-            <IdentityActions
-                editing={editing}
-                savingProfile={savingProfile}
-                form={form}
-                setEditing={setEditing}
-                handleSaveProfile={handleSaveProfile}
-            />
+                    <IdentityActions
+                        editing={editing}
+                        savingProfile={savingProfile}
+                        form={form}
+                        setEditing={setEditing}
+                        handleSaveProfile={handleSaveProfile}
+                    />
 
-        </WorkspaceActions>
+                </WorkspaceActions>
 
-    </WorkspaceSidebar>
+            </WorkspaceSidebar>
 
-</WorkspaceShell>
+        </WorkspaceShell>
 
     );
 

@@ -1,10 +1,20 @@
 import "./WorkspaceTabs.css";
 
 export default function WorkspaceTabs({
-    items = [],
-    value,
-    onChange,
+
+    model = {},
+
 }) {
+
+    const {
+
+        items = [],
+
+        current,
+
+        onChange,
+
+    } = model;
 
     return (
 
@@ -12,7 +22,7 @@ export default function WorkspaceTabs({
 
             {items.map((item) => {
 
-                const active = item.value === value;
+                const active = item.value === current;
 
                 return (
 

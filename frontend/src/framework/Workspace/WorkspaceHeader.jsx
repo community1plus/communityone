@@ -2,42 +2,48 @@ import "./WorkspaceHeader.css";
 
 export default function WorkspaceHeader({
 
-    title,
-    subtitle,
-    onClose,
+    model = {},
 
 }) {
 
+    const {
+        title,
+        subtitle,
+        onClose,
+    } = model;
+
     return (
 
-<header className="workspace-header">
+        <header className="workspace-header">
 
-    <div className="workspace-header-main">
+            <div className="workspace-header-main">
 
-        <div className="workspace-header-text">
+                <div className="workspace-header-text">
 
-            <h1>{title}</h1>
+                    {title && <h1>{title}</h1>}
 
-            {subtitle && (
-                <p>{subtitle}</p>
-            )}
+                    {subtitle && (
+                        <p>{subtitle}</p>
+                    )}
 
-        </div>
+                </div>
 
-        {onClose && (
+                {onClose && (
 
-            <button
-                className="workspace-close"
-                onClick={onClose}
-            >
-                ×
-            </button>
+                    <button
+                        type="button"
+                        className="workspace-close"
+                        onClick={onClose}
+                        aria-label="Close workspace"
+                    >
+                        ×
+                    </button>
 
-        )}
+                )}
 
-    </div>
+            </div>
 
-</header>
+        </header>
 
     );
 

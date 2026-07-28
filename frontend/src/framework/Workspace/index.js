@@ -66,3 +66,12 @@ export { default as WorkspaceTabs }
 from "./WorkspaceTabs";
 
 export * from "./Form";
+
+export { createWorkspace }
+from "./builders/createWorkspace";
+
+export { createWorkspaceHeaderModel }
+from "./models/WorkspaceHeaderModel";
+
+export { createWorkspaceProgressModel }
+from "./models/WorkspaceProgressModel";

@@ -2,10 +2,18 @@ import "./WorkspaceProgress.css";
 
 export default function WorkspaceProgress({
 
-    value = 0,
-    label,
+    model = {},
 
 }) {
+
+    const {
+
+        value = 0,
+        label,
+
+    } = model;
+
+    const progress = Math.max(0, Math.min(100, value));
 
     return (
 
@@ -16,17 +24,21 @@ export default function WorkspaceProgress({
                 <div
                     className="workspace-progress-fill"
                     style={{
-                        width: `${value}%`,
+                        width: `${progress}%`,
                     }}
                 />
 
             </div>
 
-            <div className="workspace-progress-label">
+            {label && (
 
-                {label}
+                <div className="workspace-progress-label">
 
-            </div>
+                    {label}
+
+                </div>
+
+            )}
 
         </section>
 
