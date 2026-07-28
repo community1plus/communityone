@@ -1,4 +1,4 @@
-import WalletOverview from "./WalletOverview";
+import { WalletOverview } from "./WalletOverview";
 import WalletAccounts from "./WalletAccounts";
 import WalletTransactions from "./WalletTransactions";
 import WalletSettings from "./WalletSettings";
