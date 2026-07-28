@@ -16,7 +16,7 @@ import {
 
 import WalletActions from "../../components/Wallet/WalletActions";
 import WalletHelpPanel from "../../components/Wallet/WalletHelpPanel";
-import WalletSectionRenderer from "./sections/WalletSectionRenderer";
+import WalletSectionRenderer from "..WalletSectionRenderer";
 
 import { buildWalletWorkspace } from "../../experience/workspace/builders/buildWalletWorkspace";
 
