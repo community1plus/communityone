@@ -22,7 +22,7 @@ import IdentityHelpPanel from "../../components/Identity/IdentityHelpPanel";
 import IdentityCapabilitySelector from "../../components/Identity/IdentityCapabilitySelector";
 import IdentitySectionRenderer from "../IdentityWorkspace/sections/IdentitySectionRenderer";
 import { buildIdentityWorkspace }
-from "../../experience/workspace/builders/buildIdentityWorkspace";
+from "../../framework/Workspace/builders/buildIdentityWorkspace";
 
 const workspace =
     buildIdentityWorkspace(state, actions);
