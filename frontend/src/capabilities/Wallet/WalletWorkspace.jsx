@@ -20,37 +20,37 @@ import WalletSectionRenderer from "./sections/WalletSectionRenderer";
 
 import { buildWalletWorkspace } from "../../experience/workspace/builders/buildWalletWorkspace";
 
+const walletSections = [
+    {
+        value: "overview",
+        label: "Overview",
+    },
+    {
+        value: "accounts",
+        label: "Accounts",
+    },
+    {
+        value: "transactions",
+        label: "Transactions",
+    },
+    {
+        value: "settings",
+        label: "Settings",
+    },
+];
+
 export default function WalletWorkspace() {
 
-    const [currentSection, setCurrentSection] =
-        useState("overview");
-
-    const sections = [
-        {
-            value: "overview",
-            label: "Overview",
-        },
-        {
-            value: "accounts",
-            label: "Accounts",
-        },
-        {
-            value: "transactions",
-            label: "Transactions",
-        },
-        {
-            value: "settings",
-            label: "Settings",
-        },
-    ];
+    const [activeSection, setActiveSection] =
+        useState(walletSections[0].value);
 
     const workspace = buildWalletWorkspace({
 
-        currentSection,
+        activeSection,
 
-        setCurrentSection,
+        setActiveSection,
 
-        sections,
+        sections: walletSections,
 
     });
 
@@ -83,7 +83,7 @@ export default function WalletWorkspace() {
                 <WorkspaceBody>
 
                     <WalletSectionRenderer
-                        section={currentSection}
+                        section={activeSection}
                     />
 
                 </WorkspaceBody>
@@ -95,7 +95,7 @@ export default function WalletWorkspace() {
                 <WorkspaceGuide>
 
                     <WalletHelpPanel
-                        section={currentSection}
+                        section={activeSection}
                     />
 
                 </WorkspaceGuide>
