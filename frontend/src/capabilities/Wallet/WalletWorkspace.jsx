@@ -18,7 +18,7 @@ import WalletActions from "./WalletActions";
 import WalletHelpPanel from "./WalletHelpPanel";
 import WalletSectionRenderer from "../sections/WalletSectionRenderer";
 
-import { buildWalletWorkspace } from "../../experience/workspace/builders/buildWalletWorkspace";
+import { buildWalletWorkspace } from "../../framework/Workspace/builders/buildWalletWorkspace";
 
 const walletSections = [
     {
