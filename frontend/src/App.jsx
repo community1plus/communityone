@@ -1,5 +1,4 @@
 import { Routes, Route, Navigate, Outlet, useLocation } from "react-router-dom";
-import WalletWorkspace from "./capabilities/Wallet/WalletWorkspace";
 import { useAuth } from "./context/AuthContext";
 import { GoogleMapsProvider } from "./context/GoogleMapsProvider";
 import { MapProvider } from "./context/MapContext";
