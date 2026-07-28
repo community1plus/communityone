@@ -24,8 +24,7 @@ import IdentitySectionRenderer from "../IdentityWorkspace/sections/IdentitySecti
 import { buildIdentityWorkspace }
 from "../../framework/Workspace/builders/buildIdentityWorkspace";
 
-const workspace =
-    buildIdentityWorkspace(state, actions);
+
 
 export default function IdentityWorkspace({
     state,
@@ -55,6 +54,9 @@ export default function IdentityWorkspace({
         closeProfile,
     } = actions;
 
+
+    const workspace =
+    buildIdentityWorkspace(state, actions);
     //
     // Workspace Models
     //
