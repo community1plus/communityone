@@ -76,4 +76,4 @@ from "./models/WorkspaceHeaderModel";
 export { createWorkspaceProgressModel }
 from "./models/WorkspaceProgressModel";
 
-export { Workspace } from "../builders/Workspace";
+export { Workspace } from "./builders/Workspace";
