@@ -61,32 +61,7 @@ export default function IdentityWorkspace({
     // Workspace Models
     //
 
-    const workspace = createWorkspace({
-
-        header: createWorkspaceHeaderModel({
-
-            title: "IDENTITY",
-            subtitle: "Your trusted identity.",
-            onClose: editMode ? closeProfile : undefined,
-
-        }),
-
-        sections: createWorkspaceSectionsModel({
-
-            items: activeSteps,
-            current: currentStep,
-            onChange: setCurrentStep,
-
-        }),
-
-        progress: createWorkspaceProgressModel({
-
-            value: completion,
-            label: `${completion}% Complete`,
-
-        }),
-
-    });
+  
 
     return (
 
