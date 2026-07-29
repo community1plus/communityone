@@ -110,13 +110,14 @@ export default function IdentityWorkspace({
 
             <WorkspaceSidebar>
 
-                <WorkspaceGuide>
+<WorkspaceGuide>
 
-                    <IdentityHelpPanel
-                        section={sectionId}
-                    />
+    <CapabilityGuide
+        capability="identity"
+        section={sectionId}
+    />
 
-                </WorkspaceGuide>
+</WorkspaceGuide>
 
                 <WorkspaceActions>
 
