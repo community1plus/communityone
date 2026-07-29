@@ -7,7 +7,7 @@ import { useProfile } from "../../context/ProfileContext";
 import useAPI from "../../hooks/useAPI";
 import useForm from "../../hooks/useForm";
 import "./CommunityPlusUserProfile.css";
-import PersonalExperience from "../../experience/PersonalExperience/PersonalExperience";
+import IdentityWorkspace from "../../engines/IdentityWorkspace/IdentityWorkspace";
 import {
   PROFILE_STEPS,
   ORG_STEPS,
@@ -233,15 +233,10 @@ export default function CommunityPlusUserProfile({
   ===================================== */
 
 return (
-
-    <PersonalExperience
-
-        workspaceState={workspaceState}
-
-        workspaceActions={workspaceActions}
-
+    <IdentityWorkspace
+        state={workspaceState}
+        actions={workspaceActions}
     />
-
 );
 
 }

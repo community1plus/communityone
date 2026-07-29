@@ -1,6 +1,10 @@
 import { useState } from "react";
 
 import WalletWorkspace from "../../capabilities/Wallet/WalletWorkspace";
+import { useState } from "react";
+
+import IdentityWorkspace from "../../engines/IdentityWorkspace/IdentityWorkspace";
+
 
 export default function PersonalExperience({
 
