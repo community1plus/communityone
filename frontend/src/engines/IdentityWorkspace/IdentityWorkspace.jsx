@@ -3,6 +3,7 @@ import { createWorkspaceHeaderModel } from "../../framework/Workspace/models/Wor
 import { createWorkspaceProgressModel } from "../../framework/Workspace/models/WorkspaceProgressModel";
 import { createWorkspaceSectionsModel } from "../../framework/Workspace/models/WorkspaceSectionsModel";
 import CapabilityRenderer from "../../components/Capability/CapabilityRenderer";
+import CapabilityGuide from "../../components/Capability/CapabilityGuide";
 import {
     WorkspaceShell,
     WorkspaceMain,
