@@ -1,8 +1,7 @@
 import IdentitySectionRenderer
     from "../../engines/IdentityWorkspace/sections/IdentitySectionRenderer";
 
-import WalletSectionRenderer
-    from "../Wallet/WalletSectionRenderer";
+import WalletSectionRenderer from "../../capabilities/sections/WalletSectionRenderer";
 
 export default function CapabilityRenderer({
 
