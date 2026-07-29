@@ -4,7 +4,7 @@ import { createWorkspaceProgressModel } from "../../framework/Workspace/models/W
 import { createWorkspaceSectionsModel } from "../../framework/Workspace/models/WorkspaceSectionsModel";
 import CapabilityRenderer from "../../components/Capability/CapabilityRenderer";
 import CapabilityGuide from "../../components/Capability/CapabilityGuide";
-import WalletSectionRenderer from "../../capabilities/Wallet/WalletSectionRenderer";
+import WalletSectionRenderer from "../../capabilities/sections/WalletSectionRenderer";
 import {
     WorkspaceShell,
     WorkspaceMain,
