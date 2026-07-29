@@ -1,7 +1,5 @@
 import { useState } from "react";
 
-import PersonalExperience
-from "../../experience/PersonalExperience/PersonalExperience";
 import WalletWorkspace from "../../capabilities/Wallet/WalletWorkspace";
 
 export default function PersonalExperience({
