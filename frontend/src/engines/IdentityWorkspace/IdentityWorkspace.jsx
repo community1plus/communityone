@@ -97,7 +97,7 @@ export default function IdentityWorkspace({
 <WorkspaceBody>
 
     <CapabilityRenderer
-        capability="identity"
+        capability="wallet"
         sectionId={sectionId}
         activeSteps={activeSteps}
         currentStep={currentStep}
