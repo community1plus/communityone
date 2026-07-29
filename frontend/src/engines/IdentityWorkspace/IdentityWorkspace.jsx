@@ -93,17 +93,18 @@ export default function IdentityWorkspace({
                     model={workspace.progress}
                 />
 
-                <WorkspaceBody>
+<WorkspaceBody>
 
-                    <IdentitySectionRenderer
-                        sectionId={sectionId}
-                        activeSteps={activeSteps}
-                        currentStep={currentStep}
-                        form={form}
-                        editing={editing}
-                    />
+    <CapabilityRenderer
+        capability="identity"
+        sectionId={sectionId}
+        activeSteps={activeSteps}
+        currentStep={currentStep}
+        form={form}
+        editing={editing}
+    />
 
-                </WorkspaceBody>
+</WorkspaceBody>
 
             </WorkspaceMain>
 
