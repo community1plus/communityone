@@ -232,16 +232,16 @@ export default function CommunityPlusUserProfile({
      RENDER
   ===================================== */
 
-  return (
+return (
 
-    <IdentityWorkspace
+    <PersonalExperience
 
-      state={workspaceState}
+        workspaceState={workspaceState}
 
-      actions={workspaceActions}
+        workspaceActions={workspaceActions}
 
     />
 
-  );
+);
 
 }
