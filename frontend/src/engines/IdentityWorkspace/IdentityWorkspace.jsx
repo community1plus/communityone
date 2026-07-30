@@ -5,6 +5,7 @@ import { createWorkspaceSectionsModel } from "../../framework/Workspace/models/W
 import CapabilityRenderer from "../../components/Capability/CapabilityRenderer";
 import CapabilityGuide from "../../components/Capability/CapabilityGuide";
 import WalletSectionRenderer from "../../capabilities/sections/WalletSectionRenderer";
+import { useState } from "react";
 import {
     WorkspaceShell,
     WorkspaceMain,
@@ -32,6 +33,8 @@ export default function IdentityWorkspace({
     state,
     actions,
 }) {
+    const [capability, setCapability] =
+    useState("identity");
 
     const {
         values,
@@ -98,7 +101,7 @@ export default function IdentityWorkspace({
 <WorkspaceBody>
 
     <CapabilityRenderer
-        capability="wallet"
+        capability="capability"
         sectionId={sectionId}
         activeSteps={activeSteps}
         currentStep={currentStep}
@@ -115,7 +118,7 @@ export default function IdentityWorkspace({
 <WorkspaceGuide>
 
     <CapabilityGuide
-        capability="identity"
+        capability="capability"
         section={sectionId}
     />
 
