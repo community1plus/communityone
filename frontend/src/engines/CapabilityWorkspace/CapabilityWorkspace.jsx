@@ -14,8 +14,8 @@ import {
 
 import CapabilitySelector from "./components/CapabilitySelector";
 import CapabilitySectionRenderer from "./sections/CapabilitySectionRenderer";
-import CapabilityGuide from "./components/CapabilityGuide";
-import CapabilityActions from "./components/CapabilityActions";
+import CapabilityGuide from "../../components/Capability/CapabilityGuide";
+import CapabilityActions from "../../components/Capability/CapabilityActions";
 
 export default function CapabilityWorkspace({
 
