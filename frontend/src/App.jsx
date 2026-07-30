@@ -157,24 +157,6 @@ export default function App() {
     />
 
     <Route
-        path="/communityplus/wallet"
-        element={
-        <ProtectedRoute>
-            <WalletWorkspace />
-        </ProtectedRoute>
-      }
-   />
-
-<Route
-    path="/communityplus/wallet"
-    element={
-        <ProtectedRoute>
-            <WalletWorkspace />
-        </ProtectedRoute>
-    }
-/>
-
-    <Route
         element={
         <ProfileGate>
           <SharedDashboardLayout />

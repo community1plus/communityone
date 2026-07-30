@@ -1,9 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useMemo, useCallback } from "react";
-
 import { useAuth } from "../../context/AuthContext";
 import { useProfile } from "../../context/ProfileContext";
-
 import useAPI from "../../hooks/useAPI";
 import useForm from "../../hooks/useForm";
 import "./CommunityPlusUserProfile.css";
@@ -24,8 +22,9 @@ import {
 
 export default function CommunityPlusUserProfile({
 
-  onComplete,
-  editMode = false,
+    onComplete,
+    editMode = false,
+    initialCapability = "identity",
 
 }) {
 
@@ -234,9 +233,14 @@ export default function CommunityPlusUserProfile({
 
 return (
     <IdentityWorkspace
-        state={workspaceState}
-        actions={workspaceActions}
-    />
+
+    initialCapability={initialCapability}
+
+    state={workspaceState}
+
+    actions={workspaceActions}
+
+   />
 );
 
 }
