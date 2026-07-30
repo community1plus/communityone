@@ -26,8 +26,6 @@ import IdentityActions from "../../components/Identity/IdentityActions";
 import IdentityHelpPanel from "../../components/Identity/IdentityHelpPanel";
 import IdentityCapabilitySelector from "../../components/Identity/IdentityCapabilitySelector";
 import IdentitySectionRenderer from "../IdentityWorkspace/sections/IdentitySectionRenderer";
-import { buildCapabilityWorkspace }
-from "../../framework/Workspace/builders/buildCapabilityWorkspace";
 
 export default function IdentityWorkspace({
 
