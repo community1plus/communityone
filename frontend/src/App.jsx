@@ -155,7 +155,17 @@ export default function App() {
         </ProtectedRoute>
         }
     />
-
+<Route
+    path="/communityplus/wallet"
+    element={
+        <ProtectedRoute>
+            <CommunityPlusUserProfile
+                editMode
+                initialCapability="wallet"
+            />
+        </ProtectedRoute>
+    }
+/>
     <Route
         element={
         <ProfileGate>

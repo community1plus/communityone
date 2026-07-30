@@ -29,14 +29,15 @@ import IdentitySectionRenderer from "../IdentityWorkspace/sections/IdentitySecti
 import { buildIdentityWorkspace }
 from "../../framework/Workspace/builders/buildIdentityWorkspace";
 
-
-
 export default function IdentityWorkspace({
+
+    initialCapability = "identity",
     state,
     actions,
+
 }) {
     const [capability, setCapability] =
-    useState("wallet");
+    useState(initialCapability);
 
     const {
         values,
