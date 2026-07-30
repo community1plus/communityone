@@ -232,11 +232,12 @@ export default function App() {
 <Route
     path="/communityplus/profile"
     element={
-      <ProtectedRoute>
-        <CommunityPlusUserProfile
-          editMode
-        />
-      </ProtectedRoute>
+        <ProtectedRoute>
+            <CommunityPlusUserProfile
+                editMode
+                initialCapability="identity"
+            />
+        </ProtectedRoute>
     }
 />
           <Route
