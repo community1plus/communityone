@@ -6,6 +6,7 @@ import CapabilityRenderer from "../../components/Capability/CapabilityRenderer";
 import CapabilityGuide from "../../components/Capability/CapabilityGuide";
 import WalletSectionRenderer from "../../capabilities/sections/WalletSectionRenderer";
 import { useState } from "react";
+import { buildCapabilityWorkspace } from "../../framework/Workspace/builders/buildCapabilityWorkspace";
 import {
     WorkspaceShell,
     WorkspaceMain,
@@ -60,8 +61,16 @@ export default function IdentityWorkspace({
     } = actions;
 
 
-    const workspace =
-    buildIdentityWorkspace(state, actions);
+const workspace =
+    buildCapabilityWorkspace({
+
+        capability,
+
+        state,
+
+        actions,
+
+    });
     //
     // Workspace Models
     //
