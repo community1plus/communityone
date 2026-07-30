@@ -20,7 +20,7 @@ export function buildCapabilityWorkspace({
 
         default:
 
-            return buildIdentityWorkspace(
+            return buildCapabilityWorkspace(
                 state,
                 actions
             );
