@@ -34,7 +34,7 @@ export default function IdentityWorkspace({
     actions,
 }) {
     const [capability, setCapability] =
-    useState("identity");
+    useState("wallet");
 
     const {
         values,
