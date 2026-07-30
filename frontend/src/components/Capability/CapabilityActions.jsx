@@ -1,45 +1,20 @@
-import IdentityActions
-from "../Identity/IdentityActions";
+import IdentityActions from "../Identity/IdentityActions";
 
-export default function CapabilityActions({
+export default function CapabilityActions(props) {
 
-    capability,
+    switch (props.capability) {
 
-    editing,
-    savingProfile,
-
-    form,
-
-    setEditing,
-
-    handleSaveProfile,
-
-}) {
-
-    switch (capability) {
-
-        case "identity":
-
-        default:
-
+        case "wallet":
             return (
-
-                <IdentityActions
-
-                    editing={editing}
-
-                    savingProfile={savingProfile}
-
-                    form={form}
-
-                    setEditing={setEditing}
-
-                    handleSaveProfile={handleSaveProfile}
-
-                />
-
+                <div>
+                    Wallet Actions
+                </div>
             );
 
+        case "identity":
+        default:
+            return (
+                <IdentityActions {...props} />
+            );
     }
-
 }

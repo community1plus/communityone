@@ -8,6 +8,7 @@ import WalletSectionRenderer from "../../capabilities/sections/WalletSectionRend
 import { useState } from "react";
 import { buildCapabilityWorkspace } from "../../framework/Workspace/builders/buildCapabilityWorkspace";
 import { buildWalletWorkspace } from "../../framework/Workspace/builders/buildWalletWorkspace";
+import {CapabilityActions} from "../../components/Capability/CapabilityActions";
 import {
     WorkspaceShell,
     WorkspaceMain,
@@ -133,17 +134,18 @@ const workspace =
 
 </WorkspaceGuide>
 
-                <WorkspaceActions>
+<WorkspaceActions>
 
-                    <IdentityActions
-                        editing={editing}
-                        savingProfile={savingProfile}
-                        form={form}
-                        setEditing={setEditing}
-                        handleSaveProfile={handleSaveProfile}
-                    />
+    <CapabilityActions
+        capability={capability}
+        editing={editing}
+        savingProfile={savingProfile}
+        form={form}
+        setEditing={setEditing}
+        handleSaveProfile={handleSaveProfile}
+    />
 
-                </WorkspaceActions>
+</WorkspaceActions>
 
             </WorkspaceSidebar>
 
