@@ -1,3 +1,4 @@
+import { buildWalletWorkspace } from "./buildWalletWorkspace";
 export function buildCapabilityWorkspace({
 
     capability,
