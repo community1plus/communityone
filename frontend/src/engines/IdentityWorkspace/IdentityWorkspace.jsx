@@ -101,7 +101,7 @@ export default function IdentityWorkspace({
 <WorkspaceBody>
 
     <CapabilityRenderer
-        capability="capability"
+        capability={capability}
         sectionId={sectionId}
         activeSteps={activeSteps}
         currentStep={currentStep}
@@ -118,7 +118,7 @@ export default function IdentityWorkspace({
 <WorkspaceGuide>
 
     <CapabilityGuide
-        capability="capability"
+        capability={capability}
         section={sectionId}
     />
 
