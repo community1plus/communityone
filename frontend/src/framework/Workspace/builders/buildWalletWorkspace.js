@@ -4,7 +4,7 @@ import { createWorkspaceHeaderModel } from "../../../framework/Workspace/models/
 import { createWorkspaceProgressModel } from "../../../framework/Workspace/models/WorkspaceProgressModel";
 import { createWorkspaceSectionsModel } from "../../../framework/Workspace/models/WorkspaceSectionsModel";
 
-export default function buildWalletWorkspace({
+export function buildWalletWorkspace({
 
     currentSection,
 
