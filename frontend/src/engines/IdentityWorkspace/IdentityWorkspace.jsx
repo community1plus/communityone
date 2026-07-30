@@ -66,7 +66,7 @@ export default function IdentityWorkspace({
     // Workspace Models
     //
 
-  
+  console.log("Capability:", capability);
 
     return (
 
