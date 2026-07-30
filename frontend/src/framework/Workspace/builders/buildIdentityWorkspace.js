@@ -4,7 +4,7 @@ import { createWorkspaceHeaderModel } from "../../../framework/Workspace/models/
 import { createWorkspaceSectionsModel } from "../../../framework/Workspace/models/WorkspaceSectionsModel";
 import { createWorkspaceProgressModel } from "../../../framework/Workspace/models/WorkspaceProgressModel";
 
-export function buildCapabilityWorkspace(state, actions) {
+export function buildIdentityWorkspace(state, actions) {
 
     const {
         completion,
