@@ -155,7 +155,16 @@ export default function App() {
         </ProtectedRoute>
         }
     />
-<Route
+
+    <Route
+        element={
+        <ProfileGate>
+          <SharedDashboardLayout />
+        </ProfileGate>
+      }
+    >
+          
+    <Route
     path="/communityplus/wallet"
     element={
         <ProtectedRoute>
@@ -165,14 +174,7 @@ export default function App() {
             />
         </ProtectedRoute>
     }
-/>
-    <Route
-        element={
-        <ProfileGate>
-          <SharedDashboardLayout />
-        </ProfileGate>
-      }
-    >
+/>      
           <Route path="/communityplus" element={<CommunityPlusDashboardHome />} />
 
           <Route
@@ -256,9 +258,7 @@ export default function App() {
                 <Placeholder title="Inbox" />
               </ProtectedRoute>
             }
-          />
-
-          
+          />      
 
           <Route
             path="/communityone/ses"
