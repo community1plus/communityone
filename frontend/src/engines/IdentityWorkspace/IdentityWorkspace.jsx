@@ -7,6 +7,7 @@ import CapabilityGuide from "../../components/Capability/CapabilityGuide";
 import WalletSectionRenderer from "../../capabilities/sections/WalletSectionRenderer";
 import { useState } from "react";
 import { buildCapabilityWorkspace } from "../../framework/Workspace/builders/buildCapabilityWorkspace";
+import buildWalletWorkspace from "../../framework/Workspace/builders/buildWalletWorkspace";
 import {
     WorkspaceShell,
     WorkspaceMain,
