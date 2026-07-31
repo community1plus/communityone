@@ -65,6 +65,9 @@ from "./Card/WorkspaceCardFooter";
 export { default as WorkspaceTabs }
 from "./WorkspaceTabs";
 
+export { default as WorkspaceIdentity }
+from "./WorkspaceIdentity";
+
 export { default as WorkspaceClose } from "./WorkspaceClose";
 
 export * from "./Form";
