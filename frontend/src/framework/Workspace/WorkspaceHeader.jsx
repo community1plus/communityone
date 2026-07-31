@@ -14,54 +14,31 @@ export default function WorkspaceHeader({
 
         status,
 
-        onClose,
-
     } = model;
 
     return (
 
         <header className="workspace-header">
 
-            
+            <div className="workspace-header-text">
 
-                <div className="workspace-header-text">
+                {title && <h1>{title}</h1>}
 
-                    {title && <h1>{title}</h1>}
+                {subtitle && <p>{subtitle}</p>}
 
-                    {subtitle && <p>{subtitle}</p>}
+            </div>
 
-                </div>
+            {status && (
 
-                <div className="workspace-header-side">
+                <div className="workspace-header-status">
 
-                    {status && (
-
-                        <div className="workspace-header-status">
-
-                            <WorkspaceStatus
-                                model={status}
-                            />
-
-                        </div>
-
-                    )}
-
-                    {onClose && (
-
-                        <button
-                            type="button"
-                            className="workspace-close"
-                            onClick={onClose}
-                            aria-label="Close workspace"
-                        >
-                            ×
-                        </button>
-
-                    )}
+                    <WorkspaceStatus
+                        model={status}
+                    />
 
                 </div>
 
-            
+            )}
 
         </header>
 
