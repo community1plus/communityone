@@ -77,3 +77,5 @@ export { createWorkspaceProgressModel }
 from "./models/WorkspaceProgressModel";
 
 export { Workspace } from "./builders/Workspace";
+
+export {WorkspaceClose} from "./WorkspaceClose";

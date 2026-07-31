@@ -21,6 +21,7 @@ import {
     WorkspaceGuide,
     WorkspaceActions,
     WorkspaceTabs,
+    WorkspaceClose  
 } from "../../framework/Workspace";
 
 import IdentityActions from "../../components/Identity/IdentityActions";
@@ -83,7 +84,9 @@ const workspace =
         <WorkspaceShell>
 
             <WorkspaceMain>
-
+                <WorkspaceClose
+                 onClick={workspace.header.onClose}
+                />
                 <WorkspaceRegionHeader>
 
                     <WorkspaceHeader model={workspace.header} />

@@ -1,4 +1,4 @@
-import WorkspaceClose from "./WorkspaceClose";
+
 
 export default function WorkspaceShell({
 
@@ -11,9 +11,6 @@ export default function WorkspaceShell({
 
 <div className="workspace-shell">
 
-    <WorkspaceClose
-        onClick={onClose}
-    />
 
     <div className="workspace-layout">
 
