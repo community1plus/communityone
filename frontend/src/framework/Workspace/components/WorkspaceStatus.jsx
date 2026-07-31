@@ -15,21 +15,23 @@ export default function WorkspaceStatus({
 
     return (
 
-        <div className="workspace-status">
+<div className="workspace-status">
 
-            <div className="workspace-status-circle">
+    <ProgressRing
+        value={percentage}
+    />
 
-                {percentage}%
+    <div className="workspace-status-text">
 
-            </div>
+        <div>
 
-            <div className="workspace-status-label">
-
-                {label}
-
-            </div>
+            {label}
 
         </div>
+
+    </div>
+
+</div>
 
     );
 

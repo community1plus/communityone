@@ -1,0 +1,17 @@
+.progress-ring {
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    border-radius:50%;
+
+    border:2px solid var(--border-strong);
+
+    background:var(--panel);
+
+    font-weight:600;
+
+}
