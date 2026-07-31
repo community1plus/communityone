@@ -1,7 +1,6 @@
 export default function WorkspaceSidebar({
 
-    guide,
-    actions,
+    children,
 
 }) {
 
@@ -9,17 +8,7 @@ export default function WorkspaceSidebar({
 
         <aside className="workspace-sidebar">
 
-            <div className="workspace-guide">
-
-                {guide}
-
-            </div>
-
-            <div className="workspace-actions">
-
-                {actions}
-
-            </div>
+            {children}
 
         </aside>
 
