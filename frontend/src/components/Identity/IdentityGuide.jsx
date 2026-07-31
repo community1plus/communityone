@@ -10,22 +10,31 @@ export default function IdentityGuide({
 
 }) {
 
-    return (
+const guide =
+    createIdentityGuideModel();
 
-        <>
+return(
 
-            <GuideCardProgress />
+    <>
 
-            <GuideCardAI />
+        <GuideCardProgress
+            model={guide.progress}
+        />
 
-            <GuideCardHelp
-                section={section}
-            />
+        <GuideCardAI
+            model={guide.ai}
+        />
 
-            <GuideCardNext />
+        <GuideCardHelp
+            model={guide.help}
+        />
 
-        </>
+        <GuideCardNext
+            model={guide.next}
+        />
 
-    );
+    </>
+
+);
 
 }

@@ -8,7 +8,17 @@ export default function WorkspaceGuide({
 
         <aside className="workspace-guide">
 
-            {children}
+            <div className="workspace-guide-header">
+
+                Guide
+
+            </div>
+
+            <div className="workspace-guide-body">
+
+                {children}
+
+            </div>
 
         </aside>
 

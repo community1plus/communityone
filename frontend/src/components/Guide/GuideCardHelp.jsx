@@ -1,28 +1,17 @@
-import GuideCard from "./GuideCard";
-import { guideContent } from "./GuideContent";
+export default function GuideCardHelp({
 
-export default function GuideCardHelp({ section }) {
+    model,
 
-    const guide =
-        guideContent[section] || guideContent.default;
-return(
+}){
 
-    <GuideCard
-        title={guide.title}
-    >
+    return(
 
-        {guide.paragraphs.map((paragraph,index)=>(
+        <GuideCard title={model.title}>
 
-            <p key={index}>
+            {model.paragraphs.map(...)}
 
-                {paragraph}
+        </GuideCard>
 
-            </p>
-
-        ))}
-
-    </GuideCard>
-
-)
+    );
 
 }

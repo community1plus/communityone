@@ -1,6 +1,8 @@
-import GuideCard from "./GuideCard";
+export default function GuideCardProgress({
 
-export default function GuideCardProgress(){
+    model,
+
+}){
 
     return(
 
@@ -8,13 +10,13 @@ export default function GuideCardProgress(){
 
             <strong>
 
-                0%
+                {model.percentage}%
 
             </strong>
 
             <br/>
 
-            Complete
+            {model.label}
 
         </GuideCard>
 

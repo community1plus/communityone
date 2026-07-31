@@ -1,0 +1,13 @@
+.workspace-guide-header {
+
+    padding: 0 0 16px 0;
+
+}
+
+.workspace-guide-body {
+
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+}
