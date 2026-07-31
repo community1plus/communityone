@@ -1,28 +1,14 @@
-import "./ProgressRing.css";
-
-export default function ProgressRing({
-
-    value = 0,
-
-    size = 72,
-
-    stroke = 6,
-
-}) {
+export default function ProgressRing() {
 
     return (
 
         <div
-            className="progress-ring"
             style={{
-                width: size,
-                height: size,
+                width: 80,
+                height: 80,
+                background: "red"
             }}
-        >
-
-            {value}%
-
-        </div>
+        />
 
     );
 
