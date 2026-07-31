@@ -9,13 +9,21 @@ export default function GuideCardProgress({
 
         <GuideCard title="Progress">
 
-            <strong>
+<div className="guide-progress">
 
-                {model.percentage}%
+    <strong className="guide-progress-value">
 
-            </strong>
+        {model.percentage}%
 
-            <br/>
+    </strong>
+
+    <span className="guide-progress-label">
+
+        {model.label}
+
+    </span>
+
+</div>
 
             {model.label}
 

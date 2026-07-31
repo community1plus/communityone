@@ -1,0 +1,20 @@
+.guide-progress {
+
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+}
+
+.guide-progress-value {
+
+    font-size: 1.5rem;
+    font-weight: 700;
+
+}
+
+.guide-progress-label {
+
+    color: var(--text-secondary);
+
+}

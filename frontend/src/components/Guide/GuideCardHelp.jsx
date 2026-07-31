@@ -1,28 +1,25 @@
-import GuideCard from "./GuideCard";
-import { guideContent } from "./GuideContent";
+export default function GuideCardHelp({
 
-export default function GuideCardHelp({ section }) {
+    guide,
 
-    const guide =
-        guideContent[section] || guideContent.default;
-return(
+}) {
 
-    <GuideCard
-        title={guide.title}
-    >
+    return (
 
-        {guide.paragraphs.map((paragraph,index)=>(
+        <GuideCard title={guide.title}>
 
-            <p key={index}>
+            {guide.paragraphs.map((paragraph, index) => (
 
-                {paragraph}
+                <p key={index}>
 
-            </p>
+                    {paragraph}
 
-        ))}
+                </p>
 
-    </GuideCard>
+            ))}
 
-)
+        </GuideCard>
+
+    );
 
 }

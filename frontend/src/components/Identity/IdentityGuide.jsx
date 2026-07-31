@@ -3,6 +3,7 @@ import GuideCardAI from "../Guide/GuideCardAI";
 import GuideCardHelp from "../Guide/GuideCardHelp";
 import GuideCardNext from "../Guide/GuideCardNext";
 import GuideCardTips from "../Guide/GuideCardTips";
+import { guideContent } from "../Guide/GuideContent";
 import { createIdentityGuideModel } from "../../components/Identity/models/IdentityGuideModel";
 
 export default function IdentityGuide({
@@ -11,6 +12,10 @@ export default function IdentityGuide({
 
 }) {
 
+    const guide =
+    guideContent[section] ??
+    guideContent.default;
+    
 const guide =
     createIdentityGuideModel();
 
@@ -26,9 +31,9 @@ return(
             model={guide.ai}
         />
 
-        <GuideCardHelp
-            model={guide.help}
-        />
+<GuideCardHelp
+    guide={guide}
+/>
 
         <GuideCardNext
             model={guide.next}
