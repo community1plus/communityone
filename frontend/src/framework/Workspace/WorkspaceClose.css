@@ -2,8 +2,8 @@
 
     position: absolute;
 
-    top: 32px;
-    right: 32px;
+    top: 0 px;
+    right: 0 px;
 
     z-index: 10;
 }
