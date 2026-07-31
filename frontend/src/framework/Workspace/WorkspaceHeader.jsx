@@ -39,9 +39,6 @@ export default function WorkspaceHeader({
                 </div>
 
             )}
-                </div>
-
-            )}
 
         </header>
 
