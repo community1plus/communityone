@@ -129,16 +129,11 @@ const workspace =
 
 <WorkspaceSidebar>
 
-    <div
-        style={{
-            background: "red",
-            color: "white",
-            minHeight: "600px",
-            padding: "20px",
-        }}
-    >
-        SIDEBAR IS WORKING
-    </div>
+    <WorkspaceGuide>
+
+        Hello Guide
+
+    </WorkspaceGuide>
 
 </WorkspaceSidebar>
 
