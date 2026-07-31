@@ -3,7 +3,7 @@ import GuideCardAI from "../Guide/GuideCardAI";
 import GuideCardHelp from "../Guide/GuideCardHelp";
 import GuideCardNext from "../Guide/GuideCardNext";
 import GuideCardTips from "../Guide/GuideCardTips";
-import { createIdentityGuideModel } from "../../models/identityGuideModel";
+import { createIdentityGuideModel } from "../../models/IdentityGuideModel";
 
 export default function IdentityGuide({
 
