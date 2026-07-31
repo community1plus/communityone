@@ -2,6 +2,7 @@ export default function GuideCard({
 
     title,
     children,
+    footer,
 
 }) {
 
@@ -20,6 +21,16 @@ export default function GuideCard({
                 {children}
 
             </div>
+
+            {footer && (
+
+                <footer className="guide-card-footer">
+
+                    {footer}
+
+                </footer>
+
+            )}
 
         </section>
 

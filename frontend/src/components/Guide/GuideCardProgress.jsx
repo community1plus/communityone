@@ -7,27 +7,25 @@ export default function GuideCardProgress({
 
     return(
 
-        <GuideCard title="Progress">
+<GuideCard title="Progress">
 
-<div className="guide-progress">
+    <div className="guide-progress">
 
-    <strong className="guide-progress-value">
+        <div className="guide-progress-value">
 
-        {model.percentage}%
+            {model.percentage}%
 
-    </strong>
+        </div>
 
-    <span className="guide-progress-label">
-
-        {model.label}
-
-    </span>
-
-</div>
+        <div className="guide-progress-label">
 
             {model.label}
 
-        </GuideCard>
+        </div>
+
+    </div>
+
+</GuideCard>
 
     );
 
