@@ -3,11 +3,11 @@ export default function GuideNext() {
 
     return (
 
-        <div>
+<GuideCard title="Next Steps">
 
-            Guide Next
+    Verify your email.
 
-        </div>
+</GuideCard>
 
     );
 

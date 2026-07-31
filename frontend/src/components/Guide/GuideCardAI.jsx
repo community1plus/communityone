@@ -2,11 +2,11 @@ export default function GuideAI() {
 
     return (
 
-        <div>
+<GuideCard title="AI Assistant">
 
-            Guide AI
+    Your assistant will appear here.
 
-        </div>
+</GuideCard>
 
     );
 

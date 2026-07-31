@@ -1,0 +1,29 @@
+.guide-card{
+
+    background:#fff;
+
+    border:1px solid #ece8e2;
+
+    border-radius:18px;
+
+    padding:24px;
+
+    margin-bottom:20px;
+
+    box-shadow:0 4px 12px rgba(0,0,0,.04);
+
+}
+
+.guide-card-title{
+
+    font-weight:600;
+
+    margin-bottom:18px;
+
+}
+
+.guide-card-body{
+
+    color:#555;
+
+}

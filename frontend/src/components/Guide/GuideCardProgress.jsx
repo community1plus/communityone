@@ -1,12 +1,14 @@
-export default function GuideCardProgress() {
+import GuideCard from "./GuideCard";
 
-    return (
+export default function GuideCardProgress(){
 
-        <div>
+    return(
 
-            Guide Progress
+        <GuideCard title="Progress">
 
-        </div>
+            0% Complete
+
+        </GuideCard>
 
     );
 
