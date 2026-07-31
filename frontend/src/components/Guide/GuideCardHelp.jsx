@@ -1,5 +1,5 @@
 import GuideCard from "./GuideCard";
-
+import { guideContent } from "./GuideContent";
 
 export default function GuideCardHelp({ section }) {
 
