@@ -21,7 +21,7 @@ import {
     WorkspaceGuide,
     WorkspaceActions,
     WorkspaceTabs,
-    WorkspaceClose  ,
+    WorkspaceClose,
     WorkspaceIdentity
 } from "../../framework/Workspace";
 
