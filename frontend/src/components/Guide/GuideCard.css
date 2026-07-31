@@ -1,8 +1,8 @@
 .guide-card{
 
-    background:#fff;
+    background:white;
 
-    border:1px solid #ece8e2;
+    border:1px solid #ebe7df;
 
     border-radius:18px;
 
@@ -10,13 +10,17 @@
 
     margin-bottom:20px;
 
-    box-shadow:0 4px 12px rgba(0,0,0,.04);
+    box-shadow:0 2px 8px rgba(0,0,0,.04);
 
 }
 
-.guide-card-title{
+.guide-card-header{
 
-    font-weight:600;
+    font-size:14px;
+
+    font-weight:700;
+
+    color:#444;
 
     margin-bottom:18px;
 
@@ -24,6 +28,6 @@
 
 .guide-card-body{
 
-    color:#555;
+    line-height:1.7;
 
 }

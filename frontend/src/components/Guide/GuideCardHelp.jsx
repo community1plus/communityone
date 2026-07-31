@@ -5,23 +5,24 @@ export default function GuideCardHelp({ section }) {
 
     const guide =
         guideContent[section] || guideContent.default;
+return(
 
-    return (
+    <GuideCard
+        title={guide.title}
+    >
 
-        <GuideCard title={guide.title}>
+        {guide.paragraphs.map((paragraph,index)=>(
 
-            {guide.paragraphs.map((paragraph, index) => (
+            <p key={index}>
 
-                <p key={index}>
+                {paragraph}
 
-                    {paragraph}
+            </p>
 
-                </p>
+        ))}
 
-            ))}
+    </GuideCard>
 
-        </GuideCard>
-
-    );
+)
 
 }

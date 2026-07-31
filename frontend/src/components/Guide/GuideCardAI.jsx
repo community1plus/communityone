@@ -1,13 +1,14 @@
 import GuideCard from "./GuideCard";
-export default function GuideAI() {
 
-    return (
+export default function GuideCardAI(){
 
-<GuideCard title="AI Assistant">
+    return(
 
-    Your assistant will appear here.
+        <GuideCard title="AI Assistant">
 
-</GuideCard>
+            Your assistant will appear here.
+
+        </GuideCard>
 
     );
 

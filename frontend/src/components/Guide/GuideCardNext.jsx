@@ -1,13 +1,14 @@
 import GuideCard from "./GuideCard";
-export default function GuideNext() {
 
-    return (
+export default function GuideCardNext(){
 
-<GuideCard title="Next Steps">
+    return(
 
-    Verify your email.
+        <GuideCard title="Next Steps">
 
-</GuideCard>
+            Verify your email.
+
+        </GuideCard>
 
     );
 

@@ -7,13 +7,13 @@ export default function GuideCard({
 
     return (
 
-        <div className="guide-card">
+        <section className="guide-card">
 
-            <div className="guide-card-title">
+            <header className="guide-card-header">
 
                 {title}
 
-            </div>
+            </header>
 
             <div className="guide-card-body">
 
@@ -21,7 +21,7 @@ export default function GuideCard({
 
             </div>
 
-        </div>
+        </section>
 
     );
 

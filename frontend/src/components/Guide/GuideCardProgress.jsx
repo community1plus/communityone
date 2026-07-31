@@ -6,7 +6,15 @@ export default function GuideCardProgress(){
 
         <GuideCard title="Progress">
 
-            0% Complete
+            <strong>
+
+                0%
+
+            </strong>
+
+            <br/>
+
+            Complete
 
         </GuideCard>
 
