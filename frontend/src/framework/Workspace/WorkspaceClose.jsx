@@ -1,3 +1,5 @@
+import "./WorkspaceClose.css";
+
 export default function WorkspaceClose({
 
     onClick,
