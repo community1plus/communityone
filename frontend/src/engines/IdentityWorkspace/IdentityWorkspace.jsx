@@ -129,11 +129,11 @@ const workspace =
 
 <WorkspaceSidebar>
 
-    <WorkspaceGuide>
+<WorkspaceGuide>
 
-        Hello Guide
+    <GuideProgress />
 
-    </WorkspaceGuide>
+</WorkspaceGuide>
 
 </WorkspaceSidebar>
 
