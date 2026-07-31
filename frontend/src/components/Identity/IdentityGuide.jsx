@@ -12,10 +12,7 @@ export default function IdentityGuide({
 
 }) {
 
-    const guide =
-    guideContent[section] ??
-    guideContent.default;
-    
+
 const guide =
     createIdentityGuideModel();
 
