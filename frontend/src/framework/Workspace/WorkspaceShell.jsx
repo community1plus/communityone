@@ -9,23 +9,19 @@ export default function WorkspaceShell({
 
     return (
 
-        <div className="workspace-shell">
+<div className="workspace-shell">
 
-            {onClose && (
+    <WorkspaceClose
+        onClick={onClose}
+    />
 
-                <WorkspaceClose
-                    onClick={onClose}
-                />
+    <div className="workspace-layout">
 
-            )}
+        {children}
 
-            <div className="workspace-layout">
+    </div>
 
-                {children}
-
-            </div>
-
-        </div>
+</div>
 
     );
 
