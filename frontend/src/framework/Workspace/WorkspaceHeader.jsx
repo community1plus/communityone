@@ -22,7 +22,7 @@ export default function WorkspaceHeader({
 
         <header className="workspace-header">
 
-            <div className="workspace-header-main">
+            
 
                 <div className="workspace-header-text">
 
@@ -61,7 +61,7 @@ export default function WorkspaceHeader({
 
                 </div>
 
-            </div>
+            
 
         </header>
 
