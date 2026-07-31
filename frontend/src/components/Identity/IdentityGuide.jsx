@@ -2,9 +2,9 @@ import GuideCardProgress from "../Guide/GuideCardProgress";
 import GuideCardAI from "../Guide/GuideCardAI";
 import GuideCardHelp from "../Guide/GuideCardHelp";
 import GuideCardNext from "../Guide/GuideCardNext";
-import GuideCardTips from "../Guide/GuideCardTips";
-import { guideContent } from "../Guide/GuideContent";
-import { createIdentityGuideModel } from "../../components/Identity/models/IdentityGuideModel";
+
+import { createIdentityGuideModel }
+    from "../../components/Identity/models/IdentityGuideModel";
 
 export default function IdentityGuide({
 
@@ -12,32 +12,31 @@ export default function IdentityGuide({
 
 }) {
 
+    const guide =
+        createIdentityGuideModel(section);
 
-const guide =
-    createIdentityGuideModel();
+    return (
 
-return(
+        <>
 
-    <>
+            <GuideCardProgress
+                model={guide.progress}
+            />
 
-        <GuideCardProgress
-            model={guide.progress}
-        />
+            <GuideCardAI
+                model={guide.ai}
+            />
 
-        <GuideCardAI
-            model={guide.ai}
-        />
+            <GuideCardHelp
+                guide={guide.help}
+            />
 
-<GuideCardHelp
-    guide={guide}
-/>
+            <GuideCardNext
+                model={guide.next}
+            />
 
-        <GuideCardNext
-            model={guide.next}
-        />
+        </>
 
-    </>
-
-);
+    );
 
 }
