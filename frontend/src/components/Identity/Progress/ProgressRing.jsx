@@ -1,3 +1,4 @@
+import "./ProgressRing.css";
 export default function ProgressRing({ model }) {
 
     return (
