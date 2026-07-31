@@ -1,43 +1,36 @@
-import {createGuideModel}
-from "../../../framework/Guide/models/GuideModel";
+import { createGuideModel }
+    from "../../../framework/Guide/models/GuideModel";
 
-export function createIdentityGuideModel(){
+import { guideContent }
+    from "../../../framework/Guide/GuideContent";
+
+export function createIdentityGuideModel(section) {
+
+    const help =
+        guideContent[section] ??
+        guideContent.default;
 
     return createGuideModel({
 
-        progress:{
+        progress: {
 
-            percentage:0,
+            percentage: 0,
 
-            label:"Complete",
-
-        },
-
-        ai:{
-
-            message:"Your assistant will appear here.",
+            label: "Complete",
 
         },
 
-        help:{
+        ai: {
 
-            title:"Identity Guide",
-
-            paragraphs:[
-
-                "Your public name is visible to the community.",
-
-                "Your email remains private.",
-
-                "Verified identities receive additional trust indicators.",
-
-            ],
+            message: "Your assistant will appear here.",
 
         },
 
-        next:{
+        help,
 
-            tasks:[
+        next: {
+
+            tasks: [
 
                 "Verify your email",
 

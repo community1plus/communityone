@@ -1,3 +1,5 @@
+import GuideCard from "./GuideCard";
+
 export default function GuideCardAI({
 
     model,
@@ -8,7 +10,11 @@ export default function GuideCardAI({
 
         <GuideCard title="AI Assistant">
 
-            {model.message}
+            <p>
+
+                {model.message}
+
+            </p>
 
         </GuideCard>
 

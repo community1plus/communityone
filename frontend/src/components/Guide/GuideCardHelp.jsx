@@ -1,3 +1,5 @@
+import GuideCard from "./GuideCard";
+
 export default function GuideCardHelp({
 
     guide,
@@ -6,7 +8,9 @@ export default function GuideCardHelp({
 
     return (
 
-        <GuideCard title={guide.title}>
+        <GuideCard
+            title={guide.title}
+        >
 
             {guide.paragraphs.map((paragraph, index) => (
 
