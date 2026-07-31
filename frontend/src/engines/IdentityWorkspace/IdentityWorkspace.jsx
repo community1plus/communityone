@@ -24,7 +24,7 @@ import {
 } from "../../framework/Workspace";
 
 import IdentityActions from "../../components/Identity/IdentityActions";
-import IdentityHelpPanel from "../../components/Guide/GuideCardHelp";
+import IdentityGuide from "../../components/Identity/IdentityGuide";
 import IdentityCapabilitySelector from "../../components/Identity/IdentityCapabilitySelector";
 import IdentitySectionRenderer from "../IdentityWorkspace/sections/IdentitySectionRenderer";
 
