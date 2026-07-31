@@ -14,11 +14,9 @@ export default function CapabilityGuide({
         default:
 
             return (
-
                 <IdentityGuide
                     section={section}
                 />
-
             );
 
     }
