@@ -30,17 +30,17 @@ export default function WorkspaceHeader({
 
 />
 
-            {meta && (
+{meta && (
 
-                <div className="workspace-header-meta">
+    <WorkspaceMeta>
 
-                    <WorkspaceMeta>
-                        {meta}
-                    </WorkspaceMeta>
+        <WorkspaceStatus
+            model={meta}
+        />
 
-                </div>
+    </WorkspaceMeta>
 
-            )}
+)}
 
         </header>
 

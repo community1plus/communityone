@@ -23,3 +23,11 @@
     align-items: center;
 
 }
+
+.workspace-meta {
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+}
