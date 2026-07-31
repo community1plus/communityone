@@ -1,3 +1,4 @@
+import GuideCard from "../Guide/GuideCard";
 export default function GuideTips() {
 
     return (
