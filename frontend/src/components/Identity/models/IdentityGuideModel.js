@@ -1,8 +1,6 @@
-import { createGuideModel }
-    from "../../../framework/Guide/models/GuideModel";
+import { createGuideModel } from "../../../framework/Guide/models/GuideModel";
 
-import { guideContent }
-    from "../../../framework/Guide/GuideContent";
+import { guideContent } from "../../../components/Guide/GuideContent";
 
 export function createIdentityGuideModel(section) {
 
