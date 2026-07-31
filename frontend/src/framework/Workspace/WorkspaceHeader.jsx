@@ -1,7 +1,7 @@
 import "./WorkspaceHeader.css";
-import WorkspaceStatus from "../Workspace/components/WorkspaceStatus";
-import WorkspaceMeta from "../Workspace/components/WorkspaceMeta";
-import WorkspaceIdentity from "../Workspace/components/WorkspaceIdentity";
+import WorkspaceStatus from "../Workspace/WorkspaceStatus";
+import WorkspaceMeta from "../Workspace/WorkspaceMeta";
+import WorkspaceIdentity from "../Workspace/WorkspaceIdentity";
 
 export default function WorkspaceHeader({
 
