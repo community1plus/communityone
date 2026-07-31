@@ -12,7 +12,7 @@ export default function WorkspaceHeader({
         title,
         subtitle,
 
-        status,
+        meta,
 
     } = model;
 
@@ -28,14 +28,17 @@ export default function WorkspaceHeader({
 
             </div>
 
-            {status && (
+            {meta && (
 
-                <div className="workspace-header-status">
+                <div className="workspace-header-meta">
 
-                    <WorkspaceStatus
-                        model={status}
-                    />
+                    <WorkspaceMeta>
+                        {meta}
+                    </WorkspaceMeta>
 
+                </div>
+
+            )}
                 </div>
 
             )}
