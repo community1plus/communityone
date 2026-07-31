@@ -1,4 +1,4 @@
-import "./ProfileHelpPanel.css";
+import "./GuideCardHelp.css";
 
 export default function GuideCardHelp({ section }) {
   switch (section) {
