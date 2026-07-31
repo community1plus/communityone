@@ -86,15 +86,14 @@ export default function CapabilityWorkspace({
 
             <WorkspaceSidebar>
 
-                <WorkspaceGuide>
+<WorkspaceGuide>
 
-                    <CapabilityGuide
-                        section={sectionId}
-                    >
-                        <GuideProgress />
-                    <CapabilityGuide/>    
+    <CapabilityGuide
+        capability="identity"
+        section={sectionId}
+    />
 
-                </WorkspaceGuide>
+</WorkspaceGuide>
 
                 <WorkspaceActions>
 
