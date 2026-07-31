@@ -20,13 +20,13 @@ export default function WorkspaceHeader({
 
         <header className="workspace-header">
 
-            <div className="workspace-header-text">
+<WorkspaceIdentity
 
-                {title && <h1>{title}</h1>}
+    title={title}
 
-                {subtitle && <p>{subtitle}</p>}
+    subtitle={subtitle}
 
-            </div>
+/>
 
             {meta && (
 
