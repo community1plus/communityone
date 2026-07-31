@@ -131,7 +131,7 @@ const workspace =
 
 <WorkspaceGuide>
 
-    <GuideProgress />
+    <GuideCardProgress />
 
 </WorkspaceGuide>
 
