@@ -1,5 +1,5 @@
 import "./WorkspaceHeader.css";
-import WorkspaceStatus from "./WorkspaceStatus";
+import WorkspaceStatus from "../Workspace/components/WorkspaceStatus";
 
 export default function WorkspaceHeader({
 
