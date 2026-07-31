@@ -127,31 +127,20 @@ const workspace =
 
             </WorkspaceMain>
 
-            <WorkspaceSidebar>
+<WorkspaceSidebar>
 
-<WorkspaceGuide>
+    <div
+        style={{
+            background: "red",
+            color: "white",
+            minHeight: "600px",
+            padding: "20px",
+        }}
+    >
+        SIDEBAR IS WORKING
+    </div>
 
-    <CapabilityGuide
-        capability={capability}
-        section={sectionId}
-    />
-
-</WorkspaceGuide>
-
-<WorkspaceActions>
-
-    <CapabilityActions
-        capability={capability}
-        editing={editing}
-        savingProfile={savingProfile}
-        form={form}
-        setEditing={setEditing}
-        handleSaveProfile={handleSaveProfile}
-    />
-
-</WorkspaceActions>
-
-            </WorkspaceSidebar>
+</WorkspaceSidebar>
 
         </WorkspaceShell>
 
