@@ -68,6 +68,9 @@ from "./WorkspaceTabs";
 export { default as WorkspaceIdentity }
 from "./WorkspaceIdentity";
 
+export { default as WorkspaceMeta }
+from "./WorkspaceMeta";
+
 export { default as WorkspaceClose } from "./WorkspaceClose";
 
 export * from "./Form";
