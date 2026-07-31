@@ -32,13 +32,13 @@ export default function WorkspaceHeader({
 
 {meta && (
 
-    <WorkspaceMeta>
+<WorkspaceMeta>
 
-        <WorkspaceStatus
-            model={meta}
-        />
+    <ProgressRing
+        model={meta}
+    />
 
-    </WorkspaceMeta>
+</WorkspaceMeta>
 
 )}
 
