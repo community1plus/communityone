@@ -1,4 +1,4 @@
-export default function GuideProgress() {
+export default function GuideCardProgress() {
 
     return (
 
