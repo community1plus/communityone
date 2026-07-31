@@ -1,6 +1,6 @@
 import "./ProfileHelpPanel.css";
 
-export default function ProfileHelpPanel({ section }) {
+export default function GuideCardHelp({ section }) {
   switch (section) {
     /* =====================================
        IDENTITY

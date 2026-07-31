@@ -1,4 +1,4 @@
-import IdentityHelpPanel from "../Identity/IdentityHelpPanel";
+import IdentityGuide from "../Identity/IdentityGuide";
 
 export default function CapabilityGuide({
 
@@ -14,9 +14,11 @@ export default function CapabilityGuide({
         default:
 
             return (
-                <IdentityHelpPanel
+
+                <IdentityGuide
                     section={section}
                 />
+
             );
 
     }

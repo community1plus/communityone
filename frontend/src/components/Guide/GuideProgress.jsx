@@ -1,16 +1,12 @@
-import WorkspaceCard from "../Workspace/WorkspaceCard";
-
 export default function GuideProgress() {
 
     return (
 
-        <WorkspaceCard>
+        <div>
 
-            <h3>Identity Progress</h3>
+            Guide Progress
 
-            <p>72% Complete</p>
-
-        </WorkspaceCard>
+        </div>
 
     );
 
