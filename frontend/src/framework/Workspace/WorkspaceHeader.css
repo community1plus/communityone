@@ -20,6 +20,16 @@
 
 }
 
+.workspace-header-side {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 24px;
+
+}
+
 .workspace-header-text {
 
     display: flex;
