@@ -1,3 +1,4 @@
+import GuideCard from "./GuideCard";
 export default function GuideAI() {
 
     return (

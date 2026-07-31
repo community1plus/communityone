@@ -1,4 +1,4 @@
-
+import GuideCard from "./GuideCard";
 export default function GuideNext() {
 
     return (
