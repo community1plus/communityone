@@ -129,11 +129,14 @@ const workspace =
 
 <WorkspaceSidebar>
 
-<WorkspaceGuide>
+    <WorkspaceGuide>
 
-    <GuideCardProgress />
+        <CapabilityGuide
+            capability={capability}
+            section={sectionId}
+        />
 
-</WorkspaceGuide>
+    </WorkspaceGuide>
 
 </WorkspaceSidebar>
 
