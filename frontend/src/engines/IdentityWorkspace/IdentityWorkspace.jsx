@@ -127,26 +127,31 @@ const workspace =
 
             </WorkspaceMain>
 
-<WorkspaceSidebar>
+            <WorkspaceSidebar>
 
-    <WorkspaceGuide>
+<WorkspaceGuide>
 
-        <CapabilityGuide
-            capability={capability}
-            section={sectionId}
-        />
+    <CapabilityGuide
+        capability={capability}
+        section={sectionId}
+    />
 
-    </WorkspaceGuide>
+</WorkspaceGuide>
 
-    <WorkspaceActions>
+<WorkspaceActions>
 
-        <CapabilityActions
-            ...
-        />
+    <CapabilityActions
+        capability={capability}
+        editing={editing}
+        savingProfile={savingProfile}
+        form={form}
+        setEditing={setEditing}
+        handleSaveProfile={handleSaveProfile}
+    />
 
-    </WorkspaceActions>
+</WorkspaceActions>
 
-</WorkspaceSidebar>
+            </WorkspaceSidebar>
 
         </WorkspaceShell>
 
