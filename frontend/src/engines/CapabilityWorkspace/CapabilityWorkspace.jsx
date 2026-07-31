@@ -16,7 +16,7 @@ import CapabilitySelector from "./components/CapabilitySelector";
 import CapabilitySectionRenderer from "./sections/CapabilitySectionRenderer";
 import CapabilityGuide from "../../components/Capability/CapabilityGuide";
 import CapabilityActions from "../../components/Capability/CapabilityActions";
-import GuideProgress from "../../components/Guide/GuideProgress";
+import GuideProgress from "../../components/Guide/GuideCardProgress";
 
 export default function CapabilityWorkspace({
 
