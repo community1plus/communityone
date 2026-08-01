@@ -21,11 +21,19 @@ export default function WorkspaceHeader({
 
     return (
 
+
+
 <header className="workspace-header">
 
-    <h1>HEADER WORKS</h1>
+    <pre>
+
+        {JSON.stringify(model, null, 2)}
+
+    </pre>
 
 </header>
+
+
 
     );
 
