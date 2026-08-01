@@ -22,11 +22,17 @@ export function buildIdentityWorkspace(state, actions) {
 
         header: createWorkspaceHeaderModel({
 
-            title: "IDENTITY",
-            subtitle: "Your trusted identity.",
-            onClose: editMode ? closeProfile : undefined,
+    title,
+    subtitle,
 
-        }),
+    meta: {
+
+        percentage: completion,
+        label: "Complete",
+
+    },
+
+}),
 
         sections: createWorkspaceSectionsModel({
 

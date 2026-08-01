@@ -21,19 +21,30 @@ export default function WorkspaceHeader({
 
     return (
 
+        <header className="workspace-header">
+
+<WorkspaceIdentity
+
+    title={title}
+
+    subtitle={subtitle}
+
+/>
+
+{meta && (
 
 
-<header className="workspace-header">
+<WorkspaceMeta>
 
-    <pre>
+    <ProgressRing
+        model={meta}
+    />
+    
+</WorkspaceMeta>
 
-        {JSON.stringify(model, null, 2)}
+)}
 
-    </pre>
-
-</header>
-
-
+        </header>
 
     );
 
