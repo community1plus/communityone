@@ -8,7 +8,6 @@ export default function WorkspaceMeta({
 
         <div
             className="workspace-meta"
-            style={{ background: "yellow" }}
         >
 
             {children}

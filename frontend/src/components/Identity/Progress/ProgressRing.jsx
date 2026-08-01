@@ -1,7 +1,6 @@
 import "./ProgressRing.css";
 export default function ProgressRing() {
 
-    console.log("Identity ProgressRing");
 
     return (
 
