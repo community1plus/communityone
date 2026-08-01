@@ -6,7 +6,10 @@ export default function WorkspaceMeta({
 
     return (
 
-        <div className="workspace-meta">
+        <div
+            className="workspace-meta"
+            style={{ background: "yellow" }}
+        >
 
             {children}
 
