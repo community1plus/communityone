@@ -1,5 +1,4 @@
 import "./WorkspaceHeader.css";
-import WorkspaceStatus from "../Workspace/WorkspaceStatus";
 import WorkspaceMeta from "../Workspace/WorkspaceMeta";
 import WorkspaceIdentity from "../Workspace/WorkspaceIdentity";
 import ProgressRing from "../../components/Identity/Progress/ProgressRing";
