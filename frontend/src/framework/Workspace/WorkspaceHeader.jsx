@@ -1,7 +1,7 @@
 import "./WorkspaceHeader.css";
 import WorkspaceMeta from "../Workspace/WorkspaceMeta";
 import WorkspaceIdentity from "../Workspace/WorkspaceIdentity";
-import ProgressRing from "../../components/Identity/Progress/ProgressRing";
+import WorkspaceCompletion from "../Workspace/WorkspaceCompletion";
 
 export default function WorkspaceHeader({
 
@@ -35,7 +35,7 @@ export default function WorkspaceHeader({
 
 <WorkspaceMeta>
 
-    <ProgressRing
+    <WorkspaceCompletion
         model={meta}
     />
     

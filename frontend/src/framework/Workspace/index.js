@@ -13,6 +13,9 @@ from "./WorkspaceGuide";
 export { default as WorkspaceMain }
 from "./WorkspaceMain";
 
+export { default as WorkspaceCompletion }
+from "./WorkspaceCompletion";
+
 export { default as WorkspaceSidebar }
 from "./WorkspaceSidebar";
 

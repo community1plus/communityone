@@ -1,0 +1,33 @@
+.progress-ring {
+
+    --ring-size: 72px;
+
+}
+
+.progress-ring-circle {
+
+    width: var(--ring-size);
+    height: var(--ring-size);
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border: 4px solid var(--border-strong);
+
+    border-radius: 50%;
+
+    background: var(--panel-solid);
+
+}
+
+.progress-ring-value {
+
+    font-size: 0.95rem;
+
+    font-weight: 700;
+
+    color: var(--text);
+
+}
