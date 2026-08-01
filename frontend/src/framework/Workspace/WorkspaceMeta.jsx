@@ -12,10 +12,6 @@ export default function WorkspaceMeta({
 
         </div>
 
-        <div style={{ background: "yellow" }}>
-    {children}
-</div>
-
     );
 
 }
