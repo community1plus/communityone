@@ -1,3 +1,4 @@
+import "./WorkspaceIdentity.css";
 export default function WorkspaceIdentity({
 
     title,
