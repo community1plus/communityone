@@ -33,11 +33,13 @@ export default function WorkspaceHeader({
 
 {meta && (
 
+
 <WorkspaceMeta>
 
     <ProgressRing
         model={meta}
     />
+    console.log(meta);
 
 </WorkspaceMeta>
 
