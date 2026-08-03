@@ -125,10 +125,11 @@ export default function IdentityWorkspace({
 
                 <WorkspaceGuide>
 
-                    <CapabilityGuide
-                        capability={capability}
-                        section={sectionId}
-                    />
+<>
+    <h2>Hello Guide</h2>
+
+    <p>If you can read this, the sidebar is working.</p>
+</>
 
                 </WorkspaceGuide>
 

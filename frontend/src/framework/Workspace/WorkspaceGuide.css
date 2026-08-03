@@ -1,14 +1,15 @@
 .workspace-guide {
 
     display: flex;
-
     flex-direction: column;
 
-    height: 100%;
+    width: 100%;
 
-    background: var(--panel-solid);
+    min-height: 700px;
 
-    border: 1px solid var(--border);
+    background: white;
+
+    border: 1px solid #d8d8d8;
 
     border-radius: 16px;
 
@@ -18,55 +19,20 @@
 
 .workspace-guide-header {
 
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
     padding: 20px 24px;
 
-    border-bottom: 1px solid var(--border);
+    font-weight: 700;
 
-    background: var(--panel);
+    border-bottom: 1px solid #e5e5e5;
 
-}
-
-.workspace-guide-header h3 {
-
-    margin: 0;
-
-    font-size: 1rem;
-
-    font-weight: 600;
+    background: #fafafa;
 
 }
-
 
 .workspace-guide-body {
 
     flex: 1;
 
     padding: 24px;
-
-    overflow-y: auto;
-
-}
-
-.workspace-guide {
-
-    background: yellow;
-
-    min-height: 400px;
-
-}
-
-.workspace-guide-footer {
-
-    padding: 20px 24px;
-
-    border-top: 1px solid var(--border);
-
-    background: var(--panel);
 
 }

@@ -68,13 +68,8 @@
     top:32px;
 
     align-self:start;
-
-}
-
-.workspace-sidebar {
-
     background: lightblue;
-
+    width: 340px;
 }
 
 /* ==========================================================
