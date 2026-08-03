@@ -1,0 +1,17 @@
+.workspace-sidebar {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 24px;
+
+    width: 340px;
+
+    position: sticky;
+
+    top: 32px;
+
+    align-self: start;
+
+}

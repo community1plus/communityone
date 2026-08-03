@@ -1,16 +1,16 @@
-export default function WorkspaceSidebar() {
+import "./WorkspaceShell.css";
+
+export default function WorkspaceSidebar({
+
+    children,
+
+}) {
 
     return (
 
-        <aside
-            style={{
-                width: "340px",
-                background: "red",
-                minHeight: "800px",
-            }}
-        >
+        <aside className="workspace-sidebar">
 
-            Sidebar
+            {children}
 
         </aside>
 
