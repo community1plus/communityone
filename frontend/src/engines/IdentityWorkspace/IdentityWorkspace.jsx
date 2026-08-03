@@ -1,5 +1,5 @@
 import { useState } from "react";
-import WorkspaceGuideCard from "./Guide/WorkspaceGuideCard";
+import WorkspaceGuideCard from "../../framework/GuideCard/WorkspaceGuideCard";
 import CapabilityRenderer from "../../components/Capability/CapabilityRenderer";
 import CapabilityGuide from "../../components/Capability/CapabilityGuide";
 import IdentityCapabilitySelector from "../../components/Identity/IdentityCapabilitySelector";
