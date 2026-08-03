@@ -3,9 +3,7 @@ import "./WorkspaceGuide.css";
 export default function WorkspaceGuide({
 
     title = "Guide",
-
     children,
-
     footer,
 
 }) {

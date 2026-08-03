@@ -18,9 +18,17 @@
 
 .workspace-guide-header {
 
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
     padding: 20px 24px;
 
     border-bottom: 1px solid var(--border);
+
+    background: var(--panel);
 
 }
 
@@ -28,11 +36,12 @@
 
     margin: 0;
 
-    font-size: 0.95rem;
+    font-size: 1rem;
 
     font-weight: 600;
 
 }
+
 
 .workspace-guide-body {
 
@@ -49,5 +58,7 @@
     padding: 20px 24px;
 
     border-top: 1px solid var(--border);
+
+    background: var(--panel);
 
 }
