@@ -1,5 +1,5 @@
 import { useState } from "react";
-
+import WorkspaceGuideCard from "./Guide/WorkspaceGuideCard";
 import CapabilityRenderer from "../../components/Capability/CapabilityRenderer";
 import CapabilityGuide from "../../components/Capability/CapabilityGuide";
 import IdentityCapabilitySelector from "../../components/Identity/IdentityCapabilitySelector";
@@ -123,15 +123,35 @@ export default function IdentityWorkspace({
 
             <WorkspaceSidebar>
 
-                <WorkspaceGuide>
+import WorkspaceGuideCard from "./Guide/WorkspaceGuideCard";
 
-<>
-    <h2>Hello Guide</h2>
+<WorkspaceGuide title="Identity Guide">
 
-    <p>If you can read this, the sidebar is working.</p>
-</>
+    <WorkspaceGuideCard
+        title="Welcome"
+    >
 
-                </WorkspaceGuide>
+        Manage your trusted identity.
+
+    </WorkspaceGuideCard>
+
+    <WorkspaceGuideCard
+        title="Progress"
+    >
+
+        20% Complete
+
+    </WorkspaceGuideCard>
+
+    <WorkspaceGuideCard
+        title="Current Section"
+    >
+
+        Personal Details
+
+    </WorkspaceGuideCard>
+
+</WorkspaceGuide>
 
             </WorkspaceSidebar>
 
