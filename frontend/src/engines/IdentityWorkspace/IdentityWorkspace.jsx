@@ -121,15 +121,19 @@ export default function IdentityWorkspace({
 
             </WorkspaceMain>
 
-<div
-    style={{
-        width: 340,
-        minHeight: 800,
-        background: "red",
-    }}
->
-    TEST SIDEBAR
-</div>
+            <WorkspaceSidebar>
+
+                <WorkspaceGuide>
+
+<>
+    <h2>Hello Guide</h2>
+
+    <p>If you can read this, the sidebar is working.</p>
+</>
+
+                </WorkspaceGuide>
+
+            </WorkspaceSidebar>
 
         </WorkspaceShell>
 
