@@ -53,6 +53,14 @@
 
 }
 
+.workspace-guide {
+
+    background: yellow;
+
+    min-height: 400px;
+
+}
+
 .workspace-guide-footer {
 
     padding: 20px 24px;
