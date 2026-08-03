@@ -1,14 +1,16 @@
-export default function WorkspaceSidebar({
-
-    children,
-
-}) {
+export default function WorkspaceSidebar() {
 
     return (
 
-        <aside className="workspace-sidebar">
+        <aside
+            style={{
+                width: "340px",
+                background: "red",
+                minHeight: "800px",
+            }}
+        >
 
-            {children}
+            Sidebar
 
         </aside>
 
