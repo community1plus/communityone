@@ -25,7 +25,7 @@ from "./WorkspaceContext";
 export { default as WorkspaceBody }
 from "./WorkspaceBody";
 
-import {default as WorkspaceGuideCard} from "./GuideCard/WorkspaceGuideCard";
+export {default as WorkspaceGuideCard} from "./GuideCard/WorkspaceGuideCard";
 
 export { default as WorkspaceActions }
 from "./WorkspaceActions";
