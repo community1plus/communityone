@@ -1,34 +1,25 @@
-import { createWorkspace } from "../../framework/Workspace/builders/createWorkspace";
-import { createWorkspaceHeaderModel } from "../../framework/Workspace/models/WorkspaceHeaderModel";
-import { createWorkspaceProgressModel } from "../../framework/Workspace/models/WorkspaceProgressModel";
-import { createWorkspaceSectionsModel } from "../../framework/Workspace/models/WorkspaceSectionsModel";
+import { useState } from "react";
+
 import CapabilityRenderer from "../../components/Capability/CapabilityRenderer";
 import CapabilityGuide from "../../components/Capability/CapabilityGuide";
-import WalletSectionRenderer from "../../capabilities/sections/WalletSectionRenderer";
-import { useState } from "react";
+import IdentityCapabilitySelector from "../../components/Identity/IdentityCapabilitySelector";
+
 import { buildCapabilityWorkspace } from "../../framework/Workspace/builders/buildCapabilityWorkspace";
-import { buildWalletWorkspace } from "../../framework/Workspace/builders/buildWalletWorkspace";
-import CapabilityActions from "../../components/Capability/CapabilityActions";
+
 import {
     WorkspaceShell,
     WorkspaceMain,
     WorkspaceSidebar,
     WorkspaceHeader,
     WorkspaceRegionHeader,
+    WorkspaceContext,
     WorkspaceWorkflow,
-    WorkspaceProgress,
     WorkspaceBody,
     WorkspaceGuide,
-    WorkspaceActions,
     WorkspaceTabs,
+    WorkspaceCompletion,
     WorkspaceClose,
-    WorkspaceIdentity
 } from "../../framework/Workspace";
-
-import IdentityActions from "../../components/Identity/IdentityActions";
-import IdentityGuide from "../../components/Identity/IdentityGuide";
-import IdentityCapabilitySelector from "../../components/Identity/IdentityCapabilitySelector";
-import IdentitySectionRenderer from "../IdentityWorkspace/sections/IdentitySectionRenderer";
 
 export default function IdentityWorkspace({
 
@@ -37,35 +28,23 @@ export default function IdentityWorkspace({
     actions,
 
 }) {
-    const [capability, setCapability] =
-    useState(initialCapability);
+
+    const [capability] = useState(initialCapability);
 
     const {
+
         values,
         form,
 
         editing,
-        editMode,
-        savingProfile,
-
-        completion,
 
         activeSteps,
         currentStep,
         sectionId,
+
     } = state;
 
-    const {
-        setCurrentStep,
-        setEditing,
-
-        handleSaveProfile,
-        closeProfile,
-    } = actions;
-
-
-const workspace =
-    buildCapabilityWorkspace({
+    const workspace = buildCapabilityWorkspace({
 
         capability,
 
@@ -74,33 +53,52 @@ const workspace =
         actions,
 
     });
-    //
-    // Workspace Models
-    //
-
-  console.log("Capability:", capability);
 
     return (
 
         <WorkspaceShell>
 
             <WorkspaceMain>
-                <WorkspaceClose
-                 onClick={workspace.header.onClose}
-                />
+
                 <WorkspaceRegionHeader>
 
-                    <WorkspaceHeader model={workspace.header} />
+                    <WorkspaceHeader
+                        model={workspace.header}
+                    />
 
                 </WorkspaceRegionHeader>
 
-                <WorkspaceWorkflow>
+                <WorkspaceContext
 
-                    <IdentityCapabilitySelector
-                        values={values}
-                        setValue={form.setValue}
-                        readOnly={!editing}
-                    />
+                    mode={
+
+                        <IdentityCapabilitySelector
+                            values={values}
+                            setValue={form.setValue}
+                            readOnly={!editing}
+                        />
+
+                    }
+
+                    meta={
+
+                        <WorkspaceCompletion
+                            model={workspace.progress}
+                        />
+
+                    }
+
+                    actions={
+
+                        <WorkspaceClose
+                            onClick={workspace.header.onClose}
+                        />
+
+                    }
+
+                />
+
+                <WorkspaceWorkflow>
 
                     <WorkspaceTabs
                         model={workspace.sections}
@@ -108,41 +106,33 @@ const workspace =
 
                 </WorkspaceWorkflow>
 
-                {/*
+                <WorkspaceBody>
 
-<WorkspaceProgress
-    model={workspace.progress}
-/>
+                    <CapabilityRenderer
+                        capability={capability}
+                        sectionId={sectionId}
+                        activeSteps={activeSteps}
+                        currentStep={currentStep}
+                        form={form}
+                        editing={editing}
+                    />
 
-*/}
-
-<WorkspaceBody>
-
-    <CapabilityRenderer
-        capability={capability}
-        sectionId={sectionId}
-        activeSteps={activeSteps}
-        currentStep={currentStep}
-        form={form}
-        editing={editing}
-    />
-
-</WorkspaceBody>
+                </WorkspaceBody>
 
             </WorkspaceMain>
 
-<WorkspaceSidebar>
+            <WorkspaceSidebar>
 
-    <WorkspaceGuide>
+                <WorkspaceGuide>
 
-        <CapabilityGuide
-            capability={capability}
-            section={sectionId}
-        />
+                    <CapabilityGuide
+                        capability={capability}
+                        section={sectionId}
+                    />
 
-    </WorkspaceGuide>
+                </WorkspaceGuide>
 
-</WorkspaceSidebar>
+            </WorkspaceSidebar>
 
         </WorkspaceShell>
 
