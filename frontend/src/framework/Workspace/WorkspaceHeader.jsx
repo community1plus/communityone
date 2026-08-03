@@ -9,14 +9,14 @@ export default function WorkspaceHeader({
 
 }) {
 
-    const {
+const {
 
-        title,
-        subtitle,
+    title,
+    subtitle,
 
-        meta,
+    meta,
 
-    } = model;
+} = model;
 
     return (
 
