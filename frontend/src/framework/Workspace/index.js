@@ -19,6 +19,9 @@ from "./WorkspaceCompletion";
 export { default as WorkspaceSidebar }
 from "./WorkspaceSidebar";
 
+export { default as WorkspaceContext }
+from "./WorkspaceContext";
+
 export { default as WorkspaceBody }
 from "./WorkspaceBody";
 
