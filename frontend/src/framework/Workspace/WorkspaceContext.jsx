@@ -8,39 +8,29 @@ export default function WorkspaceContext({
 
     return (
 
-        <section className="workspace-context">
+<section className="workspace-context">
 
-            <div className="workspace-context-mode">
+    <div className="workspace-context-mode">
 
-                {mode}
+        {mode}
 
-            </div>
+    </div>
 
-            <div className="workspace-context-right">
+    <div className="workspace-context-spacer" />
 
-                {meta && (
+    <div className="workspace-context-meta">
 
-                    <div className="workspace-context-meta">
+        {meta}
 
-                        {meta}
+    </div>
 
-                    </div>
+    <div className="workspace-context-actions">
 
-                )}
+        {actions}
 
-                {actions && (
+    </div>
 
-                    <div className="workspace-context-actions">
-
-                        {actions}
-
-                    </div>
-
-                )}
-
-            </div>
-
-        </section>
+</section>
 
     );
 
