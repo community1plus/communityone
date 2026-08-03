@@ -9,21 +9,31 @@ export default function WorkspaceContext({
 
     return (
 
-        <section className="workspace-context">
+<section className="workspace-context">
 
-            <div className="workspace-context-mode">
+    <div className="workspace-context-mode">
 
-                {mode}
+        {mode}
 
-            </div>
+    </div>
 
-            <div className="workspace-context-indicators">
+    <div className="workspace-context-right">
 
-                {indicators}
+        <div className="workspace-context-indicators">
 
-            </div>
+            {indicators}
 
-        </section>
+        </div>
+
+        <div className="workspace-context-actions">
+
+            {actions}
+
+        </div>
+
+    </div>
+
+</section>
 
     );
 

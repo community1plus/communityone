@@ -30,12 +30,12 @@ PROFILE TYPES
 
 export const PROFILE_TABS = [
   {
-    id: "PERSONAL",
-    label: "Personal",
+    id: "PERSON",
+    label: "Person",
   },
   {
     id: "ORG",
-    label: "Organisation",
+    label: "Entity",
   },
   {
     id: "COMMUNITY_POLICIES",

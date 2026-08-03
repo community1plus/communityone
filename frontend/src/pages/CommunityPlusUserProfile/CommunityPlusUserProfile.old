@@ -46,7 +46,7 @@ const PERSONAL_EMAIL_DOMAINS = new Set([
 ]);
 
 const PROFILE_TABS = [
-  { id: "PERSONAL", label: "Personal" },
+  { id: "PERSON", label: "Person" },
   { id: "ORG", label: "Organisation" },
   { id: "COMMUNITY_POLICIES", label: "Community Policies" },
 ];

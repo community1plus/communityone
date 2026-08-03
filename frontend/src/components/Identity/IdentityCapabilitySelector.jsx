@@ -38,12 +38,12 @@ export default function ProfileCapabilitySelector({
 
     options={[
         {
-            label: "Personal",
-            value: "personal",
+            label: "Person",
+            value: "person",
         },
         {
-            label: "Organisation",
-            value: "organisation",
+            label: "Entity",
+            value: "entity",
         },
     ]}
 
