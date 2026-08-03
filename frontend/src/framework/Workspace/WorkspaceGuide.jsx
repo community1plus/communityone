@@ -1,6 +1,12 @@
+import "./WorkspaceGuide.css";
+
 export default function WorkspaceGuide({
 
+    title = "Guide",
+
     children,
+
+    footer,
 
 }) {
 
@@ -8,17 +14,27 @@ export default function WorkspaceGuide({
 
         <aside className="workspace-guide">
 
-            <div className="workspace-guide-header">
+            <header className="workspace-guide-header">
 
-                Guide
+                <h3>{title}</h3>
 
-            </div>
+            </header>
 
             <div className="workspace-guide-body">
 
                 {children}
 
             </div>
+
+            {footer && (
+
+                <footer className="workspace-guide-footer">
+
+                    {footer}
+
+                </footer>
+
+            )}
 
         </aside>
 
