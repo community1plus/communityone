@@ -4,6 +4,34 @@
 
     align-items: center;
 
-    margin: 24px 0;
+    justify-content: space-between;
+
+    gap: 32px;
+
+    padding: 16px 0;
+
+}
+
+.workspace-context-mode {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 16px;
+
+    flex: 1;
+
+}
+
+.workspace-context-indicators {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 20px;
+
+    flex-shrink: 0;
 
 }

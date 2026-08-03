@@ -1,6 +1,9 @@
+import "./WorkspaceContext.css";
+
 export default function WorkspaceContext({
 
-    children,
+    mode,
+    indicators,
 
 }) {
 
@@ -8,7 +11,17 @@ export default function WorkspaceContext({
 
         <section className="workspace-context">
 
-            {children}
+            <div className="workspace-context-mode">
+
+                {mode}
+
+            </div>
+
+            <div className="workspace-context-indicators">
+
+                {indicators}
+
+            </div>
 
         </section>
 

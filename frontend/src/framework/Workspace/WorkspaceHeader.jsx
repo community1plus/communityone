@@ -1,7 +1,5 @@
 import "./WorkspaceHeader.css";
-import WorkspaceMeta from "../Workspace/WorkspaceMeta";
 import WorkspaceIdentity from "../Workspace/WorkspaceIdentity";
-import WorkspaceCompletion from "../Workspace/WorkspaceCompletion";
 
 export default function WorkspaceHeader({
 
@@ -9,39 +7,21 @@ export default function WorkspaceHeader({
 
 }) {
 
-const {
+    const {
 
-    title,
-    subtitle,
+        title,
+        subtitle,
 
-    meta,
-
-} = model;
+    } = model;
 
     return (
 
         <header className="workspace-header">
 
-<WorkspaceIdentity
-
-    title={title}
-
-    subtitle={subtitle}
-
-/>
-
-{meta && (
-
-
-<WorkspaceMeta>
-
-    <WorkspaceCompletion
-        model={meta}
-    />
-    
-</WorkspaceMeta>
-
-)}
+            <WorkspaceIdentity
+                title={title}
+                subtitle={subtitle}
+            />
 
         </header>
 
