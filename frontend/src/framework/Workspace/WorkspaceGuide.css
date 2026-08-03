@@ -1,31 +1,32 @@
 .workspace-guide {
 
-    display: flex;
-    flex-direction: column;
+    background: var(--panel-solid);
 
-    width: 100%;
+    border: 1px solid var(--border);
 
-    min-height: 700px;
-
-    background: white;
-
-    border: 1px solid #d8d8d8;
-
-    border-radius: 16px;
-
-    overflow: hidden;
+    border-radius: 20px;
 
 }
 
 .workspace-guide-header {
 
+    display: flex;
+
+    align-items: center;
+
     padding: 20px 24px;
 
-    font-weight: 700;
+    border-bottom: 1px solid var(--border);
 
-    border-bottom: 1px solid #e5e5e5;
+}
 
-    background: #fafafa;
+.workspace-guide-header h3 {
+
+    margin: 0;
+
+    font-size: 1rem;
+
+    font-weight: 600;
 
 }
 
@@ -34,5 +35,15 @@
     flex: 1;
 
     padding: 24px;
+
+    overflow-y: auto;
+
+}
+
+.workspace-guide-footer {
+
+    padding: 20px 24px;
+
+    border-top: 1px solid var(--border);
 
 }
