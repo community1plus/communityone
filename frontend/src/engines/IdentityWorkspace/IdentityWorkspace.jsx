@@ -124,8 +124,6 @@ export default function IdentityWorkspace({
 
             <WorkspaceSidebar>
 
-import WorkspaceGuideCard from "./Guide/WorkspaceGuideCard";
-
 <WorkspaceGuide title="Identity Guide">
 
     <WorkspaceGuideCard
