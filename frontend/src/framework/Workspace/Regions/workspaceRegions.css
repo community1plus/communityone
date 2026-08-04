@@ -3,64 +3,21 @@
     display: grid;
 
     grid-template-columns:
-
-        minmax(0, 1fr)
-
+        minmax(0,1fr)
         auto
-
         auto;
 
-    column-gap: 48px;
+    grid-template-rows:
+        auto
+        auto;
+
+    column-gap: 40px;
+    row-gap: 12px;
 
     align-items: end;
 
     padding-bottom: 24px;
 
     border-bottom: 1px solid var(--border);
-
-}
-
-.workspace-region-workflow {
-
-    display: flex;
-    flex-direction: column;
-
-    gap: 20px;
-
-}
-
-.workspace-region-progress {
-
-    display: flex;
-    flex-direction: column;
-
-    gap: 12px;
-
-}
-
-.workspace-region-body {
-
-    display: flex;
-    flex-direction: column;
-
-    gap: 24px;
-
-}
-
-.workspace-region-guide {
-
-    display: flex;
-    flex-direction: column;
-
-    gap: 20px;
-
-}
-
-.workspace-region-actions {
-
-    display: flex;
-    flex-direction: column;
-
-    gap: 16px;
 
 }
