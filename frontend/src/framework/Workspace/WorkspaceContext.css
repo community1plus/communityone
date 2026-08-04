@@ -11,7 +11,13 @@
 
     gap: 32px;
 
-    padding: 8px 0 24px;
+    padding: 20px 24px;
+
+    background: var(--panel-soft);
+
+    border: 1px solid var(--border);
+
+    border-radius: 16px;
 
 }
 

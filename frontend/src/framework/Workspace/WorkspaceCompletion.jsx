@@ -21,11 +21,23 @@ export default function WorkspaceCompletion({
 
             <ProgressRing
                 value={value}
+                size={56}
+                stroke={5}
             />
 
-            <div className="workspace-completion-label">
+            <div className="workspace-completion-content">
 
-                {label}
+                <div className="workspace-completion-value">
+
+                    {value}%
+
+                </div>
+
+                <div className="workspace-completion-label">
+
+                    {label}
+
+                </div>
 
             </div>
 
