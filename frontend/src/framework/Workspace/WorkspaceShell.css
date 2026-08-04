@@ -31,6 +31,10 @@
 
     display: grid;
 
+    width: 100%;
+
+    min-width: 0;
+
     grid-template-columns:
         minmax(0, 1fr)
         320px;
@@ -38,8 +42,6 @@
     gap: 40px;
 
     align-items: stretch;
-
-    height: 100%;
 
 }
 
