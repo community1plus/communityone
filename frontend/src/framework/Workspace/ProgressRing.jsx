@@ -10,15 +10,7 @@ export default function ProgressRing({
 
         <div className="progress-ring">
 
-            <div className="progress-ring-circle">
-
-                <div className="progress-ring-value">
-
-                    {value}%
-
-                </div>
-
-            </div>
+            <div className="progress-ring-circle" />
 
         </div>
 
