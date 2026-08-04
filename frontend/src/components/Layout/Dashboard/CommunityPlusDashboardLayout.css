@@ -1,21 +1,21 @@
 /* ==========================================================
-   COMMUNITY ONE DASHBOARD LAYOUT
-   ========================================================== */
-
-/* ==========================================================
-   Root
+   COMMUNITY ONE DASHBOARD
    ========================================================== */
 
 html,
 body,
 #root {
 
-    margin: 0;
-
     width: 100%;
     height: 100%;
 
+    margin: 0;
+
 }
+
+/* ==========================================================
+   Dashboard Root
+   ========================================================== */
 
 .dashboard-root {
 
@@ -25,7 +25,10 @@ body,
         auto
         minmax(0, 1fr);
 
-    min-height: 100vh;
+    width: 100%;
+    height: 100vh;
+
+    overflow: hidden;
 
     background:
         radial-gradient(
@@ -58,7 +61,7 @@ body,
 }
 
 /* ==========================================================
-   Main Layout
+   Body
    ========================================================== */
 
 .dashboard-body {
@@ -69,12 +72,15 @@ body,
         240px
         minmax(0,1fr);
 
+    min-width: 0;
     min-height: 0;
+
+    overflow: hidden;
 
 }
 
 /* ==========================================================
-   Navigation Sidebar
+   Navigation
    ========================================================== */
 
 .dashboard-sidebar {
@@ -85,8 +91,6 @@ body,
     min-width: 0;
     min-height: 0;
 
-    position: relative;
-
     background:
         linear-gradient(
             180deg,
@@ -94,93 +98,46 @@ body,
             rgba(246,242,238,.96)
         );
 
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-
     border-right:
         1px solid rgba(230,223,216,.9);
 
     box-shadow:
         inset -1px 0 0 rgba(255,255,255,.45);
 
-}
-
-.dashboard-sidebar::before {
-
-    content: "";
-
-    position: absolute;
-
-    inset: 0 auto auto 0;
-
-    width: 100%;
-    height: 220px;
-
-    pointer-events: none;
-
-    background:
-        radial-gradient(
-            circle at top left,
-            rgba(255,255,255,.65),
-            transparent 70%
-        );
+    overflow: hidden;
 
 }
 
 /* ==========================================================
-   Workspace Content
+   Workspace Host
    ========================================================== */
 
 .dashboard-content {
 
+    display: flex;
+    flex-direction: column;
+
     min-width: 0;
     min-height: 0;
 
-    overflow-y: auto;
-    overflow-x: hidden;
-
-    position: relative;
+    overflow: hidden;
 
 }
 
 /* ==========================================================
-   Optional Scroll Container
+   Workspace Scroll Region
    ========================================================== */
 
-.scroll-container {
+.dashboard-scroll {
 
-    padding: 12px;
+    flex: 1;
 
-    min-height: 100%;
+    min-width: 0;
+    min-height: 0;
 
-}
+    overflow: auto;
 
-/* ==========================================================
-   Sidebar Navigation Effects
-   ========================================================== */
-
-.sidebar-section-title {
-
-    opacity: .6;
-
-}
-
-.sidebar-nav-item,
-.sidebar-link,
-.sidebar-menu-item {
-
-    transition:
-        transform .2s ease,
-        background .2s ease,
-        color .2s ease;
-
-}
-
-.sidebar-nav-item:hover,
-.sidebar-link:hover,
-.sidebar-menu-item:hover {
-
-    transform: translateX(2px);
+    padding: 24px;
 
 }
 
@@ -192,7 +149,9 @@ body,
 
     .dashboard-body {
 
-        grid-template-columns: 200px minmax(0,1fr);
+        grid-template-columns:
+            200px
+            minmax(0,1fr);
 
     }
 
@@ -203,7 +162,10 @@ body,
     .dashboard-body {
 
         grid-template-columns: 1fr;
-        grid-template-rows: auto 1fr;
+
+        grid-template-rows:
+            auto
+            minmax(0,1fr);
 
     }
 
@@ -211,8 +173,7 @@ body,
 
         border-right: none;
 
-        border-bottom:
-            1px solid #e6dfd8;
+        border-bottom: 1px solid #e6dfd8;
 
     }
 
