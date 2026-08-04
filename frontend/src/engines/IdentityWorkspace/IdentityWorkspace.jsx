@@ -65,23 +65,27 @@ export default function IdentityWorkspace({
 
             <WorkspaceMain>
 
-                <WorkspaceRegionHeader>
+<WorkspaceRegionHeader>
 
-                    <WorkspaceHeader
-                        model={header}
-                    />
+    <WorkspaceHeader
+        model={header}
+    />
 
-                    <IdentityCapabilitySelector
-                        values={values}
-                        setValue={form.setValue}
-                        readOnly={!editing}
-                    />
+    <WorkspaceHeaderControls>
 
-                    <WorkspaceCompletion
-                        model={progress}
-                    />
+        <IdentityCapabilitySelector
+            values={values}
+            setValue={form.setValue}
+            readOnly={!editing}
+        />
 
-                </WorkspaceRegionHeader>
+        <WorkspaceCompletion
+            model={progress}
+        />
+
+    </WorkspaceHeaderControls>
+
+</WorkspaceRegionHeader>
 
                 <WorkspaceWorkflow>
 

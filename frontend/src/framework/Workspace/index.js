@@ -82,6 +82,8 @@ from "./WorkspaceIdentity";
 export { default as WorkspaceMeta }
 from "./WorkspaceMeta";
 
+export { default as WorkspaceHeaderControls} from "./WorkspaceHeaderControls";
+
 export { default as WorkspaceClose } from "./WorkspaceClose";
 
 export * from "./Form";

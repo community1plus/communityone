@@ -1,0 +1,11 @@
+.workspace-header-controls {
+
+    display:flex;
+
+    align-items:flex-end;
+
+    gap:40px;
+
+    flex-shrink:0;
+
+}
