@@ -4,12 +4,17 @@
 
     flex-direction: column;
 
-    gap: 20px;
+    flex: 1;
 
-    padding: 24px;
+    min-height: 0;
 
+    background: var(--panel-solid);
+
+    border: 1px solid var(--border);
 
     border-radius: 20px;
+
+    overflow: hidden;
 
 }
 
@@ -38,6 +43,25 @@
 .workspace-guide-body {
 
     padding: 28px;
+
+}
+
+.workspace-guide-body {
+
+    flex: 1;
+
+    overflow-y: auto;
+
+    padding: 24px;
+}
+
+.workspace-guide-body {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 16px;
 
 }
 
