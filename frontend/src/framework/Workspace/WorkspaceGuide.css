@@ -6,15 +6,13 @@
 
     flex: 1;
 
-    min-height: 0;
+    overflow: hidden;
 
     background: var(--panel-solid);
 
     border: 1px solid var(--border);
 
     border-radius: 20px;
-
-    overflow: hidden;
 
 }
 

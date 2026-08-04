@@ -4,8 +4,8 @@
 
     flex-direction: column;
 
-    align-self: stretch;
-
     height: 100%;
+
+    align-self: stretch;
 
 }
