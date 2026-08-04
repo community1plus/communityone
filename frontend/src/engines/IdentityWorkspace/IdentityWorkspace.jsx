@@ -15,6 +15,7 @@ import {
     WorkspaceBody,
     WorkspaceGuide,
     WorkspacePanel,
+    WorkspaceHeaderControls,
     WorkspaceClose,
 } from "../../framework/Workspace";
 
