@@ -6,6 +6,8 @@
 
     gap: 16px;
 
+    align-self: end;
+
 }
 
 .workspace-completion-content {

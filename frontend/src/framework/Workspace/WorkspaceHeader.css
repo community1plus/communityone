@@ -2,9 +2,10 @@
 .workspace-header {
 
     display: flex;
+
     flex-direction: column;
 
-    gap: 12px;
+    gap: 6px;
 
 }
 

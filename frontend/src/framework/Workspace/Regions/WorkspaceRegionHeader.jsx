@@ -1,5 +1,3 @@
-//import "./WorkspaceRegions.css";
-
 export default function WorkspaceRegionHeader({
 
     children,
