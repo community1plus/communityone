@@ -7,16 +7,15 @@ import {
     WorkspaceShell,
     WorkspaceMain,
     WorkspaceSidebar,
-    WorkspaceHeader,
     WorkspaceRegionHeader,
-    WorkspaceContext,
+    WorkspaceHeader,
     WorkspaceWorkflow,
-    WorkspaceBody,
-    WorkspaceGuide,
     WorkspaceTabs,
     WorkspaceCompletion,
-    WorkspaceClose,
+    WorkspaceBody,
+    WorkspaceGuide,
     WorkspacePanel,
+    WorkspaceClose,
 } from "../../framework/Workspace";
 
 export default function IdentityWorkspace({
@@ -66,23 +65,23 @@ export default function IdentityWorkspace({
 
             <WorkspaceMain>
 
-<WorkspaceRegionHeader>
+                <WorkspaceRegionHeader>
 
-    <WorkspaceHeader
-        model={workspace.header}
-    />
+                    <WorkspaceHeader
+                        model={header}
+                    />
 
-    <IdentityCapabilitySelector
-        values={values}
-        setValue={form.setValue}
-        readOnly={!editing}
-    />
+                    <IdentityCapabilitySelector
+                        values={values}
+                        setValue={form.setValue}
+                        readOnly={!editing}
+                    />
 
-    <WorkspaceCompletion
-        model={workspace.progress}
-    />
+                    <WorkspaceCompletion
+                        model={progress}
+                    />
 
-</WorkspaceRegionHeader>
+                </WorkspaceRegionHeader>
 
                 <WorkspaceWorkflow>
 
@@ -119,7 +118,7 @@ export default function IdentityWorkspace({
 
                     </WorkspacePanel>
 
-                    <WorkspacePanel title="Progress">
+                    <WorkspacePanel title="Profile Completion">
 
                         {progress.value}% Complete
 
