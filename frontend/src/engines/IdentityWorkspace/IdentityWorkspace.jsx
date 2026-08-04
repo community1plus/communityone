@@ -20,6 +20,7 @@ import {
     WorkspaceTabs,
     WorkspaceCompletion,
     WorkspaceClose,
+    WorkspacePanel,
 } from "../../framework/Workspace";
 
 export default function IdentityWorkspace({
@@ -126,29 +127,29 @@ export default function IdentityWorkspace({
 
 <WorkspaceGuide title="Identity Guide">
 
-    <WorkspaceGuideCard
-        title="Welcome"
-    >
+<WorkspacePanel
+    title="Welcome"
+>
 
-        Manage your trusted identity.
+    Manage your trusted identity.
 
-    </WorkspaceGuideCard>
+</WorkspacePanel>
 
-    <WorkspaceGuideCard
-        title="Progress"
-    >
+<WorkspacePanel
+    title="Progress"
+>
 
-        20% Complete
+    20% Complete
 
-    </WorkspaceGuideCard>
+</WorkspacePanel>
 
-    <WorkspaceGuideCard
-        title="Current Section"
-    >
+<WorkspacePanel
+    title="Current Section"
+>
 
-        Personal Details
+    Personal Details
 
-    </WorkspaceGuideCard>
+</WorkspacePanel>
 
 </WorkspaceGuide>
 

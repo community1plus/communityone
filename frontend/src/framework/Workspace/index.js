@@ -70,6 +70,9 @@ from "./Card/WorkspaceCardBody";
 export { default as WorkspaceCardFooter }
 from "./Card/WorkspaceCardFooter";
 
+export { default as WorkspacePanel }
+from "./WorkspacePanel";
+
 export { default as WorkspaceTabs }
 from "./WorkspaceTabs";
 

@@ -1,0 +1,35 @@
+.workspace-panel {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 12px;
+
+    padding: 20px;
+
+    border: 1px solid var(--border);
+
+    border-radius: 18px;
+
+    background: var(--panel-solid);
+
+}
+
+.workspace-panel-header {
+
+    font-size: .95rem;
+
+    font-weight: 700;
+
+    color: var(--text);
+
+}
+
+.workspace-panel-body {
+
+    color: var(--text-soft);
+
+    line-height: 1.6;
+
+}
