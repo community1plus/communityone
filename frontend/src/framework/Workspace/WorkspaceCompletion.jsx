@@ -27,17 +27,17 @@ export default function WorkspaceCompletion({
 
             <div className="workspace-completion-content">
 
-                <div className="workspace-completion-value">
+<div className="workspace-completion-value">
 
-                    {value}%
+    {value}%
 
-                </div>
+</div>
 
-                <div className="workspace-completion-label">
+<div className="workspace-completion-label">
 
-                    {label}
+    {label}
 
-                </div>
+</div>
 
             </div>
 
