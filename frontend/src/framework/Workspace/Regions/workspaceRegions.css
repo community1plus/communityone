@@ -21,3 +21,38 @@
     border-bottom: 1px solid var(--border);
 
 }
+
+.workspace-header {
+
+    grid-column: 1 / -1;
+
+}
+
+.identity-capability-selector {
+
+    grid-column: 2;
+
+    grid-row: 2;
+
+    align-self: end;
+
+}
+
+.workspace-completion {
+
+    grid-column: 3;
+
+    grid-row: 2;
+
+    align-self: end;
+
+}
+
+.workspace-header {
+
+    display:flex;
+    flex-direction:column;
+
+    gap:6px;
+
+}
