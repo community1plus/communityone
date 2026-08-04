@@ -1,7 +1,4 @@
-import { useState } from "react";
-
 import CapabilityRenderer from "../../components/Capability/CapabilityRenderer";
-import CapabilityGuide from "../../components/Capability/CapabilityGuide";
 import IdentityCapabilitySelector from "../../components/Identity/IdentityCapabilitySelector";
 
 import { buildCapabilityWorkspace } from "../../framework/Workspace/builders/buildCapabilityWorkspace";
@@ -15,7 +12,6 @@ import {
     WorkspaceContext,
     WorkspaceWorkflow,
     WorkspaceBody,
-    WorkspaceGuideCard,
     WorkspaceGuide,
     WorkspaceTabs,
     WorkspaceCompletion,
@@ -31,7 +27,7 @@ export default function IdentityWorkspace({
 
 }) {
 
-    const [capability] = useState(initialCapability);
+    const capability = initialCapability;
 
     const {
 
@@ -46,106 +42,112 @@ export default function IdentityWorkspace({
 
     } = state;
 
-    const workspace = buildCapabilityWorkspace({
+    const {
+
+        header,
+        progress,
+        sections,
+
+    } = buildCapabilityWorkspace({
 
         capability,
-
         state,
-
         actions,
 
     });
 
     return (
 
-<WorkspaceShell>
+        <WorkspaceShell>
 
-    <WorkspaceClose
-        onClick={workspace.header.onClose}
-    />
-
-    <WorkspaceMain>
-
-        <WorkspaceRegionHeader>
-
-            <WorkspaceHeader
-                model={workspace.header}
+            <WorkspaceClose
+                onClick={header.onClose}
             />
 
-        </WorkspaceRegionHeader>
+            <WorkspaceMain>
 
-        <WorkspaceContext
+                <WorkspaceRegionHeader>
 
-            mode={
+                    <WorkspaceHeader
+                        model={header}
+                    />
 
-                <IdentityCapabilitySelector
-                    values={values}
-                    setValue={form.setValue}
-                    readOnly={!editing}
+                </WorkspaceRegionHeader>
+
+                <WorkspaceContext
+
+                    mode={
+
+                        <IdentityCapabilitySelector
+                            values={values}
+                            setValue={form.setValue}
+                            readOnly={!editing}
+                        />
+
+                    }
+
+                    meta={
+
+                        <WorkspaceCompletion
+                            model={progress}
+                        />
+
+                    }
+
                 />
 
-            }
+                <WorkspaceWorkflow>
 
-            meta={
+                    <WorkspaceTabs
+                        model={sections}
+                    />
 
-                <WorkspaceCompletion
-                    model={workspace.progress}
-                />
+                </WorkspaceWorkflow>
 
-            }
+                <WorkspaceBody>
 
-        />
+                    <CapabilityRenderer
+                        capability={capability}
+                        sectionId={sectionId}
+                        activeSteps={activeSteps}
+                        currentStep={currentStep}
+                        form={form}
+                        editing={editing}
+                    />
 
-        <WorkspaceWorkflow>
+                </WorkspaceBody>
 
-            <WorkspaceTabs
-                model={workspace.sections}
-            />
+            </WorkspaceMain>
 
-        </WorkspaceWorkflow>
+            <WorkspaceSidebar>
 
-        <WorkspaceBody>
+                <WorkspaceGuide
+                    title="Identity Guide"
+                >
 
-            <CapabilityRenderer
-                capability={capability}
-                sectionId={sectionId}
-                activeSteps={activeSteps}
-                currentStep={currentStep}
-                form={form}
-                editing={editing}
-            />
+                    <WorkspacePanel title="Welcome">
 
-        </WorkspaceBody>
+                        Manage your trusted identity.
 
-    </WorkspaceMain>
+                    </WorkspacePanel>
 
-    <WorkspaceSidebar>
+                    <WorkspacePanel title="Progress">
 
-        <WorkspaceGuide title="Identity Guide">
+                        {progress.value}% Complete
 
-            <WorkspacePanel title="Welcome">
+                    </WorkspacePanel>
 
-                Manage your trusted identity.
+                    <WorkspacePanel title="Current Section">
 
-            </WorkspacePanel>
+                        Personal Details
 
-            <WorkspacePanel title="Progress">
+                    </WorkspacePanel>
 
-                20% Complete
+                </WorkspaceGuide>
 
-            </WorkspacePanel>
+            </WorkspaceSidebar>
 
-            <WorkspacePanel title="Current Section">
-
-                Personal Details
-
-            </WorkspacePanel>
-
-        </WorkspaceGuide>
-
-    </WorkspaceSidebar>
-
-</WorkspaceShell>
+        </WorkspaceShell>
 
     );
 

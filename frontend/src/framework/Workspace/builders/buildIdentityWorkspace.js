@@ -17,17 +17,6 @@ export function buildIdentityWorkspace(state, actions) {
         setCurrentStep,
     } = actions;
 
-    //
-    // Header Meta
-    //
-
-    const meta = createWorkspaceProgressModel({
-
-        value: completion,
-        label: "Complete",
-
-    });
-
     return createWorkspace({
 
         header: createWorkspaceHeaderModel({
@@ -36,7 +25,6 @@ export function buildIdentityWorkspace(state, actions) {
 
             subtitle: "Your trusted identity.",
 
-            meta,
 
             onClose: closeProfile,
 
