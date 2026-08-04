@@ -17,34 +17,31 @@ export function buildIdentityWorkspace(state, actions) {
         setCurrentStep,
     } = actions;
 
-    return createWorkspace({
+return createWorkspace({
 
-        header: createWorkspaceHeaderModel({
+    header: createWorkspaceHeaderModel({
 
-            title: "IDENTITY",
+        title: "IDENTITY",
+        subtitle: "Your trusted identity.",
+        onClose: closeProfile,
 
-            subtitle: "Your trusted identity.",
+    }),
 
+    sections: createWorkspaceSectionsModel({
 
-            onClose: closeProfile,
+        items: activeSteps,
+        current: currentStep,
+        onChange: setCurrentStep,
 
-        }),
+    }),
 
-        sections: createWorkspaceSectionsModel({
+    progress: createWorkspaceProgressModel({
 
-            items: activeSteps,
-            current: currentStep,
-            onChange: setCurrentStep,
+        value: completion,
+        label: "Profile Completion",
 
-        }),
+    }),
 
-        progress: createWorkspaceProgressModel({
-
-            value: completion,
-            label: `${completion}% Complete`,
-
-        }),
-
-    });
+});
 
 }
