@@ -68,7 +68,6 @@
     top:32px;
 
     align-self:start;
-    background: lightblue;
     width: 340px;
 }
 
@@ -84,8 +83,6 @@
     min-height: 600px;
 
     padding: 24px;
-
-    background: yellow;
 
     border: 2px solid red;
 
