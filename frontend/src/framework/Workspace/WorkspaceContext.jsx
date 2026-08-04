@@ -2,7 +2,6 @@ export default function WorkspaceContext({
 
     mode,
     meta,
-    actions,
 
 }) {
 
@@ -19,12 +18,6 @@ export default function WorkspaceContext({
             <div className="workspace-context-meta">
 
                 {meta}
-
-            </div>
-
-            <div className="workspace-context-actions">
-
-                {actions}
 
             </div>
 

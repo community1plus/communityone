@@ -2,14 +2,38 @@
 
     position: absolute;
 
-    top: 2px;
-    right: 2px;
+    top: 24px;
+    right: 24px;
 
-    z-index: 10;
+    width: 36px;
+    height: 36px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background: transparent;
+
+    color: var(--community-one-red);
+
+    font-size: 22px;
+    font-weight: 300;
+
+    cursor: pointer;
+
+    transition: all .2s ease;
+
 }
 
 .workspace-close:hover {
 
-    background: var(--bg);
+    background: rgba(155, 17, 30, 0.08);
+
+    transform: scale(1.08);
 
 }

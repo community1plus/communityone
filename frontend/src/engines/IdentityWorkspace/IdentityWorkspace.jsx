@@ -58,104 +58,94 @@ export default function IdentityWorkspace({
 
     return (
 
-        <WorkspaceShell>
+<WorkspaceShell>
 
-            <WorkspaceMain>
+    <WorkspaceClose
+        onClick={workspace.header.onClose}
+    />
 
-                <WorkspaceRegionHeader>
+    <WorkspaceMain>
 
-                    <WorkspaceHeader
-                        model={workspace.header}
-                    />
+        <WorkspaceRegionHeader>
 
-                </WorkspaceRegionHeader>
+            <WorkspaceHeader
+                model={workspace.header}
+            />
 
-                <WorkspaceContext
+        </WorkspaceRegionHeader>
 
-                    mode={
+        <WorkspaceContext
 
-                        <IdentityCapabilitySelector
-                            values={values}
-                            setValue={form.setValue}
-                            readOnly={!editing}
-                        />
+            mode={
 
-                    }
-
-                    meta={
-
-                        <WorkspaceCompletion
-                            model={workspace.progress}
-                        />
-
-                    }
-
-                    actions={
-
-                        <WorkspaceClose
-                            onClick={workspace.header.onClose}
-                        />
-
-                    }
-
+                <IdentityCapabilitySelector
+                    values={values}
+                    setValue={form.setValue}
+                    readOnly={!editing}
                 />
 
-                <WorkspaceWorkflow>
+            }
 
-                    <WorkspaceTabs
-                        model={workspace.sections}
-                    />
+            meta={
 
-                </WorkspaceWorkflow>
+                <WorkspaceCompletion
+                    model={workspace.progress}
+                />
 
-                <WorkspaceBody>
+            }
 
-                    <CapabilityRenderer
-                        capability={capability}
-                        sectionId={sectionId}
-                        activeSteps={activeSteps}
-                        currentStep={currentStep}
-                        form={form}
-                        editing={editing}
-                    />
+        />
 
-                </WorkspaceBody>
+        <WorkspaceWorkflow>
 
-            </WorkspaceMain>
+            <WorkspaceTabs
+                model={workspace.sections}
+            />
 
-            <WorkspaceSidebar>
+        </WorkspaceWorkflow>
 
-<WorkspaceGuide title="Identity Guide">
+        <WorkspaceBody>
 
-<WorkspacePanel
-    title="Welcome"
->
+            <CapabilityRenderer
+                capability={capability}
+                sectionId={sectionId}
+                activeSteps={activeSteps}
+                currentStep={currentStep}
+                form={form}
+                editing={editing}
+            />
 
-    Manage your trusted identity.
+        </WorkspaceBody>
 
-</WorkspacePanel>
+    </WorkspaceMain>
 
-<WorkspacePanel
-    title="Progress"
->
+    <WorkspaceSidebar>
 
-    20% Complete
+        <WorkspaceGuide title="Identity Guide">
 
-</WorkspacePanel>
+            <WorkspacePanel title="Welcome">
 
-<WorkspacePanel
-    title="Current Section"
->
+                Manage your trusted identity.
 
-    Personal Details
+            </WorkspacePanel>
 
-</WorkspacePanel>
+            <WorkspacePanel title="Progress">
 
-</WorkspaceGuide>
+                20% Complete
 
-            </WorkspaceSidebar>
+            </WorkspacePanel>
 
-        </WorkspaceShell>
+            <WorkspacePanel title="Current Section">
+
+                Personal Details
+
+            </WorkspacePanel>
+
+        </WorkspaceGuide>
+
+    </WorkspaceSidebar>
+
+</WorkspaceShell>
 
     );
 
