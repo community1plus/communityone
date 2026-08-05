@@ -82,6 +82,9 @@ from "./WorkspaceIdentity";
 export { default as WorkspaceMeta }
 from "./WorkspaceMeta";
 
+export { default as WorkspaceToolbar }
+from "./WorkspaceToolbar";
+
 export { default as WorkspaceHeaderControls} from "./WorkspaceHeaderControls";
 
 export { default as WorkspaceClose } from "./WorkspaceClose";

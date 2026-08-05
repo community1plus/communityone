@@ -1,5 +1,6 @@
 import CapabilityRenderer from "../../components/Capability/CapabilityRenderer";
 import IdentityCapabilitySelector from "../../components/Identity/IdentityCapabilitySelector";
+
 import { buildCapabilityWorkspace } from "../../framework/Workspace/builders/buildCapabilityWorkspace";
 
 import {
@@ -7,16 +8,15 @@ import {
     WorkspaceMain,
     WorkspaceSidebar,
     WorkspaceRegionHeader,
-    WorkspaceHeader,
+    WorkspaceIdentity,
+    WorkspaceMeta,
     WorkspaceWorkflow,
     WorkspaceTabs,
     WorkspaceCompletion,
     WorkspaceBody,
     WorkspaceGuide,
-    WorkspaceIdentity,
-    WorkspaceMeta,
+    WorkspaceToolbar,
     WorkspacePanel,
-    WorkspaceHeaderControls,
     WorkspaceClose,
 } from "../../framework/Workspace";
 
@@ -34,7 +34,6 @@ export default function IdentityWorkspace({
 
         values,
         form,
-
         editing,
 
         activeSteps,
@@ -66,39 +65,34 @@ export default function IdentityWorkspace({
             />
 
             <WorkspaceMain>
-<WorkspaceRegionHeader>
 
-<WorkspaceIdentity
+                <WorkspaceRegionHeader>
 
-    title={header.title}
+                    <WorkspaceIdentity
 
-    subtitle={header.subtitle}
+                        title={header.title}
 
-/>
+                        subtitle={header.subtitle}
 
-<WorkspaceMeta>
+                    />
 
-    <IdentityCapabilitySelector
-        values={values}
-        setValue={form.setValue}
-        readOnly={!editing}
-    />
+                    <WorkspaceMeta>
 
-    <WorkspaceCompletion
-        model={progress}
-    />
+                        <IdentityCapabilitySelector
 
-</WorkspaceMeta>
+                            values={values}
+                            setValue={form.setValue}
+                            readOnly={!editing}
 
-</WorkspaceRegionHeader>
+                        />
 
-<WorkspaceWorkflow>
+                        <WorkspaceCompletion
+                            model={progress}
+                        />
 
-    <WorkspaceTabs
-        model={sections}
-    />
+                    </WorkspaceMeta>
 
-</WorkspaceWorkflow>
+                </WorkspaceRegionHeader>
 
                 <WorkspaceWorkflow>
 
@@ -111,12 +105,18 @@ export default function IdentityWorkspace({
                 <WorkspaceBody>
 
                     <CapabilityRenderer
+
                         capability={capability}
+
                         sectionId={sectionId}
+
                         activeSteps={activeSteps}
                         currentStep={currentStep}
+
                         form={form}
+
                         editing={editing}
+
                     />
 
                 </WorkspaceBody>
@@ -129,19 +129,25 @@ export default function IdentityWorkspace({
                     title="Identity Guide"
                 >
 
-                    <WorkspacePanel title="Welcome">
+                    <WorkspacePanel
+                        title="Welcome"
+                    >
 
                         Manage your trusted identity.
 
                     </WorkspacePanel>
 
-                    <WorkspacePanel>
+                    <WorkspacePanel
+                        title="Profile Completion"
+                    >
 
-                        {progress.value}% 
+                        {progress.value}%
 
                     </WorkspacePanel>
 
-                    <WorkspacePanel title="Current Section">
+                    <WorkspacePanel
+                        title="Current Section"
+                    >
 
                         Personal Details
 
