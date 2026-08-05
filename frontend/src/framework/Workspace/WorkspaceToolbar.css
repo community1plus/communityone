@@ -8,10 +8,10 @@
 
         auto
 
-        auto;
+        260px;
 
-    align-items: end;
+    align-items: center;
 
-    column-gap: 32px;
+    column-gap: 40px;
 
 }

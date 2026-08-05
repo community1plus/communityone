@@ -14,41 +14,35 @@ export default function WorkspaceCompletion({
 
     return (
 
-        <div className="workspace-completion">
+<div className="workspace-completion">
 
-            <div className="workspace-completion-header">
+    <div className="workspace-completion-header">
 
-                <span className="workspace-completion-value">
+        <span className="workspace-completion-value">
 
-                    {value}%
+            {value}%
 
-                </span>
+        </span>
 
-                <span className="workspace-completion-label">
+    </div>
 
-                    {label}
+    <div className="workspace-completion-track">
 
-                </span>
+        <div
 
-            </div>
+            className="workspace-completion-fill"
 
-            <div className="workspace-completion-track">
+            style={{
 
-                <div
+                width: `${value}%`
 
-                    className="workspace-completion-fill"
+            }}
 
-                    style={{
+        />
 
-                        width: `${value}%`,
+    </div>
 
-                    }}
-
-                />
-
-            </div>
-
-        </div>
+</div>
 
     );
 
