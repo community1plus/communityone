@@ -1,6 +1,6 @@
 import { WorkspaceSegmentedControl } from "../../framework/Workspace";
 
-export default function ProfileCapabilitySelector({
+export default function IdentityCapabilitySelector({
 
     values = {},
 

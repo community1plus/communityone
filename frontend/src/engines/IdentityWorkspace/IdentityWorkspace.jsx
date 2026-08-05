@@ -1,6 +1,6 @@
 import CapabilityRenderer from "../../components/Capability/CapabilityRenderer";
 import IdentityCapabilitySelector from "../../components/Identity/IdentityCapabilitySelector";
-import ProfileCapabilitySelector from "../../components/Profile/ProfileCapabilitySelector";
+import ProfileCapabilitySelector from "../../components/Profile/IdentityCapabilitySelector";
 import { buildCapabilityWorkspace } from "../../framework/Workspace/builders/buildCapabilityWorkspace";
 
 import {
