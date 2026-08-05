@@ -15,6 +15,7 @@ import {
     WorkspaceBody,
     WorkspaceGuide,
     WorkspaceIdentity,
+    WorkspaceMeta,
     WorkspacePanel,
     WorkspaceHeaderControls,
     WorkspaceClose,
