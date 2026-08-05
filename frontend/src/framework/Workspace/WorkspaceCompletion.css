@@ -1,39 +1,32 @@
 .workspace-completion {
 
     display: flex;
-
     align-items: center;
-
     gap: 16px;
-
-    align-self: end;
 
 }
 
 .workspace-completion-content {
 
     display: flex;
-
     flex-direction: column;
-
-    gap: 2px;
+    justify-content: center;
 
 }
 
 .workspace-completion-value {
 
-    font-size: 1rem;
-
+    font-size: 28px;
     font-weight: 700;
-
-    color: var(--text-primary);
+    line-height: 1;
 
 }
 
 .workspace-completion-label {
 
-    font-size: .9rem;
+    margin-top: 4px;
 
+    font-size: 14px;
     color: var(--text-secondary);
 
 }

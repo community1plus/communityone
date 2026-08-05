@@ -17,31 +17,29 @@ export default function WorkspaceCompletion({
 
     return (
 
-        <div className="workspace-completion">
+<div className="workspace-completion">
 
-            <ProgressRing
-                value={value}
-                size={56}
-                stroke={5}
-            />
+    <ProgressRing
+        value={value}
+    />
 
-            <div className="workspace-completion-content">
+    <div className="workspace-completion-content">
 
-<div className="workspace-completion-value">
+        <div className="workspace-completion-value">
 
-    {value}%
-
-</div>
-
-<div className="workspace-completion-label">
-
-    {label}
-
-</div>
-
-            </div>
+            {value}%
 
         </div>
+
+        <div className="workspace-completion-label">
+
+            {label}
+
+        </div>
+
+    </div>
+
+</div>
 
     );
 
