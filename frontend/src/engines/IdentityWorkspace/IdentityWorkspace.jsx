@@ -1,6 +1,6 @@
 import CapabilityRenderer from "../../components/Capability/CapabilityRenderer";
 import IdentityCapabilitySelector from "../../components/Identity/IdentityCapabilitySelector";
-import ProfileCapabilitySelector from "../../components/Profile/IdentityCapabilitySelector";
+import IdentityCapabilitySelector from "../../components/Identity/IdentityCapabilitySelector";
 import { buildCapabilityWorkspace } from "../../framework/Workspace/builders/buildCapabilityWorkspace";
 
 import {
@@ -79,7 +79,7 @@ export default function IdentityWorkspace({
 
 <WorkspaceMeta>
 
-    <ProfileCapabilitySelector
+    <IdentityCapabilitySelector
         values={values}
         setValue={form.setValue}
         readOnly={!editing}
