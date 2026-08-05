@@ -1,4 +1,4 @@
-import "WorkspaceCompletion.css";
+import "./WorkspaceCompletion.css";
 export default function WorkspaceCompletion({
 
     model = {},
