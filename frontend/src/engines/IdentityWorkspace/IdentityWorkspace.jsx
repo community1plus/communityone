@@ -123,7 +123,7 @@ export default function IdentityWorkspace({
 
                     </WorkspacePanel>
 
-                    <WorkspacePanel title="Profile Completion">
+                    <WorkspacePanel>
 
                         {progress.value}% Complete
 
