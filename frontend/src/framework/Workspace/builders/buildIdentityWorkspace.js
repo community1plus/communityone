@@ -38,7 +38,7 @@ return createWorkspace({
     progress: createWorkspaceProgressModel({
 
         value: completion,
-        label: "Profile Completion",
+        label: "",
 
     }),
 

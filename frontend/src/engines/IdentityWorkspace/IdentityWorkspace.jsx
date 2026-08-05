@@ -125,7 +125,7 @@ export default function IdentityWorkspace({
 
                     <WorkspacePanel>
 
-                        {progress.value}% Complete
+                        {progress.value}% 
 
                     </WorkspacePanel>
 
