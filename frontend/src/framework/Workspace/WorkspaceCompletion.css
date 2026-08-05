@@ -1,10 +1,24 @@
 .workspace-completion {
 
+    width: 240px;
+
+    padding: 16px 20px;
+
+    border: 2px solid var(--community-one-red);
+
+    border-radius: 18px;
+
     display: flex;
 
     flex-direction: column;
 
-    gap: 10px;
+    gap: 12px;
+
+}
+
+.workspace-completion {
+
+    justify-self: end;
 
 }
 
@@ -37,11 +51,9 @@
 
     height: 6px;
 
-    background: var(--border);
-
     border-radius: 999px;
 
-    overflow: hidden;
+    background: rgba(181, 21, 34, .12);
 
 }
 
@@ -49,9 +61,7 @@
 
     height: 100%;
 
-    width: 0;
-
-    background: var(--primary);
+    background: var(--community-one-red);
 
     border-radius: inherit;
 
