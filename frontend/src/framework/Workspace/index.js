@@ -82,6 +82,12 @@ from "./WorkspaceIdentity";
 export { default as WorkspaceMeta }
 from "./WorkspaceMeta";
 
+export { default as WorkspaceTitle }    
+from "./WorkspaceTitle";
+
+export { default as WorkspaceSubtitle }    
+from "./WorkspaceSubtitle";
+
 export { default as WorkspaceToolbar }
 from "./WorkspaceToolbar";
 
