@@ -1,3 +1,4 @@
+import "./WorkspaceMeta.css";
 export default function WorkspaceMeta({
 
     children,
