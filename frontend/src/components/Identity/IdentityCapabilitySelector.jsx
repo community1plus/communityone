@@ -1,56 +1,67 @@
-import {
-  WorkspaceSegmentedControl,
-    WorkspaceSectionHeader,
-} from "../../framework/Workspace";
+import { WorkspaceSegmentedControl } from "../../framework/Workspace";
 
 export default function ProfileCapabilitySelector({
-  values,
-  setValue,
-  readOnly = false,
+
+    values = {},
+
+    setValue,
+
+    readOnly = false,
+
 }) {
-  return (
-    <section className="profile-capabilities">
 
-      <div className="profile-capabilities-header">
+    return (
 
+        <section className="profile-capabilities">
 
+            <WorkspaceSegmentedControl
 
-      </div>
+                value={
 
-<WorkspaceSegmentedControl
+                    values?.capabilities?.organisation
+                        ? "entity"
+                        : "person"
 
-    value={
-        values.capabilities?.organisation
-            ? "organisation"
-            : "personal"
-    }
+                }
 
-    onChange={(value) => {
+                onChange={(value) =>
 
-        form.setValue(
-            "capabilities.organisation",
-            value === "organisation"
-        );
+                    setValue(
 
-    }}
+                        "capabilities.organisation",
 
-    disabled={readOnly}
+                        value === "entity"
 
-    options={[
-        {
-            label: "Person",
-            value: "person",
-        },
-        {
-            label: "Entity",
-            value: "entity",
-        },
-    ]}
+                    )
 
-/>
+                }
 
+                disabled={readOnly}
 
+                options={[
 
-    </section>
-  );
+                    {
+
+                        label: "Person",
+
+                        value: "person",
+
+                    },
+
+                    {
+
+                        label: "Entity",
+
+                        value: "entity",
+
+                    },
+
+                ]}
+
+            />
+
+        </section>
+
+    );
+
 }
