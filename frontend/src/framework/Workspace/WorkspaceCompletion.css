@@ -1,16 +1,21 @@
 .workspace-completion {
 
-    display: flex;
-    align-items: center;
-    gap: 16px;
-
-}
-
-.workspace-completion-content {
+    width: 260px;
 
     display: flex;
     flex-direction: column;
-    justify-content: center;
+
+    gap: 8px;
+
+}
+
+.workspace-completion-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
 
 }
 
@@ -18,15 +23,34 @@
 
     font-size: 28px;
     font-weight: 700;
-    line-height: 1;
 
 }
 
 .workspace-completion-label {
 
-    margin-top: 4px;
-
     font-size: 14px;
     color: var(--text-secondary);
+
+}
+
+.workspace-completion-track {
+
+    height: 6px;
+
+    background: var(--surface-2);
+
+    border-radius: 999px;
+
+    overflow: hidden;
+
+}
+
+.workspace-completion-fill {
+
+    height: 100%;
+
+    background: var(--primary);
+
+    border-radius: inherit;
 
 }

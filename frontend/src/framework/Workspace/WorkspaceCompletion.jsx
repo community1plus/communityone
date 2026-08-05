@@ -1,7 +1,4 @@
-import "./WorkspaceCompletion.css";
-
-import ProgressRing from "./ProgressRing";
-
+import "WorkspaceCompletion.css";
 export default function WorkspaceCompletion({
 
     model = {},
@@ -11,35 +8,47 @@ export default function WorkspaceCompletion({
     const {
 
         value = 0,
-        label = "Complete",
+        label,
 
     } = model;
 
     return (
 
-<div className="workspace-completion">
+        <div className="workspace-completion">
 
-    <ProgressRing
-        value={value}
-    />
+            <div className="workspace-completion-header">
 
-    <div className="workspace-completion-content">
+                <span className="workspace-completion-value">
 
-        <div className="workspace-completion-value">
+                    {value}%
 
-            {value}%
+                </span>
+
+                <span className="workspace-completion-label">
+
+                    {label}
+
+                </span>
+
+            </div>
+
+            <div className="workspace-completion-track">
+
+                <div
+
+                    className="workspace-completion-fill"
+
+                    style={{
+
+                        width: `${value}%`,
+
+                    }}
+
+                />
+
+            </div>
 
         </div>
-
-        <div className="workspace-completion-label">
-
-            {label}
-
-        </div>
-
-    </div>
-
-</div>
 
     );
 
