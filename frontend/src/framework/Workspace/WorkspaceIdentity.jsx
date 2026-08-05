@@ -1,8 +1,6 @@
-import "./WorkspaceIdentity.css";
 export default function WorkspaceIdentity({
 
     title,
-    subtitle,
 
 }) {
 
@@ -10,9 +8,7 @@ export default function WorkspaceIdentity({
 
         <div className="workspace-identity">
 
-            {title && <h1>{title}</h1>}
-
-            {subtitle && <p>{subtitle}</p>}
+            <h1>{title}</h1>
 
         </div>
 

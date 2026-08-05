@@ -1,3 +1,4 @@
+import './WorkspaceToolbar.css';
 export default function WorkspaceToolbar({
 
     children,
