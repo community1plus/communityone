@@ -14,6 +14,7 @@ import {
     WorkspaceCompletion,
     WorkspaceBody,
     WorkspaceGuide,
+    WorkspaceIdentity,
     WorkspacePanel,
     WorkspaceHeaderControls,
     WorkspaceClose,
