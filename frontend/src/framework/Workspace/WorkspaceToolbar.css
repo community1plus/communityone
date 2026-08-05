@@ -1,11 +1,14 @@
 .workspace-toolbar {
 
-    display:flex;
+    display: grid;
 
-    justify-content:space-between;
+    grid-template-columns:
+        minmax(0, 1fr)
+        auto
+        auto;
 
-    align-items:flex-end;
+    align-items: end;
 
-    gap:32px;
+    gap: 32px;
 
 }

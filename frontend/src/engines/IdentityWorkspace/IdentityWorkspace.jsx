@@ -9,13 +9,12 @@ import {
     WorkspaceSidebar,
     WorkspaceRegionHeader,
     WorkspaceIdentity,
-    WorkspaceMeta,
+    WorkspaceToolbar,
     WorkspaceWorkflow,
     WorkspaceTabs,
     WorkspaceCompletion,
     WorkspaceBody,
     WorkspaceGuide,
-    WorkspaceToolbar,
     WorkspacePanel,
     WorkspaceClose,
 } from "../../framework/Workspace";
@@ -68,15 +67,14 @@ export default function IdentityWorkspace({
 
                 <WorkspaceRegionHeader>
 
-                    <WorkspaceIdentity
+                    <WorkspaceToolbar>
 
-                        title={header.title}
+                        <WorkspaceIdentity
 
-                        subtitle={header.subtitle}
+                            title={header.title}
+                            subtitle={header.subtitle}
 
-                    />
-
-                    <WorkspaceMeta>
+                        />
 
                         <IdentityCapabilitySelector
 
@@ -90,7 +88,7 @@ export default function IdentityWorkspace({
                             model={progress}
                         />
 
-                    </WorkspaceMeta>
+                    </WorkspaceToolbar>
 
                 </WorkspaceRegionHeader>
 
