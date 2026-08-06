@@ -1,6 +1,6 @@
-import "./WorkspaceTabs.css";
+import "./WorkspaceNavigation.css";
 
-export default function WorkspaceTabs({
+export default function WorkspaceNavigation({
 
     model = {},
 

@@ -10,7 +10,7 @@ import {
     WorkspaceSidebar,
 
     WorkspaceRegionHeader,
-
+    WorkspaceNavigation,
     WorkspaceContainer,
     WorkspaceBanner,
     WorkspaceBannerSection,
@@ -19,7 +19,6 @@ import {
     WorkspaceMode,
     WorkspaceMetric,
 
-    WorkspaceTabs,
     WorkspaceBody,
 
     WorkspaceGuide,
@@ -113,7 +112,7 @@ export default function IdentityWorkspace({
 
                         </WorkspaceBanner>
 
-                        <WorkspaceTabs
+                        <WorkspaceNavigation
                             model={sections}
                         />
 

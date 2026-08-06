@@ -10,7 +10,10 @@ from "./WorkspaceWorkflow";
 export { default as WorkspaceGuide }
 from "./WorkspaceGuide";
 
-export {default as WorkspaceContainer} from "./WorkspaceContainer/WorkspaceContainer";
+export {default as WorkspaceContainer} 
+from "./WorkspaceContainer/WorkspaceContainer";
+
+export {default as WorkspaceNavigation } from "./WorkspaceNavigation";
 
 export { default as WorkspaceMain }
 from "./WorkspaceMain";
@@ -78,7 +81,7 @@ export { default as WorkspacePanel }
 from "./WorkspacePanel";
 
 export { default as WorkspaceTabs }
-from "./WorkspaceTabs";
+from "./WorkspaceNavigation";
 
 export { default as WorkspaceIdentity }
 from "./WorkspaceIdentity";
