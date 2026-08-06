@@ -11,7 +11,7 @@ import {
 
     WorkspaceRegionHeader,
 
-    WorkspaceBannerContainer,
+    WorkspaceContainer,
     WorkspaceBanner,
     WorkspaceBannerSection,
 
@@ -77,7 +77,7 @@ export default function IdentityWorkspace({
 
                 <WorkspaceRegionHeader>
 
-                    <WorkspaceBannerContainer>
+                    <WorkspaceContainer>
 
                         <WorkspaceBanner>
 
@@ -113,15 +113,13 @@ export default function IdentityWorkspace({
 
                         </WorkspaceBanner>
 
-                    </WorkspaceBannerContainer>
-
-                    <WorkspaceBannerContainer>
-
                         <WorkspaceTabs
                             model={sections}
                         />
 
-                    </WorkspaceBannerContainer>
+                    </WorkspaceContainer>
+
+
 
                 </WorkspaceRegionHeader>
 

@@ -1,6 +1,6 @@
-import "./WorkspaceBannerContainer.css";
+import "./WorkspaceContainer.css";
 
-export default function WorkspaceBannerContainer({
+export default function WorkspaceContainer({
 
     children,
 
