@@ -1,13 +1,11 @@
+
+
 .workspace-banner-section {
 
     display: flex;
     flex-direction: column;
-    justify-content: center;
 
-    gap: 12px;
-
-    min-height: 170px;
-
+    gap: 6px;
 }
 
 .workspace-banner-content {
