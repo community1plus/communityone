@@ -4,23 +4,27 @@ import IdentityCapabilitySelector from "../../components/Identity/IdentityCapabi
 import { buildCapabilityWorkspace } from "../../framework/Workspace/builders/buildCapabilityWorkspace";
 
 import {
+
     WorkspaceShell,
     WorkspaceMain,
     WorkspaceSidebar,
+
     WorkspaceRegionHeader,
-    WorkspaceMetric,
+
+    WorkspaceBannerContainer,
     WorkspaceBanner,
     WorkspaceBannerSection,
 
     WorkspaceTitle,
     WorkspaceMode,
-    WorkspaceCompletion,
+    WorkspaceMetric,
 
     WorkspaceTabs,
     WorkspaceBody,
 
     WorkspaceGuide,
     WorkspacePanel,
+
     WorkspaceClose,
 
 } from "../../framework/Workspace";
@@ -73,46 +77,51 @@ export default function IdentityWorkspace({
 
                 <WorkspaceRegionHeader>
 
-                    <WorkspaceBanner>
+                    <WorkspaceBannerContainer>
 
-                        <WorkspaceBannerSection>
-                            
-                        
+                        <WorkspaceBanner>
 
-                            <WorkspaceTitle
-                                title={header.title}
-                            />
+                            <WorkspaceBannerSection>
 
-                        </WorkspaceBannerSection>
-
-                        <WorkspaceBannerSection>
-
-
-                            <WorkspaceMode>
-
-                                <IdentityCapabilitySelector
-                                    values={values}
-                                    setValue={form.setValue}
-                                    readOnly={!editing}
+                                <WorkspaceTitle
+                                    title={header.title}
                                 />
 
-                            </WorkspaceMode>
+                            </WorkspaceBannerSection>
 
-                        </WorkspaceBannerSection>
+                            <WorkspaceBannerSection>
 
-<WorkspaceBannerSection>
+                                <WorkspaceMode>
 
-    <WorkspaceMetric
-        model={progress}
-    />
+                                    <IdentityCapabilitySelector
+                                        values={values}
+                                        setValue={form.setValue}
+                                        readOnly={!editing}
+                                    />
 
-</WorkspaceBannerSection>
+                                </WorkspaceMode>
 
-                    </WorkspaceBanner>
+                            </WorkspaceBannerSection>
 
-                    <WorkspaceTabs
-                        model={sections}
-                    />
+                            <WorkspaceBannerSection>
+
+                                <WorkspaceMetric
+                                    model={progress}
+                                />
+
+                            </WorkspaceBannerSection>
+
+                        </WorkspaceBanner>
+
+                    </WorkspaceBannerContainer>
+
+                    <WorkspaceBannerContainer>
+
+                        <WorkspaceTabs
+                            model={sections}
+                        />
+
+                    </WorkspaceBannerContainer>
 
                 </WorkspaceRegionHeader>
 

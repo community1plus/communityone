@@ -12,3 +12,25 @@
     min-height: 0;
 
 }
+
+.workspace-banner-container {
+
+    width: 100%;
+
+    display: flex;
+
+    justify-content: center;
+
+    padding-inline: 24px;
+
+    box-sizing: border-box;
+
+}
+
+.workspace-banner {
+
+    width: 100%;
+
+    max-width: 1180px;
+
+}
