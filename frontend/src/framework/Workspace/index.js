@@ -79,12 +79,6 @@ from "./WorkspaceTabs";
 export { default as WorkspaceIdentity }
 from "./WorkspaceIdentity";
 
-export { default as WorkspaceBanner }
-from "./WorkspaceBanner/WorkspaceBanner";
-
-export {default as WorkspaceBannerSection} 
-from "./WorkspaceBanner/WorkspaceBannerSection";
-
 export { default as WorkspaceMode  }        
 from "./WorkspaceMode";
 
