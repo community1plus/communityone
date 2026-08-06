@@ -50,19 +50,19 @@ export default function IdentityWorkspace({
 
     } = state;
 
-    const {
+const {
 
-        header,
-        progress,
-        navigation: sections,
+    header,
+    progress,
+    navigation,
 
-    } = buildCapabilityWorkspace({
+} = buildCapabilityWorkspace({
 
-        capability,
-        state,
-        actions,
+    capability,
+    state,
+    actions,
 
-    });
+});
 
     return (
 

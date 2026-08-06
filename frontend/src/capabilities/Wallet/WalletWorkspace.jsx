@@ -50,7 +50,7 @@ export default function WalletWorkspace() {
 
         setActiveSection,
 
-        sections: walletSections,
+        navigation: walletSections,
 
     });
 
@@ -70,8 +70,8 @@ export default function WalletWorkspace() {
 
                 <WorkspaceWorkflow>
 
-                    <WorkspaceTabs
-                        model={workspace.sections}
+                    <WorkspaceNavigation
+                        model={workspace.navigation}
                     />
 
                 </WorkspaceWorkflow>

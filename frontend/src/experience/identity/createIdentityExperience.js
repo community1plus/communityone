@@ -36,7 +36,7 @@ export function createIdentityExperience({
 
             }),
 
-            sections: Workspace.Sections({
+            navigation: Workspace.Navigation({
 
                 items: activeSteps,
 

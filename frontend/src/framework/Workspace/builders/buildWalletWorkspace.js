@@ -10,7 +10,7 @@ export function buildWalletWorkspace({
 
     setCurrentSection,
 
-    sections,
+    navigation,
 
 }) {
 
@@ -24,9 +24,9 @@ export function buildWalletWorkspace({
 
         }),
 
-        sections: createWorkspaceSectionsModel({
+        navigation: createWorkspaceSectionsModel({
 
-            items: sections,
+            items: navigation,
 
             current: currentSection,
 
