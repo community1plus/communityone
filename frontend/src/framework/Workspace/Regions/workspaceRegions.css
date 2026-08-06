@@ -1,10 +1,11 @@
 .workspace-region-header {
 
     display: flex;
+
     flex-direction: column;
 
-    gap: 4px;
+    gap: 6px;
 
-    padding-bottom: 12px;
+    padding-bottom: 8px;
 
 }
