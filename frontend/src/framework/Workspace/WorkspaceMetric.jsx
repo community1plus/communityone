@@ -1,6 +1,6 @@
 import "./WorkspaceMetric.css";
 
-import ProgressRing from "../ProgressRing/ProgressRing";
+import ProgressRing from "./ProgressRing";
 
 export default function WorkspaceMetric({
 
