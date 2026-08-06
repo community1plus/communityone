@@ -1,4 +1,3 @@
-import "./WorkspaceTitle.css";
 export default function WorkspaceTitle({
 
     title,
