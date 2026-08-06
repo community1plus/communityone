@@ -1,38 +1,23 @@
+:root {
+
+    --workspace-title-size: 44px;
+
+}
+
 .workspace-completion {
 
     width: 240px;
-
-    padding: 16px 20px;
-
-    border: 2px solid var(--community-one-red);
-
-    border-radius: 18px;
-
+    padding: 0;
     display: flex;
-
     flex-direction: column;
-
-    gap: 12px;
-
-}
-
-.workspace-completion {
-
+    gap: 2px;
     justify-self: end;
-
 }
 
-.workspace-completion-header {
-
-    display: flex;
-
-    justify-content: flex-end;
-
-}
-
+.workspace-title h1,
 .workspace-completion-value {
 
-    font-size: 42px;
+    font-size: var(--workspace-title-size);
 
     font-weight: 700;
 
@@ -40,12 +25,8 @@
 
 }
 
-.workspace-completion-label {
 
-    font-size: 14px;
-    color: var(--text-secondary);
 
-}
 
 .workspace-completion-track {
 
