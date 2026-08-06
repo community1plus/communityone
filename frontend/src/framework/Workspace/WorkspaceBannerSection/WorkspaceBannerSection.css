@@ -1,0 +1,17 @@
+.workspace-banner-section {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+
+}
+
+.workspace-banner-content {
+
+    display: flex;
+
+    flex-direction: column;
+
+}

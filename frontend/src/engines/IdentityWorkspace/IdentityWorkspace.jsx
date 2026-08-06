@@ -17,6 +17,8 @@ import {
     WorkspaceTitle,
     WorkspaceClose,
     WorkspaceTabs,
+    WorkspaceBanner,
+    WorkspaceBannerSection,
 } from "../../framework/Workspace";
 
 export default function IdentityWorkspace({

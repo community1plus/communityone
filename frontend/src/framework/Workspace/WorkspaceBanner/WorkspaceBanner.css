@@ -1,0 +1,14 @@
+.workspace-banner {
+
+    display: grid;
+
+    grid-template-columns:
+        1.4fr
+        1fr
+        1.1fr;
+
+    column-gap: 56px;
+
+    align-items: stretch;
+
+}
