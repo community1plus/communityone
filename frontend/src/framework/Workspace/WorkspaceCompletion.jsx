@@ -26,21 +26,13 @@ export default function WorkspaceCompletion({
 
     </div>
 
-    <div className="workspace-completion-track">
+<div className="workspace-metric">
 
-        <div
+    <ProgressRing
+        value={model.value}
+    />
 
-            className="workspace-completion-fill"
-
-            style={{
-
-                width: `${value}%`
-
-            }}
-
-        />
-
-    </div>
+</div>
 
 </div>
 

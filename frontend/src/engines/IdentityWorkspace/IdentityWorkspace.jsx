@@ -100,14 +100,13 @@ export default function IdentityWorkspace({
 
                         </WorkspaceBannerSection>
 
-                        <WorkspaceBannerSection>
-                        
+<WorkspaceBannerSection>
 
-                            <WorkspaceCompletion
-                                model={progress}
-                            />
+    <WorkspaceMetric
+        model={progress}
+    />
 
-                        </WorkspaceBannerSection>
+</WorkspaceBannerSection>
 
                     </WorkspaceBanner>
 
