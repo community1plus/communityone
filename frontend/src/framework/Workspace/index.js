@@ -13,6 +13,8 @@ from "./WorkspaceGuide";
 export { default as WorkspaceMain }
 from "./WorkspaceMain";
 
+export {default as WorkspaceMetric} from "./WorkspaceMetric";
+
 export { default as WorkspaceCompletion }
 from "./WorkspaceCompletion";
 

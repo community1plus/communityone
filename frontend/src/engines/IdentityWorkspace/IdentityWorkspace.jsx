@@ -8,7 +8,7 @@ import {
     WorkspaceMain,
     WorkspaceSidebar,
     WorkspaceRegionHeader,
-
+    WorkspaceMetric,
     WorkspaceBanner,
     WorkspaceBannerSection,
 
