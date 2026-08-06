@@ -86,7 +86,7 @@ export { default as WorkspaceBanner }
 from "./WorkspaceBanner/WorkspaceBanner";
 
 export { default as WorkspaceBannerSection }
-from "./WorkspaceBanner/WorkspaceBannerSection";
+from "./WorkspaceBannerSection/WorkspaceBannerSection";
 
 export { default as WorkspaceMeta }
 from "./WorkspaceMeta";
