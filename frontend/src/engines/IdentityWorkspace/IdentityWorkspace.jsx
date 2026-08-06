@@ -93,15 +93,11 @@ export default function IdentityWorkspace({
 
     </WorkspaceSubtitle>
 
+    <WorkspaceTabs
+        model={sections}
+    />
+
 </WorkspaceRegionHeader>
-
-                <WorkspaceWorkflow>
-
-                    <WorkspaceTabs
-                        model={sections}
-                    />
-
-                </WorkspaceWorkflow>
 
                 <WorkspaceBody>
 
