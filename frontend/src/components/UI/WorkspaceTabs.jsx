@@ -1,36 +1,40 @@
 export default function WorkspaceTabs({
-  steps,
-  currentStep,
-  setCurrentStep,
+
+    model,
+
 }) {
-  return (
 
-    <div className="profile-section-tabs">
+    if (!model.visible) {
 
-      {steps.map((step, index) => (
+        return null;
 
-        <button
-          key={step.id}
-          type="button"
-          className={`profile-section-tab ${
-            currentStep === index
-              ? "active"
-              : ""
-          } ${
-            index < currentStep
-              ? "complete"
-              : ""
-          }`}
-          onClick={() =>
-            setCurrentStep(index)
-          }
-        >
-          {step.title}
-        </button>
+    }
 
-      ))}
+    return (
 
-    </div>
+        <nav className="workspace-tabs">
 
-  );
+            {model.items.map((item, index) => (
+
+                <button
+                    key={item.id}
+                    type="button"
+                    className={`
+                        workspace-tab
+                        ${model.current === index ? "active" : ""}
+                        ${index < model.current ? "complete" : ""}
+                    `}
+                    onClick={() => model.onChange(index)}
+                >
+
+                    {item.title}
+
+                </button>
+
+            ))}
+
+        </nav>
+
+    );
+
 }

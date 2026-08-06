@@ -16,6 +16,8 @@ export function createWorkspaceSectionsModel({
 
         onChange,
 
+        visible: items.length > 1,
+
     };
 
 }
