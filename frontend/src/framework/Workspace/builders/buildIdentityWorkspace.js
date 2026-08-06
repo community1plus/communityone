@@ -27,7 +27,7 @@ return createWorkspace({
 
     }),
 
-    sections: createWorkspaceSectionsModel({
+    navigation: createWorkspaceSectionsModel({
 
         items: activeSteps,
         current: currentStep,
