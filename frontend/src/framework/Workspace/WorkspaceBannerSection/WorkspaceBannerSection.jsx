@@ -11,15 +11,11 @@ export default function WorkspaceBannerSection({
 
         <section className="workspace-banner-section">
 
-            {label && (
+<div className="workspace-banner-section">
 
-                <div className="workspace-meta-label">
+    {children}
 
-                    {label}
-
-                </div>
-
-            )}
+</div>
 
             <div className="workspace-banner-content">
 

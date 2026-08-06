@@ -1,7 +1,6 @@
 export default function WorkspaceTitle({
 
     title,
-    subtitle,
 
 }) {
 
@@ -10,8 +9,6 @@ export default function WorkspaceTitle({
         <div className="workspace-title">
 
             <h1>{title}</h1>
-
-            <p>{subtitle}</p>
 
         </div>
 

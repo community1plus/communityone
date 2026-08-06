@@ -75,20 +75,18 @@ export default function IdentityWorkspace({
 
                     <WorkspaceBanner>
 
-                        <WorkspaceBannerSection
-                            label="Workspace"
-                        >
+                        <WorkspaceBannerSection>
+                            
+                        
 
                             <WorkspaceTitle
                                 title={header.title}
-                                subtitle={header.subtitle}
                             />
 
                         </WorkspaceBannerSection>
 
-                        <WorkspaceBannerSection
-                            label="Mode"
-                        >
+                        <WorkspaceBannerSection>
+
 
                             <WorkspaceMode>
 
@@ -102,9 +100,8 @@ export default function IdentityWorkspace({
 
                         </WorkspaceBannerSection>
 
-                        <WorkspaceBannerSection
-                            label="Trust"
-                        >
+                        <WorkspaceBannerSection>
+                        
 
                             <WorkspaceCompletion
                                 model={progress}
