@@ -133,7 +133,7 @@ body,
     min-width: 0;
     min-height: 0;
 
-    overflow: auto;
+    overflow: visible;
 
     padding: 24px;
 
