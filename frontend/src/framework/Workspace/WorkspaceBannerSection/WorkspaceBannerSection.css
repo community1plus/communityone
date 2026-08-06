@@ -1,21 +1,14 @@
-
-
 .workspace-banner-section {
 
     display: flex;
+
     flex-direction: column;
 
-    gap: 6px;
-}
+    justify-content: center;
 
-.workspace-banner-content {
+    gap: 12px;
 
-    margin-top: 8px;
-
-}
-
-.workspace-completion {
-
-    gap: 10px;
+    min-width: 0;
+    min-height: 0;
 
 }

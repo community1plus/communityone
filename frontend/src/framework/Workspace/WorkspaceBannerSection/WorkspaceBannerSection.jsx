@@ -2,7 +2,6 @@ import "./WorkspaceBannerSection.css";
 
 export default function WorkspaceBannerSection({
 
-    label,
     children,
 
 }) {
@@ -11,17 +10,7 @@ export default function WorkspaceBannerSection({
 
         <section className="workspace-banner-section">
 
-<div className="workspace-banner-section">
-
-    {children}
-
-</div>
-
-            <div className="workspace-banner-content">
-
-                {children}
-
-            </div>
+            {children}
 
         </section>
 
