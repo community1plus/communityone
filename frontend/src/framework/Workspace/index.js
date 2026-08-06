@@ -79,6 +79,9 @@ from "./WorkspaceTabs";
 export { default as WorkspaceIdentity }
 from "./WorkspaceIdentity";
 
+export { default as WorkspaceMode  }        
+from "./WorkspaceMode";
+
 export { default as WorkspaceMeta }
 from "./WorkspaceMeta";
 
