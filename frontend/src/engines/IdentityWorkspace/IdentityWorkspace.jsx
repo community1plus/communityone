@@ -8,15 +8,21 @@ import {
     WorkspaceMain,
     WorkspaceSidebar,
     WorkspaceRegionHeader,
-    WorkspaceToolbar,
+
+    WorkspaceBanner,
+    WorkspaceBannerSection,
+
+    WorkspaceTitle,
     WorkspaceMode,
     WorkspaceCompletion,
+
+    WorkspaceTabs,
     WorkspaceBody,
+
     WorkspaceGuide,
     WorkspacePanel,
-    WorkspaceTitle,
     WorkspaceClose,
-    WorkspaceTabs,
+
 } from "../../framework/Workspace";
 
 export default function IdentityWorkspace({
@@ -65,55 +71,64 @@ export default function IdentityWorkspace({
 
             <WorkspaceMain>
 
-<WorkspaceRegionHeader>
+                <WorkspaceRegionHeader>
 
-    <WorkspaceToolbar>
+                    <WorkspaceBanner>
 
-        <WorkspaceTitle
-            title={header.title}
-            subtitle={header.subtitle}
-        />
+                        <WorkspaceBannerSection
+                            label="Workspace"
+                        >
 
-        <WorkspaceMode
-            label="Mode"
-        >
+                            <WorkspaceTitle
+                                title={header.title}
+                                subtitle={header.subtitle}
+                            />
 
-            <IdentityCapabilitySelector
-                values={values}
-                setValue={form.setValue}
-                readOnly={!editing}
-            />
+                        </WorkspaceBannerSection>
 
-        </WorkspaceMode>
+                        <WorkspaceBannerSection
+                            label="Mode"
+                        >
 
-        <WorkspaceCompletion
-            label="Trust"
-            model={progress}
-        />
+                            <WorkspaceMode>
 
-    </WorkspaceToolbar>
+                                <IdentityCapabilitySelector
+                                    values={values}
+                                    setValue={form.setValue}
+                                    readOnly={!editing}
+                                />
 
-    <WorkspaceTabs
-        model={sections}
-    />
+                            </WorkspaceMode>
 
-</WorkspaceRegionHeader>
+                        </WorkspaceBannerSection>
+
+                        <WorkspaceBannerSection
+                            label="Trust"
+                        >
+
+                            <WorkspaceCompletion
+                                model={progress}
+                            />
+
+                        </WorkspaceBannerSection>
+
+                    </WorkspaceBanner>
+
+                    <WorkspaceTabs
+                        model={sections}
+                    />
+
+                </WorkspaceRegionHeader>
 
                 <WorkspaceBody>
 
                     <CapabilityRenderer
-
                         capability={capability}
-
                         sectionId={sectionId}
-
                         activeSteps={activeSteps}
                         currentStep={currentStep}
-
                         form={form}
-
                         editing={editing}
-
                     />
 
                 </WorkspaceBody>
