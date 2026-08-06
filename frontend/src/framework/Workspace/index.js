@@ -82,6 +82,12 @@ from "./WorkspaceIdentity";
 export { default as WorkspaceMode  }        
 from "./WorkspaceMode";
 
+export { default as WorkspaceBanner }
+from "./WorkspaceBanner/WorkspaceBanner";
+
+export { default as WorkspaceBannerSection }
+from "./WorkspaceBanner/WorkspaceBannerSection";
+
 export { default as WorkspaceMeta }
 from "./WorkspaceMeta";
 

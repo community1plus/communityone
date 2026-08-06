@@ -2,7 +2,8 @@ import CapabilityRenderer from "../../components/Capability/CapabilityRenderer";
 import IdentityCapabilitySelector from "../../components/Identity/IdentityCapabilitySelector";
 
 import { buildCapabilityWorkspace } from "../../framework/Workspace/builders/buildCapabilityWorkspace";
-
+import WorkspaceBanner from "../../framework/Workspace/WorkspaceBanner";
+import WorkspaceBannerSection from "../../framework/Workspace/WorkspaceBanner/WorkspaceBannerSection";
 import {
     WorkspaceShell,
     WorkspaceMain,
