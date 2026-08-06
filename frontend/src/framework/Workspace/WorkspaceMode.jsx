@@ -1,27 +1,29 @@
 import "./WorkspaceMode.css";
+
 export default function WorkspaceMode({
 
+    label,
     children,
 
 }) {
 
     return (
 
-<WorkspaceMode>
+        <div className="workspace-mode">
 
-    <span className="workspace-mode-label">
+            {label && (
 
-        Mode
+                <div className="workspace-meta-label">
 
-    </span>
+                    {label}
 
-    <IdentityCapabilitySelector
-        values={values}
-        setValue={form.setValue}
-        readOnly={!editing}
-    />
+                </div>
 
-</WorkspaceMode>
+            )}
+
+            {children}
+
+        </div>
 
     );
 

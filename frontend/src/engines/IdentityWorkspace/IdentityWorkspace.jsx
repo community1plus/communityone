@@ -8,17 +8,15 @@ import {
     WorkspaceMain,
     WorkspaceSidebar,
     WorkspaceRegionHeader,
-    WorkspaceIdentity,
     WorkspaceToolbar,
-    WorkspaceWorkflow,
-    WorkspaceTabs,
+    WorkspaceMode,
     WorkspaceCompletion,
     WorkspaceBody,
     WorkspaceGuide,
     WorkspacePanel,
     WorkspaceTitle,
-    WorkspaceSubtitle,
     WorkspaceClose,
+    WorkspaceTabs,
 } from "../../framework/Workspace";
 
 export default function IdentityWorkspace({
@@ -73,25 +71,27 @@ export default function IdentityWorkspace({
 
         <WorkspaceTitle
             title={header.title}
+            subtitle={header.subtitle}
         />
 
-        <IdentityCapabilitySelector
-            values={values}
-            setValue={form.setValue}
-            readOnly={!editing}
-        />
+        <WorkspaceMode
+            label="Mode"
+        >
+
+            <IdentityCapabilitySelector
+                values={values}
+                setValue={form.setValue}
+                readOnly={!editing}
+            />
+
+        </WorkspaceMode>
 
         <WorkspaceCompletion
+            label="Trust"
             model={progress}
         />
 
     </WorkspaceToolbar>
-
-    <WorkspaceSubtitle>
-
-        {header.subtitle}
-
-    </WorkspaceSubtitle>
 
     <WorkspaceTabs
         model={sections}

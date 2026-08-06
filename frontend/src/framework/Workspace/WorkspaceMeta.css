@@ -9,3 +9,17 @@
     flex-shrink: 0;
 
 }
+
+.workspace-meta-label {
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    letter-spacing: .12em;
+
+    text-transform: uppercase;
+
+    color: var(--text-secondary);
+
+}
