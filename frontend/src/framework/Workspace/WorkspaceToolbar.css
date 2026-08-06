@@ -3,11 +3,11 @@
     display: grid;
 
     grid-template-columns:
-        1.3fr
-        1fr
-        1.1fr;
+        minmax(320px, 1.5fr)
+        minmax(280px, 1fr)
+        minmax(300px, 1.2fr);
 
-    column-gap: 56px;
+    column-gap: 48px;
 
     align-items: start;
 
