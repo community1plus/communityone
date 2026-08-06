@@ -1,17 +1,23 @@
 .workspace-banner-section {
 
     display: flex;
-
     flex-direction: column;
+    justify-content: center;
 
-    gap: 10px;
+    gap: 12px;
+
+    min-height: 170px;
 
 }
 
 .workspace-banner-content {
 
-    display: flex;
+    margin-top: 8px;
 
-    flex-direction: column;
+}
+
+.workspace-completion {
+
+    gap: 10px;
 
 }
