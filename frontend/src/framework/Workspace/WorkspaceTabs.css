@@ -1,11 +1,11 @@
 .workspace-tabs {
+
     display: flex;
+
     align-items: center;
+
     gap: 40px;
 
-    border-bottom: 1px solid var(--border-color, #e8e8e8);
-
-    margin-bottom: 32px;
 }
 
 .workspace-tab {
