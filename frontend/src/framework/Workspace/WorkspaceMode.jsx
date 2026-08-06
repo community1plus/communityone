@@ -1,4 +1,4 @@
-import "WorkspaceMode.css";
+import "./WorkspaceMode.css";
 export default function WorkspaceMode({
 
     children,
