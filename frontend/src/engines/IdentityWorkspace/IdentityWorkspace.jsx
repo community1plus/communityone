@@ -54,7 +54,7 @@ export default function IdentityWorkspace({
 
         header,
         progress,
-        sections,
+        navigation: sections,
 
     } = buildCapabilityWorkspace({
 
@@ -113,7 +113,7 @@ export default function IdentityWorkspace({
                         </WorkspaceBanner>
 
                         <WorkspaceNavigation
-                            model={sections}
+                            model={navigation}
                         />
 
                     </WorkspaceContainer>

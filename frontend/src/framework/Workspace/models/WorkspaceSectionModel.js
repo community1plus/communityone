@@ -8,14 +8,16 @@ export function createWorkspaceSectionsModel({
 
 }) {
 
-    return {
+return {
 
-        items,
+    items,
 
-        current,
+    current,
 
-        onChange,
+    onChange,
 
-    };
+    visible: items.length > 1,
+
+};
 
 }

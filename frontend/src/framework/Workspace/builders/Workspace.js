@@ -8,6 +8,6 @@ export const Workspace = {
 
     Progress: createWorkspaceProgressModel,
 
-    Sections: createWorkspaceSectionsModel,
+    Navigation: createWorkspaceSectionsModel,
 
 };
