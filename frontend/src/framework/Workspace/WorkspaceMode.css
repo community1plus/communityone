@@ -2,8 +2,10 @@
 
     display: flex;
 
-    justify-content: center;
+    flex-direction: column;
 
-    padding-top: 10px;
+    align-items: center;
+
+    gap: 8px;
 
 }

@@ -7,11 +7,21 @@ export default function WorkspaceMode({
 
     return (
 
-        <div className="workspace-mode">
+<WorkspaceMode>
 
-            {children}
+    <span className="workspace-mode-label">
 
-        </div>
+        Mode
+
+    </span>
+
+    <IdentityCapabilitySelector
+        values={values}
+        setValue={form.setValue}
+        readOnly={!editing}
+    />
+
+</WorkspaceMode>
 
     );
 
