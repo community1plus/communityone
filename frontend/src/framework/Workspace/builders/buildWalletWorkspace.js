@@ -2,7 +2,7 @@ import { createWorkspace } from "../../../framework/Workspace/builders/createWor
 
 import { createWorkspaceHeaderModel } from "../../../framework/Workspace/models/WorkspaceHeaderModel";
 import { createWorkspaceProgressModel } from "../../../framework/Workspace/models/WorkspaceProgressModel";
-import { createWorkspaceSectionsModel } from "../models/WorkspaceNavigationModel";
+import { createWorkspaceNavigationModel } from "../models/WorkspaceNavigationModel";
 
 export function buildWalletWorkspace({
 
