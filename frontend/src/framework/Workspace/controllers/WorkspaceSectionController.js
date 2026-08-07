@@ -1,4 +1,4 @@
-export default function createWorkspaceSectionController({
+export function createWorkspaceSectionController({
 
     sections,
 
