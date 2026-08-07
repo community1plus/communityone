@@ -12,6 +12,7 @@ import {
     WorkspaceContainer,
     WorkspaceBanner,
     WorkspaceBannerSection,
+
     WorkspaceNavigation,
 
     WorkspaceTitle,
@@ -111,13 +112,13 @@ export default function IdentityWorkspace({
 
                         </WorkspaceBanner>
 
-                        <WorkspaceNavigation
-                            model={navigation}
-                        />
-
                     </WorkspaceContainer>
 
                 </WorkspaceRegionHeader>
+
+                <WorkspaceNavigation
+                    model={navigation}
+                />
 
                 <WorkspaceBody>
 
@@ -127,7 +128,7 @@ export default function IdentityWorkspace({
 
                         sectionId={sectionId}
 
-                        /* Legacy renderer API */
+                        /* Legacy renderer adapter */
 
                         activeSteps={sections}
                         currentStep={currentSection}
