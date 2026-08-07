@@ -1,7 +1,7 @@
 import WorkspaceBannerSection from "../WorkspaceBannerSection/WorkspaceBannerSection";
-import WorkspaceTitle from "./WorkspaceTitle";
-import WorkspaceMode from "./WorkspaceMode";
-import WorkspaceMetric from "./WorkspaceMetric";
+import WorkspaceTitle from ".WorkspaceTitle/WorkspaceTitle";
+import WorkspaceMode from "../WorkspaceMode/WorkspaceMode";
+import WorkspaceMetric from "../WorkspaceMetric/WorkspaceMetric";
 
 import "./WorkspaceBanner.css";
 
