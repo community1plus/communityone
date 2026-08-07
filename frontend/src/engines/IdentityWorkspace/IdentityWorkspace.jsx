@@ -69,7 +69,7 @@ const {
         <WorkspaceShell>
 
             <WorkspaceClose
-                onClick={header.onClose}
+                onClick={banner.onClose}
             />
 
             <WorkspaceMain>
