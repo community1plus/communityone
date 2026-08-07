@@ -17,7 +17,7 @@ export function buildIdentityWorkspace(state, actions) {
     const {
 
         closeProfile,
-        setCurrentStep,
+        setCurrentSection,
 
     } = actions;
 
