@@ -1,6 +1,6 @@
 import { createWorkspaceHeaderModel } from "../models/WorkspaceHeaderModel";
 import { createWorkspaceProgressModel } from "../models/WorkspaceProgressModel";
-import { createWorkspaceSectionsModel } from "../models/WorkspaceNavigationModel";
+import { createWorkspaceNavigationModel } from "../models/WorkspaceNavigationModel";
 
 export const Workspace = {
 
@@ -8,6 +8,6 @@ export const Workspace = {
 
     Progress: createWorkspaceProgressModel,
 
-    Navigation: createWorkspaceSectionsModel,
+    Navigation: createWorkspaceNavigationModel,
 
 };
