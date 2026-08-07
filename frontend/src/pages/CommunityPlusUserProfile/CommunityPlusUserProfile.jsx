@@ -132,7 +132,7 @@ export default function CommunityPlusUserProfile({
   }, [values.capabilities]);
 
   const sectionId =
-    activeSteps[currentSection]?.id;
+    sections[currentSection]?.id;
 
   /* =====================================
      ACTIONS

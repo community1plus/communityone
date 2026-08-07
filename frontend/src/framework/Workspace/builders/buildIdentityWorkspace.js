@@ -9,8 +9,8 @@ export function buildIdentityWorkspace(state, actions) {
     const {
 
         completion,
-        activeSteps,
-        currentStep,
+        sections,
+        currentSection,
 
     } = state;
 
@@ -33,11 +33,11 @@ export function buildIdentityWorkspace(state, actions) {
 
         navigation: createWorkspaceNavigationModel({
 
-            items: activeSteps,
+            items: sections,
 
-            current: currentStep,
+            current: currentSection,
 
-            onChange: setCurrentStep,
+            onChange: setCurrentSection,
 
         }),
 
