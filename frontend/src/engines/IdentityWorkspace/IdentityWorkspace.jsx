@@ -6,10 +6,10 @@ import { buildCapabilityWorkspace } from "../../framework/Workspace/builders/bui
 import {
     WorkspaceShell,
     WorkspaceMain,
+    WorkspaceContent,
     WorkspaceSidebar,
 
     WorkspaceRegionHeader,
-    WorkspaceContainer,
     WorkspaceBanner,
     WorkspaceBannerSection,
 
@@ -74,9 +74,9 @@ export default function IdentityWorkspace({
 
             <WorkspaceMain>
 
-                <WorkspaceRegionHeader>
+                <WorkspaceContent>
 
-                    <WorkspaceContainer>
+                    <WorkspaceRegionHeader>
 
                         <WorkspaceBanner>
 
@@ -112,34 +112,34 @@ export default function IdentityWorkspace({
 
                         </WorkspaceBanner>
 
-                    </WorkspaceContainer>
+                    </WorkspaceRegionHeader>
 
-                </WorkspaceRegionHeader>
-
-                <WorkspaceNavigation
-                    model={navigation}
-                />
-
-                <WorkspaceBody>
-
-                    <CapabilityRenderer
-
-                        capability={capability}
-
-                        sectionId={sectionId}
-
-                        /* Legacy renderer adapter */
-
-                        activeSteps={sections}
-                        currentStep={currentSection}
-
-                        form={form}
-
-                        editing={editing}
-
+                    <WorkspaceNavigation
+                        model={navigation}
                     />
 
-                </WorkspaceBody>
+                    <WorkspaceBody>
+
+                        <CapabilityRenderer
+
+                            capability={capability}
+
+                            sectionId={sectionId}
+
+                            {/* Legacy renderer adapter */}
+
+                            activeSteps={sections}
+                            currentStep={currentSection}
+
+                            form={form}
+
+                            editing={editing}
+
+                        />
+
+                    </WorkspaceBody>
+
+                </WorkspaceContent>
 
             </WorkspaceMain>
 

@@ -10,6 +10,9 @@ from "./WorkspaceWorkflow";
 export { default as WorkspaceGuide }
 from "./WorkspaceGuide";
 
+export { default as WorkspaceContent } 
+from "./WorkspaceContent";
+
 export {default as WorkspaceContainer} 
 from "./WorkspaceContainer/WorkspaceContainer";
 
