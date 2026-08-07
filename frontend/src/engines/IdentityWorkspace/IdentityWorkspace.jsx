@@ -154,7 +154,7 @@ const {
                         title="Profile Completion"
                     >
 
-                        {progress.value}%
+                        {banner.metric.value}%
 
                     </WorkspacePanel>
 
