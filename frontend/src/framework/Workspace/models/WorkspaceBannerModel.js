@@ -2,9 +2,11 @@ export function createWorkspaceBannerModel({
 
     title,
 
-    onClose,
+    mode = null,
 
-    metric,
+    metric = null,
+
+    onClose = null,
 
 }) {
 
@@ -12,9 +14,11 @@ export function createWorkspaceBannerModel({
 
         title,
 
-        onClose,
+        mode,
 
         metric,
+
+        onClose,
 
     };
 

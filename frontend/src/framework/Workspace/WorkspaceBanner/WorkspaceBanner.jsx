@@ -1,19 +1,42 @@
+import WorkspaceBannerSection from "./WorkspaceBannerSection";
+import WorkspaceTitle from "./WorkspaceTitle";
+import WorkspaceMode from "./WorkspaceMode";
+import WorkspaceMetric from "./WorkspaceMetric";
+
 import "./WorkspaceBanner.css";
 
 export default function WorkspaceBanner({
+
+    model,
 
     children,
 
 }) {
 
-    return (
+return (
 
-        <div className="workspace-banner">
+    <div className="workspace-banner">
 
-            {children}
+        <WorkspaceBannerSection>
 
-        </div>
+            <WorkspaceTitle
+                title={model.title}
+            />
 
-    );
+        </WorkspaceBannerSection>
+
+        {children}
+
+        <WorkspaceBannerSection>
+
+            <WorkspaceMetric
+                model={model.metric}
+            />
+
+        </WorkspaceBannerSection>
+
+    </div>
+
+);
 
 }

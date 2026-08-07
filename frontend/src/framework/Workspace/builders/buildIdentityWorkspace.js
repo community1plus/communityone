@@ -28,6 +28,8 @@ banner: createWorkspaceBannerModel({
 
     title: "IDENTITY",
 
+    mode: "identity",
+
     onClose: closeProfile,
 
     metric: createWorkspaceProgressModel({

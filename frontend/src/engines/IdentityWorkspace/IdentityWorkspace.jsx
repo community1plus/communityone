@@ -78,39 +78,25 @@ const {
 
                     <WorkspaceRegionHeader>
 
-                        <WorkspaceBanner>
+<WorkspaceBanner
+    model={banner}
+>
 
-                            <WorkspaceBannerSection>
+    <WorkspaceBannerSection>
 
-                                <WorkspaceTitle
-    title={banner.title}
-/>
+        <WorkspaceMode>
 
-                            </WorkspaceBannerSection>
+            <IdentityCapabilitySelector
+                values={values}
+                setValue={form.setValue}
+                readOnly={!editing}
+            />
 
-                            <WorkspaceBannerSection>
+        </WorkspaceMode>
 
-                                <WorkspaceMode>
+    </WorkspaceBannerSection>
 
-                                    <IdentityCapabilitySelector
-                                        values={values}
-                                        setValue={form.setValue}
-                                        readOnly={!editing}
-                                    />
-
-                                </WorkspaceMode>
-
-                            </WorkspaceBannerSection>
-
-                            <WorkspaceBannerSection>
-
-                                <WorkspaceMetric
-    model={banner.metric}
-/>
-
-                            </WorkspaceBannerSection>
-
-                        </WorkspaceBanner>
+</WorkspaceBanner>
 
                     </WorkspaceRegionHeader>
 
