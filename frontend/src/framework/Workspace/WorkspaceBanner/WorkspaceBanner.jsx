@@ -13,42 +13,46 @@ export default function WorkspaceBanner({
 
 }) {
 
-return (
+    const {
 
-    <div className="workspace-banner">
+        left = {},
+        centre = {},
+        right = {},
 
-<WorkspaceBannerSection>
+    } = model;
 
-    <WorkspaceTitle
+    return (
 
-        title={model.left.title}
+        <div className="workspace-banner">
 
-    />
+            <WorkspaceBannerSection>
 
-</WorkspaceBannerSection>
+                <WorkspaceTitle
+                    title={left.title}
+                />
 
-<WorkspaceBannerSection>
+            </WorkspaceBannerSection>
 
-    <WorkspaceMode>
+            <WorkspaceBannerSection>
 
-        {children}
+                <WorkspaceMode>
 
-    </WorkspaceMode>
+                    {children}
 
-</WorkspaceBannerSection>
+                </WorkspaceMode>
 
-<WorkspaceBannerSection>
+            </WorkspaceBannerSection>
 
-    <WorkspaceMetric
+            <WorkspaceBannerSection>
 
-        model={model.right.metric}
+                <WorkspaceMetric
+                    model={right.metric}
+                />
 
-    />
+            </WorkspaceBannerSection>
 
-</WorkspaceBannerSection>
+        </div>
 
-    </div>
-
-);
+    );
 
 }

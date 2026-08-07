@@ -2,7 +2,7 @@ import CapabilityRenderer from "../../components/Capability/CapabilityRenderer";
 import IdentityCapabilitySelector from "../../components/Identity/IdentityCapabilitySelector";
 
 import { buildCapabilityWorkspace } from "../../framework/Workspace/builders/buildCapabilityWorkspace";
-//
+
 import {
     WorkspaceShell,
     WorkspaceMain,
@@ -11,14 +11,7 @@ import {
 
     WorkspaceRegionHeader,
     WorkspaceBanner,
-    WorkspaceBannerSection,
-
     WorkspaceNavigation,
-
-    WorkspaceTitle,
-    WorkspaceMode,
-    WorkspaceMetric,
-
     WorkspaceBody,
 
     WorkspaceGuide,
@@ -50,13 +43,12 @@ export default function IdentityWorkspace({
 
     } = state;
 
-const {
+    const {
 
-    banner,
+        banner,
+        navigation,
 
-    navigation,
-
-} = buildCapabilityWorkspace({
+    } = buildCapabilityWorkspace({
 
         capability,
         state,
@@ -69,7 +61,7 @@ const {
         <WorkspaceShell>
 
             <WorkspaceClose
-                onClick={banner.onClose}
+                onClick={actions.closeProfile}
             />
 
             <WorkspaceMain>
@@ -78,25 +70,17 @@ const {
 
                     <WorkspaceRegionHeader>
 
-<WorkspaceBanner
-    model={banner}
->
+                        <WorkspaceBanner
+                            model={banner}
+                        >
 
-    <WorkspaceBannerSection>
+                            <IdentityCapabilitySelector
+                                values={values}
+                                setValue={form.setValue}
+                                readOnly={!editing}
+                            />
 
-        <WorkspaceMode>
-
-            <IdentityCapabilitySelector
-                values={values}
-                setValue={form.setValue}
-                readOnly={!editing}
-            />
-
-        </WorkspaceMode>
-
-    </WorkspaceBannerSection>
-
-</WorkspaceBanner>
+                        </WorkspaceBanner>
 
                     </WorkspaceRegionHeader>
 
@@ -106,7 +90,6 @@ const {
 
                     <WorkspaceBody>
 
-                        {/* Legacy renderer adapter */}
                         <CapabilityRenderer
                             capability={capability}
                             sectionId={sectionId}
@@ -140,7 +123,7 @@ const {
                         title="Profile Completion"
                     >
 
-                        {banner.metric.value}%
+                        {banner.right.metric.value}%
 
                     </WorkspacePanel>
 
@@ -148,7 +131,7 @@ const {
                         title="Current Section"
                     >
 
-                        Personal Details
+                        {sections[currentSection]?.title}
 
                     </WorkspacePanel>
 
