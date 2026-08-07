@@ -26,17 +26,27 @@ export function buildIdentityWorkspace(state, actions) {
 
 banner: createWorkspaceBannerModel({
 
-    title: "IDENTITY",
+    left: {
 
-    mode: "identity",
+        title: "IDENTITY",
 
-    onClose: closeProfile,
+    },
 
-    metric: createWorkspaceProgressModel({
+    centre: {
 
-        value: completion,
+        mode: "identity",
 
-    }),
+    },
+
+    right: {
+
+        metric: createWorkspaceProgressModel({
+
+            value: completion,
+
+        }),
+
+    },
 
 }),
 

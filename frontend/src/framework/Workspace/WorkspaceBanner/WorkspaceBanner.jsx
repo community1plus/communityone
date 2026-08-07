@@ -17,23 +17,35 @@ return (
 
     <div className="workspace-banner">
 
-        <WorkspaceBannerSection>
+<WorkspaceBannerSection>
 
-            <WorkspaceTitle
-                title={model.title}
-            />
+    <WorkspaceTitle
 
-        </WorkspaceBannerSection>
+        title={model.left.title}
+
+    />
+
+</WorkspaceBannerSection>
+
+<WorkspaceBannerSection>
+
+    <WorkspaceMode>
 
         {children}
 
-        <WorkspaceBannerSection>
+    </WorkspaceMode>
 
-            <WorkspaceMetric
-                model={model.metric}
-            />
+</WorkspaceBannerSection>
 
-        </WorkspaceBannerSection>
+<WorkspaceBannerSection>
+
+    <WorkspaceMetric
+
+        model={model.right.metric}
+
+    />
+
+</WorkspaceBannerSection>
 
     </div>
 

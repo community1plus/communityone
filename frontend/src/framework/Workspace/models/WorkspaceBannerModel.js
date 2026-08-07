@@ -1,24 +1,20 @@
 export function createWorkspaceBannerModel({
 
-    title,
+    left = {},
 
-    mode = null,
+    centre = {},
 
-    metric = null,
-
-    onClose = null,
+    right = {},
 
 }) {
 
     return {
 
-        title,
+        left,
 
-        mode,
+        centre,
 
-        metric,
-
-        onClose,
+        right,
 
     };
 
