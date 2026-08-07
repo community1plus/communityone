@@ -1,3 +1,4 @@
+import "./WorkspaceNavigation.css";
 export default function WorkspaceNavigation({
 
     model,
