@@ -12,31 +12,48 @@
 
 }
 
+/* Remove after debugging */
+/*
 .workspace-navigation {
 
     background: yellow;
 
 }
+*/
 
 .workspace-tab {
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
 
     appearance: none;
 
     background: transparent;
 
     border: none;
+    border-bottom: 2px solid transparent;
 
     padding: 0 0 14px;
 
     cursor: pointer;
 
     font: inherit;
-
     font-size: 1rem;
-
     font-weight: 500;
 
     color: var(--text-secondary);
+
+    transition:
+        color .2s ease,
+        border-color .2s ease;
+
+}
+
+.workspace-tab:hover {
+
+    color: var(--text-primary);
 
 }
 
@@ -44,6 +61,12 @@
 
     color: var(--brand-primary);
 
-    border-bottom: 2px solid var(--brand-primary);
+    border-bottom-color: var(--brand-primary);
+
+}
+
+.workspace-tab.complete {
+
+    color: var(--text-primary);
 
 }
