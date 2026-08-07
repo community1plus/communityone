@@ -1,4 +1,4 @@
-.workspace-tabs {
+.workspace-navigation {
 
     display: flex;
 
@@ -6,33 +6,36 @@
 
     gap: 40px;
 
+    border-bottom: 1px solid var(--border-color);
+
 }
 
 .workspace-tab {
+
     appearance: none;
-    background: none;
+
+    background: transparent;
+
     border: none;
-    padding: 0 0 14px 0;
+
+    padding: 0 0 14px;
 
     cursor: pointer;
 
     font: inherit;
+
     font-size: 1rem;
+
     font-weight: 500;
 
-    color: var(--text-secondary, #666);
+    color: var(--text-secondary);
 
-    transition:
-        color .2s ease,
-        border-color .2s ease;
-}
-
-.workspace-tab:hover {
-    color: var(--text-primary, #222);
 }
 
 .workspace-tab.active {
-    color: var(--brand-primary, #b01724);
-    border-bottom-color: var(--brand-primary, #b01724);
-    font-weight: 600;
+
+    color: var(--brand-primary);
+
+    border-bottom: 2px solid var(--brand-primary);
+
 }
