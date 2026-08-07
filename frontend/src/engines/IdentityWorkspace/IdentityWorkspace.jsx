@@ -120,21 +120,14 @@ export default function IdentityWorkspace({
 
                     <WorkspaceBody>
 
+                        {/* Legacy renderer adapter */}
                         <CapabilityRenderer
-
                             capability={capability}
-
                             sectionId={sectionId}
-
-                            {/* Legacy renderer adapter */}
-
                             activeSteps={sections}
                             currentStep={currentSection}
-
                             form={form}
-
                             editing={editing}
-
                         />
 
                     </WorkspaceBody>
