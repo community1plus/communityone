@@ -2,7 +2,7 @@ export function createWorkspaceBannerModel({
 
     title,
 
-    mode,
+    onClose,
 
     metric,
 
@@ -12,7 +12,7 @@ export function createWorkspaceBannerModel({
 
         title,
 
-        mode,
+        onClose,
 
         metric,
 

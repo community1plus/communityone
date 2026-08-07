@@ -24,9 +24,11 @@ export function buildIdentityWorkspace(state, actions) {
 
     return createWorkspace({
 
-        banner: createWorkspaceBannerModel({
+banner: createWorkspaceBannerModel({
 
     title: "IDENTITY",
+
+    onClose: closeProfile,
 
     metric: createWorkspaceProgressModel({
 
