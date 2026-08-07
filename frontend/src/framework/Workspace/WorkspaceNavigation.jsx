@@ -1,45 +1,36 @@
-import "./WorkspaceNavigation.css";
-
 export default function WorkspaceNavigation({
 
-    model = {},
+    model,
 
 }) {
 
-    const {
+    if (!model.visible) {
 
-        items = [],
+        return null;
 
-        current,
-
-        onChange,
-
-    } = model;
+    }
 
     return (
 
-        <nav className="workspace-tabs">
+        <nav className="workspace-navigation">
 
-            {items.map((item) => {
+            {model.items.map((item, index) => (
 
-                const active = item.value === current;
+                <button
+                    key={item.id}
+                    type="button"
+                    className={`workspace-tab
+                        ${model.current === index ? "active" : ""}
+                        ${index < model.current ? "complete" : ""}
+                    `}
+                    onClick={() => model.onChange(index)}
+                >
 
-                return (
+                    {item.title}
 
-                    <button
-                        key={item.value}
-                        type="button"
-                        className={`workspace-tab ${active ? "active" : ""}`}
-                        onClick={() => onChange?.(item.value)}
-                    >
+                </button>
 
-                        {item.label}
-
-                    </button>
-
-                );
-
-            })}
+            ))}
 
         </nav>
 

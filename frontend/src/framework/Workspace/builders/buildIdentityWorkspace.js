@@ -1,47 +1,54 @@
 import { createWorkspace } from "../../../framework/Workspace/builders/createWorkspace";
 
 import { createWorkspaceHeaderModel } from "../../../framework/Workspace/models/WorkspaceHeaderModel";
-import { createWorkspaceSectionsModel } from "../../../framework/Workspace/models/WorkspaceSectionsModel";
+import { createWorkspaceNavigationModel } from "../../../framework/Workspace/models/WorkspaceNavigationModel";
 import { createWorkspaceProgressModel } from "../../../framework/Workspace/models/WorkspaceProgressModel";
 
 export function buildIdentityWorkspace(state, actions) {
 
     const {
+
         completion,
         activeSteps,
         currentStep,
+
     } = state;
 
     const {
+
         closeProfile,
         setCurrentStep,
+
     } = actions;
 
-return createWorkspace({
+    return createWorkspace({
 
-    header: createWorkspaceHeaderModel({
+        header: createWorkspaceHeaderModel({
 
-        title: "IDENTITY",
-        subtitle: "Your trusted identity.",
-        onClose: closeProfile,
+            title: "IDENTITY",
+            subtitle: "Your trusted identity.",
+            onClose: closeProfile,
 
-    }),
+        }),
 
-    navigation: createWorkspaceSectionsModel({
+        navigation: createWorkspaceNavigationModel({
 
-        items: activeSteps,
-        current: currentStep,
-        onChange: setCurrentStep,
+            items: activeSteps,
 
-    }),
+            current: currentStep,
 
-    progress: createWorkspaceProgressModel({
+            onChange: setCurrentStep,
 
-        value: completion,
-        label: "",
+        }),
 
-    }),
+        progress: createWorkspaceProgressModel({
 
-});
+            value: completion,
+
+            label: "",
+
+        }),
+
+    });
 
 }

@@ -7,8 +7,8 @@ import useForm from "../../hooks/useForm";
 import "./CommunityPlusUserProfile.css";
 import IdentityWorkspace from "../../engines/IdentityWorkspace/IdentityWorkspace";
 import {
-  PROFILE_STEPS,
-  ORG_STEPS,
+  IDENTITY_SECTIONS,
+  ENTITY_SECTIONS,
 } from "./profileConstants";
 
 import {
@@ -51,12 +51,12 @@ export default function CommunityPlusUserProfile({
   const [editing, setEditing] =
     useState(!profile?.id);
 
-  const [currentStep, setCurrentStep] =
+  const [currentSection, setCurrentSection] =
     useState(() => {
 
       const saved =
         sessionStorage.getItem(
-          "profileCurrentStep"
+          "profileCurrentSection"
         );
 
       return saved
@@ -68,11 +68,11 @@ export default function CommunityPlusUserProfile({
   useEffect(() => {
 
     sessionStorage.setItem(
-      "profileCurrentStep",
-      currentStep
+      "profileCurrentSection",
+      currentSection
     );
 
-  }, [currentStep]);
+  }, [currentSection]);
 
   /* =====================================
      FORM
@@ -109,19 +109,19 @@ export default function CommunityPlusUserProfile({
   const completion =
     calculateProfileCompletion(values);
 
-  const activeSteps = useMemo(() => {
+  const sections = useMemo(() => {
 
-    const steps = [...PROFILE_STEPS];
+    const items = [...IDENTITY_SECTIONS];
 
     if (values.capabilities?.organisation) {
 
-      steps.splice(
+      items.splice(
 
         3,
 
         0,
 
-        ...ORG_STEPS
+        ...ENTITY_SECTIONS
 
       );
 
@@ -132,7 +132,7 @@ export default function CommunityPlusUserProfile({
   }, [values.capabilities]);
 
   const sectionId =
-    activeSteps[currentStep]?.id;
+    activeSteps[currentSection]?.id;
 
   /* =====================================
      ACTIONS
@@ -214,13 +214,13 @@ export default function CommunityPlusUserProfile({
     editMode,
     savingProfile,
     completion,
-    activeSteps,
-    currentStep,
+    sections,
+    currentSection,
     sectionId,
   };
 
   const workspaceActions = {
-    setCurrentStep,
+    setCurrentSection,
     setEditing,
     handleSaveProfile,
     closeProfile,

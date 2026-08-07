@@ -34,7 +34,7 @@ export const PROFILE_TABS = [
     label: "Person",
   },
   {
-    id: "ORG",
+    id: "Entity",
     label: "Entity",
   },
   {
@@ -47,7 +47,7 @@ export const PROFILE_TABS = [
 PERSONAL PROFILE
 ========================================= */
 
-export const PROFILE_STEPS = [
+export const IDENTITY_SECTIONS = [
 
   {
     id: "identity",
@@ -118,10 +118,10 @@ export const PROFILE_STEPS = [
 ];
 
 /* =========================================
-ORGANISATION PROFILE
+ENTITY PROFILE
 ========================================= */
 
-export const ORG_STEPS = [
+export const ENTITY_SECTIONS = [
 
   {
     id: "organisation",

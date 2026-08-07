@@ -1,10 +1,10 @@
-export function createWorkspaceSectionsModel({
+export function createWorkspaceNavigationModel({
 
     items = [],
 
-    current,
+    current = 0,
 
-    onChange,
+    onChange = () => {},
 
 }) {
 
