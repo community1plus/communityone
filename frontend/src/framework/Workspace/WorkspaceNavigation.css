@@ -4,6 +4,18 @@
 
     align-items: center;
 
+    gap: 40px;
+
+    width: 100%;
+
+    border-bottom: 1px solid var(--border-color, #e8e8e8);
+
+}
+
+.workspace-navigation {
+
+    background: yellow;
+
 }
 
 .workspace-tab {
