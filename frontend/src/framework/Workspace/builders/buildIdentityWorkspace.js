@@ -3,6 +3,7 @@ import { createWorkspace } from "../../../framework/Workspace/builders/createWor
 import { createWorkspaceHeaderModel } from "../../../framework/Workspace/models/WorkspaceHeaderModel";
 import { createWorkspaceNavigationModel } from "../../../framework/Workspace/models/WorkspaceNavigationModel";
 import { createWorkspaceProgressModel } from "../../../framework/Workspace/models/WorkspaceProgressModel";
+import { createWorkspaceBannerModel } from "../../../framework/Workspace/models/WorkspaceBannerModel";
 
 export function buildIdentityWorkspace(state, actions) {
 
@@ -23,13 +24,17 @@ export function buildIdentityWorkspace(state, actions) {
 
     return createWorkspace({
 
-        header: createWorkspaceHeaderModel({
+        banner: createWorkspaceBannerModel({
 
-            title: "IDENTITY",
-            subtitle: "Your trusted identity.",
-            onClose: closeProfile,
+    title: "IDENTITY",
 
-        }),
+    metric: createWorkspaceProgressModel({
+
+        value: completion,
+
+    }),
+
+}),
 
         navigation: createWorkspaceNavigationModel({
 
@@ -41,13 +46,7 @@ export function buildIdentityWorkspace(state, actions) {
 
         }),
 
-        progress: createWorkspaceProgressModel({
 
-            value: completion,
-
-            label: "",
-
-        }),
 
     });
 

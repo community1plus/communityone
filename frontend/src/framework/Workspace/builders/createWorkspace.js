@@ -1,16 +1,12 @@
 export function createWorkspace({
 
-    header = null,
-
-    context = null,
+    banner = null,
 
     navigation = null,
 
-    progress = null,
-
     body = null,
 
-    insights = null,
+    guide = null,
 
     actions = null,
 
@@ -18,17 +14,13 @@ export function createWorkspace({
 
     return {
 
-        header,
-
-        context,
+        banner,
 
         navigation,
 
-        progress,
-
         body,
 
-        insights,
+        guide,
 
         actions,
 

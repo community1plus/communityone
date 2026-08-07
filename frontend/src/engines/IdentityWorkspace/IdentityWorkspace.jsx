@@ -50,13 +50,13 @@ export default function IdentityWorkspace({
 
     } = state;
 
-    const {
+const {
 
-        header,
-        progress,
-        navigation,
+    banner,
 
-    } = buildCapabilityWorkspace({
+    navigation,
+
+} = buildCapabilityWorkspace({
 
         capability,
         state,
@@ -83,8 +83,8 @@ export default function IdentityWorkspace({
                             <WorkspaceBannerSection>
 
                                 <WorkspaceTitle
-                                    title={header.title}
-                                />
+    title={banner.title}
+/>
 
                             </WorkspaceBannerSection>
 
@@ -105,8 +105,8 @@ export default function IdentityWorkspace({
                             <WorkspaceBannerSection>
 
                                 <WorkspaceMetric
-                                    model={progress}
-                                />
+    model={banner.metric}
+/>
 
                             </WorkspaceBannerSection>
 
