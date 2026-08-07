@@ -1,3 +1,9 @@
+import {
+
+    createWorkspaceSectionModel,
+
+} from "../../framework/Workspace/models/WorkspaceSectionModel";
+
 export const DEFAULT_PHONE_COUNTRY = "AU";
 
 export const PHONE_COUNTRIES = [
@@ -49,29 +55,32 @@ PERSONAL PROFILE
 
 export const IDENTITY_SECTIONS = [
 
-  {
+createWorkspaceSectionModel({
+
     id: "identity",
+
     title: "Identity",
 
     fields: [
 
-      {
-        name: "username",
-        label: "Name",
-        type: "text",
-        helperText:
-          "This is how people know you in Community One.",
-      },
+        {
+            name: "username",
+            label: "Name",
+            type: "text",
+            helperText:
+                "This is how people know you in Community One.",
+        },
 
-      {
-        name: "email",
-        label: "Email",
-        type: "email",
-        readOnly: true,
-      },
+        {
+            name: "email",
+            label: "Email",
+            type: "email",
+            readOnly: true,
+        },
 
     ],
-  },
+
+}),
 
   {
     id: "location",
