@@ -4,16 +4,15 @@ import IdentityCapabilitySelector from "../../components/Identity/IdentityCapabi
 import { buildCapabilityWorkspace } from "../../framework/Workspace/builders/buildCapabilityWorkspace";
 
 import {
-
     WorkspaceShell,
     WorkspaceMain,
     WorkspaceSidebar,
 
     WorkspaceRegionHeader,
-    WorkspaceNavigation,
     WorkspaceContainer,
     WorkspaceBanner,
     WorkspaceBannerSection,
+    WorkspaceNavigation,
 
     WorkspaceTitle,
     WorkspaceMode,
@@ -44,25 +43,25 @@ export default function IdentityWorkspace({
         form,
         editing,
 
-        activeSteps,
-        currentStep,
+        sections,
+        currentSection,
         sectionId,
 
     } = state;
 
-const {
+    const {
 
-    header,
-    progress,
-    navigation,
+        header,
+        progress,
+        navigation,
 
-} = buildCapabilityWorkspace({
+    } = buildCapabilityWorkspace({
 
-    capability,
-    state,
-    actions,
+        capability,
+        state,
+        actions,
 
-});
+    });
 
     return (
 
@@ -118,19 +117,25 @@ const {
 
                     </WorkspaceContainer>
 
-
-
                 </WorkspaceRegionHeader>
 
                 <WorkspaceBody>
 
                     <CapabilityRenderer
+
                         capability={capability}
+
                         sectionId={sectionId}
-                        activeSteps={activeSteps}
-                        currentStep={currentStep}
+
+                        /* Legacy renderer API */
+
+                        activeSteps={sections}
+                        currentStep={currentSection}
+
                         form={form}
+
                         editing={editing}
+
                     />
 
                 </WorkspaceBody>
