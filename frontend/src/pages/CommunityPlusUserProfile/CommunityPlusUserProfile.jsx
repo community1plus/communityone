@@ -20,6 +20,7 @@ import {
   buildProfilePayload,
 } from "./profilePayload";
 
+import WorkspaceSectionController from "../../framework/Workspace/controllers/WorkspaceSectionController";
 export default function CommunityPlusUserProfile({
 
     onComplete,
@@ -219,8 +220,21 @@ export default function CommunityPlusUserProfile({
     sectionId,
   };
 
-  const workspaceActions = {
-    setCurrentSection,
+  const sectionController =
+    createWorkspaceSectionController({
+
+        sections,
+
+        current: currentSection,
+
+        setCurrent: setCurrentSection,
+
+    });
+
+const workspaceActions = {
+
+    goToSection:
+        sectionController.goTo,
     setEditing,
     handleSaveProfile,
     closeProfile,
