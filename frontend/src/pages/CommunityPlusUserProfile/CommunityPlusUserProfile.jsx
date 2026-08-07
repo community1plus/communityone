@@ -127,7 +127,7 @@ export default function CommunityPlusUserProfile({
 
     }
 
-    return steps;
+    return items;
 
   }, [values.capabilities]);
 
