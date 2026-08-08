@@ -30,7 +30,7 @@ export function buildWalletWorkspace({
 
             current: currentSection,
 
-            onChange: setCurrentSection,
+            onChange: goToSection,
 
         }),
 

@@ -52,7 +52,7 @@ export default function CommunityPlusUserProfile({
   const [editing, setEditing] =
     useState(!profile?.id);
 
-  const [currentSection, setCurrentSection] =
+  const [currentSection, goToSection] =
     useState(() => {
 
       const saved =

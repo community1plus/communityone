@@ -4,7 +4,7 @@ import { createWorkspaceHeaderModel } from "../../../framework/Workspace/models/
 import { createWorkspaceNavigationModel } from "../../../framework/Workspace/models/WorkspaceNavigationModel";
 import { createWorkspaceProgressModel } from "../../../framework/Workspace/models/WorkspaceProgressModel";
 import { createWorkspaceBannerModel } from "../../../framework/Workspace/models/WorkspaceBannerModel";
-import { createWorkspaceSectionModel } from "../../../framework/Workspace/models/WorkspaceSectionModel";
+
 
 export function buildIdentityWorkspace(state, actions) {
 
