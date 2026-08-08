@@ -222,8 +222,8 @@ export default function CommunityPlusUserProfile({
 
   const sectionController =
     createWorkspaceSectionController({
-
-        sections,
+  
+      sections,
 
         current: currentSection,
 
