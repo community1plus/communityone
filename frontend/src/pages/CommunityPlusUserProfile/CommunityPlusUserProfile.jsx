@@ -20,7 +20,7 @@ import {
   buildProfilePayload,
 } from "./profilePayload";
 
-import WorkspaceSectionController from "../../framework/Workspace/controllers/WorkspaceSectionController";
+import createWorkspaceSectionController from "../../framework/Workspace/controllers/WorkspaceSectionController";
 export default function CommunityPlusUserProfile({
 
     onComplete,
