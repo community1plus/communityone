@@ -8,7 +8,7 @@ export function buildWalletWorkspace({
 
     currentSection,
 
-    setCurrentSection,
+    gotToSection,
 
     navigation,
 

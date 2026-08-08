@@ -19,7 +19,7 @@ export function buildIdentityWorkspace(state, actions) {
     const {
 
         closeProfile,
-        setCurrentSection,
+        goToSection,
 
     } = actions;
 

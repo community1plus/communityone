@@ -227,7 +227,7 @@ export default function CommunityPlusUserProfile({
 
         current: currentSection,
 
-        setCurrent: setCurrentSection,
+        setCurrent: goToSection,
 
     });
 const goToSection = sectionController.goTo;
