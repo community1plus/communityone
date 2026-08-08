@@ -230,11 +230,10 @@ export default function CommunityPlusUserProfile({
         setCurrent: setCurrentSection,
 
     });
-
+const goToSection = sectionController.goTo;
 const workspaceActions = {
 
-    goToSection:
-        sectionController.goTo,
+    goToSection: sectionController.goToSection,
     setEditing,
     handleSaveProfile,
     closeProfile,
