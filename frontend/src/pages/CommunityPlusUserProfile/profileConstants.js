@@ -1,3 +1,5 @@
+import IdentitySection from "../../engines/Identity/sections/IdentitySection";
+
 import {
 
     createWorkspaceSectionModel,
@@ -60,6 +62,8 @@ createWorkspaceSectionModel({
     id: "identity",
 
     title: "Identity",
+
+    component: IdentitySection,
 
     fields: [
 

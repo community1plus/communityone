@@ -1,50 +1,40 @@
-import IdentitySectionRenderer
-    from "../../engines/IdentityWorkspace/sections/IdentitySectionRenderer";
-
-import WalletSectionRenderer from "../../capabilities/sections/WalletSectionRenderer";
-
 export default function CapabilityRenderer({
 
-    capability,
-
-    sectionId,
-
-    activeSteps,
-    currentStep,
+    section,
 
     form,
+
     editing,
 
 }) {
 
-    switch (capability) {
+    if (!section) {
 
-        case "wallet":
-
-            return (
-
-                <WalletSectionRenderer
-                    section={sectionId}
-                />
-
-            );
-
-        case "identity":
-
-        default:
-
-            return (
-
-                <IdentitySectionRenderer
-                    sectionId={sectionId}
-                    activeSteps={activeSteps}
-                    currentStep={currentStep}
-                    form={form}
-                    editing={editing}
-                />
-
-            );
+        return null;
 
     }
+
+    const Component =
+        section.component;
+
+    if (!Component) {
+
+        return null;
+
+    }
+
+    return (
+
+        <Component
+
+            form={form}
+
+            editing={editing}
+
+            section={section}
+
+        />
+
+    );
 
 }
