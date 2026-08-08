@@ -1,26 +1,34 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useMemo, useCallback } from "react";
+
 import { useAuth } from "../../context/AuthContext";
 import { useProfile } from "../../context/ProfileContext";
+
 import useAPI from "../../hooks/useAPI";
 import useForm from "../../hooks/useForm";
+
 import "./CommunityPlusUserProfile.css";
+
 import IdentityWorkspace from "../../engines/IdentityWorkspace/IdentityWorkspace";
+
 import {
-  IDENTITY_SECTIONS,
-  ENTITY_SECTIONS,
+    IDENTITY_SECTIONS,
+    ENTITY_SECTIONS,
 } from "./profileConstants";
 
 import {
-  getInitialProfileValues,
-  calculateProfileCompletion,
+    getInitialProfileValues,
+    calculateProfileCompletion,
 } from "./profileHelpers";
 
 import {
-  buildProfilePayload,
+    buildProfilePayload,
 } from "./profilePayload";
 
-import { createWorkspaceSectionController } from "../../framework/Workspace/controllers/WorkspaceSectionController";
+import {
+    createWorkspaceSectionController,
+} from "../../framework/Workspace/controllers/WorkspaceSectionController";
+
 export default function CommunityPlusUserProfile({
 
     onComplete,
@@ -29,231 +37,276 @@ export default function CommunityPlusUserProfile({
 
 }) {
 
-  const navigate = useNavigate();
+    const navigate = useNavigate();
 
-  const { user } = useAuth();
+    const { user } = useAuth();
 
-  const {
-    profile,
-    loadProfile,
-  } = useProfile();
+    const {
 
-  const {
-    patchProfile,
-  } = useAPI();
+        profile,
+        loadProfile,
 
-  /* =====================================
-     LOCAL STATE
-  ===================================== */
+    } = useProfile();
 
-  const [savingProfile, setSavingProfile] =
-    useState(false);
+    const {
 
-  const [editing, setEditing] =
-    useState(!profile?.id);
+        patchProfile,
 
-  const [currentSection, goToSection] =
-    useState(() => {
+    } = useAPI();
 
-      const saved =
-        sessionStorage.getItem(
-          "profileCurrentSection"
+    /* =====================================
+       LOCAL STATE
+    ===================================== */
+
+    const [savingProfile, setSavingProfile] =
+        useState(false);
+
+    const [editing, setEditing] =
+        useState(!profile?.id);
+
+    const [currentSection, setCurrentSection] =
+        useState(() => {
+
+            const saved =
+                sessionStorage.getItem(
+                    "profileCurrentSection"
+                );
+
+            return saved
+                ? Number(saved)
+                : 0;
+
+        });
+
+    useEffect(() => {
+
+        sessionStorage.setItem(
+            "profileCurrentSection",
+            currentSection
         );
 
-      return saved
-        ? Number(saved)
-        : 0;
+    }, [currentSection]);
+
+    /* =====================================
+       FORM
+    ===================================== */
+
+    const initialValues = useMemo(
+
+        () =>
+            getInitialProfileValues(
+                profile,
+                user
+            ),
+
+        [profile, user]
+
+    );
+
+    const form = useForm({
+
+        initialValues,
 
     });
 
-  useEffect(() => {
+    const {
 
-    sessionStorage.setItem(
-      "profileCurrentSection",
-      currentSection
-    );
+        values,
 
-  }, [currentSection]);
+    } = form;
 
-  /* =====================================
-     FORM
-  ===================================== */
+    /* =====================================
+       WORKSPACE DATA
+    ===================================== */
 
-  const initialValues = useMemo(
+    const completion =
+        calculateProfileCompletion(values);
 
-    () =>
-      getInitialProfileValues(
-        profile,
-        user
-      ),
+    const sections = useMemo(() => {
 
-    [profile, user]
+        const items = [...IDENTITY_SECTIONS];
 
-  );
+        if (values.capabilities?.organisation) {
 
-  const form = useForm({
+            items.splice(
 
-    initialValues,
+                3,
 
-  });
+                0,
 
-  const {
+                ...ENTITY_SECTIONS
 
-    values,
+            );
 
-  } = form;
+        }
 
-  /* =====================================
-     WORKSPACE STATE
-  ===================================== */
+        return items;
 
-  const completion =
-    calculateProfileCompletion(values);
+    }, [values.capabilities]);
 
-  const sections = useMemo(() => {
+    /* =====================================
+       SECTION CONTROLLER
+    ===================================== */
 
-    const items = [...IDENTITY_SECTIONS];
+    const sectionController =
+        createWorkspaceSectionController({
 
-    if (values.capabilities?.organisation) {
+            sections,
 
-      items.splice(
+            current: currentSection,
 
-        3,
+            setCurrent: setCurrentSection,
 
-        0,
+        });
 
-        ...ENTITY_SECTIONS
+    const current =
+        sectionController.currentSection();
 
-      );
+    const sectionId =
+        current?.id;
 
-    }
+    /* =====================================
+       ACTIONS
+    ===================================== */
 
-    return items;
+    const closeProfile = useCallback(() => {
 
-  }, [values.capabilities]);
+        navigate(
 
-  const sectionId =
-    sections[currentSection]?.id;
+            "/communityplus",
 
-  /* =====================================
-     ACTIONS
-  ===================================== */
+            {
 
-  const closeProfile = useCallback(() => {
+                replace: true,
 
-    navigate(
-      "/communityplus",
-      {
-        replace: true,
-      }
-    );
+            }
 
-  }, [navigate]);
+        );
 
-  const handleSaveProfile = useCallback(
+    }, [navigate]);
 
-    async () => {
+    const handleSaveProfile = useCallback(
 
-      try {
+        async () => {
 
-        setSavingProfile(true);
+            try {
 
-        const payload =
-          buildProfilePayload({
+                setSavingProfile(true);
+
+                const payload =
+                    buildProfilePayload({
+
+                        values,
+
+                        userEmail:
+                            user?.email,
+
+                        homeLocation:
+                            values.homeLocation,
+
+                    });
+
+                await patchProfile(payload);
+
+                await loadProfile({
+
+                    background: false,
+
+                });
+
+                onComplete?.();
+
+            } catch (err) {
+
+                console.error(
+
+                    "Profile save failed:",
+
+                    err
+
+                );
+
+            } finally {
+
+                setSavingProfile(false);
+
+            }
+
+        },
+
+        [
 
             values,
 
-            userEmail:
-              user?.email,
+            user,
 
-            homeLocation:
-              values.homeLocation,
+            patchProfile,
 
-          });
+            loadProfile,
 
-        await patchProfile(payload);
+            onComplete,
 
-        await loadProfile({
-          background: false,
-        });
+        ]
 
-        onComplete?.();
+    );
 
-      } catch (err) {
+    /* =====================================
+       WORKSPACE MODEL
+    ===================================== */
 
-        console.error(
-          "Profile save failed:",
-          err
-        );
+    const workspaceState = {
 
-      } finally {
+        values,
 
-        setSavingProfile(false);
+        form,
 
-      }
+        editing,
 
-    },
+        editMode,
 
-    [
-      values,
-      user,
-      patchProfile,
-      loadProfile,
-      onComplete,
-    ]
+        savingProfile,
 
-  );
+        completion,
 
-  /* =====================================
-     CONTROLLER MODEL
-  ===================================== */
+        sections,
 
-  const workspaceState = {
-    values,
-    form,
-    editing,
-    editMode,
-    savingProfile,
-    completion,
-    sections,
-    currentSection,
-    sectionId,
-  };
+        currentSection,
 
-  const sectionController =
-    createWorkspaceSectionController({
-  
-      sections,
+        current,
 
-        current: currentSection,
+        sectionId,
 
-        setCurrent: goToSection,
+    };
 
-    });
-const goToSection = sectionController.goTo;
-const workspaceActions = {
+    const workspaceActions = {
 
-    goToSection,
-    setEditing,
-    handleSaveProfile,
-    closeProfile,
+        goToSection:
+            sectionController.goTo,
 
-  };
+        setEditing,
 
-  /* =====================================
-     RENDER
-  ===================================== */
+        handleSaveProfile,
 
-return (
-    <IdentityWorkspace
+        closeProfile,
 
-    initialCapability={initialCapability}
+    };
 
-    state={workspaceState}
+    /* =====================================
+       RENDER
+    ===================================== */
 
-    actions={workspaceActions}
+    return (
 
-   />
-);
+        <IdentityWorkspace
+
+            initialCapability={initialCapability}
+
+            state={workspaceState}
+
+            actions={workspaceActions}
+
+        />
+
+    );
 
 }
