@@ -1,0 +1,81 @@
+.workspace-form {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 18px;
+
+    max-width: 960px;
+
+}
+
+
+.workspace-form-field {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+
+}
+
+
+.workspace-form-label {
+
+    font-size: 1rem;
+
+    font-weight: 600;
+
+    color: #222222;
+
+}
+
+
+.workspace-form-input {
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+    padding: 16px 20px;
+
+    border: 1px solid #d7dde5;
+
+    border-radius: 14px;
+
+    background: #f8fafc;
+
+    color: #526b84;
+
+    font: inherit;
+
+    font-size: 1rem;
+
+    outline: none;
+
+}
+
+
+.workspace-form-input:focus {
+
+    border-color: var(--brand-primary, #b51224);
+
+}
+
+
+.workspace-form-input[readonly] {
+
+    cursor: default;
+
+}
+
+
+.workspace-form-helper {
+
+    font-size: 0.85rem;
+
+    color: #526b84;
+
+}

@@ -1,3 +1,7 @@
+import WorkspaceFormView
+    from "../../framework/Workspace/views/WorkspaceFormView";
+
+
 export default function CapabilityRenderer({
 
     section,
@@ -14,51 +18,30 @@ export default function CapabilityRenderer({
 
     }
 
-    if (section.view === "form") {
 
-        return (
+    switch (section.view) {
 
-            <div>
+        case "form":
 
-                {section.fields?.map((field) => (
+            return (
 
-                    <div key={field.name}>
+                <WorkspaceFormView
 
-                        <label>
-                            {field.label}
-                        </label>
+                    section={section}
 
-                        <input
+                    form={form}
 
-                            type={field.type || "text"}
+                    editing={editing}
 
-                            value={
-                                form.values?.[field.name] ?? ""
-                            }
+                />
 
-                            readOnly={
-                                field.readOnly || !editing
-                            }
+            );
 
-                            onChange={(event) =>
-                                form.setValue(
-                                    field.name,
-                                    event.target.value
-                                )
-                            }
 
-                        />
+        default:
 
-                    </div>
-
-                ))}
-
-            </div>
-
-        );
+            return null;
 
     }
-
-    return null;
 
 }
