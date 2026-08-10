@@ -9,7 +9,8 @@ import useForm from "../../hooks/useForm";
 
 import "./CommunityPlusUserProfile.css";
 
-import IdentityWorkspace from "../../engines/IdentityWorkspace/IdentityWorkspace";
+import IdentityWorkspace
+    from "../../engines/IdentityWorkspace/IdentityWorkspace";
 
 import {
     IDENTITY_SECTIONS,
@@ -29,6 +30,10 @@ import {
     createWorkspaceSectionController,
 } from "../../framework/Workspace/controllers/WorkspaceSectionController";
 
+import {
+    createWorkspaceRuntime,
+} from "../../framework/Workspace/runtime/WorkspaceRuntime";
+
 export default function CommunityPlusUserProfile({
 
     onComplete,
@@ -42,16 +47,12 @@ export default function CommunityPlusUserProfile({
     const { user } = useAuth();
 
     const {
-
         profile,
         loadProfile,
-
     } = useProfile();
 
     const {
-
         patchProfile,
-
     } = useAPI();
 
     /* =====================================
@@ -109,18 +110,11 @@ export default function CommunityPlusUserProfile({
 
     });
 
-    const {
-
-        values,
-
-    } = form;
+    const { values } = form;
 
     /* =====================================
-       WORKSPACE DATA
+       WORKSPACE SECTIONS
     ===================================== */
-
-    const completion =
-        calculateProfileCompletion(values);
 
     const sections = useMemo(() => {
 
@@ -145,7 +139,7 @@ export default function CommunityPlusUserProfile({
     }, [values.capabilities]);
 
     /* =====================================
-       SECTION CONTROLLER
+       WORKSPACE CONTROLLER
     ===================================== */
 
     const sectionController =
@@ -159,11 +153,21 @@ export default function CommunityPlusUserProfile({
 
         });
 
-    const current =
-        sectionController.currentSection();
+    /* =====================================
+       WORKSPACE RUNTIME
+    ===================================== */
 
-    const sectionId =
-        current?.id;
+    const runtime =
+        createWorkspaceRuntime({
+
+            sections,
+
+            current: currentSection,
+
+        });
+
+    const completion =
+        calculateProfileCompletion(values);
 
     /* =====================================
        ACTIONS
@@ -172,15 +176,10 @@ export default function CommunityPlusUserProfile({
     const closeProfile = useCallback(() => {
 
         navigate(
-
             "/communityplus",
-
             {
-
                 replace: true,
-
             }
-
         );
 
     }, [navigate]);
@@ -216,7 +215,9 @@ export default function CommunityPlusUserProfile({
 
                 onComplete?.();
 
-            } catch (err) {
+            }
+
+            catch (err) {
 
                 console.error(
 
@@ -226,7 +227,9 @@ export default function CommunityPlusUserProfile({
 
                 );
 
-            } finally {
+            }
+
+            finally {
 
                 setSavingProfile(false);
 
@@ -256,6 +259,8 @@ export default function CommunityPlusUserProfile({
 
     const workspaceState = {
 
+        runtime,
+
         values,
 
         form,
@@ -268,20 +273,18 @@ export default function CommunityPlusUserProfile({
 
         completion,
 
-        sections,
-
-        currentSection,
-
-        current,
-
-        sectionId,
-
     };
 
     const workspaceActions = {
 
         goToSection:
             sectionController.goTo,
+
+        nextSection:
+            sectionController.next,
+
+        previousSection:
+            sectionController.previous,
 
         setEditing,
 
@@ -299,11 +302,17 @@ export default function CommunityPlusUserProfile({
 
         <IdentityWorkspace
 
-            initialCapability={initialCapability}
+            initialCapability={
+                initialCapability
+            }
 
-            state={workspaceState}
+            state={
+                workspaceState
+            }
 
-            actions={workspaceActions}
+            actions={
+                workspaceActions
+            }
 
         />
 
