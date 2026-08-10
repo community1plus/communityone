@@ -1,12 +1,55 @@
-createWorkspaceSectionModel({
+export function createWorkspaceSectionModel({
 
-    id: "identity",
+    id,
 
-    title: "Identity",
+    title,
 
-    view: IdentitySection,
+    fields = [],
 
-    guideModel:
-        createIdentityGuideModel,
+    view = null,
 
-})
+    guide = null,
+
+    toolbar = null,
+
+    actions = null,
+
+    validator = null,
+
+}) {
+
+    return {
+
+        id,
+
+        title,
+
+        fields,
+
+        view,
+
+        guide,
+
+        toolbar,
+
+        actions,
+
+        validator,
+
+        runtime: {
+
+            enabled: true,
+
+            visible: true,
+
+            dirty: false,
+
+            valid: true,
+
+            complete: false,
+
+        },
+
+    };
+
+}
