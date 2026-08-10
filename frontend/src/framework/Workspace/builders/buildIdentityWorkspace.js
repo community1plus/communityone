@@ -1,67 +1,95 @@
-import { createWorkspace } from "../../../framework/Workspace/builders/createWorkspace";
+import { createWorkspace }
+    from "../../../framework/Workspace/builders/createWorkspace";
 
-import { createWorkspaceHeaderModel } from "../../../framework/Workspace/models/WorkspaceHeaderModel";
-import { createWorkspaceNavigationModel } from "../../../framework/Workspace/models/WorkspaceNavigationModel";
-import { createWorkspaceProgressModel } from "../../../framework/Workspace/models/WorkspaceProgressModel";
-import { createWorkspaceBannerModel } from "../../../framework/Workspace/models/WorkspaceBannerModel";
+import {
+    createWorkspaceNavigationModel,
+} from "../../../framework/Workspace/models/WorkspaceNavigationModel";
+
+import {
+    createWorkspaceProgressModel,
+} from "../../../framework/Workspace/models/WorkspaceProgressModel";
+
+import {
+    createWorkspaceBannerModel,
+} from "../../../framework/Workspace/models/WorkspaceBannerModel";
 
 
-export function buildIdentityWorkspace(state, actions) {
+export function buildIdentityWorkspace(
+    state,
+    actions
+) {
 
     const {
 
+        runtime,
+
         completion,
-        sections,
-        currentSection,
 
     } = state;
 
     const {
 
-        closeProfile,
+        sections,
+
+        current,
+
+    } = runtime;
+
+    const {
+
         goToSection,
 
     } = actions;
 
+
     return createWorkspace({
 
-banner: createWorkspaceBannerModel({
+        banner:
 
-    left: {
+            createWorkspaceBannerModel({
 
-        title: "IDENTITY",
+                left: {
 
-    },
+                    title: "IDENTITY",
 
-    centre: {
+                },
 
-        mode: "identity",
+                centre: {
 
-    },
+                    mode: "identity",
 
-    right: {
+                },
 
-        metric: createWorkspaceProgressModel({
+                right: {
 
-            value: completion,
+                    metric:
 
-        }),
+                        createWorkspaceProgressModel({
 
-    },
+                            value:
+                                completion,
 
-}),
+                        }),
 
-        navigation: createWorkspaceNavigationModel({
+                },
 
-            items: sections,
-
-            current: currentSection,
-
-            onChange: goToSection,
-
-        }),
+            }),
 
 
+        navigation:
+
+            createWorkspaceNavigationModel({
+
+                items:
+                    sections,
+
+                current:
+                    current,
+
+                onChange:
+                    goToSection,
+
+            }),
 
     });
 

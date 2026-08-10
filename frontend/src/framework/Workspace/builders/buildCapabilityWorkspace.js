@@ -1,6 +1,7 @@
 import { buildIdentityWorkspace } from "./buildIdentityWorkspace";
 import { buildWalletWorkspace } from "./buildWalletWorkspace";
 
+
 export function buildCapabilityWorkspace({
 
     capability = "identity",
@@ -19,6 +20,7 @@ export function buildCapabilityWorkspace({
                 state,
                 actions
             );
+
 
         case "identity":
 
