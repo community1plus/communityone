@@ -1,25 +1,12 @@
-export function createWorkspaceSectionModel({
+createWorkspaceSectionModel({
 
-    id,
+    id: "identity",
 
-    title,
+    title: "Identity",
 
-    enabled = true,
+    view: IdentitySection,
 
-    visible = true,
+    guideModel:
+        createIdentityGuideModel,
 
-}) {
-
-    return {
-
-        id,
-
-        title,
-
-        enabled,
-
-        visible,
-
-    };
-
-}
+})
