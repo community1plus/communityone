@@ -57,13 +57,13 @@ PERSONAL PROFILE
 
 export const IDENTITY_SECTIONS = [
 
-createWorkspaceSectionModel({
-
+createWorkspaceSectionModel(
+  {
     id: "identity",
 
     title: "Identity",
 
-    component: IdentitySection,
+    view: "form",
 
     fields: [
 
@@ -71,8 +71,6 @@ createWorkspaceSectionModel({
             name: "username",
             label: "Name",
             type: "text",
-            helperText:
-                "This is how people know you in Community One.",
         },
 
         {
@@ -83,8 +81,7 @@ createWorkspaceSectionModel({
         },
 
     ],
-
-}),
+},
 
   {
     id: "location",
