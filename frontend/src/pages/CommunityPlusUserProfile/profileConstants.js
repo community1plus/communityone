@@ -1,311 +1,419 @@
-import IdentitySection from "../../engines/Identity/sections/IdentitySection";
-
 import {
-
     createWorkspaceSectionModel,
-
 } from "../../framework/Workspace/models/WorkspaceSectionModel";
+
+
+/* =========================================
+   PHONE
+========================================= */
 
 export const DEFAULT_PHONE_COUNTRY = "AU";
 
 export const PHONE_COUNTRIES = [
-  {
-    code: "AU",
-    label: "Australia",
-    dialCode: "+61",
-    min: 9,
-    max: 9,
-  },
-  {
-    code: "NZ",
-    label: "New Zealand",
-    dialCode: "+64",
-    min: 8,
-    max: 9,
-  },
-  {
-    code: "US",
-    label: "United States",
-    dialCode: "+1",
-    min: 10,
-    max: 10,
-  },
+
+    {
+        code: "AU",
+        label: "Australia",
+        dialCode: "+61",
+        min: 9,
+        max: 9,
+    },
+
+    {
+        code: "NZ",
+        label: "New Zealand",
+        dialCode: "+64",
+        min: 8,
+        max: 9,
+    },
+
+    {
+        code: "US",
+        label: "United States",
+        dialCode: "+1",
+        min: 10,
+        max: 10,
+    },
+
 ];
 
+
 /* =========================================
-PROFILE TYPES
+   PROFILE TYPES
 ========================================= */
 
 export const PROFILE_TABS = [
-  {
-    id: "PERSON",
-    label: "Person",
-  },
-  {
-    id: "Entity",
-    label: "Entity",
-  },
-  {
-    id: "COMMUNITY_POLICIES",
-    label: "Community Policies",
-  },
+
+    {
+        id: "PERSON",
+        label: "Person",
+    },
+
+    {
+        id: "ENTITY",
+        label: "Entity",
+    },
+
+    {
+        id: "COMMUNITY_POLICIES",
+        label: "Community Policies",
+    },
+
 ];
 
+
 /* =========================================
-PERSONAL PROFILE
+   PERSONAL PROFILE
 ========================================= */
 
 export const IDENTITY_SECTIONS = [
 
-createWorkspaceSectionModel(
-  {
-    id: "identity",
+    createWorkspaceSectionModel({
 
-    title: "Identity",
+        id: "identity",
 
-    view: "form",
+        title: "Identity",
 
-    fields: [
+        view: "form",
 
-        {
-            name: "username",
-            label: "Name",
-            type: "text",
-        },
+        fields: [
 
-        {
-            name: "email",
-            label: "Email",
-            type: "email",
-            readOnly: true,
-        },
+            {
+                name: "username",
+                label: "Name",
+                type: "text",
+                helperText:
+                    "This is how people know you in Community One.",
+            },
 
-    ],
-},
+            {
+                name: "email",
+                label: "Email",
+                type: "email",
+                readOnly: true,
+            },
 
-  {
-    id: "location",
-    title: "Location",
+        ],
 
-    fields: [
+    }),
 
-      {
-        name: "homeLocation",
-        label: "Home Address",
-        type: "location",
-      },
 
-    ],
-  },
+    createWorkspaceSectionModel({
 
-  {
-    id: "contact",
-    title: "Contact",
+        id: "location",
 
-    fields: [
+        title: "Location",
 
-      {
-        name: "phoneDisplay",
-        label: "Phone Number",
-        type: "text",
-      },
+        view: "form",
 
-    ],
-  },
+        fields: [
 
-  {
-    id: "social",
-    title: "Social",
-    fields: [],
-  },
+            {
+                name: "homeLocation",
+                label: "Home Address",
+                type: "location",
+            },
 
-  {
-    id: "payment",
-    title: "Payment",
-    fields: [],
-  },
+        ],
+
+    }),
+
+
+    createWorkspaceSectionModel({
+
+        id: "contact",
+
+        title: "Contact",
+
+        view: "form",
+
+        fields: [
+
+            {
+                name: "phoneDisplay",
+                label: "Phone Number",
+                type: "text",
+            },
+
+        ],
+
+    }),
+
+
+    createWorkspaceSectionModel({
+
+        id: "social",
+
+        title: "Social",
+
+        view: "form",
+
+        fields: [],
+
+    }),
+
+
+    createWorkspaceSectionModel({
+
+        id: "payment",
+
+        title: "Payment",
+
+        view: "form",
+
+        fields: [],
+
+    }),
 
 ];
 
+
 /* =========================================
-ENTITY PROFILE
+   ENTITY PROFILE
 ========================================= */
 
 export const ENTITY_SECTIONS = [
 
-  {
-    id: "organisation",
-    title: "Organisation",
+    createWorkspaceSectionModel({
 
-    fields: [
+        id: "organisation",
 
-      {
-        name: "organisation.name",
-        label: "Organisation Name",
-        type: "text",
-      },
-      {
-        name: "organisation.website",
-        label: "Website",
-        type: "text",
-},
-    ],
-  },
+        title: "Organisation",
 
-  {
-    id: "organisation-address",
-    title: "Address",
+        view: "form",
 
-    fields: [
-{
-    name: "organisation.streetAddress",
-    label: "Street Address",
-    type: "text",
-},
+        fields: [
 
-{
-    name: "organisation.suburb",
-    label: "Suburb",
-    type: "text",
-},
+            {
+                name: "organisation.name",
+                label: "Organisation Name",
+                type: "text",
+            },
 
-{
-    name: "organisation.postcode",
-    label: "Postcode",
-    type: "text",
-},
-    ],
-  },
-  {
-    id: "organisation-contact",
-    title: "Contact",
+            {
+                name: "organisation.website",
+                label: "Website",
+                type: "text",
+            },
 
-    fields: [
+        ],
 
-      {
-        name: "organisation.phone",
-        label: "Phone",
-        type: "text",
-      },
+    }),
 
-      {
-        name: "organisation.email",
-        label: "Email",
-        type: "email",
-        readOnly: true,
-      },
 
-    ],
-  },
-  {
-    id: "organisation",
-    title: "Organisation",
-    fields: [],
-  },
-  {
-    id: "social",
-    title: "Social",
-    fields: [],
-  },
+    createWorkspaceSectionModel({
 
-  {
-    id: "payment",
-    title: "Payment",
-    fields: [],
-  },
+        id: "organisation-address",
+
+        title: "Address",
+
+        view: "form",
+
+        fields: [
+
+            {
+                name: "organisation.streetAddress",
+                label: "Street Address",
+                type: "text",
+            },
+
+            {
+                name: "organisation.suburb",
+                label: "Suburb",
+                type: "text",
+            },
+
+            {
+                name: "organisation.postcode",
+                label: "Postcode",
+                type: "text",
+            },
+
+        ],
+
+    }),
+
+
+    createWorkspaceSectionModel({
+
+        id: "organisation-contact",
+
+        title: "Contact",
+
+        view: "form",
+
+        fields: [
+
+            {
+                name: "organisation.phone",
+                label: "Phone",
+                type: "text",
+            },
+
+            {
+                name: "organisation.email",
+                label: "Email",
+                type: "email",
+                readOnly: true,
+            },
+
+        ],
+
+    }),
+
+
+    createWorkspaceSectionModel({
+
+        id: "social",
+
+        title: "Social",
+
+        view: "form",
+
+        fields: [],
+
+    }),
+
+
+    createWorkspaceSectionModel({
+
+        id: "payment",
+
+        title: "Payment",
+
+        view: "form",
+
+        fields: [],
+
+    }),
 
 ];
 
+
 /* =========================================
-COMMUNITY POLICIES
+   COMMUNITY POLICIES
 ========================================= */
 
 export const COMMUNITY_POLICY_STEPS = [
 
-  {
-    id: "community-policies",
-    title: "Community Policies",
-    fields: [],
-  },
+    createWorkspaceSectionModel({
+
+        id: "community-policies",
+
+        title: "Community Policies",
+
+        view: "form",
+
+        fields: [],
+
+    }),
 
 ];
 
+
 /* =========================================
-CARD TITLES
+   CARD TITLES
 ========================================= */
 
 export const PROFILE_CARD_TITLES = {
 
-  identity: "Identity",
+    identity:
+        "Identity",
 
-  location: "Location",
+    location:
+        "Location",
 
-  contact: "Contact",
+    contact:
+        "Contact",
 
-  social: "Connected Accounts",
+    social:
+        "Connected Accounts",
 
-  payment: "Payment Method",
+    payment:
+        "Payment Method",
 
-  organisation: "Organisation",
+    organisation:
+        "Organisation",
 
-  "organisation-address": "Organisation Address",
+    "organisation-address":
+        "Organisation Address",
 
-  "organisation-contact": "Organisation Contact",
+    "organisation-contact":
+        "Organisation Contact",
 
-  "community-policies": "Community Policies",
+    "community-policies":
+        "Community Policies",
 
 };
 
+
 /* =========================================
-PROFILE MODES
+   PROFILE MODES
 ========================================= */
 
 export const PROFILE_MODES = {
 
-  PERSONAL: "PERSONAL",
+    PERSONAL:
+        "PERSONAL",
 
-  ORG: "ORG",
+    ORG:
+        "ORG",
 
 };
 
+
 /* =========================================
-PROFILE SECTIONS
+   PROFILE SECTIONS
 ========================================= */
 
 export const PROFILE_SECTIONS = {
 
-  IDENTITY: "identity",
+    IDENTITY:
+        "identity",
 
-  LOCATION: "location",
+    LOCATION:
+        "location",
 
-  CONTACT: "contact",
+    CONTACT:
+        "contact",
 
-  SOCIAL: "social",
+    SOCIAL:
+        "social",
 
-  PAYMENT: "payment",
+    PAYMENT:
+        "payment",
 
-  ORGANISATION: "organisation",
+    ORGANISATION:
+        "organisation",
 
-  ORGANISATION_ADDRESS: "organisation-address",
+    ORGANISATION_ADDRESS:
+        "organisation-address",
 
-  ORGANISATION_CONTACT: "organisation-contact",
+    ORGANISATION_CONTACT:
+        "organisation-contact",
 
-  COMMUNITY_POLICIES: "community-policies",
+    COMMUNITY_POLICIES:
+        "community-policies",
 
 };
 
+
 /* =========================================
-SOCIAL PROVIDERS
+   SOCIAL PROVIDERS
 ========================================= */
 
 export const SOCIAL_PROVIDERS = {
 
-  FACEBOOK: "facebook",
+    FACEBOOK:
+        "facebook",
 
-  INSTAGRAM: "instagram",
+    INSTAGRAM:
+        "instagram",
 
-  YOUTUBE: "youtube",
+    YOUTUBE:
+        "youtube",
 
-  X: "x",
+    X:
+        "x",
 
 };
