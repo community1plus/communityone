@@ -1,5 +1,5 @@
 import LocationSection
-    from "../../engines/Identity/sections/LocationSection";
+    from "../../engines/Location/sections/LocationSection";
 
 import {
     createWorkspaceSectionModel,
