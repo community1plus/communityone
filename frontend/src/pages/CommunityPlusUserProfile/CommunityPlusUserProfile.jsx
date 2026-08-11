@@ -192,14 +192,6 @@ export default function CommunityPlusUserProfile({
         });
 
 
-    const current =
-        sectionController.currentSection();
-
-
-    const sectionId =
-        current?.id ?? null;
-
-
     /* =====================================
        PROFILE COMPLETION
     ===================================== */
@@ -314,27 +306,23 @@ export default function CommunityPlusUserProfile({
        WORKSPACE STATE
     ===================================== */
 
-    const workspaceState = {
+const workspaceState = {
 
-        values,
+    values,
 
-        form,
+    form,
 
-        editing,
+    editing,
 
-        editMode,
+    editMode,
 
-        savingProfile,
+    savingProfile,
 
-        completion,
+    completion,
 
-        sections,
+    sections,
 
-        currentSection,
-
-        sectionId,
-
-    };
+};
 
 
     /* =====================================

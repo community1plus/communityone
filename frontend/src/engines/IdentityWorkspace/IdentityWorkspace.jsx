@@ -8,10 +8,8 @@ import {
     buildCapabilityWorkspace,
 } from "../../framework/Workspace/builders/buildCapabilityWorkspace";
 
-import {createWorkspaceRuntime}
-    from "../../framework/Workspace/runtime/WorkspaceRuntime";
-
 import {
+
     WorkspaceShell,
     WorkspaceMain,
     WorkspaceContent,
@@ -48,32 +46,21 @@ export default function IdentityWorkspace({
        WORKSPACE STATE
     ===================================== */
 
-const runtime =
-    createWorkspaceRuntime({
+    const {
+
+        values,
+
+        form,
+
+        editing,
+
+        completion,
 
         sections,
 
-        current:
-            currentSection,
+        currentSection,
 
-    });
-
-const {
-
-    sectionRuntime,
-
-} = runtime;    
-
-
-    /* =====================================
-       RUNTIME
-    ===================================== */
-
-    const {
-
-        section,
-
-    } = runtime;
+    } = state;
 
 
     /* =====================================
@@ -106,10 +93,6 @@ const {
         <WorkspaceShell>
 
 
-            {/* ==============================
-               CLOSE
-            ============================== */}
-
             <WorkspaceClose
 
                 onClick={
@@ -120,7 +103,6 @@ const {
 
 
             <WorkspaceMain>
-
 
                 <WorkspaceContent>
 
@@ -173,21 +155,22 @@ const {
 
                     <WorkspaceBody>
 
-<CapabilityRenderer
+                        <CapabilityRenderer
 
-    section={sectionRuntime}
+                            section={
+                                sections[currentSection]
+                            }
 
-    form={form}
+                            form={form}
 
-    editing={editing}
+                            editing={editing}
 
-/>
+                        />
 
                     </WorkspaceBody>
 
 
                 </WorkspaceContent>
-
 
             </WorkspaceMain>
 
@@ -203,7 +186,6 @@ const {
                     title="Identity Guide"
 
                 >
-
 
                     <WorkspacePanel
 
@@ -233,10 +215,12 @@ const {
 
                     >
 
-                        {section?.title ?? ""}
+                        {
+                            sections[currentSection]?.title
+                            ?? ""
+                        }
 
                     </WorkspacePanel>
-
 
                 </WorkspaceGuide>
 
