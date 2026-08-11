@@ -8,7 +8,7 @@ import {
     buildCapabilityWorkspace,
 } from "../../framework/Workspace/builders/buildCapabilityWorkspace";
 
-import createWorkspaceRuntime
+import {createWorkspaceRuntime}
     from "../../framework/Workspace/runtime/WorkspaceRuntime";
 
 import {
