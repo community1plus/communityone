@@ -1,5 +1,10 @@
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect, useMemo, useCallback } from "react";
+import {
+    useState,
+    useEffect,
+    useMemo,
+    useCallback,
+} from "react";
 
 import { useAuth } from "../../context/AuthContext";
 import { useProfile } from "../../context/ProfileContext";
@@ -34,15 +39,23 @@ import {
     createWorkspaceRuntime,
 } from "../../framework/Workspace/runtime/WorkspaceRuntime";
 
+
 export default function CommunityPlusUserProfile({
 
     onComplete,
+
     editMode = false,
+
     initialCapability = "identity",
 
 }) {
 
     const navigate = useNavigate();
+
+
+    /* =====================================
+       CONTEXT
+    ===================================== */
 
     const { user } = useAuth();
 
@@ -55,6 +68,7 @@ export default function CommunityPlusUserProfile({
         patchProfile,
     } = useAPI();
 
+
     /* =====================================
        LOCAL STATE
     ===================================== */
@@ -62,8 +76,10 @@ export default function CommunityPlusUserProfile({
     const [savingProfile, setSavingProfile] =
         useState(false);
 
+
     const [editing, setEditing] =
         useState(!profile?.id);
+
 
     const [currentSection, setCurrentSection] =
         useState(() => {
@@ -79,6 +95,7 @@ export default function CommunityPlusUserProfile({
 
         });
 
+
     useEffect(() => {
 
         sessionStorage.setItem(
@@ -87,6 +104,7 @@ export default function CommunityPlusUserProfile({
         );
 
     }, [currentSection]);
+
 
     /* =====================================
        FORM
@@ -100,9 +118,13 @@ export default function CommunityPlusUserProfile({
                 user
             ),
 
-        [profile, user]
+        [
+            profile,
+            user,
+        ]
 
     );
+
 
     const form = useForm({
 
@@ -110,17 +132,26 @@ export default function CommunityPlusUserProfile({
 
     });
 
-    const { values } = form;
+
+    const {
+        values,
+    } = form;
+
 
     /* =====================================
-       WORKSPACE SECTIONS
+       SECTIONS
     ===================================== */
 
     const sections = useMemo(() => {
 
-        const items = [...IDENTITY_SECTIONS];
+        const items = [
+            ...IDENTITY_SECTIONS,
+        ];
 
-        if (values.capabilities?.organisation) {
+
+        if (
+            values.capabilities?.organisation
+        ) {
 
             items.splice(
 
@@ -134,12 +165,18 @@ export default function CommunityPlusUserProfile({
 
         }
 
+
         return items;
 
-    }, [values.capabilities]);
+    }, [
+
+        values.capabilities,
+
+    ]);
+
 
     /* =====================================
-       WORKSPACE CONTROLLER
+       SECTION CONTROLLER
     ===================================== */
 
     const sectionController =
@@ -147,11 +184,26 @@ export default function CommunityPlusUserProfile({
 
             sections,
 
-            current: currentSection,
+            current:
+                currentSection,
 
-            setCurrent: setCurrentSection,
+            setCurrent:
+                setCurrentSection,
 
         });
+
+
+    /* =====================================
+       CURRENT SECTION
+    ===================================== */
+
+    const current =
+        sectionController.currentSection();
+
+
+    const sectionId =
+        current?.id ?? null;
+
 
     /* =====================================
        WORKSPACE RUNTIME
@@ -162,104 +214,127 @@ export default function CommunityPlusUserProfile({
 
             sections,
 
-            current: currentSection,
+            current:
+                currentSection,
 
         });
 
+
+    /* =====================================
+       PROFILE COMPLETION
+    ===================================== */
+
     const completion =
-        calculateProfileCompletion(values);
+        calculateProfileCompletion(
+            values
+        );
+
 
     /* =====================================
        ACTIONS
     ===================================== */
 
-    const closeProfile = useCallback(() => {
+    const closeProfile =
+        useCallback(() => {
 
-        navigate(
-            "/communityplus",
-            {
-                replace: true,
-            }
-        );
+            navigate(
 
-    }, [navigate]);
+                "/communityplus",
 
-    const handleSaveProfile = useCallback(
+                {
+                    replace: true,
+                }
 
-        async () => {
+            );
 
-            try {
+        }, [
 
-                setSavingProfile(true);
+            navigate,
 
-                const payload =
-                    buildProfilePayload({
+        ]);
 
-                        values,
 
-                        userEmail:
-                            user?.email,
+    const handleSaveProfile =
+        useCallback(
 
-                        homeLocation:
-                            values.homeLocation,
+            async () => {
+
+                try {
+
+                    setSavingProfile(true);
+
+
+                    const payload =
+                        buildProfilePayload({
+
+                            values,
+
+                            userEmail:
+                                user?.email,
+
+                            homeLocation:
+                                values.homeLocation,
+
+                        });
+
+
+                    await patchProfile(
+                        payload
+                    );
+
+
+                    await loadProfile({
+
+                        background:
+                            false,
 
                     });
 
-                await patchProfile(payload);
 
-                await loadProfile({
+                    onComplete?.();
 
-                    background: false,
 
-                });
+                } catch (err) {
 
-                onComplete?.();
+                    console.error(
 
-            }
+                        "Profile save failed:",
 
-            catch (err) {
+                        err
 
-                console.error(
+                    );
 
-                    "Profile save failed:",
 
-                    err
+                } finally {
 
-                );
+                    setSavingProfile(false);
 
-            }
+                }
 
-            finally {
+            },
 
-                setSavingProfile(false);
+            [
 
-            }
+                values,
 
-        },
+                user,
 
-        [
+                patchProfile,
 
-            values,
+                loadProfile,
 
-            user,
+                onComplete,
 
-            patchProfile,
+            ]
 
-            loadProfile,
+        );
 
-            onComplete,
-
-        ]
-
-    );
 
     /* =====================================
-       WORKSPACE MODEL
+       WORKSPACE STATE
     ===================================== */
 
     const workspaceState = {
-
-        runtime,
 
         values,
 
@@ -273,18 +348,25 @@ export default function CommunityPlusUserProfile({
 
         completion,
 
+        sections,
+
+        currentSection,
+
+        sectionId,
+
+        runtime,
+
     };
+
+
+    /* =====================================
+       WORKSPACE ACTIONS
+    ===================================== */
 
     const workspaceActions = {
 
         goToSection:
             sectionController.goTo,
-
-        nextSection:
-            sectionController.next,
-
-        previousSection:
-            sectionController.previous,
 
         setEditing,
 
@@ -293,6 +375,7 @@ export default function CommunityPlusUserProfile({
         closeProfile,
 
     };
+
 
     /* =====================================
        RENDER
