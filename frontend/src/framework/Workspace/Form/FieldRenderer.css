@@ -1,0 +1,46 @@
+.workspace-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.workspace-field-label {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+}
+
+.workspace-field-input {
+    width: 100%;
+    max-width: 520px;
+    min-height: 44px;
+    padding: 10px 14px;
+
+    box-sizing: border-box;
+
+    font: inherit;
+    color: var(--text);
+
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+    border-radius: 8px;
+
+    outline: none;
+}
+
+.workspace-field-input:focus {
+    border-color: var(--primary);
+}
+
+.workspace-field-input[readonly] {
+    background: var(--panel-soft);
+    color: var(--text-muted);
+    cursor: default;
+}
+
+.workspace-field-helper {
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--text-muted);
+}
