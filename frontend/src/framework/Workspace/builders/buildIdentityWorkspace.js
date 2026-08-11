@@ -13,7 +13,9 @@ import {
     createWorkspaceBannerModel,
 } from "../../../framework/Workspace/models/WorkspaceBannerModel";
 
-
+import {
+    createWorkspaceRuntime,
+} from "../../../framework/Workspace/runtime/WorkspaceRuntime";
 export function buildIdentityWorkspace(
     state,
     actions
