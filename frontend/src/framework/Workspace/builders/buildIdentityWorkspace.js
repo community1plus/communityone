@@ -1,12 +1,38 @@
+import {
+    createWorkspace,
+} from "../../../framework/Workspace/builders/createWorkspace";
+
+import {
+    createWorkspaceNavigationModel,
+} from "../../../framework/Workspace/models/WorkspaceNavigationModel";
+
+import {
+    createWorkspaceProgressModel,
+} from "../../../framework/Workspace/models/WorkspaceProgressModel";
+
+import {
+    createWorkspaceBannerModel,
+} from "../../../framework/Workspace/models/WorkspaceBannerModel";
+
+import {
+    createWorkspaceRuntime,
+} from "../../../framework/Workspace/runtime/WorkspaceRuntime";
+
+
 export function buildIdentityWorkspace(
+
     state,
+
     actions
+
 ) {
 
     const {
 
         completion,
+
         sections,
+
         currentSection,
 
     } = state;
@@ -19,6 +45,10 @@ export function buildIdentityWorkspace(
     } = actions;
 
 
+    /* =====================================
+       WORKSPACE RUNTIME
+    ===================================== */
+
     const runtime =
         createWorkspaceRuntime({
 
@@ -30,6 +60,10 @@ export function buildIdentityWorkspace(
         });
 
 
+    /* =====================================
+       WORKSPACE MODEL
+    ===================================== */
+
     return createWorkspace({
 
         banner:
@@ -38,13 +72,15 @@ export function buildIdentityWorkspace(
 
                 left: {
 
-                    title: "IDENTITY",
+                    title:
+                        "IDENTITY",
 
                 },
 
                 centre: {
 
-                    mode: "identity",
+                    mode:
+                        "identity",
 
                 },
 
