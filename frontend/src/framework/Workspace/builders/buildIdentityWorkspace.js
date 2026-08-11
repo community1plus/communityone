@@ -1,21 +1,3 @@
-import { createWorkspace }
-    from "../../../framework/Workspace/builders/createWorkspace";
-
-import {
-    createWorkspaceNavigationModel,
-} from "../../../framework/Workspace/models/WorkspaceNavigationModel";
-
-import {
-    createWorkspaceProgressModel,
-} from "../../../framework/Workspace/models/WorkspaceProgressModel";
-
-import {
-    createWorkspaceBannerModel,
-} from "../../../framework/Workspace/models/WorkspaceBannerModel";
-
-import {
-    createWorkspaceRuntime,
-} from "../../../framework/Workspace/runtime/WorkspaceRuntime";
 export function buildIdentityWorkspace(
     state,
     actions
@@ -23,25 +5,29 @@ export function buildIdentityWorkspace(
 
     const {
 
-        runtime,
-
         completion,
+        sections,
+        currentSection,
 
     } = state;
 
-    const {
-
-        sections,
-
-        current,
-
-    } = runtime;
 
     const {
 
         goToSection,
 
     } = actions;
+
+
+    const runtime =
+        createWorkspaceRuntime({
+
+            sections,
+
+            current:
+                currentSection,
+
+        });
 
 
     return createWorkspace({
@@ -83,10 +69,10 @@ export function buildIdentityWorkspace(
             createWorkspaceNavigationModel({
 
                 items:
-                    sections,
+                    runtime.sections,
 
                 current:
-                    current,
+                    runtime.current,
 
                 onChange:
                     goToSection,
