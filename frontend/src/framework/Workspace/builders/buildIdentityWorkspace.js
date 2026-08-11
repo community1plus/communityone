@@ -18,6 +18,7 @@ import {
     createWorkspaceRuntime,
 } from "../../../framework/Workspace/runtime/WorkspaceRuntime";
 
+
 export function buildIdentityWorkspace(
 
     state,
@@ -44,10 +45,6 @@ export function buildIdentityWorkspace(
     } = actions;
 
 
-    /* =====================================
-       WORKSPACE RUNTIME
-    ===================================== */
-
     const runtime =
         createWorkspaceRuntime({
 
@@ -59,11 +56,9 @@ export function buildIdentityWorkspace(
         });
 
 
-    /* =====================================
-       WORKSPACE MODEL
-    ===================================== */
-
     return createWorkspace({
+
+        runtime,
 
         banner:
 
