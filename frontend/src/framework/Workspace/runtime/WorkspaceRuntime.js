@@ -23,7 +23,7 @@ export function createWorkspaceRuntime({
             );
 
 
-    const section =
+    const sections =
         safeSections[safeCurrent] || null;
 
 
