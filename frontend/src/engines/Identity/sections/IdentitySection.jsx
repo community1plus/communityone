@@ -1,6 +1,6 @@
 import FieldRenderer
     from "../../../framework/Form/FieldRenderer";
-
+import "./IdentitySection.css";
 export default function IdentitySection({
 
     section,
