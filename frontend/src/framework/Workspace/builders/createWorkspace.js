@@ -1,5 +1,7 @@
 export function createWorkspace({
 
+    runtime = null,
+
     banner = null,
 
     navigation = null,
@@ -12,18 +14,58 @@ export function createWorkspace({
 
 }) {
 
-    return {
+return createWorkspace({
 
-        banner,
+    runtime,
 
-        navigation,
+    banner:
 
-        body,
+        createWorkspaceBannerModel({
 
-        guide,
+            left: {
 
-        actions,
+                title:
+                    "IDENTITY",
 
-    };
+            },
+
+            centre: {
+
+                mode:
+                    "identity",
+
+            },
+
+            right: {
+
+                metric:
+
+                    createWorkspaceProgressModel({
+
+                        value:
+                            completion,
+
+                    }),
+
+            },
+
+        }),
+
+    navigation:
+
+        createWorkspaceNavigationModel({
+
+            items:
+                runtime.sections,
+
+            current:
+                runtime.current,
+
+            onChange:
+                goToSection,
+
+        }),
+
+});
 
 }
