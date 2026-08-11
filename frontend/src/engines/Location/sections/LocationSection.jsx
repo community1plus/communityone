@@ -1,5 +1,5 @@
 import FieldRenderer
-    from "../../../framework/Form/FieldRenderer";
+    from "../../../framework/Workspace/Form/FieldRenderer";
 
 import "./LocationSection.css";
 
