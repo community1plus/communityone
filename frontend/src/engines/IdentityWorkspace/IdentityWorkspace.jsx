@@ -45,19 +45,21 @@ export default function IdentityWorkspace({
        WORKSPACE STATE
     ===================================== */
 
-    const {
+const runtime =
+    createWorkspaceRuntime({
 
-        runtime,
+        sections,
 
-        values,
+        current:
+            currentSection,
 
-        form,
+    });
 
-        editing,
+const {
 
-        completion,
+    sectionRuntime,
 
-    } = state;
+} = runtime;    
 
 
     /* =====================================
@@ -168,15 +170,15 @@ export default function IdentityWorkspace({
 
                     <WorkspaceBody>
 
-                        <CapabilityRenderer
+<CapabilityRenderer
 
-                            section={section}
+    section={sectionRuntime}
 
-                            form={form}
+    form={form}
 
-                            editing={editing}
+    editing={editing}
 
-                        />
+/>
 
                     </WorkspaceBody>
 

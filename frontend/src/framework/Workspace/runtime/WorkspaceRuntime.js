@@ -1,19 +1,64 @@
-export function createWorkspaceRuntime({
+export function createWorkspaceSectionRuntime({
 
-    sections,
+    section,
 
-    current,
+    index = 0,
 
 }) {
 
+    if (!section) {
+
+        return null;
+
+    }
+
+
     return {
 
-        sections,
+        id:
+            section.id,
 
-        current,
+        index,
 
-        section:
-            sections[current],
+        title:
+            section.title,
+
+        view:
+            section.view,
+
+        fields:
+            section.fields || [],
+
+        guide:
+            section.guide,
+
+        toolbar:
+            section.toolbar,
+
+        actions:
+            section.actions,
+
+        validator:
+            section.validator,
+
+        state: {
+
+            enabled:
+                section.state?.enabled ?? true,
+
+            visible:
+                section.state?.visible ?? true,
+
+            dirty:
+                false,
+
+            valid:
+                true,
+
+            complete:
+                false,
+
+        },
 
     };
 
