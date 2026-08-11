@@ -18,7 +18,6 @@ import {
     createWorkspaceRuntime,
 } from "../../../framework/Workspace/runtime/WorkspaceRuntime";
 
-
 export function buildIdentityWorkspace(
 
     state,
