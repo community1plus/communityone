@@ -9,7 +9,6 @@ import {
 } from "../../framework/Workspace/builders/buildCapabilityWorkspace";
 
 import {
-
     WorkspaceShell,
     WorkspaceMain,
     WorkspaceContent,
@@ -43,7 +42,7 @@ export default function IdentityWorkspace({
 
 
     /* =====================================
-       WORKSPACE STATE
+       STATE
     ===================================== */
 
     const {
@@ -53,12 +52,6 @@ export default function IdentityWorkspace({
         form,
 
         editing,
-
-        completion,
-
-        sections,
-
-        currentSection,
 
     } = state;
 
@@ -73,6 +66,8 @@ export default function IdentityWorkspace({
 
         navigation,
 
+        runtime,
+
     } = buildCapabilityWorkspace({
 
         capability,
@@ -85,13 +80,21 @@ export default function IdentityWorkspace({
 
 
     /* =====================================
+       CURRENT SECTION
+    ===================================== */
+
+const {
+    section,
+} = runtime ?? {};
+
+
+    /* =====================================
        RENDER
     ===================================== */
 
     return (
 
         <WorkspaceShell>
-
 
             <WorkspaceClose
 
@@ -157,9 +160,7 @@ export default function IdentityWorkspace({
 
                         <CapabilityRenderer
 
-                            section={
-                                sections[currentSection]
-                            }
+                            section={section}
 
                             form={form}
 
@@ -171,6 +172,7 @@ export default function IdentityWorkspace({
 
 
                 </WorkspaceContent>
+
 
             </WorkspaceMain>
 
@@ -204,7 +206,10 @@ export default function IdentityWorkspace({
 
                     >
 
-                        {completion ?? 0}%
+                        {banner
+                            ?.right
+                            ?.metric
+                            ?.value ?? 0}%
 
                     </WorkspacePanel>
 
@@ -215,10 +220,7 @@ export default function IdentityWorkspace({
 
                     >
 
-                        {
-                            sections[currentSection]?.title
-                            ?? ""
-                        }
+                        {section?.title ?? ""}
 
                     </WorkspacePanel>
 
