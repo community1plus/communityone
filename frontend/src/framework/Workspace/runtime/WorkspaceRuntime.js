@@ -1,64 +1,44 @@
-export function createWorkspaceSectionRuntime({
+export function createWorkspaceRuntime({
 
-    section,
+    sections = [],
 
-    index = 0,
+    current = 0,
 
 }) {
 
-    if (!section) {
+    const safeSections =
+        Array.isArray(sections)
+            ? sections
+            : [];
 
-        return null;
 
-    }
+    const safeCurrent =
+        safeSections.length === 0
+
+            ? 0
+
+            : Math.min(
+                Math.max(current, 0),
+                safeSections.length - 1
+            );
+
+
+    const section =
+        safeSections[safeCurrent] || null;
 
 
     return {
 
-        id:
-            section.id,
+        sections:
+            safeSections,
 
-        index,
+        current:
+            safeCurrent,
 
-        title:
-            section.title,
+        section,
 
-        view:
-            section.view,
-
-        fields:
-            section.fields || [],
-
-        guide:
-            section.guide,
-
-        toolbar:
-            section.toolbar,
-
-        actions:
-            section.actions,
-
-        validator:
-            section.validator,
-
-        state: {
-
-            enabled:
-                section.state?.enabled ?? true,
-
-            visible:
-                section.state?.visible ?? true,
-
-            dirty:
-                false,
-
-            valid:
-                true,
-
-            complete:
-                false,
-
-        },
+        sectionId:
+            section?.id ?? null,
 
     };
 
