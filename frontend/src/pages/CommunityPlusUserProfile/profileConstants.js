@@ -2,6 +2,9 @@ import {
     createWorkspaceSectionModel,
 } from "../../framework/Workspace/models/WorkspaceSectionModel";
 
+import IdentitySection
+    from "../../engines/Identity/sections/IdentitySection";
+
 
 /* =========================================
    PHONE
@@ -74,22 +77,30 @@ export const IDENTITY_SECTIONS = [
 
         title: "Identity",
 
+        component: IdentitySection,
+
         view: "form",
 
         fields: [
 
             {
                 name: "username",
+
                 label: "Name",
+
                 type: "text",
+
                 helperText:
                     "This is how people know you in Community One.",
             },
 
             {
                 name: "email",
+
                 label: "Email",
+
                 type: "email",
+
                 readOnly: true,
             },
 
@@ -110,7 +121,9 @@ export const IDENTITY_SECTIONS = [
 
             {
                 name: "homeLocation",
+
                 label: "Home Address",
+
                 type: "location",
             },
 
@@ -131,7 +144,9 @@ export const IDENTITY_SECTIONS = [
 
             {
                 name: "phoneDisplay",
+
                 label: "Phone Number",
+
                 type: "text",
             },
 
@@ -186,13 +201,17 @@ export const ENTITY_SECTIONS = [
 
             {
                 name: "organisation.name",
+
                 label: "Organisation Name",
+
                 type: "text",
             },
 
             {
                 name: "organisation.website",
+
                 label: "Website",
+
                 type: "text",
             },
 
@@ -213,19 +232,25 @@ export const ENTITY_SECTIONS = [
 
             {
                 name: "organisation.streetAddress",
+
                 label: "Street Address",
+
                 type: "text",
             },
 
             {
                 name: "organisation.suburb",
+
                 label: "Suburb",
+
                 type: "text",
             },
 
             {
                 name: "organisation.postcode",
+
                 label: "Postcode",
+
                 type: "text",
             },
 
@@ -246,14 +271,19 @@ export const ENTITY_SECTIONS = [
 
             {
                 name: "organisation.phone",
+
                 label: "Phone",
+
                 type: "text",
             },
 
             {
                 name: "organisation.email",
+
                 label: "Email",
+
                 type: "email",
+
                 readOnly: true,
             },
 
