@@ -14,58 +14,20 @@ export function createWorkspace({
 
 }) {
 
-return createWorkspace({
+    return {
 
-    runtime,
+        runtime,
 
-    banner:
+        banner,
 
-        createWorkspaceBannerModel({
+        navigation,
 
-            left: {
+        body,
 
-                title:
-                    "IDENTITY",
+        guide,
 
-            },
+        actions,
 
-            centre: {
-
-                mode:
-                    "identity",
-
-            },
-
-            right: {
-
-                metric:
-
-                    createWorkspaceProgressModel({
-
-                        value:
-                            completion,
-
-                    }),
-
-            },
-
-        }),
-
-    navigation:
-
-        createWorkspaceNavigationModel({
-
-            items:
-                runtime.sections,
-
-            current:
-                runtime.current,
-
-            onChange:
-                goToSection,
-
-        }),
-
-});
+    };
 
 }
