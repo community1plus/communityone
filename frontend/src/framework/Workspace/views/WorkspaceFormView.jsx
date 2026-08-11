@@ -1,3 +1,5 @@
+import FieldRenderer from "../Form/FieldRenderer";
+
 export default function WorkspaceFormView({
 
     section,
@@ -9,90 +11,28 @@ export default function WorkspaceFormView({
 }) {
 
     if (!section) {
-
         return null;
-
     }
-
-    const fields =
-        section.fields || [];
-
 
     return (
 
         <div className="workspace-form">
 
-            {fields.map((field) => {
+            {section.fields?.map((field) => (
 
-                const value =
-                    form.values?.[field.name] ?? "";
+                <FieldRenderer
 
+                    key={field.name}
 
-                return (
+                    field={field}
 
-                    <div
-                        className="workspace-form-field"
-                        key={field.name}
-                    >
+                    form={form}
 
-                        <label
-                            className="workspace-form-label"
-                        >
+                    editing={editing}
 
-                            {field.label}
+                />
 
-                        </label>
-
-
-                        <input
-
-                            className="workspace-form-input"
-
-                            type={
-                                field.type === "email"
-                                    ? "email"
-                                    : "text"
-                            }
-
-                            value={value}
-
-                            readOnly={
-                                field.readOnly ||
-                                !editing
-                            }
-
-                            onChange={(event) => {
-
-                                form.setValue(
-
-                                    field.name,
-
-                                    event.target.value
-
-                                );
-
-                            }}
-
-                        />
-
-
-                        {field.helperText && (
-
-                            <div
-                                className="workspace-form-helper"
-                            >
-
-                                {field.helperText}
-
-                            </div>
-
-                        )}
-
-                    </div>
-
-                );
-
-            })}
+            ))}
 
         </div>
 
