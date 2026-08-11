@@ -18,13 +18,20 @@ export function createWorkspaceRuntime({
             ? 0
 
             : Math.min(
-                Math.max(current, 0),
+
+                Math.max(
+                    current,
+                    0
+                ),
+
                 safeSections.length - 1
+
             );
 
 
-    const sections =
-        safeSections[safeCurrent] || null;
+    const section =
+        safeSections[safeCurrent]
+        || null;
 
 
     return {
