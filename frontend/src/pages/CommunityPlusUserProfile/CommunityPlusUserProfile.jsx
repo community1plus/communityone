@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+
 import {
     useState,
     useEffect,
@@ -34,7 +35,6 @@ import {
 import {
     createWorkspaceSectionController,
 } from "../../framework/Workspace/controllers/WorkspaceSectionController";
-
 
 
 export default function CommunityPlusUserProfile({
@@ -100,7 +100,9 @@ export default function CommunityPlusUserProfile({
             currentSection
         );
 
-    }, [currentSection]);
+    }, [
+        currentSection,
+    ]);
 
 
     /* =====================================
@@ -190,31 +192,12 @@ export default function CommunityPlusUserProfile({
         });
 
 
-    /* =====================================
-       CURRENT SECTION
-    ===================================== */
-
     const current =
         sectionController.currentSection();
 
 
     const sectionId =
         current?.id ?? null;
-
-
-    /* =====================================
-       WORKSPACE RUNTIME
-    ===================================== */
-
-    const runtime =
-        createWorkspaceRuntime({
-
-            sections,
-
-            current:
-                currentSection,
-
-        });
 
 
     /* =====================================
@@ -350,8 +333,6 @@ export default function CommunityPlusUserProfile({
         currentSection,
 
         sectionId,
-
-        runtime,
 
     };
 
