@@ -8,10 +8,22 @@
 
 .workspace-body {
 
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 32px;
+
+    flex: 1;
+
     width: 100%;
+
+    min-width: 0;
 
     min-height: 320px;
 
     padding-top: 40px;
+
+    background: #f5f3f0;
 
 }
