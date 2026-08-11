@@ -4,6 +4,8 @@ export function createWorkspaceSectionModel({
 
     title,
 
+    component = null,
+
     fields = [],
 
     view = null,
@@ -23,6 +25,8 @@ export function createWorkspaceSectionModel({
         id,
 
         title,
+
+        component,
 
         fields,
 
