@@ -1,3 +1,6 @@
+import LocationSection
+    from "../../engines/Identity/sections/LocationSection";
+
 import {
     createWorkspaceSectionModel,
 } from "../../framework/Workspace/models/WorkspaceSectionModel";
@@ -109,27 +112,27 @@ export const IDENTITY_SECTIONS = [
     }),
 
 
-    createWorkspaceSectionModel({
+createWorkspaceSectionModel({
 
-        id: "location",
+    id: "location",
 
-        title: "Location",
+    title: "Location",
 
-        view: "form",
+    component: LocationSection,
 
-        fields: [
+    view: "form",
 
-            {
-                name: "homeLocation",
+    fields: [
 
-                label: "Home Address",
+        {
+            name: "homeLocation",
+            label: "Home Address",
+            type: "location",
+        },
 
-                type: "location",
-            },
+    ],
 
-        ],
-
-    }),
+}),
 
 
     createWorkspaceSectionModel({
