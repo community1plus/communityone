@@ -327,6 +327,8 @@ const workspaceState = {
 
     sections,
 
+    currentSection,
+
 };
 
 
