@@ -24,7 +24,17 @@ export default function WorkspaceNavigation({
                         ${model.current === index ? "active" : ""}
                         ${index < model.current ? "complete" : ""}
                     `}
-                    onClick={() => model.onChange(index)}
+onClick={() => {
+
+    console.log(
+        "NAVIGATION CLICK",
+        index,
+        item.id
+    );
+
+    model.onChange(index);
+
+}}
                 >
 
                     {item.title}

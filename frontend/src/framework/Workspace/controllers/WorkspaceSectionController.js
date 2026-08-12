@@ -24,21 +24,17 @@ export function createWorkspaceSectionController({
     }
 
 
-    function goTo(index) {
+function goTo(index) {
 
-        if (
-            index < 0 ||
-            index >= safeSections.length
-        ) {
+    console.log(
+        "WORKSPACE NAV CLICK",
+        index,
+        sections[index]?.id
+    );
 
-            return;
+    setCurrent(index);
 
-        }
-
-
-        setCurrent(index);
-
-    }
+}
 
 
     function next() {
