@@ -158,17 +158,12 @@ createWorkspaceSectionModel({
     }),
 
 
-    createWorkspaceSectionModel({
-
-        id: "social",
-
-        title: "Social",
-
-        view: "form",
-
-        fields: [],
-
-    }),
+createWorkspaceSectionModel({
+    id: "social",
+    title: "Social",
+    view: "social",
+    fields: [],
+}),
 
 
     createWorkspaceSectionModel({
