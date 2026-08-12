@@ -1,3 +1,6 @@
+import WorkspaceFormView
+    from "../../framework/Workspace/views/WorkspaceFormView";
+
 export default function CapabilityRenderer({
 
     section,
@@ -8,56 +11,34 @@ export default function CapabilityRenderer({
 
 }) {
 
-    console.log(
-        "CAPABILITY RENDERER SECTION",
-        section
-    );
-
     if (!section) {
-
-        console.log(
-            "CAPABILITY RENDERER: NO SECTION"
-        );
-
         return null;
-
     }
 
-    const Component =
-        section.component;
 
-    console.log(
-        "CAPABILITY RENDERER COMPONENT",
-        Component
-    );
+    switch (section.view) {
 
-    console.log(
-        "CAPABILITY RENDERER FIELDS",
-        section.fields
-    );
+        case "form":
 
-    if (!Component) {
+            return (
 
-        console.log(
-            "CAPABILITY RENDERER: NO COMPONENT"
-        );
+                <WorkspaceFormView
 
-        return null;
+                    section={section}
+
+                    form={form}
+
+                    editing={editing}
+
+                />
+
+            );
+
+
+        default:
+
+            return null;
 
     }
-
-    return (
-
-        <Component
-
-            section={section}
-
-            form={form}
-
-            editing={editing}
-
-        />
-
-    );
 
 }
