@@ -4,34 +4,56 @@
 }
 
 .social-section-header {
-    margin-bottom: 32px;
+    margin-bottom: 28px;
 }
 
 .social-section-header h2 {
     margin: 0 0 8px;
+
     font-size: 1.35rem;
     font-weight: 600;
-    color: #222;
+
+    color: #222222;
 }
 
 .social-section-header p {
     margin: 0;
+
     color: #526b84;
+
     font-size: 0.95rem;
 }
 
-.social-account-list {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
+
+/* =====================================
+   ACCOUNT GRID
+===================================== */
+
+.social-account-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 16px;
 }
+
+
+/* =====================================
+   ACCOUNT CARD
+===================================== */
 
 .social-account {
     display: flex;
+
     align-items: center;
     justify-content: space-between;
 
-    padding: 20px 24px;
+    min-height: 110px;
+
+    box-sizing: border-box;
+
+    padding: 20px 22px;
 
     border: 1px solid #d7dde5;
     border-radius: 14px;
@@ -39,36 +61,72 @@
     background: #f8fafc;
 }
 
+
+/* =====================================
+   ACCOUNT INFORMATION
+===================================== */
+
 .social-account-info {
     display: flex;
+
     flex-direction: column;
+
     gap: 6px;
 }
 
 .social-account-info strong {
     font-size: 1rem;
-    color: #222;
+    font-weight: 600;
+
+    color: #222222;
 }
 
 .social-account-info span {
     font-size: 0.9rem;
+
     color: #526b84;
 }
 
+
+/* =====================================
+   ACTION
+===================================== */
+
 .social-account button {
+    flex-shrink: 0;
+
     padding: 10px 20px;
 
     border: 1px solid #b51224;
     border-radius: 20px;
 
     background: #b51224;
-    color: white;
+    color: #ffffff;
 
     font: inherit;
+
     cursor: pointer;
+}
+
+.social-account button:hover:not(:disabled) {
+    opacity: 0.9;
 }
 
 .social-account button:disabled {
     opacity: 0.45;
+
     cursor: default;
+}
+
+
+/* =====================================
+   RESPONSIVE
+===================================== */
+
+@media (max-width: 760px) {
+
+    .social-account-grid {
+        grid-template-columns: 1fr;
+    }
+
 }

@@ -1,196 +1,361 @@
-import { DEFAULT_PHONE_COUNTRY } from "./profileConstants";
+import {
+    DEFAULT_PHONE_COUNTRY,
+    PHONE_COUNTRIES,
+} from "./profileConstants";
 
+
+/* =====================================
+   PROFILE COMPLETION
+===================================== */
 
 export function calculateProfileCompletion(values) {
 
-  const checks = [
+    const socialVerified =
+        Object.values(
+            values.social || {}
+        ).some(
+            account => account?.verified === true
+        );
 
-    Boolean(values.username),
 
-    Boolean(values.homeLocation),
+    const checks = [
 
-    Boolean(values.phoneDisplay),
+        Boolean(values.username),
 
-    Boolean(values.social?.facebookVerified),
-    // or later: at least one verified account
+        Boolean(values.homeLocation),
 
-    Boolean(values.payment?.verified),
+        Boolean(values.phoneDisplay),
 
-  ];
+        socialVerified,
 
-  const completed =
-    checks.filter(Boolean).length;
+        Boolean(values.payment?.verified),
 
-  return Math.round(
-    (completed / checks.length) * 100
-  );
+    ];
+
+
+    const completed =
+        checks.filter(Boolean).length;
+
+
+    return Math.round(
+        (completed / checks.length) * 100
+    );
 
 }
+
+
+/* =====================================
+   INITIAL PROFILE VALUES
+===================================== */
+
 export function getInitialProfileValues(
-  profile,
-  user
+    profile,
+    user
 ) {
-  const email =
-    user?.email || "";
 
-  const emailUsername =
-    email
-      .split("@")[0]
-      .toLowerCase();
+    const email =
+        user?.email || "";
 
-  const userType =
-    profile?.userType || "PERSONAL";
 
-  return {
+    const emailUsername =
+        email
+            .split("@")[0]
+            .toLowerCase();
 
-    /* =====================================
-       IDENTITY
-    ===================================== */
 
-    username:
-      profile?.username ||
-      emailUsername,
+    const userType =
+        profile?.userType || "PERSONAL";
 
-    email,
 
-    capabilities: {
+    return {
 
-      personal:
-        userType !== "ORG",
+        /* =====================================
+           IDENTITY
+        ===================================== */
 
-      organisation:
-        userType === "ORG" ||
-        userType === "MIXED",
+        username:
+            profile?.username ||
+            emailUsername,
 
-    },
+        email,
 
-    /* =====================================
-       CONTACT
-    ===================================== */
 
-    phoneCountry:
-      profile?.phoneCountry ||
-      DEFAULT_PHONE_COUNTRY,
+        capabilities: {
 
-    phoneDisplay:
-      profile?.phoneDisplay ||
-      "",
+            personal:
+                userType !== "ORG",
 
-    /* =====================================
-       LOCATION
-    ===================================== */
+            organisation:
+                userType === "ORG" ||
+                userType === "MIXED",
 
-    homeLocation:
-      profile?.homeLocation ||
-      null,
+        },
 
-    /* =====================================
-       ORGANISATION
-    ===================================== */
 
-    organisation: {
+        /* =====================================
+           CONTACT
+        ===================================== */
 
-      name:
-        profile?.organisation?.name ||
-        "",
+        phoneCountry:
+            profile?.phoneCountry ||
+            DEFAULT_PHONE_COUNTRY,
 
-      website:
-        profile?.organisation?.website ||
-        "",
+        phoneDisplay:
+            profile?.phoneDisplay ||
+            "",
 
-      streetAddress:
-        profile?.organisation?.streetAddress ||
-        "",
 
-      suburb:
-        profile?.organisation?.suburb ||
-        "",
+        /* =====================================
+           LOCATION
+        ===================================== */
 
-      postcode:
-        profile?.organisation?.postcode ||
-        "",
+        homeLocation:
+            profile?.homeLocation ||
+            null,
 
-      phone:
-        profile?.organisation?.phone ||
-        "",
 
-      email:
-        profile?.organisation?.email ||
-        "",
+        /* =====================================
+           SOCIAL
+        ===================================== */
 
-    },
+        social: {
 
-  };
+            facebook: {
+
+                connected:
+                    profile?.social?.facebook?.connected ||
+                    false,
+
+                username:
+                    profile?.social?.facebook?.username ||
+                    "",
+
+                verified:
+                    profile?.social?.facebook?.verified ||
+                    false,
+
+            },
+
+            instagram: {
+
+                connected:
+                    profile?.social?.instagram?.connected ||
+                    false,
+
+                username:
+                    profile?.social?.instagram?.username ||
+                    "",
+
+                verified:
+                    profile?.social?.instagram?.verified ||
+                    false,
+
+            },
+
+            youtube: {
+
+                connected:
+                    profile?.social?.youtube?.connected ||
+                    false,
+
+                username:
+                    profile?.social?.youtube?.username ||
+                    "",
+
+                verified:
+                    profile?.social?.youtube?.verified ||
+                    false,
+
+            },
+
+            x: {
+
+                connected:
+                    profile?.social?.x?.connected ||
+                    false,
+
+                username:
+                    profile?.social?.x?.username ||
+                    "",
+
+                verified:
+                    profile?.social?.x?.verified ||
+                    false,
+
+            },
+
+        },
+
+
+        /* =====================================
+           PAYMENT
+        ===================================== */
+
+        payment: {
+
+            verified:
+                profile?.payment?.verified ||
+                false,
+
+        },
+
+
+        /* =====================================
+           ORGANISATION
+        ===================================== */
+
+        organisation: {
+
+            name:
+                profile?.organisation?.name ||
+                "",
+
+            website:
+                profile?.organisation?.website ||
+                "",
+
+            streetAddress:
+                profile?.organisation?.streetAddress ||
+                "",
+
+            suburb:
+                profile?.organisation?.suburb ||
+                "",
+
+            postcode:
+                profile?.organisation?.postcode ||
+                "",
+
+            phone:
+                profile?.organisation?.phone ||
+                "",
+
+            email:
+                profile?.organisation?.email ||
+                "",
+
+        },
+
+    };
+
 }
 
-/* =========================
+
+/* =====================================
    EMAIL
-========================= */
+===================================== */
 
-export function getEmailDomain(email = "") {
-  return email.split("@")[1]?.toLowerCase() || "";
+export function getEmailDomain(
+    email = ""
+) {
+
+    return (
+        email
+            .split("@")[1]
+            ?.toLowerCase() ||
+        ""
+    );
+
 }
 
-/* =========================
-   PROFILE TABS
-========================= */
 
-
-
-/* =========================
+/* =====================================
    PHONE COUNTRY
-========================= */
+===================================== */
 
-export function getPhoneCountry(code) {
-  return (
-    PHONE_COUNTRIES.find(
-      c => c.code === code
-    ) ||
-    PHONE_COUNTRIES.find(
-      c => c.code === DEFAULT_PHONE_COUNTRY
-    )
-  );
+export function getPhoneCountry(
+    code
+) {
+
+    return (
+
+        PHONE_COUNTRIES.find(
+            c => c.code === code
+        )
+
+        ||
+
+        PHONE_COUNTRIES.find(
+            c =>
+                c.code ===
+                DEFAULT_PHONE_COUNTRY
+        )
+
+    );
+
 }
 
-/* =========================
+
+/* =====================================
    PHONE
-========================= */
+===================================== */
 
 export function toE164Phone(
-  value = "",
-  countryCode = DEFAULT_PHONE_COUNTRY
+    value = "",
+    countryCode = DEFAULT_PHONE_COUNTRY
 ) {
 
-  const country =
-    getPhoneCountry(countryCode);
+    const country =
+        getPhoneCountry(
+            countryCode
+        );
 
-  const digits = value
-    .replace(/\D/g, "")
-    .replace(/^0+/, "");
 
-  if (!digits) {
-    return "";
-  }
+    const digits =
+        value
+            .replace(/\D/g, "")
+            .replace(/^0+/, "");
 
-  return `${country.dialCode}${digits}`;
+
+    if (!digits) {
+
+        return "";
+
+    }
+
+
+    return `${country.dialCode}${digits}`;
+
 }
+
+
+/* =====================================
+   PHONE VALIDATION
+===================================== */
 
 export function validatePhone(
-  phone,
-  countryCode
+    phone,
+    countryCode
 ) {
 
-  const country =
-    getPhoneCountry(countryCode);
+    const country =
+        getPhoneCountry(
+            countryCode
+        );
 
-  const digits = phone
-    .replace(country.dialCode, "")
-    .replace(/\D/g, "");
 
-  return (
-    digits.length >= country.min &&
-    digits.length <= country.max
-  );
+    const digits =
+        phone
+            .replace(
+                country.dialCode,
+                ""
+            )
+            .replace(
+                /\D/g,
+                ""
+            );
+
+
+    return (
+
+        digits.length >=
+            country.min
+
+        &&
+
+        digits.length <=
+            country.max
+
+    );
 
 }
-

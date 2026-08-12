@@ -1,12 +1,31 @@
 import "./SocialSection.css";
 
+const SOCIAL_PROVIDERS = [
+    {
+        id: "facebook",
+        label: "Facebook",
+    },
+    {
+        id: "instagram",
+        label: "Instagram",
+    },
+    {
+        id: "youtube",
+        label: "YouTube",
+    },
+    {
+        id: "x",
+        label: "X",
+    },
+];
+
 export default function SocialSection({
-    section,
     form,
     editing,
 }) {
 
     return (
+
         <div className="social-section">
 
             <div className="social-section-header">
@@ -23,109 +42,59 @@ export default function SocialSection({
             </div>
 
 
-            <div className="social-account-list">
+            <div className="social-account-grid">
 
-                <div className="social-account">
+                {SOCIAL_PROVIDERS.map((provider) => {
 
-                    <div className="social-account-info">
+                    const connected =
+                        form.getValue(
+                            `social.${provider.id}.connected`
+                        );
 
-                        <strong>
-                            Facebook
-                        </strong>
+                    return (
 
-                        <span>
-                            Not connected
-                        </span>
+                        <div
+                            className="social-account"
+                            key={provider.id}
+                        >
 
-                    </div>
+                            <div className="social-account-info">
 
+                                <strong>
+                                    {provider.label}
+                                </strong>
 
-                    <button
-                        type="button"
-                        disabled={!editing}
-                    >
-                        Connect
-                    </button>
+                                <span>
+                                    {connected
+                                        ? "Connected"
+                                        : "Not connected"
+                                    }
+                                </span>
 
-                </div>
-
-
-                <div className="social-account">
-
-                    <div className="social-account-info">
-
-                        <strong>
-                            Instagram
-                        </strong>
-
-                        <span>
-                            Not connected
-                        </span>
-
-                    </div>
+                            </div>
 
 
-                    <button
-                        type="button"
-                        disabled={!editing}
-                    >
-                        Connect
-                    </button>
+                            <button
+                                type="button"
+                                disabled={!editing}
+                            >
 
-                </div>
+                                {connected
+                                    ? "Manage"
+                                    : "Connect"
+                                }
 
+                            </button>
 
-                <div className="social-account">
+                        </div>
 
-                    <div className="social-account-info">
+                    );
 
-                        <strong>
-                            YouTube
-                        </strong>
-
-                        <span>
-                            Not connected
-                        </span>
-
-                    </div>
-
-
-                    <button
-                        type="button"
-                        disabled={!editing}
-                    >
-                        Connect
-                    </button>
-
-                </div>
-
-
-                <div className="social-account">
-
-                    <div className="social-account-info">
-
-                        <strong>
-                            X
-                        </strong>
-
-                        <span>
-                            Not connected
-                        </span>
-
-                    </div>
-
-
-                    <button
-                        type="button"
-                        disabled={!editing}
-                    >
-                        Connect
-                    </button>
-
-                </div>
+                })}
 
             </div>
 
         </div>
+
     );
 }
