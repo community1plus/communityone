@@ -191,6 +191,11 @@ export default function CommunityPlusUserProfile({
 
         });
 
+        console.log(
+    "PROFILE SECTION",
+    currentSection,
+    sections[currentSection]?.id
+);
 
     /* =====================================
        PROFILE COMPLETION
