@@ -1,7 +1,7 @@
 import WorkspaceFormView
     from "../../framework/Workspace/views/WorkspaceFormView";
 
-import SocialSection from "../sections/SocialSection";
+import SocialSection from "../../engines/IdentityWorkspace/sections/SocialSection";
 
 export default function CapabilityRenderer({
     section,
