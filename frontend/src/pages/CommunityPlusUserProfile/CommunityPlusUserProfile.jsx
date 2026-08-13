@@ -21,7 +21,7 @@ import IdentityWorkspace
 import {
     IDENTITY_SECTIONS,
     ENTITY_SECTIONS,
-} from "../../framework/Workspace/profile/profileConstants";
+} from "../../engines/Identity/identitySections";
 
 import {
     getInitialProfileValues,
