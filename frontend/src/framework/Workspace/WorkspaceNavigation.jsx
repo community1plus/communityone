@@ -32,7 +32,7 @@ onClick={() => {
         item.id
     );
 
-    model.onChange(index);
+    model.onChange?.(index);
 
 }}
                 >
