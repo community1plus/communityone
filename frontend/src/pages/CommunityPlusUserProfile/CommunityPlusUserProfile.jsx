@@ -41,7 +41,7 @@ export default function CommunityPlusUserProfile({
 
     onComplete,
 
-    editMode = false,
+    editMode = true,
 
     initialCapability = "identity",
 
@@ -74,8 +74,10 @@ export default function CommunityPlusUserProfile({
         useState(false);
 
 
-    const [editing, setEditing] =
-        useState(!profile?.id);
+const [editing, setEditing] =
+    useState(
+        editMode || !profile?.id
+    );
 
 
     const [currentSection, setCurrentSection] =
