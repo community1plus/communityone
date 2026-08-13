@@ -1,12 +1,12 @@
 import LocationSection
-    from "../../../engines/Location/sections/LocationSection";
+    from "../Location/sections/LocationSection";
 
 import {
     createWorkspaceSectionModel,
 } from "../../Workspace/models/WorkspaceSectionModel";
 
 import IdentitySection
-    from "../../../engines/Identity/sections/IdentitySection";
+    from "../Identity/sections/IdentitySection";
 
 export const IDENTITY_SECTIONS = [
 
