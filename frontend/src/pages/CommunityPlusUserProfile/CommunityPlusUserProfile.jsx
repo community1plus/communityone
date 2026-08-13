@@ -21,12 +21,12 @@ import IdentityWorkspace
 import {
     IDENTITY_SECTIONS,
     ENTITY_SECTIONS,
-} from "./profileConstants";
+} from "../../framework/Workspace/profile/profileConstants";
 
 import {
     getInitialProfileValues,
     calculateProfileCompletion,
-} from "./profileHelpers";
+} from "../../framework/Workspace/profile/profileHelpers";
 
 import {
     buildProfilePayload,

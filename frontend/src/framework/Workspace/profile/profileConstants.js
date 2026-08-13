@@ -1,12 +1,12 @@
 import LocationSection
-    from "../../engines/Location/sections/LocationSection";
+    from "../../../engines/Location/sections/LocationSection";
 
 import {
     createWorkspaceSectionModel,
-} from "../../framework/Workspace/models/WorkspaceSectionModel";
+} from "../../Workspace/models/WorkspaceSectionModel";
 
 import IdentitySection
-    from "../../engines/Identity/sections/IdentitySection";
+    from "../../../engines/Identity/sections/IdentitySection";
 
 
 /* =========================================
@@ -135,27 +135,27 @@ createWorkspaceSectionModel({
 }),
 
 
-    createWorkspaceSectionModel({
+createWorkspaceSectionModel({
 
-        id: "contact",
+    id: "contact",
 
-        title: "Contact",
+    title: "Contact",
 
-        view: "form",
+    view: "form",
 
-        fields: [
+    fields: [
 
-            {
-                name: "phoneDisplay",
+        {
+            name: "phoneDisplay",
 
-                label: "Phone Number",
+            label: "Phone Number",
 
-                type: "text",
-            },
+            type: "phone",
+        },
 
-        ],
+    ],
 
-    }),
+}),
 
 
 createWorkspaceSectionModel({
