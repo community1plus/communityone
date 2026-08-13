@@ -87,7 +87,13 @@ const {
     section,
 } = runtime ?? {};
 
-
+console.log(
+    "WORKSPACE RUNTIME",
+    {
+        section: runtime.sectionId,
+        valid: runtime.valid,
+    }
+);
     /* =====================================
        RENDER
     ===================================== */
