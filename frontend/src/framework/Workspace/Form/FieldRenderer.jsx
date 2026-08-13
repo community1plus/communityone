@@ -1,3 +1,6 @@
+import PhoneField
+    from "./fields/PhoneField";
+
 import LocationField
     from "./fields/LocationField";
 
@@ -36,7 +39,22 @@ export default function FieldRenderer({
 
             );
 
+        case "phone":
 
+    return (
+
+        <PhoneField
+
+            field={field}
+
+            form={form}
+
+            editing={editing}
+
+        />
+
+    );
+        
         default: {
 
             const {

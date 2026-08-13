@@ -19,7 +19,6 @@
 
 }
 
-
 .workspace-field-input {
 
     width: 100%;
@@ -67,5 +66,56 @@
     font-size: 0.85rem;
 
     color: #526b84;
+
+}
+
+.workspace-phone {
+
+    display: flex;
+
+    align-items: stretch;
+
+    gap: 12px;
+
+    width: 100%;
+
+    max-width: 520px;
+
+}
+
+.workspace-phone-country {
+
+    width: 110px;
+
+    box-sizing: border-box;
+
+    padding: 16px 12px;
+
+    border: 1px solid #d7dde5;
+
+    border-radius: 14px;
+
+    background: #f8fafc;
+
+    color: #526b84;
+
+    font: inherit;
+
+    font-size: 1rem;
+
+    outline: none;
+
+}
+
+.workspace-phone-country:focus {
+
+    border-color:
+        var(--brand-primary, #b51224);
+
+}
+
+.workspace-phone-country:disabled {
+
+    cursor: default;
 
 }

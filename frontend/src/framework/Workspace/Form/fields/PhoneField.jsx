@@ -1,7 +1,7 @@
 import {
     DEFAULT_PHONE_COUNTRY,
     PHONE_COUNTRIES,
-} from "../../../pages/CommunityPlusUserProfile/profileConstants";
+} from "../../Workspace/profile/profileConstants";
 
 import "../FieldRenderer.css";
 
@@ -21,6 +21,8 @@ export default function PhoneField({
 
         label,
 
+        helperText,
+
         readOnly = false,
 
     } = field;
@@ -30,7 +32,7 @@ export default function PhoneField({
         form.getValue(name) ?? "";
 
 
-    const country =
+    const selectedCountry =
         form.getValue("phoneCountry")
         || DEFAULT_PHONE_COUNTRY;
 
@@ -59,7 +61,7 @@ export default function PhoneField({
 
                     className="workspace-phone-country"
 
-                    value={country}
+                    value={selectedCountry}
 
                     disabled={isReadOnly}
 
@@ -75,16 +77,16 @@ export default function PhoneField({
                 >
 
                     {PHONE_COUNTRIES.map(
-                        (item) => (
+                        (country) => (
 
                             <option
-                                key={item.code}
-                                value={item.code}
+                                key={country.code}
+                                value={country.code}
                             >
 
-                                {item.label}
+                                {country.code}
                                 {" "}
-                                {item.dialCode}
+                                {country.dialCode}
 
                             </option>
 
@@ -121,6 +123,17 @@ export default function PhoneField({
                 />
 
             </div>
+
+
+            {helperText && (
+
+                <div className="workspace-field-helper">
+
+                    {helperText}
+
+                </div>
+
+            )}
 
         </div>
 
