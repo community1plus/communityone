@@ -1,10 +1,3 @@
-import {
-    DEFAULT_PHONE_COUNTRY,
-    PHONE_COUNTRIES,
-} from "../../../Workspace/profile/profileConstants";
-
-import "../FieldRenderer.css";
-
 export default function PhoneField({
 
     field,
@@ -32,9 +25,21 @@ export default function PhoneField({
         form.getValue(name) ?? "";
 
 
+    const phoneCountry =
+        form.getValue("phoneCountry");
+
+
     const selectedCountry =
-        form.getValue("phoneCountry")
-        || DEFAULT_PHONE_COUNTRY;
+        PHONE_COUNTRIES.some(
+
+            country =>
+                country.code === phoneCountry
+
+        )
+
+            ? phoneCountry
+
+            : DEFAULT_PHONE_COUNTRY;
 
 
     const isReadOnly =
