@@ -1,7 +1,7 @@
 import {
     DEFAULT_PHONE_COUNTRY,
     PHONE_COUNTRIES,
-} from "../../Workspace/profile/profileConstants";
+} from "../../../Workspace/profile/profileConstants";
 
 import "../FieldRenderer.css";
 
