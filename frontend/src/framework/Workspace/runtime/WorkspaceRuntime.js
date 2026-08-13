@@ -4,6 +4,8 @@ export function createWorkspaceRuntime({
 
     current = 0,
 
+    values = {},
+
 }) {
 
     const safeSections =
@@ -34,6 +36,12 @@ export function createWorkspaceRuntime({
         || null;
 
 
+    const valid =
+        section?.validator
+            ? section.validator(values)
+            : true;
+
+
     return {
 
         sections:
@@ -46,6 +54,8 @@ export function createWorkspaceRuntime({
 
         sectionId:
             section?.id ?? null,
+
+        valid,
 
     };
 

@@ -35,6 +35,8 @@ export function buildIdentityWorkspace(
 
         currentSection,
 
+        values,
+
     } = state;
 
 
@@ -45,6 +47,10 @@ export function buildIdentityWorkspace(
     } = actions;
 
 
+    /* =====================================
+       RUNTIME
+    ===================================== */
+
     const runtime =
         createWorkspaceRuntime({
 
@@ -53,61 +59,74 @@ export function buildIdentityWorkspace(
             current:
                 currentSection,
 
+            values,
+
         });
 
+
+    /* =====================================
+       MODELS
+    ===================================== */
+
+    const banner =
+        createWorkspaceBannerModel({
+
+            left: {
+
+                title:
+                    "IDENTITY",
+
+            },
+
+            centre: {
+
+                mode:
+                    "identity",
+
+            },
+
+            right: {
+
+                metric:
+
+                    createWorkspaceProgressModel({
+
+                        value:
+                            completion,
+
+                    }),
+
+            },
+
+        });
+
+
+    const navigation =
+        createWorkspaceNavigationModel({
+
+            items:
+                runtime.sections,
+
+            current:
+                runtime.current,
+
+            onChange:
+                goToSection,
+
+        });
+
+
+    /* =====================================
+       WORKSPACE
+    ===================================== */
 
     return createWorkspace({
 
         runtime,
 
-        banner:
+        banner,
 
-            createWorkspaceBannerModel({
-
-                left: {
-
-                    title:
-                        "IDENTITY",
-
-                },
-
-                centre: {
-
-                    mode:
-                        "identity",
-
-                },
-
-                right: {
-
-                    metric:
-
-                        createWorkspaceProgressModel({
-
-                            value:
-                                completion,
-
-                        }),
-
-                },
-
-            }),
-
-
-        navigation:
-
-            createWorkspaceNavigationModel({
-
-                items:
-                    runtime.sections,
-
-                current:
-                    runtime.current,
-
-                onChange:
-                    goToSection,
-
-            }),
+        navigation,
 
     });
 
