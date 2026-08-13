@@ -3,7 +3,7 @@ import { useRef } from "react";
 import { Autocomplete } from "@react-google-maps/api";
 
 import { useGoogleMaps }
-    from "../../../context/GoogleMapsProvider";
+    from "../../../../context/GoogleMapsProvider";
 
 import "../FieldRenderer.css";
 
