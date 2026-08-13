@@ -1,5 +1,4 @@
-import { toE164Phone }
-  from "./profileHelpers";
+import { toE164Phone } from "../../../src/framework/Workspace/profile/profileHelpers";
 
 export function buildProfilePayload({
   values,
