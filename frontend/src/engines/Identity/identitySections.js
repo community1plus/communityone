@@ -3,7 +3,7 @@ import LocationSection
 
 import {
     createWorkspaceSectionModel,
-} from "../../Workspace/models/WorkspaceSectionModel";
+} from "../../framework/Workspace/models/WorkspaceSectionModel";
 
 import IdentitySection
     from "../Identity/sections/IdentitySection";
