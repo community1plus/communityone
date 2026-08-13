@@ -18,17 +18,49 @@ export default function LocationField({
 
 }) {
 
-    const {
+const location = {
 
-        name,
+    label:
+        place.formatted_address,
 
-        label,
+    fullAddress:
+        place.formatted_address,
 
-        helperText,
+    lat:
+        place.geometry.location.lat(),
 
-        readOnly = false,
+    lng:
+        place.geometry.location.lng(),
 
-    } = field;
+    country,
+
+    countryCode,
+
+    type:
+        "manual",
+
+    accuracy:
+        "MANUAL",
+
+};
+
+
+console.log(
+    "LOCATION SELECTED",
+    location
+);
+
+console.log(
+    "LOCATION COUNTRY",
+    country,
+    countryCode
+);
+
+
+form.setValue(
+    name,
+    location
+);
 
 
     const autoRef =
