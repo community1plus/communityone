@@ -1,3 +1,7 @@
+import {
+    validatePhone,
+} from "../../framework/Workspace/profile/profileHelpers";
+
 import LocationSection
     from "../Location/sections/LocationSection";
 
@@ -90,6 +94,18 @@ createWorkspaceSectionModel({
         },
 
     ],
+
+    validator: (values) => {
+
+        return validatePhone(
+
+            values.phoneDisplay || "",
+
+            values.phoneCountry
+
+        );
+
+    },
 
 }),
 
