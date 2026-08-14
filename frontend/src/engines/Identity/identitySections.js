@@ -2,25 +2,22 @@ import {
     validatePhone,
 } from "../../framework/Workspace/profile/profileHelpers";
 
-import LocationSection
-    from "../Location/sections/LocationSection";
-
 import {
     createWorkspaceSectionModel,
 } from "../../framework/Workspace/models/WorkspaceSectionModel";
 
-import IdentitySection
-    from "../Identity/sections/IdentitySection";
 
-export const IDENTITY_SECTIONS = [
+/* =========================================
+   PERSONAL SECTIONS
+========================================= */
+
+export const PERSONAL_SECTIONS = [
 
     createWorkspaceSectionModel({
 
         id: "identity",
 
         title: "Identity",
-
-        component: IdentitySection,
 
         view: "form",
 
@@ -52,81 +49,60 @@ export const IDENTITY_SECTIONS = [
     }),
 
 
-createWorkspaceSectionModel({
+    createWorkspaceSectionModel({
 
-    id: "location",
+        id: "location",
 
-    title: "Location",
+        title: "Location",
 
-    component: LocationSection,
+        view: "form",
 
-    view: "form",
+        fields: [
 
-    fields: [
+            {
+                name: "homeLocation",
 
-        {
-            name: "homeLocation",
-            label: "Home Address",
-            type: "location",
-        },
+                label: "Home Address",
 
-    ],
+                type: "location",
+            },
 
-}),
+        ],
 
-
-createWorkspaceSectionModel({
-
-    id: "contact",
-
-    title: "Contact",
-
-    view: "form",
-
-    fields: [
-
-        {
-            name: "phoneDisplay",
-
-            label: "Phone Number",
-
-            type: "phone",
-        },
-
-    ],
-
-    validator: (values) => {
-
-        return validatePhone(
-
-            values.phoneDisplay || "",
-
-            values.phoneCountry
-
-        );
-
-    },
-
-}),
-
-//
-createWorkspaceSectionModel({
-    id: "social",
-    title: "Social",
-    view: "social",
-    fields: [],
-}),
+    }),
 
 
     createWorkspaceSectionModel({
 
-        id: "payment",
+        id: "contact",
 
-        title: "Payment",
+        title: "Contact",
 
         view: "form",
 
-        fields: [],
+        fields: [
+
+            {
+                name: "phoneDisplay",
+
+                label: "Phone Number",
+
+                type: "phone",
+            },
+
+        ],
+
+        validator: (values) => {
+
+            return validatePhone(
+
+                values.phoneDisplay || "",
+
+                values.phoneCountry
+
+            );
+
+        },
 
     }),
 
@@ -134,31 +110,31 @@ createWorkspaceSectionModel({
 
 
 /* =========================================
-   ENTITY PROFILE
+   ENTITY SECTIONS
 ========================================= */
 
 export const ENTITY_SECTIONS = [
 
     createWorkspaceSectionModel({
 
-        id: "organisation",
+        id: "entity",
 
-        title: "Organisation",
+        title: "Entity",
 
         view: "form",
 
         fields: [
 
             {
-                name: "organisation.name",
+                name: "entity.name",
 
-                label: "Organisation Name",
+                label: "Entity Name",
 
                 type: "text",
             },
 
             {
-                name: "organisation.website",
+                name: "entity.website",
 
                 label: "Website",
 
@@ -172,7 +148,7 @@ export const ENTITY_SECTIONS = [
 
     createWorkspaceSectionModel({
 
-        id: "organisation-address",
+        id: "entity-address",
 
         title: "Address",
 
@@ -181,7 +157,7 @@ export const ENTITY_SECTIONS = [
         fields: [
 
             {
-                name: "organisation.streetAddress",
+                name: "entity.streetAddress",
 
                 label: "Street Address",
 
@@ -189,7 +165,7 @@ export const ENTITY_SECTIONS = [
             },
 
             {
-                name: "organisation.suburb",
+                name: "entity.suburb",
 
                 label: "Suburb",
 
@@ -197,7 +173,7 @@ export const ENTITY_SECTIONS = [
             },
 
             {
-                name: "organisation.postcode",
+                name: "entity.postcode",
 
                 label: "Postcode",
 
@@ -211,7 +187,7 @@ export const ENTITY_SECTIONS = [
 
     createWorkspaceSectionModel({
 
-        id: "organisation-contact",
+        id: "entity-contact",
 
         title: "Contact",
 
@@ -220,7 +196,7 @@ export const ENTITY_SECTIONS = [
         fields: [
 
             {
-                name: "organisation.phone",
+                name: "entity.phone",
 
                 label: "Phone",
 
@@ -228,7 +204,7 @@ export const ENTITY_SECTIONS = [
             },
 
             {
-                name: "organisation.email",
+                name: "entity.email",
 
                 label: "Email",
 
@@ -241,6 +217,14 @@ export const ENTITY_SECTIONS = [
 
     }),
 
+];
+
+
+/* =========================================
+   COMMON SECTIONS
+========================================= */
+
+export const COMMON_SECTIONS = [
 
     createWorkspaceSectionModel({
 
@@ -248,7 +232,7 @@ export const ENTITY_SECTIONS = [
 
         title: "Social",
 
-        view: "form",
+        view: "social",
 
         fields: [],
 
@@ -274,7 +258,7 @@ export const ENTITY_SECTIONS = [
    COMMUNITY POLICIES
 ========================================= */
 
-export const COMMUNITY_POLICY_STEPS = [
+export const COMMUNITY_POLICY_SECTIONS = [
 
     createWorkspaceSectionModel({
 
