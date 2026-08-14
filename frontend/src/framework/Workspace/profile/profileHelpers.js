@@ -14,7 +14,8 @@ export function calculateProfileCompletion(values) {
         Object.values(
             values.social || {}
         ).some(
-            account => account?.verified === true
+            account =>
+                account?.verified === true
         );
 
 
@@ -63,8 +64,18 @@ export function getInitialProfileValues(
             .toLowerCase();
 
 
+    /*
+       Keep ORG as the backend/profile
+       userType for now.
+    */
+
     const userType =
         profile?.userType || "PERSONAL";
+
+
+    const isEntity =
+        userType === "ORG" ||
+        userType === "MIXED";
 
 
     return {
@@ -83,11 +94,10 @@ export function getInitialProfileValues(
         capabilities: {
 
             personal:
-                userType !== "ORG",
+                !isEntity,
 
-            organisation:
-                userType === "ORG" ||
-                userType === "MIXED",
+            entity:
+                isEntity,
 
         },
 
@@ -201,36 +211,43 @@ export function getInitialProfileValues(
 
 
         /* =====================================
-           ORGANISATION
+           ENTITY
         ===================================== */
 
-        organisation: {
+        entity: {
 
             name:
+                profile?.entity?.name ||
                 profile?.organisation?.name ||
                 "",
 
             website:
+                profile?.entity?.website ||
                 profile?.organisation?.website ||
                 "",
 
             streetAddress:
+                profile?.entity?.streetAddress ||
                 profile?.organisation?.streetAddress ||
                 "",
 
             suburb:
+                profile?.entity?.suburb ||
                 profile?.organisation?.suburb ||
                 "",
 
             postcode:
+                profile?.entity?.postcode ||
                 profile?.organisation?.postcode ||
                 "",
 
             phone:
+                profile?.entity?.phone ||
                 profile?.organisation?.phone ||
                 "",
 
             email:
+                profile?.entity?.email ||
                 profile?.organisation?.email ||
                 "",
 
@@ -250,10 +267,13 @@ export function getEmailDomain(
 ) {
 
     return (
+
         email
             .split("@")[1]
             ?.toLowerCase() ||
+
         ""
+
     );
 
 }
@@ -270,14 +290,15 @@ export function getPhoneCountry(
     return (
 
         PHONE_COUNTRIES.find(
-            c => c.code === code
+            country =>
+                country.code === code
         )
 
         ||
 
         PHONE_COUNTRIES.find(
-            c =>
-                c.code ===
+            country =>
+                country.code ===
                 DEFAULT_PHONE_COUNTRY
         )
 
@@ -301,6 +322,11 @@ export function toE164Phone(
         );
 
 
+    if (!country) {
+        return "";
+    }
+
+
     const digits =
         value
             .replace(/\D/g, "")
@@ -308,13 +334,13 @@ export function toE164Phone(
 
 
     if (!digits) {
-
         return "";
-
     }
 
 
-    return `${country.dialCode}${digits}`;
+    return (
+        `${country.dialCode}${digits}`
+    );
 
 }
 
@@ -324,14 +350,19 @@ export function toE164Phone(
 ===================================== */
 
 export function validatePhone(
-    phone,
-    countryCode
+    phone = "",
+    countryCode = DEFAULT_PHONE_COUNTRY
 ) {
 
     const country =
         getPhoneCountry(
             countryCode
         );
+
+
+    if (!country) {
+        return false;
+    }
 
 
     const digits =
