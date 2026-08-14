@@ -1,3 +1,7 @@
+import {
+    createWorkspaceSectionModel,
+} from "../models/WorkspaceSectionModel";
+
 
 /* =========================================
    PHONE
@@ -35,7 +39,22 @@ export const PHONE_COUNTRIES = [
 
 
 /* =========================================
-   PROFILE TYPES
+   PROFILE MODES
+========================================= */
+
+export const PROFILE_MODES = {
+
+    PERSONAL:
+        "PERSONAL",
+
+    ORG:
+        "ORG",
+
+};
+
+
+/* =========================================
+   PROFILE TABS
 ========================================= */
 
 export const PROFILE_TABS = [
@@ -59,10 +78,259 @@ export const PROFILE_TABS = [
 
 
 /* =========================================
-   PERSONAL PROFILE
+   PERSONAL SECTIONS
 ========================================= */
 
+export const PERSONAL_SECTIONS = [
 
+    createWorkspaceSectionModel({
+
+        id: "identity",
+
+        title: "Identity",
+
+        view: "form",
+
+        fields: [
+
+            {
+                name: "username",
+
+                label: "Name",
+
+                type: "text",
+
+                helperText:
+                    "This is how people know you in Community One.",
+            },
+
+            {
+                name: "email",
+
+                label: "Email",
+
+                type: "email",
+
+                readOnly: true,
+            },
+
+        ],
+
+    }),
+
+
+    createWorkspaceSectionModel({
+
+        id: "location",
+
+        title: "Location",
+
+        view: "form",
+
+        fields: [
+
+            {
+                name: "homeLocation",
+
+                label: "Home Address",
+
+                type: "location",
+            },
+
+        ],
+
+    }),
+
+
+    createWorkspaceSectionModel({
+
+        id: "contact",
+
+        title: "Contact",
+
+        view: "form",
+
+        fields: [
+
+            {
+                name: "phoneDisplay",
+
+                label: "Phone Number",
+
+                type: "phone",
+            },
+
+        ],
+
+    }),
+
+];
+
+
+/* =========================================
+   ENTITY SECTIONS
+========================================= */
+
+export const ENTITY_SECTIONS = [
+
+    createWorkspaceSectionModel({
+
+        id: "entity",
+
+        title: "Entity",
+
+        view: "form",
+
+        fields: [
+
+            {
+                name: "entity.name",
+
+                label: "Entity Name",
+
+                type: "text",
+            },
+
+            {
+                name: "entity.website",
+
+                label: "Website",
+
+                type: "text",
+            },
+
+        ],
+
+    }),
+
+
+    createWorkspaceSectionModel({
+
+        id: "entity-address",
+
+        title: "Address",
+
+        view: "form",
+
+        fields: [
+
+            {
+                name: "entity.streetAddress",
+
+                label: "Street Address",
+
+                type: "text",
+            },
+
+            {
+                name: "entity.suburb",
+
+                label: "Suburb",
+
+                type: "text",
+            },
+
+            {
+                name: "entity.postcode",
+
+                label: "Postcode",
+
+                type: "text",
+            },
+
+        ],
+
+    }),
+
+
+    createWorkspaceSectionModel({
+
+        id: "entity-contact",
+
+        title: "Contact",
+
+        view: "form",
+
+        fields: [
+
+            {
+                name: "entity.phone",
+
+                label: "Phone",
+
+                type: "text",
+            },
+
+            {
+                name: "entity.email",
+
+                label: "Email",
+
+                type: "email",
+
+                readOnly: true,
+            },
+
+        ],
+
+    }),
+
+];
+
+
+/* =========================================
+   COMMON SECTIONS
+========================================= */
+
+export const COMMON_SECTIONS = [
+
+    createWorkspaceSectionModel({
+
+        id: "social",
+
+        title: "Social",
+
+        view: "social",
+
+        fields: [],
+
+    }),
+
+
+    createWorkspaceSectionModel({
+
+        id: "payment",
+
+        title: "Payment",
+
+        view: "form",
+
+        fields: [],
+
+    }),
+
+];
+
+
+/* =========================================
+   COMMUNITY POLICIES
+========================================= */
+
+export const COMMUNITY_POLICY_SECTIONS = [
+
+    createWorkspaceSectionModel({
+
+        id: "community-policies",
+
+        title: "Community Policies",
+
+        view: "form",
+
+        fields: [],
+
+    }),
+
+];
 
 
 /* =========================================
@@ -86,32 +354,17 @@ export const PROFILE_CARD_TITLES = {
     payment:
         "Payment Method",
 
-    organisation:
-        "Organisation",
+    entity:
+        "Entity",
 
-    "organisation-address":
-        "Organisation Address",
+    "entity-address":
+        "Entity Address",
 
-    "organisation-contact":
-        "Organisation Contact",
+    "entity-contact":
+        "Entity Contact",
 
     "community-policies":
         "Community Policies",
-
-};
-
-
-/* =========================================
-   PROFILE MODES
-========================================= */
-
-export const PROFILE_MODES = {
-
-    PERSONAL:
-        "PERSONAL",
-
-    ORG:
-        "ORG",
 
 };
 
@@ -137,14 +390,14 @@ export const PROFILE_SECTIONS = {
     PAYMENT:
         "payment",
 
-    ORGANISATION:
-        "organisation",
+    ENTITY:
+        "entity",
 
-    ORGANISATION_ADDRESS:
-        "organisation-address",
+    ENTITY_ADDRESS:
+        "entity-address",
 
-    ORGANISATION_CONTACT:
-        "organisation-contact",
+    ENTITY_CONTACT:
+        "entity-contact",
 
     COMMUNITY_POLICIES:
         "community-policies",
