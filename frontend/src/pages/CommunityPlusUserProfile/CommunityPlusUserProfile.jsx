@@ -19,9 +19,10 @@ import IdentityWorkspace
     from "../../engines/IdentityWorkspace/IdentityWorkspace";
 
 import {
-    IDENTITY_SECTIONS,
+    PERSONAL_SECTIONS,
     ENTITY_SECTIONS,
-} from "../../engines/Identity/identitySections";
+    COMMON_SECTIONS,
+} from "./profileConstants";
 
 import {
     getInitialProfileValues,
@@ -111,20 +112,40 @@ const [editing, setEditing] =
        FORM
     ===================================== */
 
-    const initialValues = useMemo(
+const sections = useMemo(() => {
 
-        () =>
-            getInitialProfileValues(
-                profile,
-                user
-            ),
+    const isEntity =
+        values.capabilities?.entity;
 
-        [
-            profile,
-            user,
-        ]
 
-    );
+    if (isEntity) {
+
+        return [
+
+            ...PERSONAL_SECTIONS.slice(0, 1),
+
+            ...ENTITY_SECTIONS,
+
+            ...COMMON_SECTIONS,
+
+        ];
+
+    }
+
+
+    return [
+
+        ...PERSONAL_SECTIONS,
+
+        ...COMMON_SECTIONS,
+
+    ];
+
+}, [
+
+    values.capabilities,
+
+]);
 
 
     const form = useForm({
