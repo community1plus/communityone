@@ -112,6 +112,38 @@ const [editing, setEditing] =
        FORM
     ===================================== */
 
+    const initialValues = useMemo(
+
+        () =>
+            getInitialProfileValues(
+                profile,
+                user
+            ),
+
+        [
+            profile,
+            user,
+        ]
+
+    );
+
+
+    const form = useForm({
+
+        initialValues,
+
+    });
+
+
+    const {
+        values,
+    } = form;
+
+
+    /* =====================================
+       SECTIONS
+    ===================================== */
+
 const sections = useMemo(() => {
 
     const isEntity =
@@ -146,55 +178,6 @@ const sections = useMemo(() => {
     values.capabilities,
 
 ]);
-
-
-    const form = useForm({
-
-        initialValues,
-
-    });
-
-
-    const {
-        values,
-    } = form;
-
-
-    /* =====================================
-       SECTIONS
-    ===================================== */
-
-    const sections = useMemo(() => {
-
-        const items = [
-            ...IDENTITY_SECTIONS,
-        ];
-
-
-        if (
-            values.capabilities?.organisation
-        ) {
-
-            items.splice(
-
-                3,
-
-                0,
-
-                ...ENTITY_SECTIONS
-
-            );
-
-        }
-
-
-        return items;
-
-    }, [
-
-        values.capabilities,
-
-    ]);
 
 
     /* =====================================
