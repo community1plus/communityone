@@ -22,7 +22,7 @@ import {
     PERSONAL_SECTIONS,
     ENTITY_SECTIONS,
     COMMON_SECTIONS,
-} from "./profileConstants";
+} from "../../framework/Workspace/profile/profileConstants";
 
 import {
     getInitialProfileValues,
