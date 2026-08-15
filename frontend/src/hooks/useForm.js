@@ -1,14 +1,6 @@
 import {
-    Pencil,
-    Eraser,
-    RotateCcw,
-    Save,
-} from "lucide-react";
-
-import {
     useState,
     useEffect,
-    useCallback
 } from "react";
 
 
@@ -85,114 +77,6 @@ function setIn(
 
 
 /* =========================
-   REMOVE VALUE
-========================= */
-
-function deleteIn(
-    obj,
-    path
-) {
-
-    const keys =
-        path.split(".");
-
-
-    const next = {
-        ...obj,
-    };
-
-
-    let curr =
-        next;
-
-
-    keys.forEach(
-        (key, index) => {
-
-            if (
-                index ===
-                keys.length - 1
-            ) {
-
-                delete curr[key];
-
-                return;
-
-            }
-
-
-            if (
-                !curr[key] ||
-                typeof curr[key] !== "object"
-            ) {
-
-                return;
-
-            }
-
-
-            curr[key] = {
-
-                ...curr[key],
-
-            };
-
-
-            curr =
-                curr[key];
-
-        }
-    );
-
-
-    return next;
-
-}
-
-
-/* =========================
-   CLEAR VALUE
-========================= */
-
-function clearValue(
-    value
-) {
-
-    if (
-        typeof value ===
-        "boolean"
-    ) {
-
-        return false;
-
-    }
-
-
-    if (
-        Array.isArray(value)
-    ) {
-
-        return [];
-
-    }
-
-
-    if (
-        value &&
-        typeof value === "object"
-    ) {
-
-        return {};
-
-    }
-
-
-    return "";
-
-}
-
-
-/* =========================
    HOOK
 ========================= */
 
@@ -210,17 +94,6 @@ export default function useForm({
     );
 
 
-    useEffect(() => {
-
-        setValues(
-            initialValues
-        );
-
-    }, [
-        initialValues,
-    ]);
-
-
     const [
         errors,
         setErrors,
@@ -231,6 +104,25 @@ export default function useForm({
         touched,
         setTouchedState,
     ] = useState({});
+
+
+    /* =========================
+       SYNC INITIAL VALUES
+    ========================= */
+
+    useEffect(() => {
+
+        setValues(
+            initialValues
+        );
+
+        setErrors({});
+
+        setTouchedState({});
+
+    }, [
+        initialValues,
+    ]);
 
 
     /* =========================
@@ -246,9 +138,9 @@ export default function useForm({
     ) => {
 
         setValues(
-            prev =>
+            previous =>
                 setIn(
-                    prev,
+                    previous,
                     path,
                     value
                 )
@@ -286,9 +178,11 @@ export default function useForm({
     const isTouched = (
         path
     ) =>
-        !!getIn(
-            touched,
-            path
+        Boolean(
+            getIn(
+                touched,
+                path
+            )
         );
 
 
@@ -304,12 +198,12 @@ export default function useForm({
     ========================= */
 
     const handleChange =
-        (path) => (e) => {
+        (path) => (event) => {
 
             const value =
-                e?.target
-                    ? e.target.value
-                    : e;
+                event?.target
+                    ? event.target.value
+                    : event;
 
 
             setValue(
@@ -328,9 +222,9 @@ export default function useForm({
         (path) => () => {
 
             setTouchedState(
-                prev =>
+                previous =>
                     setIn(
-                        prev,
+                        previous,
                         path,
                         true
                     )
@@ -354,78 +248,6 @@ export default function useForm({
         setTouchedState({});
 
     };
-
-
-    /* =========================
-       RESET SECTION
-    ========================= */
-
-const resetSection =
-    useCallback(
-
-        (sectionId) => {
-
-            form.reset();
-
-            setEditingSections(
-                previous => ({
-                    ...previous,
-                    [sectionId]: false,
-                })
-            );
-
-        },
-
-        [form]
-
-    );
-
-
-    /* =========================
-       CLEAR SECTION
-    ========================= */
-
-const clearSection =
-    useCallback(
-
-        (sectionId) => {
-
-            const section =
-                sections.find(
-                    item =>
-                        item.id === sectionId
-                );
-
-            if (!section) {
-                return;
-            }
-
-            section.fields?.forEach(
-                field => {
-
-                    form.setValue(
-                        field.name,
-                        ""
-                    );
-
-                }
-            );
-
-        },
-
-        [
-            sections,
-            form,
-        ]
-
-    );
-
-
-    /* =========================
-       STORAGE
-    ========================= */
-
-    const clearStorage = () => {};
 
 
     /* =========================
@@ -462,12 +284,6 @@ const clearSection =
 
 
         reset,
-
-        resetSection,
-
-        clearSection,
-
-        clearStorage,
 
     };
 
