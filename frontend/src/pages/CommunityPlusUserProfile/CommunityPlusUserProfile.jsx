@@ -1,13 +1,12 @@
 import { useNavigate } from "react-router-dom";
 
 import {
+    useCallback,
     useState,
     useEffect,
     useMemo,
-    useCallback,
 } from "react";
 
-//
 
 import { useAuth } from "../../context/AuthContext";
 import { useProfile } from "../../context/ProfileContext";
