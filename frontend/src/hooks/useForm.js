@@ -1,4 +1,11 @@
 import {
+    Pencil,
+    Eraser,
+    RotateCcw,
+    Save,
+} from "lucide-react";
+
+import {
     useState,
     useEffect,
 } from "react";
@@ -352,284 +359,65 @@ export default function useForm({
        RESET SECTION
     ========================= */
 
-    const resetSection = (
-        fields = []
-    ) => {
+const resetSection =
+    useCallback(
 
-        if (
-            !Array.isArray(fields) ||
-            fields.length === 0
-        ) {
+        (sectionId) => {
 
-            return;
+            form.reset();
 
-        }
+            setEditingSections(
+                previous => ({
+                    ...previous,
+                    [sectionId]: false,
+                })
+            );
 
+        },
 
-        setValues(
-            prev => {
+        [form]
 
-                let next = {
-                    ...prev,
-                };
-
-
-                fields.forEach(
-                    field => {
-
-                        if (
-                            !field?.name
-                        ) {
-
-                            return;
-
-                        }
-
-
-                        const original =
-                            getIn(
-                                initialValues,
-                                field.name
-                            );
-
-
-                        next =
-                            setIn(
-                                next,
-                                field.name,
-                                original
-                            );
-
-                    }
-                );
-
-
-                return next;
-
-            }
-        );
-
-
-        /*
-           Clear validation/touched
-           state for this section.
-        */
-
-        setTouchedState(
-            prev => {
-
-                let next = {
-                    ...prev,
-                };
-
-
-                fields.forEach(
-                    field => {
-
-                        if (
-                            !field?.name
-                        ) {
-
-                            return;
-
-                        }
-
-
-                        next =
-                            deleteIn(
-                                next,
-                                field.name
-                            );
-
-                    }
-                );
-
-
-                return next;
-
-            }
-        );
-
-
-        setErrors(
-            prev => {
-
-                let next = {
-                    ...prev,
-                };
-
-
-                fields.forEach(
-                    field => {
-
-                        if (
-                            !field?.name
-                        ) {
-
-                            return;
-
-                        }
-
-
-                        next =
-                            deleteIn(
-                                next,
-                                field.name
-                            );
-
-                    }
-                );
-
-
-                return next;
-
-            }
-        );
-
-    };
+    );
 
 
     /* =========================
        CLEAR SECTION
     ========================= */
 
-    const clearSection = (
-        fields = []
-    ) => {
+const clearSection =
+    useCallback(
 
-        if (
-            !Array.isArray(fields) ||
-            fields.length === 0
-        ) {
+        (sectionId) => {
 
-            return;
-
-        }
-
-
-        setValues(
-            prev => {
-
-                let next = {
-                    ...prev,
-                };
-
-
-                fields.forEach(
-                    field => {
-
-                        if (
-                            !field?.name
-                        ) {
-
-                            return;
-
-                        }
-
-
-                        const current =
-                            getIn(
-                                next,
-                                field.name
-                            );
-
-
-                        next =
-                            setIn(
-                                next,
-                                field.name,
-                                clearValue(
-                                    current
-                                )
-                            );
-
-                    }
+            const section =
+                sections.find(
+                    item =>
+                        item.id === sectionId
                 );
 
-
-                return next;
-
+            if (!section) {
+                return;
             }
-        );
 
+            section.fields?.forEach(
+                field => {
 
-        /*
-           Clear validation state
-           after clearing fields.
-        */
+                    form.setValue(
+                        field.name,
+                        ""
+                    );
 
-        setTouchedState(
-            prev => {
+                }
+            );
 
-                let next = {
-                    ...prev,
-                };
+        },
 
+        [
+            sections,
+            form,
+        ]
 
-                fields.forEach(
-                    field => {
-
-                        if (
-                            !field?.name
-                        ) {
-
-                            return;
-
-                        }
-
-
-                        next =
-                            deleteIn(
-                                next,
-                                field.name
-                            );
-
-                    }
-                );
-
-
-                return next;
-
-            }
-        );
-
-
-        setErrors(
-            prev => {
-
-                let next = {
-                    ...prev,
-                };
-
-
-                fields.forEach(
-                    field => {
-
-                        if (
-                            !field?.name
-                        ) {
-
-                            return;
-
-                        }
-
-
-                        next =
-                            deleteIn(
-                                next,
-                                field.name
-                            );
-
-                    }
-                );
-
-
-                return next;
-
-            }
-        );
-
-    };
+    );
 
 
     /* =========================

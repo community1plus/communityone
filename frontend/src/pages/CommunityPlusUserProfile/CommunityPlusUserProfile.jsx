@@ -352,55 +352,23 @@ export default function CommunityPlusUserProfile({
        BEGIN SECTION EDIT
     ===================================== */
 
-    const beginSectionEdit =
-        useCallback(
+const beginSectionEdit =
+    useCallback(
 
-            (sectionId) => {
+        (sectionId) => {
 
-                const section =
-                    sections.find(
-                        item =>
-                            item.id === sectionId
-                    );
+            setEditingSections(
+                previous => ({
+                    ...previous,
+                    [sectionId]: true,
+                })
+            );
 
+        },
 
-                if (!section) {
-                    return;
-                }
+        []
 
-
-                const snapshot =
-                    getSectionValues(
-                        section
-                    );
-
-
-                setSavedSectionValues(
-                    previous => ({
-
-                        ...previous,
-
-                        [sectionId]:
-                            snapshot,
-
-                    })
-                );
-
-
-                setSectionEditing(
-                    sectionId,
-                    true
-                );
-
-            },
-
-            [
-                sections,
-                getSectionValues,
-                setSectionEditing,
-            ]
-
-        );
+    );
 
 
     /* =====================================
@@ -505,133 +473,86 @@ export default function CommunityPlusUserProfile({
        SAVE SECTION
     ===================================== */
 
-    const handleSaveSection =
-        useCallback(
+const handleSaveSection =
+    useCallback(
 
-            async (sectionId) => {
+        async (sectionId) => {
 
-                const section =
-                    sections.find(
-                        item =>
-                            item.id === sectionId
-                    );
+            try {
+
+                setSavingProfile(true);
 
 
-                if (!section) {
-                    return;
-                }
+                const payload =
+                    buildProfilePayload({
 
+                        values,
 
-                try {
+                        userEmail:
+                            user?.email,
 
-                    setSavingProfile(true);
-
-
-                    const payload =
-                        buildProfilePayload({
-
-                            values,
-
-                            userEmail:
-                                user?.email,
-
-                            homeLocation:
-                                values.homeLocation,
-
-                        });
-
-
-                    await patchProfile(
-                        payload
-                    );
-
-
-                    /*
-                       Capture the values that
-                       were successfully saved.
-                    */
-
-                    const snapshot =
-                        getSectionValues(
-                            section
-                        );
-
-
-                    setSavedSectionValues(
-                        previous => ({
-
-                            ...previous,
-
-                            [sectionId]:
-                                snapshot,
-
-                        })
-                    );
-
-
-                    /*
-                       Leave section edit mode.
-                    */
-
-                    setSectionEditing(
-
-                        sectionId,
-
-                        false
-
-                    );
-
-
-                    await loadProfile({
-
-                        background:
-                            false,
+                        homeLocation:
+                            values.homeLocation,
 
                     });
 
 
-                    onComplete?.();
+                await patchProfile(
+                    payload
+                );
 
 
-                } catch (err) {
+                await loadProfile({
 
-                    console.error(
+                    background:
+                        false,
 
-                        "Section save failed:",
+                });
 
-                        err
 
-                    );
+                /*
+                 * Save successful.
+                 * Leave edit mode for this section.
+                 */
+                setEditingSections(
+                    previous => ({
+                        ...previous,
+                        [sectionId]: false,
+                    })
+                );
 
-                } finally {
 
-                    setSavingProfile(false);
+                onComplete?.();
 
-                }
 
-            },
+            } catch (err) {
 
-            [
+                console.error(
+                    "Profile save failed:",
+                    err
+                );
 
-                sections,
+            } finally {
 
-                values,
+                setSavingProfile(false);
 
-                user,
+            }
 
-                patchProfile,
+        },
 
-                getSectionValues,
+        [
 
-                setSectionEditing,
+            user,
 
-                loadProfile,
+            patchProfile,
 
-                onComplete,
+            loadProfile,
 
-            ]
+            onComplete,
 
-        );
+        ]
+
+    );
 
 
     /* =====================================

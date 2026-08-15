@@ -22,7 +22,7 @@
     "aws-amplify": "^6.16.3",
     "axios": "^1.16.1",
     "express-session": "^1.19.0",
-    "lucide-react": "^1.16.0",
+    "lucide-react": "^1.31.0",
     "pkce-challenge": "^6.0.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -32,7 +32,7 @@
   "devDependencies": {
     "@eslint/js": "^9.39.4",
     "@types/react": "^18.3.12",
-"@types/react-dom": "^18.3.1",
+    "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^6.0.1",
     "eslint": "^9.39.4",
     "eslint-plugin-react-hooks": "^7.0.1",

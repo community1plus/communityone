@@ -1,3 +1,4 @@
+import "IdentityWorkspace.scss";
 import CapabilityRenderer
     from "../../components/Capability/CapabilityRenderer";
 
@@ -288,90 +289,88 @@ export default function IdentityWorkspace({
                                 </div>
 
 
-                                <div className="workspace-section-actions">
+<div className="workspace-section-actions">
+
+    {!editing ? (
+
+        <button
+            type="button"
+            onClick={handleEdit}
+            className="workspace-action-button"
+        >
+
+            <Pencil
+                size={16}
+                strokeWidth={2}
+            />
+
+            <span>Edit</span>
+
+        </button>
+
+    ) : (
+
+        <>
+
+            <button
+                type="button"
+                onClick={handleClear}
+                className="workspace-action-button"
+            >
+
+                <Eraser
+                    size={16}
+                    strokeWidth={2}
+                />
+
+                <span>Clear</span>
+
+            </button>
 
 
-                                    {!editing ? (
+            <button
+                type="button"
+                onClick={handleReset}
+                className="workspace-action-button"
+            >
 
-                                        <button
+                <RotateCcw
+                    size={16}
+                    strokeWidth={2}
+                />
 
-                                            type="button"
+                <span>Reset</span>
 
-                                            onClick={
-                                                handleEdit
-                                            }
-
-                                        >
-
-                                            Edit
-
-                                        </button>
-
-                                    ) : (
-
-                                        <>
+            </button>
 
 
-                                            <button
+            <button
+                type="button"
+                onClick={handleSave}
+                disabled={savingProfile}
+                className="workspace-action-button workspace-action-primary"
+            >
 
-                                                type="button"
+                <Save
+                    size={16}
+                    strokeWidth={2}
+                />
 
-                                                onClick={
-                                                    handleClear
-                                                }
+                <span>
+                    {
+                        savingProfile
+                            ? "Saving..."
+                            : "Save"
+                    }
+                </span>
 
-                                            >
+            </button>
 
-                                                Clear
+        </>
 
-                                            </button>
+    )}
 
-
-                                            <button
-
-                                                type="button"
-
-                                                onClick={
-                                                    handleReset
-                                                }
-
-                                            >
-
-                                                Reset
-
-                                            </button>
-
-
-                                            <button
-
-                                                type="button"
-
-                                                onClick={
-                                                    handleSave
-                                                }
-
-                                                disabled={
-                                                    savingProfile
-                                                }
-
-                                            >
-
-                                                {
-                                                    savingProfile
-
-                                                        ? "Saving..."
-
-                                                        : "Save"
-                                                }
-
-                                            </button>
-
-
-                                        </>
-
-                                    )}
-
-                                </div>
+</div>
 
 
                             </div>
