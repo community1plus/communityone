@@ -10,6 +10,13 @@ import {
 } from "../../framework/Workspace/builders/buildCapabilityWorkspace";
 
 import {
+    Pencil,
+    Eraser,
+    RotateCcw,
+    Save,
+} from "lucide-react";
+
+import {
     WorkspaceShell,
     WorkspaceMain,
     WorkspaceContent,
