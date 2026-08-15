@@ -51,7 +51,9 @@ export default function IdentityWorkspace({
 
         form,
 
-        editing,
+        editingSections,
+
+        savingProfile,
 
     } = state;
 
@@ -83,17 +85,108 @@ export default function IdentityWorkspace({
        CURRENT SECTION
     ===================================== */
 
-const {
-    section,
-} = runtime ?? {};
+    const {
+        section,
+    } = runtime ?? {};
 
-console.log(
-    "WORKSPACE RUNTIME",
-    {
-        section: runtime.sectionId,
-        valid: runtime.valid,
-    }
-);
+
+    const sectionId =
+        section?.id;
+
+
+    const editing =
+        sectionId
+            ? Boolean(
+                editingSections?.[sectionId]
+            )
+            : false;
+
+
+    /* =====================================
+       SECTION ACTIONS
+    ===================================== */
+
+    const handleEdit =
+        () => {
+
+            if (!sectionId) {
+                return;
+            }
+
+
+            actions.beginSectionEdit(
+                sectionId
+            );
+
+        };
+
+
+    const handleClear =
+        () => {
+
+            if (!sectionId) {
+                return;
+            }
+
+
+            actions.clearSection(
+                sectionId
+            );
+
+        };
+
+
+    const handleReset =
+        () => {
+
+            if (!sectionId) {
+                return;
+            }
+
+
+            actions.resetSection(
+                sectionId
+            );
+
+        };
+
+
+    const handleSave =
+        () => {
+
+            if (!sectionId) {
+                return;
+            }
+
+
+            actions.handleSaveSection(
+                sectionId
+            );
+
+        };
+
+
+    /* =====================================
+       DEBUG
+    ===================================== */
+
+    console.log(
+
+        "WORKSPACE RUNTIME",
+
+        {
+
+            sectionId,
+
+            section,
+
+            editing,
+
+        }
+
+    );
+
+
     /* =====================================
        RENDER
     ===================================== */
@@ -101,6 +194,11 @@ console.log(
     return (
 
         <WorkspaceShell>
+
+
+            {/* =================================
+               CLOSE
+            ================================= */}
 
             <WorkspaceClose
 
@@ -124,20 +222,24 @@ console.log(
 
                         <WorkspaceBanner
 
-                            model={banner}
+                            model={
+                                banner
+                            }
 
                         >
 
                             <IdentityCapabilitySelector
 
-                                values={values}
+                                values={
+                                    values
+                                }
 
                                 setValue={
                                     form.setValue
                                 }
 
                                 readOnly={
-                                    !editing
+                                    false
                                 }
 
                             />
@@ -153,7 +255,9 @@ console.log(
 
                     <WorkspaceNavigation
 
-                        model={navigation}
+                        model={
+                            navigation
+                        }
 
                     />
 
@@ -164,15 +268,137 @@ console.log(
 
                     <WorkspaceBody>
 
-                        <CapabilityRenderer
+                        <div className="workspace-section">
 
-                            section={section}
 
-                            form={form}
+                            {/* ======================
+                               SECTION HEADER
+                            ====================== */}
 
-                            editing={editing}
+                            <div className="workspace-section-header">
 
-                        />
+
+                                <div className="workspace-section-title">
+
+                                    {
+                                        section?.title
+                                        ?? ""
+                                    }
+
+                                </div>
+
+
+                                <div className="workspace-section-actions">
+
+
+                                    {!editing ? (
+
+                                        <button
+
+                                            type="button"
+
+                                            onClick={
+                                                handleEdit
+                                            }
+
+                                        >
+
+                                            Edit
+
+                                        </button>
+
+                                    ) : (
+
+                                        <>
+
+
+                                            <button
+
+                                                type="button"
+
+                                                onClick={
+                                                    handleClear
+                                                }
+
+                                            >
+
+                                                Clear
+
+                                            </button>
+
+
+                                            <button
+
+                                                type="button"
+
+                                                onClick={
+                                                    handleReset
+                                                }
+
+                                            >
+
+                                                Reset
+
+                                            </button>
+
+
+                                            <button
+
+                                                type="button"
+
+                                                onClick={
+                                                    handleSave
+                                                }
+
+                                                disabled={
+                                                    savingProfile
+                                                }
+
+                                            >
+
+                                                {
+                                                    savingProfile
+
+                                                        ? "Saving..."
+
+                                                        : "Save"
+                                                }
+
+                                            </button>
+
+
+                                        </>
+
+                                    )}
+
+                                </div>
+
+
+                            </div>
+
+
+                            {/* ======================
+                               SECTION CONTENT
+                            ====================== */}
+
+                            <CapabilityRenderer
+
+                                section={
+                                    section
+                                }
+
+                                form={
+                                    form
+                                }
+
+                                editing={
+                                    editing
+                                }
+
+                            />
+
+
+                        </div>
 
                     </WorkspaceBody>
 
@@ -183,9 +409,9 @@ console.log(
             </WorkspaceMain>
 
 
-            {/* ==============================
+            {/* =================================
                GUIDE
-            ============================== */}
+            ================================= */}
 
             <WorkspaceSidebar>
 
@@ -194,6 +420,7 @@ console.log(
                     title="Identity Guide"
 
                 >
+
 
                     <WorkspacePanel
 
@@ -212,10 +439,16 @@ console.log(
 
                     >
 
-                        {banner
-                            ?.right
-                            ?.metric
-                            ?.value ?? 0}%
+                        {
+
+                            banner
+                                ?.right
+                                ?.metric
+                                ?.value
+
+                            ?? 0
+
+                        }%
 
                     </WorkspacePanel>
 
@@ -226,9 +459,16 @@ console.log(
 
                     >
 
-                        {section?.title ?? ""}
+                        {
+
+                            section?.title
+
+                            ?? ""
+
+                        }
 
                     </WorkspacePanel>
+
 
                 </WorkspaceGuide>
 

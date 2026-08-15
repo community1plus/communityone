@@ -55,12 +55,15 @@ export default function CommunityPlusUserProfile({
        CONTEXT
     ===================================== */
 
-    const { user } = useAuth();
+    const { user } =
+        useAuth();
+
 
     const {
         profile,
         loadProfile,
     } = useProfile();
+
 
     const {
         patchProfile,
@@ -71,36 +74,54 @@ export default function CommunityPlusUserProfile({
        LOCAL STATE
     ===================================== */
 
-    const [savingProfile, setSavingProfile] =
-        useState(false);
+    const [
+        savingProfile,
+        setSavingProfile,
+    ] = useState(false);
 
 
-const [editing, setEditing] =
-    useState(
-        editMode || !profile?.id
-    );
+    const [
+        editingSections,
+        setEditingSections,
+    ] = useState({});
 
 
-    const [currentSection, setCurrentSection] =
-        useState(() => {
+    const [
+        savedSectionValues,
+        setSavedSectionValues,
+    ] = useState({});
 
-            const saved =
-                sessionStorage.getItem(
-                    "profileCurrentSection"
-                );
 
-            return saved
-                ? Number(saved)
-                : 0;
+    const [
+        currentSection,
+        setCurrentSection,
+    ] = useState(() => {
 
-        });
+        const saved =
+            sessionStorage.getItem(
+                "profileCurrentSection"
+            );
 
+
+        return saved
+            ? Number(saved)
+            : 0;
+
+    });
+
+
+    /* =====================================
+       CURRENT SECTION PERSISTENCE
+    ===================================== */
 
     useEffect(() => {
 
         sessionStorage.setItem(
+
             "profileCurrentSection",
+
             currentSection
+
         );
 
     }, [
@@ -112,27 +133,29 @@ const [editing, setEditing] =
        FORM
     ===================================== */
 
-    const initialValues = useMemo(
+    const initialValues =
+        useMemo(
 
-        () =>
-            getInitialProfileValues(
+            () =>
+                getInitialProfileValues(
+                    profile,
+                    user
+                ),
+
+            [
                 profile,
-                user
-            ),
+                user,
+            ]
 
-        [
-            profile,
-            user,
-        ]
-
-    );
+        );
 
 
-    const form = useForm({
+    const form =
+        useForm({
 
-        initialValues,
+            initialValues,
 
-    });
+        });
 
 
     const {
@@ -144,40 +167,41 @@ const [editing, setEditing] =
        SECTIONS
     ===================================== */
 
-const sections = useMemo(() => {
+    const sections =
+        useMemo(() => {
 
-    const isEntity =
-        values.capabilities?.entity;
-
-
-    if (isEntity) {
-
-        return [
-
-            ...PERSONAL_SECTIONS.slice(0, 1),
-
-            ...ENTITY_SECTIONS,
-
-            ...COMMON_SECTIONS,
-
-        ];
-
-    }
+            const isEntity =
+                values.capabilities?.entity;
 
 
-    return [
+            if (isEntity) {
 
-        ...PERSONAL_SECTIONS,
+                return [
 
-        ...COMMON_SECTIONS,
+                    ...PERSONAL_SECTIONS.slice(0, 1),
 
-    ];
+                    ...ENTITY_SECTIONS,
 
-}, [
+                    ...COMMON_SECTIONS,
 
-    values.capabilities,
+                ];
 
-]);
+            }
+
+
+            return [
+
+                ...PERSONAL_SECTIONS,
+
+                ...COMMON_SECTIONS,
+
+            ];
+
+        }, [
+
+            values.capabilities?.entity,
+
+        ]);
 
 
     /* =====================================
@@ -197,50 +221,306 @@ const sections = useMemo(() => {
 
         });
 
-        console.log(
-    "PROFILE SECTION",
-    currentSection,
-    sections[currentSection]?.id
-);
 
     /* =====================================
-       PROFILE COMPLETION
+       SECTION VALUE HELPERS
     ===================================== */
 
-    const completion =
-        calculateProfileCompletion(
-            values
+    const getSectionValues =
+        useCallback(
+
+            (section) => {
+
+                if (!section) {
+                    return {};
+                }
+
+
+                const sectionValues = {};
+
+
+                section.fields?.forEach(
+                    (field) => {
+
+                        sectionValues[
+                            field.name
+                        ] =
+                            form.getValue(
+                                field.name
+                            );
+
+                    }
+                );
+
+
+                return sectionValues;
+
+            },
+
+            [
+                form,
+            ]
+
+        );
+
+
+    const applySectionValues =
+        useCallback(
+
+            (
+                section,
+                sectionValues
+            ) => {
+
+                if (!section) {
+                    return;
+                }
+
+
+                section.fields?.forEach(
+                    (field) => {
+
+                        if (
+
+                            Object.prototype
+                                .hasOwnProperty
+                                .call(
+
+                                    sectionValues,
+
+                                    field.name
+
+                                )
+
+                        ) {
+
+                            form.setValue(
+
+                                field.name,
+
+                                sectionValues[
+                                    field.name
+                                ]
+
+                            );
+
+                        }
+
+                    }
+                );
+
+            },
+
+            [
+                form,
+            ]
+
         );
 
 
     /* =====================================
-       ACTIONS
+       SECTION EDITING
     ===================================== */
 
-    const closeProfile =
-        useCallback(() => {
-
-            navigate(
-
-                "/communityplus",
-
-                {
-                    replace: true,
-                }
-
-            );
-
-        }, [
-
-            navigate,
-
-        ]);
-
-
-    const handleSaveProfile =
+    const setSectionEditing =
         useCallback(
 
-            async () => {
+            (
+                sectionId,
+                editing
+            ) => {
+
+                setEditingSections(
+                    previous => ({
+
+                        ...previous,
+
+                        [sectionId]:
+                            editing,
+
+                    })
+                );
+
+            },
+
+            []
+
+        );
+
+
+    /* =====================================
+       BEGIN SECTION EDIT
+    ===================================== */
+
+    const beginSectionEdit =
+        useCallback(
+
+            (sectionId) => {
+
+                const section =
+                    sections.find(
+                        item =>
+                            item.id === sectionId
+                    );
+
+
+                if (!section) {
+                    return;
+                }
+
+
+                const snapshot =
+                    getSectionValues(
+                        section
+                    );
+
+
+                setSavedSectionValues(
+                    previous => ({
+
+                        ...previous,
+
+                        [sectionId]:
+                            snapshot,
+
+                    })
+                );
+
+
+                setSectionEditing(
+                    sectionId,
+                    true
+                );
+
+            },
+
+            [
+                sections,
+                getSectionValues,
+                setSectionEditing,
+            ]
+
+        );
+
+
+    /* =====================================
+       CLEAR SECTION
+    ===================================== */
+
+    const clearSection =
+        useCallback(
+
+            (sectionId) => {
+
+                const section =
+                    sections.find(
+                        item =>
+                            item.id === sectionId
+                    );
+
+
+                if (!section) {
+                    return;
+                }
+
+
+                section.fields?.forEach(
+                    (field) => {
+
+                        form.setValue(
+
+                            field.name,
+
+                            field.type === "location"
+                                ? null
+                                : ""
+
+                        );
+
+                    }
+                );
+
+            },
+
+            [
+                sections,
+                form,
+            ]
+
+        );
+
+
+    /* =====================================
+       RESET SECTION
+    ===================================== */
+
+    const resetSection =
+        useCallback(
+
+            (sectionId) => {
+
+                const section =
+                    sections.find(
+                        item =>
+                            item.id === sectionId
+                    );
+
+
+                if (!section) {
+                    return;
+                }
+
+
+                const saved =
+                    savedSectionValues[
+                        sectionId
+                    ];
+
+
+                if (!saved) {
+                    return;
+                }
+
+
+                applySectionValues(
+
+                    section,
+
+                    saved
+
+                );
+
+            },
+
+            [
+                sections,
+                savedSectionValues,
+                applySectionValues,
+            ]
+
+        );
+
+
+    /* =====================================
+       SAVE SECTION
+    ===================================== */
+
+    const handleSaveSection =
+        useCallback(
+
+            async (sectionId) => {
+
+                const section =
+                    sections.find(
+                        item =>
+                            item.id === sectionId
+                    );
+
+
+                if (!section) {
+                    return;
+                }
+
 
                 try {
 
@@ -266,6 +546,42 @@ const sections = useMemo(() => {
                     );
 
 
+                    /*
+                       Capture the values that
+                       were successfully saved.
+                    */
+
+                    const snapshot =
+                        getSectionValues(
+                            section
+                        );
+
+
+                    setSavedSectionValues(
+                        previous => ({
+
+                            ...previous,
+
+                            [sectionId]:
+                                snapshot,
+
+                        })
+                    );
+
+
+                    /*
+                       Leave section edit mode.
+                    */
+
+                    setSectionEditing(
+
+                        sectionId,
+
+                        false
+
+                    );
+
+
                     await loadProfile({
 
                         background:
@@ -281,12 +597,11 @@ const sections = useMemo(() => {
 
                     console.error(
 
-                        "Profile save failed:",
+                        "Section save failed:",
 
                         err
 
                     );
-
 
                 } finally {
 
@@ -298,11 +613,17 @@ const sections = useMemo(() => {
 
             [
 
+                sections,
+
                 values,
 
                 user,
 
                 patchProfile,
+
+                getSectionValues,
+
+                setSectionEditing,
 
                 loadProfile,
 
@@ -314,28 +635,62 @@ const sections = useMemo(() => {
 
 
     /* =====================================
+       CLOSE
+    ===================================== */
+
+    const closeProfile =
+        useCallback(() => {
+
+            navigate(
+
+                "/communityplus",
+
+                {
+                    replace: true,
+                }
+
+            );
+
+        }, [
+
+            navigate,
+
+        ]);
+
+
+    /* =====================================
+       PROFILE COMPLETION
+    ===================================== */
+
+    const completion =
+        calculateProfileCompletion(
+            values
+        );
+
+
+    /* =====================================
        WORKSPACE STATE
     ===================================== */
 
-const workspaceState = {
+    const workspaceState = {
 
-    values,
+        values,
 
-    form,
+        form,
 
-    editing,
+        editingSections,
 
-    editMode,
+        editMode,
 
-    savingProfile,
+        savingProfile,
 
-    completion,
+        completion,
 
-    sections,
+        sections,
 
-    currentSection,
+        currentSection,
 
-};
+    };
 
 
     /* =====================================
@@ -347,13 +702,34 @@ const workspaceState = {
         goToSection:
             sectionController.goTo,
 
-        setEditing,
+        setSectionEditing,
 
-        handleSaveProfile,
+        beginSectionEdit,
+
+        handleSaveSection,
+
+        clearSection,
+
+        resetSection,
 
         closeProfile,
 
     };
+
+
+    /* =====================================
+       DEBUG
+    ===================================== */
+
+    console.log(
+
+        "PROFILE SECTION",
+
+        currentSection,
+
+        sections[currentSection]?.id
+
+    );
 
 
     /* =====================================
