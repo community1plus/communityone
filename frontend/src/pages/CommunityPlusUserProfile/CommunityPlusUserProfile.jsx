@@ -294,183 +294,118 @@ export default function CommunityPlusUserProfile({
        CLEAR SECTION
     ===================================== */
 
-    const clearSection =
-        useCallback(
+const clearSection =
+    useCallback(
 
-            (
-                sectionId
-            ) => {
+        (sectionId) => {
 
-                const section =
-                    sections.find(
-                        item =>
-                            item.id ===
-                            sectionId
-                    );
-
-
-                if (!section) {
-                    return;
-                }
-
-
-                section.fields?.forEach(
-                    field => {
-
-                        form.setValue(
-                            field.name,
-                            ""
-                        );
-
-                    }
+            const section =
+                sections.find(
+                    item =>
+                        item.id === sectionId
                 );
 
-            },
 
-            [
-                sections,
-                form,
-            ]
+            if (!section) {
+                return;
+            }
 
-        );
+
+            section.fields?.forEach(
+                field => {
+
+                    form.setValue(
+                        field.name,
+                        ""
+
+                    );
+
+                }
+            );
+
+        },
+
+        [
+            sections,
+            form,
+        ]
+
+    );
 
 
     /* =====================================
        RESET SECTION
     ===================================== */
 
-    const resetSection =
-        useCallback(
+const resetSection =
+    useCallback(
 
-            (
-                sectionId
-            ) => {
+        (sectionId) => {
 
-                /*
-                 * Reset the complete form to the
-                 * last loaded profile.
-                 */
-                form.reset();
+            form.reset();
 
+            setEditingSections(
+                previous => ({
 
-                setSectionEditing(
-                    sectionId,
-                    false
-                );
+                    ...previous,
 
-            },
+                    [sectionId]: false,
 
-            [
-                form,
-                setSectionEditing,
-            ]
+                })
+            );
 
-        );
+        },
+
+        [
+            form,
+        ]
+
+    );
 
 
     /* =====================================
        SAVE SECTION
     ===================================== */
 
-const handleSaveSection =
-    useCallback(
+const handleSaveSection = async (sectionId) => {
 
-        async (sectionId) => {
+    try {
 
-            if (
-                !sectionId ||
-                savingSection
-            ) {
-                return;
-            }
+        setSavingProfile(true);
 
+        await patchProfile(
+            buildProfilePayload({
+                values,
+                userEmail: user?.email,
+                homeLocation: values.homeLocation,
+            })
+        );
 
-            try {
+        await loadProfile({
+            background: false,
+        });
 
-                setSavingSection(
-                    sectionId
-                );
+        setEditingSections(
+            previous => ({
+                ...previous,
+                [sectionId]: false,
+            })
+        );
 
+    } catch (error) {
 
-                /* =========================
-                   BUILD PAYLOAD
-                ========================= */
+        console.error(
+            "Profile save failed:",
+            error
+        );
 
-                const payload =
-                    buildProfilePayload({
+    } finally {
 
-                        values,
+        setSavingProfile(false);
 
-                        userEmail:
-                            user?.email,
+    }
 
-                        homeLocation:
-                            values.homeLocation,
-
-                    });
-
-
-                /* =========================
-                   SAVE
-                ========================= */
-
-                await patchProfile(
-                    payload
-                );
-
-
-                /* =========================
-                   SAVE SUCCEEDED
-                ========================= */
-
-                setEditingSections(
-                    previous => ({
-
-                        ...previous,
-
-                        [sectionId]:
-                            false,
-
-                    })
-                );
-
-
-                /* =========================
-                   REFRESH PROFILE
-                ========================= */
-
-await loadProfile({
-    background: false,
-});
-
-
-            } catch (error) {
-
-                console.error(
-                    "Profile section save failed:",
-                    error
-                );
-
-            } finally {
-
-                setSavingSection(
-                    null
-                );
-
-            }
-
-        },
-
-        [
-            values,
-            user?.email,
-            patchProfile,
-            loadProfile,
-            savingSection,
-            onComplete,
-        ]
-
-    );
+};
 
 
     /* =====================================

@@ -9,37 +9,43 @@ import {
 ========================= */
 
 function getIn(
-    obj,
+    object,
     path
 ) {
 
     if (!path) {
-        return obj;
+        return object;
     }
+
 
     return path
         .split(".")
         .reduce(
-            (acc, key) =>
-                acc?.[key],
-            obj
+            (current, key) =>
+                current?.[key],
+            object
         );
 
 }
 
 
 function setIn(
-    obj,
+    object,
     path,
     value
 ) {
+
+    if (!path) {
+        return object;
+    }
+
 
     const keys =
         path.split(".");
 
 
     const next = {
-        ...obj,
+        ...object,
     };
 
 
@@ -64,9 +70,7 @@ function setIn(
 
 
             current[key] = {
-
                 ...(current[key] || {}),
-
             };
 
 
@@ -91,6 +95,10 @@ export default function useForm({
     initialValues = {},
 
 }) {
+
+    /* =========================
+       STATE
+    ========================= */
 
     const [
         values,
@@ -165,7 +173,8 @@ export default function useForm({
     ========================= */
 
     const handleChange =
-        (path) => (event) => {
+        (path) =>
+        (event) => {
 
             const value =
                 event?.target
@@ -186,7 +195,8 @@ export default function useForm({
     ========================= */
 
     const handleBlur =
-        (path) => () => {
+        (path) =>
+        () => {
 
             setTouched(
                 previous =>
@@ -216,6 +226,10 @@ export default function useForm({
     };
 
 
+    /* =========================
+       TOUCHED
+    ========================= */
+
     const isTouched = (
         path
     ) => {
@@ -244,6 +258,9 @@ export default function useForm({
 
     /* =========================
        RESET
+       
+       Restores the form to the
+       latest initial values.
     ========================= */
 
     const reset = () => {
@@ -261,6 +278,8 @@ export default function useForm({
 
     /* =========================
        CLEAR
+       
+       Clears the form completely.
     ========================= */
 
     const clear = () => {
@@ -280,36 +299,45 @@ export default function useForm({
 
     return {
 
+        /* Values */
+
         values,
-
-        errors,
-
-        touched,
-
 
         setValues,
 
         setValue,
 
+        getValue,
+
+
+        /* Errors */
+
+        errors,
+
         setErrors,
+
+        getError,
+
+
+        /* Touched */
+
+        touched,
 
         setTouched,
 
+        isTouched,
+
+        isFieldValid,
+
+
+        /* Events */
 
         handleChange,
 
         handleBlur,
 
 
-        getValue,
-
-        getError,
-
-
-        isTouched,
-
-        isFieldValid,
-
+        /* Actions */
 
         reset,
 
