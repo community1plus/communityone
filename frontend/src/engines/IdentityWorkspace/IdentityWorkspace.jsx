@@ -1,4 +1,4 @@
-import "IdentityWorkspace.scss";
+import "IdentityWorkspace.css";
 import CapabilityRenderer
     from "../../components/Capability/CapabilityRenderer";
 
