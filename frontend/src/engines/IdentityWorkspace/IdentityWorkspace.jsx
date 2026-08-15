@@ -1,3 +1,9 @@
+import {
+    Pencil,
+    Eraser,
+    RotateCcw,
+    Save,
+} from "lucide-react";
 
 import CapabilityRenderer
     from "../../components/Capability/CapabilityRenderer";
