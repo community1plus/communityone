@@ -7,6 +7,8 @@ import {
     useCallback,
 } from "react";
 
+//
+
 import { useAuth } from "../../context/AuthContext";
 import { useProfile } from "../../context/ProfileContext";
 
@@ -352,23 +354,55 @@ export default function CommunityPlusUserProfile({
        BEGIN SECTION EDIT
     ===================================== */
 
-const beginSectionEdit =
-    useCallback(
+    const beginSectionEdit =
+        useCallback(
 
-        (sectionId) => {
+            (sectionId) => {
 
-            setEditingSections(
-                previous => ({
-                    ...previous,
-                    [sectionId]: true,
-                })
-            );
+                const section =
+                    sections.find(
+                        item =>
+                            item.id === sectionId
+                    );
 
-        },
 
-        []
+                if (!section) {
+                    return;
+                }
 
-    );
+
+                const snapshot =
+                    getSectionValues(
+                        section
+                    );
+
+
+                setSavedSectionValues(
+                    previous => ({
+
+                        ...previous,
+
+                        [sectionId]:
+                            snapshot,
+
+                    })
+                );
+
+
+                setSectionEditing(
+                    sectionId,
+                    true
+                );
+
+            },
+
+            [
+                sections,
+                getSectionValues,
+                setSectionEditing,
+            ]
+
+        );
 
 
     /* =====================================
