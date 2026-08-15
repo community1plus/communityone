@@ -322,6 +322,10 @@ export default function CommunityPlusUserProfile({
     /* =====================================
        SECTION EDITING
     ===================================== */
+const [
+    editingSections,
+    setEditingSections,
+] = useState({});
 
     const setSectionEditing =
         useCallback(
@@ -544,10 +548,13 @@ const handleSaveSection =
 
 
                 /*
-                 * Save successful.
-                 * Leave edit mode for this section.
+                 * SAVE SUCCEEDED
+                 *
+                 * Return this section
+                 * to read-only mode.
                  */
-                setEditingSections(
+
+                setSectionEditing(
                     previous => ({
                         ...previous,
                         [sectionId]: false,
@@ -555,15 +562,13 @@ const handleSaveSection =
                 );
 
 
-                onComplete?.();
-
-
             } catch (err) {
 
                 console.error(
-                    "Profile save failed:",
+                    "Profile section save failed:",
                     err
                 );
+
 
             } finally {
 
@@ -574,15 +579,10 @@ const handleSaveSection =
         },
 
         [
-
+            values,
             user,
-
             patchProfile,
-
             loadProfile,
-
-            onComplete,
-
         ]
 
     );
