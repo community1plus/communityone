@@ -1,4 +1,4 @@
-import "./IdentityWorkspace.css";
+import ".IdentityWorkspace.css";
 import CapabilityRenderer
     from "../../components/Capability/CapabilityRenderer";
 
@@ -8,13 +8,6 @@ import IdentityCapabilitySelector
 import {
     buildCapabilityWorkspace,
 } from "../../framework/Workspace/builders/buildCapabilityWorkspace";
-
-import {
-    Pencil,
-    Eraser,
-    RotateCcw,
-    Save,
-} from "lucide-react";
 
 import {
     WorkspaceShell,

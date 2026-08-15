@@ -322,10 +322,6 @@ export default function CommunityPlusUserProfile({
     /* =====================================
        SECTION EDITING
     ===================================== */
-const [
-    editingSections,
-    setEditingSections,
-] = useState({});
 
     const setSectionEditing =
         useCallback(
