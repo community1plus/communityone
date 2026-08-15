@@ -42,13 +42,17 @@ export const PHONE_COUNTRIES = [
    PROFILE MODES
 ========================================= */
 
-export const PROFILE_MODES = {
+/* =========================================
+   IDENTITY TYPES
+========================================= */
+
+export const IDENTITY_TYPES = {
 
     PERSONAL:
         "PERSONAL",
 
-    ORG:
-        "ORG",
+    ENTITY:
+        "ENTITY",
 
 };
 

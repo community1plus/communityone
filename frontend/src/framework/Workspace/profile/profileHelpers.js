@@ -1,6 +1,7 @@
 import {
     DEFAULT_PHONE_COUNTRY,
     PHONE_COUNTRIES,
+    IDENTITY_TYPES,
 } from "./profileConstants";
 
 
@@ -8,7 +9,7 @@ import {
    PROFILE COMPLETION
 ===================================== */
 
-export function calculateProfileCompletion(values) {
+export function calculateProfileCompletion(values = {}) {
 
     const socialVerified =
         Object.values(
@@ -38,9 +39,11 @@ export function calculateProfileCompletion(values) {
         checks.filter(Boolean).length;
 
 
-    return Math.round(
-        (completed / checks.length) * 100
-    );
+    return checks.length
+        ? Math.round(
+            (completed / checks.length) * 100
+        )
+        : 0;
 
 }
 
@@ -50,8 +53,8 @@ export function calculateProfileCompletion(values) {
 ===================================== */
 
 export function getInitialProfileValues(
-    profile,
-    user
+    profile = {},
+    user = {}
 ) {
 
     const email =
@@ -65,23 +68,84 @@ export function getInitialProfileValues(
 
 
     /*
-       Keep ORG as the backend/profile
-       userType for now.
+       -------------------------------------
+       IDENTITY TYPE
+
+       New model:
+
+       PERSONAL
+       ENTITY
+
+       Legacy ORG is temporarily mapped to
+       ENTITY for backward compatibility.
+       -------------------------------------
     */
 
-    const userType =
-        profile?.userType || "PERSONAL";
+    const identityType =
+        profile?.identityType
+        ||
 
-
-    const isEntity =
-        userType === "ORG" ||
-        userType === "MIXED";
+        (
+            profile?.userType === "ORG"
+                ? IDENTITY_TYPES.ENTITY
+                : IDENTITY_TYPES.PERSONAL
+        );
 
 
     return {
 
         /* =====================================
+           ACTIVE IDENTITY
+        ===================================== */
+
+        activeIdentityType:
+            identityType,
+
+
+        /* =====================================
+           PERSONAL IDENTITY
+        ===================================== */
+
+        personalIdentity: {
+
+            username:
+                profile?.username ||
+                emailUsername,
+
+            email,
+
+            phoneCountry:
+                profile?.phoneCountry ||
+                DEFAULT_PHONE_COUNTRY,
+
+            phoneDisplay:
+                profile?.phoneDisplay ||
+                "",
+
+            homeLocation:
+                profile?.homeLocation ||
+                null,
+
+        },
+
+
+        /* =====================================
+           FORMAL ENTITIES
+        ===================================== */
+
+        entities:
+            profile?.entities ||
+            [],
+
+
+        /* =====================================
            IDENTITY
+           
+           Temporary compatibility fields.
+
+           These allow the existing Workspace
+           fields to continue working while
+           the profile state is migrated.
         ===================================== */
 
         username:
@@ -89,17 +153,6 @@ export function getInitialProfileValues(
             emailUsername,
 
         email,
-
-
-        capabilities: {
-
-            personal:
-                !isEntity,
-
-            entity:
-                isEntity,
-
-        },
 
 
         /* =====================================
@@ -146,6 +199,7 @@ export function getInitialProfileValues(
 
             },
 
+
             instagram: {
 
                 connected:
@@ -162,6 +216,7 @@ export function getInitialProfileValues(
 
             },
 
+
             youtube: {
 
                 connected:
@@ -177,6 +232,7 @@ export function getInitialProfileValues(
                     false,
 
             },
+
 
             x: {
 
@@ -284,7 +340,7 @@ export function getEmailDomain(
 ===================================== */
 
 export function getPhoneCountry(
-    code
+    code = DEFAULT_PHONE_COUNTRY
 ) {
 
     return (
