@@ -1,3 +1,10 @@
+import {
+    Pencil,
+    Eraser,
+    RotateCcw,
+    Save,
+} from "lucide-react";
+
 import "./IdentityWorkspace.css";
 import CapabilityRenderer
     from "../../components/Capability/CapabilityRenderer";
