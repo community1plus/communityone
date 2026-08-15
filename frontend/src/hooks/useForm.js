@@ -13,6 +13,10 @@ function getIn(
     path
 ) {
 
+    if (!path) {
+        return obj;
+    }
+
     return path
         .split(".")
         .reduce(
@@ -39,7 +43,7 @@ function setIn(
     };
 
 
-    let curr =
+    let current =
         next;
 
 
@@ -51,21 +55,23 @@ function setIn(
                 keys.length - 1
             ) {
 
-                curr[key] =
+                current[key] =
                     value;
 
-            } else {
-
-                curr[key] = {
-
-                    ...(curr[key] || {}),
-
-                };
-
-                curr =
-                    curr[key];
+                return;
 
             }
+
+
+            current[key] = {
+
+                ...(current[key] || {}),
+
+            };
+
+
+            current =
+                current[key];
 
         }
     );
@@ -102,7 +108,7 @@ export default function useForm({
 
     const [
         touched,
-        setTouchedState,
+        setTouched,
     ] = useState({});
 
 
@@ -116,10 +122,6 @@ export default function useForm({
             initialValues
         );
 
-        setErrors({});
-
-        setTouchedState({});
-
     }, [
         initialValues,
     ]);
@@ -130,11 +132,8 @@ export default function useForm({
     ========================= */
 
     const setValue = (
-
         path,
-
         value
-
     ) => {
 
         setValues(
@@ -151,46 +150,14 @@ export default function useForm({
 
     const getValue = (
         path
-    ) =>
-        getIn(
+    ) => {
+
+        return getIn(
             values,
             path
         );
 
-
-    /* =========================
-       ERRORS
-    ========================= */
-
-    const getError = (
-        path
-    ) =>
-        getIn(
-            errors,
-            path
-        );
-
-
-    /* =========================
-       TOUCHED
-    ========================= */
-
-    const isTouched = (
-        path
-    ) =>
-        Boolean(
-            getIn(
-                touched,
-                path
-            )
-        );
-
-
-    const isFieldValid = (
-        path
-    ) =>
-        isTouched(path) &&
-        !getError(path);
+    };
 
 
     /* =========================
@@ -221,7 +188,7 @@ export default function useForm({
     const handleBlur =
         (path) => () => {
 
-            setTouchedState(
+            setTouched(
                 previous =>
                     setIn(
                         previous,
@@ -234,7 +201,49 @@ export default function useForm({
 
 
     /* =========================
-       RESET WHOLE FORM
+       ERRORS
+    ========================= */
+
+    const getError = (
+        path
+    ) => {
+
+        return getIn(
+            errors,
+            path
+        );
+
+    };
+
+
+    const isTouched = (
+        path
+    ) => {
+
+        return Boolean(
+            getIn(
+                touched,
+                path
+            )
+        );
+
+    };
+
+
+    const isFieldValid = (
+        path
+    ) => {
+
+        return (
+            isTouched(path) &&
+            !getError(path)
+        );
+
+    };
+
+
+    /* =========================
+       RESET
     ========================= */
 
     const reset = () => {
@@ -245,13 +254,28 @@ export default function useForm({
 
         setErrors({});
 
-        setTouchedState({});
+        setTouched({});
 
     };
 
 
     /* =========================
-       API
+       CLEAR
+    ========================= */
+
+    const clear = () => {
+
+        setValues({});
+
+        setErrors({});
+
+        setTouched({});
+
+    };
+
+
+    /* =========================
+       RETURN
     ========================= */
 
     return {
@@ -266,6 +290,10 @@ export default function useForm({
         setValues,
 
         setValue,
+
+        setErrors,
+
+        setTouched,
 
 
         handleChange,
@@ -284,6 +312,8 @@ export default function useForm({
 
 
         reset,
+
+        clear,
 
     };
 

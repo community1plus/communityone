@@ -5,16 +5,18 @@ import {
     Save,
 } from "lucide-react";
 
-import "./IdentityWorkspace.css";
 import CapabilityRenderer
     from "../../components/Capability/CapabilityRenderer";
+
 
 import IdentityCapabilitySelector
     from "../../components/Identity/IdentityCapabilitySelector";
 
+
 import {
     buildCapabilityWorkspace,
 } from "../../framework/Workspace/builders/buildCapabilityWorkspace";
+
 
 import {
     WorkspaceShell,
@@ -33,6 +35,14 @@ import {
     WorkspaceClose,
 
 } from "../../framework/Workspace";
+
+
+import {
+    Pencil,
+    Eraser,
+    RotateCcw,
+    Save,
+} from "lucide-react";
 
 
 export default function IdentityWorkspace({
@@ -61,7 +71,7 @@ export default function IdentityWorkspace({
 
         editingSections,
 
-        savingProfile,
+        savingSection,
 
     } = state;
 
@@ -105,13 +115,20 @@ export default function IdentityWorkspace({
     const editing =
         sectionId
             ? Boolean(
-                editingSections?.[sectionId]
+                editingSections?.[
+                    sectionId
+                ]
             )
             : false;
 
 
+    const saving =
+        savingSection ===
+        sectionId;
+
+
     /* =====================================
-       SECTION ACTIONS
+       ACTIONS
     ===================================== */
 
     const handleEdit =
@@ -122,8 +139,9 @@ export default function IdentityWorkspace({
             }
 
 
-            actions.beginSectionEdit(
-                sectionId
+            actions.setSectionEditing(
+                sectionId,
+                true
             );
 
         };
@@ -160,39 +178,18 @@ export default function IdentityWorkspace({
 
 
     const handleSave =
-        () => {
+        async () => {
 
             if (!sectionId) {
                 return;
             }
 
 
-            actions.handleSaveSection(
+            await actions.handleSaveSection(
                 sectionId
             );
 
         };
-
-
-    /* =====================================
-       DEBUG
-    ===================================== */
-
-    console.log(
-
-        "WORKSPACE RUNTIME",
-
-        {
-
-            sectionId,
-
-            section,
-
-            editing,
-
-        }
-
-    );
 
 
     /* =====================================
@@ -203,17 +200,10 @@ export default function IdentityWorkspace({
 
         <WorkspaceShell>
 
-
-            {/* =================================
-               CLOSE
-            ================================= */}
-
             <WorkspaceClose
-
                 onClick={
                     actions.closeProfile
                 }
-
             />
 
 
@@ -229,11 +219,7 @@ export default function IdentityWorkspace({
                     <WorkspaceRegionHeader>
 
                         <WorkspaceBanner
-
-                            model={
-                                banner
-                            }
-
+                            model={banner}
                         >
 
                             <IdentityCapabilitySelector
@@ -271,22 +257,28 @@ export default function IdentityWorkspace({
 
 
                     {/* ==========================
-                       CURRENT SECTION
+                       SECTION
                     ========================== */}
 
                     <WorkspaceBody>
 
-                        <div className="workspace-section">
+                        <div
+                            className="
+                                workspace-section
+                            "
+                        >
 
+                            <div
+                                className="
+                                    workspace-section-header
+                                "
+                            >
 
-                            {/* ======================
-                               SECTION HEADER
-                            ====================== */}
-
-                            <div className="workspace-section-header">
-
-
-                                <div className="workspace-section-title">
+                                <div
+                                    className="
+                                        workspace-section-title
+                                    "
+                                >
 
                                     {
                                         section?.title
@@ -296,96 +288,144 @@ export default function IdentityWorkspace({
                                 </div>
 
 
-<div className="workspace-section-actions">
+                                <div
+                                    className="
+                                        workspace-section-actions
+                                    "
+                                >
 
-    {!editing ? (
+                                    {!editing ? (
 
-        <button
-            type="button"
-            onClick={handleEdit}
-            className="workspace-action-button"
-        >
+                                        <button
 
-            <Pencil
-                size={16}
-                strokeWidth={2}
-            />
+                                            type="button"
 
-            <span>Edit</span>
+                                            onClick={
+                                                handleEdit
+                                            }
 
-        </button>
+                                            className="
+                                                workspace-action
+                                                workspace-action-edit
+                                            "
 
-    ) : (
+                                        >
 
-        <>
+                                            <Pencil
+                                                size={16}
+                                            />
 
-            <button
-                type="button"
-                onClick={handleClear}
-                className="workspace-action-button"
-            >
+                                            <span>
+                                                Edit
+                                            </span>
 
-                <Eraser
-                    size={16}
-                    strokeWidth={2}
-                />
+                                        </button>
 
-                <span>Clear</span>
+                                    ) : (
 
-            </button>
+                                        <>
+
+                                            <button
+
+                                                type="button"
+
+                                                onClick={
+                                                    handleClear
+                                                }
+
+                                                className="
+                                                    workspace-action
+                                                "
+
+                                                disabled={
+                                                    saving
+                                                }
+
+                                            >
+
+                                                <Eraser
+                                                    size={16}
+                                                />
+
+                                                <span>
+                                                    Clear
+                                                </span>
+
+                                            </button>
 
 
-            <button
-                type="button"
-                onClick={handleReset}
-                className="workspace-action-button"
-            >
+                                            <button
 
-                <RotateCcw
-                    size={16}
-                    strokeWidth={2}
-                />
+                                                type="button"
 
-                <span>Reset</span>
+                                                onClick={
+                                                    handleReset
+                                                }
 
-            </button>
+                                                className="
+                                                    workspace-action
+                                                "
+
+                                                disabled={
+                                                    saving
+                                                }
+
+                                            >
+
+                                                <RotateCcw
+                                                    size={16}
+                                                />
+
+                                                <span>
+                                                    Reset
+                                                </span>
+
+                                            </button>
 
 
-            <button
-                type="button"
-                onClick={handleSave}
-                disabled={savingProfile}
-                className="workspace-action-button workspace-action-primary"
-            >
+                                            <button
 
-                <Save
-                    size={16}
-                    strokeWidth={2}
-                />
+                                                type="button"
 
-                <span>
-                    {
-                        savingProfile
-                            ? "Saving..."
-                            : "Save"
-                    }
-                </span>
+                                                onClick={
+                                                    handleSave
+                                                }
 
-            </button>
+                                                className="
+                                                    workspace-action
+                                                    workspace-action-save
+                                                "
 
-        </>
+                                                disabled={
+                                                    saving
+                                                }
 
-    )}
+                                            >
 
-</div>
+                                                <Save
+                                                    size={16}
+                                                />
 
+                                                <span>
+
+                                                    {
+                                                        saving
+                                                            ? "Saving..."
+                                                            : "Save"
+                                                    }
+
+                                                </span>
+
+                                            </button>
+
+                                        </>
+
+                                    )}
+
+                                </div>
 
                             </div>
 
-
-                            {/* ======================
-                               SECTION CONTENT
-                            ====================== */}
 
                             <CapabilityRenderer
 
@@ -403,7 +443,6 @@ export default function IdentityWorkspace({
 
                             />
 
-
                         </div>
 
                     </WorkspaceBody>
@@ -415,9 +454,9 @@ export default function IdentityWorkspace({
             </WorkspaceMain>
 
 
-            {/* =================================
+            {/* ==============================
                GUIDE
-            ================================= */}
+            ============================== */}
 
             <WorkspaceSidebar>
 
@@ -427,11 +466,8 @@ export default function IdentityWorkspace({
 
                 >
 
-
                     <WorkspacePanel
-
                         title="Welcome"
-
                     >
 
                         Manage your trusted identity.
@@ -440,41 +476,30 @@ export default function IdentityWorkspace({
 
 
                     <WorkspacePanel
-
                         title="Profile Completion"
-
                     >
 
                         {
-
                             banner
                                 ?.right
                                 ?.metric
                                 ?.value
-
                             ?? 0
-
                         }%
 
                     </WorkspacePanel>
 
 
                     <WorkspacePanel
-
                         title="Current Section"
-
                     >
 
                         {
-
                             section?.title
-
                             ?? ""
-
                         }
 
                     </WorkspacePanel>
-
 
                 </WorkspaceGuide>
 
