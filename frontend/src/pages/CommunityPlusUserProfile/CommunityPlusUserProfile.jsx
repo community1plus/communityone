@@ -227,96 +227,52 @@ export default function CommunityPlusUserProfile({
        SECTION VALUE HELPERS
     ===================================== */
 
-    const getSectionValues =
-        useCallback(
+const getSectionValues = (section) => {
 
-            (section) => {
+    if (!section) {
+        return {};
+    }
 
-                if (!section) {
-                    return {};
-                }
+    const sectionValues = {};
 
+    section.fields?.forEach((field) => {
 
-                const sectionValues = {};
+        sectionValues[field.name] =
+            form.getValue(field.name);
 
+    });
 
-                section.fields?.forEach(
-                    (field) => {
-
-                        sectionValues[
-                            field.name
-                        ] =
-                            form.getValue(
-                                field.name
-                            );
-
-                    }
-                );
+    return sectionValues;
+};
 
 
-                return sectionValues;
+const applySectionValues = (
+    section,
+    sectionValues
+) => {
 
-            },
+    if (!section) {
+        return;
+    }
 
-            [
-                form,
-            ]
+    section.fields?.forEach((field) => {
 
-        );
+        if (
+            Object.prototype.hasOwnProperty.call(
+                sectionValues,
+                field.name
+            )
+        ) {
 
+            form.setValue(
+                field.name,
+                sectionValues[field.name]
+            );
 
-    const applySectionValues =
-        useCallback(
+        }
 
-            (
-                section,
-                sectionValues
-            ) => {
-
-                if (!section) {
-                    return;
-                }
-
-
-                section.fields?.forEach(
-                    (field) => {
-
-                        if (
-
-                            Object.prototype
-                                .hasOwnProperty
-                                .call(
-
-                                    sectionValues,
-
-                                    field.name
-
-                                )
-
-                        ) {
-
-                            form.setValue(
-
-                                field.name,
-
-                                sectionValues[
-                                    field.name
-                                ]
-
-                            );
-
-                        }
-
-                    }
-                );
-
-            },
-
-            [
-                form,
-            ]
-
-        );
+    });
+};
 
 
     /* =====================================
@@ -515,7 +471,6 @@ const handleSaveSection =
 
                 setSavingProfile(true);
 
-
                 const payload =
                     buildProfilePayload({
 
@@ -529,42 +484,29 @@ const handleSaveSection =
 
                     });
 
-
                 await patchProfile(
                     payload
                 );
 
-
                 await loadProfile({
-
-                    background:
-                        false,
-
+                    background: false,
                 });
 
-
-                /*
-                 * SAVE SUCCEEDED
-                 *
-                 * Return this section
-                 * to read-only mode.
-                 */
-
-                setSectionEditing(
+                setEditingSections(
                     previous => ({
                         ...previous,
                         [sectionId]: false,
                     })
                 );
 
+                onComplete?.();
 
             } catch (err) {
 
                 console.error(
-                    "Profile section save failed:",
+                    "Profile save failed:",
                     err
                 );
-
 
             } finally {
 
@@ -579,6 +521,7 @@ const handleSaveSection =
             user,
             patchProfile,
             loadProfile,
+            onComplete,
         ]
 
     );
