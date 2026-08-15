@@ -372,112 +372,105 @@ export default function CommunityPlusUserProfile({
        SAVE SECTION
     ===================================== */
 
-    const handleSaveSection =
-        useCallback(
+const handleSaveSection =
+    useCallback(
 
-            async (
-                sectionId
-            ) => {
+        async (sectionId) => {
 
-                if (
-                    !sectionId ||
-                    savingSection
-                ) {
-
-                    return;
-
-                }
+            if (
+                !sectionId ||
+                savingSection
+            ) {
+                return;
+            }
 
 
-                try {
+            try {
 
-                    setSavingSection(
-                        sectionId
-                    );
-
-
-                    const payload =
-                        buildProfilePayload({
-
-                            values,
-
-                            userEmail:
-                                user?.email,
-
-                            homeLocation:
-                                values.homeLocation,
-
-                        });
+                setSavingSection(
+                    sectionId
+                );
 
 
-                    await patchProfile(
-                        payload
-                    );
+                /* =========================
+                   BUILD PAYLOAD
+                ========================= */
 
+                const payload =
+                    buildProfilePayload({
 
-                    /*
-                     * Reload the canonical
-                     * profile from the API.
-                     */
-                    await loadProfile({
+                        values,
 
-                        background:
-                            false,
+                        userEmail:
+                            user?.email,
+
+                        homeLocation:
+                            values.homeLocation,
 
                     });
 
 
-                    /*
-                     * THIS IS THE IMPORTANT PART.
-                     *
-                     * Only leave edit mode after
-                     * the save has succeeded.
-                     */
-                    setEditingSections(
-                        previous => ({
+                /* =========================
+                   SAVE
+                ========================= */
 
-                            ...previous,
-
-                            [sectionId]:
-                                false,
-
-                        })
-                    );
+                await patchProfile(
+                    payload
+                );
 
 
-                    onComplete?.();
+                /* =========================
+                   SAVE SUCCEEDED
+                ========================= */
+
+                setEditingSections(
+                    previous => ({
+
+                        ...previous,
+
+                        [sectionId]:
+                            false,
+
+                    })
+                );
 
 
-                } catch (error) {
+                /* =========================
+                   REFRESH PROFILE
+                ========================= */
 
-                    console.error(
+await loadProfile({
+    background: false,
+});
 
-                        "Profile section save failed:",
 
-                        error
+            } catch (error) {
 
-                    );
+                console.error(
+                    "Profile section save failed:",
+                    error
+                );
 
-                } finally {
+            } finally {
 
-                    setSavingSection(
-                        null
-                    );
+                setSavingSection(
+                    null
+                );
 
-                }
+            }
 
-            },
+        },
 
-            [
-                values,
-                user?.email,
-                patchProfile,
-                loadProfile,
-                savingSection,
-                onComplete,
-            ]
+        [
+            values,
+            user?.email,
+            patchProfile,
+            loadProfile,
+            savingSection,
+            onComplete,
+        ]
 
-        );
+    );
 
 
     /* =====================================
