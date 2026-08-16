@@ -4,7 +4,7 @@ import {
     getProfile,
     putProfile,
     patchProfile,
-} from "../../controllers/profileController.js";
+} from "../../../../backend/controllers/profileController.js";
 
 const router = express.Router();
 
