@@ -83,8 +83,8 @@ export default function CommunityPlusUserProfile({
 ===================================== */
 
 const [
-    savingProfile,
-    setSavingProfile,
+    savingSection,
+    setSavingSection,
 ] = useState(false);
 
 
@@ -383,7 +383,7 @@ const handleSaveSection =
 
             try {
 
-                setSavingProfile(true);
+                setSavingSection(true);
 
 
                 const payload =
@@ -481,7 +481,7 @@ const handleSaveSection =
 
             } finally {
 
-                setSavingProfile(false);
+                setSavingSection(false);
 
             }
 
@@ -527,25 +527,21 @@ const handleSaveSection =
        WORKSPACE STATE
     ===================================== */
 
-    const workspaceState = {
+const workspaceState = {
 
-        values,
+    values,
 
-        form,
+    form,
 
-        editMode,
+    editingSections,
 
-        completion,
+    savingSection,
 
-        sections,
+    sections,
 
-        currentSection,
+    currentSection,
 
-        editingSections,
-
-        savingSection,
-
-    };
+};
 
 
     /* =====================================
