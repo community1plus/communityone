@@ -14,7 +14,14 @@ export function isBusinessType(userType) {
 }
 
 export function getUserId(req) {
-  return req.user?.id || req.user?.sub;
+
+    return (
+        req.user?.userId ||
+        req.user?.sub ||
+        req.user?.id ||
+        null
+    );
+
 }
 
 

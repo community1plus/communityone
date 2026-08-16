@@ -171,6 +171,28 @@ export async function patchProfile(req, res) {
   JSON.stringify(req.body, null, 2)
 );
     const userId = getUserId(req);
+console.log(
+    "[PROFILE PATCH] req.user:",
+    JSON.stringify(req.user, null, 2)
+);
+
+console.log(
+    "[PROFILE PATCH] resolved userId:",
+    userId
+);
+    console.log(
+    "[PROFILE PATCH] AUTH:",
+    JSON.stringify(
+        req.user,
+        null,
+        2
+    )
+);
+
+console.log(
+    "[PROFILE PATCH] RESOLVED USER ID:",
+    userId
+);
 
  console.log("PATCH USER ID:", userId);
 
@@ -178,10 +200,24 @@ export async function patchProfile(req, res) {
       return res.status(401).json({ error: "Authentication required." });
     }
 
-    const existing = await fetchProfileByUserId(userId);
+console.log(
+    "[PROFILE PATCH] fetching profile for:",
+    userId
+);
+
+const existing =
+    await fetchProfileByUserId(userId);
+
+console.log(
+    "[PROFILE PATCH] existing profile:",
+    JSON.stringify(existing, null, 2)
+);
 
 console.log("EXISTING PROFILE:", existing);
-
+console.log(
+    "[PROFILE PATCH] EXISTING PROFILE:",
+    existing
+);
     if (!existing) {
       return res.status(404).json({ error: "Profile not found" });
     }
@@ -194,14 +230,22 @@ console.log(
   "REQ BODY PROFILE",
   JSON.stringify(req.body.profile, null, 2)
 );
-    const incoming = pickProfileFields(req.body);
+
+const incoming =
+    pickProfileFields(
+        req.body.profile || {}
+    );
+
     console.log(
   "INCOMING PROFILE",
   JSON.stringify(incoming, null, 2)
 );
     incoming.endpoint = getEndpointDetails(req, req.body.endpoint);
 
-    const organisation = pickOrganisationFields(req.body);
+const organisation =
+    pickOrganisationFields(
+        req.body.organisationProfile || {}
+    );
 
     const saved = await saveProfile({ userId, incoming });
 
