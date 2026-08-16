@@ -2,38 +2,53 @@ import express from "express";
 
 import { requireAuth } from "../../middleware/auth.js";
 
-import { getProfile, putProfile, patchProfile } from "../../controllers/profileController.js";
-const router =
-  express.Router();
+import {
+    getProfile,
+    putProfile,
+    patchProfile,
+} from "../../controllers/updateProfile.js";
 
-/* ===============================
+
+const router = express.Router();
+
+
+/* =====================================
+   PROFILE
+   Base: /api/profile
+===================================== */
+
+
+/* -------------------------------------
    GET /api/profile
-=============================== */
+------------------------------------- */
 
 router.get(
-  "/",
-  requireAuth,
-  getProfile
+    "/",
+    requireAuth,
+    getProfile
 );
 
-/* ===============================
+
+/* -------------------------------------
    PUT /api/profile
-=============================== */
+------------------------------------- */
 
 router.put(
-  "/",
-  requireAuth,
-  putProfile
+    "/",
+    requireAuth,
+    putProfile
 );
 
-/* ===============================
+
+/* -------------------------------------
    PATCH /api/profile
-=============================== */
+------------------------------------- */
 
 router.patch(
-  "/",
-  requireAuth,
-  patchProfile
+    "/",
+    requireAuth,
+    patchProfile
 );
+
 
 export default router;
