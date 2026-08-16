@@ -6,7 +6,7 @@ import {
     getProfile,
     putProfile,
     patchProfile,
-} from "../../controllers/updateProfile.js";
+} from "../../controllers/profileController.js";
 
 
 const router = express.Router();
