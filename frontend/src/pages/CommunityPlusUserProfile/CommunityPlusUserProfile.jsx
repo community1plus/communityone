@@ -78,6 +78,20 @@ export default function CommunityPlusUserProfile({
         user,
     } = useAuth();
 
+    /* =====================================
+   LOCAL STATE
+===================================== */
+
+const [
+    savingProfile,
+    setSavingProfile,
+] = useState(false);
+
+
+const [
+    editingSections,
+    setEditingSections,
+] = useState({});
 
     const {
         profile,
@@ -369,12 +383,14 @@ const resetSection =
 
 const handleSaveSection =
     useCallback(
+
         async (sectionId) => {
 
             console.log(
                 "[PROFILE SAVE] START",
                 sectionId
             );
+
 
             try {
 
@@ -383,11 +399,15 @@ const handleSaveSection =
 
                 const payload =
                     buildProfilePayload({
+
                         values,
+
                         userEmail:
                             user?.email,
+
                         homeLocation:
                             values.homeLocation,
+
                     });
 
 
@@ -401,6 +421,7 @@ const handleSaveSection =
                     "[PROFILE SAVE] PATCH START"
                 );
 
+
                 const savedProfile =
                     await patchProfile(
                         payload
@@ -408,24 +429,26 @@ const handleSaveSection =
 
 
                 console.log(
-                    "[PROFILE SAVE] PATCH RETURNED",
+                    "[PROFILE SAVE] PATCH SUCCESS",
                     savedProfile
                 );
 
 
-                console.log(
-                    "[PROFILE SAVE] LOAD START"
-                );
+                /*
+                 * SAVE SUCCEEDED
+                 *
+                 * Immediately leave
+                 * section edit mode.
+                 */
+                setEditingSections(
+                    previous => ({
 
-                const loadedProfile =
-                    await loadProfile({
-                        background: false,
-                    });
+                        ...previous,
 
+                        [sectionId]:
+                            false,
 
-                console.log(
-                    "[PROFILE SAVE] LOAD RETURNED",
-                    loadedProfile
+                    })
                 );
 
 
@@ -434,42 +457,61 @@ const handleSaveSection =
                     sectionId
                 );
 
-                setEditingSections(
-                    previous => ({
-                        ...previous,
-                        [sectionId]: false,
-                    })
+
+                /*
+                 * Refresh profile in
+                 * the background.
+                 */
+                loadProfile({
+
+                    background:
+                        true,
+
+                }).catch(
+                    error => {
+
+                        console.error(
+                            "[PROFILE SAVE] Background refresh failed:",
+                            error
+                        );
+
+                    }
                 );
 
 
                 onComplete?.();
 
 
-            } catch (err) {
+            } catch (error) {
 
                 console.error(
                     "[PROFILE SAVE] FAILED",
-                    err
+                    error
                 );
+
 
             } finally {
-
-                console.log(
-                    "[PROFILE SAVE] FINALLY"
-                );
 
                 setSavingProfile(false);
 
             }
 
         },
+
         [
+
             values,
+
             user,
+
             patchProfile,
+
             loadProfile,
+
             onComplete,
+
         ]
+
     );
 
 
