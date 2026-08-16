@@ -164,17 +164,6 @@ const [
     });
 
 
-    const [
-        editingSections,
-        setEditingSections,
-    ] = useState({});
-
-
-    const [
-        savingSection,
-        setSavingSection,
-    ] = useState(null);
-
 
     /* =====================================
        CURRENT SECTION STORAGE
