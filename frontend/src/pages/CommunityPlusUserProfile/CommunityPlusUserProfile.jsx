@@ -367,45 +367,110 @@ const resetSection =
        SAVE SECTION
     ===================================== */
 
-const handleSaveSection = async (sectionId) => {
+const handleSaveSection =
+    useCallback(
+        async (sectionId) => {
 
-    try {
+            console.log(
+                "[PROFILE SAVE] START",
+                sectionId
+            );
 
-        setSavingProfile(true);
+            try {
 
-        await patchProfile(
-            buildProfilePayload({
-                values,
-                userEmail: user?.email,
-                homeLocation: values.homeLocation,
-            })
-        );
+                setSavingProfile(true);
 
-        await loadProfile({
-            background: false,
-        });
 
-        setEditingSections(
-            previous => ({
-                ...previous,
-                [sectionId]: false,
-            })
-        );
+                const payload =
+                    buildProfilePayload({
+                        values,
+                        userEmail:
+                            user?.email,
+                        homeLocation:
+                            values.homeLocation,
+                    });
 
-    } catch (error) {
 
-        console.error(
-            "Profile save failed:",
-            error
-        );
+                console.log(
+                    "[PROFILE SAVE] PAYLOAD",
+                    payload
+                );
 
-    } finally {
 
-        setSavingProfile(false);
+                console.log(
+                    "[PROFILE SAVE] PATCH START"
+                );
 
-    }
+                const savedProfile =
+                    await patchProfile(
+                        payload
+                    );
 
-};
+
+                console.log(
+                    "[PROFILE SAVE] PATCH RETURNED",
+                    savedProfile
+                );
+
+
+                console.log(
+                    "[PROFILE SAVE] LOAD START"
+                );
+
+                const loadedProfile =
+                    await loadProfile({
+                        background: false,
+                    });
+
+
+                console.log(
+                    "[PROFILE SAVE] LOAD RETURNED",
+                    loadedProfile
+                );
+
+
+                console.log(
+                    "[PROFILE SAVE] EDIT FALSE",
+                    sectionId
+                );
+
+                setEditingSections(
+                    previous => ({
+                        ...previous,
+                        [sectionId]: false,
+                    })
+                );
+
+
+                onComplete?.();
+
+
+            } catch (err) {
+
+                console.error(
+                    "[PROFILE SAVE] FAILED",
+                    err
+                );
+
+            } finally {
+
+                console.log(
+                    "[PROFILE SAVE] FINALLY"
+                );
+
+                setSavingProfile(false);
+
+            }
+
+        },
+        [
+            values,
+            user,
+            patchProfile,
+            loadProfile,
+            onComplete,
+        ]
+    );
 
 
     /* =====================================
