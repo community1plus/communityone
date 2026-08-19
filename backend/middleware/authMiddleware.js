@@ -11,9 +11,11 @@ import {
 ===================================================== */
 
 const REGION =
+  process.env.COGNITO_REGION ||
   "ap-southeast-2";
 
 const USER_POOL_ID =
+  process.env.COGNITO_USER_POOL_ID ||
   "ap-southeast-2_2TGqghCuO";
 
 const COGNITO_ISSUER =
@@ -27,17 +29,17 @@ const JWKS_URL =
    JWKS CACHE
 ===================================================== */
 
-let pems = null;
+let jwksCache = null;
 
 
 /* =====================================================
-   LOAD JWKS
+   LOAD COGNITO JWKS
 ===================================================== */
 
-async function getPems() {
+async function getJwks() {
 
-  if (pems) {
-    return pems;
+  if (jwksCache) {
+    return jwksCache;
   }
 
   console.log(
@@ -58,11 +60,26 @@ async function getPems() {
   const data =
     await response.json();
 
-  pems = {};
+  if (
+    !data.keys ||
+    !Array.isArray(data.keys)
+  ) {
+
+    throw new Error(
+      "Invalid Cognito JWKS response"
+    );
+
+  }
+
+  jwksCache = {};
 
   for (const key of data.keys) {
 
-    pems[key.kid] =
+    if (!key.kid) {
+      continue;
+    }
+
+    jwksCache[key.kid] =
       jwkToPem(key);
 
   }
@@ -71,7 +88,7 @@ async function getPems() {
     "✅ Cognito JWKS loaded"
   );
 
-  return pems;
+  return jwksCache;
 }
 
 
@@ -81,27 +98,34 @@ async function getPems() {
 
 function getBearerToken(req) {
 
-  const authHeader =
+  const header =
     req.headers.authorization;
 
+  if (!header) {
+    return null;
+  }
+
   if (
-    !authHeader ||
-    !authHeader.startsWith("Bearer ")
+    !header.startsWith(
+      "Bearer "
+    )
   ) {
 
     return null;
 
   }
 
-  return authHeader
-    .slice("Bearer ".length)
-    .trim();
+  const token =
+    header
+      .slice(7)
+      .trim();
 
+  return token || null;
 }
 
 
 /* =====================================================
-   VERIFY TOKEN
+   VERIFY COGNITO TOKEN
 ===================================================== */
 
 async function verifyCognitoToken(
@@ -124,35 +148,82 @@ async function verifyCognitoToken(
   ) {
 
     throw new Error(
-      "Invalid token format"
+      "Invalid Cognito token format"
     );
 
   }
 
 
-  const pems =
-    await getPems();
+  const jwks =
+    await getJwks();
 
   const pem =
-    pems[
+    jwks[
       decoded.header.kid
     ];
 
 
   if (!pem) {
 
-    throw new Error(
-      "Invalid token signature"
+    /*
+     * The Cognito signing key may have
+     * rotated since our JWKS was cached.
+     *
+     * Clear the cache and retry once.
+     */
+
+    jwksCache = null;
+
+    const refreshedJwks =
+      await getJwks();
+
+    const refreshedPem =
+      refreshedJwks[
+        decoded.header.kid
+      ];
+
+
+    if (!refreshedPem) {
+
+      throw new Error(
+        "Cognito signing key not found"
+      );
+
+    }
+
+
+    return verifyWithPem(
+      token,
+      refreshedPem
     );
 
   }
 
 
+  return verifyWithPem(
+    token,
+    pem
+  );
+
+}
+
+
+/* =====================================================
+   VERIFY WITH PEM
+===================================================== */
+
+function verifyWithPem(
+  token,
+  pem
+) {
+
   return jwt.verify(
     token,
     pem,
     {
-      algorithms: ["RS256"],
+      algorithms: [
+        "RS256",
+      ],
 
       issuer:
         COGNITO_ISSUER,
@@ -163,46 +234,58 @@ async function verifyCognitoToken(
 
 
 /* =====================================================
-   BUILD AUTH CONTEXT
+   BUILD PLATFORM AUTH CONTEXT
 ===================================================== */
 
-async function buildAuthContext(verified) {
+async function buildAuthContext(
+  verified
+) {
+
+  const cognitoSub =
+    verified.sub;
+
+  const email =
+    verified.email ||
+    "";
+
+  const cognitoUsername =
+    verified[
+      "cognito:username"
+    ] ||
+    verified.username ||
+    "";
+
+  const emailVerified =
+    verified.email_verified === true;
+
 
   console.log(
-    "🔗 BUILDING AUTH CONTEXT:",
+    "🔗 Resolving Community One identity:",
     {
-      cognitoSub:
-        verified.sub,
-
-      email:
-        verified.email,
-
-      username:
-        verified["cognito:username"] ||
-        verified.username ||
-        "",
+      cognitoSub,
+      email,
+      cognitoUsername,
+      emailVerified,
     }
   );
+
 
   const identity =
     await resolveIdentity({
 
-      cognitoSub:
-        verified.sub,
+      cognitoSub,
 
-      email:
-        verified.email,
+      email,
 
-      cognitoUsername:
-        verified["cognito:username"] ||
-        verified.username ||
-        "",
+      cognitoUsername,
+
+      emailVerified,
 
     });
 
 
   console.log(
-    "✅ PLATFORM IDENTITY RESOLVED:",
+    "✅ Community One identity resolved:",
     {
       userId:
         identity.userId,
@@ -256,22 +339,18 @@ export default async function authMiddleware(
   try {
 
     /* =========================================
-       TOKEN
+       1. EXTRACT TOKEN
     ========================================= */
 
     const token =
       getBearerToken(req);
 
 
-    console.log(
-      "🔐 AUTH HEADER:",
-      token
-        ? "PRESENT"
-        : "MISSING"
-    );
-
-
     if (!token) {
+
+      console.warn(
+        "🔐 Authentication failed: missing bearer token"
+      );
 
       return res.status(401).json({
 
@@ -284,47 +363,17 @@ export default async function authMiddleware(
 
 
     /* =========================================
-       VERIFY COGNITO TOKEN
+       2. VERIFY COGNITO TOKEN
     ========================================= */
 
     const verified =
       await verifyCognitoToken(
         token
       );
-console.log(
-  "🔎 COGNITO IDENTITY CHECK:",
-  {
-    sub: verified.sub,
-    email: verified.email,
-    username:
-      verified["cognito:username"],
-    tokenUse:
-      verified.token_use,
-    issuer:
-      verified.iss,
-  }
-);
-
-    console.log(
-      "✅ COGNITO TOKEN VERIFIED:",
-      {
-        sub:
-          verified.sub,
-
-        email:
-          verified.email,
-
-        username:
-          verified["cognito:username"],
-
-        tokenUse:
-          verified.token_use,
-      }
-    );
 
 
     /* =========================================
-       TOKEN TYPE
+       3. TOKEN TYPE
     ========================================= */
 
     if (
@@ -333,23 +382,24 @@ console.log(
     ) {
 
       console.warn(
-        "⚠️ NON-ID TOKEN RECEIVED:",
+        "⚠️ Unexpected Cognito token type:",
         verified.token_use
       );
+
+      return res.status(401).json({
+
+        error:
+          "Invalid token type",
+
+      });
 
     }
 
 
     /* =========================================
-       RESOLVE PLATFORM IDENTITY
+       4. RESOLVE PLATFORM IDENTITY
     ========================================= */
-console.log(
-  "🔗 RESOLVING COMMUNITY ONE USER:",
-  {
-    cognitoSub: verified.sub,
-    email: verified.email,
-  }
-);
+
     req.user =
       await buildAuthContext(
         verified
@@ -357,53 +407,57 @@ console.log(
 
 
     /* =========================================
-       IDENTITY CHECKPOINT
+       5. AUTH CHECKPOINT
     ========================================= */
 
     console.log(
-      "🔗 COMMUNITY ONE IDENTITY:",
+      "✅ AUTH SUCCESS:",
       {
-        cognitoSub:
-          req.user.cognitoSub,
-
         userId:
           req.user.userId,
+
+        cognitoSub:
+          req.user.cognitoSub,
 
         email:
           req.user.email,
 
         username:
           req.user.username,
+
       }
-    );
-
-
-    console.log(
-      "✅ AUTH SUCCESS"
     );
 
 
     return next();
 
-} catch (err) {
+  } catch (err) {
 
-  console.error(
-    "❌ AUTH ERROR:",
-    {
-      message: err.message,
-      name: err.name,
-      stack:
-        process.env.NODE_ENV === "development"
-          ? err.stack
-          : undefined,
-    }
-  );
+    console.error(
+      "❌ AUTH ERROR:",
+      {
+        message:
+          err.message,
 
-  return res.status(401).json({
-    error:
-      "Authentication failed",
-  });
+        name:
+          err.name,
 
-}
+        stack:
+          process.env.NODE_ENV ===
+          "development"
+            ? err.stack
+            : undefined,
+      }
+    );
+
+
+    return res.status(401).json({
+
+      error:
+        "Authentication failed",
+
+    });
+
+  }
 
 }
