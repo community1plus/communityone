@@ -2,7 +2,8 @@ import {
   findUserByCognitoSub,
   findUserByEmail,
   findUserById,
-  updateUserCognitoSub,
+  linkCognitoIdentity,
+  updateLastLogin,
 } from "../src/repositories/identityRepository.js";
 
 
@@ -23,86 +24,132 @@ export async function resolveIdentity({
     );
   }
 
-  /* =====================================================
-     1. PRIMARY LOOKUP
-     Cognito sub is the authoritative identity key
-  ===================================================== */
 
-  let user =
+  /* ===================================================
+     1. PRIMARY IDENTITY LOOKUP
+  =================================================== */
+
+  const existingBySub =
     await findUserByCognitoSub(
       cognitoSub
     );
 
 
-  if (user) {
+  if (existingBySub) {
 
-    return buildIdentity({
-      user,
+    await updateLastLogin(
+      existingBySub.id
+    );
+
+    return buildIdentity(
+      existingBySub,
       cognitoSub,
       email,
-      cognitoUsername,
-    });
+      cognitoUsername
+    );
 
   }
 
 
-  /* =====================================================
-     2. LEGACY / MIGRATION LOOKUP
-     
-     Only attempt email recovery when Cognito has
-     explicitly verified the email.
-  ===================================================== */
+  /* ===================================================
+     2. NO SUB MATCH
+     Try existing Community One account
+  =================================================== */
 
-  if (
-    email &&
-    emailVerified
-  ) {
+  if (!email) {
 
-    user =
-      await findUserByEmail(
-        email
-      );
+    throw new Error(
+      "Cognito identity is not linked to a Community One user"
+    );
+
+  }
 
 
-    if (user) {
-
-      console.log(
-        "🔄 LINKING EXISTING USER TO CURRENT COGNITO SUB:",
-        {
-          userId: user.id,
-          previousSub: user.cognito_sub,
-          currentSub: cognitoSub,
-          email,
-        }
-      );
+  const existingByEmail =
+    await findUserByEmail(
+      email
+    );
 
 
-      user =
-        await updateUserCognitoSub(
-          user.id,
-          cognitoSub
-        );
+  if (!existingByEmail) {
+
+    throw new Error(
+      "Cognito identity is not linked to a Community One user"
+    );
+
+  }
 
 
-      return buildIdentity({
-        user,
-        cognitoSub,
+  /* ===================================================
+     3. IDENTITY LINKING
+  =================================================== */
+
+  /*
+   * IMPORTANT:
+   *
+   * For production we should require a trusted
+   * identity linking flow.
+   *
+   * During the POC, this can be used to recover
+   * the existing Community One account.
+   */
+
+  if (!emailVerified) {
+
+    console.warn(
+      "⚠️ Cognito email is not verified; linking existing account:",
+      {
+        userId: existingByEmail.id,
         email,
-        cognitoUsername,
-      });
-
-    }
+        cognitoSub,
+      }
+    );
 
   }
 
 
-  /* =====================================================
-     3. NO COMMUNITY ONE USER
-  ===================================================== */
+  const linkedUser =
+    await linkCognitoIdentity(
+      existingByEmail.id,
+      cognitoSub
+    );
 
-  throw new Error(
-    "Cognito identity is not linked to a Community One user"
+
+  if (!linkedUser) {
+
+    throw new Error(
+      "Failed to link Cognito identity"
+    );
+
+  }
+
+
+  await updateLastLogin(
+    linkedUser.id
   );
+
+
+  console.log(
+    "🔗 Cognito identity linked:",
+    {
+      userId:
+        linkedUser.id,
+
+      cognitoSub,
+
+      email:
+        linkedUser.email,
+    }
+  );
+
+
+  return buildIdentity(
+    linkedUser,
+    cognitoSub,
+    email,
+    cognitoUsername
+  );
+
 }
 
 
@@ -110,12 +157,12 @@ export async function resolveIdentity({
    BUILD IDENTITY
 ===================================================== */
 
-function buildIdentity({
+function buildIdentity(
   user,
   cognitoSub,
   email,
-  cognitoUsername,
-}) {
+  cognitoUsername
+) {
 
   return {
 
@@ -123,8 +170,8 @@ function buildIdentity({
       user.id,
 
     cognitoSub:
-      user.cognito_sub ||
-      cognitoSub,
+      cognitoSub ||
+      user.cognito_sub,
 
     email:
       user.email ||
@@ -158,10 +205,13 @@ export async function getIdentityByUserId(
 ) {
 
   if (!userId) {
+
     throw new Error(
       "Missing Community One userId"
     );
+
   }
+
 
   const user =
     await findUserById(
@@ -170,17 +220,19 @@ export async function getIdentityByUserId(
 
 
   if (!user) {
+
     throw new Error(
       "Community One user not found"
     );
+
   }
 
 
-  return buildIdentity({
+  return buildIdentity(
     user,
-    cognitoSub: user.cognito_sub,
-    email: user.email,
-    cognitoUsername: null,
-  });
+    user.cognito_sub,
+    user.email,
+    null
+  );
 
 }

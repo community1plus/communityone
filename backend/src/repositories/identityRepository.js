@@ -1,8 +1,9 @@
 import { pool } from "../db/pool.js";
 
+const TABLE = "users";
 
 /* =====================================================
-   FIND USER BY COGNITO SUB
+   FIND BY COGNITO SUB
 ===================================================== */
 
 export async function findUserByCognitoSub(
@@ -13,50 +14,22 @@ export async function findUserByCognitoSub(
     return null;
   }
 
-  const { rows } =
-    await pool.query(
-      `
-        SELECT *
-        FROM users
-        WHERE cognito_sub = $1
-        LIMIT 1
-      `,
-      [cognitoSub]
-    );
+  const { rows } = await pool.query(
+    `
+      SELECT *
+      FROM ${TABLE}
+      WHERE cognito_sub = $1
+      LIMIT 1
+    `,
+    [cognitoSub]
+  );
 
   return rows[0] || null;
 }
 
 
 /* =====================================================
-   FIND USER BY EMAIL
-===================================================== */
-
-export async function findUserByEmail(
-  email
-) {
-
-  if (!email) {
-    return null;
-  }
-
-  const { rows } =
-    await pool.query(
-      `
-        SELECT *
-        FROM users
-        WHERE LOWER(email) = LOWER($1)
-        LIMIT 1
-      `,
-      [email]
-    );
-
-  return rows[0] || null;
-}
-
-
-/* =====================================================
-   FIND USER BY COMMUNITY ONE USER ID
+   FIND BY USER ID
 ===================================================== */
 
 export async function findUserById(
@@ -67,16 +40,41 @@ export async function findUserById(
     return null;
   }
 
-  const { rows } =
-    await pool.query(
-      `
-        SELECT *
-        FROM users
-        WHERE id = $1
-        LIMIT 1
-      `,
-      [userId]
-    );
+  const { rows } = await pool.query(
+    `
+      SELECT *
+      FROM ${TABLE}
+      WHERE id = $1
+      LIMIT 1
+    `,
+    [userId]
+  );
+
+  return rows[0] || null;
+}
+
+
+/* =====================================================
+   FIND BY EMAIL
+===================================================== */
+
+export async function findUserByEmail(
+  email
+) {
+
+  if (!email) {
+    return null;
+  }
+
+  const { rows } = await pool.query(
+    `
+      SELECT *
+      FROM ${TABLE}
+      WHERE LOWER(email) = LOWER($1)
+      LIMIT 1
+    `,
+    [email]
+  );
 
   return rows[0] || null;
 }
@@ -86,7 +84,7 @@ export async function findUserById(
    LINK COGNITO IDENTITY
 ===================================================== */
 
-export async function updateUserCognitoSub(
+export async function linkCognitoIdentity(
   userId,
   cognitoSub
 ) {
@@ -103,27 +101,44 @@ export async function updateUserCognitoSub(
     );
   }
 
-  const { rows } =
-    await pool.query(
-      `
-        UPDATE users
-        SET
-          cognito_sub = $2,
-          updated_at = NOW()
-        WHERE id = $1
-        RETURNING *
-      `,
-      [
-        userId,
-        cognitoSub,
-      ]
-    );
+  const { rows } = await pool.query(
+    `
+      UPDATE ${TABLE}
+      SET
+        cognito_sub = $2,
+        updated_at = NOW()
+      WHERE id = $1
+      RETURNING *
+    `,
+    [
+      userId,
+      cognitoSub,
+    ]
+  );
 
-  if (!rows[0]) {
-    throw new Error(
-      "Community One user not found"
-    );
-  }
+  return rows[0] || null;
+}
 
-  return rows[0];
+
+/* =====================================================
+   UPDATE LAST LOGIN
+===================================================== */
+
+export async function updateLastLogin(
+  userId
+) {
+
+  const { rows } = await pool.query(
+    `
+      UPDATE ${TABLE}
+      SET
+        last_login = NOW(),
+        updated_at = NOW()
+      WHERE id = $1
+      RETURNING *
+    `,
+    [userId]
+  );
+
+  return rows[0] || null;
 }
