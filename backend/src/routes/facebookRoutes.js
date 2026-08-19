@@ -1,13 +1,21 @@
 import express from "express";
 import crypto from "crypto";
-import authMiddleware from "../../middleware/authMiddleware.js";
-import { saveProfile } from "../../repositories/profileRepository.js";
-console.log("FACEBOOK ROUTES VERSION 27-JUN-1");
-const router = express.Router();
 
-/* =========================
+import authMiddleware from "../../middleware/authMiddleware.js";
+
+import {
+  updateFacebookProfile,
+  disconnectFacebook,
+} from "../../services/profileService.js";
+
+
+const router =
+  express.Router();
+
+
+/* =====================================================
    FACEBOOK GRAPH CONFIG
-========================= */
+===================================================== */
 
 const FB_AUTH_URL =
   "https://www.facebook.com/v25.0/dialog/oauth";
@@ -18,21 +26,38 @@ const FB_TOKEN_URL =
 const FB_GRAPH_URL =
   "https://graph.facebook.com/v25.0";
 
-/* =========================
-   FRONTEND REDIRECT/
-========================= */
 
-function getFrontendRedirect(params = {}) {
+/* =====================================================
+   FRONTEND REDIRECT
+===================================================== */
+
+function getFrontendRedirect(
+  params = {}
+) {
 
   const baseUrl =
     process.env.FRONTEND_URL ||
     "https://develop.d1ss8rtrtimogr.amplifyapp.com";
 
-  const query =
-    new URLSearchParams(params);
 
-  return `${baseUrl}/communityplus/profile?${query.toString()}`;
+  const query =
+    new URLSearchParams(
+      params
+    );
+
+
+  return (
+    `${baseUrl}` +
+    `/communityplus/profile?` +
+    `${query.toString()}`
+  );
+
 }
+
+
+/* =====================================================
+   FAILURE REDIRECT
+===================================================== */
 
 function redirectFailure(
   res,
@@ -44,568 +69,724 @@ function redirectFailure(
     reason
   );
 
+
   return res.redirect(
     getFrontendRedirect({
-      social: "facebook",
-      verified: "false",
+
+      social:
+        "facebook",
+
+      verified:
+        "false",
+
       reason,
+
     })
   );
+
 }
-router.use((req, res, next) => {
-  console.log(
-    "FACEBOOK ROUTER:",
-    req.method,
-    req.originalUrl
-  );
-  next();
-});
+
+
+/* =====================================================
+   ROUTER DEBUG
+===================================================== */
+
+router.use(
+  (req, res, next) => {
+
+    console.log(
+      "FACEBOOK ROUTER:",
+      req.method,
+      req.originalUrl
+    );
+
+    next();
+
+  }
+);
+
+
+/* =====================================================
+   BEGIN FACEBOOK VERIFICATION
+===================================================== */
+
+/*
+ * This endpoint is called by the
+ * authenticated Community One client.
+ *
+ * Store the PLATFORM userId in the
+ * OAuth session.
+ *
+ * Do not store Cognito sub here.
+ */
 
 router.post(
   "/begin",
   authMiddleware,
   (req, res) => {
-  console.log("SESSION ID:", req.sessionID);
-    req.session.userSub = req.user.sub;
 
-    req.session.fbOAuthState = crypto.randomUUID();
+    const userId =
+      req.user?.userId;
 
-    req.session.save((err) => {
 
-      if (err) {
+    if (!userId) {
 
-        return res.status(500).json({
-          error: "Session save failed",
+      console.error(
+        "❌ FACEBOOK BEGIN: missing Community One userId"
+      );
+
+      return res.status(401).json({
+
+        error:
+          "Authentication required.",
+
+      });
+
+    }
+
+
+    /*
+     * Create OAuth state.
+     */
+
+    req.session.userId =
+      userId;
+
+    req.session.fbOAuthState =
+      crypto.randomUUID();
+
+
+    console.log(
+      "Facebook verification beginning for:",
+      userId
+    );
+
+
+    /*
+     * Persist session before
+     * returning to the browser.
+     */
+
+    req.session.save(
+      (err) => {
+
+        if (err) {
+
+          console.error(
+            "❌ FACEBOOK SESSION SAVE FAILED:",
+            err
+          );
+
+          return res.status(500).json({
+
+            error:
+              "Session save failed",
+
+          });
+
+        }
+
+
+        return res.json({
+
+          ok:
+            true,
+
         });
 
       }
-
-      return res.json({
-
-        ok: true,
-
-      });
-
-    });
+    );
 
   }
 );
 
-/* =========================
+
+/* =====================================================
    START FACEBOOK OAUTH
-========================= */
+===================================================== */
 
 router.get(
   "/start",
-  async (req, res) => {
-console.log("Building Facebook auth URL...");
-    console.log("START SESSION ID:", req.sessionID);
-console.log("START SESSION:", req.session);
-console.log("=== FACEBOOK START ===");
-console.log("Session ID:", req.sessionID);
-console.log("Session:", req.session);
-console.log("UserSub:", req.session.userSub);
-if (!req.session.userSub) {
+  (req, res) => {
 
-  return redirectFailure(
-    res,
-    "missing_user_session"
-  );
+    try {
 
-}
-  try {
+      const userId =
+        req.session?.userId;
 
-    if (
-      !process.env.FACEBOOK_APP_ID ||
-      !process.env.FACEBOOK_REDIRECT_URI
-    ) {
+      const state =
+        req.session?.fbOAuthState;
 
-      return redirectFailure(
-        res,
-        "facebook_oauth_not_configured"
+
+      console.log(
+        "=== FACEBOOK START ==="
       );
-    }
 
-    const state =
-  req.session.fbOAuthState;
-
-if (!state) {
-
-  return redirectFailure(
-    res,
-    "missing_oauth_state"
-  );
-
-}
-
-
-
-console.log(
-  "Facebook verification started for:",
-  req.session.userSub
-);
-
-    const params =
-      new URLSearchParams({
-
-        client_id:
-          process.env.FACEBOOK_APP_ID,
-
-        redirect_uri:
-          process.env.FACEBOOK_REDIRECT_URI,
-
-        response_type:
-          "code",
-
-        state,
-
-        scope: [
-          "public_profile",
-          "email",
-        ].join(","),
-      });
-
-    const authUrl =
-      `${FB_AUTH_URL}?${params.toString()}`;
-
-    console.log(
-      "📘 FACEBOOK AUTH URL:",
-      authUrl
-    );
-
-    req.session.save((err) => {
-
-  if (err) {
-
-    console.error(
-      "Session save failed",
-      err
-    );
-
-    return redirectFailure(
-      res,
-      "session_save_failed"
-    );
-
-  }
-console.log("Redirecting to:", authUrl);
-  return res.redirect(
-    authUrl
-  );
-
-});
-
-  } catch (err) {
-
-    console.error(
-      "❌ FACEBOOK START ERROR:",
-      err
-    );
-    console.error("❌ FACEBOOK START ERROR");
-console.error("Message:", err.message);
-console.error("Stack:", err.stack);
-console.error("Full error:", err);
-
-    return redirectFailure(
-      res,
-      "facebook_start_failed"
-    );
-  }
-});
-
-/* =========================
-   FACEBOOK CALLBACK
-========================= */
-
-router.get("/callback", async (req, res) => {
-
-  console.log("########################################");
-  console.log("FACEBOOK CALLBACK REACHED");
-  console.log("QUERY:", req.query);
-  console.log("SESSION:", req.session);
-  console.log("########################################");
-
-  try {
-
-    const {
-      code,
-      error,
-      error_reason,
-      error_description,
-      state,
-    } = req.query;
-
-const userSub = req.session.userSub;
-
-console.log(
-  "Facebook callback for:",
-  userSub
-);
-
-if (!req.session.userSub) {
-
-    return redirectFailure(
-        res,
-        "missing_user_session"
-    );
-
-}
-
-    console.log(
-      "📘 FACEBOOK CALLBACK QUERY:",
-      req.query
-    );
-
-    /* =========================
-       OAUTH ERROR
-    ========================= */
-
-if (error) {
-
-  console.error(
-    "❌ FACEBOOK OAUTH ERROR:",
-    {
-      error,
-      error_reason,
-      error_description,
-    }
-  );
-
-  return redirectFailure(
-    res,
-    error_reason ||
-    error_description ||
-    "facebook_oauth_failed"
-  );
-
-}
-
-    /* =========================
-       MISSING CODE
-    ========================= */
-
-    if (!code) {
-
-      return redirectFailure(
-        res,
-        "missing_facebook_code"
+      console.log(
+        "Session ID:",
+        req.sessionID
       );
-    }
 
-    /* =========================
-       STATE CHECK
-    ========================= */
+      console.log(
+        "Community One userId:",
+        userId
+      );
 
-    if (
-      state !==
-      req.session.fbOAuthState
-    ) {
+
+      if (!userId) {
+
+        return redirectFailure(
+          res,
+          "missing_user_session"
+        );
+
+      }
+
+
+      if (!state) {
+
+        return redirectFailure(
+          res,
+          "missing_oauth_state"
+        );
+
+      }
+
+
+      if (
+        !process.env.FACEBOOK_APP_ID ||
+        !process.env.FACEBOOK_REDIRECT_URI
+      ) {
+
+        return redirectFailure(
+          res,
+          "facebook_oauth_not_configured"
+        );
+
+      }
+
+
+      const params =
+        new URLSearchParams({
+
+          client_id:
+            process.env.FACEBOOK_APP_ID,
+
+          redirect_uri:
+            process.env.FACEBOOK_REDIRECT_URI,
+
+          response_type:
+            "code",
+
+          state,
+
+          scope: [
+            "public_profile",
+            "email",
+          ].join(","),
+
+        });
+
+
+      const authUrl =
+        `${FB_AUTH_URL}?${params.toString()}`;
+
+
+      /*
+       * Do not log the entire URL in
+       * production unnecessarily.
+       */
+
+      console.log(
+        "Facebook OAuth URL generated."
+      );
+
+
+      return res.redirect(
+        authUrl
+      );
+
+    } catch (err) {
 
       console.error(
-        "❌ FACEBOOK STATE MISMATCH",
+        "❌ FACEBOOK START ERROR:",
         {
-          expected:
-            req.session.fbOAuthState,
-          received:
-            state,
+          message:
+            err.message,
+
+          stack:
+            err.stack,
         }
       );
 
-      return redirectFailure(
-        res,
-        "facebook_state_mismatch"
-      );
-    }
-
-    /* =========================
-       ENV CHECK
-    ========================= */
-
-    if (
-      !process.env.FACEBOOK_APP_ID ||
-      !process.env.FACEBOOK_APP_SECRET ||
-      !process.env.FACEBOOK_REDIRECT_URI
-    ) {
 
       return redirectFailure(
         res,
-        "facebook_oauth_not_configured"
+        "facebook_start_failed"
       );
+
     }
 
-    /* =========================
-       TOKEN EXCHANGE
-    ========================= */
+  }
+);
 
-    const tokenParams =
-      new URLSearchParams({
 
-        client_id:
-          process.env.FACEBOOK_APP_ID,
+/* =====================================================
+   FACEBOOK CALLBACK
+===================================================== */
 
-        client_secret:
-          process.env.FACEBOOK_APP_SECRET,
+router.get(
+  "/callback",
+  async (req, res) => {
 
-        redirect_uri:
-          process.env.FACEBOOK_REDIRECT_URI,
+    try {
 
+      const {
         code,
-      });
+        error,
+        error_reason,
+        error_description,
+        state,
+      } = req.query;
 
-    const tokenUrl =
-      `${FB_TOKEN_URL}?${tokenParams.toString()}`;
 
-    console.log(
-      "📘 FACEBOOK TOKEN URL:",
-      tokenUrl
-    );
+      /*
+       * Recover the Community One
+       * platform identity from the
+       * server-side OAuth session.
+       */
 
-    const tokenResponse =
-      await fetch(tokenUrl);
+      const userId =
+        req.session?.userId;
 
-    const tokenData =
-      await tokenResponse.json();
 
-    console.log(
-      "📘 FACEBOOK TOKEN RESPONSE:",
-      JSON.stringify(
-        tokenData,
-        null,
-        2
-      )
-    );
+      console.log(
+        "========================================"
+      );
 
-    if (
-      !tokenResponse.ok ||
-      !tokenData.access_token
-    ) {
+      console.log(
+        "FACEBOOK CALLBACK"
+      );
+
+      console.log(
+        "Session ID:",
+        req.sessionID
+      );
+
+      console.log(
+        "Community One userId:",
+        userId
+      );
+
+      console.log(
+        "========================================"
+      );
+
+
+      if (!userId) {
+
+        return redirectFailure(
+          res,
+          "missing_user_session"
+        );
+
+      }
+
+
+      /* =================================================
+         FACEBOOK OAUTH ERROR
+      ================================================= */
+
+      if (error) {
+
+        console.error(
+          "❌ FACEBOOK OAUTH ERROR:",
+          {
+            error,
+            error_reason,
+            error_description,
+          }
+        );
+
+
+        return redirectFailure(
+          res,
+          error_reason ||
+            error_description ||
+            "facebook_oauth_failed"
+        );
+
+      }
+
+
+      /* =================================================
+         CODE
+      ================================================= */
+
+      if (!code) {
+
+        return redirectFailure(
+          res,
+          "missing_facebook_code"
+        );
+
+      }
+
+
+      /* =================================================
+         STATE VALIDATION
+      ================================================= */
+
+      const expectedState =
+        req.session?.fbOAuthState;
+
+
+      if (
+        !expectedState ||
+        state !== expectedState
+      ) {
+
+        console.error(
+          "❌ FACEBOOK STATE MISMATCH"
+        );
+
+
+        return redirectFailure(
+          res,
+          "facebook_state_mismatch"
+        );
+
+      }
+
+
+      /* =================================================
+         ENVIRONMENT
+      ================================================= */
+
+      if (
+        !process.env.FACEBOOK_APP_ID ||
+        !process.env.FACEBOOK_APP_SECRET ||
+        !process.env.FACEBOOK_REDIRECT_URI
+      ) {
+
+        return redirectFailure(
+          res,
+          "facebook_oauth_not_configured"
+        );
+
+      }
+
+
+      /* =================================================
+         TOKEN EXCHANGE
+      ================================================= */
+
+      const tokenParams =
+        new URLSearchParams({
+
+          client_id:
+            process.env.FACEBOOK_APP_ID,
+
+          client_secret:
+            process.env.FACEBOOK_APP_SECRET,
+
+          redirect_uri:
+            process.env.FACEBOOK_REDIRECT_URI,
+
+          code,
+
+        });
+
+
+      const tokenUrl =
+        `${FB_TOKEN_URL}?` +
+        `${tokenParams.toString()}`;
+
+
+      const tokenResponse =
+        await fetch(
+          tokenUrl
+        );
+
+
+      const tokenData =
+        await tokenResponse.json();
+
+
+      if (
+        !tokenResponse.ok ||
+        !tokenData.access_token
+      ) {
+
+        console.error(
+          "❌ FACEBOOK TOKEN EXCHANGE FAILED:",
+          {
+            status:
+              tokenResponse.status,
+
+            error:
+              tokenData?.error,
+          }
+        );
+
+
+        return redirectFailure(
+          res,
+          "facebook_token_exchange_failed"
+        );
+
+      }
+
+
+      const accessToken =
+        tokenData.access_token;
+
+
+      /* =================================================
+         FACEBOOK PROFILE
+      ================================================= */
+
+      const profileUrl =
+        `${FB_GRAPH_URL}/me` +
+        `?fields=id,name,email,` +
+        `picture.width(400).height(400)` +
+        `&access_token=${encodeURIComponent(
+          accessToken
+        )}`;
+
+
+      const profileResponse =
+        await fetch(
+          profileUrl
+        );
+
+
+      const profileData =
+        await profileResponse.json();
+
+
+      if (
+        !profileResponse.ok ||
+        !profileData.id
+      ) {
+
+        console.error(
+          "❌ FACEBOOK PROFILE LOOKUP FAILED:",
+          {
+            status:
+              profileResponse.status,
+
+            error:
+              profileData?.error,
+          }
+        );
+
+
+        return redirectFailure(
+          res,
+          "facebook_profile_lookup_failed"
+        );
+
+      }
+
+
+      /* =================================================
+         FACEBOOK PAGES
+      ================================================= */
+
+      const pagesUrl =
+        `${FB_GRAPH_URL}/me/accounts` +
+        `?access_token=${encodeURIComponent(
+          accessToken
+        )}`;
+
+
+      const pagesResponse =
+        await fetch(
+          pagesUrl
+        );
+
+
+      const pagesData =
+        await pagesResponse.json();
+
+
+      /*
+       * Page lookup should not prevent
+       * Facebook verification if the
+       * profile itself succeeded.
+       */
+
+      const pageCount =
+        pagesResponse.ok
+          ? (
+              pagesData?.data?.length ||
+              0
+            )
+          : 0;
+
+
+      if (!pagesResponse.ok) {
+
+        console.warn(
+          "⚠️ FACEBOOK PAGE LOOKUP FAILED:",
+          {
+            status:
+              pagesResponse.status,
+
+            error:
+              pagesData?.error,
+          }
+        );
+
+      }
+
+
+      /* =================================================
+         BUILD FACEBOOK SOCIAL STATE
+      ================================================= */
+
+      const facebook = {
+
+        verified:
+          true,
+
+        verifiedAt:
+          new Date().toISOString(),
+
+        providerId:
+          profileData.id,
+
+        accountName:
+          profileData.name ||
+          null,
+
+        email:
+          profileData.email ||
+          null,
+
+        profilePicture:
+          profileData
+            .picture
+            ?.data
+            ?.url ||
+          null,
+
+        pageCount,
+
+      };
+
+
+      console.log(
+        "Facebook verification resolved:",
+        {
+          providerId:
+            facebook.providerId,
+
+          accountName:
+            facebook.accountName,
+
+          pageCount:
+            facebook.pageCount,
+        }
+      );
+
+
+      /* =================================================
+         PERSIST FACEBOOK STATE
+      ================================================= */
+
+      const saved =
+        await updateFacebookProfile({
+
+          userId,
+
+          facebook,
+
+        });
+
+
+      console.log(
+        "✅ FACEBOOK PROFILE SAVED:",
+        {
+          userId,
+
+          version:
+            saved.version,
+
+          verified:
+            saved.profile?.social
+              ?.facebook
+              ?.verified,
+        }
+      );
+
+
+      /* =================================================
+         CLEAN OAUTH SESSION
+      ================================================= */
+
+      delete req.session.fbOAuthState;
+
+      delete req.session.userId;
+
+
+      req.session.save(
+        (err) => {
+
+          if (err) {
+
+            console.error(
+              "⚠️ FACEBOOK SESSION CLEANUP FAILED:",
+              err
+            );
+
+          }
+
+
+          return res.redirect(
+            getFrontendRedirect({
+
+              social:
+                "facebook",
+
+              verified:
+                "true",
+
+            })
+          );
+
+        }
+      );
+
+    } catch (err) {
 
       console.error(
-        "❌ FACEBOOK TOKEN EXCHANGE FAILED:",
-        tokenData
+        "❌ FACEBOOK CALLBACK ERROR:",
+        {
+          message:
+            err.message,
+
+          stack:
+            err.stack,
+        }
       );
+
 
       return redirectFailure(
         res,
-        "facebook_token_exchange_failed"
+        "facebook_callback_failed"
       );
+
     }
 
-    const accessToken =
-      tokenData.access_token;
-
-    /* =========================
-       GET FACEBOOK PROFILE
-    ========================= */
-
-    const profileResponse =
-      await fetch(
-        `${FB_GRAPH_URL}/me?fields=id,name,email,picture.width(400).height(400)&access_token=${accessToken}`
-      );
-const profileData =
-      await profileResponse.json();
-
-console.log("========== FACEBOOK PROFILE ==========");
-console.log(JSON.stringify(profileData, null, 2));
-
-    
-
-      console.log("PROFILE DATA");
-console.log(profileData);
-      console.log(
-  "FACEBOOK PROFILE RAW"
-);
-
-console.log("========== FACEBOOK PROFILE ==========");
-console.log(
-  JSON.stringify(profileData, null, 2)
-);
-
-console.log(
-  JSON.stringify(profileData, null, 2)
-);
-
-console.log({
-  id: profileData.id,
-  name: profileData.name,
-  email: profileData.email,
-  picture: profileData.picture?.data?.url,
-});
-
-    console.log(
-      "📘 FACEBOOK PROFILE:",
-      JSON.stringify(
-        profileData,
-        null,
-        2
-      )
-    );
-
-    if (
-      !profileResponse.ok ||
-      !profileData.id
-    ) {
-
-      return redirectFailure(
-        res,
-        "facebook_profile_lookup_failed"
-      );
-    }
-
-    /* =========================
-       GET FACEBOOK PAGES
-    ========================= */
-
-    const pagesResponse =
-      await fetch(
-        `${FB_GRAPH_URL}/me/accounts?access_token=${accessToken}`
-      );
-
-    const pagesData =
-      await pagesResponse.json();
-
-      console.log("FACEBOOK PAGES");
-console.log(pagesData);
-
-    console.log(
-      "📘 FACEBOOK PAGES:",
-      JSON.stringify(
-        pagesData,
-        null,
-        2
-      )
-    );
-
-    const pageCount =
-      pagesData?.data?.length || 0;
-
-      console.log(
-  "FACEBOOK PROFILE DATA",
-  profileData
-);
-
-console.log({
-  id: profileData.id,
-  name: profileData.name,
-  email: profileData.email,
-  picture: profileData.picture?.data?.url,
-});
-
-      const incoming = {
-
-  social: {
-
-    facebook: {
-
-      verified: true,
-
-      verifiedAt:
-        new Date().toISOString(),
-
-      providerId:
-        profileData.id,
-
-      accountName:
-        profileData.name,
-
-      email:
-        profileData.email,
-
-      profilePicture:
-        profileData.picture?.data?.url,
-
-      pageCount,
-
-    },
-
-  },
-
-};
-
-console.log(
-  "Saving Facebook verification",
-  incoming
-);
-
-console.log(
-  "INCOMING FACEBOOK",
-  JSON.stringify(incoming, null, 2)
-);
-
-console.log(
-  "FACEBOOK INCOMING"
-);
-
-console.log(
-  JSON.stringify(incoming, null, 2)
-);
-
-const saved = await saveProfile({
-    userId: userSub,
-    incoming,
-});
-
-console.log("========== FACEBOOK INCOMING ==========");
-console.log(JSON.stringify(incoming, null, 2));
-console.log(
-    "Saved social:"
-);
-
-console.log(
-    JSON.stringify(saved.social, null, 2)
-);
-
-
-console.log(
-  "Facebook verification saved."
-);
-    /* =========================
-       CLEAN SESSION
-    ========================= */
-
-delete req.session.fbOAuthState;
-delete req.session.userSub;
-
-    /* =========================
-       SUCCESS REDIRECT
-    ========================= */
-
-return res.redirect(
-  getFrontendRedirect({
-
-    social: "facebook",
-
-    verified: "true",
-
-  })
-);
-
-  } catch (err) {
-
-    console.error("❌ FACEBOOK CALLBACK ERROR:",
-      err
-    );
-    console.error("================================");
-  console.error("FACEBOOK CALLBACK EXCEPTION");
-  console.error("Message:", err.message);
-  console.error("Stack:", err.stack);
-  console.error(err);
-  console.error("================================");
-
-
-    
-
-    return redirectFailure(
-      res,
-      "facebook_callback_failed"
-    );
   }
-});
+);
 
 
-/* =========================
+/* =====================================================
    DISCONNECT FACEBOOK
-========================= */
+===================================================== */
 
 router.delete(
   "/disconnect",
@@ -614,42 +795,96 @@ router.delete(
 
     try {
 
+      const userId =
+        req.user?.userId;
+
+
+      if (!userId) {
+
+        return res.status(401).json({
+
+          error:
+            "Authentication required.",
+
+        });
+
+      }
+
+
       console.log(
-        "Disconnecting Facebook for",
-        req.user.sub
+        "Disconnecting Facebook for:",
+        userId
       );
 
-      await saveProfile({
 
-        userId: req.user.sub,
+      const result =
+        await disconnectFacebook({
 
-        incoming: {
+          userId,
 
-          social: {
-            facebook: null,
-          },
+        });
 
-        },
 
-      });
+      console.log(
+        "✅ FACEBOOK DISCONNECTED:",
+        {
+          userId,
 
-      return res.json({
+          version:
+            result.version,
+        }
+      );
 
-        ok: true,
+
+      return res.status(200).json({
+
+        ok:
+          true,
+
+        profile:
+          result.profile,
+
+        version:
+          result.version,
 
       });
 
     } catch (err) {
 
       console.error(
-        "FACEBOOK DISCONNECT FAILED",
-        err
+        "❌ FACEBOOK DISCONNECT FAILED:",
+        {
+          message:
+            err.message,
+
+          stack:
+            err.stack,
+        }
       );
+
+
+      if (
+        err.message ===
+        "Profile not found"
+      ) {
+
+        return res.status(404).json({
+
+          error:
+            "Profile not found",
+
+        });
+
+      }
+
 
       return res.status(500).json({
 
         error:
           "facebook_disconnect_failed",
+
+        detail:
+          err.message,
 
       });
 
@@ -657,4 +892,6 @@ router.delete(
 
   }
 );
+
+
 export default router;
