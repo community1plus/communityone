@@ -4,224 +4,329 @@ import { normalizeProfile } from "../utils/normalizeProfile.js";
 
 const router = express.Router();
 
-/* =========================
+
+/* =====================================================
    GET CURRENT USER
-========================= */
+===================================================== */
 
 router.get("/", async (req, res) => {
+
   try {
+
+    console.log("========================================");
     console.log("📡 GET /api/me");
 
-    /* =========================
-       AUTH CHECK
-    ========================= */
+
+    /* ===================================================
+       AUTHENTICATION
+    =================================================== */
 
     if (!req.user) {
+
+      console.warn(
+        "[ME] No authenticated user"
+      );
+
       return res.status(401).json({
         authenticated: false,
       });
+
     }
 
-    /* =========================
-       TOKEN USER
-    ========================= */
 
-    const user = req.user;
+    /* ===================================================
+       COMMUNITY ONE IDENTITY
+       
+       req.user.userId = internal Community One UUID
+       req.user.sub    = Cognito subject
+    =================================================== */
 
-    const tokenSub = user.sub || "";
+    const userId =
+      req.user.userId ||
+      req.user.id ||
+      null;
+
+    const cognitoSub =
+      req.user.sub ||
+      null;
 
     const tokenEmail =
-      user.email ||
-      user.attributes?.email ||
+      req.user.email ||
+      req.user.attributes?.email ||
       "";
 
     const tokenUsername =
-      user.username ||
-      user["cognito:username"] ||
-      user.attributes?.preferred_username ||
+      req.user.username ||
+      req.user["cognito:username"] ||
+      req.user.attributes?.preferred_username ||
       "";
 
+
+    console.log(
+      "[ME] AUTH IDENTITY:",
+      {
+        userId,
+        cognitoSub,
+        email: tokenEmail,
+        username: tokenUsername,
+      }
+    );
+
+
+    if (!userId) {
+
+      console.error(
+        "[ME] Authenticated request has no Community One userId"
+      );
+
+      return res.status(401).json({
+        authenticated: false,
+        error: "User identity could not be resolved.",
+      });
+
+    }
+
+
+    /* ===================================================
+       PROFILE
+       
+       IMPORTANT:
+       user_profiles.user_id is the Community One
+       internal user UUID — NOT Cognito sub.
+    =================================================== */
+
+    const profileResult =
+      await pool.query(
+        `
+          SELECT *
+          FROM user_profiles
+          WHERE user_id = $1
+          LIMIT 1
+        `,
+        [userId]
+      );
+
+
+    const rawProfile =
+      profileResult.rows[0] || null;
+
+
+    console.log(
+      "[ME] PROFILE:",
+      {
+        found: !!rawProfile,
+        profileId: rawProfile?.id || null,
+        userId: rawProfile?.user_id || null,
+        username: rawProfile?.username || null,
+        version: rawProfile?.version || null,
+      }
+    );
+
+
+    /* ===================================================
+       ORGANISATION PROFILE
+    =================================================== */
+
+    let organisationProfile = null;
+
+
+    if (rawProfile?.id) {
+
+      const organisationResult =
+        await pool.query(
+          `
+            SELECT *
+            FROM organisation_profiles
+            WHERE user_profile_id = $1
+            LIMIT 1
+          `,
+          [rawProfile.id]
+        );
+
+
+      organisationProfile =
+        organisationResult.rows[0] || null;
+
+
+      console.log(
+        "[ME] ORGANISATION PROFILE:",
+        {
+          found: !!organisationProfile,
+          profileId: rawProfile.id,
+        }
+      );
+
+    }
+
+
+    /* ===================================================
+       NORMALISE PROFILE
+    =================================================== */
+
+    const normalizedProfile =
+      normalizeProfile(rawProfile);
+
+
+    const profile = {
+
+      ...normalizedProfile,
+
+      organisationProfile,
+
+      organisation:
+        organisationProfile,
+
+    };
+
+
+    console.log(
+      "[ME] NORMALIZED PROFILE:",
+      JSON.stringify(
+        profile,
+        null,
+        2
+      )
+    );
+
+
+    /* ===================================================
+       SOCIAL PROVIDERS
+    =================================================== */
+
+    const social =
+      profile?.social || {};
+
+
+    const providers = {
+
+      facebook:
+        !!social?.facebook?.verified,
+
+      instagram:
+        !!social?.instagram?.verified,
+
+      youtube:
+        !!social?.youtube?.verified,
+
+      x:
+        !!social?.x?.verified,
+
+    };
+
+
+    /* ===================================================
+       USER RESPONSE
+    =================================================== */
+
     const emailLocalPart =
-      tokenEmail && tokenEmail.includes("@")
+      tokenEmail &&
+      tokenEmail.includes("@")
         ? tokenEmail.split("@")[0]
         : "";
 
-    console.log("🔐 /api/me token user:", {
-      tokenSub,
-      tokenEmail,
-      tokenUsername,
-      emailLocalPart,
-    });
 
-    console.log(
-  "TOKEN USE",
-  req.user.tokenUse
-);
+    const user = {
 
-    /* =========================
-       PROFILE QUERY
-    ========================= */
+      /*
+       * Community One identity
+       */
+      id:
+        userId,
 
-    const profileResult = await pool.query(
-      `
-      SELECT up.*
-      FROM user_profiles up
-      LEFT JOIN users u
-        ON u.id = up.user_id
-      WHERE
-        up.user_id = $1
-        OR LOWER(u.email) = LOWER($2)
-        OR LOWER(up.username) = LOWER($3)
-        OR LOWER(up.display_name) = LOWER($3)
-        OR LOWER(up.username) = LOWER($4)
-        OR LOWER(up.display_name) = LOWER($4)
-      ORDER BY
-        CASE
-          WHEN up.user_id = $1 THEN 1
-          WHEN LOWER(u.email) = LOWER($2) THEN 2
-          WHEN LOWER(up.username) = LOWER($4) THEN 3
-          WHEN LOWER(up.display_name) = LOWER($4) THEN 4
-          WHEN LOWER(up.username) = LOWER($3) THEN 5
-          WHEN LOWER(up.display_name) = LOWER($3) THEN 6
-          ELSE 7
-        END
-      LIMIT 1
-      `,
-      [
-        tokenSub,
+
+      /*
+       * Cognito identity is deliberately
+       * kept separate.
+       */
+      cognitoSub:
+        cognitoSub,
+
+
+      email:
         tokenEmail,
-        tokenUsername,
-        emailLocalPart,
-      ]
-    );
 
- const rawProfile =
-  profileResult.rows[0] || null;
 
-console.log(
-  "RAW PROFILE",
-  JSON.stringify(rawProfile, null, 2)
-);
+      username:
+        profile?.username ||
+        emailLocalPart ||
+        tokenUsername ||
+        "",
 
-let organisationProfile = null;
 
-if (rawProfile?.id) {
+      displayName:
+        profile?.displayName ||
+        emailLocalPart ||
+        tokenUsername ||
+        "",
 
-  const orgResult = await pool.query(
-    `
-    SELECT *
-    FROM organisation_profiles
-    WHERE user_profile_id = $1
-    LIMIT 1
-    `,
-    [rawProfile.id]
-  );
 
-  organisationProfile =
-    orgResult.rows[0] || null;
-}
+      profileCompleted:
+        !!profile,
 
-const normalizedProfile =
-  normalizeProfile(rawProfile);
-
-console.log(
-  "NORMALIZED PROFILE",
-  JSON.stringify(
-    normalizedProfile,
-    null,
-    2
-  )
-);
-
-console.log(
-  "ORG PROFILE",
-  JSON.stringify(
-    organisationProfile,
-    null,
-    2
-  )
-);
-
-const profile = {
-  ...normalizedProfile,
-  organisationProfile,
-  organisation:
-    organisationProfile,
-};
-
-console.log(
-  "FINAL PROFILE",
-  JSON.stringify(
-    profile,
-    null,
-    2
-  )
-);
-
-console.log(
-  "PROFILE LOOKUP",
-  {
-    found: !!rawProfile,
-    profileId:
-      rawProfile?.id || null,
-    profileUserId:
-      rawProfile?.user_id || null,
-    profileUsername:
-      rawProfile?.username || null,
-  }
-);
-    /* =========================
-       PROVIDERS
-    ========================= */
-
-    const social = profile?.social || {};
-
-    const providers = {
-      facebook: !!social?.facebook?.verified,
-      instagram: !!social?.instagram?.verified,
-      youtube: !!social?.youtube?.verified,
-      x: !!social?.x?.verified,
     };
 
-    /* =========================
-       RESPONSE
-    ========================= */
 
-    return res.json({
+    /* ===================================================
+       RESPONSE
+    =================================================== */
+
+    const response = {
+
       authenticated: true,
 
-      user: {
-        id: tokenSub,
-
-        email: tokenEmail,
-
-        username:
-          profile?.username ||
-          emailLocalPart ||
-          tokenUsername ||
-          "",
-
-        displayName:
-          profile?.displayName ||
-          profile?.display_name ||
-          emailLocalPart ||
-          tokenUsername ||
-          "",
-
-        profileCompleted: !!profile,
-      },
+      user,
 
       profile,
 
       providers,
-    });
+
+    };
+
+
+    console.log(
+      "[ME] SUCCESS:",
+      {
+        userId,
+        profileId:
+          rawProfile?.id || null,
+        version:
+          rawProfile?.version || null,
+      }
+    );
+
+
+    console.log("========================================");
+
+
+    return res.status(200).json(
+      response
+    );
+
+
   } catch (err) {
-    console.error("❌ GET /api/me ERROR:", err);
+
+    console.error(
+      "❌ [ME] GET /api/me ERROR:",
+      {
+        message: err.message,
+        stack: err.stack,
+      }
+    );
+
 
     return res.status(500).json({
-      error: "Failed to fetch current user",
+
+      error:
+        "Failed to fetch current user",
+
+      detail:
+        err.message,
+
     });
+
   }
+
 });
+
 
 export default router;
