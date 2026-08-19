@@ -10,63 +10,94 @@ export function rowToProfile(row) {
 
   return {
 
-    id: row.id,
+    id:
+      row.id,
 
-    userId: row.user_id,
+    userId:
+      row.user_id,
 
-    username: row.username ?? "",
+    username:
+      row.username ?? "",
 
-    displayName: row.display_name ?? "",
+    displayName:
+      row.display_name ?? "",
 
-    email: row.email ?? "",
+    email:
+      row.email ?? "",
 
-    userType: row.user_type ?? "PERSONAL",
+    userType:
+      row.user_type ?? "PERSONAL",
 
-    profileLevel: row.profile_level ?? 0,
+    profileLevel:
+      row.profile_level ?? 0,
 
-    profileStatus: row.profile_status ?? "incomplete",
+    profileStatus:
+      row.profile_status ?? "incomplete",
 
-    phone: row.phone ?? "",
+    phone:
+      row.phone ?? "",
 
-    phoneE164: row.phone_e164 ?? "",
+    phoneE164:
+      row.phone_e164 ?? "",
 
-    phoneDisplay: row.phone_display ?? "",
+    phoneDisplay:
+      row.phone_display ?? "",
 
-    phoneCountry: row.phone_country ?? "AU",
+    phoneCountry:
+      row.phone_country ?? "AU",
 
-    phoneVerified: !!row.phone_verified,
+    phoneVerified:
+      Boolean(row.phone_verified),
 
-    homeLocation: row.home_location ?? null,
+    homeLocation:
+      row.home_location ?? null,
 
-    social: row.social ?? {},
+    social:
+      row.social ?? {},
 
-    payment: row.payment ?? {},
+    payment:
+      row.payment ?? {},
 
-    endpoint: row.endpoint ?? {},
+    endpoint:
+      row.endpoint ?? {},
 
     pendingAccountType:
-      row.pending_account_type,
+      row.pending_account_type ?? null,
 
     businessVerificationStatus:
-      row.business_verification_status,
+      row.business_verification_status ?? "none",
 
-    version: row.version ?? 0,
+    version:
+      row.version ?? 0,
 
-    createdAt: row.created_at,
+    createdAt:
+      row.created_at,
 
-    updatedAt: row.updated_at,
+    updatedAt:
+      row.updated_at,
 
   };
 
 }
 
+
 /* =========================================
    APPLICATION MODEL -> DATABASE ROW
 ========================================= */
 
-export function profileToRow(profile = {}) {
+export function profileToRow(
+  profile = {}
+) {
 
   return {
+
+    /*
+     * CRITICAL:
+     * Application userId maps to
+     * database user_id.
+     */
+    user_id:
+      profile.userId,
 
     username:
       profile.username,
@@ -105,22 +136,29 @@ export function profileToRow(profile = {}) {
       profile.homeLocation,
 
     social:
-      profile.social,
+      profile.social ?? {},
 
     payment:
-      profile.payment,
+      profile.payment ?? {},
 
     endpoint:
-      profile.endpoint,
+      profile.endpoint ?? {},
 
     pending_account_type:
-      profile.pendingAccountType,
+      profile.pendingAccountType ?? null,
 
     business_verification_status:
-      profile.businessVerificationStatus,
+      profile.businessVerificationStatus ??
+      "none",
 
     version:
-      profile.version,
+      profile.version ?? 0,
+
+    created_at:
+      profile.createdAt,
+
+    updated_at:
+      profile.updatedAt,
 
   };
 

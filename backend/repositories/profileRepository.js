@@ -134,84 +134,165 @@ export async function createProfile(profile) {
    UPDATE PROFILE
 ===================================================== */
 
-export async function updateProfile(profile) {
+/* =====================================================
+   UPDATE PROFILE
+===================================================== */
 
-  const row = profileToRow(profile);
+export async function updateProfile(
+  userId,
+  profile
+) {
 
-  const { rows } = await pool.query(
-    `
-      UPDATE ${TABLE}
-
-      SET
-
-        username = $1,
-        display_name = $2,
-        user_type = $3,
-
-        phone = $4,
-        phone_e164 = $5,
-        phone_display = $6,
-        phone_country = $7,
-        phone_verified = $8,
-
-        home_location = $9::jsonb,
-
-        social = $10::jsonb,
-        payment = $11::jsonb,
-        endpoint = $12::jsonb,
-
-        profile_level = $13,
-        profile_status = $14,
-
-        pending_account_type = $15,
-        business_verification_status = $16,
-
-        version = $17,
-        updated_at = $18
-
-      WHERE user_id = $19
-
-      RETURNING *
-    `,
-    [
-
-      row.username,
-      row.display_name,
-      row.user_type,
-
-      row.phone,
-      row.phone_e164,
-      row.phone_display,
-      row.phone_country,
-      row.phone_verified,
-
-      row.home_location
-        ? JSON.stringify(row.home_location)
-        : null,
-
-      JSON.stringify(row.social || {}),
-      JSON.stringify(row.payment || {}),
-      JSON.stringify(row.endpoint || {}),
-
-      row.profile_level,
-      row.profile_status,
-
-      row.pending_account_type,
-      row.business_verification_status,
-
-      row.version,
-
-      row.updated_at,
-
-      row.user_id,
-    ]
-  );
-
-  if (!rows[0]) {
+  if (!userId) {
     throw new Error(
-      "Profile update affected no rows"
+      "Missing userId for profile update"
     );
   }
 
-  return rowToProfile(rows[0]);
+  const row =
+    profileToRow(profile);
+
+  console.log(
+    "[PROFILE REPOSITORY] UPDATE:",
+    {
+      userId,
+      profileUserId: profile?.userId,
+      rowUserId: row?.user_id,
+      profileId: profile?.id,
+    }
+  );
+
+  const { rows } =
+    await pool.query(
+      `
+        UPDATE ${TABLE}
+
+        SET
+
+          username =
+            $1,
+
+          display_name =
+            $2,
+
+          user_type =
+            $3,
+
+          phone =
+            $4,
+
+          phone_e164 =
+            $5,
+
+          phone_display =
+            $6,
+
+          phone_country =
+            $7,
+
+          phone_verified =
+            $8,
+
+          home_location =
+            $9::jsonb,
+
+          social =
+            $10::jsonb,
+
+          payment =
+            $11::jsonb,
+
+          endpoint =
+            $12::jsonb,
+
+          profile_level =
+            $13,
+
+          profile_status =
+            $14,
+
+          pending_account_type =
+            $15,
+
+          business_verification_status =
+            $16,
+
+          version =
+            $17,
+
+          updated_at =
+            $18
+
+        WHERE user_id =
+            $19
+
+        RETURNING *
+      `,
+      [
+
+        row.username,
+
+        row.display_name,
+
+        row.user_type,
+
+        row.phone,
+
+        row.phone_e164,
+
+        row.phone_display,
+
+        row.phone_country,
+
+        row.phone_verified,
+
+        row.home_location
+          ? JSON.stringify(
+              row.home_location
+            )
+          : null,
+
+        JSON.stringify(
+          row.social || {}
+        ),
+
+        JSON.stringify(
+          row.payment || {}
+        ),
+
+        JSON.stringify(
+          row.endpoint || {}
+        ),
+
+        row.profile_level,
+
+        row.profile_status,
+
+        row.pending_account_type,
+
+        row.business_verification_status,
+
+        row.version,
+
+        row.updated_at,
+
+        // IMPORTANT:
+        // use the authoritative identity
+        userId,
+
+      ]
+    );
+
+  if (!rows[0]) {
+
+    throw new Error(
+      `Profile update affected no rows for userId ${userId}`
+    );
+
+  }
+
+  return rowToProfile(
+    rows[0]
+  );
+
 }

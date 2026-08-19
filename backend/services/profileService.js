@@ -6,7 +6,17 @@ import {
 
 
 /* =====================================================
-   HELPERS
+   CONSTANTS
+===================================================== */
+
+const DEFAULT_PHONE_COUNTRY = "AU";
+const DEFAULT_USER_TYPE = "PERSONAL";
+const DEFAULT_PROFILE_STATUS = "incomplete";
+const DEFAULT_BUSINESS_VERIFICATION_STATUS = "none";
+
+
+/* =====================================================
+   STRING HELPERS
 ===================================================== */
 
 function cleanString(value) {
@@ -22,10 +32,15 @@ function cleanString(value) {
 }
 
 
+/* =====================================================
+   ACCOUNT TYPE
+===================================================== */
+
 function normaliseAccountType(value) {
 
   const type =
     cleanString(value).toUpperCase();
+
 
   if (
     type === "PERSONAL" ||
@@ -33,6 +48,15 @@ function normaliseAccountType(value) {
   ) {
     return "PERSONAL";
   }
+
+
+  /*
+   * ORG is retained as a supported
+   * application-level value.
+   *
+   * BUSINESS / ORGANISATION / ORGANIZATION
+   * are normalised to BUSINESS.
+   */
 
   if (
     type === "BUSINESS" ||
@@ -42,15 +66,31 @@ function normaliseAccountType(value) {
     return "BUSINESS";
   }
 
-  return type || "PERSONAL";
+
+  if (type === "ORG") {
+    return "ORG";
+  }
+
+
+  return (
+    type ||
+    DEFAULT_USER_TYPE
+  );
 }
 
 
+/* =====================================================
+   ACCOUNT TYPE HELPERS
+===================================================== */
+
 function isBusinessType(value) {
 
+  const type =
+    normaliseAccountType(value);
+
   return (
-    normaliseAccountType(value) ===
-    "BUSINESS"
+    type === "BUSINESS" ||
+    type === "ORG"
   );
 }
 
@@ -65,24 +105,63 @@ function mergeSocialState(
 ) {
 
   const merged = {
-    ...existing,
+    ...(existing || {}),
   };
+
 
   for (
     const [provider, value]
-    of Object.entries(incoming || {})
+    of Object.entries(
+      incoming || {}
+    )
   ) {
+
+    /*
+     * null explicitly removes
+     * the provider.
+     */
 
     if (value === null) {
       delete merged[provider];
       continue;
     }
 
+
+    /*
+     * Ignore malformed values.
+     */
+
+    if (
+      typeof value !== "object" ||
+      Array.isArray(value)
+    ) {
+      continue;
+    }
+
+
     merged[provider] = {
+
       ...(merged[provider] || {}),
+
       ...value,
+
     };
+
+
+    /*
+     * Remove empty provider objects.
+     */
+
+    if (
+      Object.keys(
+        merged[provider]
+      ).length === 0
+    ) {
+      delete merged[provider];
+    }
+
   }
+
 
   return merged;
 }
@@ -94,8 +173,11 @@ function mergePaymentState(
 ) {
 
   return {
-    ...existing,
-    ...incoming,
+
+    ...(existing || {}),
+
+    ...(incoming || {}),
+
   };
 }
 
@@ -106,8 +188,11 @@ function mergeEndpointState(
 ) {
 
   return {
-    ...existing,
-    ...incoming,
+
+    ...(existing || {}),
+
+    ...(incoming || {}),
+
   };
 }
 
@@ -116,18 +201,31 @@ function mergeEndpointState(
    PROFILE STATE
 ===================================================== */
 
-function calculateProfileState(profile = {}) {
+function calculateProfileState(
+  profile = {}
+) {
 
   const username =
-    cleanString(profile.username);
+    cleanString(
+      profile.username
+    );
+
 
   const displayName =
-    cleanString(profile.displayName);
+    cleanString(
+      profile.displayName
+    );
+
 
   const userType =
     normaliseAccountType(
       profile.userType
     );
+
+
+  /*
+   * Minimum profile requirements.
+   */
 
   if (
     !username ||
@@ -135,36 +233,87 @@ function calculateProfileState(profile = {}) {
   ) {
 
     return {
+
       profileLevel: 0,
-      profileStatus: "incomplete",
+
+      profileStatus:
+        DEFAULT_PROFILE_STATUS,
+
     };
   }
 
 
-  if (userType === "PERSONAL") {
-
-    return {
-      profileLevel: 1,
-      profileStatus: "basic_complete",
-    };
-  }
-
+  /*
+   * Personal account.
+   */
 
   if (
-    profile.businessVerificationStatus ===
-    "verified"
+    userType === "PERSONAL"
   ) {
 
     return {
-      profileLevel: 3,
-      profileStatus: "verified",
+
+      profileLevel: 1,
+
+      profileStatus:
+        "basic_complete",
+
     };
   }
 
 
+  /*
+   * Business / organisation.
+   */
+
+  if (
+    isBusinessType(userType) &&
+    profile.businessVerificationStatus ===
+      "verified"
+  ) {
+
+    return {
+
+      profileLevel: 3,
+
+      profileStatus:
+        "verified",
+
+    };
+  }
+
+
+  /*
+   * Business account awaiting
+   * verification.
+   */
+
+  if (
+    isBusinessType(userType)
+  ) {
+
+    return {
+
+      profileLevel: 1,
+
+      profileStatus:
+        "business_pending",
+
+    };
+  }
+
+
+  /*
+   * Unknown account type.
+   */
+
   return {
-    profileLevel: 1,
-    profileStatus: "business_pending",
+
+    profileLevel: 0,
+
+    profileStatus:
+      DEFAULT_PROFILE_STATUS,
+
   };
 }
 
@@ -173,69 +322,135 @@ function calculateProfileState(profile = {}) {
    PROFILE FIELD PICKER
 ===================================================== */
 
-function pickProfileFields(profile = {}) {
+function pickProfileFields(
+  profile = {}
+) {
 
-  return {
+  const incoming = {};
 
-    ...(profile.username !== undefined && {
-      username: cleanString(profile.username),
-    }),
 
-    ...(profile.displayName !== undefined && {
-      displayName: cleanString(profile.displayName),
-    }),
+  if (
+    profile.username !== undefined
+  ) {
+    incoming.username =
+      cleanString(
+        profile.username
+      );
+  }
 
-    ...(profile.userType !== undefined && {
-      userType:
-        normaliseAccountType(profile.userType),
-    }),
 
-    ...(profile.phone !== undefined && {
-      phone: profile.phone,
-    }),
+  if (
+    profile.displayName !== undefined
+  ) {
+    incoming.displayName =
+      cleanString(
+        profile.displayName
+      );
+  }
 
-    ...(profile.phoneE164 !== undefined && {
-      phoneE164: profile.phoneE164,
-    }),
 
-    ...(profile.phoneDisplay !== undefined && {
-      phoneDisplay: profile.phoneDisplay,
-    }),
+  if (
+    profile.userType !== undefined
+  ) {
+    incoming.userType =
+      normaliseAccountType(
+        profile.userType
+      );
+  }
 
-    ...(profile.phoneCountry !== undefined && {
-      phoneCountry: profile.phoneCountry,
-    }),
 
-    ...(profile.phoneVerified !== undefined && {
-      phoneVerified: profile.phoneVerified,
-    }),
+  if (
+    profile.phone !== undefined
+  ) {
+    incoming.phone =
+      profile.phone;
+  }
 
-    ...(profile.homeLocation !== undefined && {
-      homeLocation: profile.homeLocation,
-    }),
 
-    ...(profile.social !== undefined && {
-      social: profile.social,
-    }),
+  if (
+    profile.phoneE164 !== undefined
+  ) {
+    incoming.phoneE164 =
+      profile.phoneE164;
+  }
 
-    ...(profile.payment !== undefined && {
-      payment: profile.payment,
-    }),
 
-    ...(profile.endpoint !== undefined && {
-      endpoint: profile.endpoint,
-    }),
+  if (
+    profile.phoneDisplay !== undefined
+  ) {
+    incoming.phoneDisplay =
+      profile.phoneDisplay;
+  }
 
-    ...(profile.pendingAccountType !== undefined && {
-      pendingAccountType:
-        profile.pendingAccountType,
-    }),
 
-    ...(profile.businessVerificationStatus !== undefined && {
-      businessVerificationStatus:
-        profile.businessVerificationStatus,
-    }),
-  };
+  if (
+    profile.phoneCountry !== undefined
+  ) {
+    incoming.phoneCountry =
+      profile.phoneCountry;
+  }
+
+
+  if (
+    profile.phoneVerified !== undefined
+  ) {
+    incoming.phoneVerified =
+      Boolean(
+        profile.phoneVerified
+      );
+  }
+
+
+  if (
+    profile.homeLocation !== undefined
+  ) {
+    incoming.homeLocation =
+      profile.homeLocation;
+  }
+
+
+  if (
+    profile.social !== undefined
+  ) {
+    incoming.social =
+      profile.social;
+  }
+
+
+  if (
+    profile.payment !== undefined
+  ) {
+    incoming.payment =
+      profile.payment;
+  }
+
+
+  if (
+    profile.endpoint !== undefined
+  ) {
+    incoming.endpoint =
+      profile.endpoint;
+  }
+
+
+  if (
+    profile.pendingAccountType !== undefined
+  ) {
+    incoming.pendingAccountType =
+      profile.pendingAccountType;
+  }
+
+
+  if (
+    profile.businessVerificationStatus !==
+    undefined
+  ) {
+    incoming.businessVerificationStatus =
+      profile.businessVerificationStatus;
+  }
+
+
+  return incoming;
 }
 
 
@@ -249,11 +464,78 @@ function getEndpointDetails(
 ) {
 
   return {
+
     ...(incoming || {}),
+
     ip:
-      req.ip ||
+      req?.ip ||
       incoming?.ip ||
       null,
+
+  };
+}
+
+
+/* =====================================================
+   DEFAULT PROFILE
+===================================================== */
+
+function createDefaultProfile(
+  userId
+) {
+
+  const now =
+    new Date();
+
+
+  return {
+
+    userId,
+
+    username: "",
+
+    displayName: "",
+
+    email: "",
+
+    userType:
+      DEFAULT_USER_TYPE,
+
+    phone: "",
+
+    phoneE164: "",
+
+    phoneDisplay: "",
+
+    phoneCountry:
+      DEFAULT_PHONE_COUNTRY,
+
+    phoneVerified: false,
+
+    homeLocation: null,
+
+    social: {},
+
+    payment: {},
+
+    endpoint: {},
+
+    profileLevel: 0,
+
+    profileStatus:
+      DEFAULT_PROFILE_STATUS,
+
+    pendingAccountType: null,
+
+    businessVerificationStatus:
+      DEFAULT_BUSINESS_VERIFICATION_STATUS,
+
+    version: 0,
+
+    createdAt: now,
+
+    updatedAt: now,
+
   };
 }
 
@@ -280,28 +562,55 @@ function buildMergedProfile(
         existing.userType
       ),
 
+
     social:
       mergeSocialState(
+
         existing.social,
+
         incoming.social
+
       ),
+
 
     payment:
       mergePaymentState(
+
         existing.payment,
+
         incoming.payment
+
       ),
+
 
     endpoint:
       mergeEndpointState(
+
         existing.endpoint,
+
         getEndpointDetails(
           req,
           incoming.endpoint
         )
+
       ),
+
   };
 
+
+  /*
+   * Never allow the client to
+   * accidentally erase the user ID.
+   */
+
+  merged.userId =
+    existing.userId;
+
+
+  /*
+   * Recalculate profile state
+   * server-side.
+   */
 
   const state =
     calculateProfileState(
@@ -309,22 +618,30 @@ function buildMergedProfile(
     );
 
 
-  return {
+  merged.profileLevel =
+    state.profileLevel;
 
-    ...merged,
 
-    profileLevel:
-      state.profileLevel,
+  merged.profileStatus =
+    state.profileStatus;
 
-    profileStatus:
-      state.profileStatus,
 
-    version:
-      (existing.version || 0) + 1,
+  /*
+   * Version is controlled by the
+   * service, not the client.
+   */
 
-    updatedAt:
-      new Date(),
-  };
+  merged.version =
+    Number(
+      existing.version || 0
+    ) + 1;
+
+
+  merged.updatedAt =
+    new Date();
+
+
+  return merged;
 }
 
 
@@ -336,10 +653,18 @@ export async function getProfileService({
   userId,
 }) {
 
+  if (!userId) {
+    throw new Error(
+      "Missing userId"
+    );
+  }
+
+
   const profile =
     await fetchProfileByUserId(
       userId
     );
+
 
   return {
 
@@ -350,6 +675,7 @@ export async function getProfileService({
 
     version:
       profile?.version ?? 0,
+
   };
 }
 
@@ -364,6 +690,13 @@ export async function putProfileService({
   req,
 }) {
 
+  if (!userId) {
+    throw new Error(
+      "Missing userId"
+    );
+  }
+
+
   const existing =
     await fetchProfileByUserId(
       userId
@@ -376,31 +709,33 @@ export async function putProfileService({
     );
 
 
+  /*
+   * Endpoint information is
+   * server-controlled.
+   */
+
+  incoming.endpoint =
+    getEndpointDetails(
+      req,
+      incoming.endpoint
+    );
+
+
+  /*
+   * CREATE
+   */
+
   if (!existing) {
+
+    const base =
+      createDefaultProfile(
+        userId
+      );
+
 
     const profile =
       buildMergedProfile(
-        {
-          userId,
-          username: "",
-          displayName: "",
-          userType: "PERSONAL",
-          phone: "",
-          phoneE164: "",
-          phoneDisplay: "",
-          phoneCountry: "AU",
-          phoneVerified: false,
-          homeLocation: null,
-          social: {},
-          payment: {},
-          endpoint: {},
-          profileLevel: 0,
-          profileStatus: "incomplete",
-          pendingAccountType: null,
-          businessVerificationStatus: "none",
-          version: 0,
-          createdAt: new Date(),
-        },
+        base,
         incoming,
         req
       );
@@ -413,11 +748,19 @@ export async function putProfileService({
 
 
     return {
+
       profile: saved,
-      version: saved.version,
+
+      version:
+        saved.version,
+
     };
   }
 
+
+  /*
+   * UPDATE
+   */
 
   const merged =
     buildMergedProfile(
@@ -434,8 +777,12 @@ export async function putProfileService({
 
 
   return {
+
     profile: saved,
-    version: saved.version,
+
+    version:
+      saved.version,
+
   };
 }
 
@@ -450,6 +797,13 @@ export async function patchProfileService({
   req,
 }) {
 
+  if (!userId) {
+    throw new Error(
+      "Missing userId"
+    );
+  }
+
+
   const existing =
     await fetchProfileByUserId(
       userId
@@ -457,6 +811,7 @@ export async function patchProfileService({
 
 
   if (!existing) {
+
     throw new Error(
       "Profile not found"
     );
@@ -469,6 +824,18 @@ export async function patchProfileService({
     );
 
 
+  /*
+   * Endpoint is generated from
+   * the authenticated request.
+   */
+
+  incoming.endpoint =
+    getEndpointDetails(
+      req,
+      incoming.endpoint
+    );
+
+
   const merged =
     buildMergedProfile(
       existing,
@@ -478,12 +845,26 @@ export async function patchProfileService({
 
 
   console.log(
-    "[PROFILE SERVICE] MERGED PROFILE:",
-    JSON.stringify(
-      merged,
-      null,
-      2
-    )
+    "[PROFILE SERVICE] PATCH",
+    {
+      userId,
+
+      existingUserId:
+        existing.userId,
+
+      mergedUserId:
+        merged.userId,
+
+      existingVersion:
+        existing.version,
+
+      nextVersion:
+        merged.version,
+
+      userType:
+        merged.userType,
+
+    }
   );
 
 
@@ -502,5 +883,6 @@ export async function patchProfileService({
 
     version:
       saved.version,
+
   };
 }
