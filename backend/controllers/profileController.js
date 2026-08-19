@@ -10,6 +10,7 @@ import {
 ===================================================== */
 
 export async function getProfile(req, res) {
+
   try {
 
     const userId = req.user?.userId;
@@ -47,6 +48,7 @@ export async function getProfile(req, res) {
 ===================================================== */
 
 export async function putProfile(req, res) {
+
   try {
 
     const userId = req.user?.userId;
@@ -86,14 +88,10 @@ export async function putProfile(req, res) {
 ===================================================== */
 
 export async function patchProfile(req, res) {
+
   try {
 
     const userId = req.user?.userId;
-
-    console.log(
-      "[PROFILE PATCH] userId:",
-      userId
-    );
 
     if (!userId) {
       return res.status(401).json({
@@ -101,12 +99,38 @@ export async function patchProfile(req, res) {
       });
     }
 
+    console.log(
+      "========================================"
+    );
+
+    console.log(
+      "[PROFILE PATCH] START"
+    );
+
+    console.log(
+      "[PROFILE PATCH] USER ID:",
+      userId
+    );
+
+    console.log(
+      "[PROFILE PATCH] BODY:",
+      JSON.stringify(req.body, null, 2)
+    );
+
     const result =
       await patchProfileService({
         userId,
         body: req.body,
         req,
       });
+
+    console.log(
+      "[PROFILE PATCH] SUCCESS:",
+      {
+        userId,
+        version: result?.version,
+      }
+    );
 
     return res.status(200).json(result);
 

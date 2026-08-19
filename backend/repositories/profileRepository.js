@@ -6,41 +6,32 @@ import {
 } from "../mappers/profileMappers.js";
 
 
-const TABLE =
-  "user_profiles";
+const TABLE = "user_profiles";
 
 
 /* =====================================================
    FETCH PROFILE
 ===================================================== */
 
-export async function fetchProfileByUserId(
-  userId
-) {
+export async function fetchProfileByUserId(userId) {
 
   if (!userId) {
-    throw new Error(
-      "Missing userId"
-    );
+    throw new Error("Missing userId");
   }
 
-
-  const { rows } =
-    await pool.query(
-      `
-        SELECT *
-        FROM ${TABLE}
-        WHERE user_id = $1
-        LIMIT 1
-      `,
-      [userId]
-    );
-
+  const { rows } = await pool.query(
+    `
+      SELECT *
+      FROM ${TABLE}
+      WHERE user_id = $1
+      LIMIT 1
+    `,
+    [userId]
+  );
 
   return rows[0]
     ? rowToProfile(rows[0])
     : null;
-
 }
 
 
@@ -48,114 +39,94 @@ export async function fetchProfileByUserId(
    CREATE PROFILE
 ===================================================== */
 
-export async function createProfile(
-  profile
-) {
+export async function createProfile(profile) {
 
-  const row =
-    profileToRow(profile);
+  const row = profileToRow(profile);
 
+  const { rows } = await pool.query(
+    `
+      INSERT INTO ${TABLE} (
 
-  const { rows } =
-    await pool.query(
-      `
-        INSERT INTO ${TABLE} (
+        user_id,
 
-          user_id,
+        username,
+        display_name,
+        user_type,
 
-          username,
-          display_name,
-          user_type,
+        phone,
+        phone_e164,
+        phone_display,
+        phone_country,
+        phone_verified,
 
-          phone,
-          phone_e164,
-          phone_display,
-          phone_country,
-          phone_verified,
+        home_location,
 
-          home_location,
+        social,
+        payment,
+        endpoint,
 
-          social,
-          payment,
-          endpoint,
+        profile_level,
+        profile_status,
 
-          profile_level,
-          profile_status,
+        pending_account_type,
+        business_verification_status,
 
-          pending_account_type,
-          business_verification_status,
+        version,
 
-          version,
+        created_at,
+        updated_at
 
-          created_at,
-          updated_at
+      )
 
-        )
+      VALUES (
 
-        VALUES (
+        $1,$2,$3,$4,$5,
+        $6,$7,$8,$9,$10,
+        $11::jsonb,
+        $12::jsonb,
+        $13::jsonb,
+        $14,$15,$16,$17,$18,$19,$20
 
-          $1,$2,$3,$4,$5,
-          $6,$7,$8,$9,$10,
-          $11::jsonb,
-          $12::jsonb,
-          $13::jsonb,
-          $14,$15,$16,$17,$18,$19,$20
+      )
 
-        )
+      RETURNING *
+    `,
+    [
 
-        RETURNING *
-      `,
-      [
+      row.user_id,
 
-        row.user_id,
+      row.username,
+      row.display_name,
+      row.user_type,
 
-        row.username,
-        row.display_name,
-        row.user_type,
+      row.phone,
+      row.phone_e164,
+      row.phone_display,
+      row.phone_country,
+      row.phone_verified,
 
-        row.phone,
-        row.phone_e164,
-        row.phone_display,
-        row.phone_country,
-        row.phone_verified,
+      row.home_location
+        ? JSON.stringify(row.home_location)
+        : null,
 
-        row.home_location
-          ? JSON.stringify(
-              row.home_location
-            )
-          : null,
+      JSON.stringify(row.social || {}),
+      JSON.stringify(row.payment || {}),
+      JSON.stringify(row.endpoint || {}),
 
-        JSON.stringify(
-          row.social || {}
-        ),
+      row.profile_level,
+      row.profile_status,
 
-        JSON.stringify(
-          row.payment || {}
-        ),
+      row.pending_account_type,
+      row.business_verification_status,
 
-        JSON.stringify(
-          row.endpoint || {}
-        ),
+      row.version,
 
-        row.profile_level,
-        row.profile_status,
-
-        row.pending_account_type,
-        row.business_verification_status,
-
-        row.version,
-
-        row.created_at,
-        row.updated_at,
-
-      ]
-    );
-
-
-  return rowToProfile(
-    rows[0]
+      row.created_at,
+      row.updated_at,
+    ]
   );
 
+  return rowToProfile(rows[0]);
 }
 
 
@@ -163,137 +134,84 @@ export async function createProfile(
    UPDATE PROFILE
 ===================================================== */
 
-export async function updateProfile(
-  profile
-) {
+export async function updateProfile(profile) {
 
-  const row =
-    profileToRow(profile);
+  const row = profileToRow(profile);
 
+  const { rows } = await pool.query(
+    `
+      UPDATE ${TABLE}
 
-  const { rows } =
-    await pool.query(
-      `
-        UPDATE ${TABLE}
+      SET
 
-        SET
+        username = $1,
+        display_name = $2,
+        user_type = $3,
 
-          username =
-            $1,
+        phone = $4,
+        phone_e164 = $5,
+        phone_display = $6,
+        phone_country = $7,
+        phone_verified = $8,
 
-          display_name =
-            $2,
+        home_location = $9::jsonb,
 
-          user_type =
-            $3,
+        social = $10::jsonb,
+        payment = $11::jsonb,
+        endpoint = $12::jsonb,
 
-          phone =
-            $4,
+        profile_level = $13,
+        profile_status = $14,
 
-          phone_e164 =
-            $5,
+        pending_account_type = $15,
+        business_verification_status = $16,
 
-          phone_display =
-            $6,
+        version = $17,
+        updated_at = $18
 
-          phone_country =
-            $7,
+      WHERE user_id = $19
 
-          phone_verified =
-            $8,
+      RETURNING *
+    `,
+    [
 
-          home_location =
-            $9::jsonb,
+      row.username,
+      row.display_name,
+      row.user_type,
 
-          social =
-            $10::jsonb,
+      row.phone,
+      row.phone_e164,
+      row.phone_display,
+      row.phone_country,
+      row.phone_verified,
 
-          payment =
-            $11::jsonb,
+      row.home_location
+        ? JSON.stringify(row.home_location)
+        : null,
 
-          endpoint =
-            $12::jsonb,
+      JSON.stringify(row.social || {}),
+      JSON.stringify(row.payment || {}),
+      JSON.stringify(row.endpoint || {}),
 
-          profile_level =
-            $13,
+      row.profile_level,
+      row.profile_status,
 
-          profile_status =
-            $14,
+      row.pending_account_type,
+      row.business_verification_status,
 
-          pending_account_type =
-            $15,
+      row.version,
 
-          business_verification_status =
-            $16,
+      row.updated_at,
 
-          version =
-            $17,
-
-          updated_at =
-            $18
-
-        WHERE user_id =
-            $19
-
-        RETURNING *
-      `,
-      [
-
-        row.username,
-        row.display_name,
-        row.user_type,
-
-        row.phone,
-        row.phone_e164,
-        row.phone_display,
-        row.phone_country,
-        row.phone_verified,
-
-        row.home_location
-          ? JSON.stringify(
-              row.home_location
-            )
-          : null,
-
-        JSON.stringify(
-          row.social || {}
-        ),
-
-        JSON.stringify(
-          row.payment || {}
-        ),
-
-        JSON.stringify(
-          row.endpoint || {}
-        ),
-
-        row.profile_level,
-        row.profile_status,
-
-        row.pending_account_type,
-        row.business_verification_status,
-
-        row.version,
-
-        row.updated_at,
-
-        row.user_id,
-
-      ]
-    );
-
+      row.user_id,
+    ]
+  );
 
   if (!rows[0]) {
-
     throw new Error(
       "Profile update affected no rows"
     );
-
   }
 
-
-  return rowToProfile(
-    rows[0]
-  );
-
+  return rowToProfile(rows[0]);
 }
