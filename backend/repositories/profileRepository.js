@@ -13,21 +13,26 @@ const TABLE = "user_profiles";
    FETCH PROFILE
 ===================================================== */
 
-export async function fetchProfileByUserId(userId) {
+export async function fetchProfileByUserId(
+  userId
+) {
 
   if (!userId) {
-    throw new Error("Missing userId");
+    throw new Error(
+      "Missing userId"
+    );
   }
 
-  const { rows } = await pool.query(
-    `
-      SELECT *
-      FROM ${TABLE}
-      WHERE user_id = $1
-      LIMIT 1
-    `,
-    [userId]
-  );
+  const { rows } =
+    await pool.query(
+      `
+        SELECT *
+        FROM ${TABLE}
+        WHERE user_id = $1
+        LIMIT 1
+      `,
+      [userId]
+    );
 
   return rows[0]
     ? rowToProfile(rows[0])
@@ -39,113 +44,13 @@ export async function fetchProfileByUserId(userId) {
    CREATE PROFILE
 ===================================================== */
 
-export async function createProfile(profile) {
-
-  const row = profileToRow(profile);
-
-  const { rows } = await pool.query(
-    `
-      INSERT INTO ${TABLE} (
-
-        user_id,
-
-        username,
-        display_name,
-        user_type,
-
-        phone,
-        phone_e164,
-        phone_display,
-        phone_country,
-        phone_verified,
-
-        home_location,
-
-        social,
-        payment,
-        endpoint,
-
-        profile_level,
-        profile_status,
-
-        pending_account_type,
-        business_verification_status,
-
-        version,
-
-        created_at,
-        updated_at
-
-      )
-
-      VALUES (
-
-        $1,$2,$3,$4,$5,
-        $6,$7,$8,$9,$10,
-        $11::jsonb,
-        $12::jsonb,
-        $13::jsonb,
-        $14,$15,$16,$17,$18,$19,$20
-
-      )
-
-      RETURNING *
-    `,
-    [
-
-      row.user_id,
-
-      row.username,
-      row.display_name,
-      row.user_type,
-
-      row.phone,
-      row.phone_e164,
-      row.phone_display,
-      row.phone_country,
-      row.phone_verified,
-
-      row.home_location
-        ? JSON.stringify(row.home_location)
-        : null,
-
-      JSON.stringify(row.social || {}),
-      JSON.stringify(row.payment || {}),
-      JSON.stringify(row.endpoint || {}),
-
-      row.profile_level,
-      row.profile_status,
-
-      row.pending_account_type,
-      row.business_verification_status,
-
-      row.version,
-
-      row.created_at,
-      row.updated_at,
-    ]
-  );
-
-  return rowToProfile(rows[0]);
-}
-
-
-/* =====================================================
-   UPDATE PROFILE
-===================================================== */
-
-/* =====================================================
-   UPDATE PROFILE
-===================================================== */
-
-export async function updateProfile(
-  userId,
+export async function createProfile(
   profile
 ) {
 
-  if (!userId) {
+  if (!profile?.userId) {
     throw new Error(
-      "Missing userId for profile update"
+      "Cannot create profile without userId"
     );
   }
 
@@ -153,14 +58,166 @@ export async function updateProfile(
     profileToRow(profile);
 
   console.log(
-    "[PROFILE REPOSITORY] UPDATE:",
+    "[PROFILE REPOSITORY] CREATE:",
     {
-      userId,
-      profileUserId: profile?.userId,
-      rowUserId: row?.user_id,
-      profileId: profile?.id,
+      userId: row.user_id,
+      profileId: row.id,
     }
   );
+
+  const { rows } =
+    await pool.query(
+      `
+        INSERT INTO ${TABLE} (
+
+          user_id,
+
+          username,
+          display_name,
+          user_type,
+
+          phone,
+          phone_e164,
+          phone_display,
+          phone_country,
+          phone_verified,
+
+          home_location,
+
+          social,
+          payment,
+          endpoint,
+
+          profile_level,
+          profile_status,
+
+          pending_account_type,
+          business_verification_status,
+
+          version,
+
+          created_at,
+          updated_at
+
+        )
+
+        VALUES (
+
+          $1,
+          $2,
+          $3,
+          $4,
+
+          $5,
+          $6,
+          $7,
+          $8,
+          $9,
+
+          $10::jsonb,
+
+          $11::jsonb,
+          $12::jsonb,
+          $13::jsonb,
+
+          $14,
+          $15,
+
+          $16,
+          $17,
+
+          $18,
+
+          $19,
+          $20
+
+        )
+
+        RETURNING *
+      `,
+      [
+
+        row.user_id,
+
+        row.username,
+        row.display_name,
+        row.user_type,
+
+        row.phone,
+        row.phone_e164,
+        row.phone_display,
+        row.phone_country,
+        row.phone_verified,
+
+        row.home_location
+          ? JSON.stringify(
+              row.home_location
+            )
+          : null,
+
+        JSON.stringify(
+          row.social || {}
+        ),
+
+        JSON.stringify(
+          row.payment || {}
+        ),
+
+        JSON.stringify(
+          row.endpoint || {}
+        ),
+
+        row.profile_level,
+        row.profile_status,
+
+        row.pending_account_type,
+        row.business_verification_status,
+
+        row.version,
+
+        row.created_at,
+        row.updated_at,
+      ]
+    );
+
+  return rowToProfile(
+    rows[0]
+  );
+}
+
+
+/* =====================================================
+   UPDATE PROFILE
+===================================================== */
+
+export async function updateProfile(
+  profile
+) {
+
+  if (!profile?.userId) {
+    throw new Error(
+      "Cannot update profile without userId"
+    );
+  }
+
+  const row =
+    profileToRow(profile);
+
+
+  console.log(
+    "[PROFILE REPOSITORY] UPDATE:",
+    {
+      profileId:
+        row.id,
+
+      userId:
+        row.user_id,
+
+      version:
+        row.version,
+    }
+  );
+
 
   const { rows } =
     await pool.query(
@@ -231,19 +288,13 @@ export async function updateProfile(
       [
 
         row.username,
-
         row.display_name,
-
         row.user_type,
 
         row.phone,
-
         row.phone_e164,
-
         row.phone_display,
-
         row.phone_country,
-
         row.phone_verified,
 
         row.home_location
@@ -265,34 +316,30 @@ export async function updateProfile(
         ),
 
         row.profile_level,
-
         row.profile_status,
 
         row.pending_account_type,
-
         row.business_verification_status,
 
         row.version,
 
         row.updated_at,
 
-        // IMPORTANT:
-        // use the authoritative identity
-        userId,
-
+        row.user_id,
       ]
     );
+
 
   if (!rows[0]) {
 
     throw new Error(
-      `Profile update affected no rows for userId ${userId}`
+      `Profile update affected no rows for userId ${row.user_id}`
     );
 
   }
 
+
   return rowToProfile(
     rows[0]
   );
-
 }

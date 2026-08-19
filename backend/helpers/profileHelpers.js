@@ -4,9 +4,28 @@ export function cleanString(value = "") {
   return String(value || "").trim();
 }
 
-export function normaliseAccountType(value = "PERSONAL") {
-  const clean = cleanString(value).toUpperCase();
-  return ACCOUNT_TYPES.includes(clean) ? clean : "PERSONAL";
+function normaliseAccountType(value) {
+
+  const type =
+    cleanString(value).toUpperCase();
+
+  if (
+    type === "PERSONAL" ||
+    type === "PERSON"
+  ) {
+    return "PERSONAL";
+  }
+
+  if (
+    type === "BUSINESS" ||
+    type === "ORG" ||
+    type === "ORGANISATION" ||
+    type === "ORGANIZATION"
+  ) {
+    return "BUSINESS";
+  }
+
+  return type || "PERSONAL";
 }
 
 export function isBusinessType(userType) {

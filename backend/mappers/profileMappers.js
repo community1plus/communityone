@@ -9,12 +9,9 @@ export function rowToProfile(row) {
   }
 
   return {
+    id: row.id,
 
-    id:
-      row.id,
-
-    userId:
-      row.user_id,
+    userId: row.user_id,
 
     username:
       row.username ?? "",
@@ -47,7 +44,7 @@ export function rowToProfile(row) {
       row.phone_country ?? "AU",
 
     phoneVerified:
-      Boolean(row.phone_verified),
+      !!row.phone_verified,
 
     homeLocation:
       row.home_location ?? null,
@@ -75,9 +72,7 @@ export function rowToProfile(row) {
 
     updatedAt:
       row.updated_at,
-
   };
-
 }
 
 
@@ -91,49 +86,47 @@ export function profileToRow(
 
   return {
 
-    /*
-     * CRITICAL:
-     * Application userId maps to
-     * database user_id.
-     */
+    id:
+      profile.id,
+
     user_id:
       profile.userId,
 
     username:
-      profile.username,
+      profile.username ?? "",
 
     display_name:
-      profile.displayName,
+      profile.displayName ?? "",
 
     email:
-      profile.email,
+      profile.email ?? "",
 
     user_type:
-      profile.userType,
+      profile.userType ?? "PERSONAL",
 
     profile_level:
-      profile.profileLevel,
+      profile.profileLevel ?? 0,
 
     profile_status:
-      profile.profileStatus,
+      profile.profileStatus ?? "incomplete",
 
     phone:
-      profile.phone,
+      profile.phone ?? "",
 
     phone_e164:
-      profile.phoneE164,
+      profile.phoneE164 ?? "",
 
     phone_display:
-      profile.phoneDisplay,
+      profile.phoneDisplay ?? "",
 
     phone_country:
-      profile.phoneCountry,
+      profile.phoneCountry ?? "AU",
 
     phone_verified:
-      profile.phoneVerified,
+      !!profile.phoneVerified,
 
     home_location:
-      profile.homeLocation,
+      profile.homeLocation ?? null,
 
     social:
       profile.social ?? {},
@@ -148,8 +141,7 @@ export function profileToRow(
       profile.pendingAccountType ?? null,
 
     business_verification_status:
-      profile.businessVerificationStatus ??
-      "none",
+      profile.businessVerificationStatus ?? "none",
 
     version:
       profile.version ?? 0,
@@ -159,7 +151,5 @@ export function profileToRow(
 
     updated_at:
       profile.updatedAt,
-
   };
-
 }
