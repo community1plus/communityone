@@ -464,48 +464,29 @@ export async function getProfile(
 
 export async function patchProfile(req, res) {
 
-    console.log("\n========================================");
-    console.log("[PROFILE PATCH] START");
-    console.log("========================================");
-
     try {
 
-        /* -----------------------------------------
-           REQUEST
-        ----------------------------------------- */
-
         console.log(
-            "[PROFILE PATCH] METHOD:",
-            req.method
+            "========================================"
         );
 
         console.log(
-            "[PROFILE PATCH] URL:",
-            req.originalUrl
+            "[PROFILE PATCH] START"
         );
 
         console.log(
             "[PROFILE PATCH] REQ.USER:",
-            JSON.stringify(
-                req.user,
-                null,
-                2
-            )
+            req.user
         );
 
-
-        /* -----------------------------------------
-           AUTH
-        ----------------------------------------- */
-
         const userId =
-            getUserId(req);
+            req.user?.userId ||
+            req.user?.id;
 
         console.log(
             "[PROFILE PATCH] RESOLVED USER ID:",
             userId
         );
-
 
         if (!userId) {
 
@@ -515,207 +496,59 @@ export async function patchProfile(req, res) {
 
             return res.status(401).json({
                 error:
-                    "Authentication required.",
+                    "Authenticated user identity unavailable",
             });
 
         }
-
-
-        /* -----------------------------------------
-           BODY
-        ----------------------------------------- */
-
-        console.log(
-            "[PROFILE PATCH] BODY:",
-            JSON.stringify(
-                req.body,
-                null,
-                2
-            )
-        );
-
-
-        /* -----------------------------------------
-           EXISTING PROFILE
-        ----------------------------------------- */
-
-        const existing =
-            await fetchProfileByUserId(
-                userId
-            );
-
-        console.log(
-            "[PROFILE PATCH] REPOSITORY PROFILE:",
-            existing
-        );
-
-
-        if (!existing) {
-
-            console.warn(
-                "[PROFILE PATCH] PROFILE NOT FOUND:",
-                userId
-            );
-
-            return res.status(404).json({
-                error:
-                    "Profile not found",
-            });
-
-        }
-
-
-        /* -----------------------------------------
-           PROFILE
-        ----------------------------------------- */
 
         const incoming =
-            pickProfileFields(
-                req.body?.profile || {}
-            );
-
-
-        incoming.endpoint =
-            getEndpointDetails(
-                req,
-                req.body?.endpoint
-            );
-
+            req.body?.profile || {};
 
         console.log(
             "[PROFILE PATCH] INCOMING PROFILE:",
-            JSON.stringify(
-                incoming,
-                null,
-                2
-            )
+            incoming
         );
 
-
-        /* -----------------------------------------
-           ORGANISATION
-        ----------------------------------------- */
-
-        const organisation =
-            pickOrganisationFields(
-                req.body?.organisationProfile || {}
-            );
-
-
-        console.log(
-            "[PROFILE PATCH] ORGANISATION:",
-            JSON.stringify(
-                organisation,
-                null,
-                2
-            )
-        );
-
-
-        /* -----------------------------------------
-           SAVE PROFILE
-        ----------------------------------------- */
-
-        console.log(
-            "[PROFILE PATCH] SAVING PROFILE..."
-        );
-
-
-        const saved =
+        const result =
             await saveProfile({
                 userId,
                 incoming,
             });
 
-
         console.log(
-            "[PROFILE PATCH] PROFILE SAVED:",
-            saved
+            "[PROFILE PATCH] SAVE SUCCESS:",
+            {
+                userId,
+            }
         );
 
-
-        /* -----------------------------------------
-           SAVE ORGANISATION
-        ----------------------------------------- */
-
-        let savedOrganisation =
-            null;
-
-
-        if (
-            isBusinessType(
-                saved.userType
-            ) &&
-            organisation
-        ) {
-
-            console.log(
-                "[PROFILE PATCH] SAVING ORGANISATION..."
-            );
-
-
-            savedOrganisation =
-                await saveOrganisationProfile({
-
-                    userProfileId:
-                        saved.id,
-
-                    organisation,
-
-                });
-
-
-        } else {
-
-            savedOrganisation =
-                await fetchOrganisationByProfileId(
-                    saved.id
-                );
-
-        }
-
-
-        /* -----------------------------------------
-           RESPONSE
-        ----------------------------------------- */
-
-        console.log(
-            "[PROFILE PATCH] SUCCESS"
-        );
-
-
-        return res.json({
+        return res.status(200).json({
+            user: {
+                id: userId,
+            },
 
             profile:
-                saved,
-
-            organisationProfile:
-                normaliseOrganisationProfile(
-                    savedOrganisation
-                ),
-
-            version:
-                saved.version,
-
+                result,
         });
-
 
     } catch (err) {
 
         console.error(
-            "[PROFILE PATCH] FAILED:",
-            err
+            "[PROFILE PATCH] ERROR:",
+            {
+                message:
+                    err.message,
+
+                stack:
+                    process.env.NODE_ENV === "development"
+                        ? err.stack
+                        : undefined,
+            }
         );
 
-
         return res.status(500).json({
-
             error:
                 "Profile update failed",
-
-            detail:
-                err.message,
-
         });
 
     }

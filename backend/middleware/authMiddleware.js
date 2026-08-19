@@ -237,92 +237,87 @@ function verifyWithPem(
    BUILD PLATFORM AUTH CONTEXT
 ===================================================== */
 
-async function buildAuthContext(
-  verified
-) {
+async function buildAuthContext(verified) {
 
-  const cognitoSub =
-    verified.sub;
+    const cognitoSub =
+        verified.sub;
 
-  const email =
-    verified.email ||
-    "";
+    const email =
+        verified.email || "";
 
-  const cognitoUsername =
-    verified[
-      "cognito:username"
-    ] ||
-    verified.username ||
-    "";
+    const cognitoUsername =
+        verified["cognito:username"] ||
+        verified.username ||
+        "";
 
-  const emailVerified =
-    verified.email_verified === true;
+    console.log(
+        "🔗 Resolving Community One identity:",
+        {
+            cognitoSub,
+            email,
+            cognitoUsername,
+            emailVerified:
+                verified.email_verified,
+        }
+    );
 
+    const identity =
+        await resolveIdentity({
+            cognitoSub,
+            email,
+            cognitoUsername,
+        });
 
-  console.log(
-    "🔗 Resolving Community One identity:",
-    {
-      cognitoSub,
-      email,
-      cognitoUsername,
-      emailVerified,
-    }
-  );
+    console.log(
+        "✅ Community One identity resolved:",
+        {
+            userId:
+                identity.userId,
 
+            cognitoSub:
+                identity.cognitoSub,
 
-  const identity =
-    await resolveIdentity({
+            email:
+                identity.email,
+        }
+    );
 
-      cognitoSub,
+    return {
 
-      email,
+        /*
+         * Canonical platform identity
+         */
+        id:
+            identity.userId,
 
-      cognitoUsername,
+        userId:
+            identity.userId,
 
-      emailVerified,
+        /*
+         * External identity
+         */
+        cognitoSub:
+            identity.cognitoSub,
 
-    });
+        /*
+         * User information
+         */
+        email:
+            identity.email,
 
+        username:
+            identity.username,
 
-  console.log(
-    "✅ Community One identity resolved:",
-    {
-      userId:
-        identity.userId,
+        /*
+         * Authentication metadata
+         */
+        tokenUse:
+            verified.token_use || "",
 
-      cognitoSub:
-        identity.cognitoSub,
+        provider:
+            verified.identities || null,
 
-      email:
-        identity.email,
-    }
-  );
-
-
-  return {
-
-    userId:
-      identity.userId,
-
-    cognitoSub:
-      identity.cognitoSub,
-
-    email:
-      identity.email,
-
-    username:
-      identity.username,
-
-    tokenUse:
-      verified.token_use ||
-      "",
-
-    provider:
-      verified.identities ||
-      null,
-
-  };
-
+    };
 }
 
 
