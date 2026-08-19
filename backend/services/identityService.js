@@ -1,7 +1,7 @@
 import {
   findUserByCognitoSub,
   findUserById,
-} from "../repositories/identityRepository.js";
+} from "../src/repositories/identityRepository.js";
 //
 
 /* =====================================================
