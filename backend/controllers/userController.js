@@ -49,10 +49,8 @@ export async function getMe(
       );
 
       return res.status(401).json({
-
         error:
-          "Unauthorized: invalid identity",
-
+          "Unauthorized",
       });
 
     }
@@ -168,41 +166,14 @@ export async function getMe(
     );
 
 
-    /*
-     * Authentication has already succeeded.
-     *
-     * Preserve the authenticated platform
-     * identity if profile retrieval fails.
-     */
+    /* =========================================
+       DEGRADED RESPONSE
+    ========================================= */
 
-    return res.status(200).json({
-
-      user: {
-
-        id:
-          req.user?.userId ||
-          null,
-
-        email:
-          req.user?.email ||
-          "",
-
-        cognito_sub:
-          req.user?.cognitoSub ||
-          null,
-
-      },
-
-      profile:
-        null,
-
-      hasProfile:
-        false,
-
-      degraded:
-        true,
-
-    });
+return res.status(500).json({
+  error: "PROFILE_LOAD_FAILED",
+  message: "Unable to load user profile",
+});
 
   }
 

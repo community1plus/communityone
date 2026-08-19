@@ -9,6 +9,41 @@ const TABLE = "user_profiles";
 /* =========================
    FETCH
 ========================= */
+/* =====================================================
+   STATE MERGERS
+===================================================== */
+
+function mergeSocialState(
+  existing = {},
+  incoming = {}
+) {
+  return {
+    ...existing,
+    ...incoming,
+  };
+}
+
+
+function mergePaymentState(
+  existing = {},
+  incoming = {}
+) {
+  return {
+    ...existing,
+    ...incoming,
+  };
+}
+
+
+function mergeEndpointState(
+  existing = {},
+  incoming = {}
+) {
+  return {
+    ...existing,
+    ...incoming,
+  };
+}
 
 export async function fetchProfileByUserId(userId) {
 
@@ -178,12 +213,18 @@ const accountResolved =
 
   const profileState = calculateProfileState(accountResolved);
 
-  const finalProfile = {
-    ...accountResolved,
-    profile_level: profileState.profile_level,
-    profile_status: profileState.profile_status,
-    updated_at: now,
-  };
+const finalProfile = {
+  ...accountResolved,
+
+  profileLevel:
+    profileState.profile_level,
+
+  profileStatus:
+    profileState.profile_status,
+
+  updatedAt:
+    now,
+};
 
   const row = profileToRow(finalProfile);
 
