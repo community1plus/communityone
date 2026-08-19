@@ -1,46 +1,124 @@
 import {
-  createIdentityRecord,
+  findUserByCognitoSub,
+  findUserById,
 } from "../repositories/identityRepository.js";
 
-const VALID_IDENTITY_TYPES = [
-  "PERSON",
-  "SYSTEM",
-  "AI",
-];
 
-export async function createIdentity(data) {
+/* =====================================================
+   RESOLVE COGNITO IDENTITY
+===================================================== */
 
-  const displayName =
-    data.displayName?.trim();
+export async function resolveIdentity({
+  cognitoSub,
+  email,
+  cognitoUsername,
+}) {
 
-  if (!displayName) {
+  if (!cognitoSub) {
+
     throw new Error(
-      "displayName is required"
+      "Missing Cognito subject"
     );
+
   }
 
-  const identityType =
-    data.identityType || "PERSON";
-
-  if (
-    !VALID_IDENTITY_TYPES.includes(
-      identityType
-    )
-  ) {
-    throw new Error(
-      "Invalid identityType"
+  const user =
+    await findUserByCognitoSub(
+      cognitoSub
     );
+
+
+  if (!user) {
+
+    throw new Error(
+      "Cognito identity is not linked to a Community One user"
+    );
+
   }
 
-  return await createIdentityRecord({
 
-    displayName,
+  return {
 
-    identityType,
+    userId:
+      user.id,
 
-    avatarUrl:
-      data.avatarUrl || null,
+    cognitoSub:
+      user.cognito_sub,
 
-  });
+    email:
+      user.email ||
+      email ||
+      "",
+
+    username:
+      cognitoUsername ||
+      "",
+
+    createdAt:
+      user.created_at,
+
+    updatedAt:
+      user.updated_at,
+
+    lastLogin:
+      user.last_login,
+
+  };
+
+}
+
+
+/* =====================================================
+   GET PLATFORM USER
+===================================================== */
+
+export async function getIdentityByUserId(
+  userId
+) {
+
+  if (!userId) {
+
+    throw new Error(
+      "Missing Community One userId"
+    );
+
+  }
+
+  const user =
+    await findUserById(
+      userId
+    );
+
+
+  if (!user) {
+
+    throw new Error(
+      "Community One user not found"
+    );
+
+  }
+
+
+  return {
+
+    userId:
+      user.id,
+
+    cognitoSub:
+      user.cognito_sub,
+
+    email:
+      user.email,
+
+    createdAt:
+      user.created_at,
+
+    updatedAt:
+      user.updated_at,
+
+    lastLogin:
+      user.last_login,
+
+  };
 
 }

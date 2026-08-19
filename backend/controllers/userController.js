@@ -1,98 +1,209 @@
-import { getOrCreateUserWithProfile } from "../services/userService.js";
+import {
+  getUserByIdWithProfile,
+} from "../services/userService.js";
+
 
 /* =====================================================
-   GET CURRENT USER + PROFILE (FINAL STABLE)
+   GET CURRENT USER + PROFILE
 ===================================================== */
 
-export async function getMe(req, res) {
+export async function getMe(
+  req,
+  res
+) {
+
   try {
-    /* =========================
-       🔐 AUTH CONTEXT
-    ========================= */
 
-    c const userId =
-  req.user.id ||
-  req.user.sub;
-    const email = req.user?.email;
+    /* =========================================
+       AUTH CONTEXT
+    ========================================= */
 
-    console.log("👤 getMe user:", { userId, email });
+    const userId =
+      req.user?.userId;
 
-    if (!userId) {
-      console.error("❌ Missing sub from auth middleware");
+    const email =
+      req.user?.email || "";
 
-      return res.status(401).json({
-        error: "Unauthorized: invalid token",
-      });
-    }
 
-    /* =========================
-       🔥 SERVICE
-    ========================= */
+    console.log(
+      "👤 /me identity:",
+      {
+        userId,
 
-    const result = await getOrCreateUserWithProfile(
-      userId,
-      email
+        cognitoSub:
+          req.user?.cognitoSub,
+
+        email,
+      }
     );
 
-    const user = result?.user || null;
-    const profile = result?.profile || null;
 
-    if (!user?.id) {
-      throw new Error("User retrieval failed");
+    /* =========================================
+       VALIDATE IDENTITY
+    ========================================= */
+
+    if (!userId) {
+
+      console.error(
+        "❌ /me missing Community One userId"
+      );
+
+      return res.status(401).json({
+
+        error:
+          "Unauthorized: invalid identity",
+
+      });
+
     }
 
-    /* =========================
-       🔥 NORMALISE PROFILE
-    ========================= */
 
-    const safeProfile = profile
-      ? {
-          ...profile,
-          version: profile.version ?? 1,
-        }
-      : null;
+    /* =========================================
+       LOAD USER + PROFILE
+    ========================================= */
 
-    /* =========================
-       ✅ RESPONSE CONTRACT
-    ========================= */
+    const result =
+      await getUserByIdWithProfile(
+        userId
+      );
+
+
+    const user =
+      result?.user ||
+      null;
+
+    const profile =
+      result?.profile ||
+      null;
+
+
+    if (!user?.id) {
+
+      throw new Error(
+        "Community One user not found"
+      );
+
+    }
+
+
+    /* =========================================
+       NORMALISE PROFILE
+    ========================================= */
+
+    const safeProfile =
+      profile
+        ? {
+            ...profile,
+
+            version:
+              profile.version ?? 1,
+          }
+        : null;
+
+
+    /* =========================================
+       RESPONSE
+    ========================================= */
 
     const response = {
+
       user: {
-        id: user.id,
-        email: user.email,
-        created_at: user.created_at,
-        last_login: user.last_login,
+
+        id:
+          user.id,
+
+        email:
+          user.email,
+
+        created_at:
+          user.created_at,
+
+        updated_at:
+          user.updated_at,
+
+        last_login:
+          user.last_login,
+
       },
-      profile: safeProfile,
-      hasProfile: !!safeProfile?.is_completed,
+
+      profile:
+        safeProfile,
+
+      hasProfile:
+        !!safeProfile,
+
     };
 
-    console.log("✅ /me response:", {
-      userId: user.id,
-      hasProfile: response.hasProfile,
-    });
 
-    return res.status(200).json(response);
+    console.log(
+      "✅ /me response:",
+      {
+        userId:
+          user.id,
+
+        hasProfile:
+          response.hasProfile,
+      }
+    );
+
+
+    return res.status(200).json(
+      response
+    );
+
 
   } catch (err) {
-    /* =========================
-       ❌ ERROR HANDLING (SAFE)
-    ========================= */
 
-    console.error("🔥 getMe ERROR:", {
-      message: err.message,
-      stack:
-        process.env.NODE_ENV === "development"
-          ? err.stack
-          : undefined,
-    });
+    console.error(
+      "🔥 /me ERROR:",
+      {
+        message:
+          err.message,
 
-    // 🔥 IMPORTANT: never break frontend auth flow
+        stack:
+          process.env.NODE_ENV === "development"
+            ? err.stack
+            : undefined,
+      }
+    );
+
+
+    /*
+     * Authentication has already succeeded.
+     *
+     * Preserve the authenticated platform
+     * identity if profile retrieval fails.
+     */
+
     return res.status(200).json({
-      user: req.user || null,
-      profile: null,
-      hasProfile: false,
-      degraded: true,
+
+      user: {
+
+        id:
+          req.user?.userId ||
+          null,
+
+        email:
+          req.user?.email ||
+          "",
+
+        cognito_sub:
+          req.user?.cognitoSub ||
+          null,
+
+      },
+
+      profile:
+        null,
+
+      hasProfile:
+        false,
+
+      degraded:
+        true,
+
     });
+
   }
+
 }
