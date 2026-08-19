@@ -1,7 +1,7 @@
 import {
-  getProfile,
-  putProfile,
-  patchProfile,
+  getProfileService,
+  putProfileService,
+  patchProfileService,
 } from "../services/profileService.js";
 
 
@@ -9,33 +9,23 @@ import {
    GET PROFILE
 ===================================================== */
 
-export async function getProfile(
-  req,
-  res
-) {
-
+export async function getProfile(req, res) {
   try {
 
-    const userId =
-      req.user?.userId;
+    const userId = req.user?.userId;
 
     if (!userId) {
-
       return res.status(401).json({
-        error:
-          "Authentication required.",
+        error: "Authentication required.",
       });
-
     }
 
     const result =
-      await getProfile({
+      await getProfileService({
         userId,
       });
 
-    return res.status(200).json(
-      result
-    );
+    return res.status(200).json(result);
 
   } catch (err) {
 
@@ -45,14 +35,10 @@ export async function getProfile(
     );
 
     return res.status(500).json({
-      error:
-        "Profile retrieval failed",
-      detail:
-        err.message,
+      error: "Failed to load profile",
+      detail: err.message,
     });
-
   }
-
 }
 
 
@@ -60,36 +46,25 @@ export async function getProfile(
    PUT PROFILE
 ===================================================== */
 
-export async function putProfile(
-  req,
-  res
-) {
-
+export async function putProfile(req, res) {
   try {
 
-    const userId =
-      req.user?.userId;
+    const userId = req.user?.userId;
 
     if (!userId) {
-
       return res.status(401).json({
-        error:
-          "Authentication required.",
+        error: "Authentication required.",
       });
-
     }
 
     const result =
       await putProfileService({
         userId,
-        body:
-          req.body || {},
+        body: req.body,
         req,
       });
 
-    return res.status(200).json(
-      result
-    );
+    return res.status(200).json(result);
 
   } catch (err) {
 
@@ -99,14 +74,10 @@ export async function putProfile(
     );
 
     return res.status(500).json({
-      error:
-        "Profile update failed",
-      detail:
-        err.message,
+      error: "Profile update failed",
+      detail: err.message,
     });
-
   }
-
 }
 
 
@@ -114,100 +85,50 @@ export async function putProfile(
    PATCH PROFILE
 ===================================================== */
 
-export async function patchProfile(
-  req,
-  res
-) {
-
+export async function patchProfile(req, res) {
   try {
 
-    const userId =
-      req.user?.userId;
+    const userId = req.user?.userId;
 
     console.log(
-      "[PROFILE PATCH] USER ID:",
+      "[PROFILE PATCH] userId:",
       userId
     );
 
-
     if (!userId) {
-
       return res.status(401).json({
-        error:
-          "Authentication required.",
+        error: "Authentication required.",
       });
-
     }
-
 
     const result =
       await patchProfileService({
-
         userId,
-
-        body:
-          req.body || {},
-
+        body: req.body,
         req,
-
       });
 
-
-    console.log(
-      "[PROFILE PATCH] SUCCESS:",
-      {
-        userId,
-        version:
-          result.version,
-      }
-    );
-
-
-    return res.status(200).json(
-      result
-    );
-
+    return res.status(200).json(result);
 
   } catch (err) {
 
     console.error(
       "[PROFILE PATCH] ERROR:",
       {
-        message:
-          err.message,
-
-        stack:
-          process.env.NODE_ENV ===
-          "development"
-            ? err.stack
-            : undefined,
+        message: err.message,
+        stack: err.stack,
       }
     );
 
-
-    if (
-      err.message ===
-      "Profile not found"
-    ) {
-
+    if (err.message === "Profile not found") {
       return res.status(404).json({
-        error:
-          "Profile not found",
+        error: "Profile not found",
       });
-
     }
 
-
     return res.status(500).json({
-
-      error:
-        "Profile update failed",
-
-      detail:
-        err.message,
-
+      error: "Profile update failed",
+      detail: err.message,
     });
-
   }
-
 }

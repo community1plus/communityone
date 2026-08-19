@@ -6,7 +6,7 @@ import {
 
 
 /* =====================================================
-   NORMALISATION
+   HELPERS
 ===================================================== */
 
 function cleanString(value) {
@@ -29,7 +29,7 @@ function normaliseAccountType(value) {
     return type;
   }
 
-  return null;
+  return "PERSONAL";
 }
 
 
@@ -42,56 +42,6 @@ function isBusinessType(value) {
     type === "BUSINESS" ||
     type === "ORGANISATION"
   );
-}
-
-
-/* =====================================================
-   PROFILE FIELD FILTER
-===================================================== */
-
-function pickProfileFields(profile = {}) {
-
-  const allowed = [
-    "username",
-    "displayName",
-    "userType",
-
-    "phone",
-    "phoneE164",
-    "phoneDisplay",
-    "phoneCountry",
-    "phoneVerified",
-
-    "homeLocation",
-
-    "social",
-    "payment",
-    "endpoint",
-
-    "profileLevel",
-    "profileStatus",
-
-    "pendingAccountType",
-    "businessVerificationStatus",
-  ];
-
-  const result = {};
-
-  for (const field of allowed) {
-
-    if (
-      Object.prototype.hasOwnProperty.call(
-        profile,
-        field
-      )
-    ) {
-      result[field] =
-        profile[field];
-    }
-
-  }
-
-  return result;
 }
 
 
@@ -120,21 +70,13 @@ function mergeSocialState(
       continue;
     }
 
-    if (
-      typeof value === "object" &&
-      !Array.isArray(value)
-    ) {
+    merged[provider] = {
 
-      merged[provider] = {
-        ...(merged[provider] || {}),
-        ...value,
-      };
+      ...(merged[provider] || {}),
 
-    } else {
+      ...(value || {}),
 
-      merged[provider] = value;
-
-    }
+    };
 
   }
 
@@ -148,8 +90,11 @@ function mergePaymentState(
 ) {
 
   return {
+
     ...existing,
+
     ...incoming,
+
   };
 }
 
@@ -160,9 +105,70 @@ function mergeEndpointState(
 ) {
 
   return {
+
     ...existing,
+
     ...incoming,
+
   };
+}
+
+
+/* =====================================================
+   PROFILE FIELD FILTER
+===================================================== */
+
+function pickProfileFields(
+  profile = {}
+) {
+
+  const allowed = [
+
+    "username",
+    "displayName",
+    "email",
+
+    "userType",
+
+    "phone",
+    "phoneE164",
+    "phoneDisplay",
+    "phoneCountry",
+    "phoneVerified",
+
+    "homeLocation",
+
+    "social",
+    "payment",
+    "endpoint",
+
+    "profileLevel",
+    "profileStatus",
+
+    "pendingAccountType",
+    "businessVerificationStatus",
+
+  ];
+
+  const result = {};
+
+  for (const field of allowed) {
+
+    if (
+      Object.prototype.hasOwnProperty.call(
+        profile,
+        field
+      )
+    ) {
+
+      result[field] =
+        profile[field];
+
+    }
+
+  }
+
+  return result;
 }
 
 
@@ -171,44 +177,30 @@ function mergeEndpointState(
 ===================================================== */
 
 function applyAccountTypeRules(
-  existing = {},
-  incoming = {}
+  base,
+  merged
 ) {
 
   const result = {
-    ...existing,
-    ...incoming,
+    ...merged,
   };
 
+  const currentType =
+    normaliseAccountType(
+      base.userType
+    );
+
   const requestedType =
-    normaliseAccountType(
-      incoming.userType
-    );
-
-  const existingType =
-    normaliseAccountType(
-      existing.userType
-    );
+    merged.userType
+      ? normaliseAccountType(
+          merged.userType
+        )
+      : currentType;
 
 
   /*
-   * No account type supplied.
-   *
-   * Preserve the existing type.
-   */
-
-  if (!requestedType) {
-
-    result.userType =
-      existingType ||
-      "PERSONAL";
-
-    return result;
-  }
-
-
-  /*
-   * Personal account.
+   * Personal accounts can immediately
+   * remain PERSONAL.
    */
 
   if (
@@ -221,27 +213,13 @@ function applyAccountTypeRules(
     result.pendingAccountType =
       null;
 
-    /*
-     * Personal accounts do not
-     * require business verification.
-     */
-
-    if (
-      !result.businessVerificationStatus
-    ) {
-      result.businessVerificationStatus =
-        "none";
-    }
-
     return result;
   }
 
 
   /*
-   * Business / organisation.
-   *
-   * Do not automatically mark it
-   * as verified.
+   * Business / organisation accounts
+   * enter the verification workflow.
    */
 
   if (
@@ -252,25 +230,28 @@ function applyAccountTypeRules(
     result.userType =
       requestedType;
 
-    if (
-      existingType !== requestedType
-    ) {
-
-      result.pendingAccountType =
-        requestedType;
-
-    }
+    /*
+     * Do not automatically mark a
+     * business as verified.
+     */
 
     if (
-      !result.businessVerificationStatus
+      result.businessVerificationStatus !==
+      "verified"
     ) {
 
       result.businessVerificationStatus =
+        result.businessVerificationStatus ||
         "none";
 
     }
 
+    return result;
   }
+
+
+  result.userType =
+    currentType;
 
   return result;
 }
@@ -302,8 +283,7 @@ function calculateProfileState(
 
   if (
     !username ||
-    !displayName ||
-    !userType
+    !displayName
   ) {
 
     return {
@@ -317,10 +297,6 @@ function calculateProfileState(
 
   }
 
-
-  /*
-   * Personal account
-   */
 
   if (
     userType === "PERSONAL"
@@ -337,11 +313,6 @@ function calculateProfileState(
 
   }
 
-
-  /*
-   * Business / organisation
-   * requires verification.
-   */
 
   if (
     profile.businessVerificationStatus ===
@@ -373,70 +344,28 @@ function calculateProfileState(
 
 
 /* =====================================================
-   ENDPOINT DETAILS
+   BUILD INCOMING PROFILE
 ===================================================== */
 
-function getEndpointDetails(
-  req,
-  incoming = {}
+function buildIncomingProfile(
+  body = {}
 ) {
 
-  return {
-
-    ...(incoming || {}),
-
-    ip:
-      req.ip ||
-      null,
-
-    userAgent:
-      req.get("user-agent") ||
-      null,
-
-    updatedAt:
-      new Date().toISOString(),
-
-  };
-
-}
-
-
-/* =====================================================
-   USER ID
-===================================================== */
-
-function getUserId(req) {
-
-  return (
-    req.user?.userId ||
-    null
+  return pickProfileFields(
+    body.profile || {}
   );
 
 }
 
 
 /* =====================================================
-   PATCH PROFILE SERVICE
+   SAVE PROFILE
 ===================================================== */
 
-export async function patchProfileService({
+async function persistProfile(
   userId,
-  body = {},
-  req,
-}) {
-
-  if (!userId) {
-
-    throw new Error(
-      "Missing Community One userId"
-    );
-
-  }
-
-
-  /*
-   * Load current profile.
-   */
+  incoming
+) {
 
   const existing =
     await fetchProfileByUserId(
@@ -444,123 +373,277 @@ export async function patchProfileService({
     );
 
 
-  if (!existing) {
+  /*
+   * Existing profile
+   */
 
-    throw new Error(
-      "Profile not found"
+  if (existing) {
+
+    const merged = {
+
+      ...existing,
+
+      ...incoming,
+
+      social:
+        mergeSocialState(
+          existing.social,
+          incoming.social
+        ),
+
+      payment:
+        mergePaymentState(
+          existing.payment,
+          incoming.payment
+        ),
+
+      endpoint:
+        mergeEndpointState(
+          existing.endpoint,
+          incoming.endpoint
+        ),
+
+      organisation: {
+
+        ...(existing.organisation || {}),
+
+        ...(incoming.organisation || {}),
+
+      },
+
+    };
+
+
+    const accountResolved =
+      applyAccountTypeRules(
+        existing,
+        merged
+      );
+
+
+    const profileState =
+      calculateProfileState(
+        accountResolved
+      );
+
+
+    const finalProfile = {
+
+      ...accountResolved,
+
+      profileLevel:
+        profileState.profileLevel,
+
+      profileStatus:
+        profileState.profileStatus,
+
+      version:
+        (existing.version || 0) + 1,
+
+      updatedAt:
+        new Date(),
+
+    };
+
+
+    return updateProfile(
+      finalProfile
     );
 
   }
 
 
   /*
-   * Extract only fields that
-   * profile is allowed to change.
+   * No profile yet.
    */
 
-  const incoming =
-    pickProfileFields(
-      body.profile || {}
-    );
+  const base = {
 
+    userId,
 
-  /*
-   * Merge nested state.
-   */
+    username:
+      "",
 
-  incoming.social =
-    mergeSocialState(
-      existing.social || {},
-      incoming.social || {}
-    );
+    displayName:
+      "",
 
+    email:
+      "",
 
-  incoming.payment =
-    mergePaymentState(
-      existing.payment || {},
-      incoming.payment || {}
-    );
+    userType:
+      "PERSONAL",
 
+    phone:
+      "",
 
-  incoming.endpoint =
-    getEndpointDetails(
-      req,
-      mergeEndpointState(
-        existing.endpoint || {},
-        body.endpoint || {}
-      )
-    );
+    phoneE164:
+      "",
 
+    phoneDisplay:
+      "",
 
-  /*
-   * Merge profile.
-   */
+    phoneCountry:
+      "AU",
 
-  let merged = {
+    phoneVerified:
+      false,
 
-    ...existing,
-
-    ...incoming,
+    homeLocation:
+      null,
 
     social:
-      incoming.social,
+      {},
 
     payment:
-      incoming.payment,
+      {},
 
     endpoint:
-      incoming.endpoint,
+      {},
+
+    profileLevel:
+      0,
+
+    profileStatus:
+      "incomplete",
+
+    pendingAccountType:
+      null,
+
+    businessVerificationStatus:
+      "none",
+
+    version:
+      1,
+
+    createdAt:
+      new Date(),
+
+    updatedAt:
+      new Date(),
 
   };
 
 
-  /*
-   * Apply account rules.
-   */
+  const merged = {
 
-  merged =
+    ...base,
+
+    ...incoming,
+
+    social:
+      mergeSocialState(
+        base.social,
+        incoming.social
+      ),
+
+    payment:
+      mergePaymentState(
+        base.payment,
+        incoming.payment
+      ),
+
+    endpoint:
+      mergeEndpointState(
+        base.endpoint,
+        incoming.endpoint
+      ),
+
+  };
+
+
+  const accountResolved =
     applyAccountTypeRules(
-      existing,
+      base,
       merged
     );
 
 
-  /*
-   * Calculate derived state.
-   */
-
-  const state =
+  const profileState =
     calculateProfileState(
-      merged
+      accountResolved
     );
 
 
-  merged.profileLevel =
-    state.profileLevel;
+  const finalProfile = {
 
-  merged.profileStatus =
-    state.profileStatus;
+    ...accountResolved,
 
+    profileLevel:
+      profileState.profileLevel,
 
-  /*
-   * Increment version.
-   */
+    profileStatus:
+      profileState.profileStatus,
 
-  merged.version =
-    (existing.version || 0) + 1;
+  };
 
 
-  merged.updatedAt =
-    new Date();
+  return createProfile(
+    finalProfile
+  );
+
+}
 
 
-  /*
-   * Persist.
-   */
+/* =====================================================
+   GET PROFILE
+===================================================== */
+
+export async function getProfileService({
+  userId,
+}) {
+
+  const profile =
+    await fetchProfileByUserId(
+      userId
+    );
+
+
+  if (!profile) {
+
+    return {
+
+      profile: null,
+
+      hasProfile: false,
+
+    };
+
+  }
+
+
+  return {
+
+    profile,
+
+    hasProfile: true,
+
+    version:
+      profile.version,
+
+  };
+
+}
+
+
+/* =====================================================
+   PUT PROFILE
+===================================================== */
+
+export async function putProfileService({
+  userId,
+  body,
+}) {
+
+  const incoming =
+    buildIncomingProfile(
+      body
+    );
+
 
   const saved =
-    await updateProfile(
-      merged
+    await persistProfile(
+      userId,
+      incoming
     );
 
 
@@ -578,147 +661,80 @@ export async function patchProfileService({
 
 
 /* =====================================================
-   PATCH PROFILE CONTROLLER
+   PATCH PROFILE
 ===================================================== */
 
-export async function patchProfile(
+export async function patchProfileService({
+  userId,
+  body,
   req,
-  res
-) {
+}) {
 
-  try {
-
-    console.log(
-      "========================================"
-    );
-
-    console.log(
-      "[PROFILE PATCH] START"
-    );
-
-    console.log(
-      "========================================"
-    );
-
-
-    const userId =
-      getUserId(req);
-
-
-    console.log(
-      "[PROFILE PATCH] USER ID:",
+  const existing =
+    await fetchProfileByUserId(
       userId
     );
 
 
-    if (!userId) {
+  if (!existing) {
 
-      return res.status(401).json({
-
-        error:
-          "Authentication required.",
-
-      });
-
-    }
-
-
-    console.log(
-      "[PROFILE PATCH] REQ.USER:",
-      JSON.stringify(
-        req.user,
-        null,
-        2
-      )
-    );
-
-
-    console.log(
-      "[PROFILE PATCH] INCOMING:",
-      JSON.stringify(
-        req.body,
-        null,
-        2
-      )
-    );
-
-
-    const result =
-      await patchProfileService({
-
-        userId,
-
-        body:
-          req.body || {},
-
-        req,
-
-      });
-
-
-    console.log(
-      "[PROFILE PATCH] SUCCESS:",
-      {
-        userId,
-
-        version:
-          result.version,
-      }
-    );
-
-
-    return res.status(200).json({
-
-      profile:
-        result.profile,
-
-      version:
-        result.version,
-
-    });
-
-  } catch (err) {
-
-    console.error(
-      "[PROFILE PATCH] ERROR:",
-      {
-        message:
-          err.message,
-
-        stack:
-          process.env.NODE_ENV ===
-          "development"
-            ? err.stack
-            : undefined,
-      }
-    );
-
-
-    if (
-      err.message ===
+    throw new Error(
       "Profile not found"
-    ) {
-
-      return res.status(404).json({
-
-        error:
-          "Profile not found",
-
-      });
-
-    }
-
-
-    return res.status(500).json({
-
-      error:
-        "Profile update failed",
-
-      detail:
-        err.message,
-
-    });
+    );
 
   }
+
+
+  const incoming =
+    buildIncomingProfile(
+      body
+    );
+
+
+  /*
+   * Endpoint information is generated
+   * server-side rather than trusted from
+   * the browser.
+   */
+
+  if (req) {
+
+    incoming.endpoint = {
+
+      ...(incoming.endpoint || {}),
+
+      ip:
+        req.ip ||
+        null,
+
+      userAgent:
+        req.headers[
+          "user-agent"
+        ] || null,
+
+    };
+
+  }
+
+
+  const saved =
+    await persistProfile(
+      userId,
+      incoming
+    );
+
+
+  return {
+
+    profile:
+      saved,
+
+    organisationProfile:
+      null,
+
+    version:
+      saved.version,
+
+  };
 
 }
