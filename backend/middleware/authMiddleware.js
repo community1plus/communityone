@@ -166,9 +166,23 @@ async function verifyCognitoToken(
    BUILD AUTH CONTEXT
 ===================================================== */
 
-async function buildAuthContext(
-  verified
-) {
+async function buildAuthContext(verified) {
+
+  console.log(
+    "🔗 BUILDING AUTH CONTEXT:",
+    {
+      cognitoSub:
+        verified.sub,
+
+      email:
+        verified.email,
+
+      username:
+        verified["cognito:username"] ||
+        verified.username ||
+        "",
+    }
+  );
 
   const identity =
     await resolveIdentity({
@@ -185,6 +199,21 @@ async function buildAuthContext(
         "",
 
     });
+
+
+  console.log(
+    "✅ PLATFORM IDENTITY RESOLVED:",
+    {
+      userId:
+        identity.userId,
+
+      cognitoSub:
+        identity.cognitoSub,
+
+      email:
+        identity.email,
+    }
+  );
 
 
   return {
@@ -262,7 +291,19 @@ export default async function authMiddleware(
       await verifyCognitoToken(
         token
       );
-
+console.log(
+  "🔎 COGNITO IDENTITY CHECK:",
+  {
+    sub: verified.sub,
+    email: verified.email,
+    username:
+      verified["cognito:username"],
+    tokenUse:
+      verified.token_use,
+    issuer:
+      verified.iss,
+  }
+);
 
     console.log(
       "✅ COGNITO TOKEN VERIFIED:",
@@ -302,7 +343,13 @@ export default async function authMiddleware(
     /* =========================================
        RESOLVE PLATFORM IDENTITY
     ========================================= */
-
+console.log(
+  "🔗 RESOLVING COMMUNITY ONE USER:",
+  {
+    cognitoSub: verified.sub,
+    email: verified.email,
+  }
+);
     req.user =
       await buildAuthContext(
         verified
@@ -338,32 +385,25 @@ export default async function authMiddleware(
 
     return next();
 
-  } catch (err) {
+} catch (err) {
 
-    console.error(
-      "❌ AUTH ERROR:",
-      {
-        message:
-          err.message,
+  console.error(
+    "❌ AUTH ERROR:",
+    {
+      message: err.message,
+      name: err.name,
+      stack:
+        process.env.NODE_ENV === "development"
+          ? err.stack
+          : undefined,
+    }
+  );
 
-        name:
-          err.name,
+  return res.status(401).json({
+    error:
+      "Authentication failed",
+  });
 
-        stack:
-          process.env.NODE_ENV === "development"
-            ? err.stack
-            : undefined,
-      }
-    );
-
-
-    return res.status(401).json({
-
-      error:
-        "Authentication failed",
-
-    });
-
-  }
+}
 
 }
