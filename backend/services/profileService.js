@@ -1,162 +1,573 @@
-import { fetchProfileByUserId, saveProfile } from "../repositories/profileRepository.js";
+import {
+  fetchProfileByUserId,
+  createProfile,
+  updateProfile,
+} from "../repositories/profileRepository.js";
 
-/* =========================================
-   PATCH PROFILE
-========================================= */
-function mergeSocialState(existing = {}, incoming = {}) {
+
+/* =====================================================
+   NORMALISATION
+===================================================== */
+
+function cleanString(value) {
+  return typeof value === "string"
+    ? value.trim()
+    : "";
+}
+
+
+function normaliseAccountType(value) {
+
+  const type =
+    cleanString(value).toUpperCase();
+
+  if (
+    type === "PERSONAL" ||
+    type === "BUSINESS" ||
+    type === "ORGANISATION"
+  ) {
+    return type;
+  }
+
+  return null;
+}
+
+
+function isBusinessType(value) {
+
+  const type =
+    normaliseAccountType(value);
+
+  return (
+    type === "BUSINESS" ||
+    type === "ORGANISATION"
+  );
+}
+
+
+/* =====================================================
+   PROFILE FIELD FILTER
+===================================================== */
+
+function pickProfileFields(profile = {}) {
+
+  const allowed = [
+    "username",
+    "displayName",
+    "userType",
+
+    "phone",
+    "phoneE164",
+    "phoneDisplay",
+    "phoneCountry",
+    "phoneVerified",
+
+    "homeLocation",
+
+    "social",
+    "payment",
+    "endpoint",
+
+    "profileLevel",
+    "profileStatus",
+
+    "pendingAccountType",
+    "businessVerificationStatus",
+  ];
+
+  const result = {};
+
+  for (const field of allowed) {
+
+    if (
+      Object.prototype.hasOwnProperty.call(
+        profile,
+        field
+      )
+    ) {
+      result[field] =
+        profile[field];
+    }
+
+  }
+
+  return result;
+}
+
+
+/* =====================================================
+   STATE MERGERS
+===================================================== */
+
+function mergeSocialState(
+  existing = {},
+  incoming = {}
+) {
 
   const merged = {
     ...existing,
   };
 
-  for (const [provider, value] of Object.entries(incoming)) {
+  for (
+    const [provider, value]
+    of Object.entries(incoming)
+  ) {
 
     if (value === null) {
+
       delete merged[provider];
+
       continue;
     }
 
-    merged[provider] = {
-      ...(merged[provider] || {}),
-      ...value,
-    };
+    if (
+      typeof value === "object" &&
+      !Array.isArray(value)
+    ) {
 
-    if (Object.keys(merged[provider]).length === 0) {
-      delete merged[provider];
+      merged[provider] = {
+        ...(merged[provider] || {}),
+        ...value,
+      };
+
+    } else {
+
+      merged[provider] = value;
+
     }
 
   }
 
   return merged;
-
 }
 
-function mergePaymentState(existing = {}, incoming = {}) {
+
+function mergePaymentState(
+  existing = {},
+  incoming = {}
+) {
+
   return {
     ...existing,
     ...incoming,
   };
 }
 
-function mergeEndpointState(existing = {}, incoming = {}) {
+
+function mergeEndpointState(
+  existing = {},
+  incoming = {}
+) {
+
   return {
     ...existing,
     ...incoming,
   };
 }
 
-function calculateProfileState(profile = {}) {
+
+/* =====================================================
+   ACCOUNT TYPE RULES
+===================================================== */
+
+function applyAccountTypeRules(
+  existing = {},
+  incoming = {}
+) {
+
+  const result = {
+    ...existing,
+    ...incoming,
+  };
+
+  const requestedType =
+    normaliseAccountType(
+      incoming.userType
+    );
+
+  const existingType =
+    normaliseAccountType(
+      existing.userType
+    );
+
+
+  /*
+   * No account type supplied.
+   *
+   * Preserve the existing type.
+   */
+
+  if (!requestedType) {
+
+    result.userType =
+      existingType ||
+      "PERSONAL";
+
+    return result;
+  }
+
+
+  /*
+   * Personal account.
+   */
+
+  if (
+    requestedType === "PERSONAL"
+  ) {
+
+    result.userType =
+      "PERSONAL";
+
+    result.pendingAccountType =
+      null;
+
+    /*
+     * Personal accounts do not
+     * require business verification.
+     */
+
+    if (
+      !result.businessVerificationStatus
+    ) {
+      result.businessVerificationStatus =
+        "none";
+    }
+
+    return result;
+  }
+
+
+  /*
+   * Business / organisation.
+   *
+   * Do not automatically mark it
+   * as verified.
+   */
+
+  if (
+    requestedType === "BUSINESS" ||
+    requestedType === "ORGANISATION"
+  ) {
+
+    result.userType =
+      requestedType;
+
+    if (
+      existingType !== requestedType
+    ) {
+
+      result.pendingAccountType =
+        requestedType;
+
+    }
+
+    if (
+      !result.businessVerificationStatus
+    ) {
+
+      result.businessVerificationStatus =
+        "none";
+
+    }
+
+  }
+
+  return result;
+}
+
+
+/* =====================================================
+   PROFILE STATE
+===================================================== */
+
+function calculateProfileState(
+  profile = {}
+) {
 
   const username =
-    cleanString(profile.username);
+    cleanString(
+      profile.username
+    );
 
   const displayName =
-    cleanString(profile.displayName);
+    cleanString(
+      profile.displayName
+    );
 
   const userType =
     normaliseAccountType(
       profile.userType
     );
 
+
   if (
     !username ||
     !displayName ||
     !userType
   ) {
+
     return {
+
       profileLevel: 0,
-      profileStatus: "incomplete",
+
+      profileStatus:
+        "incomplete",
+
     };
+
   }
 
-  if (userType === "PERSONAL") {
+
+  /*
+   * Personal account
+   */
+
+  if (
+    userType === "PERSONAL"
+  ) {
+
     return {
+
       profileLevel: 1,
-      profileStatus: "basic_complete",
+
+      profileStatus:
+        "basic_complete",
+
     };
+
   }
+
+
+  /*
+   * Business / organisation
+   * requires verification.
+   */
 
   if (
     profile.businessVerificationStatus ===
     "verified"
   ) {
+
     return {
+
       profileLevel: 3,
-      profileStatus: "verified",
+
+      profileStatus:
+        "verified",
+
     };
+
   }
 
+
   return {
+
     profileLevel: 1,
-    profileStatus: "business_pending",
+
+    profileStatus:
+      "business_pending",
+
   };
 
 }
 
+
+/* =====================================================
+   ENDPOINT DETAILS
+===================================================== */
+
+function getEndpointDetails(
+  req,
+  incoming = {}
+) {
+
+  return {
+
+    ...(incoming || {}),
+
+    ip:
+      req.ip ||
+      null,
+
+    userAgent:
+      req.get("user-agent") ||
+      null,
+
+    updatedAt:
+      new Date().toISOString(),
+
+  };
+
+}
+
+
+/* =====================================================
+   USER ID
+===================================================== */
+
+function getUserId(req) {
+
+  return (
+    req.user?.userId ||
+    null
+  );
+
+}
+
+
+/* =====================================================
+   PATCH PROFILE SERVICE
+===================================================== */
+
 export async function patchProfileService({
   userId,
-  body,
+  body = {},
   req,
 }) {
 
-  const existing =
-    await fetchProfileByUserId(userId);
+  if (!userId) {
 
-  if (!existing) {
-    throw new Error("Profile not found");
+    throw new Error(
+      "Missing Community One userId"
+    );
+
   }
 
+
+  /*
+   * Load current profile.
+   */
+
+  const existing =
+    await fetchProfileByUserId(
+      userId
+    );
+
+
+  if (!existing) {
+
+    throw new Error(
+      "Profile not found"
+    );
+
+  }
+
+
+  /*
+   * Extract only fields that
+   * profile is allowed to change.
+   */
+
   const incoming =
-    pickProfileFields(body.profile || {});
+    pickProfileFields(
+      body.profile || {}
+    );
+
+
+  /*
+   * Merge nested state.
+   */
+
+  incoming.social =
+    mergeSocialState(
+      existing.social || {},
+      incoming.social || {}
+    );
+
+
+  incoming.payment =
+    mergePaymentState(
+      existing.payment || {},
+      incoming.payment || {}
+    );
+
 
   incoming.endpoint =
     getEndpointDetails(
       req,
-      body.endpoint
+      mergeEndpointState(
+        existing.endpoint || {},
+        body.endpoint || {}
+      )
     );
 
-  const organisation =
-    pickOrganisationFields(
-      body.organisationProfile || {}
+
+  /*
+   * Merge profile.
+   */
+
+  let merged = {
+
+    ...existing,
+
+    ...incoming,
+
+    social:
+      incoming.social,
+
+    payment:
+      incoming.payment,
+
+    endpoint:
+      incoming.endpoint,
+
+  };
+
+
+  /*
+   * Apply account rules.
+   */
+
+  merged =
+    applyAccountTypeRules(
+      existing,
+      merged
     );
+
+
+  /*
+   * Calculate derived state.
+   */
+
+  const state =
+    calculateProfileState(
+      merged
+    );
+
+
+  merged.profileLevel =
+    state.profileLevel;
+
+  merged.profileStatus =
+    state.profileStatus;
+
+
+  /*
+   * Increment version.
+   */
+
+  merged.version =
+    (existing.version || 0) + 1;
+
+
+  merged.updatedAt =
+    new Date();
+
+
+  /*
+   * Persist.
+   */
 
   const saved =
-    await saveProfile({
-      userId,
-      incoming,
-    });
+    await updateProfile(
+      merged
+    );
 
-  let savedOrganisation = null;
-
-  if (
-    isBusinessType(saved.userType)
-  ) {
-
-    savedOrganisation =
-      await saveOrganisationProfile({
-
-        userProfileId:
-          saved.id,
-
-        organisation,
-
-      });
-
-  } else {
-
-    savedOrganisation =
-      await fetchOrganisationByProfileId(
-        saved.id
-      );
-
-  }
 
   return {
 
-    profile: saved,
-
-    organisationProfile:
-      savedOrganisation,
+    profile:
+      saved,
 
     version:
       saved.version,
@@ -165,133 +576,149 @@ export async function patchProfileService({
 
 }
 
-export async function patchProfile(req, res) {
-  try {
-    console.log(
-  JSON.stringify(req.body, null, 2)
-);
-    const userId = getUserId(req);
-console.log(
-    "[PROFILE PATCH] req.user:",
-    JSON.stringify(req.user, null, 2)
-);
 
-console.log(
-    "[PROFILE PATCH] resolved userId:",
-    userId
-);
+/* =====================================================
+   PATCH PROFILE CONTROLLER
+===================================================== */
+
+export async function patchProfile(
+  req,
+  res
+) {
+
+  try {
+
     console.log(
-    "[PROFILE PATCH] AUTH:",
-    JSON.stringify(
+      "========================================"
+    );
+
+    console.log(
+      "[PROFILE PATCH] START"
+    );
+
+    console.log(
+      "========================================"
+    );
+
+
+    const userId =
+      getUserId(req);
+
+
+    console.log(
+      "[PROFILE PATCH] USER ID:",
+      userId
+    );
+
+
+    if (!userId) {
+
+      return res.status(401).json({
+
+        error:
+          "Authentication required.",
+
+      });
+
+    }
+
+
+    console.log(
+      "[PROFILE PATCH] REQ.USER:",
+      JSON.stringify(
         req.user,
         null,
         2
-    )
-);
-
-console.log(
-    "[PROFILE PATCH] RESOLVED USER ID:",
-    userId
-);
-
- console.log("PATCH USER ID:", userId);
-
-    if (!userId) {
-      return res.status(401).json({ error: "Authentication required." });
-    }
-
-console.log(
-    "[PROFILE PATCH] fetching profile for:",
-    userId
-);
-
-const existing =
-    await fetchProfileByUserId(userId);
-
-console.log(
-    "[PROFILE PATCH] existing profile:",
-    JSON.stringify(existing, null, 2)
-);
-
-console.log("EXISTING PROFILE:", existing);
-console.log(
-    "[PROFILE PATCH] EXISTING PROFILE:",
-    existing
-);
-    if (!existing) {
-      return res.status(404).json({ error: "Profile not found" });
-    }
-  console.log(
-  "REQ BODY",
-  JSON.stringify(req.body, null, 2)
-);
-
-console.log(
-  "REQ BODY PROFILE",
-  JSON.stringify(req.body.profile, null, 2)
-);
-
-const incoming =
-    pickProfileFields(
-        req.body.profile || {}
+      )
     );
+
 
     console.log(
-  "INCOMING PROFILE",
-  JSON.stringify(incoming, null, 2)
-);
-    incoming.endpoint = getEndpointDetails(req, req.body.endpoint);
-
-const organisation =
-    pickOrganisationFields(
-        req.body.organisationProfile || {}
+      "[PROFILE PATCH] INCOMING:",
+      JSON.stringify(
+        req.body,
+        null,
+        2
+      )
     );
 
-    const saved = await saveProfile({ userId, incoming });
 
-let savedOrganisation = null;
+    const result =
+      await patchProfileService({
 
-if (
-  isBusinessType(saved.userType) &&
-  organisation
-) {
+        userId,
 
-  savedOrganisation =
-    await saveOrganisationProfile({
+        body:
+          req.body || {},
 
-      userProfileId: saved.id,
+        req,
 
-      organisation,
+      });
+
+
+    console.log(
+      "[PROFILE PATCH] SUCCESS:",
+      {
+        userId,
+
+        version:
+          result.version,
+      }
+    );
+
+
+    return res.status(200).json({
+
+      profile:
+        result.profile,
+
+      version:
+        result.version,
 
     });
 
-} else {
+  } catch (err) {
 
-  savedOrganisation =
-    await fetchOrganisationByProfileId(
-      saved.id
+    console.error(
+      "[PROFILE PATCH] ERROR:",
+      {
+        message:
+          err.message,
+
+        stack:
+          process.env.NODE_ENV ===
+          "development"
+            ? err.stack
+            : undefined,
+      }
     );
 
-}
 
-return res.json({
+    if (
+      err.message ===
+      "Profile not found"
+    ) {
 
-  profile: saved,
+      return res.status(404).json({
 
-  organisationProfile:
-    normaliseOrganisationProfile(
-      savedOrganisation
-    ),
+        error:
+          "Profile not found",
 
-  version: saved.version,
+      });
 
-});
-  } catch (err) {
-    console.error("PATCH PROFILE FAILED:", err);
+    }
+
 
     return res.status(500).json({
-      error: "Profile update failed",
-      detail: err.message,
+
+      error:
+        "Profile update failed",
+
+      detail:
+        err.message,
+
     });
+
   }
+
 }
