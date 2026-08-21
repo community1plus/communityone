@@ -2,6 +2,10 @@
    DATABASE ROW -> APPLICATION MODEL
 ========================================= */
 
+/* =========================================
+   DATABASE ROW -> APPLICATION MODEL
+========================================= */
+
 export function rowToProfile(row) {
 
   if (!row) {
@@ -9,9 +13,12 @@ export function rowToProfile(row) {
   }
 
   return {
-    id: row.id,
 
-    userId: row.user_id,
+    id:
+      row.id,
+
+    userId:
+      row.user_id,
 
     username:
       row.username ?? "",
@@ -22,6 +29,18 @@ export function rowToProfile(row) {
     email:
       row.email ?? "",
 
+    /*
+     * Canonical application model
+     */
+    mode:
+      normaliseMode(
+        row.user_type
+      ),
+
+    /*
+     * Temporary compatibility field.
+     * Remove once frontend migration is complete.
+     */
     userType:
       row.user_type ?? "PERSONAL",
 
@@ -59,10 +78,10 @@ export function rowToProfile(row) {
       row.endpoint ?? {},
 
     pendingAccountType:
-      row.pending_account_type ?? null,
+      row.pending_account_type,
 
     businessVerificationStatus:
-      row.business_verification_status ?? "none",
+      row.business_verification_status,
 
     version:
       row.version ?? 0,
@@ -72,9 +91,15 @@ export function rowToProfile(row) {
 
     updatedAt:
       row.updated_at,
+
   };
+
 }
 
+
+/* =========================================
+   APPLICATION MODEL -> DATABASE ROW
+========================================= */
 
 /* =========================================
    APPLICATION MODEL -> DATABASE ROW
@@ -84,72 +109,77 @@ export function profileToRow(
   profile = {}
 ) {
 
-  return {
+  const mode =
+    normaliseMode(
+      profile.mode ??
+      profile.userType
+    );
 
-    id:
-      profile.id,
+
+  return {
 
     user_id:
       profile.userId,
 
     username:
-      profile.username ?? "",
+      profile.username,
 
     display_name:
-      profile.displayName ?? "",
+      profile.displayName,
 
     email:
-      profile.email ?? "",
+      profile.email,
 
+    /*
+     * Database compatibility.
+     */
     user_type:
-      profile.userType ?? "PERSONAL",
+      mode === "ENTITY"
+        ? "ORG"
+        : "PERSONAL",
 
     profile_level:
-      profile.profileLevel ?? 0,
+      profile.profileLevel,
 
     profile_status:
-      profile.profileStatus ?? "incomplete",
+      profile.profileStatus,
 
     phone:
-      profile.phone ?? "",
+      profile.phone,
 
     phone_e164:
-      profile.phoneE164 ?? "",
+      profile.phoneE164,
 
     phone_display:
-      profile.phoneDisplay ?? "",
+      profile.phoneDisplay,
 
     phone_country:
-      profile.phoneCountry ?? "AU",
+      profile.phoneCountry,
 
     phone_verified:
-      !!profile.phoneVerified,
+      profile.phoneVerified,
 
     home_location:
-      profile.homeLocation ?? null,
+      profile.homeLocation,
 
     social:
-      profile.social ?? {},
+      profile.social,
 
     payment:
-      profile.payment ?? {},
+      profile.payment,
 
     endpoint:
-      profile.endpoint ?? {},
+      profile.endpoint,
 
     pending_account_type:
-      profile.pendingAccountType ?? null,
+      profile.pendingAccountType,
 
     business_verification_status:
-      profile.businessVerificationStatus ?? "none",
+      profile.businessVerificationStatus,
 
     version:
-      profile.version ?? 0,
+      profile.version,
 
-    created_at:
-      profile.createdAt,
-
-    updated_at:
-      profile.updatedAt,
   };
+
 }

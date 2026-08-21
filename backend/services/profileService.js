@@ -10,7 +10,7 @@ import {
 ===================================================== */
 
 const DEFAULT_PHONE_COUNTRY = "AU";
-const DEFAULT_USER_TYPE = "PERSONAL";
+const DEFAULT_MODE = "PERSON";
 const DEFAULT_PROFILE_STATUS = "incomplete";
 const DEFAULT_BUSINESS_VERIFICATION_STATUS = "none";
 
@@ -20,11 +20,7 @@ const DEFAULT_BUSINESS_VERIFICATION_STATUS = "none";
 ===================================================== */
 
 function cleanString(value) {
-
-  if (
-    value === null ||
-    value === undefined
-  ) {
+  if (value === null || value === undefined) {
     return "";
   }
 
@@ -33,14 +29,39 @@ function cleanString(value) {
 
 
 /* =====================================================
-   ACCOUNT TYPE
+   MODE
+===================================================== */
+
+function normaliseMode(value) {
+  const type = cleanString(value).toUpperCase();
+
+  if (
+    type === "PERSON" ||
+    type === "PERSONAL"
+  ) {
+    return "PERSON";
+  }
+
+  if (
+    type === "ENTITY" ||
+    type === "BUSINESS" ||
+    type === "ORGANISATION" ||
+    type === "ORGANIZATION" ||
+    type === "ORG"
+  ) {
+    return "ENTITY";
+  }
+
+  return type || DEFAULT_MODE;
+}
+
+
+/* =====================================================
+   LEGACY ACCOUNT TYPE
 ===================================================== */
 
 function normaliseAccountType(value) {
-
-  const type =
-    cleanString(value).toUpperCase();
-
+  const type = cleanString(value).toUpperCase();
 
   if (
     type === "PERSONAL" ||
@@ -48,15 +69,6 @@ function normaliseAccountType(value) {
   ) {
     return "PERSONAL";
   }
-
-
-  /*
-   * ORG is retained as a supported
-   * application-level value.
-   *
-   * BUSINESS / ORGANISATION / ORGANIZATION
-   * are normalised to BUSINESS.
-   */
 
   if (
     type === "BUSINESS" ||
@@ -66,32 +78,16 @@ function normaliseAccountType(value) {
     return "BUSINESS";
   }
 
-
   if (type === "ORG") {
     return "ORG";
   }
 
-
-  return (
-    type ||
-    DEFAULT_USER_TYPE
-  );
+  return type || "PERSONAL";
 }
 
 
-/* =====================================================
-   ACCOUNT TYPE HELPERS
-===================================================== */
-
-function isBusinessType(value) {
-
-  const type =
-    normaliseAccountType(value);
-
-  return (
-    type === "BUSINESS" ||
-    type === "ORG"
-  );
+function isEntityMode(value) {
+  return normaliseMode(value) === "ENTITY";
 }
 
 
@@ -103,33 +99,19 @@ function mergeSocialState(
   existing = {},
   incoming = {}
 ) {
-
   const merged = {
     ...(existing || {}),
   };
 
-
   for (
     const [provider, value]
-    of Object.entries(
-      incoming || {}
-    )
+    of Object.entries(incoming || {})
   ) {
-
-    /*
-     * null explicitly removes
-     * the provider.
-     */
 
     if (value === null) {
       delete merged[provider];
       continue;
     }
-
-
-    /*
-     * Ignore malformed values.
-     */
 
     if (
       typeof value !== "object" ||
@@ -138,19 +120,10 @@ function mergeSocialState(
       continue;
     }
 
-
     merged[provider] = {
-
       ...(merged[provider] || {}),
-
       ...value,
-
     };
-
-
-    /*
-     * Remove empty provider objects.
-     */
 
     if (
       Object.keys(
@@ -159,9 +132,7 @@ function mergeSocialState(
     ) {
       delete merged[provider];
     }
-
   }
-
 
   return merged;
 }
@@ -171,13 +142,9 @@ function mergePaymentState(
   existing = {},
   incoming = {}
 ) {
-
   return {
-
     ...(existing || {}),
-
     ...(incoming || {}),
-
   };
 }
 
@@ -186,13 +153,9 @@ function mergeEndpointState(
   existing = {},
   incoming = {}
 ) {
-
   return {
-
     ...(existing || {}),
-
     ...(incoming || {}),
-
   };
 }
 
@@ -204,116 +167,48 @@ function mergeEndpointState(
 function calculateProfileState(
   profile = {}
 ) {
-
   const username =
-    cleanString(
-      profile.username
-    );
-
+    cleanString(profile.username);
 
   const displayName =
-    cleanString(
-      profile.displayName
-    );
+    cleanString(profile.displayName);
 
-
-  const userType =
-    normaliseAccountType(
+  const mode =
+    normaliseMode(
+      profile.mode ??
       profile.userType
     );
-
-
-  /*
-   * Minimum profile requirements.
-   */
 
   if (
     !username ||
     !displayName
   ) {
-
     return {
-
       profileLevel: 0,
-
-      profileStatus:
-        DEFAULT_PROFILE_STATUS,
-
+      profileStatus: "incomplete",
     };
   }
 
-
-  /*
-   * Personal account.
-   */
-
-  if (
-    userType === "PERSONAL"
-  ) {
-
+  if (mode === "PERSON") {
     return {
-
       profileLevel: 1,
-
-      profileStatus:
-        "basic_complete",
-
+      profileStatus: "basic_complete",
     };
   }
 
-
-  /*
-   * Business / organisation.
-   */
-
   if (
-    isBusinessType(userType) &&
     profile.businessVerificationStatus ===
-      "verified"
+    "verified"
   ) {
-
     return {
-
       profileLevel: 3,
-
-      profileStatus:
-        "verified",
-
+      profileStatus: "verified",
     };
   }
-
-
-  /*
-   * Business account awaiting
-   * verification.
-   */
-
-  if (
-    isBusinessType(userType)
-  ) {
-
-    return {
-
-      profileLevel: 1,
-
-      profileStatus:
-        "business_pending",
-
-    };
-  }
-
-
-  /*
-   * Unknown account type.
-   */
 
   return {
-
-    profileLevel: 0,
-
-    profileStatus:
-      DEFAULT_PROFILE_STATUS,
-
+    profileLevel: 1,
+    profileStatus: "entity_pending",
   };
 }
 
@@ -328,7 +223,6 @@ function pickProfileFields(
 
   const incoming = {};
 
-
   if (
     profile.username !== undefined
   ) {
@@ -337,7 +231,6 @@ function pickProfileFields(
         profile.username
       );
   }
-
 
   if (
     profile.displayName !== undefined
@@ -348,16 +241,29 @@ function pickProfileFields(
       );
   }
 
+  /*
+   * Mode is canonical.
+   *
+   * userType is accepted temporarily
+   * for frontend compatibility.
+   */
 
   if (
+    profile.mode !== undefined
+  ) {
+    incoming.mode =
+      normaliseMode(
+        profile.mode
+      );
+  }
+  else if (
     profile.userType !== undefined
   ) {
-    incoming.userType =
-      normaliseAccountType(
+    incoming.mode =
+      normaliseMode(
         profile.userType
       );
   }
-
 
   if (
     profile.phone !== undefined
@@ -366,14 +272,12 @@ function pickProfileFields(
       profile.phone;
   }
 
-
   if (
     profile.phoneE164 !== undefined
   ) {
     incoming.phoneE164 =
       profile.phoneE164;
   }
-
 
   if (
     profile.phoneDisplay !== undefined
@@ -382,7 +286,6 @@ function pickProfileFields(
       profile.phoneDisplay;
   }
 
-
   if (
     profile.phoneCountry !== undefined
   ) {
@@ -390,16 +293,12 @@ function pickProfileFields(
       profile.phoneCountry;
   }
 
-
   if (
     profile.phoneVerified !== undefined
   ) {
     incoming.phoneVerified =
-      Boolean(
-        profile.phoneVerified
-      );
+      profile.phoneVerified;
   }
-
 
   if (
     profile.homeLocation !== undefined
@@ -408,14 +307,12 @@ function pickProfileFields(
       profile.homeLocation;
   }
 
-
   if (
     profile.social !== undefined
   ) {
     incoming.social =
       profile.social;
   }
-
 
   if (
     profile.payment !== undefined
@@ -424,15 +321,6 @@ function pickProfileFields(
       profile.payment;
   }
 
-
-  if (
-    profile.endpoint !== undefined
-  ) {
-    incoming.endpoint =
-      profile.endpoint;
-  }
-
-
   if (
     profile.pendingAccountType !== undefined
   ) {
@@ -440,15 +328,12 @@ function pickProfileFields(
       profile.pendingAccountType;
   }
 
-
   if (
-    profile.businessVerificationStatus !==
-    undefined
+    profile.businessVerificationStatus !== undefined
   ) {
     incoming.businessVerificationStatus =
       profile.businessVerificationStatus;
   }
-
 
   return incoming;
 }
@@ -462,16 +347,12 @@ function getEndpointDetails(
   req,
   incoming = {}
 ) {
-
   return {
-
     ...(incoming || {}),
 
     ip:
       req?.ip ||
-      incoming?.ip ||
       null,
-
   };
 }
 
@@ -483,10 +364,8 @@ function getEndpointDetails(
 function createDefaultProfile(
   userId
 ) {
-
   const now =
     new Date();
-
 
   return {
 
@@ -498,8 +377,17 @@ function createDefaultProfile(
 
     email: "",
 
-    userType:
-      DEFAULT_USER_TYPE,
+    mode:
+      DEFAULT_MODE,
+
+    /*
+     * Legacy compatibility.
+     *
+     * Repository/mapping can continue
+     * supporting userType while migration
+     * completes.
+     */
+    userType: "PERSONAL",
 
     phone: "",
 
@@ -535,7 +423,6 @@ function createDefaultProfile(
     createdAt: now,
 
     updatedAt: now,
-
   };
 }
 
@@ -550,67 +437,54 @@ function buildMergedProfile(
   req
 ) {
 
+  const mode =
+    normaliseMode(
+      incoming.mode ??
+      existing.mode ??
+      existing.userType
+    );
+
   const merged = {
 
     ...existing,
 
     ...incoming,
 
-    userType:
-      normaliseAccountType(
-        incoming.userType ??
-        existing.userType
-      ),
-
+    mode,
 
     social:
       mergeSocialState(
-
         existing.social,
-
         incoming.social
-
       ),
-
 
     payment:
       mergePaymentState(
-
         existing.payment,
-
         incoming.payment
-
       ),
-
 
     endpoint:
       mergeEndpointState(
-
         existing.endpoint,
-
         getEndpointDetails(
           req,
           incoming.endpoint
         )
-
       ),
-
   };
 
 
   /*
-   * Never allow the client to
-   * accidentally erase the user ID.
+   * Preserve legacy database field
+   * while the Mode migration completes.
    */
 
-  merged.userId =
-    existing.userId;
+  merged.userType =
+    mode === "PERSON"
+      ? "PERSONAL"
+      : "ORG";
 
-
-  /*
-   * Recalculate profile state
-   * server-side.
-   */
 
   const state =
     calculateProfileState(
@@ -618,30 +492,22 @@ function buildMergedProfile(
     );
 
 
-  merged.profileLevel =
-    state.profileLevel;
+  return {
 
+    ...merged,
 
-  merged.profileStatus =
-    state.profileStatus;
+    profileLevel:
+      state.profileLevel,
 
+    profileStatus:
+      state.profileStatus,
 
-  /*
-   * Version is controlled by the
-   * service, not the client.
-   */
+    version:
+      (existing.version || 0) + 1,
 
-  merged.version =
-    Number(
-      existing.version || 0
-    ) + 1;
-
-
-  merged.updatedAt =
-    new Date();
-
-
-  return merged;
+    updatedAt:
+      new Date(),
+  };
 }
 
 
@@ -659,15 +525,12 @@ export async function getProfileService({
     );
   }
 
-
   const profile =
     await fetchProfileByUserId(
       userId
     );
 
-
   return {
-
     profile,
 
     hasProfile:
@@ -675,7 +538,6 @@ export async function getProfileService({
 
     version:
       profile?.version ?? 0,
-
   };
 }
 
@@ -696,34 +558,16 @@ export async function putProfileService({
     );
   }
 
-
   const existing =
     await fetchProfileByUserId(
       userId
     );
-
 
   const incoming =
     pickProfileFields(
       body?.profile || {}
     );
 
-
-  /*
-   * Endpoint information is
-   * server-controlled.
-   */
-
-  incoming.endpoint =
-    getEndpointDetails(
-      req,
-      incoming.endpoint
-    );
-
-
-  /*
-   * CREATE
-   */
 
   if (!existing) {
 
@@ -732,7 +576,6 @@ export async function putProfileService({
         userId
       );
 
-
     const profile =
       buildMergedProfile(
         base,
@@ -740,27 +583,17 @@ export async function putProfileService({
         req
       );
 
-
     const saved =
       await createProfile(
         profile
       );
 
-
     return {
-
       profile: saved,
-
-      version:
-        saved.version,
-
+      version: saved.version,
     };
   }
 
-
-  /*
-   * UPDATE
-   */
 
   const merged =
     buildMergedProfile(
@@ -769,20 +602,14 @@ export async function putProfileService({
       req
     );
 
-
   const saved =
     await updateProfile(
       merged
     );
 
-
   return {
-
     profile: saved,
-
-    version:
-      saved.version,
-
+    version: saved.version,
   };
 }
 
@@ -803,38 +630,21 @@ export async function patchProfileService({
     );
   }
 
-
   const existing =
     await fetchProfileByUserId(
       userId
     );
 
-
   if (!existing) {
-
     throw new Error(
       "Profile not found"
     );
   }
 
-
   const incoming =
     pickProfileFields(
       body?.profile || {}
     );
-
-
-  /*
-   * Endpoint is generated from
-   * the authenticated request.
-   */
-
-  incoming.endpoint =
-    getEndpointDetails(
-      req,
-      incoming.endpoint
-    );
-
 
   const merged =
     buildMergedProfile(
@@ -861,9 +671,11 @@ export async function patchProfileService({
       nextVersion:
         merged.version,
 
+      mode:
+        merged.mode,
+
       userType:
         merged.userType,
-
     }
   );
 
@@ -875,7 +687,6 @@ export async function patchProfileService({
 
 
   return {
-
     profile: saved,
 
     organisationProfile:
@@ -883,6 +694,5 @@ export async function patchProfileService({
 
     version:
       saved.version,
-
   };
 }
