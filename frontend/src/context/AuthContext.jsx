@@ -1,272 +1,619 @@
-import { useMemo } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
-import { useAuth } from "../context/AuthContext";
-import { useUI } from "../context/UIContext";
-import { apiFetch } from "../services/api";
+import {
+  fetchAuthSession,
+  getCurrentUser,
+  signInWithRedirect,
+  signOut,
+} from "aws-amplify/auth";
 
 
-export default function useAPI() {
+const AuthContext =
+  createContext(null);
 
-    const {
-        token,
-        refreshAuth,
-    } = useAuth();
 
-    const ui =
-        useUI();
+const GUEST_KEY =
+  "community_guest";
 
 
-    const startSaving =
-        ui?.startSaving;
+/* =========================================
+   NORMALISE USER
+========================================= */
 
-    const stopSaving =
-        ui?.stopSaving;
+function normaliseUser(
+  amplifyUser,
+  tokens
+) {
 
+  if (!amplifyUser) {
+    return null;
+  }
 
-    /* =========================================
-       REQUEST
-    ========================================= */
 
-    const request =
-        useMemo(() => {
+  const idPayload =
+    tokens?.idToken?.payload || {};
 
-            return async (
-                method,
-                path,
-                body = null,
-                options = {}
-            ) => {
 
-                startSaving?.();
+  const email =
+    idPayload.email ||
+    amplifyUser.signInDetails?.loginId ||
+    "";
 
 
-                try {
+  const name =
+    idPayload.name || "";
 
-                    /* =====================================
-                       FIRST REQUEST
-                    ===================================== */
 
-                    try {
+  const username =
+    amplifyUser.username ||
+    email ||
+    "";
 
-                        return await apiFetch(
-                            path,
-                            {
-                                method,
-                                token,
-                                body,
-                                ...options,
-                            }
-                        );
 
-                    } catch (error) {
+  const fallback =
+    email?.split("@")[0] ||
+    username ||
+    "User";
 
-                        /* =================================
-                           AUTH FAILURE
-                        ================================= */
 
-                        if (
-                            error?.status !== 401 ||
-                            !refreshAuth
-                        ) {
+  const displayName =
+    name || fallback;
 
-                            throw error;
 
-                        }
+  const initials =
+    displayName
+      .split(/[\s._-]+/)
+      .filter(Boolean)
+      .map(
+        part => part[0]
+      )
+      .join("")
+      .slice(0, 2)
+      .toUpperCase();
 
 
-                        console.warn(
-                            "[API] 401 received — refreshing Cognito session"
-                        );
+  return {
 
+    id:
+      amplifyUser.userId ||
+      idPayload.sub ||
+      amplifyUser.username ||
+      email,
 
-                        /* =================================
-                           REFRESH TOKEN
-                        ================================= */
+    sub:
+      idPayload.sub ||
+      amplifyUser.userId ||
+      null,
 
-                        const refreshed =
-                            await refreshAuth({
-                                forceRefresh: true,
-                            });
+    username,
 
+    email,
 
-                        if (
-                            !refreshed?.token
-                        ) {
+    name,
 
-                            console.error(
-                                "[API] Cognito token refresh failed"
-                            );
+    displayName,
 
-                            throw error;
+    initials,
 
-                        }
+    raw:
+      amplifyUser,
 
+  };
 
-                        console.log(
-                            "[API] Cognito token refreshed"
-                        );
+}
 
 
-                        /* =================================
-                           RETRY ONCE
-                        ================================= */
+/* =========================================
+   AUTH PROVIDER
+========================================= */
 
-                        return await apiFetch(
-                            path,
-                            {
-                                method,
-
-                                token:
-                                    refreshed.token,
-
-                                body,
-
-                                ...options,
-                            }
-                        );
-
-                    }
-
-                } finally {
-
-                    stopSaving?.();
-
-                }
-
-            };
-
-        }, [
-            token,
-            refreshAuth,
-            startSaving,
-            stopSaving,
-        ]);
-
-
-    /* =========================================
-       GET
-    ========================================= */
-
-    const get =
-        useMemo(() => {
-
-            return async (
-                path,
-                options = {}
-            ) => {
-
-                return apiFetch(
-                    path,
-                    {
-                        method: "GET",
-                        token,
-                        ...options,
-                    }
-                );
-
-            };
-
-        }, [
-            token,
-        ]);
-
-
-    /* =========================================
-       API METHODS
-    ========================================= */
-
-    const api =
-        useMemo(() => ({
-
-            get,
-
-            post:
-                (
-                    path,
-                    body = null,
-                    options = {}
-                ) =>
-                    request(
-                        "POST",
-                        path,
-                        body,
-                        options
-                    ),
-
-            patch:
-                (
-                    path,
-                    body = null,
-                    options = {}
-                ) =>
-                    request(
-                        "PATCH",
-                        path,
-                        body,
-                        options
-                    ),
-
-            put:
-                (
-                    path,
-                    body = null,
-                    options = {}
-                ) =>
-                    request(
-                        "PUT",
-                        path,
-                        body,
-                        options
-                    ),
-
-            delete:
-                (
-                    path,
-                    body = null,
-                    options = {}
-                ) =>
-                    request(
-                        "DELETE",
-                        path,
-                        body,
-                        options
-                    ),
-
-        }), [
-            get,
-            request,
-        ]);
-
-
-    /* =========================================
-       PROFILE
-    ========================================= */
-
-    const patchProfile =
-        (
-            body,
-            options = {}
-        ) => {
-
-            return api.patch(
-                "/profile",
-                body,
-                options
-            );
-
-        };
-
-
-    /* =========================================
-       RETURN
-    ========================================= */
-
-    return {
-
-        ...api,
-
-        patchProfile,
+export function AuthProvider({
+  children,
+}) {
+
+  const mountedRef =
+    useRef(true);
+
+
+  const [
+    user,
+    setUser,
+  ] = useState(null);
+
+
+  const [
+    token,
+    setToken,
+  ] = useState(null);
+
+
+  const [
+    tokens,
+    setTokens,
+  ] = useState(null);
+
+
+  const [
+    isGuest,
+    setIsGuest,
+  ] = useState(() => {
+
+    return (
+      localStorage.getItem(
+        GUEST_KEY
+      ) === "true"
+    );
+
+  });
+
+
+  const [
+    loading,
+    setLoading,
+  ] = useState(true);
+
+
+  const [
+    hydrating,
+    setHydrating,
+  ] = useState(false);
+
+
+  /* =========================================
+     MOUNT
+  ========================================= */
+
+  useEffect(() => {
+
+    mountedRef.current = true;
+
+
+    return () => {
+
+      mountedRef.current = false;
 
     };
+
+  }, []);
+
+
+  /* =========================================
+     CLEAR AUTH
+  ========================================= */
+
+  const clearAuth =
+    useCallback(() => {
+
+      if (!mountedRef.current) {
+        return;
+      }
+
+
+      setUser(null);
+
+      setToken(null);
+
+      setTokens(null);
+
+    }, []);
+
+
+  /* =========================================
+     REFRESH AUTH
+  ========================================= */
+
+  const refreshAuth =
+    useCallback(
+      async ({
+        forceRefresh = false,
+      } = {}) => {
+
+        if (mountedRef.current) {
+
+          setHydrating(true);
+
+        }
+
+
+        try {
+
+          const amplifyUser =
+            await getCurrentUser();
+
+
+          const session =
+            await fetchAuthSession({
+              forceRefresh,
+            });
+
+
+          const accessToken =
+            session.tokens?.idToken?.toString();
+
+
+          if (!accessToken) {
+
+            clearAuth();
+
+            return null;
+
+          }
+
+
+          const normalisedUser =
+            normaliseUser(
+              amplifyUser,
+              session.tokens
+            );
+
+
+          if (mountedRef.current) {
+
+            setUser(
+              normalisedUser
+            );
+
+            setToken(
+              accessToken
+            );
+
+            setTokens(
+              session.tokens
+            );
+
+
+            localStorage.removeItem(
+              GUEST_KEY
+            );
+
+            setIsGuest(false);
+
+          }
+
+
+          /*
+          =====================================
+          IMPORTANT
+
+          Return the NEW token as well as the
+          normalised user.
+
+          useAPI needs this immediately when
+          retrying a request after a 401.
+          =====================================
+          */
+
+          return {
+
+            user:
+              normalisedUser,
+
+            token:
+              accessToken,
+
+          };
+
+        } catch (err) {
+
+          if (
+            err?.name !==
+              "UserUnAuthenticatedException" &&
+            err?.name !==
+              "NotAuthorizedException"
+          ) {
+
+            console.warn(
+              "Auth refresh failed:",
+              err?.name ||
+              err?.message ||
+              err
+            );
+
+          }
+
+
+          clearAuth();
+
+          return null;
+
+        } finally {
+
+          if (mountedRef.current) {
+
+            setHydrating(false);
+
+          }
+
+        }
+
+      },
+      [
+        clearAuth,
+      ]
+    );
+
+
+  /* =========================================
+     INITIAL AUTH
+  ========================================= */
+
+  useEffect(() => {
+
+    async function initAuth() {
+
+      try {
+
+        await refreshAuth();
+
+      } finally {
+
+        if (mountedRef.current) {
+
+          setLoading(false);
+
+        }
+
+      }
+
+    }
+
+
+    initAuth();
+
+  }, [
+    refreshAuth,
+  ]);
+
+
+  /* =========================================
+     LOGIN
+  ========================================= */
+
+  const login =
+    useCallback(
+      async () => {
+
+        localStorage.removeItem(
+          GUEST_KEY
+        );
+
+        setIsGuest(false);
+
+
+        await signInWithRedirect();
+
+      },
+      []
+    );
+
+
+  /* =========================================
+     GUEST
+  ========================================= */
+
+  const continueAsGuest =
+    useCallback(
+      async () => {
+
+        try {
+
+          await signOut({
+            global: false,
+          });
+
+        } catch (err) {
+
+          console.warn(
+            "Guest mode signOut warning:",
+            err?.message || err
+          );
+
+        }
+
+
+        clearAuth();
+
+
+        localStorage.setItem(
+          GUEST_KEY,
+          "true"
+        );
+
+
+        setIsGuest(true);
+
+        setLoading(false);
+
+        setHydrating(false);
+
+      },
+      [
+        clearAuth,
+      ]
+    );
+
+
+  /* =========================================
+     LOGOUT
+  ========================================= */
+
+  const logout =
+    useCallback(
+      async () => {
+
+        try {
+
+          await signOut({
+            global: true,
+          });
+
+        } catch (err) {
+
+          console.warn(
+            "Logout warning:",
+            err?.message || err
+          );
+
+        } finally {
+
+          clearAuth();
+
+          localStorage.removeItem(
+            GUEST_KEY
+          );
+
+          setIsGuest(false);
+
+          window.location.assign("/");
+
+        }
+
+      },
+      [
+        clearAuth,
+      ]
+    );
+
+
+  /* =========================================
+     AUTH STATE
+  ========================================= */
+
+  const isAuthenticated =
+    Boolean(
+      user &&
+      token
+    );
+
+
+  const authLoading =
+    loading ||
+    hydrating;
+
+
+  const role =
+    isAuthenticated
+      ? "member"
+      : isGuest
+      ? "guest"
+      : "anonymous";
+
+
+  /* =========================================
+     CONTEXT VALUE
+  ========================================= */
+
+  const value =
+    useMemo(
+      () => ({
+
+        user,
+
+        token,
+
+        tokens,
+
+        loading,
+
+        hydrating,
+
+        authLoading,
+
+        isAuthenticated,
+
+        isGuest,
+
+        role,
+
+        login,
+
+        logout,
+
+        continueAsGuest,
+
+        refreshAuth,
+
+        clearAuth,
+
+      }),
+      [
+
+        user,
+
+        token,
+
+        tokens,
+
+        loading,
+
+        hydrating,
+
+        authLoading,
+
+        isAuthenticated,
+
+        isGuest,
+
+        role,
+
+        login,
+
+        logout,
+
+        continueAsGuest,
+
+        refreshAuth,
+
+        clearAuth,
+
+      ]
+    );
+
+
+  return (
+
+    <AuthContext.Provider
+      value={value}
+    >
+
+      {children}
+
+    </AuthContext.Provider>
+
+  );
+
+}
+
+
+/* =========================================
+   USE AUTH
+========================================= */
+
+export function useAuth() {
+
+  const context =
+    useContext(
+      AuthContext
+    );
+
+
+  if (!context) {
+
+    throw new Error(
+      "useAuth must be used within AuthProvider"
+    );
+
+  }
+
+
+  return context;
 
 }
