@@ -1,6 +1,37 @@
 /* =========================================
-   DATABASE ROW -> APPLICATION MODEL
+   NORMALISE MODE
 ========================================= */
+
+function normaliseMode(value) {
+
+  const mode =
+    value === null ||
+    value === undefined
+      ? ""
+      : String(value)
+          .trim()
+          .toUpperCase();
+
+  if (
+    mode === "PERSON" ||
+    mode === "PERSONAL"
+  ) {
+    return "PERSON";
+  }
+
+  if (
+    mode === "ENTITY" ||
+    mode === "BUSINESS" ||
+    mode === "ORGANISATION" ||
+    mode === "ORGANIZATION" ||
+    mode === "ORG"
+  ) {
+    return "ENTITY";
+  }
+
+  return mode || "ENTITY";
+}
+
 
 /* =========================================
    DATABASE ROW -> APPLICATION MODEL
@@ -13,163 +44,69 @@ export function rowToProfile(row) {
   }
 
   return {
+    id: row.id,
+    userId: row.user_id,
 
-    id:
-      row.id,
+    username: row.username ?? "",
+    displayName: row.display_name ?? "",
+    email: row.email ?? "",
 
-    userId:
-      row.user_id,
+    userType: row.user_type ?? "PERSONAL",
 
-    username:
-      row.username ?? "",
+    profileLevel: row.profile_level ?? 0,
+    profileStatus: row.profile_status ?? "incomplete",
 
-    displayName:
-      row.display_name ?? "",
+    phone: row.phone ?? "",
+    phoneE164: row.phone_e164 ?? "",
+    phoneDisplay: row.phone_display ?? "",
+    phoneCountry: row.phone_country ?? "AU",
+    phoneVerified: !!row.phone_verified,
 
-    email:
-      row.email ?? "",
+    homeLocation: row.home_location ?? null,
 
-    /*
-     * Canonical application model
-     */
-    mode:
-      normaliseMode(
-        row.user_type
-      ),
-
-    /*
-     * Temporary compatibility field.
-     * Remove once frontend migration is complete.
-     */
-    userType:
-      row.user_type ?? "PERSONAL",
-
-    profileLevel:
-      row.profile_level ?? 0,
-
-    profileStatus:
-      row.profile_status ?? "incomplete",
-
-    phone:
-      row.phone ?? "",
-
-    phoneE164:
-      row.phone_e164 ?? "",
-
-    phoneDisplay:
-      row.phone_display ?? "",
-
-    phoneCountry:
-      row.phone_country ?? "AU",
-
-    phoneVerified:
-      !!row.phone_verified,
-
-    homeLocation:
-      row.home_location ?? null,
-
-    social:
-      row.social ?? {},
-
-    payment:
-      row.payment ?? {},
-
-    endpoint:
-      row.endpoint ?? {},
+    social: row.social ?? {},
+    payment: row.payment ?? {},
+    endpoint: row.endpoint ?? {},
 
     pendingAccountType:
-      row.pending_account_type,
+      row.pending_account_type ?? null,
 
     businessVerificationStatus:
-      row.business_verification_status,
+      row.business_verification_status ?? null,
 
-    version:
-      row.version ?? 0,
+    version: row.version ?? 0,
 
-    createdAt:
-      row.created_at,
-
-    updatedAt:
-      row.updated_at,
-
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
   };
-
 }
 
 
-/* =========================================
-   APPLICATION MODEL -> DATABASE ROW
-========================================= */
-
-/* =========================================
-   APPLICATION MODEL -> DATABASE ROW
-========================================= */
-
-export function profileToRow(
-  profile = {}
-) {
-
-  const mode =
-    normaliseMode(
-      profile.mode ??
-      profile.userType
-    );
-
+export function profileToRow(profile = {}) {
 
   return {
+    user_id: profile.userId,
 
-    user_id:
-      profile.userId,
+    username: profile.username,
+    display_name: profile.displayName,
+    email: profile.email,
 
-    username:
-      profile.username,
+    user_type: profile.userType,
 
-    display_name:
-      profile.displayName,
+    profile_level: profile.profileLevel,
+    profile_status: profile.profileStatus,
 
-    email:
-      profile.email,
+    phone: profile.phone,
+    phone_e164: profile.phoneE164,
+    phone_display: profile.phoneDisplay,
+    phone_country: profile.phoneCountry,
+    phone_verified: profile.phoneVerified,
 
-    /*
-     * Database compatibility.
-     */
-    user_type:
-      mode === "ENTITY"
-        ? "ORG"
-        : "PERSONAL",
+    home_location: profile.homeLocation,
 
-    profile_level:
-      profile.profileLevel,
-
-    profile_status:
-      profile.profileStatus,
-
-    phone:
-      profile.phone,
-
-    phone_e164:
-      profile.phoneE164,
-
-    phone_display:
-      profile.phoneDisplay,
-
-    phone_country:
-      profile.phoneCountry,
-
-    phone_verified:
-      profile.phoneVerified,
-
-    home_location:
-      profile.homeLocation,
-
-    social:
-      profile.social,
-
-    payment:
-      profile.payment,
-
-    endpoint:
-      profile.endpoint,
+    social: profile.social,
+    payment: profile.payment,
+    endpoint: profile.endpoint,
 
     pending_account_type:
       profile.pendingAccountType,
@@ -180,6 +117,10 @@ export function profileToRow(
     version:
       profile.version,
 
-  };
+    created_at:
+      profile.createdAt,
 
+    updated_at:
+      profile.updatedAt,
+  };
 }
