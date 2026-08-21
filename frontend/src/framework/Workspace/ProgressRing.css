@@ -29,9 +29,7 @@
 ===================================== */
 
 .progress-ring__track {
-
-    stroke: #e5e5e5;
-
+    stroke: #dedede;
 }
 
 
@@ -40,12 +38,9 @@
 ===================================== */
 
 .progress-ring__progress {
-
     stroke: #b20d1f;
-
-    transition:
-        stroke-dashoffset 0.4s ease;
-
+    stroke-width: 4px;
+    transition: stroke-dashoffset 0.4s ease;
 }
 
 
