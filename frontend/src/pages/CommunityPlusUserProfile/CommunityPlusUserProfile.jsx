@@ -397,24 +397,28 @@ const handleSaveSection = async (sectionId) => {
             "[PROFILE SAVE] PATCH START"
         );
 
-        await patchProfile(payload);
+await patchProfile(payload);
 
-        console.log(
-            "[PROFILE SAVE] PATCH SUCCESS"
-        );
+console.log(
+    "[PROFILE SAVE] PATCH SUCCESS"
+);
 
-        /*
-         * Only leave edit mode after
-         * the backend successfully accepts
-         * the profile.
-         */
+/*
+ * Refresh the canonical profile state
+ * after the backend accepts the update.
+ */
+await loadProfile();
 
-        setEditingSections(
-            previous => ({
-                ...previous,
-                [sectionId]: false,
-            })
-        );
+console.log(
+    "[PROFILE SAVE] PROFILE RELOADED"
+);
+
+setEditingSections(
+    previous => ({
+        ...previous,
+        [sectionId]: false,
+    })
+);
 
     } catch (error) {
 
