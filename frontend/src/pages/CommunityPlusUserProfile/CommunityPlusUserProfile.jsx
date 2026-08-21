@@ -263,17 +263,29 @@ const [
         );
 
 console.log(
-    "[PROFILE COMPLETION]",
-    {
-        completion,
-        username: values.username,
-        homeLocation: values.homeLocation,
-        phoneDisplay: values.phoneDisplay,
-        social: values.social,
-        payment: values.payment,
-        values,
-    }
-);        
+    "[PROFILE COMPLETION] VALUE:",
+    completion
+);
+
+console.log(
+    "[PROFILE COMPLETION] USERNAME:",
+    values.username
+);
+
+console.log(
+    "[PROFILE COMPLETION] LOCATION:",
+    values.homeLocation
+);
+
+console.log(
+    "[PROFILE COMPLETION] PHONE:",
+    values.phoneDisplay
+);
+
+console.log(
+    "[PROFILE COMPLETION] PAYMENT:",
+    values.payment
+);      
 
 
     /* =====================================
