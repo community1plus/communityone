@@ -1,21 +1,9 @@
 .workspace-field-value {
-    width: 100%;
     min-height: 48px;
-
     display: flex;
     align-items: center;
 
-    box-sizing: border-box;
-
-    padding: 0 16px;
-
-    border: 1px solid #d9dfe7;
-    border-radius: 14px;
-
-    background: #f8fafc;
-
     color: #365f87;
-
     font-size: 16px;
     line-height: 1.4;
 }
