@@ -1,6 +1,5 @@
 import "./ProgressRing.css";
 
-
 export default function ProgressRing({
 
     value = 0,
@@ -52,7 +51,7 @@ export default function ProgressRing({
                 viewBox={`0 0 ${size} ${size}`}
             >
 
-                {/* Background track */}
+                {/* Track */}
 
                 <circle
 
@@ -85,13 +84,9 @@ export default function ProgressRing({
 
                     strokeWidth={stroke}
 
-                    strokeDasharray={
-                        circumference
-                    }
+                    strokeDasharray={circumference}
 
-                    strokeDashoffset={
-                        offset
-                    }
+                    strokeDashoffset={offset}
 
                     strokeLinecap="round"
 
@@ -99,8 +94,6 @@ export default function ProgressRing({
 
             </svg>
 
-
-            {/* Percentage */}
 
             <span className="progress-ring__value">
 
