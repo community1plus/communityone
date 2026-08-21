@@ -6,6 +6,7 @@ import LocationField
 
 import "./FieldRenderer.css";
 
+
 export default function FieldRenderer({
 
     field,
@@ -20,6 +21,10 @@ export default function FieldRenderer({
         return null;
     }
 
+
+    /* =====================================================
+       SPECIAL FIELD TYPES
+    ===================================================== */
 
     switch (field.type) {
 
@@ -39,101 +44,155 @@ export default function FieldRenderer({
 
             );
 
+
         case "phone":
-
-    return (
-
-        <PhoneField
-
-            field={field}
-
-            form={form}
-
-            editing={editing}
-
-        />
-
-    );
-        
-        default: {
-
-            const {
-
-                name,
-
-                label,
-
-                type = "text",
-
-                helperText,
-
-                readOnly = false,
-
-            } = field;
-
-
-            const value =
-                form.getValue(name) ?? "";
-
-            const isReadOnly =
-                readOnly || !editing;
-
 
             return (
 
-                <div className="workspace-field">
+                <PhoneField
 
-                    <label
-                        className="workspace-field-label"
-                        htmlFor={name}
-                    >
+                    field={field}
 
-                        {label}
+                    form={form}
 
-                    </label>
+                    editing={editing}
 
-
-                    <input
-
-                        id={name}
-
-                        name={name}
-
-                        type={type}
-
-                        className="workspace-field-input"
-
-                        value={value}
-
-                        readOnly={isReadOnly}
-
-                        onChange={
-                            form.handleChange(name)
-                        }
-
-                        onBlur={
-                            form.handleBlur(name)
-                        }
-
-                    />
-
-
-                    {helperText && (
-
-                        <div className="workspace-field-helper">
-
-                            {helperText}
-
-                        </div>
-
-                    )}
-
-                </div>
+                />
 
             );
 
-        }
+
+        default:
+            break;
 
     }
+
+
+    /* =====================================================
+       STANDARD FIELD
+    ===================================================== */
+
+    const {
+
+        name,
+
+        label,
+
+        type = "text",
+
+        helperText,
+
+        readOnly = false,
+
+    } = field;
+
+
+    const value =
+        form.getValue(name) ?? "";
+
+
+    /* =====================================================
+       VIEW MODE
+    ===================================================== */
+
+    if (!editing) {
+
+        return (
+
+            <div className="workspace-field">
+
+                <label
+                    className="workspace-field-label"
+                    htmlFor={name}
+                >
+
+                    {label}
+
+                </label>
+
+
+                <div
+                    className="workspace-field-value"
+                    id={name}
+                >
+
+                    {value || "—"}
+
+                </div>
+
+
+                {helperText && (
+
+                    <div className="workspace-field-helper">
+
+                        {helperText}
+
+                    </div>
+
+                )}
+
+            </div>
+
+        );
+
+    }
+
+
+    /* =====================================================
+       EDIT MODE
+    ===================================================== */
+
+    return (
+
+        <div className="workspace-field">
+
+            <label
+                className="workspace-field-label"
+                htmlFor={name}
+            >
+
+                {label}
+
+            </label>
+
+
+            <input
+
+                id={name}
+
+                name={name}
+
+                type={type}
+
+                className="workspace-field-input"
+
+                value={value}
+
+                readOnly={readOnly}
+
+                onChange={
+                    form.handleChange(name)
+                }
+
+                onBlur={
+                    form.handleBlur(name)
+                }
+
+            />
+
+
+            {helperText && (
+
+                <div className="workspace-field-helper">
+
+                    {helperText}
+
+                </div>
+
+            )}
+
+        </div>
+
+    );
 
 }

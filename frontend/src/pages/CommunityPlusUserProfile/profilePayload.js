@@ -2,13 +2,17 @@ import { toE164Phone } from "../../../src/framework/Workspace/profile/profileHel
 
 export function buildProfilePayload({
   values,
-  activeProfileTab,
   userEmail,
   homeLocation,
 }) {
 
+  const userType =
+    values.userType ||
+    values.identityType ||
+    "PERSONAL";
+
   const isOrg =
-    activeProfileTab === "ORG";
+    userType === "ORG";
 
   const phoneE164 =
     toE164Phone(
@@ -20,28 +24,21 @@ export function buildProfilePayload({
 
     profile: {
 
-      /* =====================================
-         USER
-      ===================================== */
-
       username:
-        values.username,
+        values.username || "",
 
       displayName:
-        values.displayName,
+        values.displayName || "",
 
       email:
         values.email ||
-        userEmail,
+        userEmail ||
+        "",
 
-      userType:
-        activeProfileTab,
+      userType,
 
-      profileLevel: 1,
-
-      /* =====================================
-         CONTACT
-      ===================================== */
+      profileLevel:
+        1,
 
       phone:
         phoneE164,
@@ -49,23 +46,15 @@ export function buildProfilePayload({
       phoneE164,
 
       phoneDisplay:
-        values.phoneDisplay,
+        values.phoneDisplay || "",
 
       phoneCountry:
-        values.phoneCountry,
-
-      /* =====================================
-         HOME
-      ===================================== */
+        values.phoneCountry || "AU",
 
       homeLocation:
         isOrg
           ? null
           : homeLocation,
-
-      /* =====================================
-         OTHER
-      ===================================== */
 
       policies:
         values.policies,
@@ -76,11 +65,8 @@ export function buildProfilePayload({
     },
 
     organisationProfile:
-
       isOrg
-
         ? {
-
             ...values.organisation,
 
             location:
@@ -92,13 +78,12 @@ export function buildProfilePayload({
             ownershipVerified:
               false,
 
-            businessLevel: 1,
+            businessLevel:
+              1,
 
             source:
               "manual",
-
           }
-
         : null,
 
   };
