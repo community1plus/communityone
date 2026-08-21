@@ -69,6 +69,41 @@ export function getInitialProfileValues(
 
     /*
        -------------------------------------
+       PROFILE USERNAME
+
+       Important:
+
+       An empty username is a valid saved
+       profile state.
+
+       Do NOT use:
+
+           profile?.username || emailUsername
+
+       because "" is falsy and would cause
+       the authentication email username to
+       be restored.
+
+       Only use the email username when the
+       profile has never contained a username.
+       -------------------------------------
+    */
+
+    const hasProfileUsername =
+        Object.prototype.hasOwnProperty.call(
+            profile,
+            "username"
+        );
+
+
+    const profileUsername =
+        hasProfileUsername
+            ? profile.username
+            : emailUsername;
+
+
+    /*
+       -------------------------------------
        IDENTITY TYPE
 
        New model:
@@ -84,7 +119,6 @@ export function getInitialProfileValues(
     const identityType =
         profile?.identityType
         ||
-
         (
             profile?.userType === "ORG"
                 ? IDENTITY_TYPES.ENTITY
@@ -109,8 +143,7 @@ export function getInitialProfileValues(
         personalIdentity: {
 
             username:
-                profile?.username ||
-                emailUsername,
+                profileUsername,
 
             email,
 
@@ -149,8 +182,7 @@ export function getInitialProfileValues(
         ===================================== */
 
         username:
-            profile?.username ||
-            emailUsername,
+            profileUsername,
 
         email,
 
