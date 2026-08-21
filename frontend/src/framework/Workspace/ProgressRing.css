@@ -15,7 +15,15 @@
 
 .progress-ring__svg {
 
+    position: absolute;
+
+    inset: 0;
+
     display: block;
+
+    width: 100%;
+
+    height: 100%;
 
     transform: rotate(-90deg);
 
@@ -24,12 +32,16 @@
 
 .progress-ring__track {
 
+    fill: none;
+
     stroke: #e6e6e6;
 
 }
 
 
 .progress-ring__progress {
+
+    fill: none;
 
     stroke: #b20d1f;
 
@@ -53,7 +65,7 @@
 
     color: #b20d1f;
 
-    font-size: 14px;
+    font-size: 13px;
 
     font-weight: 600;
 
