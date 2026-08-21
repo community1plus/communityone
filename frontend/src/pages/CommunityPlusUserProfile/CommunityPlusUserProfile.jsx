@@ -262,6 +262,19 @@ const [
             values
         );
 
+console.log(
+    "[PROFILE COMPLETION]",
+    {
+        completion,
+        username: values.username,
+        homeLocation: values.homeLocation,
+        phoneDisplay: values.phoneDisplay,
+        social: values.social,
+        payment: values.payment,
+        values,
+    }
+);        
+
 
     /* =====================================
        EDIT SECTION
