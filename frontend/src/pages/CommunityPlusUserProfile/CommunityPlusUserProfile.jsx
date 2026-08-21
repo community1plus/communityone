@@ -502,6 +502,8 @@ const workspaceState = {
 
     currentSection,
 
+    completion,
+
 };
 
 
