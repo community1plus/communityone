@@ -1,281 +1,272 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useMemo } from "react";
 
-import {
-  fetchAuthSession,
-  getCurrentUser,
-  signInWithRedirect,
-  signOut,
-} from "aws-amplify/auth";
+import { useAuth } from "../context/AuthContext";
+import { useUI } from "../context/UIContext";
+import { apiFetch } from "../services/api";
 
-const AuthContext = createContext(null);
 
-const GUEST_KEY = "community_guest";
+export default function useAPI() {
 
-function normaliseUser(amplifyUser, tokens) {
-  if (!amplifyUser) return null;
+    const {
+        token,
+        refreshAuth,
+    } = useAuth();
 
-  const idPayload = tokens?.idToken?.payload || {};
+    const ui =
+        useUI();
 
-  const email =
-    idPayload.email ||
-    amplifyUser.signInDetails?.loginId ||
-    "";
 
-  const name = idPayload.name || "";
+    const startSaving =
+        ui?.startSaving;
 
-  const username =
-    amplifyUser.username ||
-    email ||
-    "";
+    const stopSaving =
+        ui?.stopSaving;
 
-  const fallback =
-    email?.split("@")[0] ||
-    username ||
-    "User";
 
-  const displayName = name || fallback;
+    /* =========================================
+       REQUEST
+    ========================================= */
 
-  const initials = displayName
-    .split(/[\s._-]+/)
-    .filter(Boolean)
-    .map((part) => part[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
+    const request =
+        useMemo(() => {
 
-  return {
-    id:
-      amplifyUser.userId ||
-      idPayload.sub ||
-      amplifyUser.username ||
-      email,
+            return async (
+                method,
+                path,
+                body = null,
+                options = {}
+            ) => {
 
-    sub: idPayload.sub || amplifyUser.userId || null,
+                startSaving?.();
 
-    username,
-    email,
-    name,
-    displayName,
-    initials,
 
-    raw: amplifyUser,
-  };
-}
+                try {
 
-export function AuthProvider({ children }) {
-  const mountedRef = useRef(true);
+                    /* =====================================
+                       FIRST REQUEST
+                    ===================================== */
 
-  const [user, setUser] = useState(null);
-  const [token, setToken] = useState(null);
-  const [tokens, setTokens] = useState(null);
+                    try {
 
-  const [isGuest, setIsGuest] = useState(() => {
-    return localStorage.getItem(GUEST_KEY) === "true";
-  });
+                        return await apiFetch(
+                            path,
+                            {
+                                method,
+                                token,
+                                body,
+                                ...options,
+                            }
+                        );
 
-  const [loading, setLoading] = useState(true);
-  const [hydrating, setHydrating] = useState(false);
+                    } catch (error) {
 
-  useEffect(() => {
-    mountedRef.current = true;
+                        /* =================================
+                           AUTH FAILURE
+                        ================================= */
 
-    return () => {
-      mountedRef.current = false;
+                        if (
+                            error?.status !== 401 ||
+                            !refreshAuth
+                        ) {
+
+                            throw error;
+
+                        }
+
+
+                        console.warn(
+                            "[API] 401 received — refreshing Cognito session"
+                        );
+
+
+                        /* =================================
+                           REFRESH TOKEN
+                        ================================= */
+
+                        const refreshed =
+                            await refreshAuth({
+                                forceRefresh: true,
+                            });
+
+
+                        if (
+                            !refreshed?.token
+                        ) {
+
+                            console.error(
+                                "[API] Cognito token refresh failed"
+                            );
+
+                            throw error;
+
+                        }
+
+
+                        console.log(
+                            "[API] Cognito token refreshed"
+                        );
+
+
+                        /* =================================
+                           RETRY ONCE
+                        ================================= */
+
+                        return await apiFetch(
+                            path,
+                            {
+                                method,
+
+                                token:
+                                    refreshed.token,
+
+                                body,
+
+                                ...options,
+                            }
+                        );
+
+                    }
+
+                } finally {
+
+                    stopSaving?.();
+
+                }
+
+            };
+
+        }, [
+            token,
+            refreshAuth,
+            startSaving,
+            stopSaving,
+        ]);
+
+
+    /* =========================================
+       GET
+    ========================================= */
+
+    const get =
+        useMemo(() => {
+
+            return async (
+                path,
+                options = {}
+            ) => {
+
+                return apiFetch(
+                    path,
+                    {
+                        method: "GET",
+                        token,
+                        ...options,
+                    }
+                );
+
+            };
+
+        }, [
+            token,
+        ]);
+
+
+    /* =========================================
+       API METHODS
+    ========================================= */
+
+    const api =
+        useMemo(() => ({
+
+            get,
+
+            post:
+                (
+                    path,
+                    body = null,
+                    options = {}
+                ) =>
+                    request(
+                        "POST",
+                        path,
+                        body,
+                        options
+                    ),
+
+            patch:
+                (
+                    path,
+                    body = null,
+                    options = {}
+                ) =>
+                    request(
+                        "PATCH",
+                        path,
+                        body,
+                        options
+                    ),
+
+            put:
+                (
+                    path,
+                    body = null,
+                    options = {}
+                ) =>
+                    request(
+                        "PUT",
+                        path,
+                        body,
+                        options
+                    ),
+
+            delete:
+                (
+                    path,
+                    body = null,
+                    options = {}
+                ) =>
+                    request(
+                        "DELETE",
+                        path,
+                        body,
+                        options
+                    ),
+
+        }), [
+            get,
+            request,
+        ]);
+
+
+    /* =========================================
+       PROFILE
+    ========================================= */
+
+    const patchProfile =
+        (
+            body,
+            options = {}
+        ) => {
+
+            return api.patch(
+                "/profile",
+                body,
+                options
+            );
+
+        };
+
+
+    /* =========================================
+       RETURN
+    ========================================= */
+
+    return {
+
+        ...api,
+
+        patchProfile,
+
     };
-  }, []);
 
-  const clearAuth = useCallback(() => {
-    if (!mountedRef.current) return;
-
-    setUser(null);
-    setToken(null);
-    setTokens(null);
-  }, []);
-
-  const refreshAuth = useCallback(
-    async ({ forceRefresh = false } = {}) => {
-      if (mountedRef.current) {
-        setHydrating(true);
-      }
-
-      try {
-        const amplifyUser = await getCurrentUser();
-
-        const session = await fetchAuthSession({
-          forceRefresh,
-        });
-
-        const accessToken = session.tokens?.idToken?.toString();
-        if (!accessToken) {
-          clearAuth();
-          return null;
-        }
-
-        const normalisedUser = normaliseUser(
-          amplifyUser,
-          session.tokens
-        );
-
-        if (mountedRef.current) {
-          setUser(normalisedUser);
-          setToken(accessToken);
-          setTokens(session.tokens);
-
-          localStorage.removeItem(GUEST_KEY);
-          setIsGuest(false);
-        }
-
-        return normalisedUser;
-      } catch (err) {
-        if (
-          err?.name !== "UserUnAuthenticatedException" &&
-          err?.name !== "NotAuthorizedException"
-        ) {
-          console.warn(
-            "Auth refresh failed:",
-            err?.name || err?.message || err
-          );
-        }
-
-        clearAuth();
-
-        return null;
-      } finally {
-        if (mountedRef.current) {
-          setHydrating(false);
-        }
-      }
-    },
-    [clearAuth]
-  );
-
-  useEffect(() => {
-    async function initAuth() {
-      try {
-        await refreshAuth();
-      } finally {
-        if (mountedRef.current) {
-          setLoading(false);
-        }
-      }
-    }
-
-    initAuth();
-  }, [refreshAuth]);
-
-  const login = useCallback(async () => {
-    localStorage.removeItem(GUEST_KEY);
-    setIsGuest(false);
-
-    await signInWithRedirect();
-  }, []);
-
-  const continueAsGuest = useCallback(async () => {
-    try {
-      await signOut({ global: false });
-    } catch (err) {
-      console.warn(
-        "Guest mode signOut warning:",
-        err?.message || err
-      );
-    }
-
-    clearAuth();
-
-    localStorage.setItem(GUEST_KEY, "true");
-    setIsGuest(true);
-    setLoading(false);
-    setHydrating(false);
-  }, [clearAuth]);
-
-  const logout = useCallback(async () => {
-    try {
-      await signOut({ global: true });
-    } catch (err) {
-      console.warn(
-        "Logout warning:",
-        err?.message || err
-      );
-    } finally {
-      clearAuth();
-
-      localStorage.removeItem(GUEST_KEY);
-      setIsGuest(false);
-
-      window.location.assign("/");
-    }
-  }, [clearAuth]);
-
-  const isAuthenticated = Boolean(user && token);
-
-  const authLoading = loading || hydrating;
-
-  const role = isAuthenticated
-    ? "member"
-    : isGuest
-    ? "guest"
-    : "anonymous";
-
-  const value = useMemo(
-    () => ({
-      user,
-      token,
-      tokens,
-
-      loading,
-      hydrating,
-      authLoading,
-
-      isAuthenticated,
-      isGuest,
-      role,
-
-      login,
-      logout,
-      continueAsGuest,
-
-      refreshAuth,
-      clearAuth,
-    }),
-    [
-      user,
-      token,
-      tokens,
-      loading,
-      hydrating,
-      authLoading,
-      isAuthenticated,
-      isGuest,
-      role,
-      login,
-      logout,
-      continueAsGuest,
-      refreshAuth,
-      clearAuth,
-    ]
-  );
-
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
-}
-
-export function useAuth() {
-  const context = useContext(AuthContext);
-
-  if (!context) {
-    throw new Error("useAuth must be used within AuthProvider");
-  }
-
-  return context;
 }
