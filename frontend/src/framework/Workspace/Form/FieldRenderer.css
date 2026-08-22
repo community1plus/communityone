@@ -5,20 +5,16 @@
 .workspace-field {
     display: grid;
 
-    grid-template-columns: 120px minmax(0, 640px);
-
-    column-gap: 24px;
+    grid-template-columns: 120px minmax(0, 1fr);
 
     align-items: start;
 
     width: 100%;
-    max-width: 784px;
+    max-width: 640px;
 
     margin: 0 auto;
 
-    box-sizing: border-box;
-
-    text-align: left;
+    column-gap: 24px;
 }
 
 
@@ -27,15 +23,14 @@
 ========================================= */
 
 .workspace-field-label {
-    display: block;
-
     margin: 0;
-    padding: 2px 0 0;
+
+    padding-top: 4px;
 
     font-family: inherit;
     font-size: 0.95rem;
     font-weight: 600;
-    line-height: 1.5;
+    line-height: 1.3;
 
     color: var(--text-primary, #111);
 
@@ -44,14 +39,18 @@
 
 
 /* =========================================
-   FIELD BODY
+   FIELD CONTENT
 ========================================= */
 
-.workspace-field > div {
-    min-width: 0;
-    width: 100%;
+.workspace-field-content {
+    display: flex;
+    flex-direction: column;
 
-    box-sizing: border-box;
+    min-width: 0;
+
+    gap: 8px;
+
+    text-align: left;
 }
 
 
@@ -60,10 +59,6 @@
 ========================================= */
 
 .workspace-field-value {
-    display: block;
-
-    width: 100%;
-
     margin: 0;
 
     font-family: inherit;
@@ -74,6 +69,8 @@
     color: #426b96;
 
     text-align: left;
+
+    overflow-wrap: anywhere;
 }
 
 
@@ -87,11 +84,12 @@
     width: 100%;
     max-width: 100%;
 
+    min-width: 0;
     min-height: 52px;
 
-    padding: 0 16px;
-
     box-sizing: border-box;
+
+    padding: 0 16px;
 
     background: #f8fafc;
 
@@ -100,12 +98,9 @@
 
     font-family: inherit;
     font-size: 1rem;
-    font-weight: 400;
     line-height: 1.4;
 
     color: #426b96;
-
-    text-align: left;
 
     outline: none;
 
@@ -120,7 +115,7 @@
 ========================================= */
 
 .workspace-field-input:focus {
-    border-color: #ad0d1c;
+    border-color: var(--platform-red, #ad0d1c);
 
     box-shadow:
         0 0 0 2px rgba(173, 13, 28, 0.08);
@@ -132,9 +127,7 @@
 ========================================= */
 
 .workspace-field-helper {
-    display: block;
-
-    margin: 10px 0 0;
+    margin: 0;
 
     font-family: inherit;
     font-size: 0.9rem;
@@ -148,20 +141,22 @@
 
 
 /* =========================================
-   MOBILE
+   RESPONSIVE
 ========================================= */
 
-@media (max-width: 760px) {
+@media (max-width: 640px) {
 
     .workspace-field {
         grid-template-columns: 1fr;
 
         row-gap: 8px;
-
-        max-width: 640px;
     }
 
     .workspace-field-label {
         padding-top: 0;
+    }
+
+    .workspace-field-content {
+        width: 100%;
     }
 }
