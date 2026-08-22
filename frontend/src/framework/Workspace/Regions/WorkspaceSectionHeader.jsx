@@ -9,25 +9,28 @@ export default function WorkspaceSectionHeader({
 
     return (
 
-        <div className="workspace-section-header">
+<div className="workspace-section-header">
 
-            <h2 className="workspace-section-title">
+    <div className="workspace-section-title">
 
-                {title}
+        <span>
+            {section?.title ?? ""}
+        </span>
 
-            </h2>
+        <span className="workspace-section-completion">
+            {sectionCompletion ?? 0}%
+        </span>
 
-            {description && (
+        <button
+            className="workspace-section-edit"
+            onClick={handleEdit}
+        >
+            Edit
+        </button>
 
-                <p className="workspace-section-description">
+    </div>
 
-                    {description}
-
-                </p>
-
-            )}
-
-        </div>
+</div>
 
     );
 
