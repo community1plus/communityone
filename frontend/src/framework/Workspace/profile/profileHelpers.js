@@ -34,44 +34,6 @@ export function calculateProfileCompletion(values = {}) {
    PROFILE COMPLETION
 ===================================== */
 
-export function calculateProfileCompletion(values = {}) {
-
-    const socialVerified =
-        Object.values(
-            values.social || {}
-        ).some(
-            account =>
-                account?.verified === true
-        );
-
-
-    const checks = [
-
-        Boolean(values.username),
-
-        Boolean(values.homeLocation),
-
-        Boolean(values.phoneDisplay),
-
-        socialVerified,
-
-        Boolean(values.payment?.verified),
-
-    ];
-
-
-    const completed =
-        checks.filter(Boolean).length;
-
-
-    return checks.length
-        ? Math.round(
-            (completed / checks.length) * 100
-        )
-        : 0;
-
-}
-
 
 /* =====================================
    INITIAL PROFILE VALUES
