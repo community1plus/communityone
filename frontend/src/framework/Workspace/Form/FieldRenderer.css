@@ -1,14 +1,20 @@
 /* =========================================
    WORKSPACE FIELD
+   One horizontal row
 ========================================= */
 
 .workspace-field {
-    display: flex;
-    flex-direction: column;
+    display: grid;
 
-    width: min(100%, 560px);
+    grid-template-columns: 100px minmax(0, 1fr);
+    align-items: center;
+
+    width: 100%;
+    max-width: 640px;
 
     margin: 0 auto;
+
+    column-gap: 24px;
 }
 
 
@@ -17,7 +23,7 @@
 ========================================= */
 
 .workspace-field-label {
-    margin: 0 0 12px;
+    margin: 0;
 
     font-family: inherit;
     font-size: 0.95rem;
@@ -25,6 +31,8 @@
     line-height: 1.2;
 
     color: var(--text-primary, #111);
+
+    text-align: left;
 }
 
 
@@ -43,6 +51,8 @@
     line-height: 1.5;
 
     color: #426b96;
+
+    text-align: left;
 }
 
 
@@ -54,7 +64,6 @@
     display: block;
 
     width: 100%;
-    max-width: 100%;
 
     box-sizing: border-box;
 
@@ -73,6 +82,8 @@
 
     color: #426b96;
 
+    text-align: left;
+
     outline: none;
 
     transition:
@@ -82,7 +93,27 @@
 
 
 /* =========================================
-   FIELD INPUT FOCUS
+   FIELD HELPER
+========================================= */
+
+.workspace-field-helper {
+    grid-column: 2;
+
+    margin-top: -14px;
+
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 400;
+    line-height: 1.5;
+
+    color: #426b96;
+
+    text-align: left;
+}
+
+
+/* =========================================
+   FOCUS
 ========================================= */
 
 .workspace-field-input:focus {
@@ -94,33 +125,19 @@
 
 
 /* =========================================
-   FIELD HELPER
-========================================= */
-
-.workspace-field-helper {
-    width: 100%;
-
-    margin-top: 10px;
-
-    font-family: inherit;
-    font-size: 0.9rem;
-    font-weight: 400;
-    line-height: 1.5;
-
-    color: #426b96;
-
-    text-align: center;
-}
-
-
-/* =========================================
    RESPONSIVE
 ========================================= */
 
 @media (max-width: 600px) {
 
     .workspace-field {
-        width: 100%;
+        grid-template-columns: 1fr;
+        row-gap: 10px;
+    }
+
+    .workspace-field-helper {
+        grid-column: 1;
+        margin-top: 0;
     }
 
 }
