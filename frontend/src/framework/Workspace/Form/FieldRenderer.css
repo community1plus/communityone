@@ -1,131 +1,100 @@
-.workspace-field-value {
-    min-height: 48px;
-    display: flex;
-    align-items: center;
-
-    color: #365f87;
-    font-size: 16px;
-    line-height: 1.4;
-}
+/* =========================================
+   WORKSPACE FIELD
+========================================= */
 
 .workspace-field {
-
     display: flex;
-
     flex-direction: column;
 
-    gap: 8px;
+    width: 100%;
+    max-width: 640px;
 
+    margin: 0 auto;
 }
 
+
+/* =========================================
+   FIELD LABEL
+========================================= */
 
 .workspace-field-label {
+    margin: 0 0 12px;
 
-    font-size: 1rem;
-
+    font-family: inherit;
+    font-size: 0.95rem;
     font-weight: 600;
+    line-height: 1.2;
 
-    color: #222222;
-
+    color: var(--text-primary, #111);
 }
 
+
+/* =========================================
+   FIELD VALUE
+========================================= */
+
+.workspace-field-value {
+    margin: 0;
+
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+
+    color: #426b96;
+}
+
+
+/* =========================================
+   FIELD INPUT
+========================================= */
+
 .workspace-field-input {
-
     width: 100%;
-
-    max-width: 520px;
-
     box-sizing: border-box;
 
-    padding: 16px 20px;
+    min-height: 52px;
 
-    border: 1px solid #d7dde5;
-
-    border-radius: 14px;
+    padding: 0 16px;
 
     background: #f8fafc;
 
-    color: #526b84;
+    border: 1px solid #d7dee7;
+    border-radius: 16px;
 
-    font: inherit;
-
+    font-family: inherit;
     font-size: 1rem;
+    line-height: 1.4;
+
+    color: #426b96;
 
     outline: none;
 
+    transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
 }
 
 
 .workspace-field-input:focus {
+    border-color: #ad0d1c;
 
-    border-color:
-        var(--brand-primary, #b51224);
-
+    box-shadow:
+        0 0 0 2px rgba(173, 13, 28, 0.08);
 }
 
 
-.workspace-field-input[readonly] {
-
-    cursor: default;
-
-}
-
+/* =========================================
+   FIELD HELPER
+========================================= */
 
 .workspace-field-helper {
+    margin-top: 10px;
 
-    font-size: 0.85rem;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 400;
+    line-height: 1.5;
 
-    color: #526b84;
-
-}
-
-.workspace-phone {
-
-    display: flex;
-
-    align-items: stretch;
-
-    gap: 12px;
-
-    width: 100%;
-
-    max-width: 520px;
-
-}
-
-.workspace-phone-country {
-
-    width: 110px;
-
-    box-sizing: border-box;
-
-    padding: 16px 12px;
-
-    border: 1px solid #d7dde5;
-
-    border-radius: 14px;
-
-    background: #f8fafc;
-
-    color: #526b84;
-
-    font: inherit;
-
-    font-size: 1rem;
-
-    outline: none;
-
-}
-
-.workspace-phone-country:focus {
-
-    border-color:
-        var(--brand-primary, #b51224);
-
-}
-
-.workspace-phone-country:disabled {
-
-    cursor: default;
-
+    color: #426b96;
 }
