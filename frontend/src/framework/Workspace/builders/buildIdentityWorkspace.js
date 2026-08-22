@@ -27,17 +27,13 @@ export function buildIdentityWorkspace(
 
 ) {
 
-    const {
-
-        completion,
-
-        sections,
-
-        currentSection,
-
-        values,
-
-    } = state;
+const {
+    completion,
+    sectionCompletion,
+    sections,
+    currentSection,
+    values,
+} = state;
 
 
     const {

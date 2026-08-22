@@ -1,4 +1,10 @@
 import {
+    getInitialProfileValues,
+    calculateProfileCompletion,
+    calculateProfileSectionCompletion,
+} from "../../framework/Workspace/profile/profileHelpers";
+
+import {
     useState,
     useEffect,
     useMemo,
@@ -261,6 +267,11 @@ const [
         calculateProfileCompletion(
             values
         );
+
+        const sectionCompletion =
+    calculateProfileSectionCompletion(
+        values
+    );
 
 console.log(
     "[PROFILE COMPLETION] VALUE:",

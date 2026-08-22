@@ -4,6 +4,31 @@ import {
     IDENTITY_TYPES,
 } from "./profileConstants";
 
+export function calculateProfileCompletion(values = {}) {
+
+    const sections =
+        calculateProfileSectionCompletion(
+            values
+        );
+
+
+    const checks =
+        Object.values(
+            sections
+        );
+
+
+    const completed =
+        checks.filter(Boolean).length;
+
+
+    return checks.length
+        ? Math.round(
+            (completed / checks.length) * 100
+        )
+        : 0;
+
+}
 
 /* =====================================
    PROFILE COMPLETION
