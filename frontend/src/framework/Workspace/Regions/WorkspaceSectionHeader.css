@@ -14,15 +14,9 @@
 .workspace-section-header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-
-    width: 100%;
-    min-height: 40px;
-
-    margin: 0 0 28px;
-    padding: 0;
+    justify-content: flex-start;
+    gap: 12px;
 }
-
 
 /* =========================================
    SECTION TITLE
