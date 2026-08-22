@@ -1,19 +1,37 @@
 /* =========================================
-   WORKSPACE SECTION ACTIONS
+   WORKSPACE SECTION
 ========================================= */
+
+.workspace-section {
+    width: 100%;
+    min-width: 0;
+}
+
+
+/* =========================================
+   SECTION HEADER
+========================================= */
+
 .workspace-section-header {
 
     display: flex;
 
     align-items: center;
-
     justify-content: space-between;
 
     gap: 20px;
 
-    margin-bottom: 24px;
+    width: 100%;
+    max-width: 900px;
+
+    margin: 0 auto 24px;
 
 }
+
+
+/* =========================================
+   SECTION TITLE
+========================================= */
 
 .workspace-section-title {
 
@@ -21,36 +39,9 @@
 
     align-items: center;
 
-    gap: 16px;
+    gap: 14px;
 
     width: 100%;
-
-}
-
-/* =========================================
-   SECTION CONTENT
-========================================= */
-
-.workspace-section-content {
-
-    width: 100%;
-
-    display: flex;
-
-    justify-content: center;
-
-}
-
-
-/* =========================================
-   CONTENT WIDTH
-========================================= */
-
-.workspace-section-content > * {
-
-    width: 100%;
-
-    max-width: 900px;
 
 }
 
@@ -66,22 +57,73 @@
 }
 
 
+/* =========================================
+   SECTION COMPLETION
+========================================= */
+
 .workspace-section-completion {
+
+    display: inline-flex;
+
+    align-items: center;
 
     flex: 0 0 auto;
 
-    font-size: 1rem;
+    padding: 5px 8px;
 
-    font-weight: 400;
+    color: #b20d1f;
+
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1;
+
+    background: #ffffff;
+
+    border: 1px solid #e2e2e2;
+    border-radius: 999px;
 
 }
 
+
+/* =========================================
+   SECTION CONTENT
+========================================= */
+
+.workspace-section-content {
+
+    display: flex;
+
+    justify-content: center;
+
+    width: 100%;
+
+}
+
+
+/* =========================================
+   CONTENT WIDTH
+========================================= */
+
+.workspace-section-content > * {
+
+    width: 100%;
+    max-width: 900px;
+
+    margin-inline: auto;
+
+}
+
+
+/* =========================================
+   SECTION EDIT
+========================================= */
 
 .workspace-section-edit {
 
     display: inline-flex;
 
     align-items: center;
+    justify-content: center;
 
     gap: 6px;
 
@@ -90,13 +132,11 @@
     background: transparent;
 
     border: 1px solid var(--border-color, #d8d8d8);
-
     border-radius: 4px;
 
     color: var(--text-primary, #111);
 
     font: inherit;
-
     font-size: 0.85rem;
 
     cursor: pointer;
@@ -111,6 +151,10 @@
 }
 
 
+/* =========================================
+   SECTION ACTIONS
+========================================= */
+
 .workspace-section-actions {
 
     display: flex;
@@ -122,11 +166,16 @@
 }
 
 
+/* =========================================
+   SECTION ACTION
+========================================= */
+
 .workspace-section-action {
 
     display: inline-flex;
 
     align-items: center;
+    justify-content: center;
 
     gap: 6px;
 
@@ -135,13 +184,11 @@
     background: transparent;
 
     border: 1px solid var(--border-color, #d8d8d8);
-
     border-radius: 4px;
 
     color: var(--text-primary, #111);
 
     font: inherit;
-
     font-size: 0.85rem;
 
     cursor: pointer;
@@ -156,32 +203,15 @@
 }
 
 
-.workspace-section-action:disabled,
-.workspace-section-edit:disabled {
-
-    opacity: 0.5;
-
-    cursor: not-allowed;
-
-}
-
-.workspace-section-actions {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 8px;
-
-}
-
+/* =========================================
+   ACTION BUTTON
+========================================= */
 
 .workspace-action-button {
 
     display: inline-flex;
 
     align-items: center;
-
     justify-content: center;
 
     gap: 6px;
@@ -190,16 +220,14 @@
 
     padding: 0 12px;
 
-    border: 1px solid #d8d8d8;
-
-    border-radius: 6px;
-
     background: #ffffff;
+
+    border: 1px solid #d8d8d8;
+    border-radius: 6px;
 
     color: #172b4d;
 
     font-size: 14px;
-
     font-weight: 500;
 
     cursor: pointer;
@@ -217,15 +245,6 @@
     background: #f5f5f5;
 
     border-color: #bdbdbd;
-
-}
-
-
-.workspace-action-button:disabled {
-
-    opacity: 0.55;
-
-    cursor: not-allowed;
 
 }
 
@@ -253,27 +272,17 @@
 
 }
 
-.workspace-section-title {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-}
 
-.workspace-section-completion {
-    display: inline-flex;
-    align-items: center;
+/* =========================================
+   DISABLED
+========================================= */
 
-    color: #b20d1f;
+.workspace-action-button:disabled,
+.workspace-section-action:disabled,
+.workspace-section-edit:disabled {
 
-    font-size: 14px;
-    font-weight: 600;
+    opacity: 0.55;
 
-    line-height: 1;
+    cursor: not-allowed;
 
-    padding: 5px 8px;
-
-    border: 1px solid #e2e2e2;
-    border-radius: 999px;
-
-    background: #ffffff;
 }
