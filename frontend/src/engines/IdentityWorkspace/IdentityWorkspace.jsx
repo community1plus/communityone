@@ -30,14 +30,6 @@ import {
 } from "../../framework/Workspace";
 
 
-import {
-    Pencil,
-    Eraser,
-    RotateCcw,
-    Save,
-} from "lucide-react";
-
-
 export default function IdentityWorkspace({
 
     initialCapability = "identity",
@@ -60,7 +52,6 @@ export default function IdentityWorkspace({
         values,
         form,
         editingSections,
-        savingSection,
         sectionCompletion,
     } = state;
 
@@ -111,10 +102,6 @@ export default function IdentityWorkspace({
             : false;
 
 
-    const saving =
-        Boolean(savingSection);
-
-
     /* =====================================
        ACTIONS
     ===================================== */
@@ -126,51 +113,10 @@ export default function IdentityWorkspace({
                 return;
             }
 
+
             actions.setSectionEditing(
                 sectionId,
                 true
-            );
-
-        };
-
-
-    const handleClear =
-        () => {
-
-            if (!sectionId) {
-                return;
-            }
-
-            actions.clearSection(
-                sectionId
-            );
-
-        };
-
-
-    const handleReset =
-        () => {
-
-            if (!sectionId) {
-                return;
-            }
-
-            actions.resetSection(
-                sectionId
-            );
-
-        };
-
-
-    const handleSave =
-        async () => {
-
-            if (!sectionId) {
-                return;
-            }
-
-            await actions.handleSaveSection(
-                sectionId
             );
 
         };
@@ -244,60 +190,98 @@ export default function IdentityWorkspace({
                        SECTION
                     ========================== */}
 
-{/* ======================
-   SECTION
-====================== */}
+                    <WorkspaceBody>
 
-<WorkspaceBody>
-
-    <div className="workspace-section">
-
-        {/* ======================
-           SECTION HEADER
-        ====================== */}
-
-<div className="workspace-section-header">
-
-    <div className="workspace-section-title">
-
-        <span>
-            {section?.title ?? ""}
-        </span>
-
-        <span className="workspace-section-completion">
-            {sectionCompletion ?? 0}%
-        </span>
-
-        <button
-            className="workspace-section-edit"
-            onClick={handleEdit}
-        >
-            Edit
-        </button>
-
-    </div>
-
-</div>
+                        <div className="workspace-section">
 
 
-        {/* ======================
-           SECTION CONTENT
-        ====================== */}
+                            {/* ======================
+                               SECTION HEADER
+                            ====================== */}
 
-        <div className="workspace-section-content">
+                            <div className="workspace-section-header">
 
-            <CapabilityRenderer
-                section={section}
-                form={form}
-                editing={editing}
-                sectionCompletion={sectionCompletion}
-            />
 
-        </div>
+                                {/* ==================
+                                   SECTION TITLE
+                                ================== */}
 
-    </div>
+                                <div className="workspace-section-title">
 
-</WorkspaceBody>
+                                    {
+                                        section?.title
+                                        ?? ""
+                                    }
+
+                                </div>
+
+
+                                {/* ==================
+                                   SECTION META
+                                ================== */}
+
+                                <div className="workspace-section-meta">
+
+                                    <span className="workspace-section-completion">
+
+                                        {
+                                            sectionCompletion
+                                            ?? 0
+                                        }%
+
+                                    </span>
+
+
+                                    <button
+                                        type="button"
+                                        className="workspace-section-edit"
+                                        onClick={
+                                            handleEdit
+                                        }
+                                    >
+
+                                        Edit
+
+                                    </button>
+
+                                </div>
+
+
+                            </div>
+
+
+                            {/* ======================
+                               SECTION CONTENT
+                            ====================== */}
+
+                            <div className="workspace-section-content">
+
+                                <CapabilityRenderer
+
+                                    section={
+                                        section
+                                    }
+
+                                    form={
+                                        form
+                                    }
+
+                                    editing={
+                                        editing
+                                    }
+
+                                    sectionCompletion={
+                                        sectionCompletion
+                                    }
+
+                                />
+
+                            </div>
+
+
+                        </div>
+
+                    </WorkspaceBody>
 
 
                 </WorkspaceContent>
