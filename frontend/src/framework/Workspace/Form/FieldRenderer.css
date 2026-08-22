@@ -3,12 +3,12 @@
 ========================================= */
 
 .workspace-field {
+    display: flex;
+    flex-direction: column;
+
     width: 100%;
     margin: 0;
     padding: 0;
-
-    display: flex;
-    flex-direction: column;
 
     box-sizing: border-box;
 }
@@ -21,14 +21,20 @@
 .workspace-field-label {
     display: block;
 
+    width: 100%;
     margin: 0 0 12px;
+    padding: 0;
+
+    box-sizing: border-box;
 
     font-family: inherit;
-    font-size: 0.95rem;
+    font-size: 1rem;
     font-weight: 600;
     line-height: 1.2;
 
     color: var(--text-primary, #111);
+
+    text-align: left;
 }
 
 
@@ -37,12 +43,13 @@
 ========================================= */
 
 .workspace-field-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
     width: 100%;
     margin: 0;
     padding: 0;
-
-    display: flex;
-    flex-direction: column;
 
     box-sizing: border-box;
 }
@@ -53,14 +60,46 @@
 ========================================= */
 
 .workspace-field-value {
+    display: block;
+
+    width: 100%;
     margin: 0;
+    padding: 0;
+
+    box-sizing: border-box;
 
     font-family: inherit;
     font-size: 1rem;
     font-weight: 400;
     line-height: 1.5;
 
-    color: #426b96;
+    color: #3f78b5;
+
+    text-align: left;
+}
+
+
+/* =========================================
+   FIELD HELPER
+========================================= */
+
+.workspace-field-helper {
+    display: block;
+
+    width: 100%;
+    margin: 8px 0 0;
+    padding: 0;
+
+    box-sizing: border-box;
+
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 400;
+    line-height: 1.5;
+
+    color: #3f78b5;
+
+    text-align: left;
 }
 
 
@@ -73,23 +112,24 @@
 
     width: 100%;
     max-width: 100%;
-    min-height: 52px;
 
     margin: 0;
-    padding: 0 16px;
+    padding: 14px 16px;
 
     box-sizing: border-box;
 
+    border: 1px solid #d6dfe8;
+    border-radius: 18px;
+
     background: #f8fafc;
 
-    border: 1px solid #d7dee7;
-    border-radius: 16px;
+    color: var(--text-primary, #111);
 
     font-family: inherit;
     font-size: 1rem;
     line-height: 1.4;
 
-    color: #426b96;
+    text-align: left;
 
     outline: none;
 }
@@ -101,23 +141,26 @@
 
 .workspace-field-input:focus {
     border-color: #ad0d1c;
-
-    box-shadow:
-        0 0 0 2px rgba(173, 13, 28, 0.08);
 }
 
 
 /* =========================================
-   FIELD HELPER
+   READ ONLY
 ========================================= */
 
-.workspace-field-helper {
-    margin: 10px 0 0;
+.workspace-field-input:read-only {
+    cursor: default;
+}
 
-    font-family: inherit;
-    font-size: 0.9rem;
-    font-weight: 400;
-    line-height: 1.5;
 
-    color: #426b96;
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 760px) {
+
+    .workspace-field-input {
+        width: 100%;
+        max-width: 100%;
+    }
 }
