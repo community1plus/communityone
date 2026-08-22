@@ -14,9 +14,15 @@
 .workspace-section-header {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
-    gap: 12px;
+    justify-content: space-between;
+
+    width: 100%;
+    min-height: 40px;
+
+    margin: 0 0 28px;
+    padding: 0;
 }
+
 
 /* =========================================
    SECTION TITLE
@@ -26,6 +32,7 @@
     display: flex;
     align-items: center;
 
+    min-width: 0;
     margin: 0;
     padding: 0;
 }
@@ -35,7 +42,7 @@
 
     font-family: inherit;
     font-size: 1.35rem;
-    font-weight: 400;
+    font-weight: 500;
     line-height: 1.2;
     letter-spacing: 0;
     text-transform: none;
@@ -51,7 +58,125 @@
 .workspace-section-actions {
     display: flex;
     align-items: center;
+    justify-content: flex-end;
+
     gap: 8px;
+
+    margin-left: auto;
+}
+
+
+/* =========================================
+   SECTION COMPLETION
+========================================= */
+
+.workspace-section-completion {
+    display: inline-flex;
+    align-items: center;
+
+    margin: 0;
+    padding: 0;
+
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 400;
+    line-height: 1;
+
+    color: var(--text-primary, #111);
+
+    white-space: nowrap;
+}
+
+
+/* =========================================
+   SECTION ACTION
+========================================= */
+
+.workspace-section-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 6px;
+
+    height: 30px;
+    min-width: 30px;
+
+    padding: 0 9px;
+
+    background: #fff;
+
+    border: 1px solid #cfcfcf;
+    border-radius: 3px;
+
+    color: #111;
+
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: 400;
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition:
+        background 0.15s ease,
+        border-color 0.15s ease,
+        color 0.15s ease;
+}
+
+
+/* =========================================
+   ACTION HOVER
+========================================= */
+
+.workspace-section-action:hover {
+    background: #f5f5f5;
+    border-color: #aaa;
+}
+
+
+/* =========================================
+   PRIMARY ACTION
+========================================= */
+
+.workspace-section-action-primary {
+    background: #ad0d1c;
+    border-color: #ad0d1c;
+    color: #fff;
+}
+
+.workspace-section-action-primary:hover {
+    background: #940b18;
+    border-color: #940b18;
+}
+
+
+/* =========================================
+   ACTION ICON
+========================================= */
+
+.workspace-section-action svg {
+    flex: 0 0 auto;
+}
+
+
+/* =========================================
+   DISABLED
+========================================= */
+
+.workspace-section-action:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+
+/* =========================================
+   DISABLED HOVER
+========================================= */
+
+.workspace-section-action:disabled:hover {
+    background: inherit;
+    border-color: inherit;
 }
 
 
