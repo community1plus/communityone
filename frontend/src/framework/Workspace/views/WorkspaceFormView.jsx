@@ -1,7 +1,5 @@
 import "./WorkspaceFormView.css";
-
-import FieldRenderer
-    from "../Form/FieldRenderer";
+import FieldRenderer from "../Form/FieldRenderer";
 
 
 export default function WorkspaceFormView({
@@ -9,7 +7,6 @@ export default function WorkspaceFormView({
     section,
     form,
     editing,
-    sectionCompletion,
 
 }) {
 
@@ -24,22 +21,17 @@ export default function WorkspaceFormView({
 
             {section.fields?.map((field) => (
 
-                <div
+                <FieldRenderer
+
                     key={field.name}
-                    className="workspace-form-field"
-                >
 
-                    <FieldRenderer
+                    field={field}
 
-                        field={field}
+                    form={form}
 
-                        form={form}
+                    editing={editing}
 
-                        editing={editing}
-
-                    />
-
-                </div>
+                />
 
             ))}
 

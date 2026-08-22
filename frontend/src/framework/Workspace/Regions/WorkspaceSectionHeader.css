@@ -20,7 +20,6 @@
     min-height: 40px;
 
     margin: 0 0 28px;
-    padding: 0;
 }
 
 
@@ -33,9 +32,6 @@
     align-items: center;
 
     min-width: 0;
-
-    margin: 0;
-    padding: 0;
 }
 
 .workspace-section-title h2 {
@@ -45,9 +41,6 @@
     font-size: 1.35rem;
     font-weight: 500;
     line-height: 1.2;
-
-    letter-spacing: 0;
-    text-transform: none;
 
     color: var(--text-primary, #111);
 }
@@ -63,8 +56,6 @@
     justify-content: flex-end;
 
     gap: 8px;
-
-    margin-left: auto;
 }
 
 
@@ -77,7 +68,6 @@
     align-items: center;
 
     margin: 0;
-    padding: 0;
 
     font-family: inherit;
     font-size: 0.9rem;
@@ -104,12 +94,10 @@
     height: 30px;
     min-width: 30px;
 
-    padding: 0 9px;
+    padding: 0 6px;
 
-    background: inherit;
-
-    border: none;
-    border-radius: 3px;
+    background: transparent;
+    border: 0;
 
     color: var(--text-primary, #111);
 
@@ -124,11 +112,6 @@
         background 0.15s ease,
         color 0.15s ease;
 }
-
-
-/* =========================================
-   ACTION HOVER
-========================================= */
 
 .workspace-section-action:hover {
     background: rgba(0, 0, 0, 0.04);
@@ -159,7 +142,7 @@
 
 
 /* =========================================
-   DISABLED
+   DISABLED ACTION
 ========================================= */
 
 .workspace-section-action:disabled {
@@ -168,13 +151,9 @@
 }
 
 .workspace-section-action:disabled:hover {
-    background: inherit;
+    background: transparent;
 }
 
-
-/* =========================================
-   SECTION CONTENT
-========================================= */
 
 /* =========================================
    SECTION CONTENT
@@ -185,12 +164,11 @@
     justify-content: center;
 
     width: 100%;
-    margin: 0;
-    padding: 0;
 }
 
+
 /* =========================================
-   SECTION FORM CONTENT
+   CONTENT COLUMN
 ========================================= */
 
 .workspace-section-content > * {
@@ -200,46 +178,52 @@
 
 
 /* =========================================
-   FORM CONTENT
+   WORKSPACE FORM
 ========================================= */
 
-.workspace-section-content form {
+.workspace-section-content .workspace-form {
     display: flex;
     flex-direction: column;
 
     width: 100%;
+
+    gap: 32px;
 }
 
 
 /* =========================================
-   FORM GROUP DISTRIBUTION
+   FORM FIELD
 ========================================= */
 
-.workspace-section-content form > * {
+.workspace-section-content .workspace-form > * {
     width: 100%;
 }
 
 
 /* =========================================
-   CENTRED FIELD WIDTH
+   FIELD CONTENT
 ========================================= */
 
-.workspace-section-content input,
-.workspace-section-content textarea,
-.workspace-section-content select {
-    width: min(100%, 640px);
+.workspace-section-content .workspace-form input,
+.workspace-section-content .workspace-form textarea,
+.workspace-section-content .workspace-form select {
+    width: 640px;
+    max-width: 100%;
+
+    align-self: center;
 }
 
 
 /* =========================================
-   FIELD DISTRIBUTION
+   RESPONSIVE
 ========================================= */
 
-.workspace-section-content form > * + * {
-    margin-top: 28px;
-}
+@media (max-width: 760px) {
 
-.workspace-section-content .capability-form {
-    width: min(100%, 760px);
-    margin: 0 auto;
+    .workspace-section-content .workspace-form input,
+    .workspace-section-content .workspace-form textarea,
+    .workspace-section-content .workspace-form select {
+        width: 100%;
+    }
+
 }
