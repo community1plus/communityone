@@ -65,8 +65,6 @@ from "./Regions/WorkspaceRegionHeader";
 export { default as WorkspaceSegmentedControl }
 from "./WorkspaceSegmentedControl/WorkspaceSegmentedControl";
 
-export { default as WorkspaceSectionHeader }
-from "./Regions/WorkspaceSectionHeader";
 
 export { default as WorkspaceCard }
 from "./Card/WorkspaceCard";
