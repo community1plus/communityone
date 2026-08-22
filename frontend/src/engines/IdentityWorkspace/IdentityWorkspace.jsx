@@ -262,20 +262,33 @@ export default function IdentityWorkspace({
                                 "
                             >
 
-                                <div
-                                    className="
-                                        workspace-section-title
-                                    "
-                                >
+{/* ======================
+   SECTION CONTENT
+====================== */}
 
-                                    <span>
-                                        {
-                                            section?.title
-                                            ?? ""
-                                        }
-                                    </span>
+<div className="workspace-section-content">
 
-                                </div>
+    <CapabilityRenderer
+
+        section={
+            section
+        }
+
+        form={
+            form
+        }
+
+        editing={
+            editing
+        }
+
+        sectionCompletion={
+            sectionCompletion
+        }
+
+    />
+
+</div>
 
 
                                 <div

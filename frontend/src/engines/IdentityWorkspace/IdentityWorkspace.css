@@ -15,18 +15,42 @@
 
 }
 
-
 .workspace-section-title {
 
     display: flex;
 
     align-items: center;
 
-    font-size: 2rem;
+    gap: 16px;
 
-    font-weight: 600;
+    width: 100%;
 
-    line-height: 1.2;
+}
+
+/* =========================================
+   SECTION CONTENT
+========================================= */
+
+.workspace-section-content {
+
+    width: 100%;
+
+    display: flex;
+
+    justify-content: center;
+
+}
+
+
+/* =========================================
+   CONTENT WIDTH
+========================================= */
+
+.workspace-section-content > * {
+
+    width: 100%;
+
+    max-width: 900px;
 
 }
 
@@ -44,9 +68,11 @@
 
 .workspace-section-completion {
 
-    font-size: 0.95rem;
+    flex: 0 0 auto;
 
-    color: var(--text-secondary);
+    font-size: 1rem;
+
+    font-weight: 400;
 
 }
 
