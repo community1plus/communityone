@@ -26,17 +26,10 @@ export default function CapabilityRenderer({
             return (
 
                 <WorkspaceFormView
-
                     section={section}
-
                     form={form}
-
                     editing={editing}
-
-                    sectionCompletion={
-                        sectionCompletion
-                    }
-
+                    sectionCompletion={sectionCompletion}
                 />
 
             );
@@ -47,17 +40,10 @@ export default function CapabilityRenderer({
             return (
 
                 <SocialSection
-
                     section={section}
-
                     form={form}
-
                     editing={editing}
-
-                    sectionCompletion={
-                        sectionCompletion
-                    }
-
+                    sectionCompletion={sectionCompletion}
                 />
 
             );
