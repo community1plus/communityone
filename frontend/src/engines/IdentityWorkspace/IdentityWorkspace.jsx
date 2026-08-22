@@ -1,15 +1,12 @@
 import CapabilityRenderer
     from "../../components/Capability/CapabilityRenderer";
 
-
 import IdentityCapabilitySelector
     from "../../components/Identity/IdentityCapabilitySelector";
-
 
 import {
     buildCapabilityWorkspace,
 } from "../../framework/Workspace/builders/buildCapabilityWorkspace";
-
 
 import {
     WorkspaceShell,
@@ -24,6 +21,7 @@ import {
 
     WorkspaceGuide,
     WorkspacePanel,
+    WorkspaceSectionHeader,
 
     WorkspaceClose,
 
@@ -40,6 +38,10 @@ export default function IdentityWorkspace({
 
 }) {
 
+    /* =====================================
+       CAPABILITY
+    ===================================== */
+
     const capability =
         initialCapability;
 
@@ -52,6 +54,7 @@ export default function IdentityWorkspace({
         values,
         form,
         editingSections,
+        savingSection,
         sectionCompletion,
     } = state;
 
@@ -61,19 +64,13 @@ export default function IdentityWorkspace({
     ===================================== */
 
     const {
-
         banner,
-
         navigation,
-
         runtime,
-
     } = buildCapabilityWorkspace({
 
         capability,
-
         state,
-
         actions,
 
     });
@@ -83,27 +80,27 @@ export default function IdentityWorkspace({
        CURRENT SECTION
     ===================================== */
 
-    const {
-        section,
-    } = runtime ?? {};
-
+    const section =
+        runtime?.section;
 
     const sectionId =
         section?.id;
 
-
     const editing =
         sectionId
             ? Boolean(
-                editingSections?.[
-                    sectionId
-                ]
+                editingSections?.[sectionId]
             )
             : false;
 
+    const saving =
+        Boolean(
+            savingSection
+        );
+
 
     /* =====================================
-       ACTIONS
+       SECTION ACTIONS
     ===================================== */
 
     const handleEdit =
@@ -113,10 +110,51 @@ export default function IdentityWorkspace({
                 return;
             }
 
-
             actions.setSectionEditing(
                 sectionId,
                 true
+            );
+
+        };
+
+
+    const handleClear =
+        () => {
+
+            if (!sectionId) {
+                return;
+            }
+
+            actions.clearSection(
+                sectionId
+            );
+
+        };
+
+
+    const handleReset =
+        () => {
+
+            if (!sectionId) {
+                return;
+            }
+
+            actions.resetSection(
+                sectionId
+            );
+
+        };
+
+
+    const handleSave =
+        async () => {
+
+            if (!sectionId) {
+                return;
+            }
+
+            await actions.handleSaveSection(
+                sectionId
             );
 
         };
@@ -130,6 +168,10 @@ export default function IdentityWorkspace({
 
         <WorkspaceShell>
 
+            {/* =================================
+               CLOSE
+            ================================= */}
+
             <WorkspaceClose
                 onClick={
                     actions.closeProfile
@@ -137,13 +179,17 @@ export default function IdentityWorkspace({
             />
 
 
+            {/* =================================
+               MAIN
+            ================================= */}
+
             <WorkspaceMain>
 
                 <WorkspaceContent>
 
 
                     {/* ==========================
-                       BANNER
+                       REGION HEADER
                     ========================== */}
 
                     <WorkspaceRegionHeader>
@@ -178,11 +224,9 @@ export default function IdentityWorkspace({
                     ========================== */}
 
                     <WorkspaceNavigation
-
                         model={
                             navigation
                         }
-
                     />
 
 
@@ -190,92 +234,98 @@ export default function IdentityWorkspace({
                        SECTION
                     ========================== */}
 
-<WorkspaceBody>
+                    <WorkspaceBody>
 
-    <div className="workspace-section">
-
-        <WorkspaceSectionHeader
-
-            title={
-                section?.title ?? ""
-            }
-
-            completion={
-                sectionCompletion ?? 0
-            }
-
-            editing={
-                editing
-            }
-
-            saving={
-                saving
-            }
-
-            onEdit={
-                handleEdit
-            }
-
-            onClear={
-                handleClear
-            }
-
-            onReset={
-                handleReset
-            }
-
-            onSave={
-                handleSave
-            }
-
-        />
+                        <div className="workspace-section">
 
 
-        <div className="workspace-section-content">
+                            {/* ======================
+                               SECTION HEADER
+                            ====================== */}
 
-            <CapabilityRenderer
+                            <WorkspaceSectionHeader
 
-                section={
-                    section
-                }
+                                title={
+                                    section?.title ?? ""
+                                }
 
-                form={
-                    form
-                }
+                                completion={
+                                    sectionCompletion ?? 0
+                                }
 
-                editing={
-                    editing
-                }
+                                editing={
+                                    editing
+                                }
 
-                sectionCompletion={
-                    sectionCompletion
-                }
+                                saving={
+                                    saving
+                                }
 
-            />
+                                onEdit={
+                                    handleEdit
+                                }
 
-        </div>
+                                onClear={
+                                    handleClear
+                                }
 
-    </div>
+                                onReset={
+                                    handleReset
+                                }
 
-</WorkspaceBody>
+                                onSave={
+                                    handleSave
+                                }
+
+                            />
+
+
+                            {/* ======================
+                               SECTION CONTENT
+                            ====================== */}
+
+                            <div className="workspace-section-content">
+
+                                <CapabilityRenderer
+
+                                    section={
+                                        section
+                                    }
+
+                                    form={
+                                        form
+                                    }
+
+                                    editing={
+                                        editing
+                                    }
+
+                                    sectionCompletion={
+                                        sectionCompletion
+                                    }
+
+                                />
+
+                            </div>
+
+                        </div>
+
+                    </WorkspaceBody>
 
 
                 </WorkspaceContent>
 
-
             </WorkspaceMain>
 
 
-            {/* ==============================
+            {/* =================================
                GUIDE
-            ============================== */}
+            ================================= */}
 
             <WorkspaceSidebar>
 
                 <WorkspaceGuide
-
                     title="Identity Guide"
-
                 >
 
                     <WorkspacePanel
@@ -316,7 +366,6 @@ export default function IdentityWorkspace({
                 </WorkspaceGuide>
 
             </WorkspaceSidebar>
-
 
         </WorkspaceShell>
 
