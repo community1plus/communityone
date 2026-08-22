@@ -1,7 +1,7 @@
 import FieldRenderer
     from "../Form/FieldRenderer";
 
-import WorkspaceFormView from "./WorkspaceFormView.css";
+import "./WorkspaceFormView.css";
 
 export default function WorkspaceFormView({
 
