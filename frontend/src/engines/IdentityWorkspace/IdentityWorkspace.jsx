@@ -190,98 +190,74 @@ export default function IdentityWorkspace({
                        SECTION
                     ========================== */}
 
-                    <WorkspaceBody>
+<WorkspaceBody>
 
-                        <div className="workspace-section">
+    <div className="workspace-section">
 
+        <WorkspaceSectionHeader
 
-                            {/* ======================
-                               SECTION HEADER
-                            ====================== */}
+            title={
+                section?.title ?? ""
+            }
 
-                            <div className="workspace-section-header">
+            completion={
+                sectionCompletion ?? 0
+            }
 
+            editing={
+                editing
+            }
 
-                                {/* ==================
-                                   SECTION TITLE
-                                ================== */}
+            saving={
+                saving
+            }
 
-                                <div className="workspace-section-title">
+            onEdit={
+                handleEdit
+            }
 
-                                    {
-                                        section?.title
-                                        ?? ""
-                                    }
+            onClear={
+                handleClear
+            }
 
-                                </div>
+            onReset={
+                handleReset
+            }
 
+            onSave={
+                handleSave
+            }
 
-                                {/* ==================
-                                   SECTION META
-                                ================== */}
-
-                                <div className="workspace-section-meta">
-
-                                    <span className="workspace-section-completion">
-
-                                        {
-                                            sectionCompletion
-                                            ?? 0
-                                        }%
-
-                                    </span>
-
-
-                                    <button
-                                        type="button"
-                                        className="workspace-section-edit"
-                                        onClick={
-                                            handleEdit
-                                        }
-                                    >
-
-                                        Edit
-
-                                    </button>
-
-                                </div>
+        />
 
 
-                            </div>
+        <div className="workspace-section-content">
 
+            <CapabilityRenderer
 
-                            {/* ======================
-                               SECTION CONTENT
-                            ====================== */}
+                section={
+                    section
+                }
 
-                            <div className="workspace-section-content">
+                form={
+                    form
+                }
 
-                                <CapabilityRenderer
+                editing={
+                    editing
+                }
 
-                                    section={
-                                        section
-                                    }
+                sectionCompletion={
+                    sectionCompletion
+                }
 
-                                    form={
-                                        form
-                                    }
+            />
 
-                                    editing={
-                                        editing
-                                    }
+        </div>
 
-                                    sectionCompletion={
-                                        sectionCompletion
-                                    }
+    </div>
 
-                                />
-
-                            </div>
-
-
-                        </div>
-
-                    </WorkspaceBody>
+</WorkspaceBody>
 
 
                 </WorkspaceContent>
