@@ -4,6 +4,7 @@ import {
     IDENTITY_TYPES,
 } from "./profileConstants";
 
+
 /* =====================================
    PROFILE SECTION COMPLETION
 ===================================== */
@@ -18,38 +19,60 @@ export function calculateProfileSectionCompletion(
 
     switch (sectionId) {
 
+        /* =====================================
+           IDENTITY
+        ===================================== */
+
         case "identity":
 
             checks = [
 
-                Boolean(values.username),
+                Boolean(
+                    values.username
+                ),
 
             ];
 
             break;
 
+
+        /* =====================================
+           LOCATION
+        ===================================== */
 
         case "location":
 
             checks = [
 
-                Boolean(values.homeLocation),
+                Boolean(
+                    values.homeLocation
+                ),
 
             ];
 
             break;
 
+
+        /* =====================================
+           CONTACT
+        ===================================== */
 
         case "contact":
 
             checks = [
 
-                Boolean(values.phoneDisplay),
+                Boolean(
+                    values.phoneDisplay
+                ),
 
             ];
 
             break;
 
+
+        /* =====================================
+           SOCIAL
+        ===================================== */
 
         case "social":
 
@@ -67,126 +90,9 @@ export function calculateProfileSectionCompletion(
             break;
 
 
-        case "payment":
-
-            checks = [
-
-                Boolean(
-                    values.payment?.verified
-                ),
-
-            ];
-
-            break;
-
-
-        default:
-
-            return 0;
-
-    }
-
-
-    const completed =
-        checks.filter(Boolean).length;
-
-
-    return checks.length
-        ? Math.round(
-            (completed / checks.length) * 100
-        )
-        : 0;
-
-}
-
-export function calculateProfileCompletion(values = {}) {
-
-    const sections =
-        calculateProfileSectionCompletion(
-            values
-        );
-
-
-    const checks =
-        Object.values(
-            sections
-        );
-
-
-    const completed =
-        checks.filter(Boolean).length;
-
-
-    return checks.length
-        ? Math.round(
-            (completed / checks.length) * 100
-        )
-        : 0;
-
-}
-
-/* =====================================
-   PROFILE SECTION COMPLETION
-===================================== */
-
-export function calculateProfileSectionCompletion(
-    values = {},
-    sectionId = ""
-) {
-
-    let checks = [];
-
-
-    switch (sectionId) {
-
-        case "identity":
-
-            checks = [
-
-                Boolean(values.username),
-
-            ];
-
-            break;
-
-
-        case "location":
-
-            checks = [
-
-                Boolean(values.homeLocation),
-
-            ];
-
-            break;
-
-
-        case "contact":
-
-            checks = [
-
-                Boolean(values.phoneDisplay),
-
-            ];
-
-            break;
-
-
-        case "social":
-
-            checks = [
-
-                Object.values(
-                    values.social || {}
-                ).some(
-                    account =>
-                        account?.verified === true
-                ),
-
-            ];
-
-            break;
-
+        /* =====================================
+           PAYMENT
+        ===================================== */
 
         case "payment":
 
@@ -201,6 +107,69 @@ export function calculateProfileSectionCompletion(
             break;
 
 
+        /* =====================================
+           ENTITY
+        ===================================== */
+
+        case "entity":
+
+            checks = [
+
+                Boolean(
+                    values.entity?.name
+                ),
+
+                Boolean(
+                    values.entity?.website
+                ),
+
+            ];
+
+            break;
+
+
+        case "entity-address":
+
+            checks = [
+
+                Boolean(
+                    values.entity?.streetAddress
+                ),
+
+                Boolean(
+                    values.entity?.suburb
+                ),
+
+                Boolean(
+                    values.entity?.postcode
+                ),
+
+            ];
+
+            break;
+
+
+        case "entity-contact":
+
+            checks = [
+
+                Boolean(
+                    values.entity?.phone
+                ),
+
+                Boolean(
+                    values.entity?.email
+                ),
+
+            ];
+
+            break;
+
+
+        /* =====================================
+           DEFAULT
+        ===================================== */
+
         default:
 
             return 0;
@@ -209,20 +178,73 @@ export function calculateProfileSectionCompletion(
 
 
     const completed =
-        checks.filter(Boolean).length;
+        checks.filter(
+            Boolean
+        ).length;
 
 
     return checks.length
         ? Math.round(
-            (completed / checks.length) * 100
+            (
+                completed /
+                checks.length
+            ) * 100
         )
         : 0;
 
 }
+
 
 /* =====================================
    PROFILE COMPLETION
 ===================================== */
+
+export function calculateProfileCompletion(
+    values = {}
+) {
+
+    const sectionIds = [
+
+        "identity",
+
+        "location",
+
+        "contact",
+
+        "social",
+
+        "payment",
+
+    ];
+
+
+    const sectionCompletions =
+        sectionIds.map(
+            sectionId =>
+                calculateProfileSectionCompletion(
+                    values,
+                    sectionId
+                )
+        );
+
+
+    const completedSections =
+        sectionCompletions.filter(
+            completion =>
+                completion === 100
+        ).length;
+
+
+    return Math.round(
+
+        (
+            completedSections /
+            sectionIds.length
+        ) * 100
+
+    );
+
+}
 
 
 /* =====================================
@@ -245,26 +267,16 @@ export function getInitialProfileValues(
 
 
     /*
-       -------------------------------------
-       PROFILE USERNAME
-
-       Important:
-
-       An empty username is a valid saved
-       profile state.
-
-       Do NOT use:
-
-           profile?.username || emailUsername
-
-       because "" is falsy and would cause
-       the authentication email username to
-       be restored.
-
-       Only use the email username when the
-       profile has never contained a username.
-       -------------------------------------
-    */
+     * -------------------------------------
+     * PROFILE USERNAME
+     *
+     * An empty username is a valid saved
+     * profile state.
+     *
+     * Only use the email username when the
+     * profile has never contained a username.
+     * -------------------------------------
+     */
 
     const hasProfileUsername =
         Object.prototype.hasOwnProperty.call(
@@ -280,18 +292,16 @@ export function getInitialProfileValues(
 
 
     /*
-       -------------------------------------
-       IDENTITY TYPE
-
-       New model:
-
-       PERSONAL
-       ENTITY
-
-       Legacy ORG is temporarily mapped to
-       ENTITY for backward compatibility.
-       -------------------------------------
-    */
+     * -------------------------------------
+     * IDENTITY TYPE
+     *
+     * PERSONAL
+     * ENTITY
+     *
+     * Legacy ORG is temporarily mapped to
+     * ENTITY for backward compatibility.
+     * -------------------------------------
+     */
 
     const identityType =
         profile?.identityType
@@ -311,6 +321,9 @@ export function getInitialProfileValues(
 
         activeIdentityType:
             identityType,
+
+
+        identityType,
 
 
         /* =====================================
@@ -350,12 +363,6 @@ export function getInitialProfileValues(
 
         /* =====================================
            IDENTITY
-           
-           Temporary compatibility fields.
-
-           These allow the existing Workspace
-           fields to continue working while
-           the profile state is migrated.
         ===================================== */
 
         username:
@@ -535,7 +542,9 @@ export function getEmailDomain(
 
         email
             .split("@")[1]
-            ?.toLowerCase() ||
+            ?.toLowerCase()
+
+        ||
 
         ""
 
@@ -588,7 +597,9 @@ export function toE164Phone(
 
 
     if (!country) {
+
         return "";
+
     }
 
 
@@ -599,7 +610,9 @@ export function toE164Phone(
 
 
     if (!digits) {
+
         return "";
+
     }
 
 
@@ -626,7 +639,9 @@ export function validatePhone(
 
 
     if (!country) {
+
         return false;
+
     }
 
 
