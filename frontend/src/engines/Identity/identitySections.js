@@ -15,7 +15,7 @@ export const PERSONAL_SECTIONS = [
 
     createWorkspaceSectionModel({
 
-        id: "identity",
+        id: "IDENTITY",
 
         title: "IDENTITY",
 
