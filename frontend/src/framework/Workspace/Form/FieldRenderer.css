@@ -1,20 +1,15 @@
 /* =========================================
    WORKSPACE FIELD
-   One horizontal row
 ========================================= */
 
 .workspace-field {
-    display: grid;
-
-    grid-template-columns: 100px minmax(0, 1fr);
-    align-items: center;
+    display: flex;
+    flex-direction: column;
 
     width: 100%;
-    max-width: 640px;
+    margin: 0;
 
-    margin: 0 auto;
-
-    column-gap: 24px;
+    text-align: left;
 }
 
 
@@ -23,7 +18,9 @@
 ========================================= */
 
 .workspace-field-label {
-    margin: 0;
+    display: block;
+
+    margin: 0 0 12px;
 
     font-family: inherit;
     font-size: 0.95rem;
@@ -41,6 +38,8 @@
 ========================================= */
 
 .workspace-field-value {
+    display: block;
+
     width: 100%;
 
     margin: 0;
@@ -64,7 +63,7 @@
     display: block;
 
     width: 100%;
-
+    max-width: 100%;
     box-sizing: border-box;
 
     min-height: 52px;
@@ -82,9 +81,9 @@
 
     color: #426b96;
 
-    text-align: left;
-
     outline: none;
+
+    text-align: left;
 
     transition:
         border-color 0.15s ease,
@@ -93,27 +92,7 @@
 
 
 /* =========================================
-   FIELD HELPER
-========================================= */
-
-.workspace-field-helper {
-    grid-column: 2;
-
-    margin-top: -14px;
-
-    font-family: inherit;
-    font-size: 0.9rem;
-    font-weight: 400;
-    line-height: 1.5;
-
-    color: #426b96;
-
-    text-align: left;
-}
-
-
-/* =========================================
-   FOCUS
+   INPUT FOCUS
 ========================================= */
 
 .workspace-field-input:focus {
@@ -125,19 +104,18 @@
 
 
 /* =========================================
-   RESPONSIVE
+   FIELD HELPER
 ========================================= */
 
-@media (max-width: 600px) {
+.workspace-field-helper {
+    margin-top: 10px;
 
-    .workspace-field {
-        grid-template-columns: 1fr;
-        row-gap: 10px;
-    }
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 400;
+    line-height: 1.5;
 
-    .workspace-field-helper {
-        grid-column: 1;
-        margin-top: 0;
-    }
+    color: #426b96;
 
+    text-align: left;
 }

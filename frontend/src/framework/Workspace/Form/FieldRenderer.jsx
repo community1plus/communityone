@@ -29,22 +29,26 @@ export default function FieldRenderer({
         case "location":
 
             return (
+
                 <LocationField
                     field={field}
                     form={form}
                     editing={editing}
                 />
+
             );
 
 
         case "phone":
 
             return (
+
                 <PhoneField
                     field={field}
                     form={form}
                     editing={editing}
                 />
+
             );
 
 
@@ -59,11 +63,13 @@ export default function FieldRenderer({
     ===================================================== */
 
     const {
+
         name,
         label,
         type = "text",
         helperText,
         readOnly = false,
+
     } = field;
 
 
@@ -79,13 +85,24 @@ export default function FieldRenderer({
 
         <div className="workspace-field">
 
+
+            {/* =============================================
+               LABEL
+            ============================================= */}
+
             <label
                 className="workspace-field-label"
                 htmlFor={name}
             >
+
                 {label}
+
             </label>
 
+
+            {/* =============================================
+               VALUE / INPUT
+            ============================================= */}
 
             {!editing ? (
 
@@ -93,7 +110,9 @@ export default function FieldRenderer({
                     className="workspace-field-value"
                     id={name}
                 >
+
                     {value || "—"}
+
                 </div>
 
             ) : (
@@ -116,10 +135,16 @@ export default function FieldRenderer({
             )}
 
 
+            {/* =============================================
+               HELPER
+            ============================================= */}
+
             {helperText && (
 
                 <div className="workspace-field-helper">
+
                     {helperText}
+
                 </div>
 
             )}
