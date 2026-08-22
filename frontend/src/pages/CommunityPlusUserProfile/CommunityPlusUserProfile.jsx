@@ -44,12 +44,6 @@ import {
 
 
 import {
-    getInitialProfileValues,
-    calculateProfileCompletion,
-} from "../../framework/Workspace/profile/profileHelpers";
-
-
-import {
     buildProfilePayload,
 } from "./profilePayload";
 
