@@ -1,13 +1,5 @@
 .workspace-body {
 
-    flex: 1;
-
-    min-width: 0;
-
-}
-
-.workspace-body {
-
     display: flex;
 
     flex-direction: column;
@@ -22,7 +14,7 @@
 
     min-height: 320px;
 
-    padding-top: 40px;
+    padding-top: 20px;
 
     background: #f5f3f0;
 
