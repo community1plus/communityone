@@ -89,3 +89,15 @@
     border-color: #940b18;
 
 }
+
+.workspace-section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.workspace-section-completion {
+    color: #b20d1f;
+    font-size: 13px;
+    font-weight: 600;
+}

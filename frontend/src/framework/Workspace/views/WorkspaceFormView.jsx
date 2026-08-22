@@ -1,5 +1,6 @@
 import FieldRenderer from "../Form/FieldRenderer";
 
+
 export default function WorkspaceFormView({
 
     section,
@@ -8,11 +9,14 @@ export default function WorkspaceFormView({
 
     editing,
 
+    sectionCompletion,
+
 }) {
 
     if (!section) {
         return null;
     }
+
 
     return (
 

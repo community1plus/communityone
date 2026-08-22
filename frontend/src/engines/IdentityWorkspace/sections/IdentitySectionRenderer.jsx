@@ -18,6 +18,7 @@ export default function IdentitySectionRenderer({
     currentStep,
     form,
     editing,
+    sectionCompletion,
 }) {
 
     const defaultContent = (
@@ -30,6 +31,12 @@ export default function IdentitySectionRenderer({
             />
         </WorkspaceForm>
     );
+
+console.log(
+    "[IDENTITY SECTION COMPLETION]",
+    sectionId,
+    sectionCompletion
+);
 
     const sectionMap = {
         social: (

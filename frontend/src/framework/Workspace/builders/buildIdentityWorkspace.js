@@ -29,7 +29,6 @@ export function buildIdentityWorkspace(
 
 const {
     completion,
-    sectionCompletion,
     sections,
     currentSection,
     values,

@@ -57,17 +57,13 @@ export default function IdentityWorkspace({
        STATE
     ===================================== */
 
-    const {
-
-        values,
-
-        form,
-
-        editingSections,
-
-        savingSection,
-
-    } = state;
+const {
+    values,
+    form,
+    editingSections,
+    savingSection,
+    sectionCompletion,
+} = state;
 
 
     /* =====================================
@@ -262,180 +258,49 @@ export default function IdentityWorkspace({
                             "
                         >
 
-                            <div
-                                className="
-                                    workspace-section-header
-                                "
-                            >
+<div
+    className="
+        workspace-section-title
+    "
+>
 
-                                <div
-                                    className="
-                                        workspace-section-title
-                                    "
-                                >
+    <span>
+        {
+            section?.title
+            ?? ""
+        }
+    </span>
 
-                                    {
-                                        section?.title
-                                        ?? ""
-                                    }
+    <span
+        className="
+            workspace-section-completion
+        "
+    >
+        {sectionCompletion ?? 0}%
+    </span>
 
-                                </div>
-
-
-                                <div
-                                    className="
-                                        workspace-section-actions
-                                    "
-                                >
-
-                                    {!editing ? (
-
-                                        <button
-
-                                            type="button"
-
-                                            onClick={
-                                                handleEdit
-                                            }
-
-                                            className="
-                                                workspace-action
-                                                workspace-action-edit
-                                            "
-
-                                        >
-
-                                            <Pencil
-                                                size={16}
-                                            />
-
-                                            <span>
-                                                Edit
-                                            </span>
-
-                                        </button>
-
-                                    ) : (
-
-                                        <>
-
-                                            <button
-
-                                                type="button"
-
-                                                onClick={
-                                                    handleClear
-                                                }
-
-                                                className="
-                                                    workspace-action
-                                                "
-
-                                                disabled={
-                                                    saving
-                                                }
-
-                                            >
-
-                                                <Eraser
-                                                    size={16}
-                                                />
-
-                                                <span>
-                                                    Clear
-                                                </span>
-
-                                            </button>
+</div>
 
 
-                                            <button
+<CapabilityRenderer
 
-                                                type="button"
+    section={
+        section
+    }
 
-                                                onClick={
-                                                    handleReset
-                                                }
+    form={
+        form
+    }
 
-                                                className="
-                                                    workspace-action
-                                                "
+    editing={
+        editing
+    }
 
-                                                disabled={
-                                                    saving
-                                                }
+    sectionCompletion={
+        sectionCompletion
+    }
 
-                                            >
-
-                                                <RotateCcw
-                                                    size={16}
-                                                />
-
-                                                <span>
-                                                    Reset
-                                                </span>
-
-                                            </button>
-
-
-                                            <button
-
-                                                type="button"
-
-                                                onClick={
-                                                    handleSave
-                                                }
-
-                                                className="
-                                                    workspace-action
-                                                    workspace-action-save
-                                                "
-
-                                                disabled={
-                                                    savingSection
-                                                }
-
-                                            >
-
-                                                <Save
-                                                    size={16}
-                                                />
-
-                                                <span>
-
-                                                    {
-                                                        saving
-                                                            ? "Saving..."
-                                                            : "Save"
-                                                    }
-
-                                                </span>
-
-                                            </button>
-
-                                        </>
-
-                                    )}
-
-                                </div>
-
-                            </div>
-
-
-                            <CapabilityRenderer
-
-                                section={
-                                    section
-                                }
-
-                                form={
-                                    form
-                                }
-
-                                editing={
-                                    editing
-                                }
-
-                            />
+/>
 
                         </div>
 
