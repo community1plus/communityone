@@ -3,13 +3,17 @@
 ========================================= */
 
 .workspace-form {
+    box-sizing: border-box;
+
     display: flex;
     flex-direction: column;
 
     width: 100%;
     max-width: 720px;
 
-    margin: 0 auto;
+    margin-left: auto;
+    margin-right: auto;
+
     padding: 0;
 
     gap: 32px;
@@ -21,14 +25,9 @@
 ========================================= */
 
 .workspace-form-field {
+    box-sizing: border-box;
+
     width: 100%;
-}
-
-
-/* =========================================
-   FORM FIELD SPACING
-========================================= */
-
-.workspace-form-field + .workspace-form-field {
-    margin-top: 0;
+    margin: 0;
+    padding: 0;
 }
