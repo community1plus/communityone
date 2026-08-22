@@ -4,24 +4,26 @@
 
 .workspace-section {
     width: 100%;
+    box-sizing: border-box;
 }
 
 
 /* =========================================
    SECTION HEADER
-   Two columns:
-   title | actions
 ========================================= */
 
 .workspace-section-header {
     display: grid;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: minmax(0, 1fr) auto;
+
     align-items: center;
 
     width: 100%;
     min-height: 40px;
 
     margin: 0 0 32px;
+
+    box-sizing: border-box;
 }
 
 
@@ -51,15 +53,18 @@
 
 .workspace-section-actions {
     display: flex;
+
     align-items: center;
     justify-content: flex-end;
 
     gap: 8px;
+
+    white-space: nowrap;
 }
 
 
 /* =========================================
-   COMPLETION
+   SECTION COMPLETION
 ========================================= */
 
 .workspace-section-completion {
@@ -85,6 +90,7 @@
 
 .workspace-section-action {
     display: inline-flex;
+
     align-items: center;
     justify-content: center;
 
@@ -94,6 +100,8 @@
     padding: 0 6px;
 
     border: 0;
+    border-radius: 0;
+
     background: transparent;
 
     color: var(--text-primary, #111);
@@ -153,27 +161,29 @@
 
 
 /* =========================================
-   SECTION CONTENT
-   This is the ONE body column.
+   SECTION CONTENT / BODY
 ========================================= */
 
 .workspace-section-content {
     display: flex;
+
     justify-content: center;
 
     width: 100%;
+
+    box-sizing: border-box;
 }
 
 
 /* =========================================
-   BODY
-   The body has a fixed visual width and
-   is centred inside the section.
+   BODY COLUMN
 ========================================= */
 
 .workspace-section-content > * {
     width: 100%;
     max-width: 760px;
+
+    box-sizing: border-box;
 }
 
 
@@ -181,7 +191,7 @@
    WORKSPACE FORM
 ========================================= */
 
-.workspace-form {
+.workspace-section-content .workspace-form {
     display: flex;
     flex-direction: column;
 
@@ -194,15 +204,19 @@
     gap: 32px;
 
     box-sizing: border-box;
+
+    text-align: left;
 }
 
 
 /* =========================================
-   FORM FIELD ROW
+   FORM ROWS
 ========================================= */
 
-.workspace-form > * {
+.workspace-section-content .workspace-form > * {
     width: 100%;
+
+    box-sizing: border-box;
 }
 
 
@@ -220,7 +234,7 @@
         max-width: 100%;
     }
 
-    .workspace-form {
+    .workspace-section-content .workspace-form {
         max-width: 100%;
     }
 }
