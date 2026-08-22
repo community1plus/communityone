@@ -10,7 +10,9 @@ import "./FieldRenderer.css";
 export default function FieldRenderer({
 
     field,
+
     form,
+
     editing,
 
 }) {
@@ -65,9 +67,13 @@ export default function FieldRenderer({
     const {
 
         name,
+
         label,
+
         type = "text",
+
         helperText,
+
         readOnly = false,
 
     } = field;
@@ -78,76 +84,106 @@ export default function FieldRenderer({
 
 
     /* =====================================================
-       FIELD
+       VIEW MODE
+    ===================================================== */
+
+    if (!editing) {
+
+        return (
+
+            <div className="workspace-field">
+
+                <label
+                    className="workspace-field-label"
+                    htmlFor={name}
+                >
+                    {label}
+                </label>
+
+
+                <div>
+
+                    <div
+                        className="workspace-field-value"
+                        id={name}
+                    >
+                        {value || "—"}
+                    </div>
+
+
+                    {helperText && (
+
+                        <div className="workspace-field-helper">
+
+                            {helperText}
+
+                        </div>
+
+                    )}
+
+                </div>
+
+            </div>
+
+        );
+
+    }
+
+
+    /* =====================================================
+       EDIT MODE
     ===================================================== */
 
     return (
 
         <div className="workspace-field">
 
-
-            {/* =============================================
-               LABEL
-            ============================================= */}
-
             <label
                 className="workspace-field-label"
                 htmlFor={name}
             >
-
                 {label}
-
             </label>
 
 
-            {/* =============================================
-               VALUE / INPUT
-            ============================================= */}
-
-            {!editing ? (
-
-                <div
-                    className="workspace-field-value"
-                    id={name}
-                >
-
-                    {value || "—"}
-
-                </div>
-
-            ) : (
+            <div>
 
                 <input
+
                     id={name}
+
                     name={name}
+
                     type={type}
+
                     className="workspace-field-input"
+
                     value={value}
+
                     readOnly={readOnly}
+
                     onChange={
                         form.handleChange(name)
                     }
+
                     onBlur={
                         form.handleBlur(name)
                     }
+
                 />
 
-            )}
 
+                {helperText && (
 
-            {/* =============================================
-               HELPER
-            ============================================= */}
+                    <div className="workspace-field-helper">
 
-            {helperText && (
+                        {helperText}
 
-                <div className="workspace-field-helper">
+                    </div>
 
-                    {helperText}
+                )}
 
-                </div>
-
-            )}
+            </div>
 
         </div>
 
