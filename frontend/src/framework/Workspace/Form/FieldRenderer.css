@@ -11,6 +11,8 @@
     padding: 0;
 
     box-sizing: border-box;
+
+    gap: 10px;
 }
 
 
@@ -22,7 +24,7 @@
     display: block;
 
     width: 100%;
-    margin: 0 0 12px;
+    margin: 0;
     padding: 0;
 
     box-sizing: border-box;
@@ -32,7 +34,7 @@
     font-weight: 600;
     line-height: 1.2;
 
-    color: var(--text-primary, #111);
+    color: var(--text-primary, #171717);
 
     text-align: left;
 }
@@ -45,13 +47,14 @@
 .workspace-field-content {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
 
     width: 100%;
     margin: 0;
     padding: 0;
 
     box-sizing: border-box;
+
+    gap: 10px;
 }
 
 
@@ -71,9 +74,9 @@
     font-family: inherit;
     font-size: 1rem;
     font-weight: 400;
-    line-height: 1.5;
+    line-height: 1.4;
 
-    color: #3f78b5;
+    color: #3473b5;
 
     text-align: left;
 }
@@ -87,7 +90,7 @@
     display: block;
 
     width: 100%;
-    margin: 8px 0 0;
+    margin: 0;
     padding: 0;
 
     box-sizing: border-box;
@@ -95,9 +98,9 @@
     font-family: inherit;
     font-size: 0.95rem;
     font-weight: 400;
-    line-height: 1.5;
+    line-height: 1.4;
 
-    color: #3f78b5;
+    color: #3473b5;
 
     text-align: left;
 }
@@ -114,22 +117,21 @@
     max-width: 100%;
 
     margin: 0;
-    padding: 14px 16px;
+    padding: 10px 12px;
 
     box-sizing: border-box;
 
-    border: 1px solid #d6dfe8;
-    border-radius: 18px;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
 
-    background: #f8fafc;
-
-    color: var(--text-primary, #111);
+    background: #fff;
 
     font-family: inherit;
     font-size: 1rem;
+    font-weight: 400;
     line-height: 1.4;
 
-    text-align: left;
+    color: var(--text-primary, #171717);
 
     outline: none;
 }
@@ -149,18 +151,26 @@
 ========================================= */
 
 .workspace-field-input:read-only {
+    background: #f7f7f7;
     cursor: default;
 }
 
 
 /* =========================================
-   RESPONSIVE
+   FIELD RESPONSIVE
 ========================================= */
 
 @media (max-width: 760px) {
 
+    .workspace-field {
+        width: 100%;
+    }
+
+    .workspace-field-label,
+    .workspace-field-content,
+    .workspace-field-value,
+    .workspace-field-helper,
     .workspace-field-input {
         width: 100%;
-        max-width: 100%;
     }
 }
