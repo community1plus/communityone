@@ -10,9 +10,7 @@ import "./FieldRenderer.css";
 export default function FieldRenderer({
 
     field,
-
     form,
-
     editing,
 
 }) {
@@ -31,34 +29,22 @@ export default function FieldRenderer({
         case "location":
 
             return (
-
                 <LocationField
-
                     field={field}
-
                     form={form}
-
                     editing={editing}
-
                 />
-
             );
 
 
         case "phone":
 
             return (
-
                 <PhoneField
-
                     field={field}
-
                     form={form}
-
                     editing={editing}
-
                 />
-
             );
 
 
@@ -69,21 +55,15 @@ export default function FieldRenderer({
 
 
     /* =====================================================
-       STANDARD FIELD
+       FIELD CONFIGURATION
     ===================================================== */
 
     const {
-
         name,
-
         label,
-
         type = "text",
-
         helperText,
-
         readOnly = false,
-
     } = field;
 
 
@@ -92,54 +72,7 @@ export default function FieldRenderer({
 
 
     /* =====================================================
-       VIEW MODE
-    ===================================================== */
-
-    if (!editing) {
-
-        return (
-
-            <div className="workspace-field">
-
-                <label
-                    className="workspace-field-label"
-                    htmlFor={name}
-                >
-
-                    {label}
-
-                </label>
-
-
-                <div
-                    className="workspace-field-value"
-                    id={name}
-                >
-
-                    {value || "—"}
-
-                </div>
-
-
-                {helperText && (
-
-                    <div className="workspace-field-helper">
-
-                        {helperText}
-
-                    </div>
-
-                )}
-
-            </div>
-
-        );
-
-    }
-
-
-    /* =====================================================
-       EDIT MODE
+       FIELD
     ===================================================== */
 
     return (
@@ -150,43 +83,43 @@ export default function FieldRenderer({
                 className="workspace-field-label"
                 htmlFor={name}
             >
-
                 {label}
-
             </label>
 
 
-            <input
+            {!editing ? (
 
-                id={name}
+                <div
+                    className="workspace-field-value"
+                    id={name}
+                >
+                    {value || "—"}
+                </div>
 
-                name={name}
+            ) : (
 
-                type={type}
+                <input
+                    id={name}
+                    name={name}
+                    type={type}
+                    className="workspace-field-input"
+                    value={value}
+                    readOnly={readOnly}
+                    onChange={
+                        form.handleChange(name)
+                    }
+                    onBlur={
+                        form.handleBlur(name)
+                    }
+                />
 
-                className="workspace-field-input"
-
-                value={value}
-
-                readOnly={readOnly}
-
-                onChange={
-                    form.handleChange(name)
-                }
-
-                onBlur={
-                    form.handleBlur(name)
-                }
-
-            />
+            )}
 
 
             {helperText && (
 
                 <div className="workspace-field-helper">
-
                     {helperText}
-
                 </div>
 
             )}
