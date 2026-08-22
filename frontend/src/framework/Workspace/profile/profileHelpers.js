@@ -4,6 +4,101 @@ import {
     IDENTITY_TYPES,
 } from "./profileConstants";
 
+/* =====================================
+   PROFILE SECTION COMPLETION
+===================================== */
+
+export function calculateProfileSectionCompletion(
+    values = {},
+    sectionId = ""
+) {
+
+    let checks = [];
+
+
+    switch (sectionId) {
+
+        case "identity":
+
+            checks = [
+
+                Boolean(values.username),
+
+            ];
+
+            break;
+
+
+        case "location":
+
+            checks = [
+
+                Boolean(values.homeLocation),
+
+            ];
+
+            break;
+
+
+        case "contact":
+
+            checks = [
+
+                Boolean(values.phoneDisplay),
+
+            ];
+
+            break;
+
+
+        case "social":
+
+            checks = [
+
+                Object.values(
+                    values.social || {}
+                ).some(
+                    account =>
+                        account?.verified === true
+                ),
+
+            ];
+
+            break;
+
+
+        case "payment":
+
+            checks = [
+
+                Boolean(
+                    values.payment?.verified
+                ),
+
+            ];
+
+            break;
+
+
+        default:
+
+            return 0;
+
+    }
+
+
+    const completed =
+        checks.filter(Boolean).length;
+
+
+    return checks.length
+        ? Math.round(
+            (completed / checks.length) * 100
+        )
+        : 0;
+
+}
+
 export function calculateProfileCompletion(values = {}) {
 
     const sections =
