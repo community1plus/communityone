@@ -262,10 +262,12 @@ const [
             values
         );
 
-        const sectionCompletion =
+    const sectionCompletion =
     calculateProfileSectionCompletion(
-        values
-    );
+        values,
+        sections[currentSection]?.id
+    );    
+
 
 console.log(
     "[PROFILE COMPLETION] VALUE:",
@@ -508,6 +510,8 @@ const workspaceState = {
     currentSection,
 
     completion,
+
+    sectionCompletion,
 
 };
 
