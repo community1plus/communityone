@@ -6,9 +6,6 @@
     display: flex;
     flex-direction: column;
 
-    align-items: stretch;
-    justify-content: flex-start;
-
     width: 100%;
     margin: 0;
     padding: 0;
@@ -23,7 +20,7 @@
    FIELD LABEL
 ========================================= */
 
-.workspace-field .workspace-field-label {
+.workspace-field-label {
     display: block;
 
     width: 100%;
@@ -40,9 +37,6 @@
     color: var(--text-primary, #171717);
 
     text-align: left;
-
-    align-items: unset;
-    justify-content: unset;
 }
 
 
@@ -50,12 +44,9 @@
    FIELD CONTENT
 ========================================= */
 
-.workspace-field .workspace-field-content {
+.workspace-field-content {
     display: flex;
     flex-direction: column;
-
-    align-items: stretch;
-    justify-content: flex-start;
 
     width: 100%;
     margin: 0;
@@ -73,7 +64,7 @@
    FIELD VALUE
 ========================================= */
 
-.workspace-field .workspace-field-value {
+.workspace-field-value {
     display: block;
 
     width: 100%;
@@ -97,7 +88,7 @@
    FIELD HELPER
 ========================================= */
 
-.workspace-field .workspace-field-helper {
+.workspace-field-helper {
     display: block;
 
     width: 100%;
@@ -121,12 +112,10 @@
    FIELD INPUT
 ========================================= */
 
-.workspace-field .workspace-field-input {
+.workspace-field-input {
     display: block;
 
     width: 100%;
-    max-width: 100%;
-
     margin: 0;
     padding: 10px 12px;
 
@@ -154,7 +143,7 @@
    INPUT FOCUS
 ========================================= */
 
-.workspace-field .workspace-field-input:focus {
+.workspace-field-input:focus {
     border-color: #ad0d1c;
 }
 
@@ -163,7 +152,7 @@
    READ ONLY
 ========================================= */
 
-.workspace-field .workspace-field-input:read-only {
+.workspace-field-input:read-only {
     background: #f7f7f7;
     cursor: default;
 }
@@ -176,11 +165,11 @@
 @media (max-width: 760px) {
 
     .workspace-field,
-    .workspace-field .workspace-field-label,
-    .workspace-field .workspace-field-content,
-    .workspace-field .workspace-field-value,
-    .workspace-field .workspace-field-helper,
-    .workspace-field .workspace-field-input {
+    .workspace-field-label,
+    .workspace-field-content,
+    .workspace-field-value,
+    .workspace-field-helper,
+    .workspace-field-input {
         width: 100%;
         max-width: 100%;
     }
