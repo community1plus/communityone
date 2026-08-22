@@ -60,8 +60,15 @@ export default function WorkspaceSectionHeader({
                         aria-label="Edit section"
                         title="Edit"
                     >
-                        <Pencil size={15} strokeWidth={1.8} />
-                        <span>Edit</span>
+                        <Pencil
+                            size={15}
+                            strokeWidth={1.8}
+                        />
+
+                        <span>
+                            Edit
+                        </span>
+
                     </button>
 
                 )}
@@ -78,8 +85,15 @@ export default function WorkspaceSectionHeader({
                             aria-label="Clear section"
                             title="Clear"
                         >
-                            <Eraser size={15} strokeWidth={1.8} />
-                            <span>Clear</span>
+                            <Eraser
+                                size={15}
+                                strokeWidth={1.8}
+                            />
+
+                            <span>
+                                Clear
+                            </span>
+
                         </button>
 
 
@@ -90,8 +104,15 @@ export default function WorkspaceSectionHeader({
                             aria-label="Reset section"
                             title="Reset"
                         >
-                            <RotateCcw size={15} strokeWidth={1.8} />
-                            <span>Reset</span>
+                            <RotateCcw
+                                size={15}
+                                strokeWidth={1.8}
+                            />
+
+                            <span>
+                                Reset
+                            </span>
+
                         </button>
 
 
@@ -103,10 +124,18 @@ export default function WorkspaceSectionHeader({
                             aria-label="Save section"
                             title="Save"
                         >
-                            <Save size={15} strokeWidth={1.8} />
+                            <Save
+                                size={15}
+                                strokeWidth={1.8}
+                            />
+
                             <span>
-                                {saving ? "Saving..." : "Save"}
+                                {saving
+                                    ? "Saving..."
+                                    : "Save"
+                                }
                             </span>
+
                         </button>
 
                     </>
