@@ -1,3 +1,7 @@
+/* =========================================
+   SECTION NAVIGATION
+========================================= */
+
 .workspace-navigation {
 
     display: flex;
@@ -8,18 +12,11 @@
 
     width: 100%;
 
-    border-bottom: 1px solid var(--border-color, #e8e8e8);
+    border-bottom:
+        1px solid
+        var(--border-color, #e8e8e8);
 
 }
-
-/* Remove after debugging */
-/*
-.workspace-navigation {
-
-    background: yellow;
-
-}
-*/
 
 .workspace-tab {
 
@@ -33,17 +30,28 @@
     background: transparent;
 
     border: none;
-    border-bottom: 2px solid transparent;
 
-    padding: 0 0 14px;
+    border-bottom:
+        2px solid
+        transparent;
+
+    padding:
+        0 0 14px;
 
     cursor: pointer;
 
-    font: inherit;
-    font-size: 1rem;
-    font-weight: 500;
+    font-family: inherit;
 
-    color: var(--text-secondary);
+    font-size: 0.85rem;
+
+    font-weight: 600;
+
+    letter-spacing: 0.08em;
+
+    text-transform: uppercase;
+
+    color:
+        var(--text-secondary, #555);
 
     transition:
         color .2s ease,
@@ -53,20 +61,17 @@
 
 .workspace-tab:hover {
 
-    color: var(--text-primary);
+    color:
+        var(--text-primary, #111);
 
 }
 
 .workspace-tab.active {
 
-    color: var(--brand-primary);
+    color:
+        var(--text-primary, #111);
 
-    border-bottom-color: var(--brand-primary);
-
-}
-
-.workspace-tab.complete {
-
-    color: var(--text-primary);
+    border-bottom-color:
+        var(--text-primary, #111);
 
 }

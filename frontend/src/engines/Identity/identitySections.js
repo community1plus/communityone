@@ -15,9 +15,9 @@ export const PERSONAL_SECTIONS = [
 
     createWorkspaceSectionModel({
 
-        id: "IDENTITY",
+        id: "identity",
 
-        title: "IDENTITY",
+        title: "Identity",
 
         view: "form",
 
@@ -53,7 +53,7 @@ export const PERSONAL_SECTIONS = [
 
         id: "location",
 
-        title: "LOCATION",
+        title: "Location",
 
         view: "form",
 
@@ -76,7 +76,7 @@ export const PERSONAL_SECTIONS = [
 
         id: "contact",
 
-        title: "CONTACT",
+        title: "Contact",
 
         view: "form",
 
@@ -230,7 +230,7 @@ export const COMMON_SECTIONS = [
 
         id: "social",
 
-        title: "SOCIAL",
+        title: "Social",
 
         view: "social",
 
@@ -243,7 +243,7 @@ export const COMMON_SECTIONS = [
 
         id: "payment",
 
-        title: "PAYMENT",
+        title: "Payment",
 
         view: "form",
 
