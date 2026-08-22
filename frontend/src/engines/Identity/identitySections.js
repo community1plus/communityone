@@ -17,7 +17,7 @@ export const PERSONAL_SECTIONS = [
 
         id: "identity",
 
-        title: "Identity",
+        title: "IDENTITY",
 
         view: "form",
 
@@ -53,7 +53,7 @@ export const PERSONAL_SECTIONS = [
 
         id: "location",
 
-        title: "Location",
+        title: "LOCATION",
 
         view: "form",
 
@@ -76,7 +76,7 @@ export const PERSONAL_SECTIONS = [
 
         id: "contact",
 
-        title: "Contact",
+        title: "CONTACT",
 
         view: "form",
 
@@ -230,7 +230,7 @@ export const COMMON_SECTIONS = [
 
         id: "social",
 
-        title: "Social",
+        title: "SOCIAL",
 
         view: "social",
 
@@ -243,7 +243,7 @@ export const COMMON_SECTIONS = [
 
         id: "payment",
 
-        title: "Payment",
+        title: "PAYMENT",
 
         view: "form",
 
