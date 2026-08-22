@@ -12,15 +12,14 @@
 ========================================= */
 
 .workspace-section-header {
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
-    justify-content: space-between;
 
     width: 100%;
     min-height: 40px;
 
-    margin: 0 0 28px;
-    padding: 0;
+    margin: 0 0 32px;
 }
 
 
@@ -33,8 +32,6 @@
     align-items: center;
 
     min-width: 0;
-    margin: 0;
-    padding: 0;
 }
 
 .workspace-section-title h2 {
@@ -60,7 +57,8 @@
 
     gap: 8px;
 
-    margin-left: auto;
+    margin: 0;
+    padding: 0;
 }
 
 
@@ -80,7 +78,7 @@
     font-weight: 400;
     line-height: 1;
 
-    color: var(--text-primary, #111);
+    color: #ad0d1c;
 
     white-space: nowrap;
 }
@@ -100,13 +98,12 @@
     height: 30px;
     min-width: 30px;
 
-    padding: 0 9px;
+    padding: 0 6px;
 
-    background: #fff;
-    border: 1px solid #cfcfcf;
-    border-radius: 3px;
+    background: transparent;
+    border: 0;
 
-    color: #111;
+    color: var(--text-primary, #111);
 
     font-family: inherit;
     font-size: 0.8rem;
@@ -117,13 +114,11 @@
 
     transition:
         background 0.15s ease,
-        border-color 0.15s ease,
         color 0.15s ease;
 }
 
 .workspace-section-action:hover {
-    background: #f5f5f5;
-    border-color: #aaa;
+    background: rgba(0, 0, 0, 0.04);
 }
 
 
@@ -133,18 +128,16 @@
 
 .workspace-section-action-primary {
     background: #ad0d1c;
-    border-color: #ad0d1c;
     color: #fff;
 }
 
 .workspace-section-action-primary:hover {
     background: #940b18;
-    border-color: #940b18;
 }
 
 
 /* =========================================
-   ICON
+   ACTION ICON
 ========================================= */
 
 .workspace-section-action svg {
@@ -159,4 +152,8 @@
 .workspace-section-action:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+.workspace-section-action:disabled:hover {
+    background: transparent;
 }
