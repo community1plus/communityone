@@ -1,8 +1,5 @@
-import PhoneField
-    from "./fields/PhoneField";
-
-import LocationField
-    from "./fields/LocationField";
+import PhoneField from "./fields/PhoneField";
+import LocationField from "./fields/LocationField";
 
 import "./FieldRenderer.css";
 
@@ -68,40 +65,50 @@ export default function FieldRenderer({
 
 
     /* =====================================================
-       FIELD CONTENT
+       VIEW MODE
     ===================================================== */
 
-    const content = editing ? (
+    if (!editing) {
 
-        <input
-            id={name}
-            name={name}
-            type={type}
-            className="workspace-field-input"
-            value={value}
-            readOnly={readOnly}
-            onChange={form.handleChange(name)}
-            onBlur={form.handleBlur(name)}
-        />
+        return (
+            <div className="workspace-field">
 
-    ) : (
+                <label
+                    className="workspace-field-label"
+                    htmlFor={name}
+                >
+                    {label}
+                </label>
 
-        <div
-            className="workspace-field-value"
-            id={name}
-        >
-            {value || "—"}
-        </div>
 
-    );
+                <div className="workspace-field-content">
+
+                    <div
+                        id={name}
+                        className="workspace-field-value"
+                    >
+                        {value || "—"}
+                    </div>
+
+
+                    {helperText && (
+                        <div className="workspace-field-helper">
+                            {helperText}
+                        </div>
+                    )}
+
+                </div>
+
+            </div>
+        );
+    }
 
 
     /* =====================================================
-       RENDER
+       EDIT MODE
     ===================================================== */
 
     return (
-
         <div className="workspace-field">
 
             <label
@@ -114,21 +121,26 @@ export default function FieldRenderer({
 
             <div className="workspace-field-content">
 
-                {content}
+                <input
+                    id={name}
+                    name={name}
+                    type={type}
+                    className="workspace-field-input"
+                    value={value}
+                    readOnly={readOnly}
+                    onChange={form.handleChange(name)}
+                    onBlur={form.handleBlur(name)}
+                />
 
 
                 {helperText && (
-
                     <div className="workspace-field-helper">
                         {helperText}
                     </div>
-
                 )}
 
             </div>
 
         </div>
-
     );
-
 }
