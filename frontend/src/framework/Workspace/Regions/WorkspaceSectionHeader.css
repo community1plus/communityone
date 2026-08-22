@@ -1,37 +1,165 @@
+/* =========================================
+   WORKSPACE SECTION HEADER
+========================================= */
+
 .workspace-section-header {
-
     display: flex;
+    align-items: center;
+    justify-content: space-between;
 
-    align-items: baseline;
-
-    gap: 18px;
-
-    margin-bottom: 20px;
-
+    width: 100%;
+    margin: 0 0 24px;
+    padding: 0;
 }
+
+
+/* =========================================
+   SECTION TITLE
+========================================= */
 
 .workspace-section-title {
+    display: flex;
+    align-items: center;
 
     margin: 0;
-
-    font-size: 2rem;
-
-    font-weight: 700;
-
-    color: #1f2937;
-
-    flex-shrink: 0;
-
+    padding: 0;
 }
 
-.workspace-section-description {
 
+/* Actual section heading */
+
+.workspace-section-title h2 {
     margin: 0;
 
-    font-size: 1rem;
-
+    font-family: inherit;
+    font-size: 1.75rem;
     font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: 0;
 
-    color: #64748b;
+    color: var(--text-primary, #111);
+}
 
+
+/* =========================================
+   SECTION ACTIONS
+========================================= */
+
+.workspace-section-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    margin-left: auto;
+}
+
+
+/* =========================================
+   SECTION COMPLETION
+========================================= */
+
+.workspace-section-completion {
+    display: inline-flex;
+    align-items: center;
+
+    margin-right: 4px;
+
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 400;
+    line-height: 1;
+
+    color: var(--text-secondary, #555);
+
+    white-space: nowrap;
+}
+
+
+/* =========================================
+   ACTION BUTTON
+========================================= */
+
+.workspace-section-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 6px;
+
+    height: 32px;
+    padding: 0 10px;
+
+    background: #ffffff;
+
+    border: 1px solid var(--border-color, #d8d8d8);
+    border-radius: 4px;
+
+    color: var(--text-primary, #111);
+
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 400;
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition:
+        background 0.15s ease,
+        border-color 0.15s ease,
+        color 0.15s ease;
+}
+
+
+/* =========================================
+   ACTION ICON
+========================================= */
+
+.workspace-section-action svg {
+    flex: 0 0 auto;
+}
+
+
+/* =========================================
+   ACTION HOVER
+========================================= */
+
+.workspace-section-action:hover {
+    background: #f5f5f5;
+    border-color: #bdbdbd;
+}
+
+
+/* =========================================
+   PRIMARY ACTION
+========================================= */
+
+.workspace-section-action-primary {
+    background: #ad0d1c;
+    border-color: #ad0d1c;
+    color: #ffffff;
+}
+
+.workspace-section-action-primary:hover {
+    background: #940b18;
+    border-color: #940b18;
+}
+
+
+/* =========================================
+   DISABLED
+========================================= */
+
+.workspace-section-action:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+
+/* =========================================
+   FOCUS
+========================================= */
+
+.workspace-section-action:focus-visible {
+    outline: 2px solid #ad0d1c;
+    outline-offset: 2px;
 }
