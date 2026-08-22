@@ -1,11 +1,78 @@
 /* =========================================
-   WORKSPACE SECTION
+   SECTION CONTENT
 ========================================= */
 
-.workspace-section {
+.workspace-section-content {
+    display: flex;
+    justify-content: center;
     width: 100%;
 }
 
+/* =========================================
+   SECTION CONTENT
+========================================= */
+
+.workspace-section-content {
+    display: flex;
+    justify-content: center;
+
+    width: 100%;
+}
+
+
+/* =========================================
+   CENTRED FORM COLUMN
+========================================= */
+
+.workspace-section-content .workspace-form {
+    display: flex;
+    flex-direction: column;
+
+    width: 640px;
+    max-width: 100%;
+
+    margin: 0 auto;
+
+    gap: 32px;
+}
+
+
+/* =========================================
+   FORM FIELDS
+========================================= */
+
+.workspace-section-content .workspace-form > .workspace-field {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+}
+
+
+/* =========================================
+   FORM CONTROLS
+========================================= */
+
+.workspace-section-content .workspace-form input,
+.workspace-section-content .workspace-form textarea,
+.workspace-section-content .workspace-form select {
+    width: 100%;
+    max-width: 100%;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 760px) {
+
+    .workspace-section-content .workspace-form {
+        width: 100%;
+    }
+
+}
 
 /* =========================================
    SECTION HEADER
@@ -190,9 +257,11 @@
     display: flex;
     flex-direction: column;
 
-    width: min(640px, 100%);
+    width: 680px;
+    max-width: 100%;
 
-    margin: 0 auto;
+    margin-left: auto;
+    margin-right: auto;
 
     gap: 32px;
 }
@@ -205,6 +274,24 @@
 .workspace-section-content .workspace-form > * {
     width: 100%;
 }
+
+.workspace-section-content .workspace-form .workspace-field {
+    width: 100%;
+}
+
+
+/* =========================================
+   FORM CONTROLS
+========================================= */
+
+.workspace-section-content .workspace-form input,
+.workspace-section-content .workspace-form textarea,
+.workspace-section-content .workspace-form select {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+
 
 
 /* =========================================
