@@ -1,80 +1,34 @@
+/* =========================================
+   WORKSPACE FORM
+========================================= */
+
 .workspace-form {
-
     display: flex;
-
     flex-direction: column;
-
-    gap: 18px;
-
-
-}
-
-
-.workspace-form-field {
-
-    display: flex;
-
-    flex-direction: column;
-
-    gap: 8px;
-
-}
-
-
-.workspace-form-label {
-
-    font-size: 1rem;
-
-    font-weight: 600;
-
-    color: #222222;
-
-}
-
-
-.workspace-form-input {
 
     width: 100%;
+    max-width: 720px;
 
-    box-sizing: border-box;
+    margin: 0 auto;
+    padding: 0;
 
-    padding: 16px 20px;
-
-    border: 1px solid #d7dde5;
-
-    border-radius: 14px;
-
-    background: #f8fafc;
-
-    color: #526b84;
-
-    font: inherit;
-
-    font-size: 1rem;
-
-    outline: none;
-
+    gap: 32px;
 }
 
 
-.workspace-form-input:focus {
+/* =========================================
+   FORM FIELD
+========================================= */
 
-    border-color: var(--brand-primary, #b51224);
-
+.workspace-form-field {
+    width: 100%;
 }
 
 
-.workspace-form-input[readonly] {
+/* =========================================
+   FORM FIELD SPACING
+========================================= */
 
-    cursor: default;
-
-}
-
-
-.workspace-form-helper {
-
-    font-size: 0.85rem;
-
-    color: #526b84;
-
+.workspace-form-field + .workspace-form-field {
+    margin-top: 0;
 }
