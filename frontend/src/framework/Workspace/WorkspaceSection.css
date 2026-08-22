@@ -161,42 +161,26 @@
 
 
 /* =========================================
-   SECTION CONTENT / BODY
+   SECTION CONTENT
 ========================================= */
 
 .workspace-section-content {
     display: flex;
-
     justify-content: center;
-
     width: 100%;
-
     box-sizing: border-box;
 }
 
 
 /* =========================================
-   BODY COLUMN
-========================================= */
-
-.workspace-section-content > * {
-    width: 100%;
-    max-width: 760px;
-
-    box-sizing: border-box;
-}
-
-
-/* =========================================
-   WORKSPACE FORM
+   FORM CONTAINER
 ========================================= */
 
 .workspace-section-content .workspace-form {
     display: flex;
     flex-direction: column;
 
-    width: 100%;
-    max-width: 760px;
+    width: min(680px, 100%);
 
     margin: 0 auto;
     padding: 0;
@@ -204,8 +188,34 @@
     gap: 32px;
 
     box-sizing: border-box;
+}
 
-    text-align: left;
+
+/* =========================================
+   FORM FIELD
+========================================= */
+
+.workspace-section-content .workspace-form > .workspace-field {
+    width: 100%;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 760px) {
+
+    .workspace-section-content {
+        width: 100%;
+    }
+
+    .workspace-section-content .workspace-form {
+        width: 100%;
+    }
+
 }
 
 
