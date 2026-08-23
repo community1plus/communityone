@@ -1,36 +1,134 @@
-/* =========================================================
-   SECTION CONTENT
-========================================================= */
-
 /* =========================================
-   SECTION CONTENT — DEBUG
+   WORKSPACE SECTION
 ========================================= */
 
-.workspace-section-content {
-    display: flex;
-    justify-content: center;
+.workspace-section {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+/* =========================================
+   SECTION HEADER
+========================================= */
+
+.workspace-section-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+
+    align-items: center;
 
     width: 100%;
+    min-height: 40px;
+
+    margin: 0 0 32px;
+    padding: 0;
+
     box-sizing: border-box;
-
-    border: 2px solid red;
 }
 
-.workspace-section-content .workspace-form {
-    width: 680px;
-    max-width: 100%;
+
+/* =========================================
+   SECTION TITLE
+========================================= */
+
+.workspace-section-title {
     margin: 0;
+
+    font-family: inherit;
+    font-size: 1.35rem;
+    font-weight: 500;
+    line-height: 1.2;
+
+    color: var(--text-primary, #111);
 }
 
 
-/* =========================================================
-   FIELD
-========================================================= */
+/* =========================================
+   SECTION DESCRIPTION
+========================================= */
 
-.workspace-section-content .workspace-form > .workspace-field {
+.workspace-section-description {
+    margin: 0;
+
+    font-family: inherit;
+    font-size: 0.95rem;
+    line-height: 1.4;
+
+    color: var(--text-secondary, #666);
+}
+
+
+/* =========================================
+   SECTION BODY
+========================================= */
+
+.workspace-section-body {
     width: 100%;
     margin: 0;
     padding: 0;
 
     box-sizing: border-box;
+
+    /* DEBUG */
+    border: 2px solid red;
+}
+
+
+/* =========================================
+   FORM
+========================================= */
+
+.workspace-section-body .workspace-form {
+    display: flex;
+    flex-direction: column;
+
+    width: min(680px, 100%);
+
+    margin: 0 auto;
+    padding: 0;
+
+    gap: 32px;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================
+   FORM ROWS
+========================================= */
+
+.workspace-section-body .workspace-form > * {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+
+/* =========================================
+   FIELDS
+========================================= */
+
+.workspace-section-body .workspace-form > .workspace-field {
+    width: 100%;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 760px) {
+
+    .workspace-section-body {
+        width: 100%;
+    }
+
+    .workspace-section-body .workspace-form {
+        width: 100%;
+        max-width: 100%;
+    }
 }
