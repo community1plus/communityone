@@ -7,7 +7,7 @@ export default function WorkspaceSection({
 
 }) {
 
-    if (!model?.visible) {
+    if (!model?.runtime?.visible) {
 
         return null;
 
@@ -30,7 +30,7 @@ export default function WorkspaceSection({
                     </span>
 
                     <span className="workspace-section-completion">
-                        [{model.completion ?? 0}%]
+                        [{model.runtime?.completion ?? 0}%]
                     </span>
 
                 </div>

@@ -28,12 +28,21 @@ export function buildIdentityWorkspace(
 ) {
 
     const {
+
         completion,
+
         sections,
+
         currentSection,
+
         values,
+
+        sectionCompletion,
+
         editingSections,
+
         savingSection,
+
     } = state;
 
 
@@ -56,6 +65,12 @@ export function buildIdentityWorkspace(
 
             values,
 
+            sectionCompletion,
+
+            editingSections,
+
+            savingSection,
+
         });
 
 
@@ -63,19 +78,23 @@ export function buildIdentityWorkspace(
        CURRENT SECTION
     ===================================== */
 
-    const sectionId =
-        runtime.sectionId;
+    const section =
+        runtime.section;
+
+
+    /* =====================================
+       SECTION ACTION STATE
+    ===================================== */
 
     const editing =
-        sectionId
-            ? Boolean(
-                editingSections?.[sectionId]
-            )
-            : false;
+        Boolean(
+            section?.runtime?.editing
+        );
+
 
     const saving =
         Boolean(
-            savingSection
+            section?.runtime?.saving
         );
 
 
@@ -87,12 +106,12 @@ export function buildIdentityWorkspace(
 
         edit: () => {
 
-            if (!sectionId) {
+            if (!runtime.sectionId) {
                 return;
             }
 
             actions.setSectionEditing(
-                sectionId,
+                runtime.sectionId,
                 true
             );
 
@@ -101,12 +120,12 @@ export function buildIdentityWorkspace(
 
         clear: () => {
 
-            if (!sectionId) {
+            if (!runtime.sectionId) {
                 return;
             }
 
             actions.clearSection(
-                sectionId
+                runtime.sectionId
             );
 
         },
@@ -114,12 +133,12 @@ export function buildIdentityWorkspace(
 
         reset: () => {
 
-            if (!sectionId) {
+            if (!runtime.sectionId) {
                 return;
             }
 
             actions.resetSection(
-                sectionId
+                runtime.sectionId
             );
 
         },
@@ -127,12 +146,12 @@ export function buildIdentityWorkspace(
 
         save: async () => {
 
-            if (!sectionId) {
+            if (!runtime.sectionId) {
                 return;
             }
 
             await actions.handleSaveSection(
-                sectionId
+                runtime.sectionId
             );
 
         },
@@ -145,7 +164,8 @@ export function buildIdentityWorkspace(
     ===================================== */
 
     const sectionActions =
-        (runtime.section?.actions ?? [])
+        (section?.actions ?? [])
+
             .map((actionId) => {
 
                 const handler =
@@ -153,9 +173,31 @@ export function buildIdentityWorkspace(
                         actionId
                     ];
 
+
                 if (!handler) {
                     return null;
                 }
+
+
+                const visible =
+
+                    actionId === "edit"
+
+                        ? !editing
+
+                        : actionId === "clear"
+                        || actionId === "reset"
+                        || actionId === "save"
+
+                            ? editing
+
+                            : true;
+
+
+                if (!visible) {
+                    return null;
+                }
+
 
                 return {
 
@@ -170,40 +212,29 @@ export function buildIdentityWorkspace(
                             ? saving
                             : false,
 
-                    visible:
-
-                        actionId === "edit"
-                            ? !editing
-
-                            : actionId === "clear"
-                            || actionId === "reset"
-                            || actionId === "save"
-                                ? editing
-
-                                : true,
-
                 };
 
             })
-            .filter(Boolean)
-            .filter(
-                action =>
-                    action.visible
-            );
+
+            .filter(Boolean);
 
 
     /* =====================================
-       SECTION
+       SECTION MODEL
     ===================================== */
 
-    const section = {
+    const resolvedSection = section
 
-        ...runtime.section,
+        ? {
 
-        actions:
-            sectionActions,
+            ...section,
 
-    };
+            actions:
+                sectionActions,
+
+        }
+
+        : null;
 
 
     /* =====================================
@@ -276,7 +307,8 @@ export function buildIdentityWorkspace(
 
         body: {
 
-            section,
+            section:
+                resolvedSection,
 
         },
 

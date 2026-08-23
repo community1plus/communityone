@@ -6,6 +6,12 @@ export function createWorkspaceRuntime({
 
     values = {},
 
+    sectionCompletion = {},
+
+    editingSections = {},
+
+    savingSection = false,
+
 }) {
 
     const safeSections =
@@ -31,15 +37,85 @@ export function createWorkspaceRuntime({
             );
 
 
-    const section =
+    const baseSection =
         safeSections[safeCurrent]
         || null;
 
 
     const valid =
-        section?.validator
-            ? section.validator(values)
+        baseSection?.validator
+            ? baseSection.validator(values)
             : true;
+
+
+    if (!baseSection) {
+
+        return {
+
+            sections:
+                safeSections,
+
+            current:
+                safeCurrent,
+
+            section:
+                null,
+
+            sectionId:
+                null,
+
+            valid:
+                true,
+
+        };
+
+    }
+
+
+    /* =====================================
+       SECTION RUNTIME
+    ===================================== */
+
+    const completion =
+        sectionCompletion?.[baseSection.id]
+        ?? 0;
+
+
+    const editing =
+        Boolean(
+            editingSections?.[baseSection.id]
+        );
+
+
+    const runtime = {
+
+        ...baseSection.runtime,
+
+        visible:
+            baseSection.runtime?.visible ?? true,
+
+        enabled:
+            baseSection.runtime?.enabled ?? true,
+
+        valid,
+
+        completion,
+
+        editing,
+
+        saving:
+            savingSection,
+
+    };
+
+
+    const section = {
+
+        ...baseSection,
+
+        runtime,
+
+    };
 
 
     return {
@@ -53,7 +129,7 @@ export function createWorkspaceRuntime({
         section,
 
         sectionId:
-            section?.id ?? null,
+            section.id,
 
         valid,
 
