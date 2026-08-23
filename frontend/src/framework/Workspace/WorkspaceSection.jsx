@@ -5,13 +5,10 @@ export default function WorkspaceSection({
     description,
     children,
 }) {
-
     return (
-
         <section className="workspace-section">
 
             {(title || description) && (
-
                 <header className="workspace-section-header">
 
                     {title && (
@@ -27,17 +24,12 @@ export default function WorkspaceSection({
                     )}
 
                 </header>
-
             )}
 
             <div className="workspace-section-body">
-
                 {children}
-
             </div>
 
         </section>
-
     );
-
 }
