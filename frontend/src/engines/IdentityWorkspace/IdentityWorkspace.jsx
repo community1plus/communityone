@@ -233,73 +233,70 @@ export default function IdentityWorkspace({
                     {/* ==========================
                        SECTION
                     ========================== */}
-<WorkspaceBody>
 
-    <WorkspaceSection>
+                    <WorkspaceBody>
 
-        <WorkspaceSectionHeader
+                        <WorkspaceSection>
 
-            title={
-                section?.title ?? ""
-            }
+                            <WorkspaceSectionHeader
 
-            completion={
-                sectionCompletion ?? 0
-            }
+                                title={
+                                    section?.title ?? ""
+                                }
 
-            editing={
-                editing
-            }
+                                completion={
+                                    sectionCompletion ?? 0
+                                }
 
-            saving={
-                saving
-            }
+                                editing={
+                                    editing
+                                }
 
-            onEdit={
-                handleEdit
-            }
+                                saving={
+                                    saving
+                                }
 
-            onClear={
-                handleClear
-            }
+                                onEdit={
+                                    handleEdit
+                                }
 
-            onReset={
-                handleReset
-            }
+                                onClear={
+                                    handleClear
+                                }
 
-            onSave={
-                handleSave
-            }
+                                onReset={
+                                    handleReset
+                                }
 
-        />
+                                onSave={
+                                    handleSave
+                                }
 
-        <div className="workspace-section-content">
+                            />
 
-            <CapabilityRenderer
+                            <CapabilityRenderer
 
-                section={
-                    section
-                }
+                                section={
+                                    section
+                                }
 
-                form={
-                    form
-                }
+                                form={
+                                    form
+                                }
 
-                editing={
-                    editing
-                }
+                                editing={
+                                    editing
+                                }
 
-                sectionCompletion={
-                    sectionCompletion
-                }
+                                sectionCompletion={
+                                    sectionCompletion
+                                }
 
-            />
+                            />
 
-        </div>
+                        </WorkspaceSection>
 
-    </WorkspaceSection>
-
-</WorkspaceBody>
+                    </WorkspaceBody>
 
 
                 </WorkspaceContent>
