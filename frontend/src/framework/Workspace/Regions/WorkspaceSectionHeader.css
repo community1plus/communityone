@@ -5,14 +5,15 @@
 .workspace-section-header {
 
     display: flex;
-
     flex-direction: column;
 
     align-items: flex-start;
 
     width: 100%;
+    min-width: 0;
 
     margin: 0 0 28px;
+    padding: 0;
 
     box-sizing: border-box;
 }
@@ -27,84 +28,13 @@
     display: flex;
 
     align-items: center;
-
     justify-content: flex-start;
 
     gap: 8px;
 
-    width: auto;
-
-    margin: 0 0 18px;
-
-    flex-shrink: 0;
-}
-
-
-/* =========================================
-   SECTION HEADING
-========================================= */
-
-.workspace-section-heading {
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
     width: 100%;
 
-    min-width: 0;
-
-    box-sizing: border-box;
-}
-
-
-/* =========================================
-   SECTION TITLE
-========================================= */
-
-.workspace-section-title {
-
-    margin: 0;
-
-    min-width: 0;
-
-    font-family: inherit;
-
-    font-size: 1.35rem;
-
-    font-weight: 500;
-
-    line-height: 1.2;
-
-    color: var(--text-primary, #111);
-}
-
-
-/* =========================================
-   SECTION COMPLETION
-========================================= */
-
-.workspace-section-completion {
-
-    display: inline-flex;
-
-    align-items: center;
-
-    margin: 0;
-
-    font-family: inherit;
-
-    font-size: 0.9rem;
-
-    font-weight: 400;
-
-    line-height: 1;
-
-    color: var(--platform-red, #ad0d1c);
-
-    white-space: nowrap;
+    margin: 0 0 18px;
 
     flex-shrink: 0;
 }
@@ -119,27 +49,22 @@
     display: inline-flex;
 
     align-items: center;
-
-    justify-content: center;
+    justify-content: flex-start;
 
     gap: 6px;
 
     height: 30px;
-
     min-width: 30px;
 
     padding: 0 6px;
 
     background: transparent;
-
     border: 0;
 
     color: var(--text-primary, #111);
 
     font-family: inherit;
-
     font-size: 0.8rem;
-
     font-weight: 400;
 
     line-height: 1;
@@ -159,6 +84,7 @@
 .workspace-section-action:hover {
 
     background: rgba(0, 0, 0, 0.04);
+
 }
 
 
@@ -169,14 +95,15 @@
 .workspace-section-action-primary {
 
     background: var(--platform-red, #ad0d1c);
-
     color: #fff;
+
 }
 
 
 .workspace-section-action-primary:hover {
 
     background: var(--platform-red-dark, #940b18);
+
 }
 
 
@@ -187,6 +114,7 @@
 .workspace-section-action svg {
 
     flex: 0 0 auto;
+
 }
 
 
@@ -197,12 +125,78 @@
 .workspace-section-action:disabled {
 
     opacity: 0.5;
-
     cursor: not-allowed;
+
 }
 
 
 .workspace-section-action:disabled:hover {
 
     background: transparent;
+
+}
+
+
+/* =========================================
+   SECTION TITLE
+========================================= */
+
+.workspace-section-title {
+
+    display: flex;
+
+    align-items: baseline;
+
+    gap: 4px;
+
+    min-width: 0;
+
+    margin: 0;
+
+}
+
+
+/* =========================================
+   TITLE
+========================================= */
+
+.workspace-section-title h2 {
+
+    margin: 0;
+
+    font-family: inherit;
+
+    font-size: 1.35rem;
+    font-weight: 500;
+
+    line-height: 1.2;
+
+    color: var(--text-primary, #111);
+
+}
+
+
+/* =========================================
+   SECTION COMPLETION
+========================================= */
+
+.workspace-section-completion {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    margin: 0;
+
+    font-family: inherit;
+
+    font-size: 0.9rem;
+    font-weight: 400;
+
+    line-height: 1;
+
+    color: var(--platform-red, #ad0d1c);
+
+    white-space: nowrap;
+
 }

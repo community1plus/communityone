@@ -236,65 +236,65 @@ export default function IdentityWorkspace({
 
                     <WorkspaceBody>
 
-                        <WorkspaceSection>
+<WorkspaceSection>
 
-                            <WorkspaceSectionHeader
+    <WorkspaceSectionHeader
 
-                                title={
-                                    section?.title ?? ""
-                                }
+        title={
+            section?.title ?? ""
+        }
 
-                                completion={
-                                    sectionCompletion ?? 0
-                                }
+        completion={
+            sectionCompletion ?? 0
+        }
 
-                                editing={
-                                    editing
-                                }
+        editing={
+            editing
+        }
 
-                                saving={
-                                    saving
-                                }
+        saving={
+            saving
+        }
 
-                                onEdit={
-                                    handleEdit
-                                }
+        onEdit={
+            handleEdit
+        }
 
-                                onClear={
-                                    handleClear
-                                }
+        onClear={
+            handleClear
+        }
 
-                                onReset={
-                                    handleReset
-                                }
+        onReset={
+            handleReset
+        }
 
-                                onSave={
-                                    handleSave
-                                }
+        onSave={
+            handleSave
+        }
 
-                            />
+    />
 
-                            <CapabilityRenderer
+    <CapabilityRenderer
 
-                                section={
-                                    section
-                                }
+        section={
+            section
+        }
 
-                                form={
-                                    form
-                                }
+        form={
+            form
+        }
 
-                                editing={
-                                    editing
-                                }
+        editing={
+            editing
+        }
 
-                                sectionCompletion={
-                                    sectionCompletion
-                                }
+        sectionCompletion={
+            sectionCompletion
+        }
 
-                            />
+    />
 
-                        </WorkspaceSection>
+</WorkspaceSection>
 
                     </WorkspaceBody>
 

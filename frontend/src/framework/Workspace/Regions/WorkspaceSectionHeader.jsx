@@ -27,13 +27,11 @@ export default function WorkspaceSectionHeader({
 
         <header className="workspace-section-header">
 
-
             {/* =================================
-               SECTION ACTIONS
+               SECTION ACTION MENU
             ================================= */}
 
             <div className="workspace-section-actions">
-
 
                 {!editing && (
 
@@ -44,7 +42,6 @@ export default function WorkspaceSectionHeader({
                         aria-label="Edit section"
                         title="Edit"
                     >
-
                         <Pencil
                             size={15}
                             strokeWidth={1.8}
@@ -70,7 +67,6 @@ export default function WorkspaceSectionHeader({
                             aria-label="Clear section"
                             title="Clear"
                         >
-
                             <Eraser
                                 size={15}
                                 strokeWidth={1.8}
@@ -90,7 +86,6 @@ export default function WorkspaceSectionHeader({
                             aria-label="Reset section"
                             title="Reset"
                         >
-
                             <RotateCcw
                                 size={15}
                                 strokeWidth={1.8}
@@ -111,7 +106,6 @@ export default function WorkspaceSectionHeader({
                             aria-label="Save section"
                             title="Save"
                         >
-
                             <Save
                                 size={15}
                                 strokeWidth={1.8}
@@ -134,22 +128,20 @@ export default function WorkspaceSectionHeader({
 
 
             {/* =================================
-               SECTION HEADING
+               SECTION TITLE
             ================================= */}
 
-            <div className="workspace-section-heading">
+            <div className="workspace-section-title">
 
-                <h2 className="workspace-section-title">
+                <h2>
                     {title}
                 </h2>
-
 
                 <span className="workspace-section-completion">
                     {completion}%
                 </span>
 
             </div>
-
 
         </header>
 
