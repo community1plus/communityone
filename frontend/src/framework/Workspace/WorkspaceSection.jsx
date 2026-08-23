@@ -1,53 +1,95 @@
 import "./WorkspaceSection.css";
 
 export default function WorkspaceSection({
-    title,
-    description,
+
+    model,
     children,
+
 }) {
+
+    if (!model?.visible) {
+
+        return null;
+
+    }
+
     return (
-<section className="workspace-section">
 
-    <div className="workspace-section-header">
+        <section className="workspace-section">
 
-        <div className="workspace-section-identity">
-            <span className="workspace-section-title">
-                Identity
-            </span>
+            {/* =================================
+               SECTION MENU
+            ================================= */}
 
-            <span className="workspace-section-completion">
-                [100%]
-            </span>
-        </div>
+            <header className="workspace-section-header">
 
-        <div className="workspace-section-actions">
+                <div className="workspace-section-identity">
 
-            <button type="button" onClick={onEdit}>
-                Edit
-            </button>
+                    <span className="workspace-section-title">
+                        {model.title}
+                    </span>
 
-            <button type="button" onClick={onClear}>
-                Clear
-            </button>
+                    <span className="workspace-section-completion">
+                        [{model.completion ?? 0}%]
+                    </span>
 
-            <button type="button" onClick={onReset}>
-                Reset
-            </button>
+                </div>
 
-            <button type="button" onClick={onSave}>
-                Save
-            </button>
 
-        </div>
+                {/* =================================
+                   ACTIONS
+                ================================= */}
 
-    </div>
+                <div className="workspace-section-actions">
 
-    <div className="workspace-section-body">
+                    {model.actions?.map((action) => (
 
-        {/* Name, Email, etc. */}
+                        <button
+                            key={action.id}
+                            type="button"
+                            className={`
+                                workspace-section-action
+                                ${action.primary
+                                    ? "workspace-section-action-primary"
+                                    : ""
+                                }
+                            `}
+                            onClick={() =>
+                                action.onClick?.()
+                            }
+                            disabled={
+                                Boolean(action.disabled)
+                            }
+                            title={action.title}
+                        >
 
-    </div>
+                            {action.icon}
 
-</section>
+                            <span>
+                                {action.label}
+                            </span>
+
+                        </button>
+
+                    ))}
+
+                </div>
+
+            </header>
+
+
+            {/* =================================
+               SECTION BODY
+            ================================= */}
+
+            <div className="workspace-section-body">
+
+                {children}
+
+            </div>
+
+        </section>
+
     );
+
 }

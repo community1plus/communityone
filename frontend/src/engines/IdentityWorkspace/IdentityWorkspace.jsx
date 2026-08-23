@@ -21,7 +21,6 @@ import {
 
     WorkspaceGuide,
     WorkspacePanel,
-    WorkspaceSectionHeader,
     WorkspaceSection,
     WorkspaceClose,
 
@@ -100,67 +99,6 @@ export default function IdentityWorkspace({
 
 
     /* =====================================
-       SECTION ACTIONS
-    ===================================== */
-
-    const handleEdit =
-        () => {
-
-            if (!sectionId) {
-                return;
-            }
-
-            actions.setSectionEditing(
-                sectionId,
-                true
-            );
-
-        };
-
-
-    const handleClear =
-        () => {
-
-            if (!sectionId) {
-                return;
-            }
-
-            actions.clearSection(
-                sectionId
-            );
-
-        };
-
-
-    const handleReset =
-        () => {
-
-            if (!sectionId) {
-                return;
-            }
-
-            actions.resetSection(
-                sectionId
-            );
-
-        };
-
-
-    const handleSave =
-        async () => {
-
-            if (!sectionId) {
-                return;
-            }
-
-            await actions.handleSaveSection(
-                sectionId
-            );
-
-        };
-
-
-    /* =====================================
        RENDER
     ===================================== */
 
@@ -236,65 +174,35 @@ export default function IdentityWorkspace({
 
                     <WorkspaceBody>
 
-<WorkspaceSection>
+                        <WorkspaceSection
+                            model={section}
+                        >
 
-    <WorkspaceSectionHeader
+                            <div className="workspace-section-content">
 
-        title={
-            section?.title ?? ""
-        }
+                                <CapabilityRenderer
 
-        completion={
-            sectionCompletion ?? 0
-        }
+                                    section={
+                                        section
+                                    }
 
-        editing={
-            editing
-        }
+                                    form={
+                                        form
+                                    }
 
-        saving={
-            saving
-        }
+                                    editing={
+                                        editing
+                                    }
 
-        onEdit={
-            handleEdit
-        }
+                                    sectionCompletion={
+                                        sectionCompletion
+                                    }
 
-        onClear={
-            handleClear
-        }
+                                />
 
-        onReset={
-            handleReset
-        }
+                            </div>
 
-        onSave={
-            handleSave
-        }
-
-    />
-
-    <CapabilityRenderer
-
-        section={
-            section
-        }
-
-        form={
-            form
-        }
-
-        editing={
-            editing
-        }
-
-        sectionCompletion={
-            sectionCompletion
-        }
-
-    />
-
-</WorkspaceSection>
+                        </WorkspaceSection>
 
                     </WorkspaceBody>
 

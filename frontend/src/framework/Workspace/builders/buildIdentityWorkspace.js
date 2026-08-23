@@ -27,18 +27,18 @@ export function buildIdentityWorkspace(
 
 ) {
 
-const {
-    completion,
-    sections,
-    currentSection,
-    values,
-} = state;
+    const {
+        completion,
+        sections,
+        currentSection,
+        values,
+        editingSections,
+        savingSection,
+    } = state;
 
 
     const {
-
         goToSection,
-
     } = actions;
 
 
@@ -60,7 +60,154 @@ const {
 
 
     /* =====================================
-       MODELS
+       CURRENT SECTION
+    ===================================== */
+
+    const sectionId =
+        runtime.sectionId;
+
+    const editing =
+        sectionId
+            ? Boolean(
+                editingSections?.[sectionId]
+            )
+            : false;
+
+    const saving =
+        Boolean(
+            savingSection
+        );
+
+
+    /* =====================================
+       SECTION ACTION HANDLERS
+    ===================================== */
+
+    const sectionActionHandlers = {
+
+        edit: () => {
+
+            if (!sectionId) {
+                return;
+            }
+
+            actions.setSectionEditing(
+                sectionId,
+                true
+            );
+
+        },
+
+
+        clear: () => {
+
+            if (!sectionId) {
+                return;
+            }
+
+            actions.clearSection(
+                sectionId
+            );
+
+        },
+
+
+        reset: () => {
+
+            if (!sectionId) {
+                return;
+            }
+
+            actions.resetSection(
+                sectionId
+            );
+
+        },
+
+
+        save: async () => {
+
+            if (!sectionId) {
+                return;
+            }
+
+            await actions.handleSaveSection(
+                sectionId
+            );
+
+        },
+
+    };
+
+
+    /* =====================================
+       SECTION ACTION MODEL
+    ===================================== */
+
+    const sectionActions =
+        (runtime.section?.actions ?? [])
+            .map((actionId) => {
+
+                const handler =
+                    sectionActionHandlers[
+                        actionId
+                    ];
+
+                if (!handler) {
+                    return null;
+                }
+
+                return {
+
+                    id:
+                        actionId,
+
+                    onClick:
+                        handler,
+
+                    disabled:
+                        actionId === "save"
+                            ? saving
+                            : false,
+
+                    visible:
+
+                        actionId === "edit"
+                            ? !editing
+
+                            : actionId === "clear"
+                            || actionId === "reset"
+                            || actionId === "save"
+                                ? editing
+
+                                : true,
+
+                };
+
+            })
+            .filter(Boolean)
+            .filter(
+                action =>
+                    action.visible
+            );
+
+
+    /* =====================================
+       SECTION
+    ===================================== */
+
+    const section = {
+
+        ...runtime.section,
+
+        actions:
+            sectionActions,
+
+    };
+
+
+    /* =====================================
+       BANNER
     ===================================== */
 
     const banner =
@@ -96,6 +243,10 @@ const {
         });
 
 
+    /* =====================================
+       NAVIGATION
+    ===================================== */
+
     const navigation =
         createWorkspaceNavigationModel({
 
@@ -122,6 +273,12 @@ const {
         banner,
 
         navigation,
+
+        body: {
+
+            section,
+
+        },
 
     });
 
