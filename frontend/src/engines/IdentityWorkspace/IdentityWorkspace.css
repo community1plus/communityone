@@ -82,13 +82,17 @@
     padding: 0;
 
     font-family: inherit;
-    font-size: 0.9rem;
+    font-size: 1.0rem;
     font-weight: 400;
     line-height: 1;
 
-    color: #ad0d1c;
-
     white-space: nowrap;
+
+    font-weight: 700;
+
+    color:
+        var(--accent-color, #c41230);
+
 }
 
 

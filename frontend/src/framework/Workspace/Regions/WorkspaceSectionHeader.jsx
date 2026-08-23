@@ -37,9 +37,9 @@ export default function WorkspaceSectionHeader({
                     {title}
                 </h2>
 
-                <span className="workspace-section-completion">
-                    {completion}%
-                </span>
+<span className="workspace-section-completion">
+    [{completion}%]
+</span>
 
             </div>
 
