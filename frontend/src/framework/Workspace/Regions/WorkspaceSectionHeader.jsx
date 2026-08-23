@@ -28,7 +28,7 @@ export default function WorkspaceSectionHeader({
         <header className="workspace-section-header">
 
             {/* =================================
-               SECTION ACTION MENU
+               ACTION MENU
             ================================= */}
 
             <div className="workspace-section-actions">
@@ -42,6 +42,7 @@ export default function WorkspaceSectionHeader({
                         aria-label="Edit section"
                         title="Edit"
                     >
+
                         <Pencil
                             size={15}
                             strokeWidth={1.8}
@@ -67,6 +68,7 @@ export default function WorkspaceSectionHeader({
                             aria-label="Clear section"
                             title="Clear"
                         >
+
                             <Eraser
                                 size={15}
                                 strokeWidth={1.8}
@@ -86,6 +88,7 @@ export default function WorkspaceSectionHeader({
                             aria-label="Reset section"
                             title="Reset"
                         >
+
                             <RotateCcw
                                 size={15}
                                 strokeWidth={1.8}
@@ -106,6 +109,7 @@ export default function WorkspaceSectionHeader({
                             aria-label="Save section"
                             title="Save"
                         >
+
                             <Save
                                 size={15}
                                 strokeWidth={1.8}
