@@ -28,7 +28,7 @@ export default function WorkspaceSectionHeader({
         <header className="workspace-section-header">
 
             {/* =================================
-               SECTION IDENTITY
+               SECTION TITLE
             ================================= */}
 
             <div className="workspace-section-title">
@@ -59,7 +59,6 @@ export default function WorkspaceSectionHeader({
                         aria-label="Edit section"
                         title="Edit"
                     >
-
                         <Pencil
                             size={15}
                             strokeWidth={1.8}
@@ -85,7 +84,6 @@ export default function WorkspaceSectionHeader({
                             aria-label="Clear section"
                             title="Clear"
                         >
-
                             <Eraser
                                 size={15}
                                 strokeWidth={1.8}
@@ -105,7 +103,6 @@ export default function WorkspaceSectionHeader({
                             aria-label="Reset section"
                             title="Reset"
                         >
-
                             <RotateCcw
                                 size={15}
                                 strokeWidth={1.8}
@@ -126,17 +123,13 @@ export default function WorkspaceSectionHeader({
                             aria-label="Save section"
                             title="Save"
                         >
-
                             <Save
                                 size={15}
                                 strokeWidth={1.8}
                             />
 
                             <span>
-                                {saving
-                                    ? "Saving..."
-                                    : "Save"
-                                }
+                                {saving ? "Saving..." : "Save"}
                             </span>
 
                         </button>
