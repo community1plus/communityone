@@ -10,131 +10,55 @@ import {
 
 export default function WorkspaceSectionHeader({
 
-    title,
-    completion = 0,
-
-    onEdit,
-    onClear,
-    onReset,
-    onSave,
-
-    saving = false,
+    model,
 
 }) {
 
+    if (!model?.visible) {
+
+        return null;
+
+    }
+
     return (
 
-        <header className="workspace-section-header">
+        <div className="workspace-section-header">
 
-            {/* =================================
-               SECTION IDENTITY
-            ================================= */}
+            <div className="workspace-section-identity">
 
-            <div className="workspace-section-heading">
-
-                <h2>
-                    {title}
-                </h2>
+                <span className="workspace-section-title">
+                    {model.title}
+                </span>
 
                 <span className="workspace-section-completion">
-                    [{completion}%]
+                    [{model.completion}%]
                 </span>
 
             </div>
 
-
-            {/* =================================
-               PERMANENT SECTION MENU
-            ================================= */}
-
             <div className="workspace-section-actions">
 
-                <button
-                    type="button"
-                    className="workspace-section-action"
-                    onClick={onEdit}
-                    aria-label="Edit section"
-                    title="Edit"
-                >
+                {model.actions?.map((action) => (
 
-                    <Pencil
-                        size={15}
-                        strokeWidth={1.8}
-                    />
+                    <button
+                        key={action.id}
+                        type="button"
+                        onClick={() =>
+                            action.onClick?.()
+                        }
+                    >
 
-                    <span>
-                        Edit
-                    </span>
+                        {action.icon}
 
-                </button>
+                        {action.title}
 
+                    </button>
 
-                <button
-                    type="button"
-                    className="workspace-section-action"
-                    onClick={onClear}
-                    aria-label="Clear section"
-                    title="Clear"
-                >
-
-                    <Eraser
-                        size={15}
-                        strokeWidth={1.8}
-                    />
-
-                    <span>
-                        Clear
-                    </span>
-
-                </button>
-
-
-                <button
-                    type="button"
-                    className="workspace-section-action"
-                    onClick={onReset}
-                    aria-label="Reset section"
-                    title="Reset"
-                >
-
-                    <RotateCcw
-                        size={15}
-                        strokeWidth={1.8}
-                    />
-
-                    <span>
-                        Reset
-                    </span>
-
-                </button>
-
-
-                <button
-                    type="button"
-                    className="
-                        workspace-section-action
-                        workspace-section-action-primary
-                    "
-                    onClick={onSave}
-                    disabled={saving}
-                    aria-label="Save section"
-                    title="Save"
-                >
-
-                    <Save
-                        size={15}
-                        strokeWidth={1.8}
-                    />
-
-                    <span>
-                        {saving ? "Saving..." : "Save"}
-                    </span>
-
-                </button>
+                ))}
 
             </div>
 
-        </header>
+        </div>
 
     );
 

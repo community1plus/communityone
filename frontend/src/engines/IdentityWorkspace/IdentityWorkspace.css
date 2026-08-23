@@ -1,12 +1,22 @@
+/* =========================================
+   WORKSPACE SECTION
+========================================= */
+
 .workspace-section {
 
     position: relative;
 
     width: 100%;
 
+    min-width: 0;
+
     box-sizing: border-box;
 
-    padding-top: 56px; /* space reserved for the permanent menu */
+    background:
+        var(--surface-secondary, #f7f6f4);
+
+    padding:
+        68px 32px 48px;
 
 }
 
