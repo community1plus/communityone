@@ -22,7 +22,7 @@ import {
     WorkspaceGuide,
     WorkspacePanel,
     WorkspaceSectionHeader,
-
+    WorkspaceSection,
     WorkspaceClose,
 
 } from "../../framework/Workspace";
@@ -233,84 +233,73 @@ export default function IdentityWorkspace({
                     {/* ==========================
                        SECTION
                     ========================== */}
+<WorkspaceBody>
 
-                    <WorkspaceBody>
+    <WorkspaceSection>
 
-                        <div className="workspace-section">
+        <WorkspaceSectionHeader
 
+            title={
+                section?.title ?? ""
+            }
 
-                            {/* ======================
-                               SECTION HEADER
-                            ====================== */}
+            completion={
+                sectionCompletion ?? 0
+            }
 
-                            <WorkspaceSectionHeader
+            editing={
+                editing
+            }
 
-                                title={
-                                    section?.title ?? ""
-                                }
+            saving={
+                saving
+            }
 
-                                completion={
-                                    sectionCompletion ?? 0
-                                }
+            onEdit={
+                handleEdit
+            }
 
-                                editing={
-                                    editing
-                                }
+            onClear={
+                handleClear
+            }
 
-                                saving={
-                                    saving
-                                }
+            onReset={
+                handleReset
+            }
 
-                                onEdit={
-                                    handleEdit
-                                }
+            onSave={
+                handleSave
+            }
 
-                                onClear={
-                                    handleClear
-                                }
+        />
 
-                                onReset={
-                                    handleReset
-                                }
+        <div className="workspace-section-content">
 
-                                onSave={
-                                    handleSave
-                                }
+            <CapabilityRenderer
 
-                            />
+                section={
+                    section
+                }
 
+                form={
+                    form
+                }
 
-                            {/* ======================
-                               SECTION CONTENT
-                            ====================== */}
+                editing={
+                    editing
+                }
 
-                            <div className="workspace-section-content">
+                sectionCompletion={
+                    sectionCompletion
+                }
 
-                                <CapabilityRenderer
+            />
 
-                                    section={
-                                        section
-                                    }
+        </div>
 
-                                    form={
-                                        form
-                                    }
+    </WorkspaceSection>
 
-                                    editing={
-                                        editing
-                                    }
-
-                                    sectionCompletion={
-                                        sectionCompletion
-                                    }
-
-                                />
-
-                            </div>
-
-                        </div>
-
-                    </WorkspaceBody>
+</WorkspaceBody>
 
 
                 </WorkspaceContent>
