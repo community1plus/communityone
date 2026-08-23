@@ -1,5 +1,3 @@
-import "./WorkspaceSection.css";
-
 export default function WorkspaceSection({
 
     model,
@@ -8,9 +6,7 @@ export default function WorkspaceSection({
 }) {
 
     if (!model?.runtime?.visible) {
-
         return null;
-
     }
 
     return (
@@ -46,13 +42,17 @@ export default function WorkspaceSection({
                                     : ""
                                 }
                             `}
-                            onClick={() =>
-                                action.onClick?.()
+                            onClick={
+                                action.onClick
                             }
                             disabled={
-                                Boolean(action.disabled)
+                                Boolean(
+                                    action.disabled
+                                )
                             }
-                            title={action.title}
+                            title={
+                                action.title
+                            }
                         >
 
                             {action.icon}
@@ -68,7 +68,6 @@ export default function WorkspaceSection({
                 </div>
 
             </header>
-
 
             <div className="workspace-section-body">
 

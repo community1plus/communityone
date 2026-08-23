@@ -14,13 +14,17 @@ export function createWorkspaceSectionModel({
 
     toolbar = null,
 
-    actions = null,
+    actions = [],
 
     validator = null,
 
 }) {
 
     return {
+
+        /* =====================================
+           DEFINITION
+        ===================================== */
 
         id,
 
@@ -40,6 +44,11 @@ export function createWorkspaceSectionModel({
 
         validator,
 
+
+        /* =====================================
+           RUNTIME
+        ===================================== */
+
         runtime: {
 
             enabled: true,
@@ -51,6 +60,12 @@ export function createWorkspaceSectionModel({
             valid: true,
 
             complete: false,
+
+            completion: 0,
+
+            editing: false,
+
+            saving: false,
 
         },
 

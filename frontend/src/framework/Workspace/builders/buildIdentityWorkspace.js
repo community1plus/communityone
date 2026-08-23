@@ -160,6 +160,46 @@ export function buildIdentityWorkspace(
 
 
     /* =====================================
+       SECTION ACTION DEFINITIONS
+    ===================================== */
+
+    const sectionActionDefinitions = {
+
+        edit: {
+
+            label:
+                "Edit",
+
+        },
+
+        clear: {
+
+            label:
+                "Clear",
+
+        },
+
+        reset: {
+
+            label:
+                "Reset",
+
+        },
+
+        save: {
+
+            label:
+                "Save",
+
+            primary:
+                true,
+
+        },
+
+    };
+
+
+    /* =====================================
        SECTION ACTION MODEL
     ===================================== */
 
@@ -174,8 +214,19 @@ export function buildIdentityWorkspace(
                     ];
 
 
-                if (!handler) {
+                const definition =
+                    sectionActionDefinitions[
+                        actionId
+                    ];
+
+
+                if (
+                    !handler ||
+                    !definition
+                ) {
+
                     return null;
+
                 }
 
 
@@ -185,9 +236,11 @@ export function buildIdentityWorkspace(
 
                         ? !editing
 
-                        : actionId === "clear"
-                        || actionId === "reset"
-                        || actionId === "save"
+                        : (
+                            actionId === "clear" ||
+                            actionId === "reset" ||
+                            actionId === "save"
+                        )
 
                             ? editing
 
@@ -203,6 +256,12 @@ export function buildIdentityWorkspace(
 
                     id:
                         actionId,
+
+                    label:
+                        definition.label,
+
+                    primary:
+                        definition.primary ?? false,
 
                     onClick:
                         handler,
@@ -220,21 +279,23 @@ export function buildIdentityWorkspace(
 
 
     /* =====================================
-       SECTION MODEL
+       RESOLVED SECTION
     ===================================== */
 
-    const resolvedSection = section
+    const resolvedSection =
 
-        ? {
+        section
 
-            ...section,
+            ? {
 
-            actions:
-                sectionActions,
+                ...section,
 
-        }
+                actions:
+                    sectionActions,
 
-        : null;
+            }
+
+            : null;
 
 
     /* =====================================
