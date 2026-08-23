@@ -1,3 +1,28 @@
+/* =========================================
+   WORKSPACE SECTION ACTIONS
+========================================= */
+
+export const WORKSPACE_SECTION_ACTIONS = {
+
+    EDIT:
+        "edit",
+
+    CLEAR:
+        "clear",
+
+    RESET:
+        "reset",
+
+    SAVE:
+        "save",
+
+};
+
+
+/* =========================================
+   WORKSPACE SECTION MODEL
+========================================= */
+
 export function createWorkspaceSectionModel({
 
     id,
@@ -22,10 +47,6 @@ export function createWorkspaceSectionModel({
 
     return {
 
-        /* =====================================
-           DEFINITION
-        ===================================== */
-
         id,
 
         title,
@@ -43,31 +64,6 @@ export function createWorkspaceSectionModel({
         actions,
 
         validator,
-
-
-        /* =====================================
-           RUNTIME
-        ===================================== */
-
-        runtime: {
-
-            enabled: true,
-
-            visible: true,
-
-            dirty: false,
-
-            valid: true,
-
-            complete: false,
-
-            completion: 0,
-
-            editing: false,
-
-            saving: false,
-
-        },
 
     };
 

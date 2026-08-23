@@ -1,4 +1,8 @@
 import {
+    validatePhone,
+} from "../../framework/Workspace/profile/profileHelpers";
+
+import {
     createWorkspaceSectionModel,
 } from "../models/WorkspaceSectionModel";
 
@@ -8,6 +12,7 @@ import {
 ========================================= */
 
 export const DEFAULT_PHONE_COUNTRY = "AU";
+
 
 export const PHONE_COUNTRIES = [
 
@@ -39,10 +44,6 @@ export const PHONE_COUNTRIES = [
 
 
 /* =========================================
-   PROFILE MODES
-========================================= */
-
-/* =========================================
    IDENTITY TYPES
 ========================================= */
 
@@ -58,64 +59,87 @@ export const IDENTITY_TYPES = {
 
 
 /* =========================================
-   PROFILE TABS
+   PROFILE MODES
 ========================================= */
 
-export const PROFILE_TABS = [
+export const PROFILE_MODES = {
 
-    {
-        id: "PERSON",
-        label: "Person",
-    },
+    PERSON:
+        "PERSON",
 
-    {
-        id: "ENTITY",
-        label: "Entity",
-    },
+    ENTITY:
+        "ENTITY",
 
-    {
-        id: "COMMUNITY_POLICIES",
-        label: "Community Policies",
-    },
-
-];
+};
 
 
 /* =========================================
-   PERSONAL SECTIONS
+   PROFILE STEPS
 ========================================= */
 
-export const PERSONAL_SECTIONS = [
+/*
+ * These are workspace navigation steps.
+ *
+ * The step model is declarative.
+ * Runtime state is added later by
+ * createWorkspaceRuntime().
+ */
+
+
+/* =========================================
+   PERSONAL
+========================================= */
+
+export const PERSONAL_STEPS = [
 
     createWorkspaceSectionModel({
 
-        id: "identity",
+        id:
+            "identity",
 
-        title: "Identity",
+        title:
+            "Identity",
 
-        view: "form",
+        view:
+            "form",
+
+        actions: [
+
+            "edit",
+            "clear",
+            "reset",
+            "save",
+
+        ],
 
         fields: [
 
             {
-                name: "username",
+                name:
+                    "username",
 
-                label: "Name",
+                label:
+                    "Name",
 
-                type: "text",
+                type:
+                    "text",
 
                 helperText:
                     "This is how people know you in Community One.",
             },
 
             {
-                name: "email",
+                name:
+                    "email",
 
-                label: "Email",
+                label:
+                    "Email",
 
-                type: "email",
+                type:
+                    "email",
 
-                readOnly: true,
+                readOnly:
+                    true,
             },
 
         ],
@@ -125,20 +149,35 @@ export const PERSONAL_SECTIONS = [
 
     createWorkspaceSectionModel({
 
-        id: "location",
+        id:
+            "location",
 
-        title: "Location",
+        title:
+            "Location",
 
-        view: "form",
+        view:
+            "form",
+
+        actions: [
+
+            "edit",
+            "clear",
+            "reset",
+            "save",
+
+        ],
 
         fields: [
 
             {
-                name: "homeLocation",
+                name:
+                    "homeLocation",
 
-                label: "Home Address",
+                label:
+                    "Home Address",
 
-                type: "location",
+                type:
+                    "location",
             },
 
         ],
@@ -148,59 +187,117 @@ export const PERSONAL_SECTIONS = [
 
     createWorkspaceSectionModel({
 
-        id: "contact",
+        id:
+            "contact",
 
-        title: "Contact",
+        title:
+            "Contact",
 
-        view: "form",
+        view:
+            "form",
+
+        actions: [
+
+            "edit",
+            "clear",
+            "reset",
+            "save",
+
+        ],
 
         fields: [
 
             {
-                name: "phoneDisplay",
+                name:
+                    "phoneDisplay",
 
-                label: "Phone Number",
+                label:
+                    "Phone Number",
 
-                type: "phone",
+                type:
+                    "phone",
             },
 
         ],
+
+        validator:
+            (values) => {
+
+                return validatePhone(
+
+                    values.phoneDisplay || "",
+
+                    values.phoneCountry
+
+                );
+
+            },
 
     }),
 
 ];
 
 
+/*
+ * Backwards compatibility.
+ *
+ * Existing code can continue importing
+ * PERSONAL_SECTIONS while the framework
+ * moves toward "steps".
+ */
+
+export const PERSONAL_SECTIONS =
+    PERSONAL_STEPS;
+
+
 /* =========================================
-   ENTITY SECTIONS
+   ENTITY
 ========================================= */
 
-export const ENTITY_SECTIONS = [
+export const ENTITY_STEPS = [
 
     createWorkspaceSectionModel({
 
-        id: "entity",
+        id:
+            "entity",
 
-        title: "Entity",
+        title:
+            "Entity",
 
-        view: "form",
+        view:
+            "form",
+
+        actions: [
+
+            "edit",
+            "clear",
+            "reset",
+            "save",
+
+        ],
 
         fields: [
 
             {
-                name: "entity.name",
+                name:
+                    "entity.name",
 
-                label: "Entity Name",
+                label:
+                    "Entity Name",
 
-                type: "text",
+                type:
+                    "text",
             },
 
             {
-                name: "entity.website",
+                name:
+                    "entity.website",
 
-                label: "Website",
+                label:
+                    "Website",
 
-                type: "text",
+                type:
+                    "text",
             },
 
         ],
@@ -210,36 +307,57 @@ export const ENTITY_SECTIONS = [
 
     createWorkspaceSectionModel({
 
-        id: "entity-address",
+        id:
+            "entity-address",
 
-        title: "Address",
+        title:
+            "Address",
 
-        view: "form",
+        view:
+            "form",
+
+        actions: [
+
+            "edit",
+            "clear",
+            "reset",
+            "save",
+
+        ],
 
         fields: [
 
             {
-                name: "entity.streetAddress",
+                name:
+                    "entity.streetAddress",
 
-                label: "Street Address",
+                label:
+                    "Street Address",
 
-                type: "text",
+                type:
+                    "text",
             },
 
             {
-                name: "entity.suburb",
+                name:
+                    "entity.suburb",
 
-                label: "Suburb",
+                label:
+                    "Suburb",
 
-                type: "text",
+                type:
+                    "text",
             },
 
             {
-                name: "entity.postcode",
+                name:
+                    "entity.postcode",
 
-                label: "Postcode",
+                label:
+                    "Postcode",
 
-                type: "text",
+                type:
+                    "text",
             },
 
         ],
@@ -249,30 +367,49 @@ export const ENTITY_SECTIONS = [
 
     createWorkspaceSectionModel({
 
-        id: "entity-contact",
+        id:
+            "entity-contact",
 
-        title: "Contact",
+        title:
+            "Contact",
 
-        view: "form",
+        view:
+            "form",
+
+        actions: [
+
+            "edit",
+            "clear",
+            "reset",
+            "save",
+
+        ],
 
         fields: [
 
             {
-                name: "entity.phone",
+                name:
+                    "entity.phone",
 
-                label: "Phone",
+                label:
+                    "Phone",
 
-                type: "text",
+                type:
+                    "text",
             },
 
             {
-                name: "entity.email",
+                name:
+                    "entity.email",
 
-                label: "Email",
+                label:
+                    "Email",
 
-                type: "email",
+                type:
+                    "email",
 
-                readOnly: true,
+                readOnly:
+                    true,
             },
 
         ],
@@ -282,63 +419,175 @@ export const ENTITY_SECTIONS = [
 ];
 
 
+export const ENTITY_SECTIONS =
+    ENTITY_STEPS;
+
+
 /* =========================================
-   COMMON SECTIONS
+   COMMON
 ========================================= */
 
-export const COMMON_SECTIONS = [
+export const COMMON_STEPS = [
 
     createWorkspaceSectionModel({
 
-        id: "social",
+        id:
+            "social",
 
-        title: "Social",
+        title:
+            "Social",
 
-        view: "social",
+        view:
+            "social",
 
-        fields: [],
+        actions: [
+
+            "edit",
+            "clear",
+            "reset",
+            "save",
+
+        ],
+
+        fields:
+            [],
 
     }),
 
 
     createWorkspaceSectionModel({
 
-        id: "payment",
+        id:
+            "payment",
 
-        title: "Payment",
+        title:
+            "Payment",
 
-        view: "form",
+        view:
+            "form",
 
-        fields: [],
+        actions: [
+
+            "edit",
+            "clear",
+            "reset",
+            "save",
+
+        ],
+
+        fields:
+            [],
 
     }),
 
 ];
 
 
+export const COMMON_SECTIONS =
+    COMMON_STEPS;
+
+
 /* =========================================
-   COMMUNITY POLICIES
+   COMMUNITY POLICY
 ========================================= */
 
-export const COMMUNITY_POLICY_SECTIONS = [
+export const COMMUNITY_POLICY_STEPS = [
 
     createWorkspaceSectionModel({
 
-        id: "community-policies",
+        id:
+            "community-policies",
 
-        title: "Community Policies",
+        title:
+            "Community Policies",
 
-        view: "form",
+        view:
+            "form",
 
-        fields: [],
+        actions: [
+
+            "edit",
+            "clear",
+            "reset",
+            "save",
+
+        ],
+
+        fields:
+            [],
 
     }),
 
 ];
 
 
+export const COMMUNITY_POLICY_SECTIONS =
+    COMMUNITY_POLICY_STEPS;
+
+
 /* =========================================
-   CARD TITLES
+   PROFILE STEP COLLECTIONS
+========================================= */
+
+export const PROFILE_STEPS = {
+
+    PERSONAL:
+        PERSONAL_STEPS,
+
+    ENTITY:
+        ENTITY_STEPS,
+
+    COMMON:
+        COMMON_STEPS,
+
+    COMMUNITY_POLICIES:
+        COMMUNITY_POLICY_STEPS,
+
+};
+
+
+/* =========================================
+   PROFILE TABS
+========================================= */
+
+/*
+ * Kept as a compatibility model.
+ *
+ * The workspace navigation itself should now
+ * come from the step models.
+ */
+
+export const PROFILE_TABS = [
+
+    {
+        id:
+            "PERSON",
+
+        label:
+            "Person",
+    },
+
+    {
+        id:
+            "ENTITY",
+
+        label:
+            "Entity",
+    },
+
+    {
+        id:
+            "COMMUNITY_POLICIES",
+
+        label:
+            "Community Policies",
+    },
+
+];
+
+
+/* =========================================
+   PROFILE CARD TITLES
 ========================================= */
 
 export const PROFILE_CARD_TITLES = {
@@ -374,7 +623,7 @@ export const PROFILE_CARD_TITLES = {
 
 
 /* =========================================
-   PROFILE SECTIONS
+   PROFILE STEP IDS
 ========================================= */
 
 export const PROFILE_SECTIONS = {
@@ -407,6 +656,16 @@ export const PROFILE_SECTIONS = {
         "community-policies",
 
 };
+
+
+/*
+ * New framework vocabulary.
+ *
+ * PROFILE_SECTIONS remains above for compatibility.
+ */
+
+export const PROFILE_STEP_IDS =
+    PROFILE_SECTIONS;
 
 
 /* =========================================
