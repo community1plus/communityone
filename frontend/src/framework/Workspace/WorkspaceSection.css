@@ -1,11 +1,12 @@
 /* =========================================
-   SECTION
+   SECTION CONTENT
 ========================================= */
 
-.workspace-section {
+.workspace-section-content {
 
     display: flex;
     flex-direction: column;
+    align-items: center;
 
     width: 100%;
     min-width: 0;
@@ -19,19 +20,134 @@
 
 
 /* =========================================
-   SECTION CONTENT
+   CONTENT CHILDREN
+   -----------------------------------------
+   Default children are intrinsically sized.
 ========================================= */
 
-.workspace-section-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+.workspace-section-content > * {
 
-    width: 100%;
-    min-width: 0;
+    width: fit-content;
+    max-width: 100%;
 
-    margin: 0;
-    padding: 0;
+    margin-left: auto;
+    margin-right: auto;
 
     box-sizing: border-box;
+
+}
+
+
+/* =========================================
+   SECTION HEADER
+   -----------------------------------------
+   Header is structural and must span the
+   section rather than shrink-wrap.
+========================================= */
+
+.workspace-section-content > .workspace-section-header {
+
+    width: 100%;
+    max-width: 100%;
+
+    margin-left: 0;
+    margin-right: 0;
+
+}
+
+
+/* =========================================
+   FORM
+========================================= */
+
+.workspace-section-content .workspace-form {
+
+    display: flex;
+    flex-direction: column;
+
+    width: fit-content;
+    max-width: 100%;
+
+    margin-left: auto;
+    margin-right: auto;
+
+    box-sizing: border-box;
+
+}
+
+
+/* =========================================
+   FORM FIELD
+========================================= */
+
+.workspace-section-content
+.workspace-form
+.workspace-field {
+
+    width: fit-content;
+    max-width: 100%;
+
+    box-sizing: border-box;
+
+}
+
+
+/* =========================================
+   FIELD CONTENT
+========================================= */
+
+.workspace-section-content
+.workspace-form
+.workspace-field-content {
+
+    width: fit-content;
+    max-width: 100%;
+
+    box-sizing: border-box;
+
+}
+
+
+/* =========================================
+   FORM CONTROLS
+========================================= */
+
+.workspace-section-content
+.workspace-form
+input,
+.workspace-section-content
+.workspace-form
+textarea,
+.workspace-section-content
+.workspace-form
+select {
+
+    display: block;
+
+    width: 100%;
+    max-width: 100%;
+
+    box-sizing: border-box;
+
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 760px) {
+
+    .workspace-section-content > .workspace-section-header,
+    .workspace-section-content .workspace-form,
+    .workspace-section-content .workspace-form .workspace-field,
+    .workspace-section-content
+    .workspace-form
+    .workspace-field-content {
+
+        width: 100%;
+        max-width: 100%;
+
+    }
+
 }
