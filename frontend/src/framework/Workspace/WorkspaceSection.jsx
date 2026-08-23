@@ -17,10 +17,6 @@ export default function WorkspaceSection({
 
         <section className="workspace-section">
 
-            {/* =================================
-               SECTION MENU
-            ================================= */}
-
             <header className="workspace-section-header">
 
                 <div className="workspace-section-identity">
@@ -35,10 +31,6 @@ export default function WorkspaceSection({
 
                 </div>
 
-
-                {/* =================================
-                   ACTIONS
-                ================================= */}
 
                 <div className="workspace-section-actions">
 
@@ -77,10 +69,6 @@ export default function WorkspaceSection({
 
             </header>
 
-
-            {/* =================================
-               SECTION BODY
-            ================================= */}
 
             <div className="workspace-section-body">
 
