@@ -10,22 +10,43 @@ export default function WorkspaceSection({
 
     <div className="workspace-section-header">
 
-        <span className="workspace-section-title">
-            Identity
-        </span>
+        <div className="workspace-section-identity">
+            <span className="workspace-section-title">
+                Identity
+            </span>
 
-        <span className="workspace-section-completion">
-            [100%]
-        </span>
+            <span className="workspace-section-completion">
+                [100%]
+            </span>
+        </div>
 
-        <button>Edit</button>
-        <button>Clear</button>
-        <button>Reset</button>
-        <button>Save</button>
+        <div className="workspace-section-actions">
+
+            <button type="button" onClick={onEdit}>
+                Edit
+            </button>
+
+            <button type="button" onClick={onClear}>
+                Clear
+            </button>
+
+            <button type="button" onClick={onReset}>
+                Reset
+            </button>
+
+            <button type="button" onClick={onSave}>
+                Save
+            </button>
+
+        </div>
 
     </div>
 
-    {/* existing section content */}
+    <div className="workspace-section-body">
+
+        {/* Name, Email, etc. */}
+
+    </div>
 
 </section>
     );
