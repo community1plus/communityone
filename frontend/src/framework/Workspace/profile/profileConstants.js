@@ -1,11 +1,10 @@
 import {
     validatePhone,
-} from "../../framework/Workspace/profile/profileHelpers";
+} from "./profileHelpers";
 
 import {
     createWorkspaceSectionModel,
 } from "../models/WorkspaceSectionModel";
-
 
 /* =========================================
    PHONE
