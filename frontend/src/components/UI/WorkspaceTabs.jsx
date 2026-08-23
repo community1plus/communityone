@@ -1,3 +1,4 @@
+import "./WorkspaceTabs.css";
 export default function WorkspaceTabs({
 
     model,
