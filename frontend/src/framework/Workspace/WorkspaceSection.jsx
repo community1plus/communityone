@@ -6,30 +6,27 @@ export default function WorkspaceSection({
     children,
 }) {
     return (
-        <section className="workspace-section">
+<section className="workspace-section">
 
-            {(title || description) && (
-                <header className="workspace-section-header">
+    <div className="workspace-section-header">
 
-                    {title && (
-                        <h2 className="workspace-section-title">
-                            {title}
-                        </h2>
-                    )}
+        <span className="workspace-section-title">
+            Identity
+        </span>
 
-                    {description && (
-                        <p className="workspace-section-description">
-                            {description}
-                        </p>
-                    )}
+        <span className="workspace-section-completion">
+            [100%]
+        </span>
 
-                </header>
-            )}
+        <button>Edit</button>
+        <button>Clear</button>
+        <button>Reset</button>
+        <button>Save</button>
 
-            <div className="workspace-section-content">
-                {children}
-            </div>
+    </div>
 
-        </section>
+    {/* existing section content */}
+
+</section>
     );
 }
