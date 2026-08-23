@@ -1,78 +1,4 @@
 /* =========================================
-   SECTION
-========================================= */
-
-.workspace-section {
-
-    display: flex;
-    flex-direction: column;
-
-    width: 100%;
-    min-width: 0;
-
-    margin: 0;
-    padding: 0;
-
-    box-sizing: border-box;
-
-    background: transparent;
-
-}
-
-
-/* =========================================
-   SECTION HEADER
-========================================= */
-
-.workspace-section-header {
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    width: 100%;
-    min-height: 40px;
-
-    margin: 0 0 28px;
-
-    box-sizing: border-box;
-}
-
-
-/* =========================================
-   SECTION TITLE
-========================================= */
-
-.workspace-section-title {
-
-    margin: 0;
-
-    font-family: inherit;
-    font-size: 1.35rem;
-    font-weight: 500;
-    line-height: 1.2;
-
-    color: var(--text-primary, #111);
-}
-
-
-/* =========================================
-   SECTION DESCRIPTION
-========================================= */
-
-.workspace-section-description {
-
-    margin: 0;
-
-    font-family: inherit;
-    font-size: 0.95rem;
-    line-height: 1.5;
-
-    color: var(--text-secondary, #666);
-}
-
-
-/* =========================================
    SECTION CONTENT
 ========================================= */
 
@@ -89,22 +15,44 @@
     padding: 0;
 
     box-sizing: border-box;
+
 }
 
 
 /* =========================================
-   CONTENT CHILD
+   CONTENT CHILDREN
+   -----------------------------------------
+   Default children are intrinsically sized.
 ========================================= */
 
 .workspace-section-content > * {
 
-    width: max-content;
+    width: fit-content;
     max-width: 100%;
 
     margin-left: auto;
     margin-right: auto;
 
     box-sizing: border-box;
+
+}
+
+
+/* =========================================
+   SECTION HEADER
+   -----------------------------------------
+   Header is structural and must span the
+   section rather than shrink-wrap.
+========================================= */
+
+.workspace-section-content > .workspace-section-header {
+
+    width: 100%;
+    max-width: 100%;
+
+    margin-left: 0;
+    margin-right: 0;
+
 }
 
 
@@ -114,26 +62,49 @@
 
 .workspace-section-content .workspace-form {
 
-    width: max-content;
+    display: flex;
+    flex-direction: column;
+
+    width: fit-content;
     max-width: 100%;
 
     margin-left: auto;
     margin-right: auto;
 
     box-sizing: border-box;
+
 }
 
 
 /* =========================================
-   FORM FIELDS
+   FORM FIELD
 ========================================= */
 
-.workspace-section-content .workspace-form .workspace-field {
+.workspace-section-content
+.workspace-form
+.workspace-field {
 
-    width: max-content;
+    width: fit-content;
     max-width: 100%;
 
     box-sizing: border-box;
+
+}
+
+
+/* =========================================
+   FIELD CONTENT
+========================================= */
+
+.workspace-section-content
+.workspace-form
+.workspace-field-content {
+
+    width: fit-content;
+    max-width: 100%;
+
+    box-sizing: border-box;
+
 }
 
 
@@ -141,9 +112,15 @@
    FORM CONTROLS
 ========================================= */
 
-.workspace-section-content .workspace-form input,
-.workspace-section-content .workspace-form textarea,
-.workspace-section-content .workspace-form select {
+.workspace-section-content
+.workspace-form
+input,
+.workspace-section-content
+.workspace-form
+textarea,
+.workspace-section-content
+.workspace-form
+select {
 
     display: block;
 
@@ -151,6 +128,7 @@
     max-width: 100%;
 
     box-sizing: border-box;
+
 }
 
 
@@ -160,12 +138,16 @@
 
 @media (max-width: 760px) {
 
-    .workspace-section-content > *,
+    .workspace-section-content > .workspace-section-header,
     .workspace-section-content .workspace-form,
-    .workspace-section-content .workspace-form .workspace-field {
+    .workspace-section-content .workspace-form .workspace-field,
+    .workspace-section-content
+    .workspace-form
+    .workspace-field-content {
 
         width: 100%;
         max-width: 100%;
+
     }
 
 }

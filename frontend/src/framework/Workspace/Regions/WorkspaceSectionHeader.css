@@ -70,10 +70,6 @@
 }
 
 
-/* =========================================
-   ACTION HOVER
-========================================= */
-
 .workspace-section-action:hover {
 
     color: var(--accent-primary, #b5091b);
@@ -81,14 +77,9 @@
 }
 
 
-/* =========================================
-   ACTION DISABLED
-========================================= */
-
 .workspace-section-action:disabled {
 
     opacity: 0.5;
-
     cursor: default;
 
 }
@@ -113,19 +104,13 @@
 }
 
 
-/* =========================================
-   TITLE
-========================================= */
-
 .workspace-section-title h2 {
 
     margin: 0;
 
     font-family: inherit;
-
     font-size: 1.35rem;
     font-weight: 500;
-
     line-height: 1.2;
 
     color: var(--text-primary, #111);
@@ -142,52 +127,11 @@
     margin: 0;
     padding: 0;
 
-    font-family: inherit;
-
     font-size: 0.9rem;
     font-weight: 400;
 
     line-height: 1;
 
     color: var(--accent-primary, #b5091b);
-
-}
-
-
-/* =========================================
-   PRIMARY ACTION
-========================================= */
-
-.workspace-section-action-primary {
-
-    font-weight: 500;
-
-}
-
-
-/* =========================================
-   RESPONSIVE
-========================================= */
-
-@media (max-width: 760px) {
-
-    .workspace-section-header {
-
-        align-items: flex-start;
-
-    }
-
-    .workspace-section-actions {
-
-        gap: 8px;
-        margin-right: 12px;
-
-    }
-
-    .workspace-section-action span {
-
-        display: none;
-
-    }
 
 }
