@@ -20,7 +20,6 @@
     border-bottom:
         1px solid
         var(--border-color, #e8e8e8);
-
 }
 
 
@@ -35,6 +34,8 @@
     justify-content: center;
 
     appearance: none;
+
+    flex: 0 0 auto;
 
     margin: 0;
     padding: 0 0 14px;
@@ -56,8 +57,7 @@
     letter-spacing: 0.08em;
     text-transform: uppercase;
 
-    color:
-        var(--text-secondary, #555);
+    color: var(--text-secondary, #555);
 
     white-space: nowrap;
 
@@ -68,41 +68,26 @@
 
 
 /* =========================================
-   TAB HOVER
+   HOVER
 ========================================= */
 
 .workspace-tab:hover {
 
-    color:
-        var(--text-primary, #111);
+    color: var(--text-primary, #111);
 
 }
 
 
 /* =========================================
-   ACTIVE TAB
+   ACTIVE
 ========================================= */
 
 .workspace-tab.active {
 
-    color:
-        var(--text-primary, #111);
+    color: var(--text-primary, #111);
 
     border-bottom-color:
         var(--text-primary, #111);
-
-}
-
-
-/* =========================================
-   COMPLETED TAB
-========================================= */
-
-.workspace-tab.complete {
-
-    color:
-        var(--text-secondary, #555);
-
 }
 
 
@@ -118,13 +103,11 @@
 
         overflow-x: auto;
         overflow-y: hidden;
-
     }
 
     .workspace-tab {
 
         flex-shrink: 0;
-
     }
 
 }
