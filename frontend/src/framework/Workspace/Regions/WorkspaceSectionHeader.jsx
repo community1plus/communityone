@@ -27,9 +27,8 @@ export default function WorkspaceSectionHeader({
 
         <header className="workspace-section-header">
 
-
             {/* =================================
-               TITLE
+               SECTION TITLE
             ================================= */}
 
             <div className="workspace-section-heading">
@@ -121,10 +120,7 @@ export default function WorkspaceSectionHeader({
 
                         <button
                             type="button"
-                            className="
-                                workspace-section-action
-                                workspace-section-action-primary
-                            "
+                            className="workspace-section-action workspace-section-action-primary"
                             onClick={onSave}
                             disabled={saving}
                             aria-label="Save section"
