@@ -23,7 +23,6 @@
 ========================================= */
 
 .workspace-section-content {
-
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -35,7 +34,6 @@
     padding: 0;
 
     box-sizing: border-box;
-
 }
 
 
@@ -44,15 +42,8 @@
 ========================================= */
 
 .workspace-section-content > * {
-
-    width: max-content;
+    width: fit-content;
     max-width: 100%;
-
-    margin-left: auto;
-    margin-right: auto;
-
-    box-sizing: border-box;
-
 }
 
 
@@ -60,19 +51,16 @@
    FORM
 ========================================= */
 
-.workspace-section-content .workspace-form {
-
+.workspace-form {
     display: flex;
     flex-direction: column;
 
-    width: max-content;
+    width: fit-content;
     max-width: 100%;
 
-    margin-left: auto;
-    margin-right: auto;
+    margin: 0 auto;
 
     box-sizing: border-box;
-
 }
 
 
