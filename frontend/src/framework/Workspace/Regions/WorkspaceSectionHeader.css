@@ -1,21 +1,24 @@
 /* =========================================
-   SECTION HEADER
+   WORKSPACE SECTION HEADER
 ========================================= */
 
 .workspace-section-header {
 
     display: flex;
+
     align-items: center;
 
+    justify-content: flex-start;
+
+    gap: 28px;
+
     width: 100%;
-    min-height: 40px;
 
     margin: 0;
-    padding: 0 0 28px;
+    padding: 0;
 
     box-sizing: border-box;
 
-    gap: 22px;
 }
 
 
@@ -25,49 +28,51 @@
 
 .workspace-section-heading {
 
-    display: inline-flex;
+    display: flex;
+
     align-items: baseline;
 
-    flex: 0 0 auto;
+    gap: 6px;
 
     margin: 0;
     padding: 0;
 
-    gap: 5px;
 }
 
 
 /* =========================================
-   SECTION TITLE
+   TITLE
 ========================================= */
 
 .workspace-section-heading h2 {
 
     margin: 0;
 
-    font-family: inherit;
-
     font-size: 1.35rem;
+
     font-weight: 500;
-    line-height: 1.2;
+
+    line-height: 1;
 
     color:
         var(--text-primary, #111);
+
 }
 
 
 /* =========================================
-   COMPLETION
+   SECTION COMPLETION
 ========================================= */
 
 .workspace-section-completion {
 
-    font-size: 0.95rem;
+    font-size: 0.85rem;
+
     font-weight: 400;
-    line-height: 1;
 
     color:
-        var(--accent-color, #c8102e);
+        var(--accent-color, #c41230);
+
 }
 
 
@@ -77,15 +82,15 @@
 
 .workspace-section-actions {
 
-    display: inline-flex;
-    align-items: center;
+    display: flex;
 
-    flex: 0 0 auto;
+    align-items: center;
 
     gap: 18px;
 
     margin: 0;
     padding: 0;
+
 }
 
 
@@ -96,40 +101,48 @@
 .workspace-section-action {
 
     display: inline-flex;
+
     align-items: center;
 
     gap: 6px;
 
     appearance: none;
 
-    margin: 0;
-    padding: 0;
+    background: transparent;
 
     border: none;
-    background: transparent;
+
+    margin: 0;
+    padding: 0;
 
     cursor: pointer;
 
     font-family: inherit;
-    font-size: 0.95rem;
+
+    font-size: 0.9rem;
+
     font-weight: 400;
-    line-height: 1;
 
     color:
         var(--text-primary, #111);
 
-    white-space: nowrap;
 }
 
-
-/* =========================================
-   ACTION HOVER
-========================================= */
 
 .workspace-section-action:hover {
 
     color:
-        var(--text-secondary, #555);
+        var(--accent-color, #c41230);
+
+}
+
+
+.workspace-section-action:disabled {
+
+    opacity: 0.5;
+
+    cursor: default;
+
 }
 
 
@@ -140,17 +153,27 @@
 .workspace-section-action-primary {
 
     color:
-        var(--accent-color, #c8102e);
+        var(--accent-color, #c41230);
+
 }
 
 
 /* =========================================
-   DISABLED
+   RESPONSIVE
 ========================================= */
 
-.workspace-section-action:disabled {
+@media (max-width: 760px) {
 
-    opacity: 0.5;
+    .workspace-section-header {
 
-    cursor: not-allowed;
+        gap: 18px;
+
+    }
+
+    .workspace-section-actions {
+
+        gap: 12px;
+
+    }
+
 }
