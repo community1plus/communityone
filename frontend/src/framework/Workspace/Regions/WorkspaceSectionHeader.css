@@ -5,7 +5,8 @@
 .workspace-section-header {
 
     display: flex;
-    align-items: center;
+    align-items: flex-start;
+    justify-content: flex-start;
 
     width: 100%;
     min-height: 40px;
@@ -14,67 +15,11 @@
     padding: 0;
 
     box-sizing: border-box;
-
 }
 
 
 /* =========================================
-   SECTION TITLE + COMPLETION
-========================================= */
-
-.workspace-section-title {
-
-    display: flex;
-    align-items: baseline;
-    gap: 4px;
-
-    flex: 0 0 auto;
-
-    margin: 0;
-    padding: 0;
-
-}
-
-
-/* =========================================
-   TITLE
-========================================= */
-
-.workspace-section-title h2 {
-
-    margin: 0;
-
-    font-family: inherit;
-    font-size: 1.35rem;
-    font-weight: 500;
-    line-height: 1.2;
-
-    color: var(--text-primary, #111);
-
-}
-
-
-/* =========================================
-   COMPLETION
-========================================= */
-
-.workspace-section-completion {
-
-    margin: 0;
-
-    font-size: 0.95rem;
-    font-weight: 400;
-    line-height: 1;
-
-    color: var(--accent-primary, #b20d1c);
-
-    white-space: nowrap;
-
-}
-
-
-/* =========================================
-   ACTION MENU
+   SECTION ACTIONS
 ========================================= */
 
 .workspace-section-actions {
@@ -83,16 +28,15 @@
     align-items: center;
     gap: 14px;
 
-    flex: 0 0 auto;
-
-    margin-left: 18px;
+    margin: 0;
     padding: 0;
 
+    flex-shrink: 0;
 }
 
 
 /* =========================================
-   ACTION
+   SECTION ACTION
 ========================================= */
 
 .workspace-section-action {
@@ -107,39 +51,23 @@
     border: 0;
     background: transparent;
 
-    font: inherit;
+    font-family: inherit;
     font-size: 0.95rem;
-    line-height: 1;
+    line-height: 1.2;
 
     color: var(--text-primary, #111);
 
     cursor: pointer;
-
-    white-space: nowrap;
-
 }
 
 
 /* =========================================
-   ACTION HOVER
+   SECTION ACTION ICON
 ========================================= */
 
-.workspace-section-action:hover {
+.workspace-section-action svg {
 
-    opacity: 0.7;
-
-}
-
-
-/* =========================================
-   ACTION DISABLED
-========================================= */
-
-.workspace-section-action:disabled {
-
-    opacity: 0.5;
-    cursor: default;
-
+    flex-shrink: 0;
 }
 
 
@@ -149,6 +77,64 @@
 
 .workspace-section-action-primary {
 
-    color: var(--accent-primary, #b20d1c);
+    color: var(--accent-primary, #b3081b);
+}
 
+
+/* =========================================
+   DISABLED ACTION
+========================================= */
+
+.workspace-section-action:disabled {
+
+    opacity: 0.5;
+    cursor: default;
+}
+
+
+/* =========================================
+   SECTION TITLE
+========================================= */
+
+.workspace-section-title {
+
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+
+    margin: 0 0 0 18px;
+    padding: 0;
+
+    flex-shrink: 0;
+}
+
+
+/* =========================================
+   SECTION TITLE HEADING
+========================================= */
+
+.workspace-section-title h2 {
+
+    margin: 0;
+
+    font-family: inherit;
+    font-size: 1.35rem;
+    font-weight: 500;
+    line-height: 1.2;
+
+    color: var(--text-primary, #111);
+}
+
+
+/* =========================================
+   SECTION COMPLETION
+========================================= */
+
+.workspace-section-completion {
+
+    font-size: 0.95rem;
+    font-weight: 400;
+    line-height: 1;
+
+    color: var(--accent-primary, #b3081b);
 }
