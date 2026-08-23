@@ -19,6 +19,61 @@
 
 
 /* =========================================
+   SECTION TITLE + COMPLETION
+========================================= */
+
+.workspace-section-title {
+
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+
+    flex: 0 0 auto;
+
+    margin: 0;
+    padding: 0;
+
+}
+
+
+/* =========================================
+   TITLE
+========================================= */
+
+.workspace-section-title h2 {
+
+    margin: 0;
+
+    font-family: inherit;
+    font-size: 1.35rem;
+    font-weight: 500;
+    line-height: 1.2;
+
+    color: var(--text-primary, #111);
+
+}
+
+
+/* =========================================
+   COMPLETION
+========================================= */
+
+.workspace-section-completion {
+
+    margin: 0;
+
+    font-size: 0.95rem;
+    font-weight: 400;
+    line-height: 1;
+
+    color: var(--accent-primary, #b20d1c);
+
+    white-space: nowrap;
+
+}
+
+
+/* =========================================
    ACTION MENU
 ========================================= */
 
@@ -30,7 +85,7 @@
 
     flex: 0 0 auto;
 
-    margin: 0;
+    margin-left: 18px;
     padding: 0;
 
 }
@@ -61,6 +116,7 @@
     cursor: pointer;
 
     white-space: nowrap;
+
 }
 
 
@@ -94,82 +150,5 @@
 .workspace-section-action-primary {
 
     color: var(--accent-primary, #b20d1c);
-
-}
-
-
-/* =========================================
-   SECTION TITLE
-========================================= */
-
-.workspace-section-title {
-
-    display: flex;
-    align-items: baseline;
-    gap: 4px;
-
-    margin: 0 0 0 20px;
-    padding: 0;
-
-    flex: 0 0 auto;
-
-}
-
-
-/* =========================================
-   TITLE
-========================================= */
-
-.workspace-section-title h2 {
-
-    margin: 0;
-
-    font-family: inherit;
-    font-size: 1.35rem;
-    font-weight: 500;
-    line-height: 1.2;
-
-    color: var(--text-primary, #111);
-
-}
-
-
-/* =========================================
-   COMPLETION
-========================================= */
-
-.workspace-section-completion {
-
-    margin: 0;
-
-    font-family: inherit;
-    font-size: 0.95rem;
-    font-weight: 400;
-    line-height: 1;
-
-    color: var(--accent-primary, #b20d1c);
-
-    white-space: nowrap;
-
-}
-
-
-/* =========================================
-   RESPONSIVE
-========================================= */
-
-@media (max-width: 760px) {
-
-    .workspace-section-header {
-
-        align-items: flex-start;
-
-    }
-
-    .workspace-section-title {
-
-        margin-left: 14px;
-
-    }
 
 }

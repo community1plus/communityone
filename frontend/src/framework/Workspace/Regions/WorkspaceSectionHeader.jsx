@@ -28,12 +28,29 @@ export default function WorkspaceSectionHeader({
         <header className="workspace-section-header">
 
             {/* =================================
+               SECTION IDENTITY
+            ================================= */}
+
+            <div className="workspace-section-title">
+
+                <h2>
+                    {title}
+                </h2>
+
+                <span className="workspace-section-completion">
+                    {completion}%
+                </span>
+
+            </div>
+
+
+            {/* =================================
                ACTION MENU
             ================================= */}
 
             <div className="workspace-section-actions">
 
-                {!editing ? (
+                {!editing && (
 
                     <button
                         type="button"
@@ -54,7 +71,10 @@ export default function WorkspaceSectionHeader({
 
                     </button>
 
-                ) : (
+                )}
+
+
+                {editing && (
 
                     <>
 
@@ -100,10 +120,7 @@ export default function WorkspaceSectionHeader({
 
                         <button
                             type="button"
-                            className="
-                                workspace-section-action
-                                workspace-section-action-primary
-                            "
+                            className="workspace-section-action workspace-section-action-primary"
                             onClick={onSave}
                             disabled={saving}
                             aria-label="Save section"
@@ -116,7 +133,10 @@ export default function WorkspaceSectionHeader({
                             />
 
                             <span>
-                                {saving ? "Saving..." : "Save"}
+                                {saving
+                                    ? "Saving..."
+                                    : "Save"
+                                }
                             </span>
 
                         </button>
@@ -124,23 +144,6 @@ export default function WorkspaceSectionHeader({
                     </>
 
                 )}
-
-            </div>
-
-
-            {/* =================================
-               SECTION TITLE
-            ================================= */}
-
-            <div className="workspace-section-title">
-
-                <h2>
-                    {title}
-                </h2>
-
-                <span className="workspace-section-completion">
-                    {completion}%
-                </span>
 
             </div>
 
