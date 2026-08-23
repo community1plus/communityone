@@ -1,57 +1,69 @@
 /* =========================================
-   WORKSPACE TABS
+   WORKSPACE NAVIGATION
 ========================================= */
 
-.workspace-tabs {
+.workspace-navigation {
 
     display: flex;
+
     align-items: flex-end;
-    gap: 44px;
 
     width: 100%;
-    min-width: 0;
 
     margin: 0;
     padding: 0;
 
     box-sizing: border-box;
 
+    gap: 44px;
+
     border-bottom:
         1px solid
         var(--border-color, #e8e8e8);
+
 }
 
 
 /* =========================================
-   TAB
+   NAVIGATION TAB
 ========================================= */
 
-.workspace-tab {
+.workspace-navigation .workspace-tab {
 
     display: inline-flex;
+
     align-items: center;
     justify-content: center;
 
-    appearance: none;
+    flex: 0 0 auto;
 
-    margin: 0;
-    padding: 0 0 14px;
+    appearance: none;
 
     background: transparent;
 
-    border: 0;
-    border-bottom: 2px solid transparent;
+    border: none;
+
+    border-bottom:
+        2px solid
+        transparent;
+
+    margin: 0;
+
+    padding:
+        0 0 14px;
 
     cursor: pointer;
 
-    box-sizing: border-box;
+    font-family: inherit;
 
-    font: inherit;
     font-size: 0.85rem;
+
     font-weight: 600;
-    line-height: 1.2;
 
     letter-spacing: 0.08em;
+
+    line-height: 1;
+
     text-transform: uppercase;
 
     color:
@@ -60,33 +72,48 @@
     white-space: nowrap;
 
     transition:
-        color 0.2s ease,
-        border-color 0.2s ease;
+        color .2s ease,
+        border-color .2s ease;
+
 }
 
 
 /* =========================================
-   TAB — HOVER
+   HOVER
 ========================================= */
 
-.workspace-tab:hover {
+.workspace-navigation .workspace-tab:hover {
 
     color:
         var(--text-primary, #111);
+
 }
 
 
 /* =========================================
-   TAB — ACTIVE
+   ACTIVE
 ========================================= */
 
-.workspace-tab.active {
+.workspace-navigation .workspace-tab.active {
 
     color:
         var(--text-primary, #111);
 
     border-bottom-color:
         var(--text-primary, #111);
+
+}
+
+
+/* =========================================
+   COMPLETED
+========================================= */
+
+.workspace-navigation .workspace-tab.complete {
+
+    color:
+        var(--text-secondary, #555);
+
 }
 
 
@@ -96,16 +123,12 @@
 
 @media (max-width: 760px) {
 
-    .workspace-tabs {
+    .workspace-navigation {
 
         gap: 28px;
 
         overflow-x: auto;
-        scrollbar-width: none;
+
     }
 
-    .workspace-tabs::-webkit-scrollbar {
-
-        display: none;
-    }
 }
