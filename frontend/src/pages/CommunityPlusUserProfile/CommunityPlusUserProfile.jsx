@@ -262,11 +262,21 @@ const [
             values
         );
 
-    const sectionCompletion =
-    calculateProfileSectionCompletion(
-        values,
-        sections[currentSection]?.id
-    );    
+const sectionCompletion =
+    Object.fromEntries(
+
+        sections.map(section => [
+
+            section.id,
+
+            calculateProfileSectionCompletion(
+                values,
+                section.id
+            ),
+
+        ])
+
+    ); 
 
 
 console.log(
