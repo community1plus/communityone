@@ -25,30 +25,14 @@ export default function WorkspaceSectionHeader({
 
     return (
 
-        <div className="workspace-section-header">
-
-            {/* ==========================
-               SECTION TITLE
-            ========================== */}
-
-            <div className="workspace-section-title">
-
-                <h2>
-                    {title}
-                </h2>
-
-            </div>
+        <header className="workspace-section-header">
 
 
-            {/* ==========================
+            {/* =================================
                SECTION ACTIONS
-            ========================== */}
+            ================================= */}
 
             <div className="workspace-section-actions">
-
-                <span className="workspace-section-completion">
-                    {completion}%
-                </span>
 
 
                 {!editing && (
@@ -60,6 +44,7 @@ export default function WorkspaceSectionHeader({
                         aria-label="Edit section"
                         title="Edit"
                     >
+
                         <Pencil
                             size={15}
                             strokeWidth={1.8}
@@ -85,6 +70,7 @@ export default function WorkspaceSectionHeader({
                             aria-label="Clear section"
                             title="Clear"
                         >
+
                             <Eraser
                                 size={15}
                                 strokeWidth={1.8}
@@ -104,6 +90,7 @@ export default function WorkspaceSectionHeader({
                             aria-label="Reset section"
                             title="Reset"
                         >
+
                             <RotateCcw
                                 size={15}
                                 strokeWidth={1.8}
@@ -124,6 +111,7 @@ export default function WorkspaceSectionHeader({
                             aria-label="Save section"
                             title="Save"
                         >
+
                             <Save
                                 size={15}
                                 strokeWidth={1.8}
@@ -144,7 +132,26 @@ export default function WorkspaceSectionHeader({
 
             </div>
 
-        </div>
+
+            {/* =================================
+               SECTION HEADING
+            ================================= */}
+
+            <div className="workspace-section-heading">
+
+                <h2 className="workspace-section-title">
+                    {title}
+                </h2>
+
+
+                <span className="workspace-section-completion">
+                    {completion}%
+                </span>
+
+            </div>
+
+
+        </header>
 
     );
 
