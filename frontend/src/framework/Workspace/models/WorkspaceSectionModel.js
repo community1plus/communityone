@@ -68,6 +68,34 @@ export function createWorkspaceSectionModel({
 
         validator,
 
+        runtime: {
+
+            enabled:
+                true,
+
+            visible:
+                true,
+
+            dirty:
+                false,
+
+            valid:
+                true,
+
+            complete:
+                false,
+
+            completion:
+                0,
+
+            editing:
+                false,
+
+            saving:
+                false,
+
+        },
+
     };
 
 }

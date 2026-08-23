@@ -20,54 +20,328 @@ import {
 
 
 /* =========================================
-   ACTION DEFINITIONS
+   SECTION ACTION DEFINITIONS
 ========================================= */
 
 const SECTION_ACTION_DEFINITIONS = {
 
     edit: {
 
-        label: "Edit",
+        label:
+            "Edit",
 
-        icon: "✎",
+        icon:
+            "✎",
 
     },
+
 
     clear: {
 
-        label: "Clear",
+        label:
+            "Clear",
 
-        icon: "□",
+        icon:
+            "□",
 
     },
+
 
     reset: {
 
-        label: "Reset",
+        label:
+            "Reset",
 
-        icon: "↻",
+        icon:
+            "↻",
 
     },
+
 
     exit: {
 
-        label: "Exit",
+        label:
+            "Exit",
 
-        icon: "×",
+        icon:
+            "×",
 
     },
 
+
     save: {
 
-        label: "Save",
+        label:
+            "Save",
 
-        icon: "✓",
+        icon:
+            "✓",
 
-        primary: true,
+        primary:
+            true,
 
     },
 
 };
+
+
+/* =========================================
+   SECTION ACTION VISIBILITY
+========================================= */
+
+function getSectionActionVisibility(
+    editing
+) {
+
+    return {
+
+        edit:
+            !editing,
+
+        clear:
+            editing,
+
+        reset:
+            editing,
+
+        exit:
+            true,
+
+        save:
+            editing,
+
+    };
+
+}
+
+
+/* =========================================
+   SECTION ACTION HANDLERS
+========================================= */
+
+function createSectionActionHandlers({
+
+    runtime,
+
+    actions,
+
+}) {
+
+    return {
+
+        edit: () => {
+
+            if (!runtime.sectionId) {
+                return;
+            }
+
+            actions.setSectionEditing(
+
+                runtime.sectionId,
+
+                true
+
+            );
+
+        },
+
+
+        clear: () => {
+
+            if (!runtime.sectionId) {
+                return;
+            }
+
+            actions.clearSection(
+
+                runtime.sectionId
+
+            );
+
+        },
+
+
+        reset: () => {
+
+            if (!runtime.sectionId) {
+                return;
+            }
+
+            actions.resetSection(
+
+                runtime.sectionId
+
+            );
+
+        },
+
+
+        exit: () => {
+
+            actions.closeProfile();
+
+        },
+
+
+        save: async () => {
+
+            if (!runtime.sectionId) {
+                return;
+            }
+
+            await actions.handleSaveSection(
+
+                runtime.sectionId
+
+            );
+
+        },
+
+    };
+
+}
+
+
+/* =========================================
+   SECTION ACTION MODEL
+========================================= */
+
+function createSectionActionModel({
+
+    actionId,
+
+    handler,
+
+    definition,
+
+    visible,
+
+    saving,
+
+}) {
+
+    if (
+        !handler ||
+        !definition ||
+        !visible
+    ) {
+
+        return null;
+
+    }
+
+
+    return {
+
+        id:
+            actionId,
+
+        label:
+            definition.label,
+
+        icon:
+            definition.icon,
+
+        primary:
+            definition.primary ?? false,
+
+        onClick:
+            handler,
+
+        disabled:
+
+            actionId === "save"
+
+                ? saving
+
+                : false,
+
+    };
+
+}
+
+
+/* =========================================
+   RESOLVE SECTION ACTIONS
+========================================= */
+
+function resolveSectionActions({
+
+    section,
+
+    runtime,
+
+    editing,
+
+    saving,
+
+    actions,
+
+}) {
+
+    if (!section) {
+        return [];
+    }
+
+
+    const handlers =
+        createSectionActionHandlers({
+
+            runtime,
+
+            actions,
+
+        });
+
+
+    const visibility =
+        getSectionActionVisibility(
+
+            editing
+
+        );
+
+
+    return (
+
+        section.actions ?? []
+
+    )
+
+        .map((actionId) => {
+
+            const definition =
+                SECTION_ACTION_DEFINITIONS[
+                    actionId
+                ];
+
+
+            const handler =
+                handlers[
+                    actionId
+                ];
+
+
+            return createSectionActionModel({
+
+                actionId,
+
+                handler,
+
+                definition,
+
+                visible:
+                    visibility[actionId],
+
+                saving,
+
+            });
+
+        })
+
+        .filter(Boolean);
+
+}
 
 
 /* =========================================
@@ -139,185 +413,44 @@ export function buildIdentityWorkspace(
         runtime.section;
 
 
-    const sectionId =
-        runtime.sectionId;
-
-
     /* =====================================
        SECTION STATE
     ===================================== */
 
     const editing =
         Boolean(
+
             section?.runtime?.editing
+
         );
 
 
     const saving =
         Boolean(
+
             section?.runtime?.saving
+
         );
 
 
     /* =====================================
-       SECTION ACTION HANDLERS
-    ===================================== */
-
-    const sectionActionHandlers = {
-
-        edit: () => {
-
-            if (!sectionId) {
-                return;
-            }
-
-            actions.setSectionEditing?.(
-                sectionId,
-                true
-            );
-
-        },
-
-
-        clear: () => {
-
-            if (!sectionId) {
-                return;
-            }
-
-            actions.clearSection?.(
-                sectionId
-            );
-
-        },
-
-
-        reset: () => {
-
-            if (!sectionId) {
-                return;
-            }
-
-            actions.resetSection?.(
-                sectionId
-            );
-
-        },
-
-
-        exit: () => {
-
-            actions.closeProfile?.();
-
-        },
-
-
-        save: async () => {
-
-            if (!sectionId) {
-                return;
-            }
-
-            await actions.handleSaveSection?.(
-                sectionId
-            );
-
-        },
-
-    };
-
-
-    /* =====================================
-       SECTION ACTION MODEL
+       SECTION ACTIONS
     ===================================== */
 
     const sectionActions =
+        resolveSectionActions({
 
-        (section?.actions ?? [])
+            section,
 
-            .map((actionId) => {
+            runtime,
 
-                const handler =
-                    sectionActionHandlers[
-                        actionId
-                    ];
+            editing,
 
+            saving,
 
-                const definition =
-                    SECTION_ACTION_DEFINITIONS[
-                        actionId
-                    ];
+            actions,
 
-
-                if (
-                    !handler ||
-                    !definition
-                ) {
-
-                    return null;
-
-                }
-
-
-                /* =============================
-                   VISIBILITY
-                ============================= */
-
-                const visible =
-
-                    actionId === "edit"
-
-                        ? !editing
-
-                        : (
-                            actionId === "clear" ||
-                            actionId === "reset" ||
-                            actionId === "save"
-                        )
-
-                            ? editing
-
-                            : true;
-
-
-                if (!visible) {
-
-                    return null;
-
-                }
-
-
-                /* =============================
-                   ACTION
-                ============================= */
-
-                return {
-
-                    id:
-                        actionId,
-
-                    label:
-                        definition.label,
-
-                    primary:
-                        definition.primary ?? false,
-
-                    onClick:
-                        handler,
-
-                    disabled:
-
-                        actionId === "save"
-
-                            ? saving
-
-                            : false,
-
-                };
-
-            })
-
-            .filter(Boolean);
+        });
 
 
     /* =====================================

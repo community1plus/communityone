@@ -459,30 +459,64 @@ export const COMMON_STEPS = [
     }),
 
 
-    createWorkspaceSectionModel({
+createWorkspaceSectionModel({
 
-        id:
-            "payment",
+    id:
+        "identity",
 
-        title:
-            "Payment",
+    title:
+        "Identity",
 
-        view:
-            "form",
+    view:
+        "form",
 
-        actions: [
+    actions: [
 
-            "edit",
-            "clear",
-            "reset",
-            "save",
+        WORKSPACE_SECTION_ACTIONS.EDIT,
 
-        ],
+        WORKSPACE_SECTION_ACTIONS.CLEAR,
 
-        fields:
-            [],
+        WORKSPACE_SECTION_ACTIONS.RESET,
 
-    }),
+        WORKSPACE_SECTION_ACTIONS.EXIT,
+
+        WORKSPACE_SECTION_ACTIONS.SAVE,
+
+    ],
+
+    fields: [
+
+        {
+            name:
+                "username",
+
+            label:
+                "Name",
+
+            type:
+                "text",
+
+            helperText:
+                "This is how people know you in Community One.",
+        },
+
+        {
+            name:
+                "email",
+
+            label:
+                "Email",
+
+            type:
+                "email",
+
+            readOnly:
+                true,
+        },
+
+    ],
+
+}),
 
 ];
 
@@ -510,13 +544,17 @@ export const COMMUNITY_POLICY_STEPS = [
 
         actions: [
 
-            "edit",
-            "clear",
-            "reset",
-            "save",
+    WORKSPACE_SECTION_ACTIONS.EDIT,
 
-        ],
+    WORKSPACE_SECTION_ACTIONS.CLEAR,
 
+    WORKSPACE_SECTION_ACTIONS.RESET,
+
+    WORKSPACE_SECTION_ACTIONS.EXIT,
+
+    WORKSPACE_SECTION_ACTIONS.SAVE,
+
+],
         fields:
             [],
 
