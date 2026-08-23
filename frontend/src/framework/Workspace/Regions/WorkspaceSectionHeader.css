@@ -5,19 +5,17 @@
 .workspace-section-header {
 
     display: flex;
-
     align-items: center;
 
-    justify-content: flex-start;
-
     width: 100%;
-    min-width: 0;
+    min-height: 40px;
 
     margin: 0;
-    padding: 0;
+    padding: 0 0 28px;
 
     box-sizing: border-box;
 
+    gap: 22px;
 }
 
 
@@ -27,17 +25,15 @@
 
 .workspace-section-heading {
 
-    display: flex;
-
+    display: inline-flex;
     align-items: baseline;
 
-    gap: 6px;
+    flex: 0 0 auto;
 
     margin: 0;
     padding: 0;
 
-    flex: 0 0 auto;
-
+    gap: 5px;
 }
 
 
@@ -45,23 +41,18 @@
    SECTION TITLE
 ========================================= */
 
-.workspace-section-title {
+.workspace-section-heading h2 {
 
     margin: 0;
-
-    padding: 0;
 
     font-family: inherit;
 
     font-size: 1.35rem;
-
     font-weight: 500;
-
     line-height: 1.2;
 
     color:
         var(--text-primary, #111);
-
 }
 
 
@@ -71,22 +62,12 @@
 
 .workspace-section-completion {
 
-    display: inline-block;
-
-    margin: 0;
-    padding: 0;
-
-    font-family: inherit;
-
     font-size: 0.95rem;
-
     font-weight: 400;
-
     line-height: 1;
 
     color:
-        #c41230;
-
+        var(--accent-color, #c8102e);
 }
 
 
@@ -96,16 +77,15 @@
 
 .workspace-section-actions {
 
-    display: flex;
-
+    display: inline-flex;
     align-items: center;
+
+    flex: 0 0 auto;
 
     gap: 18px;
 
-    margin-left: 22px;
-
+    margin: 0;
     padding: 0;
-
 }
 
 
@@ -116,10 +96,7 @@
 .workspace-section-action {
 
     display: inline-flex;
-
     align-items: center;
-
-    justify-content: center;
 
     gap: 6px;
 
@@ -128,25 +105,20 @@
     margin: 0;
     padding: 0;
 
-    background: transparent;
-
     border: none;
+    background: transparent;
 
     cursor: pointer;
 
     font-family: inherit;
-
-    font-size: 0.9rem;
-
+    font-size: 0.95rem;
     font-weight: 400;
-
     line-height: 1;
 
     color:
         var(--text-primary, #111);
 
     white-space: nowrap;
-
 }
 
 
@@ -158,7 +130,6 @@
 
     color:
         var(--text-secondary, #555);
-
 }
 
 
@@ -169,8 +140,7 @@
 .workspace-section-action-primary {
 
     color:
-        #c41230;
-
+        var(--accent-color, #c8102e);
 }
 
 
@@ -182,33 +152,5 @@
 
     opacity: 0.5;
 
-    cursor: default;
-
-}
-
-
-/* =========================================
-   RESPONSIVE
-========================================= */
-
-@media (max-width: 760px) {
-
-    .workspace-section-header {
-
-        flex-wrap: wrap;
-
-        row-gap: 16px;
-
-    }
-
-    .workspace-section-actions {
-
-        margin-left: 0;
-
-        width: 100%;
-
-        gap: 18px;
-
-    }
-
+    cursor: not-allowed;
 }

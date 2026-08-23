@@ -27,13 +27,14 @@ export default function WorkspaceSectionHeader({
 
         <header className="workspace-section-header">
 
+
             {/* =================================
-               SECTION IDENTITY
+               TITLE
             ================================= */}
 
             <div className="workspace-section-heading">
 
-                <h2 className="workspace-section-title">
+                <h2>
                     {title}
                 </h2>
 
@@ -45,7 +46,7 @@ export default function WorkspaceSectionHeader({
 
 
             {/* =================================
-               SECTION ACTIONS
+               ACTIONS
             ================================= */}
 
             <div className="workspace-section-actions">
