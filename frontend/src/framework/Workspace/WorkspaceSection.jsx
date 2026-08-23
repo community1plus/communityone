@@ -6,7 +6,10 @@ export default function WorkspaceSection({
     children,
 }) {
     return (
-        <section className="workspace-section">
+        <section
+            className="workspace-section"
+            style={{ background: "blue" }}
+        >
 
             {(title || description) && (
                 <header className="workspace-section-header">
