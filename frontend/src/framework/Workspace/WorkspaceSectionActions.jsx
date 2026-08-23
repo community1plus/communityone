@@ -1,105 +1,57 @@
 import "./WorkspaceSectionActions.css";
 
-
-const ACTIONS = {
-
-    edit: {
-        label: "Edit",
-        icon: "✎",
-    },
-
-    clear: {
-        label: "Clear",
-        icon: "⌫",
-    },
-
-    reset: {
-        label: "Reset",
-        icon: "↻",
-    },
-
-    exit: {
-        label: "Exit",
-        icon: "×",
-    },
-
-    save: {
-        label: "Save",
-        icon: "✓",
-    },
-
-};
-
-
 export default function WorkspaceSectionActions({
 
     actions = [],
 
 }) {
 
-    if (!actions.length) {
-
-        return null;
-
-    }
-
-
     return (
 
         <div className="workspace-section-actions">
 
-            {actions.map((action) => {
+            {actions.map((action) => (
 
-                const definition =
-                    ACTIONS[action.id];
+                <button
 
-                if (!definition) {
-                    return null;
-                }
+                    key={action.id}
 
+                    type="button"
 
-                return (
-
-                    <button
-                        key={action.id}
-                        type="button"
-                        className="
-                            workspace-section-action
-                        "
-                        onClick={
-                            action.onClick
+                    className={`
+                        workspace-section-action
+                        ${
+                            action.primary
+                                ? "workspace-section-action-primary"
+                                : ""
                         }
-                        disabled={
-                            Boolean(
-                                action.disabled
-                            )
-                        }
-                        title={
-                            definition.label
-                        }
-                    >
+                    `}
 
-                        <span
-                            className="
-                                workspace-section-action-icon
-                            "
-                        >
-                            {definition.icon}
-                        </span>
+                    onClick={
+                        action.onClick
+                    }
 
-                        <span
-                            className="
-                                workspace-section-action-label
-                            "
-                        >
-                            {definition.label}
-                        </span>
+                    disabled={
+                        Boolean(
+                            action.disabled
+                        )
+                    }
 
-                    </button>
+                    title={
+                        action.label
+                    }
 
-                );
+                    aria-label={
+                        action.label
+                    }
 
-            })}
+                >
+
+                    {action.icon}
+
+                </button>
+
+            ))}
 
         </div>
 

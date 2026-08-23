@@ -27,39 +27,43 @@ const SECTION_ACTION_DEFINITIONS = {
 
     edit: {
 
-        label:
-            "Edit",
+        label: "Edit",
+
+        icon: "✎",
 
     },
 
     clear: {
 
-        label:
-            "Clear",
+        label: "Clear",
+
+        icon: "□",
 
     },
 
     reset: {
 
-        label:
-            "Reset",
+        label: "Reset",
+
+        icon: "↻",
 
     },
 
     exit: {
 
-        label:
-            "Exit",
+        label: "Exit",
+
+        icon: "×",
 
     },
 
     save: {
 
-        label:
-            "Save",
+        label: "Save",
 
-        primary:
-            true,
+        icon: "✓",
+
+        primary: true,
 
     },
 
