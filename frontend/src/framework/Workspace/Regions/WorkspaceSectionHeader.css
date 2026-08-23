@@ -1,11 +1,20 @@
 /* =========================================
-   WORKSPACE SECTION CONTENT
+   WORKSPACE SECTION
 ========================================= */
 
-.workspace-section-content {
+.workspace-section {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+
     width: 100%;
+    min-width: 0;
+
+    margin: 0;
+    padding: 0;
+
+    box-sizing: border-box;
+
+    background: transparent;
 }
 
 
@@ -19,9 +28,13 @@
     justify-content: space-between;
 
     width: 100%;
+    min-width: 0;
     min-height: 40px;
 
     margin: 0 0 28px;
+    padding: 0;
+
+    box-sizing: border-box;
 }
 
 
@@ -34,6 +47,7 @@
     align-items: center;
 
     min-width: 0;
+    margin: 0;
 }
 
 .workspace-section-title h2 {
@@ -165,50 +179,55 @@
 
 
 /* =========================================
-   CONTENT COLUMN
+   SECTION CONTENT
 ========================================= */
 
-.workspace-section-content > * {
-    width: 100%;
-    max-width: 760px;
+.workspace-section-content {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+
+    width: min(680px, 100%);
+    max-width: 680px;
+
+    margin: 0 auto;
+    padding: 0;
+
+    box-sizing: border-box;
 }
 
 
 /* =========================================
-   WORKSPACE FORM
+   CONTENT CHILDREN
+========================================= */
+
+.workspace-section-content > * {
+    width: 100%;
+    min-width: 0;
+
+    margin: 0;
+    padding: 0;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================
+   FORM
 ========================================= */
 
 .workspace-section-content .workspace-form {
     display: flex;
     flex-direction: column;
 
-    width: 680px;
-    max-width: 100%;
-
-    margin: 0 auto;
-
-    gap: 32px;
-
-    text-align: left;
-}
-
-
-/* =========================================
-   FORM FIELD
-========================================= */
-
-.workspace-section-content .workspace-form > * {
-    width: 100%;
-}
-
-
-/* =========================================
-   WORKSPACE FIELD
-========================================= */
-
-.workspace-section-content .workspace-form .workspace-field {
     width: 100%;
     max-width: 100%;
+    min-width: 0;
+
+    margin: 0;
+    padding: 0;
+
+    box-sizing: border-box;
 }
 
 
@@ -234,11 +253,9 @@
 
 @media (max-width: 760px) {
 
-    .workspace-section-content > * {
+    .workspace-section-content {
+        width: 100%;
         max-width: 100%;
     }
 
-    .workspace-section-content .workspace-form {
-        width: 100%;
-    }
 }
