@@ -82,6 +82,8 @@ export {
     default as WorkspaceSectionHeader,
 } from "../Workspace/Regions/WorkspaceSectionHeader";
 
+export { default as WorkspaceSection} from "./WorkspaceSection";
+
 export { default as WorkspacePanel }
 from "./WorkspacePanel";
 
