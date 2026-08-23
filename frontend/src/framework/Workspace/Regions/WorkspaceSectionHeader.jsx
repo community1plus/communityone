@@ -33,7 +33,7 @@ export default function WorkspaceSectionHeader({
 
             <div className="workspace-section-actions">
 
-                {!editing && (
+                {!editing ? (
 
                     <button
                         type="button"
@@ -54,10 +54,7 @@ export default function WorkspaceSectionHeader({
 
                     </button>
 
-                )}
-
-
-                {editing && (
+                ) : (
 
                     <>
 
@@ -103,7 +100,10 @@ export default function WorkspaceSectionHeader({
 
                         <button
                             type="button"
-                            className="workspace-section-action workspace-section-action-primary"
+                            className="
+                                workspace-section-action
+                                workspace-section-action-primary
+                            "
                             onClick={onSave}
                             disabled={saving}
                             aria-label="Save section"
@@ -116,10 +116,7 @@ export default function WorkspaceSectionHeader({
                             />
 
                             <span>
-                                {saving
-                                    ? "Saving..."
-                                    : "Save"
-                                }
+                                {saving ? "Saving..." : "Save"}
                             </span>
 
                         </button>

@@ -5,141 +5,91 @@
 .workspace-section-header {
 
     display: flex;
-
-    flex-direction: column;
-
-    align-items: stretch;
+    align-items: center;
+    justify-content: flex-start;
 
     width: 100%;
+    min-height: 40px;
 
     margin: 0 0 28px;
-
     padding: 0;
 
     box-sizing: border-box;
+
 }
 
 
 /* =========================================
-   SECTION ACTIONS
+   ACTION MENU
 ========================================= */
 
 .workspace-section-actions {
 
     display: flex;
-
     align-items: center;
 
-    justify-content: flex-start;
+    gap: 12px;
 
-    gap: 8px;
+    margin: 0 16px 0 0;
+    padding: 0;
 
-    width: 100%;
-
-    min-height: 30px;
-
-    margin: 0 0 16px;
+    box-sizing: border-box;
 
 }
 
 
 /* =========================================
-   SECTION ACTION
+   ACTION
 ========================================= */
 
 .workspace-section-action {
 
     display: inline-flex;
-
     align-items: center;
 
-    justify-content: center;
+    gap: 5px;
 
-    gap: 6px;
-
-    height: 30px;
-
-    min-width: 30px;
-
-    padding: 0 6px;
-
-    background: transparent;
+    margin: 0;
+    padding: 0;
 
     border: 0;
-
-    color: var(--text-primary, #111);
+    background: transparent;
 
     font-family: inherit;
-
-    font-size: 0.8rem;
-
+    font-size: 0.9rem;
     font-weight: 400;
 
     line-height: 1;
 
+    color: var(--text-primary, #111);
+
     cursor: pointer;
 
-    transition:
-        background 0.15s ease,
-        color 0.15s ease;
+    box-sizing: border-box;
 
 }
 
+
+/* =========================================
+   ACTION HOVER
+========================================= */
 
 .workspace-section-action:hover {
 
-    background: rgba(0, 0, 0, 0.04);
+    color: var(--accent-primary, #b5091b);
 
 }
 
 
 /* =========================================
-   PRIMARY ACTION
-========================================= */
-
-.workspace-section-action-primary {
-
-    background: var(--platform-red, #ad0d1c);
-
-    color: #fff;
-
-}
-
-
-.workspace-section-action-primary:hover {
-
-    background: var(--platform-red-dark, #940b18);
-
-}
-
-
-/* =========================================
-   ACTION ICON
-========================================= */
-
-.workspace-section-action svg {
-
-    flex: 0 0 auto;
-
-}
-
-
-/* =========================================
-   DISABLED ACTION
+   ACTION DISABLED
 ========================================= */
 
 .workspace-section-action:disabled {
 
     opacity: 0.5;
 
-    cursor: not-allowed;
-
-}
-
-
-.workspace-section-action:disabled:hover {
-
-    background: transparent;
+    cursor: default;
 
 }
 
@@ -151,23 +101,21 @@
 .workspace-section-title {
 
     display: flex;
-
     align-items: baseline;
-
-    justify-content: flex-start;
 
     gap: 4px;
 
-    width: 100%;
-
-    min-width: 0;
-
     margin: 0;
-
     padding: 0;
+
+    box-sizing: border-box;
 
 }
 
+
+/* =========================================
+   TITLE
+========================================= */
 
 .workspace-section-title h2 {
 
@@ -176,7 +124,6 @@
     font-family: inherit;
 
     font-size: 1.35rem;
-
     font-weight: 500;
 
     line-height: 1.2;
@@ -187,28 +134,33 @@
 
 
 /* =========================================
-   SECTION COMPLETION
+   COMPLETION
 ========================================= */
 
 .workspace-section-completion {
 
-    display: inline-flex;
-
-    align-items: center;
-
     margin: 0;
+    padding: 0;
 
     font-family: inherit;
 
     font-size: 0.9rem;
-
     font-weight: 400;
 
     line-height: 1;
 
-    color: var(--platform-red, #ad0d1c);
+    color: var(--accent-primary, #b5091b);
 
-    white-space: nowrap;
+}
+
+
+/* =========================================
+   PRIMARY ACTION
+========================================= */
+
+.workspace-section-action-primary {
+
+    font-weight: 500;
 
 }
 
@@ -221,7 +173,20 @@
 
     .workspace-section-header {
 
-        margin-bottom: 20px;
+        align-items: flex-start;
+
+    }
+
+    .workspace-section-actions {
+
+        gap: 8px;
+        margin-right: 12px;
+
+    }
+
+    .workspace-section-action span {
+
+        display: none;
 
     }
 
