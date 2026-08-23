@@ -1,22 +1,33 @@
 /* =========================================
-   SECTION NAVIGATION
+   WORKSPACE TABS
 ========================================= */
 
-.workspace-navigation {
+.workspace-tabs {
 
     display: flex;
 
-    align-items: center;
+    align-items: flex-end;
 
-    gap: 40px;
+    gap: 44px;
 
     width: 100%;
+    min-width: 0;
+
+    margin: 0;
+    padding: 0;
+
+    box-sizing: border-box;
 
     border-bottom:
         1px solid
         var(--border-color, #e8e8e8);
 
 }
+
+
+/* =========================================
+   TAB
+========================================= */
 
 .workspace-tab {
 
@@ -34,6 +45,8 @@
     border-bottom:
         2px solid
         transparent;
+
+    margin: 0;
 
     padding:
         0 0 14px;
@@ -53,11 +66,18 @@
     color:
         var(--text-secondary, #555);
 
+    white-space: nowrap;
+
     transition:
         color .2s ease,
         border-color .2s ease;
 
 }
+
+
+/* =========================================
+   TAB HOVER
+========================================= */
 
 .workspace-tab:hover {
 
@@ -66,6 +86,11 @@
 
 }
 
+
+/* =========================================
+   ACTIVE TAB
+========================================= */
+
 .workspace-tab.active {
 
     color:
@@ -73,5 +98,22 @@
 
     border-bottom-color:
         var(--text-primary, #111);
+
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 760px) {
+
+    .workspace-tabs {
+
+        gap: 28px;
+
+        overflow-x: auto;
+
+    }
 
 }

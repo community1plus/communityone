@@ -28,12 +28,12 @@ export default function WorkspaceSectionHeader({
         <header className="workspace-section-header">
 
             {/* =================================
-               SECTION TITLE
+               SECTION IDENTITY
             ================================= */}
 
-            <div className="workspace-section-title">
+            <div className="workspace-section-heading">
 
-                <h2>
+                <h2 className="workspace-section-title">
                     {title}
                 </h2>
 
@@ -45,7 +45,7 @@ export default function WorkspaceSectionHeader({
 
 
             {/* =================================
-               ACTION MENU
+               SECTION ACTIONS
             ================================= */}
 
             <div className="workspace-section-actions">
@@ -59,6 +59,7 @@ export default function WorkspaceSectionHeader({
                         aria-label="Edit section"
                         title="Edit"
                     >
+
                         <Pencil
                             size={15}
                             strokeWidth={1.8}
@@ -84,6 +85,7 @@ export default function WorkspaceSectionHeader({
                             aria-label="Clear section"
                             title="Clear"
                         >
+
                             <Eraser
                                 size={15}
                                 strokeWidth={1.8}
@@ -103,6 +105,7 @@ export default function WorkspaceSectionHeader({
                             aria-label="Reset section"
                             title="Reset"
                         >
+
                             <RotateCcw
                                 size={15}
                                 strokeWidth={1.8}
@@ -117,12 +120,16 @@ export default function WorkspaceSectionHeader({
 
                         <button
                             type="button"
-                            className="workspace-section-action workspace-section-action-primary"
+                            className="
+                                workspace-section-action
+                                workspace-section-action-primary
+                            "
                             onClick={onSave}
                             disabled={saving}
                             aria-label="Save section"
                             title="Save"
                         >
+
                             <Save
                                 size={15}
                                 strokeWidth={1.8}
