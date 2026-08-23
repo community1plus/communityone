@@ -1,4 +1,24 @@
 /* =========================================
+   SECTION
+========================================= */
+
+.workspace-section {
+
+    display: flex;
+    flex-direction: column;
+
+    width: 100%;
+    min-width: 0;
+
+    margin: 0;
+    padding: 0;
+
+    box-sizing: border-box;
+
+}
+
+
+/* =========================================
    SECTION CONTENT
 ========================================= */
 
@@ -20,38 +40,18 @@
 
 
 /* =========================================
-   CONTENT CHILDREN
-   -----------------------------------------
-   Default children are intrinsically sized.
+   CONTENT BLOCK
 ========================================= */
 
 .workspace-section-content > * {
 
-    width: fit-content;
+    width: max-content;
     max-width: 100%;
 
     margin-left: auto;
     margin-right: auto;
 
     box-sizing: border-box;
-
-}
-
-
-/* =========================================
-   SECTION HEADER
-   -----------------------------------------
-   Header is structural and must span the
-   section rather than shrink-wrap.
-========================================= */
-
-.workspace-section-content > .workspace-section-header {
-
-    width: 100%;
-    max-width: 100%;
-
-    margin-left: 0;
-    margin-right: 0;
 
 }
 
@@ -65,7 +65,7 @@
     display: flex;
     flex-direction: column;
 
-    width: fit-content;
+    width: max-content;
     max-width: 100%;
 
     margin-left: auto;
@@ -80,11 +80,9 @@
    FORM FIELD
 ========================================= */
 
-.workspace-section-content
-.workspace-form
-.workspace-field {
+.workspace-section-content .workspace-form .workspace-field {
 
-    width: fit-content;
+    width: max-content;
     max-width: 100%;
 
     box-sizing: border-box;
@@ -93,34 +91,12 @@
 
 
 /* =========================================
-   FIELD CONTENT
+   FORM CONTROL
 ========================================= */
 
-.workspace-section-content
-.workspace-form
-.workspace-field-content {
-
-    width: fit-content;
-    max-width: 100%;
-
-    box-sizing: border-box;
-
-}
-
-
-/* =========================================
-   FORM CONTROLS
-========================================= */
-
-.workspace-section-content
-.workspace-form
-input,
-.workspace-section-content
-.workspace-form
-textarea,
-.workspace-section-content
-.workspace-form
-select {
+.workspace-section-content .workspace-form input,
+.workspace-section-content .workspace-form textarea,
+.workspace-section-content .workspace-form select {
 
     display: block;
 
@@ -133,17 +109,14 @@ select {
 
 
 /* =========================================
-   RESPONSIVE
+   MOBILE
 ========================================= */
 
 @media (max-width: 760px) {
 
-    .workspace-section-content > .workspace-section-header,
+    .workspace-section-content > *,
     .workspace-section-content .workspace-form,
-    .workspace-section-content .workspace-form .workspace-field,
-    .workspace-section-content
-    .workspace-form
-    .workspace-field-content {
+    .workspace-section-content .workspace-form .workspace-field {
 
         width: 100%;
         max-width: 100%;
