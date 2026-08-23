@@ -1,0 +1,86 @@
+.workspace-section-actions {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 2px;
+
+}
+
+
+.workspace-section-action {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    appearance: none;
+
+    border: 1px solid transparent;
+
+    background: transparent;
+
+    padding: 5px 8px;
+
+    font-family: inherit;
+
+    font-size: 0.75rem;
+
+    color:
+        var(--text-secondary, #555);
+
+    cursor: pointer;
+
+    white-space: nowrap;
+
+}
+
+
+.workspace-section-action:hover {
+
+    border-color:
+        var(--border-color, #d8d8d8);
+
+    background:
+        var(--surface-hover, #f5f5f5);
+
+    color:
+        var(--text-primary, #111);
+
+}
+
+
+.workspace-section-action:disabled {
+
+    opacity: 0.4;
+
+    cursor: default;
+
+}
+
+
+.workspace-section-action-icon {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width: 16px;
+
+    height: 16px;
+
+    font-size: 14px;
+
+}
+
+
+.workspace-section-action-label {
+
+    line-height: 1;
+
+}

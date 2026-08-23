@@ -1,3 +1,8 @@
+import "./WorkspaceSection.css";
+
+import WorkspaceSectionActions from "./WorkspaceSectionActions";
+
+
 export default function WorkspaceSection({
 
     model,
@@ -6,74 +11,81 @@ export default function WorkspaceSection({
 }) {
 
     if (!model?.runtime?.visible) {
+
         return null;
+
     }
+
+
+    const completion =
+        model.runtime?.completion ?? 0;
+
 
     return (
 
         <section className="workspace-section">
 
-            <header className="workspace-section-header">
 
-                <div className="workspace-section-identity">
+            {/* =================================
+               SECTION HEADER
+            ================================= */}
 
-                    <span className="workspace-section-title">
-                        {model.title}
-                    </span>
+<header className="workspace-section-header">
 
-                    <span className="workspace-section-completion">
-                        [{model.runtime?.completion ?? 0}%]
-                    </span>
+    <div className="workspace-section-identity">
 
-                </div>
+        <span className="workspace-section-title">
+            {model.title}
+        </span>
+
+    </div>
 
 
-                <div className="workspace-section-actions">
+    <div className="workspace-section-controls">
 
-                    {model.actions?.map((action) => (
+        <div className="workspace-section-completion">
 
-                        <button
-                            key={action.id}
-                            type="button"
-                            className={`
-                                workspace-section-action
-                                ${action.primary
-                                    ? "workspace-section-action-primary"
-                                    : ""
-                                }
-                            `}
-                            onClick={
-                                action.onClick
-                            }
-                            disabled={
-                                Boolean(
-                                    action.disabled
-                                )
-                            }
-                            title={
-                                action.title
-                            }
-                        >
+            <div className="workspace-section-progress">
 
-                            {action.icon}
+                <div
+                    className="workspace-section-progress-fill"
+                    style={{
+                        width: `${model.runtime?.completion ?? 0}%`,
+                    }}
+                />
 
-                            <span>
-                                {action.label}
-                            </span>
+            </div>
 
-                        </button>
+            <span className="workspace-section-completion-value">
 
-                    ))}
+                {model.runtime?.completion ?? 0}%
 
-                </div>
+            </span>
 
-            </header>
+        </div>
+
+
+        <WorkspaceSectionActions
+            actions={
+                model.actions ?? []
+            }
+        />
+
+    </div>
+
+</header>
+
+
+            {/* =================================
+               SECTION BODY
+            ================================= */}
 
             <div className="workspace-section-body">
 
                 {children}
 
             </div>
+
 
         </section>
 

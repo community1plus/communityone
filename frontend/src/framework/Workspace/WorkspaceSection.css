@@ -2,22 +2,56 @@
    SECTION CONTENT
 ========================================= */
 
-.workspace-section-content {
+.workspace-section-header {
 
     display: flex;
-    flex-direction: column;
+
     align-items: center;
 
-    width: 100%;
-    min-width: 0;
+    justify-content: space-between;
 
-    margin: 0;
-    padding: 0;
+    width: 100%;
 
     box-sizing: border-box;
 
 }
 
+.workspace-section-title {
+
+    font-size: 0.85rem;
+
+    font-weight: 700;
+
+    letter-spacing: 0.08em;
+
+    text-transform: uppercase;
+
+    color:
+        var(--text-primary, #111);
+
+}
+
+.workspace-section-controls {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 24px;
+
+    margin-left: auto;
+
+}
+
+.workspace-section-identity {
+
+    display: flex;
+
+    align-items: center;
+
+    min-width: 0;
+
+}
 
 /* =========================================
    CONTENT CHILDREN

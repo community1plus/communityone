@@ -102,14 +102,19 @@ export const PERSONAL_STEPS = [
         view:
             "form",
 
-        actions: [
+       actions: [
 
-            "edit",
-            "clear",
-            "reset",
-            "save",
+    "edit",
 
-        ],
+    "clear",
+
+    "reset",
+
+    "exit",
+
+    "save",
+
+],
 
         fields: [
 

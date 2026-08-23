@@ -13,6 +13,9 @@ export const WORKSPACE_SECTION_ACTIONS = {
     RESET:
         "reset",
 
+    EXIT:
+        "exit",
+
     SAVE:
         "save",
 

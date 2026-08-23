@@ -19,6 +19,57 @@ import {
 } from "../../../framework/Workspace/runtime/WorkspaceRuntime";
 
 
+/* =========================================
+   ACTION DEFINITIONS
+========================================= */
+
+const SECTION_ACTION_DEFINITIONS = {
+
+    edit: {
+
+        label:
+            "Edit",
+
+    },
+
+    clear: {
+
+        label:
+            "Clear",
+
+    },
+
+    reset: {
+
+        label:
+            "Reset",
+
+    },
+
+    exit: {
+
+        label:
+            "Exit",
+
+    },
+
+    save: {
+
+        label:
+            "Save",
+
+        primary:
+            true,
+
+    },
+
+};
+
+
+/* =========================================
+   WORKSPACE BUILDER
+========================================= */
+
 export function buildIdentityWorkspace(
 
     state,
@@ -47,7 +98,9 @@ export function buildIdentityWorkspace(
 
 
     const {
+
         goToSection,
+
     } = actions;
 
 
@@ -82,8 +135,12 @@ export function buildIdentityWorkspace(
         runtime.section;
 
 
+    const sectionId =
+        runtime.sectionId;
+
+
     /* =====================================
-       SECTION ACTION STATE
+       SECTION STATE
     ===================================== */
 
     const editing =
@@ -106,12 +163,12 @@ export function buildIdentityWorkspace(
 
         edit: () => {
 
-            if (!runtime.sectionId) {
+            if (!sectionId) {
                 return;
             }
 
-            actions.setSectionEditing(
-                runtime.sectionId,
+            actions.setSectionEditing?.(
+                sectionId,
                 true
             );
 
@@ -120,12 +177,12 @@ export function buildIdentityWorkspace(
 
         clear: () => {
 
-            if (!runtime.sectionId) {
+            if (!sectionId) {
                 return;
             }
 
-            actions.clearSection(
-                runtime.sectionId
+            actions.clearSection?.(
+                sectionId
             );
 
         },
@@ -133,66 +190,33 @@ export function buildIdentityWorkspace(
 
         reset: () => {
 
-            if (!runtime.sectionId) {
+            if (!sectionId) {
                 return;
             }
 
-            actions.resetSection(
-                runtime.sectionId
+            actions.resetSection?.(
+                sectionId
             );
+
+        },
+
+
+        exit: () => {
+
+            actions.closeProfile?.();
 
         },
 
 
         save: async () => {
 
-            if (!runtime.sectionId) {
+            if (!sectionId) {
                 return;
             }
 
-            await actions.handleSaveSection(
-                runtime.sectionId
+            await actions.handleSaveSection?.(
+                sectionId
             );
-
-        },
-
-    };
-
-
-    /* =====================================
-       SECTION ACTION DEFINITIONS
-    ===================================== */
-
-    const sectionActionDefinitions = {
-
-        edit: {
-
-            label:
-                "Edit",
-
-        },
-
-        clear: {
-
-            label:
-                "Clear",
-
-        },
-
-        reset: {
-
-            label:
-                "Reset",
-
-        },
-
-        save: {
-
-            label:
-                "Save",
-
-            primary:
-                true,
 
         },
 
@@ -204,6 +228,7 @@ export function buildIdentityWorkspace(
     ===================================== */
 
     const sectionActions =
+
         (section?.actions ?? [])
 
             .map((actionId) => {
@@ -215,7 +240,7 @@ export function buildIdentityWorkspace(
 
 
                 const definition =
-                    sectionActionDefinitions[
+                    SECTION_ACTION_DEFINITIONS[
                         actionId
                     ];
 
@@ -229,6 +254,10 @@ export function buildIdentityWorkspace(
 
                 }
 
+
+                /* =============================
+                   VISIBILITY
+                ============================= */
 
                 const visible =
 
@@ -248,9 +277,15 @@ export function buildIdentityWorkspace(
 
 
                 if (!visible) {
+
                     return null;
+
                 }
 
+
+                /* =============================
+                   ACTION
+                ============================= */
 
                 return {
 
@@ -267,8 +302,11 @@ export function buildIdentityWorkspace(
                         handler,
 
                     disabled:
+
                         actionId === "save"
+
                             ? saving
+
                             : false,
 
                 };
