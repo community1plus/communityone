@@ -1,9 +1,10 @@
-import "./WorkspaceSectionActions.css";
-
-
 export function WorkspaceSectionActions({
 
     actions = [],
+
+    handlers = {},
+
+    sectionId,
 
 }) {
 
@@ -12,83 +13,115 @@ export function WorkspaceSectionActions({
     }
 
 
+    const {
+
+        setSectionEditing,
+
+        handleSaveSection,
+
+        clearSection,
+
+        resetSection,
+
+        closeProfile,
+
+    } = handlers;
+
+
+    const handleAction = (action) => {
+
+        switch (action) {
+
+            case "edit":
+
+                setSectionEditing?.(
+                    sectionId,
+                    true
+                );
+
+                break;
+
+
+            case "clear":
+
+                clearSection?.(
+                    sectionId
+                );
+
+                break;
+
+
+            case "reset":
+
+                resetSection?.(
+                    sectionId
+                );
+
+                break;
+
+
+            case "exit":
+
+                closeProfile?.();
+
+                break;
+
+
+            case "save":
+
+                handleSaveSection?.(
+                    sectionId
+                );
+
+                break;
+
+
+            default:
+
+                break;
+
+        }
+
+    };
+
+
     return (
 
         <div className="workspace-section-actions">
 
-
-            {actions.map(action => {
-
-                if (!action) {
-                    return null;
-                }
-
-
-                const {
-
-                    id,
-
-                    label,
-
-                    icon,
-
-                    onClick,
-
-                    disabled = false,
-
-                    primary = false,
-
-                } = action;
+            <button
+                type="button"
+                className="workspace-section-actions-trigger"
+                aria-label="Section actions"
+                title="Section actions"
+            >
+                ⋮
+            </button>
 
 
-                return (
+            <div className="workspace-section-actions-menu">
+
+                {actions.map(action => (
 
                     <button
 
-                        key={id}
+                        key={action}
 
                         type="button"
 
-                        className={
-
-                            primary
-
-                                ? "workspace-section-action workspace-section-action-primary"
-
-                                : "workspace-section-action"
-
+                        onClick={() =>
+                            handleAction(action)
                         }
-
-                        onClick={onClick}
-
-                        disabled={disabled}
-
-                        title={label}
 
                     >
 
-                        {icon && (
-
-                            <span className="workspace-section-action-icon">
-
-                                {icon}
-
-                            </span>
-
-                        )}
-
-                        <span>
-
-                            {label}
-
-                        </span>
+                        {action}
 
                     </button>
 
-                );
+                ))}
 
-            })}
-
+            </div>
 
         </div>
 

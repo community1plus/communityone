@@ -14,6 +14,8 @@ export default function WorkspaceSection({
 
     children,
 
+    actionHandlers = {},
+
 }) {
 
     if (!model?.runtime?.visible) {
@@ -22,6 +24,8 @@ export default function WorkspaceSection({
 
 
     const {
+
+        id,
 
         title = "",
 
@@ -42,7 +46,7 @@ export default function WorkspaceSection({
 
 
             {/* =====================================
-               SECTION HEADER
+               SECTION ACTION BAR
             ===================================== */}
 
             <header className="workspace-section-header">
@@ -68,7 +72,19 @@ export default function WorkspaceSection({
 
 
                     <WorkspaceSectionActions
-                        actions={actions}
+
+                        actions={
+                            actions
+                        }
+
+                        handlers={
+                            actionHandlers
+                        }
+
+                        sectionId={
+                            id
+                        }
+
                     />
 
 
