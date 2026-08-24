@@ -66,27 +66,17 @@ export default function HeaderTopRow({ onOpenAuthModal }) {
   return (
     <div className="header-row">
       <div className="header-left">
-        <div
-          className="brand"
-          onClick={() => navigate("/communityplus")}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(event) => {
-            if (event.key === "Enter" || event.key === " ") {
-              navigate("/communityplus");
-            }
-          }}
-        >
-          <div className="brand-mark">
-            <span className="brand-c"></span>
-            <span className="brand-o"></span>
-          </div>
+<div className="brand">
+    <div className="brand-mark">
+        <span className="brand-c"></span>
+        <span className="brand-o"></span>
+    </div>
 
-          <div className="brand-wordmark">
-            <span>COMMUNITY</span>
-            <span>ONE</span>
-          </div>
-        </div>
+    <div className="brand-wordmark">
+        <span>THE WRKSHOP</span>
+        <span>Co</span>
+    </div>
+</div>
       </div>
 
       <div className="header-center">
