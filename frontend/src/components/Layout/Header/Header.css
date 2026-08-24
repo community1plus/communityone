@@ -74,8 +74,8 @@
 
 .brand-c,
 .brand-o {
-  width: 38px;
-  height: 38px;
+  width: 36px;
+  height: 36px;
   border: 9px solid #d72626;
   box-sizing: border-box;
 }
@@ -108,7 +108,7 @@
 
 .brand-wordmark span {
   font-size: 24px;
-  font-weight: 800;
+  font-weight: 700;
   color: #d72626;
 }
 
