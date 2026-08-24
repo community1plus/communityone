@@ -4,8 +4,6 @@
 
 .workspace-section {
 
-    display: block;
-
     width: 100%;
     min-width: 0;
 
@@ -30,8 +28,10 @@
 
     width: 100%;
 
+    min-height: 68px;
+
     margin: 0;
-    padding: 0 0 14px;
+    padding: 0;
 
     box-sizing: border-box;
 
@@ -52,8 +52,6 @@
 
     align-items: center;
 
-    flex: 1 1 auto;
-
     min-width: 0;
 
 }
@@ -63,11 +61,9 @@
 
     margin: 0;
 
-    padding: 0;
+    font-size: 1.35rem;
 
-    font-size: 1rem;
-
-    font-weight: 600;
+    font-weight: 500;
 
     line-height: 1.2;
 
@@ -89,9 +85,9 @@
 
     justify-content: flex-end;
 
-    flex: 0 0 auto;
+    gap: 20px;
 
-    gap: 16px;
+    flex: 0 0 auto;
 
 }
 
@@ -102,13 +98,28 @@
 
 .workspace-section-body {
 
-    display: block;
+    width: 100%;
+    min-width: 0;
+
+    margin: 0;
+    padding: 0;
+
+    box-sizing: border-box;
+
+}
+
+
+/* =========================================
+   SECTION CONTENT
+========================================= */
+
+.workspace-section-content {
 
     width: 100%;
     min-width: 0;
 
     margin: 0;
-    padding: 32px 0 0;
+    padding: 0;
 
     box-sizing: border-box;
 
