@@ -4,15 +4,15 @@
 
 .workspace-field {
 
+    width: 100%;
+
     display: grid;
 
-    grid-template-columns: 140px minmax(0, 420px);
+    grid-template-columns: 160px minmax(0, 1fr);
 
-    column-gap: 36px;
+    column-gap: 48px;
 
     align-items: start;
-
-    box-sizing: border-box;
 
 }
 
@@ -23,17 +23,9 @@
 
 .workspace-field-label {
 
-    margin: 0;
-    padding: 0;
-
-    font-size: 1rem;
+    padding-top: 2px;
 
     font-weight: 600;
-
-    line-height: 1.4;
-
-    color:
-        var(--text-primary, #111);
 
 }
 
@@ -46,6 +38,11 @@
 
     min-width: 0;
 
+    display: flex;
+    flex-direction: column;
+
+    align-items: flex-start;
+
 }
 
 
@@ -55,14 +52,9 @@
 
 .workspace-field-value {
 
-    margin: 0;
-    padding: 0;
+    color: #2878d4;
 
-    font-size: 1rem;
-
-    line-height: 1.4;
-
-    color: #2776d2;
+    line-height: 1.5;
 
 }
 
@@ -73,14 +65,11 @@
 
 .workspace-field-helper {
 
-    margin-top: 6px;
+    margin-top: 4px;
 
-    font-size: 0.95rem;
+    color: #667085;
 
-    line-height: 1.4;
-
-    color:
-        var(--text-secondary, #666);
+    line-height: 1.5;
 
 }
 
