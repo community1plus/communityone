@@ -12,20 +12,18 @@ export default function WorkspaceSection({
 
     model,
 
-    handlers = {},
-
     children,
 
 }) {
 
     if (!model?.runtime?.visible) {
+
         return null;
+
     }
 
 
     const {
-
-        id = null,
 
         title = "",
 
@@ -42,10 +40,7 @@ export default function WorkspaceSection({
 
     return (
 
-        <section
-            className="workspace-section"
-            data-section-id={id}
-        >
+        <section className="workspace-section">
 
 
             {/* =====================================
@@ -68,7 +63,6 @@ export default function WorkspaceSection({
 
                 <div className="workspace-section-tools">
 
-
                     <WorkspaceSectionProgress
                         value={
                             completion
@@ -80,14 +74,6 @@ export default function WorkspaceSection({
 
                         actions={
                             actions
-                        }
-
-                        handlers={
-                            handlers
-                        }
-
-                        sectionId={
-                            id
                         }
 
                     />

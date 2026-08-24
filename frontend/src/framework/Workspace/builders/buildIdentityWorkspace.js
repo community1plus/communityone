@@ -26,29 +26,56 @@ import {
 const SECTION_ACTION_DEFINITIONS = {
 
     edit: {
-        label: "Edit",
-        icon: "✎",
+
+        label:
+            "Edit",
+
+        icon:
+            "✎",
+
     },
 
     clear: {
-        label: "Clear",
-        icon: "□",
+
+        label:
+            "Clear",
+
+        icon:
+            "□",
+
     },
 
     reset: {
-        label: "Reset",
-        icon: "↻",
+
+        label:
+            "Reset",
+
+        icon:
+            "↻",
+
     },
 
     exit: {
-        label: "Exit",
-        icon: "×",
+
+        label:
+            "Exit",
+
+        icon:
+            "×",
+
     },
 
     save: {
-        label: "Save",
-        icon: "✓",
-        primary: true,
+
+        label:
+            "Save",
+
+        icon:
+            "✓",
+
+        primary:
+            true,
+
     },
 
 };
@@ -123,8 +150,69 @@ export function buildIdentityWorkspace(
         runtime.section;
 
 
-    const sectionId =
-        runtime.sectionId;
+    if (!section) {
+
+        return createWorkspace({
+
+            runtime,
+
+            banner:
+                createWorkspaceBannerModel({
+
+                    left: {
+
+                        title:
+                            "IDENTITY",
+
+                    },
+
+                    centre: {
+
+                        mode:
+                            "identity",
+
+                    },
+
+                    right: {
+
+                        metric:
+
+                            createWorkspaceProgressModel({
+
+                                value:
+                                    completion,
+
+                            }),
+
+                    },
+
+                }),
+
+            navigation:
+
+                createWorkspaceNavigationModel({
+
+                    items:
+                        runtime.sections,
+
+                    current:
+                        runtime.current,
+
+                    onChange:
+                        goToSection,
+
+                }),
+
+            body: {
+
+                section:
+                    null,
+
+            },
+
+        });
+
+    }
 
 
     /* =====================================
@@ -133,14 +221,18 @@ export function buildIdentityWorkspace(
 
     const editing =
         Boolean(
-            section?.runtime?.editing
+            section.runtime?.editing
         );
 
 
     const saving =
         Boolean(
-            section?.runtime?.saving
+            section.runtime?.saving
         );
+
+
+    const sectionId =
+        section.id;
 
 
     /* =====================================
@@ -150,10 +242,6 @@ export function buildIdentityWorkspace(
     const sectionActionHandlers = {
 
         edit: () => {
-
-            if (!sectionId) {
-                return;
-            }
 
             actions.setSectionEditing(
                 sectionId,
@@ -165,10 +253,6 @@ export function buildIdentityWorkspace(
 
         clear: () => {
 
-            if (!sectionId) {
-                return;
-            }
-
             actions.clearSection(
                 sectionId
             );
@@ -177,10 +261,6 @@ export function buildIdentityWorkspace(
 
 
         reset: () => {
-
-            if (!sectionId) {
-                return;
-            }
 
             actions.resetSection(
                 sectionId
@@ -198,10 +278,6 @@ export function buildIdentityWorkspace(
 
         save: async () => {
 
-            if (!sectionId) {
-                return;
-            }
-
             await actions.handleSaveSection(
                 sectionId
             );
@@ -212,7 +288,7 @@ export function buildIdentityWorkspace(
 
 
     /* =====================================
-       SECTION ACTION VISIBILITY
+       ACTION VISIBILITY
     ===================================== */
 
     const isActionVisible = {
@@ -236,14 +312,14 @@ export function buildIdentityWorkspace(
 
 
     /* =====================================
-       SECTION ACTION MODEL
+       RESOLVE SECTION ACTIONS
     ===================================== */
 
     const sectionActions =
 
-        (section?.actions ?? [])
+        (section.actions ?? [])
 
-            .map((actionId) => {
+            .map(actionId => {
 
                 const definition =
                     SECTION_ACTION_DEFINITIONS[
@@ -257,10 +333,6 @@ export function buildIdentityWorkspace(
                     ];
 
 
-                /* -----------------------------
-                   Invalid action
-                ----------------------------- */
-
                 if (
                     !definition ||
                     !handler
@@ -270,10 +342,6 @@ export function buildIdentityWorkspace(
 
                 }
 
-
-                /* -----------------------------
-                   Visibility
-                ----------------------------- */
 
                 if (
                     !isActionVisible[
@@ -285,10 +353,6 @@ export function buildIdentityWorkspace(
 
                 }
 
-
-                /* -----------------------------
-                   Resolved action
-                ----------------------------- */
 
                 return {
 
@@ -302,15 +366,16 @@ export function buildIdentityWorkspace(
                         definition.icon,
 
                     primary:
-                        definition.primary ?? false,
-
-                    onClick:
-                        handler,
+                        definition.primary
+                            ?? false,
 
                     disabled:
                         actionId === "save"
                             ? saving
                             : false,
+
+                    onClick:
+                        handler,
 
                 };
 
@@ -323,20 +388,14 @@ export function buildIdentityWorkspace(
        RESOLVED SECTION
     ===================================== */
 
-    const resolvedSection =
+    const resolvedSection = {
 
-        section
+        ...section,
 
-            ? {
+        actions:
+            sectionActions,
 
-                ...section,
-
-                actions:
-                    sectionActions,
-
-            }
-
-            : null;
+    };
 
 
     /* =====================================

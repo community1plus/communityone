@@ -55,9 +55,13 @@ export default function IdentityWorkspace({
 
 
     const {
+
         banner,
+
         navigation,
+
         runtime,
+
     } = workspace;
 
 
@@ -66,8 +70,11 @@ export default function IdentityWorkspace({
     ===================================== */
 
     const {
+
         values,
+
         form,
+
     } = state;
 
 
@@ -78,6 +85,10 @@ export default function IdentityWorkspace({
     const section =
         runtime?.section ?? null;
 
+
+    /* =====================================
+       SECTION STATE
+    ===================================== */
 
     const editing =
         Boolean(
@@ -159,7 +170,7 @@ export default function IdentityWorkspace({
 
 
                     {/* =============================
-                       SECTION
+                       CURRENT SECTION
                     ============================= */}
 
                     <WorkspaceBody>
