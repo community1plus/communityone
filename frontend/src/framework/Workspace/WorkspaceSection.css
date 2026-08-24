@@ -76,18 +76,22 @@
 /* =========================================
    SECTION TOOLS
 ========================================= */
-
 .workspace-section-tools {
 
     display: flex;
+
+    position: relative;
 
     align-items: center;
 
     justify-content: flex-end;
 
+    flex: 0 0 auto;
+
     gap: 20px;
 
-    flex: 0 0 auto;
+    margin: 0;
+    padding: 0;
 
 }
 

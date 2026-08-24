@@ -27,24 +27,32 @@
    SECTION MENU
 ========================================= */
 
+/* =========================================
+   SECTION HEADER
+========================================= */
+
 .workspace-section-header {
-
-    position: absolute;
-
-    top: 0;
-    left: 0;
 
     display: flex;
 
-    align-items: center;
+    position: relative;
 
-    gap: 18px;
+    align-items: center;
+    justify-content: space-between;
 
     width: 100%;
+    min-width: 0;
+
+    min-height: 68px;
+
+    margin: 0;
+    padding: 0;
 
     box-sizing: border-box;
 
-    padding: 0;
+    border-bottom:
+        1px solid
+        var(--border-color, #e8e8e8);
 
 }
 
