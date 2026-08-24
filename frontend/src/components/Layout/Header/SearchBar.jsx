@@ -142,7 +142,7 @@ export default function SearchBar() {
         <input
           type="text"
           className="search-input"
-          placeholder="Search Community One..."
+          placeholder="Search your Community ..."
           value={searchQuery}
           onChange={handleChange}
         />
