@@ -17,9 +17,7 @@ export default function WorkspaceSection({
 }) {
 
     if (!model?.runtime?.visible) {
-
         return null;
-
     }
 
 
@@ -43,10 +41,6 @@ export default function WorkspaceSection({
         <section className="workspace-section">
 
 
-            {/* =====================================
-               SECTION HEADER
-            ===================================== */}
-
             <header className="workspace-section-header">
 
 
@@ -64,18 +58,13 @@ export default function WorkspaceSection({
                 <div className="workspace-section-tools">
 
                     <WorkspaceSectionProgress
-                        value={
-                            completion
-                        }
+                        value={completion}
                     />
 
-
                     <WorkspaceSectionActions
-
-                        actions={
-                            actions
-                        }
-
+                        actions={actions}
+                        handlers={runtime.handlers}
+                        sectionId={model.id}
                     />
 
                 </div>
@@ -83,10 +72,6 @@ export default function WorkspaceSection({
 
             </header>
 
-
-            {/* =====================================
-               SECTION BODY
-            ===================================== */}
 
             <div className="workspace-section-body">
 
