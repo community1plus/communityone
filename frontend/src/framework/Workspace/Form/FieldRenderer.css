@@ -3,15 +3,21 @@
 ========================================================= */
 
 .workspace-field {
-    display: flex;
-    flex-direction: column;
+
+    display: grid;
+
+    grid-template-columns: 140px minmax(0, 1fr);
+
+    align-items: start;
 
     width: 100%;
 
     margin: 0;
-    padding: 0;
+
+    padding: 20px 0;
 
     box-sizing: border-box;
+
 }
 
 
