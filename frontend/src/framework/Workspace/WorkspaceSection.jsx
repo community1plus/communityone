@@ -20,16 +20,8 @@ export default function WorkspaceSection({
     }
 
 
-    const title =
-        model.title ?? "";
-
-
     const completion =
         model.runtime?.completion ?? 0;
-
-
-    const actions =
-        model.actions ?? [];
 
 
     return (
@@ -40,7 +32,7 @@ export default function WorkspaceSection({
 
                 <div className="workspace-section-title">
 
-                    {title}
+                    {model.title}
 
                 </div>
 
@@ -56,9 +48,8 @@ export default function WorkspaceSection({
 
                     <WorkspaceSectionActions
                         actions={
-                            actions
+                            model.actions ?? []
                         }
-
                     />
 
                 </div>

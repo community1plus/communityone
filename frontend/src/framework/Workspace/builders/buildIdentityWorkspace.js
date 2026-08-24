@@ -6,6 +6,9 @@ import {
     createWorkspaceNavigationModel,
 } from "../../../framework/Workspace/models/WorkspaceNavigationModel";
 
+import {
+    createWorkspaceProgressModel,
+} from "../../../framework/Workspace/models/WorkspaceProgressModel";
 
 import {
     createWorkspaceBannerModel,
@@ -24,201 +27,31 @@ const SECTION_ACTION_DEFINITIONS = {
 
     edit: {
         label: "Edit",
-        icon: "edit",
+        icon: "✎",
     },
 
     clear: {
         label: "Clear",
-        icon: "clear",
+        icon: "□",
     },
 
     reset: {
         label: "Reset",
-        icon: "reset",
+        icon: "↻",
     },
 
     exit: {
         label: "Exit",
-        icon: "exit",
+        icon: "×",
     },
 
     save: {
         label: "Save",
-        icon: "save",
+        icon: "✓",
         primary: true,
     },
 
 };
-
-
-/* =========================================
-   SECTION ACTION VISIBILITY
-========================================= */
-
-function getSectionActionVisibility(editing) {
-
-    return {
-
-        edit:
-            !editing,
-
-        clear:
-            editing,
-
-        reset:
-            editing,
-
-        exit:
-            true,
-
-        save:
-            editing,
-
-    };
-
-}
-
-
-/* =========================================
-   BUILD SECTION ACTIONS
-========================================= */
-
-function buildSectionActions({
-
-    section,
-
-    runtime,
-
-    editing,
-
-    saving,
-
-    actions,
-
-}) {
-
-    const visibility =
-        getSectionActionVisibility(
-            editing
-        );
-
-
-    return (section?.actions ?? [])
-
-        .map((actionId) => {
-
-            const definition =
-                SECTION_ACTION_DEFINITIONS[
-                    actionId
-                ];
-
-
-            if (!definition) {
-                return null;
-            }
-
-
-            const handler = {
-
-                edit: () => {
-
-                    if (!runtime.sectionId) {
-                        return;
-                    }
-
-                    actions.setSectionEditing(
-                        runtime.sectionId,
-                        true
-                    );
-
-                },
-
-
-                clear: () => {
-
-                    if (!runtime.sectionId) {
-                        return;
-                    }
-
-                    actions.clearSection(
-                        runtime.sectionId
-                    );
-
-                },
-
-
-                reset: () => {
-
-                    if (!runtime.sectionId) {
-                        return;
-                    }
-
-                    actions.resetSection(
-                        runtime.sectionId
-                    );
-
-                },
-
-
-                exit: () => {
-
-                    actions.closeProfile();
-
-                },
-
-
-                save: async () => {
-
-                    if (!runtime.sectionId) {
-                        return;
-                    }
-
-                    await actions.handleSaveSection(
-                        runtime.sectionId
-                    );
-
-                },
-
-            }[actionId];
-
-
-            if (
-                !handler ||
-                !visibility[actionId]
-            ) {
-                return null;
-            }
-
-
-           return {
-
-    id:
-        actionId,
-
-    label:
-        definition.label,
-
-    icon:
-        definition.icon,
-
-    primary:
-        definition.primary ?? false,
-
-    onClick:
-        handler,
-
-    disabled:
-        actionId === "save"
-            ? saving
-            : false,
-
-};
-
-        })
-
-        .filter(Boolean);
-
-}
 
 
 /* =========================================
@@ -290,6 +123,10 @@ export function buildIdentityWorkspace(
         runtime.section;
 
 
+    const sectionId =
+        runtime.sectionId;
+
+
     /* =====================================
        SECTION STATE
     ===================================== */
@@ -307,104 +144,179 @@ export function buildIdentityWorkspace(
 
 
     /* =====================================
-       SECTION COMPLETION
+       SECTION ACTION HANDLERS
     ===================================== */
 
-    const currentSectionCompletion =
-        section
-            ? (
-                sectionCompletion?.[
-                    section.id
-                ] ?? 0
-            )
-            : 0;
+    const sectionActionHandlers = {
 
-const isSectionActionVisible = (
-    actionId,
-    editing
-) => {
+        edit: () => {
 
-    switch (actionId) {
+            if (!sectionId) {
+                return;
+            }
 
-        case "edit":
-            return !editing;
+            actions.setSectionEditing(
+                sectionId,
+                true
+            );
 
-        case "clear":
-        case "reset":
-        case "save":
-            return editing;
+        },
 
-        case "exit":
-            return true;
 
-        default:
-            return false;
+        clear: () => {
 
-    }
+            if (!sectionId) {
+                return;
+            }
 
-};
+            actions.clearSection(
+                sectionId
+            );
+
+        },
+
+
+        reset: () => {
+
+            if (!sectionId) {
+                return;
+            }
+
+            actions.resetSection(
+                sectionId
+            );
+
+        },
+
+
+        exit: () => {
+
+            actions.closeProfile();
+
+        },
+
+
+        save: async () => {
+
+            if (!sectionId) {
+                return;
+            }
+
+            await actions.handleSaveSection(
+                sectionId
+            );
+
+        },
+
+    };
+
+
     /* =====================================
-       SECTION ACTIONS
+       SECTION ACTION VISIBILITY
     ===================================== */
 
-const sectionActions =
+    const isActionVisible = {
 
-    (section?.actions ?? [])
+        edit:
+            !editing,
 
-        .map(actionId => {
+        clear:
+            editing,
 
-            const handler =
-                sectionActionHandlers[actionId];
+        reset:
+            editing,
 
-            const definition =
-                SECTION_ACTION_DEFINITIONS[actionId];
+        exit:
+            true,
 
+        save:
+            editing,
 
-            if (
-                !handler ||
-                !definition
-            ) {
-                return null;
-            }
-
-
-            if (
-                !isSectionActionVisible(
-                    actionId,
-                    editing
-                )
-            ) {
-                return null;
-            }
+    };
 
 
-            return {
+    /* =====================================
+       SECTION ACTION MODEL
+    ===================================== */
 
-                id:
-                    actionId,
+    const sectionActions =
 
-                label:
-                    definition.label,
+        (section?.actions ?? [])
 
-                icon:
-                    definition.icon,
+            .map((actionId) => {
 
-                primary:
-                    definition.primary ?? false,
+                const definition =
+                    SECTION_ACTION_DEFINITIONS[
+                        actionId
+                    ];
 
-                onClick:
-                    handler,
 
-                disabled:
-                    actionId === "save"
-                        ? saving
-                        : false,
+                const handler =
+                    sectionActionHandlers[
+                        actionId
+                    ];
 
-            };
 
-        })
+                /* -----------------------------
+                   Invalid action
+                ----------------------------- */
 
-        .filter(Boolean);
+                if (
+                    !definition ||
+                    !handler
+                ) {
+
+                    return null;
+
+                }
+
+
+                /* -----------------------------
+                   Visibility
+                ----------------------------- */
+
+                if (
+                    !isActionVisible[
+                        actionId
+                    ]
+                ) {
+
+                    return null;
+
+                }
+
+
+                /* -----------------------------
+                   Resolved action
+                ----------------------------- */
+
+                return {
+
+                    id:
+                        actionId,
+
+                    label:
+                        definition.label,
+
+                    icon:
+                        definition.icon,
+
+                    primary:
+                        definition.primary ?? false,
+
+                    onClick:
+                        handler,
+
+                    disabled:
+                        actionId === "save"
+                            ? saving
+                            : false,
+
+                };
+
+            })
+
+            .filter(Boolean);
 
 
     /* =====================================
@@ -419,19 +331,6 @@ const sectionActions =
 
                 ...section,
 
-                runtime: {
-
-                    ...section.runtime,
-
-                    completion:
-                        currentSectionCompletion,
-
-                    editing,
-
-                    saving,
-
-                },
-
                 actions:
                     sectionActions,
 
@@ -441,33 +340,44 @@ const sectionActions =
 
 
     /* =====================================
-       WORKSPACE BANNER
-       
-       ONLY workspace-level information
+       BANNER
     ===================================== */
 
-const banner =
-    createWorkspaceBannerModel({
+    const banner =
+        createWorkspaceBannerModel({
 
-        left: {
+            left: {
 
-            title:
-                "IDENTITY",
+                title:
+                    "IDENTITY",
 
-        },
+            },
 
-        centre: {
+            centre: {
 
-            mode:
-                "identity",
+                mode:
+                    "identity",
 
-        },
+            },
 
-    });
+            right: {
+
+                metric:
+
+                    createWorkspaceProgressModel({
+
+                        value:
+                            completion,
+
+                    }),
+
+            },
+
+        });
 
 
     /* =====================================
-       SECTION NAVIGATION
+       NAVIGATION
     ===================================== */
 
     const navigation =
