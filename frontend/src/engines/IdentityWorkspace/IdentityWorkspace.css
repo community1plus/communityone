@@ -2,21 +2,23 @@
    WORKSPACE SECTION
 ========================================= */
 
+/* =========================================
+   WORKSPACE SECTION
+========================================= */
+
 .workspace-section {
+
+    display: block;
 
     position: relative;
 
     width: 100%;
-
     min-width: 0;
 
+    margin: 0;
+    padding: 0;
+
     box-sizing: border-box;
-
-    background:
-        var(--surface-secondary, #f7f6f4);
-
-    padding:
-        68px 32px 48px;
 
 }
 
