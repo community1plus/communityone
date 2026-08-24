@@ -6,13 +6,16 @@
 
     display: grid;
 
-    grid-template-columns: 120px minmax(0, 1fr);
+    grid-template-columns: 140px minmax(0, 420px);
 
-    column-gap: 32px;
+    column-gap: 36px;
 
     align-items: start;
 
-    width: 100%;
+    width: fit-content;
+    max-width: 100%;
+
+    margin: 0 auto;
 
 }
 
@@ -33,6 +36,9 @@
 
     line-height: 1.4;
 
+    color:
+        var(--text-primary, #111);
+
 }
 
 
@@ -41,10 +47,6 @@
 ========================================= */
 
 .workspace-field-content {
-
-    display: flex;
-
-    flex-direction: column;
 
     min-width: 0;
 
@@ -66,7 +68,7 @@
     line-height: 1.4;
 
     color:
-        var(--link-color, #2878c8);
+        #2776d2;
 
 }
 
@@ -90,11 +92,49 @@
 
 
 /* =========================================
+   FIELD INPUT
+========================================= */
+
+.workspace-field-input {
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+}
+
+
+/* =========================================
    FIELD SPACING
 ========================================= */
 
 .workspace-field + .workspace-field {
 
-    margin-top: 44px;
+    margin-top: 48px;
+
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 760px) {
+
+    .workspace-field {
+
+        width: 100%;
+
+        grid-template-columns: 1fr;
+
+        row-gap: 8px;
+
+    }
+
+    .workspace-field + .workspace-field {
+
+        margin-top: 32px;
+
+    }
 
 }
