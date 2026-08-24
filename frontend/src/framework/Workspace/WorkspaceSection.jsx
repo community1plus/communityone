@@ -24,15 +24,21 @@ export default function WorkspaceSection({
         model.runtime?.completion ?? 0;
 
 
+    const actions =
+        model.actions ?? [];
+
+
     return (
 
         <section className="workspace-section">
 
             <header className="workspace-section-header">
 
-                <div className="workspace-section-title">
+                <div className="workspace-section-heading">
 
-                    {model.title}
+                    <h2 className="workspace-section-title">
+                        {model.title}
+                    </h2>
 
                 </div>
 
@@ -40,16 +46,12 @@ export default function WorkspaceSection({
                 <div className="workspace-section-tools">
 
                     <WorkspaceSectionProgress
-                        value={
-                            completion
-                        }
+                        value={completion}
                     />
 
 
                     <WorkspaceSectionActions
-                        actions={
-                            model.actions ?? []
-                        }
+                        actions={actions}
                     />
 
                 </div>

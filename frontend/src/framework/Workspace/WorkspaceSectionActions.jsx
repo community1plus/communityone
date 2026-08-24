@@ -1,57 +1,63 @@
-import "./WorkspaceSectionActions.css";
+export const WORKSPACE_SECTION_ACTIONS = {
 
+    edit: {
 
-export default function WorkspaceSectionActions({
+        id: "edit",
 
-    actions = [],
+        label: "Edit",
 
-}) {
+        icon: "✎",
 
-    if (!actions.length) {
-        return null;
-    }
+        primary: false,
 
+    },
 
-    return (
+    clear: {
 
-        <div className="workspace-section-actions">
+        id: "clear",
 
-            {actions.map(action => (
+        label: "Clear",
 
-                <button
-                    key={action.id}
-                    type="button"
-                    className={`
-                        workspace-section-action
-                        ${action.primary
-                            ? "workspace-section-action-primary"
-                            : ""
-                        }
-                    `}
-                    onClick={action.onClick}
-                    disabled={action.disabled}
-                    title={action.label}
-                >
+        icon: "□",
 
-                    <span className="workspace-section-action-icon">
+        primary: false,
 
-                        {action.icon}
+    },
 
-                    </span>
+    reset: {
 
+        id: "reset",
 
-                    <span className="workspace-section-action-label">
+        label: "Reset",
 
-                        {action.label}
+        icon: "↻",
 
-                    </span>
+        primary: false,
 
-                </button>
+    },
 
-            ))}
+    exit: {
 
-        </div>
+        id: "exit",
 
-    );
+        label: "Exit",
 
-}
+        icon: "×",
+
+        primary: false,
+
+    },
+
+    save: {
+
+        id: "save",
+
+        label: "Save",
+
+        icon: "✓",
+
+        primary: true,
+
+    },
+
+};

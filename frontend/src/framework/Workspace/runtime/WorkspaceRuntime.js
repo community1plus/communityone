@@ -14,134 +14,34 @@ export function createWorkspaceRuntime({
 
 }) {
 
-    /* =========================================
-       NORMALISE SECTIONS
-    ========================================= */
-
     const safeSections =
         Array.isArray(sections)
             ? sections
             : [];
 
 
-    /* =========================================
-       RESOLVE CURRENT INDEX
-    ========================================= */
-
     const safeCurrent =
         safeSections.length === 0
-
             ? 0
-
             : Math.min(
-
                 Math.max(
                     Number(current) || 0,
                     0
                 ),
-
                 safeSections.length - 1
-
             );
 
 
-    /* =========================================
-       HYDRATE SECTION RUNTIME
-    ========================================= */
-
-    const runtimeSections =
-        safeSections.map(section => {
-
-            const sectionId =
-                section.id;
+    const baseSection =
+        safeSections[safeCurrent] ?? null;
 
 
-            const completion =
-                Number(
-                    sectionCompletion?.[sectionId]
-                ) || 0;
-
-
-            const editing =
-                Boolean(
-                    editingSections?.[sectionId]
-                );
-
-
-            const valid =
-                section?.validator
-                    ? section.validator(values)
-                    : true;
-
-
-            return {
-
-                ...section,
-
-                runtime: {
-
-                    ...section.runtime,
-
-                    enabled:
-                        section.runtime?.enabled
-                        ?? true,
-
-                    visible:
-                        section.runtime?.visible
-                        ?? true,
-
-                    dirty:
-                        section.runtime?.dirty
-                        ?? false,
-
-                    valid,
-
-                    complete:
-                        completion >= 100,
-
-                    completion,
-
-                    editing,
-
-                    saving:
-                        savingSection,
-
-                },
-
-            };
-
-        });
-
-
-    /* =========================================
-       CURRENT SECTION
-    ========================================= */
-
-    const section =
-        runtimeSections[safeCurrent]
-        ?? null;
-
-
-    const sectionId =
-        section?.id
-        ?? null;
-
-
-    const valid =
-        section?.runtime?.valid
-        ?? true;
-
-
-    /* =========================================
-       EMPTY WORKSPACE
-    ========================================= */
-
-    if (!section) {
+    if (!baseSection) {
 
         return {
 
             sections:
-                runtimeSections,
+                safeSections,
 
             current:
                 safeCurrent,
@@ -160,14 +60,61 @@ export function createWorkspaceRuntime({
     }
 
 
-    /* =========================================
-       RUNTIME MODEL
-    ========================================= */
+    const valid =
+        typeof baseSection.validator === "function"
+            ? baseSection.validator(values)
+            : true;
+
+
+    const sectionId =
+        baseSection.id;
+
+
+    const completion =
+        sectionCompletion?.[sectionId] ?? 0;
+
+
+    const editing =
+        Boolean(
+            editingSections?.[sectionId]
+        );
+
+
+    const runtime = {
+
+        ...(baseSection.runtime ?? {}),
+
+        visible:
+            baseSection.runtime?.visible ?? true,
+
+        enabled:
+            baseSection.runtime?.enabled ?? true,
+
+        valid,
+
+        completion,
+
+        editing,
+
+        saving:
+            Boolean(savingSection),
+
+    };
+
+
+    const section = {
+
+        ...baseSection,
+
+        runtime,
+
+    };
+
 
     return {
 
         sections:
-            runtimeSections,
+            safeSections,
 
         current:
             safeCurrent,

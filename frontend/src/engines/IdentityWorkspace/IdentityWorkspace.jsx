@@ -52,9 +52,6 @@ export default function IdentityWorkspace({
     const {
         values,
         form,
-        editingSections,
-        savingSection,
-        sectionCompletion,
     } = state;
 
 
@@ -62,17 +59,23 @@ export default function IdentityWorkspace({
        WORKSPACE MODEL
     ===================================== */
 
+    const workspace =
+        buildCapabilityWorkspace({
+
+            capability,
+
+            state,
+
+            actions,
+
+        });
+
+
     const {
         banner,
         navigation,
         runtime,
-    } = buildCapabilityWorkspace({
-
-        capability,
-        state,
-        actions,
-
-    });
+    } = workspace;
 
 
     /* =====================================
@@ -80,21 +83,16 @@ export default function IdentityWorkspace({
     ===================================== */
 
     const section =
-        runtime?.section;
+        runtime?.section ?? null;
 
-    const sectionId =
-        section?.id;
+
+    /* =====================================
+       SECTION STATE
+    ===================================== */
 
     const editing =
-        sectionId
-            ? Boolean(
-                editingSections?.[sectionId]
-            )
-            : false;
-
-    const saving =
         Boolean(
-            savingSection
+            section?.runtime?.editing
         );
 
 
@@ -158,7 +156,7 @@ export default function IdentityWorkspace({
 
 
                     {/* ==========================
-                       NAVIGATION
+                       SECTION NAVIGATION
                     ========================== */}
 
                     <WorkspaceNavigation
@@ -169,13 +167,15 @@ export default function IdentityWorkspace({
 
 
                     {/* ==========================
-                       SECTION
+                       CURRENT SECTION
                     ========================== */}
 
                     <WorkspaceBody>
 
                         <WorkspaceSection
-                            model={section}
+                            model={
+                                section
+                            }
                         >
 
                             <div className="workspace-section-content">
@@ -192,10 +192,6 @@ export default function IdentityWorkspace({
 
                                     editing={
                                         editing
-                                    }
-
-                                    sectionCompletion={
-                                        sectionCompletion
                                     }
 
                                 />

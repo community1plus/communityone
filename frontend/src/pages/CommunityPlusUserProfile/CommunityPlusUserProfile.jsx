@@ -194,49 +194,31 @@ export default function CommunityPlusUserProfile({
        Workspace section runtime contract.
     ===================================== */
 
-    const sections =
-        useMemo(() => {
+const sections = useMemo(() => {
 
-            const isEntity =
-                values.identityType === "ENTITY" ||
-                values.capabilities?.entity;
+    const isEntity =
+        values.identityType === "ENTITY" ||
+        values.capabilities?.entity;
 
+    if (isEntity) {
 
-            if (isEntity) {
+        return [
+            ...PERSONAL_STEPS.slice(0, 1),
+            ...ENTITY_STEPS,
+            ...COMMON_STEPS,
+        ];
 
-                return [
+    }
 
-                    /*
-                     * Personal identity remains
-                     * the first step for an Entity.
-                     */
+    return [
+        ...PERSONAL_STEPS,
+        ...COMMON_STEPS,
+    ];
 
-                    ...PERSONAL_STEPS.slice(0, 1),
-
-                    ...ENTITY_STEPS,
-
-                    ...COMMON_STEPS,
-
-                ];
-
-            }
-
-
-            return [
-
-                ...PERSONAL_STEPS,
-
-                ...COMMON_STEPS,
-
-            ];
-
-        }, [
-
-            values.identityType,
-
-            values.capabilities,
-
-        ]);
+}, [
+    values.identityType,
+    values.capabilities,
+]);
 
 
     /* =====================================
