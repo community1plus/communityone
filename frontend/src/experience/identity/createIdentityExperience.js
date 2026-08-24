@@ -26,7 +26,7 @@ export function createIdentityExperience({
 
             header: Workspace.Header({
 
-                title: "PROFILE",
+                title: "IDENTITY",
 
                 subtitle: "Your trusted identity.",
 
