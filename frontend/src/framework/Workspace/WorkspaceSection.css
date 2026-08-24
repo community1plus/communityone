@@ -2,10 +2,6 @@
    WORKSPACE SECTION
 ========================================= */
 
-/* =========================================
-   WORKSPACE SECTION
-========================================= */
-
 .workspace-section {
 
     display: flex;
@@ -34,11 +30,11 @@
     display: flex;
 
     align-items: center;
-
     justify-content: space-between;
 
+    flex: 0 0 auto;
+
     width: 100%;
-    min-width: 0;
 
     min-height: 68px;
 
@@ -55,93 +51,6 @@
 
 
 /* =========================================
-   SECTION HEADING
-========================================= */
-
-.workspace-section-heading {
-
-    display: flex;
-
-    align-items: center;
-
-    min-width: 0;
-
-    margin: 0;
-    padding: 0;
-
-}
-
-
-/* =========================================
-   SECTION TITLE
-========================================= */
-
-.workspace-section-title {
-
-    margin: 0;
-
-    font-size: 1.35rem;
-
-    font-weight: 500;
-
-    line-height: 1.2;
-
-    color:
-        var(--text-primary, #111);
-
-}
-
-
-/* =========================================
-   SECTION TOOLS
-========================================= */
-
-.workspace-section-tools {
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: flex-end;
-
-    flex: 0 0 auto;
-
-    gap: 20px;
-
-    min-width: 0;
-
-    margin: 0;
-    padding: 0;
-
-}
-
-
-/* =========================================
-   SECTION BODY
-========================================= */
-
-.workspace-section-body {
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    width: 100%;
-    min-width: 0;
-
-    margin: 0;
-    padding: 48px;
-
-    box-sizing: border-box;
-
-}
-
-
-/* =========================================
-   SECTION CONTENT
-========================================= */
-/* =========================================
    SECTION CONTENT
 ========================================= */
 
@@ -155,6 +64,7 @@
     flex: 1;
 
     width: 100%;
+
     min-width: 0;
     min-height: 0;
 
@@ -162,26 +72,5 @@
     padding: 0;
 
     box-sizing: border-box;
-
-}
-
-
-/* =========================================
-   RESPONSIVE
-========================================= */
-
-@media (max-width: 760px) {
-
-    .workspace-section-header {
-
-        min-height: 60px;
-
-    }
-
-    .workspace-section-tools {
-
-        gap: 12px;
-
-    }
 
 }
