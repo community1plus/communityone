@@ -28,50 +28,41 @@ export default function WorkspaceSection({
 
     return (
 
-        <section className="workspace-section">
+<section className="workspace-section">
 
-            <header className="workspace-section-header">
+    <header className="workspace-section-header">
 
-                <div className="workspace-section-identity">
+        <div className="workspace-section-title">
+            {section.title}
+        </div>
 
-                    <span className="workspace-section-title">
-                        {model.title}
-                    </span>
+        <div className="workspace-section-tools">
 
-                </div>
+            <WorkspaceProgress
+                value={
+                    section.runtime.completion
+                }
+            />
 
+            <WorkspaceSectionActions
+                actions={
+                    section.actions
+                }
 
-                <div className="workspace-section-controls">
+            />
 
-                    <WorkspaceSectionProgress
+        </div>
 
-                        value={
-                            completion
-                        }
-
-                    />
-
-
-                    <WorkspaceSectionActions
-
-                        actions={
-                            model.actions
-                        }
-
-                    />
-
-                </div>
-
-            </header>
+    </header>
 
 
-            <div className="workspace-section-body">
+    <div className="workspace-section-body">
 
-                {children}
+        {/* existing section renderer */}
 
-            </div>
+    </div>
 
-        </section>
+</section>
 
     );
 
