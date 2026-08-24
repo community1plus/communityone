@@ -14,15 +14,13 @@
 
     margin: 0;
 
-    padding: 56px 0;
-
     box-sizing: border-box;
 
 }
 
 
 /* =========================================
-   FORM FIELD GROUP
+   FORM FIELD
 ========================================= */
 
 .workspace-form .workspace-field {
