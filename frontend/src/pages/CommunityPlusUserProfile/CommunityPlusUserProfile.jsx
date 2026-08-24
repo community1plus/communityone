@@ -37,7 +37,7 @@ import IdentityWorkspace
 
 
 import {
-    PERSONAL_SECTIONS,
+    PERSONAL_STEPS,
     ENTITY_SECTIONS,
     COMMON_SECTIONS,
 } from "../../framework/Workspace/profile/profileConstants";
