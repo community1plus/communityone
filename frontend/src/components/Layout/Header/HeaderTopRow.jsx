@@ -70,8 +70,8 @@ export default function HeaderTopRow({ onOpenAuthModal }) {
 
 
     <div className="brand-wordmark">
-        <span>THE WRKSHOP</span>
-        <span>Co</span>
+        <span>THE </span>
+        <span>WRKSHOP</span>
     </div>
         <div className="brand-mark">
         <span className="brand-c"></span>
