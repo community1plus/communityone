@@ -4,6 +4,10 @@
 
 .workspace-section {
 
+    position: relative;
+
+    display: block;
+
     width: 100%;
     min-width: 0;
 
@@ -24,9 +28,11 @@
     display: flex;
 
     align-items: center;
+
     justify-content: space-between;
 
     width: 100%;
+    min-width: 0;
 
     min-height: 68px;
 
@@ -54,8 +60,15 @@
 
     min-width: 0;
 
+    margin: 0;
+    padding: 0;
+
 }
 
+
+/* =========================================
+   SECTION TITLE
+========================================= */
 
 .workspace-section-title {
 
@@ -76,11 +89,10 @@
 /* =========================================
    SECTION TOOLS
 ========================================= */
+
 .workspace-section-tools {
 
     display: flex;
-
-    position: relative;
 
     align-items: center;
 
@@ -89,6 +101,8 @@
     flex: 0 0 auto;
 
     gap: 20px;
+
+    min-width: 0;
 
     margin: 0;
     padding: 0;
@@ -101,6 +115,8 @@
 ========================================= */
 
 .workspace-section-body {
+
+    display: block;
 
     width: 100%;
     min-width: 0;
@@ -126,5 +142,26 @@
     padding: 0;
 
     box-sizing: border-box;
+
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 760px) {
+
+    .workspace-section-header {
+
+        min-height: 60px;
+
+    }
+
+    .workspace-section-tools {
+
+        gap: 12px;
+
+    }
 
 }
