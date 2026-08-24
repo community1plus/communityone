@@ -15,6 +15,10 @@ export default function WorkspaceSection({
 
 }) {
 
+    /* =====================================
+       VISIBILITY
+    ===================================== */
+
     if (!model?.runtime?.visible) {
 
         return null;
@@ -22,47 +26,81 @@ export default function WorkspaceSection({
     }
 
 
+    /* =====================================
+       SECTION STATE
+    ===================================== */
+
     const completion =
         model.runtime?.completion ?? 0;
 
 
+    const actions =
+        model.actions ?? [];
+
+
+    /* =====================================
+       RENDER
+    ===================================== */
+
     return (
 
-<section className="workspace-section">
+        <section
+            className="workspace-section"
+        >
 
-    <header className="workspace-section-header">
+            {/* =================================
+                SECTION HEADER
+            ================================= */}
 
-        <div className="workspace-section-title">
-            {section.title}
-        </div>
+            <header
+                className="workspace-section-header"
+            >
 
-        <div className="workspace-section-tools">
+                <div
+                    className="workspace-section-title"
+                >
 
-            <WorkspaceProgress
-                value={
-                    section.runtime.completion
-                }
-            />
+                    {model.title}
 
-            <WorkspaceSectionActions
-                actions={
-                    section.actions
-                }
-
-            />
-
-        </div>
-
-    </header>
+                </div>
 
 
-    <div className="workspace-section-body">
+                <div
+                    className="workspace-section-tools"
+                >
 
-        {/* existing section renderer */}
+                    <WorkspaceSectionProgress
+                        value={
+                            completion
+                        }
+                    />
 
-    </div>
 
-</section>
+                    <WorkspaceSectionActions
+                        actions={
+                            actions
+                        }
+
+                    />
+
+                </div>
+
+            </header>
+
+
+            {/* =================================
+                SECTION BODY
+            ================================= */}
+
+            <div
+                className="workspace-section-body"
+            >
+
+                {children}
+
+            </div>
+
+        </section>
 
     );
 
