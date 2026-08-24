@@ -1,54 +1,46 @@
+/* =========================================
+   WORKSPACE SECTION
+========================================= */
+
 .workspace-section {
+
     width: 100%;
+
+    margin-top: 32px;
+
 }
 
+
+/* =========================================
+   SECTION HEADER
+========================================= */
 
 .workspace-section-header {
+
+    width: 100%;
+
+    min-height: 64px;
+
     display: flex;
+
     align-items: center;
+
     justify-content: space-between;
 
-    min-height: 56px;
+    padding: 0 4px;
 
-    padding:
-        0 8px
-        0 8px;
+    border-bottom: 1px solid #e5e5e5;
 
-    border-bottom:
-        1px solid #e5e5e5;
-}
-
-
-.workspace-section-title {
-    font-size: 18px;
-    font-weight: 600;
-
-    letter-spacing: 0.04em;
-
-    color: #151515;
-}
-
-
-.workspace-section-tools {
-    display: flex;
-    align-items: center;
-
-    gap: 18px;
-}
-
-.workspace-section-controls {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 24px;
-
-    margin-left: auto;
+    box-sizing: border-box;
 
 }
 
-.workspace-section-identity {
+
+/* =========================================
+   SECTION HEADING
+========================================= */
+
+.workspace-section-heading {
 
     display: flex;
 
@@ -58,135 +50,247 @@
 
 }
 
-/* =========================================
-   CONTENT CHILDREN
-   -----------------------------------------
-   Default children are intrinsically sized.
-========================================= */
 
-.workspace-section-content > * {
+.workspace-section-title {
 
-    width: fit-content;
-    max-width: 100%;
+    margin: 0;
 
-    margin-left: auto;
-    margin-right: auto;
+    font-size: 18px;
 
-    box-sizing: border-box;
+    font-weight: 600;
+
+    line-height: 1.2;
+
+    color: #161616;
 
 }
 
 
 /* =========================================
-   SECTION HEADER
-   -----------------------------------------
-   Header is structural and must span the
-   section rather than shrink-wrap.
+   SECTION TOOLS
 ========================================= */
 
-.workspace-section-content > .workspace-section-header {
-
-    width: 100%;
-    max-width: 100%;
-
-    margin-left: 0;
-    margin-right: 0;
-
-}
-
-
-/* =========================================
-   FORM
-========================================= */
-
-.workspace-section-content .workspace-form {
+.workspace-section-tools {
 
     display: flex;
+
+    align-items: center;
+
+    gap: 16px;
+
+}
+
+
+/* =========================================
+   SECTION PROGRESS
+========================================= */
+
+.workspace-section-progress {
+
+    display: flex;
+
+    align-items: center;
+
+}
+
+
+/* =========================================
+   SECTION ACTIONS
+========================================= */
+
+.workspace-section-actions {
+
+    position: relative;
+
+    display: flex;
+
+    align-items: center;
+
+}
+
+
+/* =========================================
+   ACTION TRIGGER
+========================================= */
+
+.workspace-section-actions-trigger {
+
+    width: 36px;
+
+    height: 36px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 0;
+
+    border: 1px solid #d8d8d8;
+
+    border-radius: 6px;
+
+    background: #ffffff;
+
+    color: #222222;
+
+    font-size: 20px;
+
+    line-height: 1;
+
+    cursor: pointer;
+
+}
+
+
+.workspace-section-actions-trigger:hover {
+
+    background: #f5f5f5;
+
+}
+
+
+/* =========================================
+   ACTION MENU
+========================================= */
+
+.workspace-section-actions-menu {
+
+    position: absolute;
+
+    top: calc(100% + 8px);
+
+    right: 0;
+
+    z-index: 100;
+
+    min-width: 160px;
+
+    display: none;
+
     flex-direction: column;
 
-    width: fit-content;
-    max-width: 100%;
+    padding: 6px;
 
-    margin-left: auto;
-    margin-right: auto;
+    background: #ffffff;
 
-    box-sizing: border-box;
+    border: 1px solid #e2e2e2;
 
-}
+    border-radius: 8px;
 
-
-/* =========================================
-   FORM FIELD
-========================================= */
-
-.workspace-section-content
-.workspace-form
-.workspace-field {
-
-    width: fit-content;
-    max-width: 100%;
-
-    box-sizing: border-box;
+    box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.12);
 
 }
 
 
 /* =========================================
-   FIELD CONTENT
+   OPEN MENU
 ========================================= */
 
-.workspace-section-content
-.workspace-form
-.workspace-field-content {
+.workspace-section-actions:focus-within
+.workspace-section-actions-menu {
 
-    width: fit-content;
-    max-width: 100%;
-
-    box-sizing: border-box;
+    display: flex;
 
 }
 
 
 /* =========================================
-   FORM CONTROLS
+   ACTION ITEM
 ========================================= */
 
-.workspace-section-content
-.workspace-form
-input,
-.workspace-section-content
-.workspace-form
-textarea,
-.workspace-section-content
-.workspace-form
-select {
-
-    display: block;
+.workspace-section-action {
 
     width: 100%;
-    max-width: 100%;
 
-    box-sizing: border-box;
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 9px 12px;
+
+    border: 0;
+
+    border-radius: 5px;
+
+    background: transparent;
+
+    color: #222222;
+
+    text-align: left;
+
+    font-size: 14px;
+
+    cursor: pointer;
+
+}
+
+
+.workspace-section-action:hover {
+
+    background: #f4f4f4;
 
 }
 
 
 /* =========================================
-   RESPONSIVE
+   ACTION ICON
 ========================================= */
 
-@media (max-width: 760px) {
+.workspace-section-action-icon {
 
-    .workspace-section-content > .workspace-section-header,
-    .workspace-section-content .workspace-form,
-    .workspace-section-content .workspace-form .workspace-field,
-    .workspace-section-content
-    .workspace-form
-    .workspace-field-content {
+    width: 18px;
 
-        width: 100%;
-        max-width: 100%;
+    display: inline-flex;
 
-    }
+    align-items: center;
+
+    justify-content: center;
+
+}
+
+
+/* =========================================
+   PRIMARY ACTION
+========================================= */
+
+.workspace-section-action.primary {
+
+    font-weight: 600;
+
+}
+
+
+/* =========================================
+   DISABLED
+========================================= */
+
+.workspace-section-action:disabled {
+
+    opacity: 0.45;
+
+    cursor: not-allowed;
+
+}
+
+
+/* =========================================
+   SECTION BODY
+========================================= */
+
+.workspace-section-body {
+
+    width: 100%;
+
+}
+
+
+.workspace-section-content {
+
+    width: 100%;
 
 }
