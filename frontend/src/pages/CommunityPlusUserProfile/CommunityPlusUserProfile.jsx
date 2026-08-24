@@ -38,8 +38,8 @@ import IdentityWorkspace
 
 import {
     PERSONAL_STEPS,
-    ENTITY_SECTIONS,
-    COMMON_SECTIONS,
+    ENTITY_STEPS,
+    COMMON_STEPS,
 } from "../../framework/Workspace/profile/profileConstants";
 
 
@@ -78,20 +78,6 @@ export default function CommunityPlusUserProfile({
         user,
     } = useAuth();
 
-    /* =====================================
-   LOCAL STATE
-===================================== */
-
-const [
-    savingSection,
-    setSavingSection,
-] = useState(false);
-
-
-const [
-    editingSections,
-    setEditingSections,
-] = useState({});
 
     const {
         profile,
@@ -102,6 +88,22 @@ const [
     const {
         patchProfile,
     } = useAPI();
+
+
+    /* =====================================
+       LOCAL STATE
+    ===================================== */
+
+    const [
+        savingSection,
+        setSavingSection,
+    ] = useState(false);
+
+
+    const [
+        editingSections,
+        setEditingSections,
+    ] = useState({});
 
 
     /* =====================================
@@ -143,7 +145,12 @@ const [
 
 
     /* =====================================
-       WORKSPACE STATE
+       CURRENT SECTION
+       
+       NOTE:
+       The underlying Workspace runtime is
+       still section-based. The profile
+       configuration is now step-based.
     ===================================== */
 
     const [
@@ -164,7 +171,6 @@ const [
     });
 
 
-
     /* =====================================
        CURRENT SECTION STORAGE
     ===================================== */
@@ -182,7 +188,10 @@ const [
 
 
     /* =====================================
-       SECTIONS
+       PROFILE STEPS
+       
+       These are converted into the existing
+       Workspace section runtime contract.
     ===================================== */
 
     const sections =
@@ -197,11 +206,16 @@ const [
 
                 return [
 
-                    ...PERSONAL_SECTIONS.slice(0, 1),
+                    /*
+                     * Personal identity remains
+                     * the first step for an Entity.
+                     */
 
-                    ...ENTITY_SECTIONS,
+                    ...PERSONAL_STEPS.slice(0, 1),
 
-                    ...COMMON_SECTIONS,
+                    ...ENTITY_STEPS,
+
+                    ...COMMON_STEPS,
 
                 ];
 
@@ -210,9 +224,9 @@ const [
 
             return [
 
-                ...PERSONAL_SECTIONS,
+                ...PERSONAL_STEPS,
 
-                ...COMMON_SECTIONS,
+                ...COMMON_STEPS,
 
             ];
 
@@ -227,6 +241,10 @@ const [
 
     /* =====================================
        SECTION CONTROLLER
+       
+       Existing runtime controller retained
+       until Workspace section → step
+       migration is completed.
     ===================================== */
 
     const sectionController =
@@ -254,55 +272,56 @@ const [
 
 
     /* =====================================
-       COMPLETION
+       PROFILE COMPLETION
     ===================================== */
 
     const completion =
-        calculateProfileCompletion(
-            values
+        useMemo(
+
+            () =>
+                calculateProfileCompletion(
+                    values
+                ),
+
+            [
+                values,
+            ]
+
         );
 
-const sectionCompletion =
-    Object.fromEntries(
 
-        sections.map(section => [
+    /* =====================================
+       STEP / SECTION COMPLETION
+    ===================================== */
 
-            section.id,
+    const sectionCompletion =
+        useMemo(
 
-            calculateProfileSectionCompletion(
+            () =>
+
+                Object.fromEntries(
+
+                    sections.map(
+                        section => [
+
+                            section.id,
+
+                            calculateProfileSectionCompletion(
+                                values,
+                                section.id
+                            ),
+
+                        ]
+                    )
+
+                ),
+
+            [
+                sections,
                 values,
-                section.id
-            ),
+            ]
 
-        ])
-
-    ); 
-
-
-console.log(
-    "[PROFILE COMPLETION] VALUE:",
-    completion
-);
-
-console.log(
-    "[PROFILE COMPLETION] USERNAME:",
-    values.username
-);
-
-console.log(
-    "[PROFILE COMPLETION] LOCATION:",
-    values.homeLocation
-);
-
-console.log(
-    "[PROFILE COMPLETION] PHONE:",
-    values.phoneDisplay
-);
-
-console.log(
-    "[PROFILE COMPLETION] PAYMENT:",
-    values.payment
-);      
+        );
 
 
     /* =====================================
@@ -339,191 +358,222 @@ console.log(
        CLEAR SECTION
     ===================================== */
 
-const clearSection =
-    useCallback(
+    const clearSection =
+        useCallback(
 
-        (sectionId) => {
+            (sectionId) => {
 
-            const section =
-                sections.find(
-                    item =>
-                        item.id === sectionId
-                );
-
-
-            if (!section) {
-                return;
-            }
-
-
-            section.fields?.forEach(
-                field => {
-
-                    form.setValue(
-                        field.name,
-                        ""
-
+                const section =
+                    sections.find(
+                        item =>
+                            item.id === sectionId
                     );
 
+
+                if (!section) {
+                    return;
                 }
-            );
 
-        },
 
-        [
-            sections,
-            form,
-        ]
+                section.fields?.forEach(
+                    field => {
 
-    );
+                        form.setValue(
+                            field.name,
+                            ""
+                        );
+
+                    }
+                );
+
+            },
+
+            [
+                sections,
+                form,
+            ]
+
+        );
 
 
     /* =====================================
        RESET SECTION
     ===================================== */
 
-const resetSection =
-    useCallback(
+    const resetSection =
+        useCallback(
 
-        (sectionId) => {
+            (sectionId) => {
 
-            form.reset();
+                form.reset();
 
-            setEditingSections(
-                previous => ({
 
-                    ...previous,
+                setEditingSections(
+                    previous => ({
 
-                    [sectionId]: false,
+                        ...previous,
 
-                })
-            );
+                        [sectionId]:
+                            false,
 
-        },
+                    })
+                );
 
-        [
-            form,
-        ]
+            },
 
-    );
+            [
+                form,
+            ]
+
+        );
 
 
     /* =====================================
        SAVE SECTION
     ===================================== */
 
-const handleSaveSection = async (sectionId) => {
+    const handleSaveSection =
+        useCallback(
 
-    console.log(
-        "[PROFILE SAVE] START",
-        sectionId
-    );
+            async (sectionId) => {
 
-    try {
+                if (!sectionId) {
+                    return;
+                }
 
-        setSavingSection(true);
 
-        const payload =
-            buildProfilePayload({
+                try {
+
+                    setSavingSection(true);
+
+
+                    const payload =
+                        buildProfilePayload({
+
+                            values,
+
+                            userEmail:
+                                user?.email,
+
+                            homeLocation:
+                                values.homeLocation,
+
+                        });
+
+
+                    await patchProfile(
+                        payload
+                    );
+
+
+                    /*
+                     * Refresh canonical
+                     * profile state.
+                     */
+
+                    await loadProfile();
+
+
+                    /*
+                     * Exit edit mode for
+                     * the saved section.
+                     */
+
+                    setEditingSections(
+                        previous => ({
+
+                            ...previous,
+
+                            [sectionId]:
+                                false,
+
+                        })
+                    );
+
+
+                    /*
+                     * Notify parent when
+                     * supplied.
+                     */
+
+                    if (onComplete) {
+                        onComplete();
+                    }
+
+                } catch (error) {
+
+                    console.error(
+                        "[PROFILE SAVE] FAILED",
+                        error
+                    );
+
+                } finally {
+
+                    setSavingSection(false);
+
+                }
+
+            },
+
+            [
                 values,
-                userEmail: user?.email,
-                homeLocation: values.homeLocation,
-            });
+                user?.email,
+                patchProfile,
+                loadProfile,
+                onComplete,
+            ]
 
-        console.log(
-            "[PROFILE SAVE] PAYLOAD",
-            payload
         );
-
-        console.log(
-            "[PROFILE SAVE] PATCH START"
-        );
-
-await patchProfile(payload);
-
-console.log(
-    "[PROFILE SAVE] PATCH SUCCESS"
-);
-
-/*
- * Refresh the canonical profile state
- * after the backend accepts the update.
- */
-await loadProfile();
-
-console.log(
-    "[PROFILE SAVE] PROFILE RELOADED"
-);
-
-setEditingSections(
-    previous => ({
-        ...previous,
-        [sectionId]: false,
-    })
-);
-
-    } catch (error) {
-
-        console.error(
-            "[PROFILE SAVE] FAILED",
-            error
-        );
-
-    } finally {
-
-        console.log(
-            "[PROFILE SAVE] FINALLY"
-        );
-
-        setSavingSection(false);
-
-    }
-
-};
 
 
     /* =====================================
-       CLOSE
+       CLOSE PROFILE
     ===================================== */
 
     const closeProfile =
-        useCallback(() => {
+        useCallback(
 
-            navigate(
-                "/communityplus",
-                {
-                    replace: true,
-                }
-            );
+            () => {
 
-        }, [
-            navigate,
-        ]);
+                navigate(
+                    "/communityplus",
+                    {
+                        replace: true,
+                    }
+                );
+
+            },
+
+            [
+                navigate,
+            ]
+
+        );
 
 
     /* =====================================
        WORKSPACE STATE
     ===================================== */
 
-const workspaceState = {
+    const workspaceState = {
 
-    values,
+        values,
 
-    form,
+        form,
 
-    editingSections,
+        editingSections,
 
-    savingSection,
+        savingSection,
 
-    sections,
+        sections,
 
-    currentSection,
+        currentSection,
 
-    completion,
+        completion,
 
-    sectionCompletion,
+        sectionCompletion,
 
-};
+    };
 
 
     /* =====================================
