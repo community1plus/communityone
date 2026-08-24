@@ -1,5 +1,6 @@
 import "./WorkspaceSectionProgress.css";
 
+
 export default function WorkspaceSectionProgress({
 
     value = 0,
@@ -8,20 +9,17 @@ export default function WorkspaceSectionProgress({
 
     const completion =
         Math.min(
+            100,
             Math.max(
-                Number(value) || 0,
-                0
-            ),
-            100
+                0,
+                Number(value) || 0
+            )
         );
 
 
     return (
 
-        <div
-            className="workspace-section-progress"
-            aria-label={`Section completion ${completion}%`}
-        >
+        <div className="workspace-section-progress">
 
             <div className="workspace-section-progress-track">
 
@@ -34,8 +32,11 @@ export default function WorkspaceSectionProgress({
 
             </div>
 
+
             <span className="workspace-section-progress-value">
+
                 {completion}%
+
             </span>
 
         </div>

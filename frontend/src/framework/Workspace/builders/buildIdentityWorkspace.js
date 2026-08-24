@@ -6,9 +6,6 @@ import {
     createWorkspaceNavigationModel,
 } from "../../../framework/Workspace/models/WorkspaceNavigationModel";
 
-import {
-    createWorkspaceProgressModel,
-} from "../../../framework/Workspace/models/WorkspaceProgressModel";
 
 import {
     createWorkspaceBannerModel,
@@ -193,29 +190,29 @@ function buildSectionActions({
             }
 
 
-            return {
+           return {
 
-                id:
-                    actionId,
+    id:
+        actionId,
 
-                label:
-                    definition.label,
+    label:
+        definition.label,
 
-                icon:
-                    definition.icon,
+    icon:
+        definition.icon,
 
-                primary:
-                    definition.primary ?? false,
+    primary:
+        definition.primary ?? false,
 
-                disabled:
-                    actionId === "save"
-                        ? saving
-                        : false,
+    onClick:
+        handler,
 
-                onClick:
-                    handler,
+    disabled:
+        actionId === "save"
+            ? saving
+            : false,
 
-            };
+};
 
         })
 
@@ -322,25 +319,92 @@ export function buildIdentityWorkspace(
             )
             : 0;
 
+const isSectionActionVisible = (
+    actionId,
+    editing
+) => {
 
+    switch (actionId) {
+
+        case "edit":
+            return !editing;
+
+        case "clear":
+        case "reset":
+        case "save":
+            return editing;
+
+        case "exit":
+            return true;
+
+        default:
+            return false;
+
+    }
+
+};
     /* =====================================
        SECTION ACTIONS
     ===================================== */
 
-    const sectionActions =
-        buildSectionActions({
+const sectionActions =
 
-            section,
+    (section?.actions ?? [])
 
-            runtime,
+        .map(actionId => {
 
-            editing,
+            const handler =
+                sectionActionHandlers[actionId];
 
-            saving,
+            const definition =
+                SECTION_ACTION_DEFINITIONS[actionId];
 
-            actions,
 
-        });
+            if (
+                !handler ||
+                !definition
+            ) {
+                return null;
+            }
+
+
+            if (
+                !isSectionActionVisible(
+                    actionId,
+                    editing
+                )
+            ) {
+                return null;
+            }
+
+
+            return {
+
+                id:
+                    actionId,
+
+                label:
+                    definition.label,
+
+                icon:
+                    definition.icon,
+
+                primary:
+                    definition.primary ?? false,
+
+                onClick:
+                    handler,
+
+                disabled:
+                    actionId === "save"
+                        ? saving
+                        : false,
+
+            };
+
+        })
+
+        .filter(Boolean);
 
 
     /* =====================================
@@ -382,37 +446,24 @@ export function buildIdentityWorkspace(
        ONLY workspace-level information
     ===================================== */
 
-    const banner =
-        createWorkspaceBannerModel({
+const banner =
+    createWorkspaceBannerModel({
 
-            left: {
+        left: {
 
-                title:
-                    "IDENTITY",
+            title:
+                "IDENTITY",
 
-            },
+        },
 
-            centre: {
+        centre: {
 
-                mode:
-                    "identity",
+            mode:
+                "identity",
 
-            },
+        },
 
-            right: {
-
-                metric:
-
-                    createWorkspaceProgressModel({
-
-                        value:
-                            completion,
-
-                    }),
-
-            },
-
-        });
+    });
 
 
     /* =====================================

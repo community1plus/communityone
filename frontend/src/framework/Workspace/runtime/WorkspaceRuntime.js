@@ -14,11 +14,19 @@ export function createWorkspaceRuntime({
 
 }) {
 
+    /* =========================================
+       NORMALISE SECTIONS
+    ========================================= */
+
     const safeSections =
         Array.isArray(sections)
             ? sections
             : [];
 
+
+    /* =========================================
+       RESOLVE CURRENT INDEX
+    ========================================= */
 
     const safeCurrent =
         safeSections.length === 0
@@ -28,7 +36,7 @@ export function createWorkspaceRuntime({
             : Math.min(
 
                 Math.max(
-                    current,
+                    Number(current) || 0,
                     0
                 ),
 
@@ -37,23 +45,103 @@ export function createWorkspaceRuntime({
             );
 
 
-    const baseSection =
-        safeSections[safeCurrent]
-        || null;
+    /* =========================================
+       HYDRATE SECTION RUNTIME
+    ========================================= */
+
+    const runtimeSections =
+        safeSections.map(section => {
+
+            const sectionId =
+                section.id;
+
+
+            const completion =
+                Number(
+                    sectionCompletion?.[sectionId]
+                ) || 0;
+
+
+            const editing =
+                Boolean(
+                    editingSections?.[sectionId]
+                );
+
+
+            const valid =
+                section?.validator
+                    ? section.validator(values)
+                    : true;
+
+
+            return {
+
+                ...section,
+
+                runtime: {
+
+                    ...section.runtime,
+
+                    enabled:
+                        section.runtime?.enabled
+                        ?? true,
+
+                    visible:
+                        section.runtime?.visible
+                        ?? true,
+
+                    dirty:
+                        section.runtime?.dirty
+                        ?? false,
+
+                    valid,
+
+                    complete:
+                        completion >= 100,
+
+                    completion,
+
+                    editing,
+
+                    saving:
+                        savingSection,
+
+                },
+
+            };
+
+        });
+
+
+    /* =========================================
+       CURRENT SECTION
+    ========================================= */
+
+    const section =
+        runtimeSections[safeCurrent]
+        ?? null;
+
+
+    const sectionId =
+        section?.id
+        ?? null;
 
 
     const valid =
-        baseSection?.validator
-            ? baseSection.validator(values)
-            : true;
+        section?.runtime?.valid
+        ?? true;
 
 
-    if (!baseSection) {
+    /* =========================================
+       EMPTY WORKSPACE
+    ========================================= */
+
+    if (!section) {
 
         return {
 
             sections:
-                safeSections,
+                runtimeSections,
 
             current:
                 safeCurrent,
@@ -72,64 +160,21 @@ export function createWorkspaceRuntime({
     }
 
 
-    /* =====================================
-       SECTION RUNTIME
-    ===================================== */
-
-    const completion =
-        sectionCompletion?.[baseSection.id]
-        ?? 0;
-
-
-    const editing =
-        Boolean(
-            editingSections?.[baseSection.id]
-        );
-
-
-    const runtime = {
-
-        ...baseSection.runtime,
-
-        visible:
-            baseSection.runtime?.visible ?? true,
-
-        enabled:
-            baseSection.runtime?.enabled ?? true,
-
-        valid,
-
-        completion,
-
-        editing,
-
-        saving:
-            savingSection,
-
-    };
-
-
-    const section = {
-
-        ...baseSection,
-
-        runtime,
-
-    };
-
+    /* =========================================
+       RUNTIME MODEL
+    ========================================= */
 
     return {
 
         sections:
-            safeSections,
+            runtimeSections,
 
         current:
             safeCurrent,
 
         section,
 
-        sectionId:
-            section.id,
+        sectionId,
 
         valid,
 

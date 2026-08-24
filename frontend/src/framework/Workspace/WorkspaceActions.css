@@ -1,0 +1,61 @@
+.workspace-section-actions {
+    display: flex;
+    align-items: center;
+
+    gap: 4px;
+}
+
+
+.workspace-section-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 6px;
+
+    min-width: 34px;
+    height: 34px;
+
+    padding: 0 8px;
+
+    border: 0;
+    border-radius: 4px;
+
+    background: transparent;
+
+    color: #333;
+
+    cursor: pointer;
+
+    font-size: 13px;
+}
+
+
+.workspace-section-action:hover {
+    background: #eeeeee;
+}
+
+
+.workspace-section-action:disabled {
+    opacity: 0.45;
+
+    cursor: default;
+}
+
+
+.workspace-section-action-icon {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 18px;
+    height: 18px;
+
+    font-size: 16px;
+}
+
+
+.workspace-section-action-label {
+    white-space: nowrap;
+}

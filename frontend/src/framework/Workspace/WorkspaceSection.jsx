@@ -15,20 +15,14 @@ export default function WorkspaceSection({
 
 }) {
 
-    /* =====================================
-       VISIBILITY
-    ===================================== */
-
     if (!model?.runtime?.visible) {
-
         return null;
-
     }
 
 
-    /* =====================================
-       SECTION STATE
-    ===================================== */
+    const title =
+        model.title ?? "";
+
 
     const completion =
         model.runtime?.completion ?? 0;
@@ -38,36 +32,20 @@ export default function WorkspaceSection({
         model.actions ?? [];
 
 
-    /* =====================================
-       RENDER
-    ===================================== */
-
     return (
 
-        <section
-            className="workspace-section"
-        >
+        <section className="workspace-section">
 
-            {/* =================================
-                SECTION HEADER
-            ================================= */}
+            <header className="workspace-section-header">
 
-            <header
-                className="workspace-section-header"
-            >
+                <div className="workspace-section-title">
 
-                <div
-                    className="workspace-section-title"
-                >
-
-                    {model.title}
+                    {title}
 
                 </div>
 
 
-                <div
-                    className="workspace-section-tools"
-                >
+                <div className="workspace-section-tools">
 
                     <WorkspaceSectionProgress
                         value={
@@ -88,13 +66,7 @@ export default function WorkspaceSection({
             </header>
 
 
-            {/* =================================
-                SECTION BODY
-            ================================= */}
-
-            <div
-                className="workspace-section-body"
-            >
+            <div className="workspace-section-body">
 
                 {children}
 

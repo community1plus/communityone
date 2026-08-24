@@ -1,34 +1,39 @@
-/* =========================================
-   SECTION CONTENT
-========================================= */
-
-.workspace-section-header {
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
+.workspace-section {
     width: 100%;
-
-    box-sizing: border-box;
-
 }
 
+
+.workspace-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    min-height: 56px;
+
+    padding:
+        0 8px
+        0 8px;
+
+    border-bottom:
+        1px solid #e5e5e5;
+}
+
+
 .workspace-section-title {
+    font-size: 18px;
+    font-weight: 600;
 
-    font-size: 0.85rem;
+    letter-spacing: 0.04em;
 
-    font-weight: 700;
+    color: #151515;
+}
 
-    letter-spacing: 0.08em;
 
-    text-transform: uppercase;
+.workspace-section-tools {
+    display: flex;
+    align-items: center;
 
-    color:
-        var(--text-primary, #111);
-
+    gap: 18px;
 }
 
 .workspace-section-controls {
