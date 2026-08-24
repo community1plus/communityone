@@ -4,17 +4,16 @@
 
 .workspace-navigation {
 
-    display: flex;
-
-    align-items: flex-end;
-
     width: 100%;
     min-width: 0;
 
-    margin: 0;
-    padding: 0;
+    display: flex;
+    align-items: flex-end;
 
     box-sizing: border-box;
+
+    margin: 0;
+    padding: 0;
 
     gap: 44px;
 
@@ -31,6 +30,8 @@
 
 .workspace-navigation .workspace-tab {
 
+    position: relative;
+
     display: inline-flex;
 
     align-items: center;
@@ -40,18 +41,21 @@
 
     appearance: none;
 
+    margin: 0;
+    padding:
+        0 0 14px;
+
+    height: 42px;
+
+    box-sizing: border-box;
+
     background: transparent;
 
-    border: none;
+    border: 0;
 
     border-bottom:
         2px solid
         transparent;
-
-    margin: 0;
-
-    padding:
-        0 0 14px;
 
     cursor: pointer;
 
@@ -63,6 +67,8 @@
 
     letter-spacing: 0.08em;
 
+    line-height: 1;
+
     text-transform: uppercase;
 
     color:
@@ -71,8 +77,8 @@
     white-space: nowrap;
 
     transition:
-        color .2s ease,
-        border-color .2s ease;
+        color 0.2s ease,
+        border-color 0.2s ease;
 
 }
 
@@ -132,9 +138,17 @@
 
     }
 
+
     .workspace-navigation::-webkit-scrollbar {
 
         display: none;
+
+    }
+
+
+    .workspace-navigation .workspace-tab {
+
+        flex: 0 0 auto;
 
     }
 
