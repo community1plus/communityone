@@ -2,21 +2,30 @@ import {
     createWorkspace,
 } from "../../../framework/Workspace/builders/createWorkspace";
 
+
 import {
     createWorkspaceNavigationModel,
 } from "../../../framework/Workspace/models/WorkspaceNavigationModel";
+
 
 import {
     createWorkspaceProgressModel,
 } from "../../../framework/Workspace/models/WorkspaceProgressModel";
 
+
 import {
     createWorkspaceBannerModel,
 } from "../../../framework/Workspace/models/WorkspaceBannerModel";
 
+
 import {
     createWorkspaceRuntime,
 } from "../../../framework/Workspace/runtime/WorkspaceRuntime";
+
+
+import {
+    WORKSPACE_SECTION_ACTIONS,
+} from "../../../framework/Workspace/models/WorkspaceSectionModel";
 
 
 /* =========================================
@@ -25,7 +34,7 @@ import {
 
 const SECTION_ACTION_DEFINITIONS = {
 
-    edit: {
+    [WORKSPACE_SECTION_ACTIONS.EDIT]: {
 
         label:
             "Edit",
@@ -36,7 +45,7 @@ const SECTION_ACTION_DEFINITIONS = {
     },
 
 
-    clear: {
+    [WORKSPACE_SECTION_ACTIONS.CLEAR]: {
 
         label:
             "Clear",
@@ -47,7 +56,7 @@ const SECTION_ACTION_DEFINITIONS = {
     },
 
 
-    reset: {
+    [WORKSPACE_SECTION_ACTIONS.RESET]: {
 
         label:
             "Reset",
@@ -58,7 +67,7 @@ const SECTION_ACTION_DEFINITIONS = {
     },
 
 
-    exit: {
+    [WORKSPACE_SECTION_ACTIONS.EXIT]: {
 
         label:
             "Exit",
@@ -69,7 +78,7 @@ const SECTION_ACTION_DEFINITIONS = {
     },
 
 
-    save: {
+    [WORKSPACE_SECTION_ACTIONS.SAVE]: {
 
         label:
             "Save",
@@ -86,260 +95,77 @@ const SECTION_ACTION_DEFINITIONS = {
 
 
 /* =========================================
-   SECTION ACTION VISIBILITY
+   ACTION VISIBILITY
 ========================================= */
 
-function getSectionActionVisibility(
-    editing
-) {
-
-    return {
-
-        edit:
-            !editing,
-
-        clear:
-            editing,
-
-        reset:
-            editing,
-
-        exit:
-            true,
-
-        save:
-            editing,
-
-    };
-
-}
-
-
-/* =========================================
-   SECTION ACTION HANDLERS
-========================================= */
-
-function createSectionActionHandlers({
-
-    runtime,
-
-    actions,
-
-}) {
-
-    return {
-
-        edit: () => {
-
-            if (!runtime.sectionId) {
-                return;
-            }
-
-            actions.setSectionEditing(
-
-                runtime.sectionId,
-
-                true
-
-            );
-
-        },
-
-
-        clear: () => {
-
-            if (!runtime.sectionId) {
-                return;
-            }
-
-            actions.clearSection(
-
-                runtime.sectionId
-
-            );
-
-        },
-
-
-        reset: () => {
-
-            if (!runtime.sectionId) {
-                return;
-            }
-
-            actions.resetSection(
-
-                runtime.sectionId
-
-            );
-
-        },
-
-
-        exit: () => {
-
-            actions.closeProfile();
-
-        },
-
-
-        save: async () => {
-
-            if (!runtime.sectionId) {
-                return;
-            }
-
-            await actions.handleSaveSection(
-
-                runtime.sectionId
-
-            );
-
-        },
-
-    };
-
-}
-
-
-/* =========================================
-   SECTION ACTION MODEL
-========================================= */
-
-function createSectionActionModel({
+function isSectionActionVisible(
 
     actionId,
 
-    handler,
+    editing
 
-    definition,
+) {
 
-    visible,
+    switch (actionId) {
 
-    saving,
+        case WORKSPACE_SECTION_ACTIONS.EDIT:
 
-}) {
+            return !editing;
 
-    if (
-        !handler ||
-        !definition ||
-        !visible
-    ) {
 
-        return null;
+        case WORKSPACE_SECTION_ACTIONS.CLEAR:
+
+            return editing;
+
+
+        case WORKSPACE_SECTION_ACTIONS.RESET:
+
+            return editing;
+
+
+        case WORKSPACE_SECTION_ACTIONS.EXIT:
+
+            return true;
+
+
+        case WORKSPACE_SECTION_ACTIONS.SAVE:
+
+            return editing;
+
+
+        default:
+
+            return false;
 
     }
-
-
-    return {
-
-        id:
-            actionId,
-
-        label:
-            definition.label,
-
-        icon:
-            definition.icon,
-
-        primary:
-            definition.primary ?? false,
-
-        onClick:
-            handler,
-
-        disabled:
-
-            actionId === "save"
-
-                ? saving
-
-                : false,
-
-    };
 
 }
 
 
 /* =========================================
-   RESOLVE SECTION ACTIONS
+   ACTION DISABLED STATE
 ========================================= */
 
-function resolveSectionActions({
+function isSectionActionDisabled(
 
-    section,
+    actionId,
 
-    runtime,
+    saving
 
-    editing,
+) {
 
-    saving,
+    switch (actionId) {
 
-    actions,
+        case WORKSPACE_SECTION_ACTIONS.SAVE:
 
-}) {
+            return saving;
 
-    if (!section) {
-        return [];
+
+        default:
+
+            return false;
+
     }
-
-
-    const handlers =
-        createSectionActionHandlers({
-
-            runtime,
-
-            actions,
-
-        });
-
-
-    const visibility =
-        getSectionActionVisibility(
-
-            editing
-
-        );
-
-
-    return (
-
-        section.actions ?? []
-
-    )
-
-        .map((actionId) => {
-
-            const definition =
-                SECTION_ACTION_DEFINITIONS[
-                    actionId
-                ];
-
-
-            const handler =
-                handlers[
-                    actionId
-                ];
-
-
-            return createSectionActionModel({
-
-                actionId,
-
-                handler,
-
-                definition,
-
-                visible:
-                    visibility[actionId],
-
-                saving,
-
-            });
-
-        })
-
-        .filter(Boolean);
 
 }
 
@@ -355,6 +181,11 @@ export function buildIdentityWorkspace(
     actions
 
 ) {
+
+
+    /* =====================================
+       STATE
+    ===================================== */
 
     const {
 
@@ -374,6 +205,10 @@ export function buildIdentityWorkspace(
 
     } = state;
 
+
+    /* =====================================
+       NAVIGATION ACTION
+    ===================================== */
 
     const {
 
@@ -413,44 +248,176 @@ export function buildIdentityWorkspace(
         runtime.section;
 
 
+    const sectionId =
+        runtime.sectionId;
+
+
     /* =====================================
-       SECTION STATE
+       SECTION RUNTIME STATE
     ===================================== */
 
     const editing =
         Boolean(
-
             section?.runtime?.editing
-
         );
 
 
     const saving =
         Boolean(
-
             section?.runtime?.saving
-
         );
 
 
     /* =====================================
-       SECTION ACTIONS
+       SECTION ACTION HANDLERS
+    ===================================== */
+
+    const sectionActionHandlers = {
+
+        [WORKSPACE_SECTION_ACTIONS.EDIT]:
+
+            () => {
+
+                if (!sectionId) {
+                    return;
+                }
+
+                actions.setSectionEditing(
+                    sectionId,
+                    true
+                );
+
+            },
+
+
+        [WORKSPACE_SECTION_ACTIONS.CLEAR]:
+
+            () => {
+
+                if (!sectionId) {
+                    return;
+                }
+
+                actions.clearSection(
+                    sectionId
+                );
+
+            },
+
+
+        [WORKSPACE_SECTION_ACTIONS.RESET]:
+
+            () => {
+
+                if (!sectionId) {
+                    return;
+                }
+
+                actions.resetSection(
+                    sectionId
+                );
+
+            },
+
+
+        [WORKSPACE_SECTION_ACTIONS.EXIT]:
+
+            () => {
+
+                actions.closeProfile();
+
+            },
+
+
+        [WORKSPACE_SECTION_ACTIONS.SAVE]:
+
+            async () => {
+
+                if (!sectionId) {
+                    return;
+                }
+
+                await actions.handleSaveSection(
+                    sectionId
+                );
+
+            },
+
+    };
+
+
+    /* =====================================
+       SECTION ACTION MODEL
     ===================================== */
 
     const sectionActions =
-        resolveSectionActions({
 
-            section,
+        (section?.actions ?? [])
 
-            runtime,
+            .map((actionId) => {
 
-            editing,
+                const definition =
+                    SECTION_ACTION_DEFINITIONS[
+                        actionId
+                    ];
 
-            saving,
 
-            actions,
+                const handler =
+                    sectionActionHandlers[
+                        actionId
+                    ];
 
-        });
+
+                if (
+                    !definition ||
+                    !handler
+                ) {
+
+                    return null;
+
+                }
+
+
+                const visible =
+                    isSectionActionVisible(
+                        actionId,
+                        editing
+                    );
+
+
+                if (!visible) {
+                    return null;
+                }
+
+
+                return {
+
+                    id:
+                        actionId,
+
+                    label:
+                        definition.label,
+
+                    icon:
+                        definition.icon,
+
+                    primary:
+                        definition.primary ?? false,
+
+                    onClick:
+                        handler,
+
+                    disabled:
+                        isSectionActionDisabled(
+                            actionId,
+                            saving
+                        ),
+
+                };
+
+            })
+
+            .filter(Boolean);
 
 
     /* =====================================
@@ -474,7 +441,7 @@ export function buildIdentityWorkspace(
 
 
     /* =====================================
-       BANNER
+       WORKSPACE BANNER
     ===================================== */
 
     const banner =
@@ -487,12 +454,14 @@ export function buildIdentityWorkspace(
 
             },
 
+
             centre: {
 
                 mode:
                     "identity",
 
             },
+
 
             right: {
 

@@ -70,29 +70,21 @@ export function createWorkspaceSectionModel({
 
         runtime: {
 
-            enabled:
-                true,
+            enabled: true,
 
-            visible:
-                true,
+            visible: true,
 
-            dirty:
-                false,
+            dirty: false,
 
-            valid:
-                true,
+            valid: true,
 
-            complete:
-                false,
+            complete: false,
 
-            completion:
-                0,
+            completion: 0,
 
-            editing:
-                false,
+            editing: false,
 
-            saving:
-                false,
+            saving: false,
 
         },
 
