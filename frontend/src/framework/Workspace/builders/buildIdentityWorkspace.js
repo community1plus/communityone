@@ -162,7 +162,7 @@ export function buildIdentityWorkspace(
                     left: {
 
                         title:
-                            "IDENTITY",
+                            "PROFILE",
 
                     },
 
