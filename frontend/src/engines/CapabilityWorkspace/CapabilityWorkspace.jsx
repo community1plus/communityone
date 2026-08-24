@@ -2,21 +2,31 @@ import {
     WorkspaceShell,
     WorkspaceMain,
     WorkspaceSidebar,
+
     WorkspaceRegionHeader,
     WorkspaceHeader,
+
     WorkspaceWorkflow,
     WorkspaceTabs,
+
     WorkspaceProgress,
     WorkspaceBody,
+
     WorkspaceGuide,
-    WorkspaceActions,
 } from "../../framework/Workspace";
 
-import CapabilitySelector from "./components/CapabilitySelector";
-import CapabilitySectionRenderer from "./sections/CapabilitySectionRenderer";
-import CapabilityGuide from "../../components/Capability/CapabilityGuide";
-import CapabilityActions from "../../components/Capability/CapabilityActions";
-import GuideProgress from "../../components/Guide/GuideCardProgress";
+
+import CapabilitySelector
+    from "./components/CapabilitySelector";
+
+
+import CapabilitySectionRenderer
+    from "./sections/CapabilitySectionRenderer";
+
+
+import CapabilityGuide
+    from "../../components/Capability/CapabilityGuide";
+
 
 export default function CapabilityWorkspace({
 
@@ -25,14 +35,26 @@ export default function CapabilityWorkspace({
 
 }) {
 
+    /* =====================================
+       STATE
+    ===================================== */
+
     const {
 
-        activeSteps,
-        currentStep,
-        completion,
+        activeSteps = [],
+
+        currentStep = 0,
+
+        completion = 0,
+
         sectionId,
 
     } = state;
+
+
+    /* =====================================
+       ACTIONS
+    ===================================== */
 
     const {
 
@@ -40,71 +62,158 @@ export default function CapabilityWorkspace({
 
     } = actions;
 
+
+    /* =====================================
+       CURRENT SECTION
+    ===================================== */
+
+    const currentSection =
+        activeSteps[currentStep]
+        ?? null;
+
+
+    /* =====================================
+       RENDER
+    ===================================== */
+
     return (
 
         <WorkspaceShell>
 
+
+            {/* =================================
+               MAIN
+            ================================= */}
+
             <WorkspaceMain>
+
+
+                {/* ==============================
+                   REGION HEADER
+                ============================== */}
 
                 <WorkspaceRegionHeader>
 
                     <WorkspaceHeader
+
                         title="CAPABILITIES"
-                        subtitle="Configure what this Entity can do."
+
+                        subtitle={
+                            "Configure what this Entity can do."
+                        }
+
                     />
 
                 </WorkspaceRegionHeader>
 
+
+                {/* ==============================
+                   WORKFLOW
+                ============================== */}
+
                 <WorkspaceWorkflow>
+
 
                     <CapabilitySelector />
 
+
                     <WorkspaceTabs
-                        steps={activeSteps}
-                        currentStep={currentStep}
-                        setCurrentStep={setCurrentStep}
+
+                        steps={
+                            activeSteps
+                        }
+
+                        currentStep={
+                            currentStep
+                        }
+
+                        setCurrentStep={
+                            setCurrentStep
+                        }
+
                     />
+
 
                 </WorkspaceWorkflow>
 
+
+                {/* ==============================
+                   OVERALL PROGRESS
+                ============================== */}
+
                 <WorkspaceProgress
-                    value={completion}
-                    label={`${completion}% Complete`}
+
+                    value={
+                        completion
+                    }
+
+                    label={
+                        `${completion}% Complete`
+                    }
+
                 />
+
+
+                {/* ==============================
+                   SECTION
+                ============================== */}
 
                 <WorkspaceBody>
 
+
                     <CapabilitySectionRenderer
-                        sectionId={sectionId}
-                        state={state}
-                        actions={actions}
+
+                        sectionId={
+                            sectionId
+                        }
+
+                        section={
+                            currentSection
+                        }
+
+                        state={
+                            state
+                        }
+
+                        actions={
+                            actions
+                        }
+
                     />
+
 
                 </WorkspaceBody>
 
+
             </WorkspaceMain>
+
+
+            {/* =================================
+               GUIDE
+            ================================= */}
 
             <WorkspaceSidebar>
 
-<WorkspaceGuide>
 
-    <CapabilityGuide
-        capability="identity"
-        section={sectionId}
-    />
+                <WorkspaceGuide>
 
-</WorkspaceGuide>
 
-                <WorkspaceActions>
+                    <CapabilityGuide
 
-                    <CapabilityActions
-                        state={state}
-                        actions={actions}
+                        capability="identity"
+
+                        section={
+                            sectionId
+                        }
+
                     />
 
-                </WorkspaceActions>
+
+                </WorkspaceGuide>
+
 
             </WorkspaceSidebar>
+
 
         </WorkspaceShell>
 

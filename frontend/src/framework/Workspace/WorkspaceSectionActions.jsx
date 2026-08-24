@@ -1,95 +1,96 @@
 import "./WorkspaceSectionActions.css";
 
 
-export default function WorkspaceSectionActions({
+export function WorkspaceSectionActions({
 
     actions = [],
 
 }) {
 
-    if (
-        !Array.isArray(actions) ||
-        actions.length === 0
-    ) {
+    if (!actions.length) {
         return null;
     }
 
 
     return (
 
-        <details className="workspace-section-actions">
-
-            <summary
-                className="workspace-section-actions-trigger"
-                aria-label="Section actions"
-            >
-                ⋮
-            </summary>
+        <div className="workspace-section-actions">
 
 
-            <div className="workspace-section-actions-menu">
+            {actions.map(action => {
 
-                {actions.map(action => {
-
-                    if (!action) {
-                        return null;
-                    }
+                if (!action) {
+                    return null;
+                }
 
 
-                    return (
+                const {
 
-                        <button
+                    id,
 
-                            key={action.id}
+                    label,
 
-                            type="button"
+                    icon,
 
-                            className={`
-                                workspace-section-action
-                                ${
-                                    action.primary
-                                        ? "workspace-section-action-primary"
-                                        : ""
-                                }
-                            `}
+                    onClick,
 
-                            onClick={
-                                action.onClick
-                            }
+                    disabled = false,
 
-                            disabled={
-                                Boolean(
-                                    action.disabled
-                                )
-                            }
+                    primary = false,
 
-                        >
+                } = action;
 
-                            {action.icon && (
 
-                                <span
-                                    className="workspace-section-action-icon"
-                                >
-                                    {action.icon}
-                                </span>
+                return (
 
-                            )}
+                    <button
 
-                            <span>
+                        key={id}
 
-                                {action.label}
+                        type="button"
+
+                        className={
+
+                            primary
+
+                                ? "workspace-section-action workspace-section-action-primary"
+
+                                : "workspace-section-action"
+
+                        }
+
+                        onClick={onClick}
+
+                        disabled={disabled}
+
+                        title={label}
+
+                    >
+
+                        {icon && (
+
+                            <span className="workspace-section-action-icon">
+
+                                {icon}
 
                             </span>
 
-                        </button>
+                        )}
 
-                    );
+                        <span>
 
-                })}
+                            {label}
 
-            </div>
+                        </span>
 
-        </details>
+                    </button>
+
+                );
+
+            })}
+
+
+        </div>
 
     );
 
