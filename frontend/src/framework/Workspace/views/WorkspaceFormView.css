@@ -9,13 +9,27 @@
     flex-direction: column;
 
     width: 100%;
-    max-width: 760px;
 
     min-width: 0;
 
-    margin: 0 auto;
+    margin: 0;
+
     padding: 56px 0;
 
     box-sizing: border-box;
+
+}
+
+
+/* =========================================
+   FORM FIELD GROUP
+========================================= */
+
+.workspace-form .workspace-field {
+
+    width: min(596px, 100%);
+
+    margin-left: auto;
+    margin-right: auto;
 
 }
