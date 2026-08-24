@@ -4,7 +4,7 @@ import { buildWalletWorkspace } from "./buildWalletWorkspace";
 
 export function buildCapabilityWorkspace({
 
-    capability = "profile",
+    capability = "identity",
 
     state,
 
@@ -22,7 +22,7 @@ export function buildCapabilityWorkspace({
             );
 
 
-        case "profile":
+        case "identity":
 
         default:
 
