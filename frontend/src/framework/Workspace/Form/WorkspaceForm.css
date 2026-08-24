@@ -3,33 +3,189 @@
 ========================================= */
 
 .workspace-form {
+
     display: flex;
+
     flex-direction: column;
 
     width: 100%;
-    max-width: 760px;
 
-    margin: 0 auto;
+    min-width: 0;
+
+    margin: 0;
     padding: 0;
-
-    gap: 32px;
 
     box-sizing: border-box;
 
-    text-align: left;
 }
 
 
 /* =========================================
-   WORKSPACE CONTENT
+   FIELD
 ========================================= */
 
-.workspace-content {
-    display: flex;
-    flex-direction: column;
+.workspace-field {
+
+    display: grid;
+
+    grid-template-columns: 150px minmax(0, 1fr);
+
+    align-items: start;
 
     width: 100%;
-    min-height: 560px;
+
+    min-width: 0;
+
+    margin: 0;
+
+    padding: 20px 32px;
 
     box-sizing: border-box;
+
+}
+
+
+/* =========================================
+   LABEL
+========================================= */
+
+.workspace-field-label {
+
+    margin: 0;
+
+    padding: 0;
+
+    font-size: 0.95rem;
+
+    font-weight: 600;
+
+    line-height: 1.5;
+
+    color:
+        var(--text-primary, #111);
+
+}
+
+
+/* =========================================
+   CONTENT
+========================================= */
+
+.workspace-field-content {
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    min-width: 0;
+
+    margin: 0;
+
+    padding: 0;
+
+}
+
+
+/* =========================================
+   VALUE
+========================================= */
+
+.workspace-field-value {
+
+    margin: 0;
+
+    padding: 0;
+
+    font-size: 1rem;
+
+    line-height: 1.5;
+
+    color:
+        var(--text-link, #2670c9);
+
+}
+
+
+/* =========================================
+   HELPER
+========================================= */
+
+.workspace-field-helper {
+
+    margin-top: 6px;
+
+    font-size: 0.85rem;
+
+    line-height: 1.4;
+
+    color:
+        var(--text-secondary, #666);
+
+}
+
+
+/* =========================================
+   INPUT
+========================================= */
+
+.workspace-field-input {
+
+    width: 100%;
+
+    max-width: 520px;
+
+    min-height: 42px;
+
+    margin: 0;
+
+    padding: 9px 12px;
+
+    box-sizing: border-box;
+
+    border:
+        1px solid
+        var(--border-color, #dcdcdc);
+
+    border-radius: 4px;
+
+    background: #fff;
+
+    font-family: inherit;
+
+    font-size: 1rem;
+
+    color:
+        var(--text-primary, #111);
+
+}
+
+
+.workspace-field-input:focus {
+
+    outline: none;
+
+    border-color:
+        var(--accent-color, #c41230);
+
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 760px) {
+
+    .workspace-field {
+
+        grid-template-columns: 1fr;
+
+        gap: 8px;
+
+        padding: 16px 20px;
+
+    }
+
 }
