@@ -14,12 +14,6 @@
 
     width: 100%;
 
-    margin: 0;
-
-    padding: 0;
-
-    box-sizing: border-box;
-
 }
 
 
@@ -39,9 +33,6 @@
 
     line-height: 1.4;
 
-    color:
-        var(--text-primary, #111);
-
 }
 
 
@@ -56,10 +47,6 @@
     flex-direction: column;
 
     min-width: 0;
-
-    margin: 0;
-
-    padding: 0;
 
 }
 
@@ -80,39 +67,6 @@
 
     color:
         var(--link-color, #2878c8);
-
-}
-
-
-/* =========================================
-   FIELD INPUT
-========================================= */
-
-.workspace-field-input {
-
-    width: 100%;
-
-    min-width: 0;
-
-    margin: 0;
-
-    padding: 10px 12px;
-
-    box-sizing: border-box;
-
-    font: inherit;
-
-    color:
-        var(--text-primary, #111);
-
-    background:
-        var(--surface-color, #fff);
-
-    border:
-        1px solid
-        var(--border-color, #ddd);
-
-    border-radius: 4px;
 
 }
 
@@ -142,39 +96,5 @@
 .workspace-field + .workspace-field {
 
     margin-top: 44px;
-
-}
-
-
-/* =========================================
-   RESPONSIVE
-========================================= */
-
-@media (max-width: 760px) {
-
-    .workspace-form {
-
-        max-width: none;
-
-        padding:
-            40px 24px;
-
-    }
-
-
-    .workspace-field {
-
-        grid-template-columns: 1fr;
-
-        row-gap: 8px;
-
-    }
-
-
-    .workspace-field + .workspace-field {
-
-        margin-top: 32px;
-
-    }
 
 }
