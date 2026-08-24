@@ -1,3 +1,8 @@
+import {
+    useState,
+} from "react";
+
+
 export function WorkspaceSectionActions({
 
     actions = [],
@@ -7,6 +12,12 @@ export function WorkspaceSectionActions({
     sectionId,
 
 }) {
+
+    const [
+        open,
+        setOpen,
+    ] = useState(false);
+
 
     if (!actions.length) {
         return null;
@@ -82,6 +93,9 @@ export function WorkspaceSectionActions({
 
         }
 
+
+        setOpen(false);
+
     };
 
 
@@ -89,39 +103,81 @@ export function WorkspaceSectionActions({
 
         <div className="workspace-section-actions">
 
+
+            {/* =====================================
+               TRIGGER
+            ===================================== */}
+
             <button
+
                 type="button"
+
                 className="workspace-section-actions-trigger"
+
                 aria-label="Section actions"
+
+                aria-expanded={
+                    open
+                }
+
                 title="Section actions"
+
+                onClick={() =>
+                    setOpen(
+                        previous =>
+                            !previous
+                    )
+                }
+
             >
+
                 ⋮
+
             </button>
 
 
-            <div className="workspace-section-actions-menu">
+            {/* =====================================
+               MENU
+            ===================================== */}
 
-                {actions.map(action => (
+            {open && (
 
-                    <button
+                <div
+                    className="workspace-section-actions-menu"
+                    role="menu"
+                >
 
-                        key={action}
+                    {actions.map(
+                        action => (
 
-                        type="button"
+                            <button
 
-                        onClick={() =>
-                            handleAction(action)
-                        }
+                                key={
+                                    action
+                                }
 
-                    >
+                                type="button"
 
-                        {action}
+                                role="menuitem"
 
-                    </button>
+                                onClick={() =>
+                                    handleAction(
+                                        action
+                                    )
+                                }
 
-                ))}
+                            >
 
-            </div>
+                                {action}
+
+                            </button>
+
+                        )
+                    )}
+
+                </div>
+
+            )}
 
         </div>
 
