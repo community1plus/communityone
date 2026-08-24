@@ -122,95 +122,75 @@ export default function IdentityWorkspace({
 
             <WorkspaceMain>
 
-                <WorkspaceContent>
+ <WorkspaceContent>
+
+    {/* =================================
+       WORKSPACE HEADER
+    ================================= */}
+
+    <WorkspaceRegionHeader>
+
+        <WorkspaceBanner
+            model={banner}
+        >
+
+            <IdentityCapabilitySelector
+                values={values}
+                setValue={form.setValue}
+                readOnly={false}
+            />
+
+        </WorkspaceBanner>
+
+    </WorkspaceRegionHeader>
 
 
-                    {/* =============================
-                       REGION HEADER
-                    ============================= */}
+    {/* =================================
+       SECTION NAVIGATION
+    ================================= */}
 
-                    <WorkspaceRegionHeader>
-
-                        <WorkspaceBanner
-                            model={
-                                banner
-                            }
-                        >
-
-                            <IdentityCapabilitySelector
-
-                                values={
-                                    values
-                                }
-
-                                setValue={
-                                    form.setValue
-                                }
-
-                                readOnly={
-                                    false
-                                }
-
-                            />
-
-                        </WorkspaceBanner>
-
-                    </WorkspaceRegionHeader>
+    <WorkspaceNavigation
+        model={navigation}
+    />
 
 
-                    {/* =============================
-                       SECTION NAVIGATION
-                    ============================= */}
+    {/* =================================
+       SECTION BODY
+    ================================= */}
 
-                    <WorkspaceNavigation
-                        model={
-                            navigation
-                        }
+    <WorkspaceBody>
+
+        {section && (
+
+            <WorkspaceSection
+
+                model={section}
+
+                actions={actions}
+
+            >
+
+                <div className="workspace-section-content">
+
+                    <CapabilityRenderer
+
+                        section={section}
+
+                        form={form}
+
+                        editing={editing}
+
                     />
 
+                </div>
 
-                    {/* =============================
-                       CURRENT SECTION
-                    ============================= */}
+            </WorkspaceSection>
 
-                    <WorkspaceBody>
+        )}
 
-                        {section && (
+    </WorkspaceBody>
 
-                            <WorkspaceSection
-                                model={
-                                    section
-                                }
-                            >
-
-                                <div className="workspace-section-content">
-
-                                    <CapabilityRenderer
-
-                                        section={
-                                            section
-                                        }
-
-                                        form={
-                                            form
-                                        }
-
-                                        editing={
-                                            editing
-                                        }
-
-                                    />
-
-                                </div>
-
-                            </WorkspaceSection>
-
-                        )}
-
-                    </WorkspaceBody>
-
-
-                </WorkspaceContent>
+</WorkspaceContent>
 
             </WorkspaceMain>
 
