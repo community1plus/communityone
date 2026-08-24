@@ -12,9 +12,9 @@ export default function WorkspaceSection({
 
     model,
 
-    children,
+    handlers = {},
 
-    actionHandlers = {},
+    children,
 
 }) {
 
@@ -25,7 +25,7 @@ export default function WorkspaceSection({
 
     const {
 
-        id,
+        id = null,
 
         title = "",
 
@@ -42,11 +42,14 @@ export default function WorkspaceSection({
 
     return (
 
-        <section className="workspace-section">
+        <section
+            className="workspace-section"
+            data-section-id={id}
+        >
 
 
             {/* =====================================
-               SECTION ACTION BAR
+               SECTION HEADER
             ===================================== */}
 
             <header className="workspace-section-header">
@@ -67,7 +70,9 @@ export default function WorkspaceSection({
 
 
                     <WorkspaceSectionProgress
-                        value={completion}
+                        value={
+                            completion
+                        }
                     />
 
 
@@ -78,7 +83,7 @@ export default function WorkspaceSection({
                         }
 
                         handlers={
-                            actionHandlers
+                            handlers
                         }
 
                         sectionId={
@@ -86,7 +91,6 @@ export default function WorkspaceSection({
                         }
 
                     />
-
 
                 </div>
 
