@@ -59,18 +59,20 @@
 
 /* BRAND */
 .brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-  user-select: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
 }
 
 .brand-mark {
-  display: flex;
-  align-items: center;
-  gap: 2px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    width: 82px;
+    height: 48px;
 }
+
 
 .brand-c,
 .brand-o {
@@ -101,9 +103,14 @@
 }
 
 .brand-wordmark {
-  display: flex;
-  flex-direction: column;
-  line-height: 0.9;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    line-height: 0.9;
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.4px;
+    color: #d71920;
 }
 
 .brand-wordmark span {
