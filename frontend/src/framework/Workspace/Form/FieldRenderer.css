@@ -6,16 +6,17 @@
 
     display: grid;
 
-    grid-template-columns: 140px minmax(0, 420px);
+    grid-template-columns: 140px 420px;
 
     column-gap: 36px;
 
     align-items: start;
 
     width: fit-content;
-    max-width: 100%;
 
     margin: 0 auto;
+
+    box-sizing: border-box;
 
 }
 
@@ -27,7 +28,6 @@
 .workspace-field-label {
 
     margin: 0;
-
     padding: 0;
 
     font-size: 1rem;
@@ -60,7 +60,6 @@
 .workspace-field-value {
 
     margin: 0;
-
     padding: 0;
 
     font-size: 1rem;
@@ -79,7 +78,7 @@
 
 .workspace-field-helper {
 
-    margin-top: 8px;
+    margin-top: 6px;
 
     font-size: 0.95rem;
 
@@ -99,6 +98,9 @@
 
     width: 100%;
 
+    margin: 0;
+    padding: 8px 10px;
+
     box-sizing: border-box;
 
 }
@@ -110,7 +112,7 @@
 
 .workspace-field + .workspace-field {
 
-    margin-top: 48px;
+    margin-top: 42px;
 
 }
 
@@ -133,7 +135,7 @@
 
     .workspace-field + .workspace-field {
 
-        margin-top: 32px;
+        margin-top: 30px;
 
     }
 
