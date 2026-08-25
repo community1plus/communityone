@@ -252,9 +252,19 @@ export function calculateProfileCompletion(
 ===================================== */
 
 export function getInitialProfileValues(
-    profile = {},
-    user = {}
+    profile,
+    user
 ) {
+
+    profile =
+        profile && typeof profile === "object"
+            ? profile
+            : {};
+
+    user =
+        user && typeof user === "object"
+            ? user
+            : {};
 
     const email =
         user?.email || "";

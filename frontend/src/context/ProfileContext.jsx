@@ -278,43 +278,27 @@ const {
     },
     []
   );
-
 const getAuthHeaders = useCallback(
   async (extraHeaders = {}) => {
-    let authToken = token;
+
+    const session = await fetchAuthSession({
+      forceRefresh: true,
+    });
+
+    const authToken =
+      session.tokens?.idToken?.toString();
 
     if (!authToken) {
-      const session = await fetchAuthSession({
-        forceRefresh: true,
-      });
-
-      authToken = session.tokens?.idToken?.toString();
-
-      console.log(
-  "TOKEN TYPE",
-  session.tokens?.idToken?.payload?.token_use,
-  session.tokens?.accessToken?.payload?.token_use
-
-  
-);
+      throw new Error("No authenticated session");
     }
 
-    if (!authToken) {
-      throw new Error("No access token found");
-    }
-
-
-    console.log(
-  "AUTH HEADER TOKEN",
-  authToken?.slice(0, 50)
-);
     return {
       "Content-Type": "application/json",
       Authorization: `Bearer ${authToken}`,
       ...extraHeaders,
     };
   },
-  [token]
+  []
 );
 
   const loadProfile = useCallback(
