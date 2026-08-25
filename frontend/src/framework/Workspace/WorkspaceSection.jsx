@@ -61,11 +61,9 @@ export default function WorkspaceSection({
                         value={completion}
                     />
 
-                    <WorkspaceSectionActions
-                        actions={actions}
-                        handlers={runtime.handlers}
-                        sectionId={model.id}
-                    />
+<WorkspaceSectionActions
+    actions={actions}
+/>
 
                 </div>
 

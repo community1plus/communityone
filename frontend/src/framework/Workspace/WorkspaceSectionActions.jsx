@@ -19,46 +19,20 @@ export function WorkspaceSectionActions({
         <div className="workspace-section-actions">
 
 
-            {/* =====================================
-               MENU TRIGGER
-            ===================================== */}
+            <span className="workspace-section-actions-label">
 
-            <button
+                Menu
 
-                type="button"
-
-                className="
-                    workspace-section-actions-trigger
-                "
-
-                aria-label="Section actions"
-
-                title="Section actions"
-
-            >
-
-                ⋮
-
-            </button>
+            </span>
 
 
-            {/* =====================================
-               MENU
-            ===================================== */}
-
-            <div
-                className="
-                    workspace-section-actions-menu
-                "
-            >
+            <div className="workspace-section-actions-list">
 
                 {actions.map(action => (
 
                     <button
 
-                        key={
-                            action.id
-                        }
+                        key={action.id}
 
                         type="button"
 
@@ -91,9 +65,7 @@ export function WorkspaceSectionActions({
                                 aria-hidden="true"
                             >
 
-                                {
-                                    action.icon
-                                }
+                                {action.icon}
 
                             </span>
 
@@ -102,9 +74,7 @@ export function WorkspaceSectionActions({
 
                         <span>
 
-                            {
-                                action.label
-                            }
+                            {action.label}
 
                         </span>
 

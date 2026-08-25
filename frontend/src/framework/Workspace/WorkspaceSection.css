@@ -30,6 +30,7 @@
     display: flex;
 
     align-items: center;
+
     justify-content: space-between;
 
     flex: 0 0 auto;
@@ -51,8 +52,60 @@
 
 
 /* =========================================
-   SECTION CONTENT
+   SECTION HEADING
 ========================================= */
+
+.workspace-section-heading {
+
+    display: flex;
+
+    align-items: center;
+
+    min-width: 0;
+
+    margin: 0;
+    padding: 0;
+
+}
+
+
+.workspace-section-title {
+
+    margin: 0;
+
+    font-size: 1.35rem;
+
+    font-weight: 500;
+
+    line-height: 1.2;
+
+    color:
+        var(--text-primary, #111);
+
+}
+
+
+/* =========================================
+   SECTION TOOLS
+========================================= */
+
+.workspace-section-tools {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: flex-end;
+
+    flex: 0 0 auto;
+
+    gap: 24px;
+
+    margin: 0;
+    padding: 0;
+
+}
+
 
 /* =========================================
    SECTION CONTENT
@@ -75,6 +128,7 @@
     box-sizing: border-box;
 
 }
+
 
 /* =========================================
    SECTION BODY
