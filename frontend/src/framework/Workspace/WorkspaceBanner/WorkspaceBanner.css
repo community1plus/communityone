@@ -1,17 +1,58 @@
+/* =========================================
+   WORKSPACE BANNER
+========================================= */
+
 .workspace-banner {
 
     display: grid;
 
     grid-template-columns:
-
         1.2fr
         1.1fr
-        .9fr;
+        0.9fr;
 
     column-gap: 56px;
 
     align-items: center;
 
-    padding-bottom: 0px;
+    width: 100%;
+
+    margin: 0;
+    padding: 0;
+
+    box-sizing: border-box;
+
+}
+
+
+/* =========================================
+   LEFT
+========================================= */
+
+.workspace-banner > :first-child {
+
+    justify-self: start;
+
+}
+
+
+/* =========================================
+   CENTRE
+========================================= */
+
+.workspace-banner > :nth-child(2) {
+
+    justify-self: center;
+
+}
+
+
+/* =========================================
+   RIGHT
+========================================= */
+
+.workspace-banner > :last-child {
+
+    justify-self: end;
 
 }
