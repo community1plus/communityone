@@ -1,6 +1,37 @@
 import "./WorkspaceSectionActions.css";
 
 
+const ACTION_DEFINITIONS = {
+
+    edit: {
+        label: "Edit",
+        icon: "✎",
+    },
+
+    clear: {
+        label: "Clear",
+        icon: "×",
+    },
+
+    reset: {
+        label: "Reset",
+        icon: "↺",
+    },
+
+    exit: {
+        label: "Exit",
+        icon: "→",
+    },
+
+    save: {
+        label: "Save",
+        icon: "✓",
+        primary: true,
+    },
+
+};
+
+
 export function WorkspaceSectionActions({
 
     actions = [],
@@ -18,23 +49,66 @@ export function WorkspaceSectionActions({
 
         <div className="workspace-section-actions">
 
-            {actions.map(action => (
+            {actions.map(actionId => {
 
-                <button
+                const action =
+                    ACTION_DEFINITIONS[actionId];
 
-                    key={action}
 
-                    type="button"
+                if (!action) {
 
-                    className="workspace-section-action"
+                    return null;
 
-                >
+                }
 
-                    {action}
 
-                </button>
+                return (
 
-            ))}
+                    <button
+
+                        key={actionId}
+
+                        type="button"
+
+                        className={
+
+                            action.primary
+
+                                ? "workspace-section-action primary"
+
+                                : "workspace-section-action"
+
+                        }
+
+                    >
+
+                        <span
+                            className="
+                                workspace-section-action-icon
+                            "
+                            aria-hidden="true"
+                        >
+
+                            {action.icon}
+
+                        </span>
+
+
+                        <span
+                            className="
+                                workspace-section-action-label
+                            "
+                        >
+
+                            {action.label}
+
+                        </span>
+
+                    </button>
+
+                );
+
+            })}
 
         </div>
 
