@@ -7,9 +7,6 @@ export function WorkspaceSectionActions({
 
 }) {
 
-
-        console.log("SECTION ACTIONS:", actions);
-        
     if (!actions.length) {
 
         return null;
@@ -25,48 +22,15 @@ export function WorkspaceSectionActions({
 
                 <button
 
-                    key={action.id}
+                    key={action}
 
                     type="button"
 
-                    className={
-
-                        action.primary
-
-                            ? "workspace-section-action primary"
-
-                            : "workspace-section-action"
-
-                    }
-
-                    disabled={action.disabled}
-
-                    onClick={action.onClick}
+                    className="workspace-section-action"
 
                 >
 
-                    {action.icon && (
-
-                        <span
-
-                            className="workspace-section-action-icon"
-
-                            aria-hidden="true"
-
-                        >
-
-                            {action.icon}
-
-                        </span>
-
-                    )}
-
-
-                    <span className="workspace-section-action-label">
-
-                        {action.label}
-
-                    </span>
+                    {action}
 
                 </button>
 
