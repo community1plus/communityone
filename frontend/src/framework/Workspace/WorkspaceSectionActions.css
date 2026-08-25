@@ -5,11 +5,14 @@
 .workspace-section-actions {
 
     display: flex;
+
     align-items: center;
 
-    gap: 8px;
+    justify-content: flex-end;
 
     flex: 0 0 auto;
+
+    gap: 4px;
 
     margin: 0;
     padding: 0;
@@ -24,36 +27,41 @@
 .workspace-section-action {
 
     display: inline-flex;
+
     align-items: center;
     justify-content: center;
 
-    gap: 6px;
+    gap: 5px;
 
     height: 32px;
 
     margin: 0;
-    padding: 0 10px;
+    padding: 0 8px;
 
     box-sizing: border-box;
 
     appearance: none;
 
-    border: 1px solid transparent;
-    border-radius: 4px;
-
     background: transparent;
+
+    border: 1px solid transparent;
+
+    border-radius: 4px;
 
     color:
         var(--text-secondary, #555);
 
     font-family: inherit;
-    font-size: 0.8rem;
+
+    font-size: 0.78rem;
+
     font-weight: 600;
+
     line-height: 1;
 
-    white-space: nowrap;
-
     cursor: pointer;
+
+    white-space: nowrap;
 
     transition:
         color 0.15s ease,
@@ -72,7 +80,7 @@
     color:
         var(--text-primary, #111);
 
-    background-color:
+    background:
         #f5f5f5;
 
     border-color:
@@ -87,23 +95,8 @@
 
 .workspace-section-action:active:not(:disabled) {
 
-    background-color:
+    background:
         #eeeeee;
-
-}
-
-
-/* =========================================
-   FOCUS
-========================================= */
-
-.workspace-section-action:focus-visible {
-
-    outline:
-        2px solid
-        var(--brand-red, #b30b1b);
-
-    outline-offset: 2px;
 
 }
 
@@ -128,12 +121,12 @@
 .workspace-section-action-icon {
 
     display: inline-flex;
+
     align-items: center;
     justify-content: center;
 
-    flex: 0 0 auto;
+    font-size: 0.85rem;
 
-    font-size: 0.9rem;
     line-height: 1;
 
 }
@@ -146,13 +139,16 @@
 .workspace-section-action-label {
 
     display: inline-flex;
+
     align-items: center;
+
+    line-height: 1;
 
 }
 
 
 /* =========================================
-   PRIMARY ACTION
+   PRIMARY
 ========================================= */
 
 .workspace-section-action.primary {
@@ -172,7 +168,7 @@
     color:
         var(--brand-red, #b30b1b);
 
-    background-color:
+    background:
         #f8eeee;
 
     border-color:
@@ -189,7 +185,7 @@
 
     .workspace-section-actions {
 
-        gap: 4px;
+        gap: 2px;
 
         overflow-x: auto;
 
@@ -209,9 +205,10 @@
 
         flex: 0 0 auto;
 
-        padding: 0 8px;
+        padding:
+            0 6px;
 
-        font-size: 0.75rem;
+        font-size: 0.72rem;
 
     }
 

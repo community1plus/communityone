@@ -27,9 +27,13 @@ export function WorkspaceSectionActions({
                     type="button"
 
                     className={
+
                         action.primary
+
                             ? "workspace-section-action primary"
+
                             : "workspace-section-action"
+
                     }
 
                     disabled={
@@ -48,13 +52,10 @@ export function WorkspaceSectionActions({
                             className="workspace-section-action-icon"
                             aria-hidden="true"
                         >
-
                             {action.icon}
-
                         </span>
 
                     )}
-
 
                     <span className="workspace-section-action-label">
 

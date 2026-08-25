@@ -5,6 +5,7 @@
 .workspace-section {
 
     display: flex;
+
     flex-direction: column;
 
     width: 100%;
@@ -27,7 +28,12 @@
 .workspace-section-header {
 
     display: flex;
+
     align-items: center;
+
+    justify-content: space-between;
+
+    flex: 0 0 auto;
 
     width: 100%;
 
@@ -52,9 +58,8 @@
 .workspace-section-heading {
 
     display: flex;
-    align-items: center;
 
-    flex: 1 1 auto;
+    align-items: center;
 
     min-width: 0;
 
@@ -68,16 +73,14 @@
 
     margin: 0;
 
-    color:
-        var(--text-primary, #111);
-
     font-size: 1.35rem;
 
     font-weight: 500;
 
     line-height: 1.2;
 
-    white-space: nowrap;
+    color:
+        var(--text-primary, #111);
 
 }
 
@@ -89,15 +92,17 @@
 .workspace-section-tools {
 
     display: flex;
+
     align-items: center;
 
     justify-content: flex-end;
 
     flex: 0 0 auto;
 
-    gap: 24px;
+    gap: 18px;
 
-    margin-left: 24px;
+    margin: 0;
+    padding: 0;
 
 }
 
@@ -109,13 +114,16 @@
 .workspace-section-content {
 
     display: flex;
+
     flex-direction: column;
+
+    justify-content: center;
 
     width: 100%;
 
     min-width: 0;
 
-    flex: 1 1 auto;
+    flex: 1;
 
     box-sizing: border-box;
 
@@ -129,45 +137,15 @@
 .workspace-section-body {
 
     display: flex;
+
     flex-direction: column;
 
     width: 100%;
 
     min-width: 0;
 
-    flex: 1 1 auto;
+    flex: 1;
 
     box-sizing: border-box;
-
-}
-
-
-/* =========================================
-   RESPONSIVE
-========================================= */
-
-@media (max-width: 760px) {
-
-    .workspace-section-header {
-
-        min-height: 60px;
-
-    }
-
-
-    .workspace-section-tools {
-
-        gap: 12px;
-
-        margin-left: 16px;
-
-    }
-
-
-    .workspace-section-title {
-
-        font-size: 1.2rem;
-
-    }
 
 }
