@@ -2,18 +2,14 @@ import "./WorkspaceSectionActions.css";
 
 
 export function WorkspaceSectionActions({
+
     actions = [],
+
 }) {
 
-    console.log(
-        "WorkspaceSectionActions:",
-        actions
-    );
 
-    if (!actions.length) {
-        return null;
-    }
-
+        console.log("SECTION ACTIONS:", actions);
+        
     if (!actions.length) {
 
         return null;
@@ -43,26 +39,28 @@ export function WorkspaceSectionActions({
 
                     }
 
-                    disabled={
-                        action.disabled
-                    }
+                    disabled={action.disabled}
 
-                    onClick={
-                        action.onClick
-                    }
+                    onClick={action.onClick}
 
                 >
 
                     {action.icon && (
 
                         <span
+
                             className="workspace-section-action-icon"
+
                             aria-hidden="true"
+
                         >
+
                             {action.icon}
+
                         </span>
 
                     )}
+
 
                     <span className="workspace-section-action-label">
 
