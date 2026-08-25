@@ -1,47 +1,14 @@
 import "./WorkspaceSectionActions.css";
 
 
-const ACTION_DEFINITIONS = {
-
-    edit: {
-        label: "Edit",
-        icon: "✎",
-    },
-
-    clear: {
-        label: "Clear",
-        icon: "×",
-    },
-
-    reset: {
-        label: "Reset",
-        icon: "↺",
-    },
-
-    exit: {
-        label: "Exit",
-        icon: "→",
-    },
-
-    save: {
-        label: "Save",
-        icon: "✓",
-        primary: true,
-    },
-
-};
-
-
 export function WorkspaceSectionActions({
 
     actions = [],
 
 }) {
 
-    if (!actions.length) {
-
+    if (!Array.isArray(actions) || !actions.length) {
         return null;
-
     }
 
 
@@ -49,16 +16,10 @@ export function WorkspaceSectionActions({
 
         <div className="workspace-section-actions">
 
-            {actions.map(actionId => {
+            {actions.map((action) => {
 
-                const action =
-                    ACTION_DEFINITIONS[actionId];
-
-
-                if (!action) {
-
+                if (!action?.id) {
                     return null;
-
                 }
 
 
@@ -66,32 +27,38 @@ export function WorkspaceSectionActions({
 
                     <button
 
-                        key={actionId}
+                        key={action.id}
 
                         type="button"
 
                         className={
-
                             action.primary
-
                                 ? "workspace-section-action primary"
-
                                 : "workspace-section-action"
+                        }
 
+                        disabled={
+                            action.disabled
+                        }
+
+                        onClick={
+                            action.onClick
                         }
 
                     >
 
-                        <span
-                            className="
-                                workspace-section-action-icon
-                            "
-                            aria-hidden="true"
-                        >
+                        {action.icon && (
 
-                            {action.icon}
+                            <span
+                                className="
+                                    workspace-section-action-icon
+                                "
+                                aria-hidden="true"
+                            >
+                                {action.icon}
+                            </span>
 
-                        </span>
+                        )}
 
 
                         <span
@@ -99,9 +66,7 @@ export function WorkspaceSectionActions({
                                 workspace-section-action-label
                             "
                         >
-
                             {action.label}
-
                         </span>
 
                     </button>
