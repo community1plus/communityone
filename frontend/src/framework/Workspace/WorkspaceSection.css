@@ -1,46 +1,13 @@
-/* =========================================
-   WORKSPACE SECTION
-========================================= */
-
-.workspace-section {
-
-    display: flex;
-
-    flex-direction: column;
-
-    width: 100%;
-
-    min-width: 0;
-    min-height: 0;
-
-    margin: 0;
-    padding: 0;
-
-    box-sizing: border-box;
-
-}
-
-
-/* =========================================
-   SECTION HEADER
-========================================= */
-
 .workspace-section-header {
 
     display: flex;
 
     align-items: center;
-
     justify-content: space-between;
 
     width: 100%;
 
     min-height: 68px;
-
-    flex: 0 0 auto;
-
-    margin: 0;
-    padding: 0;
 
     box-sizing: border-box;
 
@@ -51,29 +18,18 @@
 }
 
 
-/* =========================================
-   SECTION HEADING
-========================================= */
-
 .workspace-section-heading {
 
     display: flex;
 
     align-items: center;
 
+    gap: 24px;
+
     min-width: 0;
-
-    margin: 0;
-    padding: 0;
-
-    gap: 32px;
 
 }
 
-
-/* =========================================
-   SECTION TITLE
-========================================= */
 
 .workspace-section-title {
 
@@ -87,100 +43,5 @@
 
     color:
         var(--text-primary, #111);
-
-    white-space: nowrap;
-
-}
-
-
-/* =========================================
-   SECTION ACTIONS
-========================================= */
-
-.workspace-section-actions {
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: flex-end;
-
-    flex: 0 0 auto;
-
-    margin: 0;
-    padding: 0;
-
-}
-
-
-/* =========================================
-   SECTION CONTENT
-========================================= */
-
-.workspace-section-content {
-
-    display: flex;
-
-    flex-direction: column;
-
-    justify-content: center;
-
-    width: 100%;
-
-    min-width: 0;
-
-    flex: 1;
-
-    box-sizing: border-box;
-
-}
-
-
-/* =========================================
-   SECTION BODY
-========================================= */
-
-.workspace-section-body {
-
-    display: flex;
-
-    flex-direction: column;
-
-    width: 100%;
-
-    min-width: 0;
-
-    flex: 1;
-
-    box-sizing: border-box;
-
-}
-
-
-/* =========================================
-   RESPONSIVE
-========================================= */
-
-@media (max-width: 760px) {
-
-    .workspace-section-header {
-
-        min-height: 60px;
-
-    }
-
-
-    .workspace-section-heading {
-
-        gap: 20px;
-
-    }
-
-
-    .workspace-section-title {
-
-        font-size: 1.2rem;
-
-    }
 
 }

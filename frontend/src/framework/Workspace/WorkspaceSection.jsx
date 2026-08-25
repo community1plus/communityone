@@ -41,14 +41,19 @@ export default function WorkspaceSection({
         <section className="workspace-section">
 
 
+            {/* =====================================
+               SECTION HEADER
+            ===================================== */}
+
             <header className="workspace-section-header">
 
 
-                {/* =====================================
-                   SECTION IDENTITY + PROGRESS
-                ===================================== */}
+                {/* =================================
+                   SECTION HEADING
+                ================================= */}
 
                 <div className="workspace-section-heading">
+
 
                     <h2 className="workspace-section-title">
 
@@ -61,12 +66,13 @@ export default function WorkspaceSection({
                         value={completion}
                     />
 
+
                 </div>
 
 
-                {/* =====================================
+                {/* =================================
                    SECTION ACTIONS
-                ===================================== */}
+                ================================= */}
 
                 <WorkspaceSectionActions
                     actions={actions}
