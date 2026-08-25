@@ -18,72 +18,53 @@ export function WorkspaceSectionActions({
 
         <div className="workspace-section-actions">
 
+            {actions.map(action => (
 
-            <span className="workspace-section-actions-label">
+                <button
 
-                Menu
+                    key={action.id}
 
-            </span>
+                    type="button"
 
+                    className={
+                        action.primary
+                            ? "workspace-section-action primary"
+                            : "workspace-section-action"
+                    }
 
-            <div className="workspace-section-actions-list">
+                    disabled={
+                        action.disabled
+                    }
 
-                {actions.map(action => (
+                    onClick={
+                        action.onClick
+                    }
 
-                    <button
+                >
 
-                        key={action.id}
+                    {action.icon && (
 
-                        type="button"
+                        <span
+                            className="workspace-section-action-icon"
+                            aria-hidden="true"
+                        >
 
-                        className={
-
-                            action.primary
-
-                                ? "workspace-section-action primary"
-
-                                : "workspace-section-action"
-
-                        }
-
-                        disabled={
-                            action.disabled
-                        }
-
-                        onClick={
-                            action.onClick
-                        }
-
-                    >
-
-                        {action.icon && (
-
-                            <span
-                                className="
-                                    workspace-section-action-icon
-                                "
-                                aria-hidden="true"
-                            >
-
-                                {action.icon}
-
-                            </span>
-
-                        )}
-
-
-                        <span>
-
-                            {action.label}
+                            {action.icon}
 
                         </span>
 
-                    </button>
+                    )}
 
-                ))}
 
-            </div>
+                    <span className="workspace-section-action-label">
 
+                        {action.label}
+
+                    </span>
+
+                </button>
+
+            ))}
 
         </div>
 
