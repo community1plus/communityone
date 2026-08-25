@@ -33,11 +33,11 @@
 
     justify-content: space-between;
 
-    flex: 0 0 auto;
-
     width: 100%;
 
     min-height: 68px;
+
+    flex: 0 0 auto;
 
     margin: 0;
     padding: 0;
@@ -66,8 +66,14 @@
     margin: 0;
     padding: 0;
 
+    gap: 32px;
+
 }
 
+
+/* =========================================
+   SECTION TITLE
+========================================= */
 
 .workspace-section-title {
 
@@ -82,14 +88,16 @@
     color:
         var(--text-primary, #111);
 
+    white-space: nowrap;
+
 }
 
 
 /* =========================================
-   SECTION TOOLS
+   SECTION ACTIONS
 ========================================= */
 
-.workspace-section-tools {
+.workspace-section-actions {
 
     display: flex;
 
@@ -98,8 +106,6 @@
     justify-content: flex-end;
 
     flex: 0 0 auto;
-
-    gap: 18px;
 
     margin: 0;
     padding: 0;
@@ -147,5 +153,34 @@
     flex: 1;
 
     box-sizing: border-box;
+
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 760px) {
+
+    .workspace-section-header {
+
+        min-height: 60px;
+
+    }
+
+
+    .workspace-section-heading {
+
+        gap: 20px;
+
+    }
+
+
+    .workspace-section-title {
+
+        font-size: 1.2rem;
+
+    }
 
 }

@@ -44,6 +44,10 @@ export default function WorkspaceSection({
             <header className="workspace-section-header">
 
 
+                {/* =====================================
+                   SECTION IDENTITY + PROGRESS
+                ===================================== */}
+
                 <div className="workspace-section-heading">
 
                     <h2 className="workspace-section-title">
@@ -52,24 +56,29 @@ export default function WorkspaceSection({
 
                     </h2>
 
-                </div>
-
-
-                <div className="workspace-section-tools">
 
                     <WorkspaceSectionProgress
                         value={completion}
                     />
 
-<WorkspaceSectionActions
-    actions={actions}
-/>
-
                 </div>
+
+
+                {/* =====================================
+                   SECTION ACTIONS
+                ===================================== */}
+
+                <WorkspaceSectionActions
+                    actions={actions}
+                />
 
 
             </header>
 
+
+            {/* =====================================
+               SECTION BODY
+            ===================================== */}
 
             <div className="workspace-section-body">
 
