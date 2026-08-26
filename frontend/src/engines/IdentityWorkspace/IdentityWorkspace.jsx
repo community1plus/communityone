@@ -55,8 +55,6 @@ export default function IdentityWorkspace({
 
         navigation,
 
-        runtime,
-
     } = workspace;
 
 
@@ -126,65 +124,32 @@ export default function IdentityWorkspace({
 
                     <WorkspaceRegionHeader>
 
-
-                        {/* =============================
-                           HEADER TITLE + ACTIONS
-                        ============================= */}
-
-                        <div className="workspace-region-header-title-row">
-
-                            <h1 className="workspace-region-header-title">
-
-                                PROFILE
-
-                            </h1>
-
-
-                            <WorkspaceHeaderActions>
-
-                                <button
-                                    type="button"
-                                    className="workspace-header-action"
-                                    onClick={
-                                        actions.closeProfile
-                                    }
-                                >
-
-                                    Exit
-
-                                </button>
-
-                            </WorkspaceHeaderActions>
-
-                        </div>
-
-
-                        {/* =============================
-                           WORKSPACE BANNER
-                        ============================= */}
-
                         <WorkspaceBanner
                             model={banner}
                         >
 
                             <IdentityCapabilitySelector
-
-                                values={
-                                    values
-                                }
-
-                                setValue={
-                                    form.setValue
-                                }
-
-                                readOnly={
-                                    false
-                                }
-
+                                values={values}
+                                setValue={form.setValue}
+                                readOnly={false}
                             />
 
                         </WorkspaceBanner>
 
+
+                        <WorkspaceHeaderActions>
+
+                            <button
+                                type="button"
+                                className="workspace-header-action"
+                                onClick={
+                                    actions.closeProfile
+                                }
+                            >
+                                Exit
+                            </button>
+
+                        </WorkspaceHeaderActions>
 
                     </WorkspaceRegionHeader>
 
@@ -253,7 +218,6 @@ export default function IdentityWorkspace({
                     title="Identity Guide"
                 >
 
-
                     <WorkspacePanel
                         title="Welcome"
                     >
@@ -288,7 +252,6 @@ export default function IdentityWorkspace({
                         }
 
                     </WorkspacePanel>
-
 
                 </WorkspaceGuide>
 
