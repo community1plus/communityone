@@ -8,18 +8,13 @@ import {
 } from "./WorkspaceSectionActions";
 
 
-export function WorkspaceSectionActions({
-    actions = [],
+export default function WorkspaceSection({
+
+    model,
+
+    children,
+
 }) {
-
-    console.log(
-        "🔥 WorkspaceSectionActions RENDERED",
-        actions
-    );
-
-    if (!actions.length) {
-        return null;
-    }
 
     if (!model?.runtime?.visible) {
         return null;
@@ -80,8 +75,8 @@ export function WorkspaceSectionActions({
                 ================================= */}
 
                 <WorkspaceSectionActions
-    actions={["edit"]}
-/>
+                    actions={actions}
+                />
 
 
             </header>

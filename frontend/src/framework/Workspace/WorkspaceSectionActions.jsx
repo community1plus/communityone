@@ -2,10 +2,17 @@ import "./WorkspaceSectionActions.css";
 
 
 export function WorkspaceSectionActions({
-
     actions = [],
-
 }) {
+
+    console.log(
+        "🔥 WorkspaceSectionActions RENDERED",
+        actions
+    );
+
+    if (!actions.length) {
+        return null;
+    }
 
     if (!Array.isArray(actions) || !actions.length) {
         return null;
