@@ -8,7 +8,11 @@ export default function WorkspaceRegionHeader({
 
         <section className="workspace-region-header">
 
-            {children}
+            <div className="workspace-region-header-inner">
+
+                {children}
+
+            </div>
 
         </section>
 
