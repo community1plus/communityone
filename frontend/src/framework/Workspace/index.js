@@ -4,6 +4,9 @@ from "./WorkspaceShell";
 export { default as WorkspaceHeader }
 from "./WorkspaceHeader";
 
+export {default as WorkspaceHeaderActions}
+from "./WorkspaceHeaderActions";
+
 export { default as WorkspaceWorkflow }
 from "./WorkspaceWorkflow";
 

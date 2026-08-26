@@ -15,6 +15,7 @@ import {
     WorkspaceSidebar,
 
     WorkspaceRegionHeader,
+    WorkspaceHeaderActions,
     WorkspaceBanner,
     WorkspaceNavigation,
     WorkspaceBody,
@@ -41,14 +42,11 @@ export default function IdentityWorkspace({
        WORKSPACE
     ===================================== */
 
-const workspace =
-    buildIdentityWorkspace(
-
-        state,
-
-        actions
-
-    );
+    const workspace =
+        buildIdentityWorkspace(
+            state,
+            actions
+        );
 
 
     const {
@@ -79,8 +77,8 @@ const workspace =
        CURRENT SECTION
     ===================================== */
 
-const section =
-    workspace?.body?.section ?? null;
+    const section =
+        workspace?.body?.section ?? null;
 
 
     /* =====================================
@@ -103,7 +101,7 @@ const section =
 
 
             {/* =================================
-               CLOSE
+               WORKSPACE CLOSE
             ================================= */}
 
             <WorkspaceClose
@@ -119,75 +117,128 @@ const section =
 
             <WorkspaceMain>
 
- <WorkspaceContent>
-
-    {/* =================================
-       WORKSPACE HEADER
-    ================================= */}
-
-    <WorkspaceRegionHeader>
-
-        <WorkspaceBanner
-            model={banner}
-        >
-
-            <IdentityCapabilitySelector
-                values={values}
-                setValue={form.setValue}
-                readOnly={false}
-            />
-
-        </WorkspaceBanner>
-
-    </WorkspaceRegionHeader>
+                <WorkspaceContent>
 
 
-    {/* =================================
-       SECTION NAVIGATION
-    ================================= */}
+                    {/* =================================
+                       WORKSPACE HEADER
+                    ================================= */}
 
-    <WorkspaceNavigation
-        model={navigation}
-    />
+                    <WorkspaceRegionHeader>
 
 
-    {/* =================================
-       SECTION BODY
-    ================================= */}
+                        {/* =============================
+                           HEADER TITLE + ACTIONS
+                        ============================= */}
 
-    <WorkspaceBody>
+                        <div className="workspace-region-header-title-row">
 
-        {section && (
+                            <h1 className="workspace-region-header-title">
 
-            <WorkspaceSection
+                                PROFILE
 
-                model={section}
+                            </h1>
 
-                actions={actions}
 
-            >
+                            <WorkspaceHeaderActions>
 
-                <div className="workspace-section-content">
+                                <button
+                                    type="button"
+                                    className="workspace-header-action"
+                                    onClick={
+                                        actions.closeProfile
+                                    }
+                                >
 
-                    <CapabilityRenderer
+                                    Exit
 
-                        section={section}
+                                </button>
 
-                        form={form}
+                            </WorkspaceHeaderActions>
 
-                        editing={editing}
+                        </div>
 
+
+                        {/* =============================
+                           WORKSPACE BANNER
+                        ============================= */}
+
+                        <WorkspaceBanner
+                            model={banner}
+                        >
+
+                            <IdentityCapabilitySelector
+
+                                values={
+                                    values
+                                }
+
+                                setValue={
+                                    form.setValue
+                                }
+
+                                readOnly={
+                                    false
+                                }
+
+                            />
+
+                        </WorkspaceBanner>
+
+
+                    </WorkspaceRegionHeader>
+
+
+                    {/* =================================
+                       SECTION NAVIGATION
+                    ================================= */}
+
+                    <WorkspaceNavigation
+                        model={navigation}
                     />
 
-                </div>
 
-            </WorkspaceSection>
+                    {/* =================================
+                       SECTION BODY
+                    ================================= */}
 
-        )}
+                    <WorkspaceBody>
 
-    </WorkspaceBody>
+                        {section && (
 
-</WorkspaceContent>
+                            <WorkspaceSection
+                                model={section}
+                                actions={actions}
+                            >
+
+                                <div className="workspace-section-content">
+
+                                    <CapabilityRenderer
+
+                                        section={
+                                            section
+                                        }
+
+                                        form={
+                                            form
+                                        }
+
+                                        editing={
+                                            editing
+                                        }
+
+                                    />
+
+                                </div>
+
+                            </WorkspaceSection>
+
+                        )}
+
+                    </WorkspaceBody>
+
+
+                </WorkspaceContent>
 
             </WorkspaceMain>
 
@@ -201,6 +252,7 @@ const section =
                 <WorkspaceGuide
                     title="Identity Guide"
                 >
+
 
                     <WorkspacePanel
                         title="Welcome"
@@ -236,6 +288,7 @@ const section =
                         }
 
                     </WorkspacePanel>
+
 
                 </WorkspaceGuide>
 
