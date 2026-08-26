@@ -405,6 +405,16 @@ export function buildIdentityWorkspace(
 
     };
 
+    console.log(
+    "🔥 BUILD IDENTITY RESOLVED SECTION:",
+    resolvedSection
+);
+
+console.log(
+    "🔥 BUILD IDENTITY RESOLVED ACTIONS:",
+    resolvedSection.actions
+);
+
 
     /* =====================================
        BANNER
