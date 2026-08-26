@@ -9,12 +9,25 @@ import {
 
 
 export default function WorkspaceSection({
-
     model,
-
     children,
-
 }) {
+
+    console.log(
+        "🔥 WorkspaceSection MODEL:",
+        model
+    );
+
+    console.log(
+        "🔥 WorkspaceSection ACTIONS:",
+        model?.actions
+    );
+
+    if (!model?.runtime?.visible) {
+        return null;
+    }
+
+    ...
 
     if (!model?.runtime?.visible) {
         return null;
