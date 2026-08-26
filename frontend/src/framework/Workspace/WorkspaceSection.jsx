@@ -8,13 +8,18 @@ import {
 } from "./WorkspaceSectionActions";
 
 
-export default function WorkspaceSection({
-
-    model,
-
-    children,
-
+export function WorkspaceSectionActions({
+    actions = [],
 }) {
+
+    console.log(
+        "🔥 WorkspaceSectionActions RENDERED",
+        actions
+    );
+
+    if (!actions.length) {
+        return null;
+    }
 
     if (!model?.runtime?.visible) {
         return null;
