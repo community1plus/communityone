@@ -5,8 +5,8 @@ import IdentityCapabilitySelector
     from "../../components/Identity/IdentityCapabilitySelector";
 
 import {
-    buildCapabilityWorkspace,
-} from "../../framework/Workspace/builders/buildCapabilityWorkspace";
+    buildIdentityWorkspace,
+} from "../../framework/Workspace/builders/buildIdentityWorkspace";
 
 import {
     WorkspaceShell,
@@ -41,17 +41,14 @@ export default function IdentityWorkspace({
        WORKSPACE
     ===================================== */
 
-    const workspace =
-        buildCapabilityWorkspace({
+const workspace =
+    buildIdentityWorkspace(
 
-            capability:
-                initialCapability,
+        state,
 
-            state,
+        actions
 
-            actions,
-
-        });
+    );
 
 
     const {
@@ -82,8 +79,8 @@ export default function IdentityWorkspace({
        CURRENT SECTION
     ===================================== */
 
-    const section =
-        runtime?.section ?? null;
+const section =
+    workspace?.body?.section ?? null;
 
 
     /* =====================================
