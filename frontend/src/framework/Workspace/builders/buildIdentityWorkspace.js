@@ -152,6 +152,14 @@ export function buildIdentityWorkspace(
 
     if (!section) {
 
+        console.log(
+    "🧩 IDENTITY WORKSPACE FINAL:",
+    {
+        section: resolvedSection,
+        actions: resolvedSection.actions,
+    }
+);
+
         return createWorkspace({
 
             runtime,
