@@ -75,8 +75,8 @@ export default function WorkspaceSection({
                 ================================= */}
 
                 <WorkspaceSectionActions
-                    actions={actions}
-                />
+    actions={["edit"]}
+/>
 
 
             </header>
