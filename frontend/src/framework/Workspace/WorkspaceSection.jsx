@@ -27,7 +27,6 @@ export default function WorkspaceSection({
         return null;
     }
 
-    ...
 
     if (!model?.runtime?.visible) {
         return null;
