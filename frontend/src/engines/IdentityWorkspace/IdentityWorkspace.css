@@ -1,7 +1,62 @@
 /* =========================================
-   WORKSPACE SECTION
+   WORKSPACE HEADER CLOSE
 ========================================= */
 
+.workspace-header-close {
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 44px;
+    height: 44px;
+
+    padding: 0;
+
+    border: none;
+    border-radius: 999px;
+
+    background: #2daa72;
+    color: #ffffff;
+
+    font-family: inherit;
+    font-size: 1.35rem;
+    font-weight: 400;
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition:
+        background .2s ease,
+        transform .15s ease;
+
+}
+
+
+.workspace-header-close:hover {
+
+    background: #269b66;
+
+}
+
+
+.workspace-header-close:active {
+
+    transform: scale(.96);
+
+}
+
+
+.workspace-header-close:disabled {
+
+    opacity: .45;
+
+    cursor: default;
+
+    transform: none;
+
+}
 .workspace-section {
 
     display: block;

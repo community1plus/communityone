@@ -111,29 +111,20 @@ export default function IdentityWorkspace({
 
     const headerAction = (
 
-        <WorkspaceHeaderActions>
+<WorkspaceHeaderActions>
 
-            <button
-                type="button"
-                className={
-                    profileReady
-                        ? "workspace-header-action workspace-header-action-ready"
-                        : "workspace-header-action"
-                }
-                onClick={
-                    profileReady
-                        ? actions.closeProfile
-                        : undefined
-                }
-                disabled={!profileReady}
-                aria-disabled={!profileReady}
-            >
+    <button
+        type="button"
+        className="workspace-header-close"
+        onClick={profileReady ? actions.closeProfile : undefined}
+        disabled={!profileReady}
+        aria-disabled={!profileReady}
+        aria-label="Exit profile"
+    >
+        ×
+    </button>
 
-                Exit
-
-            </button>
-
-        </WorkspaceHeaderActions>
+</WorkspaceHeaderActions>
 
     );
 
