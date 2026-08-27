@@ -21,6 +21,8 @@
 
     border-radius: 22px;
 
+    background: #fff;
+
 }
 
 
@@ -35,6 +37,8 @@
     font-size: 1rem;
 
     font-weight: 600;
+
+    line-height: 1.4;
 
     color:
         var(--text-primary, #111);

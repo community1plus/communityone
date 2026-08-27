@@ -22,7 +22,6 @@ export default function WorkspaceGuide({
 
             </header>
 
-
             <div className="workspace-guide-body">
 
                 {children}

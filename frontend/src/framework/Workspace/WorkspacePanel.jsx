@@ -18,7 +18,6 @@ export default function WorkspacePanel({
 
             </h3>
 
-
             <div className="workspace-panel-content">
 
                 {children}

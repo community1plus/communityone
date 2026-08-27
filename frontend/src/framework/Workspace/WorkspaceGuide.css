@@ -1,7 +1,10 @@
+/* =========================================
+   WORKSPACE GUIDE
+========================================= */
+
 .workspace-guide {
 
     display: flex;
-
     flex-direction: column;
 
     width: 100%;
@@ -12,32 +15,32 @@
 
     box-sizing: border-box;
 
-    background:
-        var(--surface-color, #fff);
+    background: #fff;
 
     border:
         1px solid
         var(--border-color, #e8e8e8);
 
-    border-radius: 24px;
+    border-radius: 28px;
 
     overflow: hidden;
 
 }
 
 
+/* =========================================
+   GUIDE HEADER
+========================================= */
+
 .workspace-guide-header {
 
     display: flex;
-
     align-items: center;
 
     width: 100%;
 
-    min-height: 72px;
-
-    padding:
-        0 28px;
+    margin: 0;
+    padding: 28px 32px;
 
     box-sizing: border-box;
 
@@ -48,6 +51,10 @@
 }
 
 
+/* =========================================
+   GUIDE TITLE
+========================================= */
+
 .workspace-guide-title {
 
     margin: 0;
@@ -56,7 +63,7 @@
 
     font-weight: 600;
 
-    line-height: 1.3;
+    line-height: 1.4;
 
     color:
         var(--text-primary, #111);
@@ -64,18 +71,22 @@
 }
 
 
+/* =========================================
+   GUIDE BODY
+========================================= */
+
 .workspace-guide-body {
 
     display: flex;
-
     flex-direction: column;
 
-    gap: 24px;
+    gap: 20px;
 
     width: 100%;
     min-width: 0;
 
-    padding: 28px;
+    margin: 0;
+    padding: 32px;
 
     box-sizing: border-box;
 
