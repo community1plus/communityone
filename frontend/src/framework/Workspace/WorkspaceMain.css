@@ -1,7 +1,3 @@
-/* =========================================
-   WORKSPACE MAIN
-========================================= */
-
 .workspace-main {
 
     display: grid;
@@ -10,19 +6,13 @@
         minmax(0, 1fr)
         360px;
 
-    grid-template-areas:
-        "content sidebar";
-
-    column-gap: 40px;
+    gap: 40px;
 
     width: 100%;
     min-width: 0;
 
-    margin: 0;
-    padding: 0;
+    align-items: start;
 
     box-sizing: border-box;
-
-    align-items: start;
 
 }
