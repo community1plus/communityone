@@ -1,7 +1,3 @@
-/* =========================================
-   WORKSPACE PANEL
-========================================= */
-
 .workspace-panel {
 
     display: flex;
@@ -17,48 +13,8 @@
 
     border:
         1px solid
-        var(--border-color, #e8e8e8);
+        var(--border, #e8e8e8);
 
     border-radius: 22px;
-
-    background: #fff;
-
-}
-
-
-/* =========================================
-   PANEL TITLE
-========================================= */
-
-.workspace-panel-title {
-
-    margin: 0 0 18px;
-
-    font-size: 1rem;
-
-    font-weight: 600;
-
-    line-height: 1.4;
-
-    color:
-        var(--text-primary, #111);
-
-}
-
-
-/* =========================================
-   PANEL CONTENT
-========================================= */
-
-.workspace-panel-content {
-
-    margin: 0;
-
-    font-size: 1rem;
-
-    line-height: 1.5;
-
-    color:
-        var(--text-secondary, #667085);
 
 }

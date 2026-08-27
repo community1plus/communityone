@@ -47,3 +47,20 @@
     box-sizing: border-box;
 
 }
+
+.workspace-main {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    position: relative;
+}
+
+.workspace-sidebar {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    box-sizing: border-box;
+}
