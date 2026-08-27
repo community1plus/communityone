@@ -26,19 +26,6 @@
 
     box-sizing: border-box;
 
-}
-
-
-/* ==========================================================
-   RESPONSIVE
-   ========================================================== */
-
-@media (max-width: 1100px) {
-
-    .workspace-main {
-
-        grid-template-columns: 1fr;
-
-    }
+    align-items: start;
 
 }
