@@ -9,14 +9,11 @@
     grid-template-columns:
         minmax(0, 1fr)
         auto
-        minmax(0, 1fr);
+        auto;
 
     align-items: center;
 
     width: 100%;
-    min-width: 0;
-
-    min-height: 92px;
 
     box-sizing: border-box;
 
@@ -24,58 +21,16 @@
 
 
 /* =========================================
-   BANNER SECTIONS
+   TITLE
 ========================================= */
 
-.workspace-banner
-.workspace-banner-section {
+.workspace-banner-title {
 
     display: flex;
 
     align-items: center;
 
-    min-width: 0;
-
-}
-
-
-/* =========================================
-   LEFT
-========================================= */
-
-.workspace-banner-left {
-
-    display: flex;
-
-    align-items: baseline;
-
-    gap: 14px;
-
-    min-width: 0;
-
-}
-
-
-/* =========================================
-   CENTRE
-========================================= */
-
-.workspace-banner
-.workspace-banner-section:nth-child(2) {
-
-    justify-content: center;
-
-}
-
-
-/* =========================================
-   RIGHT
-========================================= */
-
-.workspace-banner
-.workspace-banner-section:nth-child(3) {
-
-    justify-content: flex-end;
+    gap: 16px;
 
 }
 
@@ -86,13 +41,11 @@
 
 .workspace-header-actions {
 
-    display: inline-flex;
+    display: flex;
 
     align-items: center;
 
     gap: 8px;
-
-    flex-shrink: 0;
 
 }
 
@@ -108,22 +61,24 @@
     align-items: center;
     justify-content: center;
 
-    height: 30px;
+    min-height: 38px;
 
-    padding: 0 14px;
+    padding:
+        0 16px;
 
-    border: 1px solid
-        var(--border-color, #dedede);
+    border:
+        1px solid
+        #d8d8d8;
 
     border-radius: 999px;
 
-    background: transparent;
+    background:
+        #f1f1f1;
 
-    color: var(--text-secondary, #666);
+    color:
+        #777;
 
-    font-family: inherit;
-
-    font-size: 0.8rem;
+    font-size: 0.9rem;
 
     font-weight: 600;
 
@@ -131,7 +86,7 @@
 
     cursor: not-allowed;
 
-    appearance: none;
+    opacity: 0.7;
 
     box-sizing: border-box;
 
@@ -144,38 +99,17 @@
 
 .workspace-header-action-ready {
 
-    border-color: #2e9b5b;
+    border-color:
+        #2ca66f;
 
-    background: #2e9b5b;
+    background:
+        #2ca66f;
 
-    color: #fff;
+    color:
+        #fff;
 
     cursor: pointer;
 
-}
-
-
-/* =========================================
-   READY HOVER
-========================================= */
-
-.workspace-header-action-ready:hover {
-
-    background: #27864f;
-
-    border-color: #27864f;
-
-}
-
-
-/* =========================================
-   DISABLED
-========================================= */
-
-.workspace-header-action:disabled {
-
-    opacity: 0.45;
-
-    cursor: not-allowed;
+    opacity: 1;
 
 }

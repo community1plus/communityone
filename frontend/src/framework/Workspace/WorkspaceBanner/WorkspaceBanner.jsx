@@ -10,6 +10,9 @@ import WorkspaceMode
 import WorkspaceMetric
     from "../WorkspaceMetric";
 
+import WorkspaceHeaderActions
+    from "../WorkspaceHeaderActions/WorkspaceHeaderActions";
+
 import "./WorkspaceBanner.css";
 
 
@@ -19,7 +22,7 @@ export default function WorkspaceBanner({
 
     children,
 
-    actions,
+    actions = null,
 
 }) {
 
@@ -37,18 +40,26 @@ export default function WorkspaceBanner({
 
 
             {/* =================================
-               LEFT
+               TITLE + WORKSPACE ACTIONS
             ================================= */}
 
             <WorkspaceBannerSection>
 
-                <div className="workspace-banner-left">
+                <div className="workspace-banner-title">
 
                     <WorkspaceTitle
                         title={left.title}
                     />
 
-                    {actions}
+                    {actions && (
+
+                        <WorkspaceHeaderActions>
+
+                            {actions}
+
+                        </WorkspaceHeaderActions>
+
+                    )}
 
                 </div>
 
@@ -56,7 +67,7 @@ export default function WorkspaceBanner({
 
 
             {/* =================================
-               CENTRE
+               MODE
             ================================= */}
 
             <WorkspaceBannerSection>
@@ -71,7 +82,7 @@ export default function WorkspaceBanner({
 
 
             {/* =================================
-               RIGHT
+               METRIC
             ================================= */}
 
             <WorkspaceBannerSection>
