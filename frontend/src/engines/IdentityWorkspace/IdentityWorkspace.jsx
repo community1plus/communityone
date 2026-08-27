@@ -216,7 +216,7 @@ return (
         <WorkspaceSidebar>
 
             <WorkspaceGuide
-                title="Identity Guide"
+                title="IDENTITY GUIDE"
             >
 
                 <WorkspacePanel
