@@ -11,7 +11,7 @@ import WorkspaceMetric
     from "../WorkspaceMetric";
 
 import WorkspaceHeaderActions
-    from "../WorkspaceHeaderActions/WorkspaceHeaderActions";
+    from "../WorkspaceHeaderActions";
 
 import "./WorkspaceBanner.css";
 
