@@ -6,7 +6,7 @@
 
 
 /* ==========================================================
-   WORKSPACE GUIDE
+   GUIDE
    ========================================================== */
 
 .workspace-guide {
@@ -15,7 +15,6 @@
     flex-direction: column;
 
     width: 100%;
-
     min-width: 0;
     min-height: 0;
 
@@ -28,7 +27,7 @@
         1px solid
         var(--border, #e8e8e8);
 
-    border-radius: 0px;
+    border-radius: 28px;
 
     overflow: hidden;
 
@@ -44,13 +43,15 @@
     display: flex;
 
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
 
     width: 100%;
+    min-width: 0;
 
     min-height: 86px;
 
-    padding: 0 32px;
+    padding:
+        0 24px;
 
     box-sizing: border-box;
 
@@ -67,13 +68,23 @@
 
 .workspace-guide-title {
 
+    width: 100%;
+
     margin: 0;
 
-    font-size: 1rem;
+    text-align: center;
+
+    font-family: inherit;
+
+    font-size: .95rem;
 
     font-weight: 600;
 
     line-height: 1.3;
+
+    letter-spacing: .08em;
+
+    text-transform: uppercase;
 
     color:
         var(--text-primary, #111111);
@@ -90,11 +101,10 @@
     display: flex;
     flex-direction: column;
 
-    gap: 28px;
-
     width: 100%;
-
     min-width: 0;
+
+    gap: 28px;
 
     padding: 32px;
 
@@ -104,13 +114,13 @@
 
 
 /* ==========================================================
-   WORKSPACE GUIDE PANEL
+   GUIDE PANEL
    ========================================================== */
 
-.workspace-panel {
+.workspace-guide-body > * {
 
     width: 100%;
-
+    max-width: 100%;
     min-width: 0;
 
     box-sizing: border-box;
@@ -119,71 +129,49 @@
 
 
 /* ==========================================================
-   WORKSPACE HEADER ACTIONS
+   WORKSPACE PANEL
    ========================================================== */
 
-.workspace-header-actions {
+.workspace-panel {
 
     display: flex;
+    flex-direction: column;
 
-    align-items: center;
-    justify-content: flex-end;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
 
-    gap: 18px;
+    box-sizing: border-box;
 
-    min-height: 24px;
+    padding: 36px;
 
-    white-space: nowrap;
+    background:
+        var(--panel-solid, #ffffff);
+
+    border:
+        1px solid
+        var(--border, #e8e8e8);
+
+    border-radius: 28px;
 
 }
 
 
 /* ==========================================================
-   WORKSPACE HEADER ACTION
+   PANEL TITLE
    ========================================================== */
 
-.workspace-header-action {
+.workspace-panel-title {
 
-    display: inline-flex;
-
-    align-items: center;
-    justify-content: center;
-
-    padding: 0;
-
-    border: none;
-
-    background: transparent;
-
-    color:
-        var(--text-secondary, #60738a);
+    margin: 0 0 20px;
 
     font-family: inherit;
 
-    font-size: .82rem;
+    font-size: 1rem;
 
-    font-weight: 500;
+    font-weight: 600;
 
-    line-height: 1.4;
-
-    letter-spacing: .08em;
-
-    text-transform: uppercase;
-
-    cursor: pointer;
-
-    transition:
-        color .2s ease,
-        opacity .2s ease;
-
-}
-
-
-/* ==========================================================
-   ACTION HOVER
-   ========================================================== */
-
-.workspace-header-action:hover {
+    line-height: 1.35;
 
     color:
         var(--text-primary, #111111);
@@ -192,128 +180,12 @@
 
 
 /* ==========================================================
-   ACTION DISABLED
+   PANEL CONTENT
    ========================================================== */
 
-.workspace-header-action:disabled {
+.workspace-panel-content {
 
-    opacity: .45;
-
-    cursor: default;
-
-}
-
-
-/* ==========================================================
-   SAVE ACTION
-   ========================================================== */
-
-.workspace-header-action-save {
-
-    color:
-        #b00020;
-
-}
-
-
-.workspace-header-action-save:hover {
-
-    color:
-        #8f0019;
-
-}
-
-
-/* ==========================================================
-   WORKSPACE HEADER CLOSE
-   ========================================================== */
-
-.workspace-header-close {
-
-    display: inline-flex;
-
-    align-items: center;
-    justify-content: center;
-
-    width: 20px;
-    height: 20px;
-
-    padding: 0;
-
-    border: none;
-
-    border-radius: 999px;
-
-    background:
-        #2daa72;
-
-    color:
-        #ffffff;
-
-    font-family: inherit;
-
-    font-size: 1.35rem;
-
-    font-weight: 400;
-
-    line-height: 1;
-
-    cursor: pointer;
-
-    transition:
-        background .2s ease,
-        transform .15s ease;
-
-}
-
-
-/* ==========================================================
-   HEADER CLOSE HOVER
-   ========================================================== */
-
-.workspace-header-close:hover {
-
-    background:
-        #269b66;
-
-}
-
-
-/* ==========================================================
-   HEADER CLOSE ACTIVE
-   ========================================================== */
-
-.workspace-header-close:active {
-
-    transform:
-        scale(.96);
-
-}
-
-
-/* ==========================================================
-   HEADER CLOSE DISABLED
-   ========================================================== */
-
-.workspace-header-close:disabled {
-
-    opacity: .45;
-
-    cursor: default;
-
-    transform: none;
-
-}
-
-
-/* ==========================================================
-   SECONDARY WORKSPACE TEXT
-   ========================================================== */
-
-.workspace-text-secondary {
-
-    color:
-        var(--text-secondary, #60738a);
+    margin: 0;
 
     font-family: inherit;
 
@@ -323,21 +195,28 @@
 
     line-height: 1.55;
 
+    color:
+        var(--text-secondary, #60738a);
+
 }
 
 
 /* ==========================================================
-   WORKSPACE SECTION ACTIONS
+   PANEL VALUE
    ========================================================== */
 
-.workspace-section-actions {
+.workspace-panel-value {
 
-    display: flex;
+    font-family: inherit;
 
-    align-items: center;
-    justify-content: flex-end;
+    font-size: .95rem;
 
-    min-height: 24px;
+    font-weight: 400;
+
+    line-height: 1.5;
+
+    color:
+        var(--text-secondary, #60738a);
 
 }
 
@@ -353,26 +232,23 @@
         min-height: 72px;
 
         padding:
-            0 24px;
+            0 20px;
 
     }
 
 
     .workspace-guide-body {
 
-        padding:
-            24px;
+        gap: 20px;
 
-        gap:
-            24px;
+        padding: 20px;
 
     }
 
 
-    .workspace-header-actions {
+    .workspace-panel {
 
-        gap:
-            14px;
+        padding: 28px;
 
     }
 
