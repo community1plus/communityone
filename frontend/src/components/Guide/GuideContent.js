@@ -1,6 +1,6 @@
 export const guideContent = {
     identity: {
-        title: "Identity Guide",
+        title: "IDENTITY GUIDE",
         paragraphs: [
             "Your public name is visible to the community.",
             "Your email remains private.",
