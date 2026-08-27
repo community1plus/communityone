@@ -2,8 +2,9 @@
    WORKSPACE CONTENT
 ========================================= */
 
-
 .workspace-content {
+
+    grid-area: content;
 
     min-width: 0;
 

@@ -4,7 +4,16 @@
 
 .workspace-sidebar {
 
+    grid-area: sidebar;
+
     width: 100%;
     min-width: 0;
+
+    margin: 0;
+    padding: 0;
+
+    box-sizing: border-box;
+
+    align-self: start;
 
 }

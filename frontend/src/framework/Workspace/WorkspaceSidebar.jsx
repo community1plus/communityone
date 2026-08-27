@@ -1,4 +1,4 @@
-import "./WorkspaceShell.css";
+import "./WorkspaceSidebar.css";
 
 export default function WorkspaceSidebar({
 
