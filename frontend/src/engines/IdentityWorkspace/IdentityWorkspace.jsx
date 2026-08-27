@@ -152,15 +152,19 @@ return (
                         actions={headerAction}
                     >
 
-                        <IdentityCapabilitySelector
+<div className="identity-capability-selector">
 
-                            values={values}
+    <IdentityCapabilitySelector
 
-                            setValue={form.setValue}
+        values={values}
 
-                            readOnly={false}
+        setValue={form.setValue}
 
-                        />
+        readOnly={false}
+
+    />
+
+</div>
 
                     </WorkspaceBanner>
 
