@@ -23,7 +23,6 @@ import {
     WorkspaceGuide,
     WorkspacePanel,
     WorkspaceSection,
-    WorkspaceClose,
 
 } from "../../framework/Workspace";
 
@@ -90,23 +89,71 @@ export default function IdentityWorkspace({
 
 
     /* =====================================
+       PROFILE READINESS
+    ===================================== */
+
+    const completion =
+        banner
+            ?.right
+            ?.metric
+            ?.value
+        ?? 0;
+
+
+    const profileReady =
+        completion >= 20;
+
+
+    /* =====================================
+       HEADER ACTION
+    ===================================== */
+
+    const headerAction = (
+
+        <WorkspaceHeaderActions>
+
+            <button
+
+                type="button"
+
+                className={
+                    profileReady
+                        ? "workspace-header-action workspace-header-action-ready"
+                        : "workspace-header-action"
+                }
+
+                onClick={
+                    profileReady
+                        ? actions.closeProfile
+                        : undefined
+                }
+
+                disabled={
+                    !profileReady
+                }
+
+                aria-disabled={
+                    !profileReady
+                }
+
+            >
+
+                Exit
+
+            </button>
+
+        </WorkspaceHeaderActions>
+
+    );
+
+
+    /* =====================================
        RENDER
     ===================================== */
 
     return (
 
         <WorkspaceShell>
-
-
-            {/* =================================
-               WORKSPACE CLOSE
-            ================================= */}
-
-            <WorkspaceClose
-                onClick={
-                    actions.closeProfile
-                }
-            />
 
 
             {/* =================================
@@ -125,31 +172,28 @@ export default function IdentityWorkspace({
                     <WorkspaceRegionHeader>
 
                         <WorkspaceBanner
+
                             model={banner}
+
+                            actions={
+                                headerAction
+                            }
+
                         >
 
                             <IdentityCapabilitySelector
+
                                 values={values}
-                                setValue={form.setValue}
+
+                                setValue={
+                                    form.setValue
+                                }
+
                                 readOnly={false}
+
                             />
 
                         </WorkspaceBanner>
-
-
-                        <WorkspaceHeaderActions>
-
-                            <button
-                                type="button"
-                                className="workspace-header-action"
-                                onClick={
-                                    actions.closeProfile
-                                }
-                            >
-                                Exit
-                            </button>
-
-                        </WorkspaceHeaderActions>
 
                     </WorkspaceRegionHeader>
 
@@ -176,7 +220,11 @@ export default function IdentityWorkspace({
                                 actions={actions}
                             >
 
-                                <div className="workspace-section-content">
+                                <div
+                                    className={
+                                        "workspace-section-content"
+                                    }
+                                >
 
                                     <CapabilityRenderer
 
@@ -205,57 +253,52 @@ export default function IdentityWorkspace({
 
                 </WorkspaceContent>
 
+
+                {/* =================================
+                   GUIDE
+                ================================= */}
+
+                <WorkspaceSidebar>
+
+                    <WorkspaceGuide
+                        title="Identity Guide"
+                    >
+
+                        <WorkspacePanel
+                            title="Welcome"
+                        >
+
+                            Manage your trusted identity.
+
+                        </WorkspacePanel>
+
+
+                        <WorkspacePanel
+                            title="Profile Completion"
+                        >
+
+                            {completion}%
+
+                        </WorkspacePanel>
+
+
+                        <WorkspacePanel
+                            title="Current Section"
+                        >
+
+                            {
+                                section?.title
+                                ?? ""
+                            }
+
+                        </WorkspacePanel>
+
+                    </WorkspaceGuide>
+
+                </WorkspaceSidebar>
+
+
             </WorkspaceMain>
-
-
-            {/* =================================
-               GUIDE
-            ================================= */}
-
-            <WorkspaceSidebar>
-
-                <WorkspaceGuide
-                    title="Identity Guide"
-                >
-
-                    <WorkspacePanel
-                        title="Welcome"
-                    >
-
-                        Manage your trusted identity.
-
-                    </WorkspacePanel>
-
-
-                    <WorkspacePanel
-                        title="Profile Completion"
-                    >
-
-                        {
-                            banner
-                                ?.right
-                                ?.metric
-                                ?.value
-                            ?? 0
-                        }%
-
-                    </WorkspacePanel>
-
-
-                    <WorkspacePanel
-                        title="Current Section"
-                    >
-
-                        {
-                            section?.title
-                            ?? ""
-                        }
-
-                    </WorkspacePanel>
-
-                </WorkspaceGuide>
-
-            </WorkspaceSidebar>
 
 
         </WorkspaceShell>

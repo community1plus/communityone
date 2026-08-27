@@ -1,58 +1,31 @@
 /* =========================================
-   WORKSPACE BANNER
+   WORKSPACE BANNER TITLE
 ========================================= */
 
-.workspace-banner {
+.workspace-banner-title {
 
-    display: grid;
-
-    grid-template-columns:
-        1.2fr
-        1.1fr
-        0.9fr;
-
-    column-gap: 56px;
+    display: flex;
 
     align-items: center;
 
-    width: 100%;
+    gap: 14px;
 
-    margin: 0;
-    padding: 0;
-
-    box-sizing: border-box;
+    min-width: 0;
 
 }
 
 
 /* =========================================
-   LEFT
+   WORKSPACE HEADER ACTIONS
 ========================================= */
 
-.workspace-banner > :first-child {
+.workspace-banner-title
+.workspace-header-actions {
 
-    justify-self: start;
+    display: flex;
 
-}
+    align-items: center;
 
-
-/* =========================================
-   CENTRE
-========================================= */
-
-.workspace-banner > :nth-child(2) {
-
-    justify-self: center;
-
-}
-
-
-/* =========================================
-   RIGHT
-========================================= */
-
-.workspace-banner > :last-child {
-
-    justify-self: end;
+    flex-shrink: 0;
 
 }

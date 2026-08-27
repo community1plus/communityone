@@ -1,15 +1,28 @@
-import WorkspaceBannerSection from "../WorkspaceBannerSection/WorkspaceBannerSection";
-import WorkspaceTitle from "../WorkspaceTitle";
-import WorkspaceMode from "../WorkspaceMode";
-import WorkspaceMetric from "../WorkspaceMetric";
+import WorkspaceBannerSection
+    from "../WorkspaceBannerSection/WorkspaceBannerSection";
+
+import WorkspaceTitle
+    from "../WorkspaceTitle";
+
+import WorkspaceMode
+    from "../WorkspaceMode";
+
+import WorkspaceMetric
+    from "../WorkspaceMetric";
+
+import WorkspaceHeaderActions
+    from "../WorkspaceHeaderActions";
 
 import "./WorkspaceBanner.css";
+
 
 export default function WorkspaceBanner({
 
     model,
 
     children,
+
+    actions = null,
 
 }) {
 
@@ -21,17 +34,43 @@ export default function WorkspaceBanner({
 
     } = model;
 
+
     return (
 
         <div className="workspace-banner">
 
+
+            {/* =================================
+               LEFT
+            ================================= */}
+
             <WorkspaceBannerSection>
 
-                <WorkspaceTitle
-                    title={left.title}
-                />
+                <div className="workspace-banner-title">
+
+                    <WorkspaceTitle
+                        title={left.title}
+                    />
+
+
+                    {actions && (
+
+                        <WorkspaceHeaderActions>
+
+                            {actions}
+
+                        </WorkspaceHeaderActions>
+
+                    )}
+
+                </div>
 
             </WorkspaceBannerSection>
+
+
+            {/* =================================
+               CENTRE
+            ================================= */}
 
             <WorkspaceBannerSection>
 
@@ -43,6 +82,11 @@ export default function WorkspaceBanner({
 
             </WorkspaceBannerSection>
 
+
+            {/* =================================
+               RIGHT
+            ================================= */}
+
             <WorkspaceBannerSection>
 
                 <WorkspaceMetric
@@ -50,6 +94,7 @@ export default function WorkspaceBanner({
                 />
 
             </WorkspaceBannerSection>
+
 
         </div>
 
