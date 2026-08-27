@@ -12,17 +12,14 @@ export default function WorkspacePanel({
 
         <section className="workspace-panel">
 
-            {title && (
+            <h3 className="workspace-panel-title">
 
-                <header className="workspace-panel-header">
+                {title}
 
-                    {title}
+            </h3>
 
-                </header>
 
-            )}
-
-            <div className="workspace-panel-body">
+            <div className="workspace-panel-content">
 
                 {children}
 

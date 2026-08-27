@@ -1,35 +1,60 @@
+/* =========================================
+   WORKSPACE PANEL
+========================================= */
+
 .workspace-panel {
 
     display: flex;
-
     flex-direction: column;
 
-    gap: 12px;
+    width: 100%;
+    min-width: 0;
 
-    padding: 20px;
+    margin: 0;
+    padding: 28px;
 
-    border: 1px solid var(--border);
+    box-sizing: border-box;
 
-    border-radius: 18px;
+    border:
+        1px solid
+        var(--border-color, #e8e8e8);
 
-    background: var(--panel-solid);
-
-}
-
-.workspace-panel-header {
-
-    font-size: .95rem;
-
-    font-weight: 700;
-
-    color: var(--text);
+    border-radius: 22px;
 
 }
 
-.workspace-panel-body {
 
-    color: var(--text-soft);
+/* =========================================
+   PANEL TITLE
+========================================= */
 
-    line-height: 1.6;
+.workspace-panel-title {
+
+    margin: 0 0 18px;
+
+    font-size: 1rem;
+
+    font-weight: 600;
+
+    color:
+        var(--text-primary, #111);
+
+}
+
+
+/* =========================================
+   PANEL CONTENT
+========================================= */
+
+.workspace-panel-content {
+
+    margin: 0;
+
+    font-size: 1rem;
+
+    line-height: 1.5;
+
+    color:
+        var(--text-secondary, #667085);
 
 }
