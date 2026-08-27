@@ -180,29 +180,62 @@ export default function IdentityWorkspace({
                        WORKSPACE HEADER
                     ================================= */}
 
-                    <WorkspaceRegionHeader>
+<WorkspaceRegionHeader>
 
-                        <WorkspaceBanner
+    <WorkspaceBanner
 
-                            model={banner}
+        model={banner}
 
-                            actions={exitAction}
+        actions={
 
-                        >
+            <button
 
-                            <IdentityCapabilitySelector
+                type="button"
 
-                                values={values}
+                className={
+                    profileReady
+                        ? "workspace-header-action workspace-header-action-ready"
+                        : "workspace-header-action"
+                }
 
-                                setValue={form.setValue}
+                onClick={
+                    profileReady
+                        ? actions.closeProfile
+                        : undefined
+                }
 
-                                readOnly={false}
+                disabled={
+                    !profileReady
+                }
 
-                            />
+            >
 
-                        </WorkspaceBanner>
+                Exit
 
-                    </WorkspaceRegionHeader>
+            </button>
+
+        }
+
+    >
+
+        <IdentityCapabilitySelector
+
+            values={values}
+
+            setValue={form.setValue}
+
+            readOnly={false}
+
+        />
+
+    </WorkspaceBanner>
+
+
+    <WorkspaceNavigation
+        model={navigation}
+    />
+
+</WorkspaceRegionHeader>
 
 
                     {/* =================================
