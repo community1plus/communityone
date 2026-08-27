@@ -1,19 +1,58 @@
-import "./WorkspaceMain.css";
+/* =========================================
+   WORKSPACE MAIN
+========================================= */
 
-export default function WorkspaceMain({
+.workspace-main {
 
-    children,
+    display: grid;
 
-}) {
+    grid-template-columns:
+        minmax(0, 1fr)
+        360px;
 
-    return (
+    grid-template-areas:
+        "content sidebar";
 
-        <main className="workspace-main">
+    column-gap: 40px;
 
-            {children}
+    width: 100%;
+    min-width: 0;
 
-        </main>
+    margin: 0;
+    padding: 0;
 
-    );
+    box-sizing: border-box;
+
+    align-items: start;
+
+}
+
+
+/* =========================================
+   CONTENT
+========================================= */
+
+.workspace-main
+.workspace-content {
+
+    grid-area: content;
+
+    min-width: 0;
+    width: 100%;
+
+}
+
+
+/* =========================================
+   SIDEBAR
+========================================= */
+
+.workspace-main
+.workspace-sidebar {
+
+    grid-area: sidebar;
+
+    min-width: 0;
+    width: 100%;
 
 }
