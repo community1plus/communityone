@@ -1,4 +1,4 @@
-import "./WorkspaceShell.css";
+import "./WorkspaceSidebar.css";
 
 export default function WorkspaceSidebar({
 
@@ -10,7 +10,11 @@ export default function WorkspaceSidebar({
 
         <aside className="workspace-sidebar">
 
-            {children}
+            <div className="workspace-sidebar-inner">
+
+                {children}
+
+            </div>
 
         </aside>
 

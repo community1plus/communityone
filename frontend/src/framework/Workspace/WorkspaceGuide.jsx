@@ -1,36 +1,82 @@
-import "./WorkspaceGuide.css";
+.workspace-guide {
 
-export default function WorkspaceGuide({
+    display: flex;
 
-    title,
+    flex-direction: column;
 
-    children,
+    width: 100%;
+    min-width: 0;
 
-}) {
+    margin: 0;
+    padding: 0;
 
-    return (
+    box-sizing: border-box;
 
-        <section className="workspace-guide">
+    background:
+        var(--surface-color, #fff);
 
-            <header className="workspace-guide-header">
+    border:
+        1px solid
+        var(--border-color, #e8e8e8);
 
-                <h2 className="workspace-guide-title">
+    border-radius: 24px;
 
-                    {title}
+    overflow: hidden;
 
-                </h2>
-
-            </header>
+}
 
 
-            <div className="workspace-guide-body">
+.workspace-guide-header {
 
-                {children}
+    display: flex;
 
-            </div>
+    align-items: center;
 
-        </section>
+    width: 100%;
 
-    );
+    min-height: 72px;
+
+    padding:
+        0 28px;
+
+    box-sizing: border-box;
+
+    border-bottom:
+        1px solid
+        var(--border-color, #e8e8e8);
+
+}
+
+
+.workspace-guide-title {
+
+    margin: 0;
+
+    font-size: 1rem;
+
+    font-weight: 600;
+
+    line-height: 1.3;
+
+    color:
+        var(--text-primary, #111);
+
+}
+
+
+.workspace-guide-body {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 24px;
+
+    width: 100%;
+    min-width: 0;
+
+    padding: 28px;
+
+    box-sizing: border-box;
 
 }
