@@ -8,18 +8,19 @@
     flex-direction: column;
 
     width: 100%;
+
     min-width: 0;
 
     box-sizing: border-box;
 
+    background:
+        var(--panel-solid, #ffffff);
+
     border:
         1px solid
-        var(--border-color, #e8e8e8);
+        var(--border, #e8e8e8);
 
     border-radius: 28px;
-
-    background:
-        var(--surface-primary, #fff);
 
     overflow: hidden;
 
@@ -33,7 +34,10 @@
 .workspace-guide-header {
 
     display: flex;
+
     align-items: center;
+
+    justify-content: space-between;
 
     width: 100%;
 
@@ -45,7 +49,7 @@
 
     border-bottom:
         1px solid
-        var(--border-color, #e8e8e8);
+        var(--border, #e8e8e8);
 
 }
 
@@ -65,7 +69,7 @@
     line-height: 1.3;
 
     color:
-        var(--text-primary, #111);
+        var(--text-primary, #111111);
 
 }
 
@@ -77,11 +81,13 @@
 .workspace-guide-body {
 
     display: flex;
+
     flex-direction: column;
 
     gap: 28px;
 
     width: 100%;
+
     min-width: 0;
 
     padding: 32px;
