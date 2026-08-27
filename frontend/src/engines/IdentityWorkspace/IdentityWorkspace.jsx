@@ -15,6 +15,7 @@ import {
     WorkspaceSidebar,
 
     WorkspaceRegionHeader,
+    WorkspaceHeaderActions,
     WorkspaceBanner,
     WorkspaceNavigation,
     WorkspaceBody,
@@ -35,7 +36,6 @@ export default function IdentityWorkspace({
     actions,
 
 }) {
-
 
     /* =====================================
        WORKSPACE
@@ -71,36 +71,11 @@ export default function IdentityWorkspace({
 
 
     /* =====================================
-       PROFILE COMPLETION
-    ===================================== */
-
-    const profileCompletion =
-        Number(
-            banner
-                ?.right
-                ?.metric
-                ?.value
-            ?? 0
-        );
-
-
-    /* =====================================
-       PROFILE READY
-    ===================================== */
-
-    const profileReady =
-        profileCompletion >= 20;
-
-
-    /* =====================================
        CURRENT SECTION
     ===================================== */
 
     const section =
-        workspace
-            ?.body
-            ?.section
-        ?? null;
+        workspace?.body?.section ?? null;
 
 
     /* =====================================
@@ -109,51 +84,65 @@ export default function IdentityWorkspace({
 
     const editing =
         Boolean(
-            section
-                ?.runtime
-                ?.editing
+            section?.runtime?.editing
         );
 
 
     /* =====================================
-       WORKSPACE EXIT
+       PROFILE READINESS
     ===================================== */
 
-    const exitAction = (
+    const completion =
+        banner
+            ?.right
+            ?.metric
+            ?.value
+        ?? 0;
 
-        <button
 
-            type="button"
+    const profileReady =
+        completion >= 20;
 
-            className={
 
-                profileReady
+    /* =====================================
+       HEADER ACTION
+    ===================================== */
 
-                    ? "workspace-header-action workspace-header-action-ready"
+    const headerAction = (
 
-                    : "workspace-header-action"
+        <WorkspaceHeaderActions>
 
-            }
+            <button
 
-            onClick={
+                type="button"
 
-                profileReady
+                className={
+                    profileReady
+                        ? "workspace-header-action workspace-header-action-ready"
+                        : "workspace-header-action"
+                }
 
-                    ? actions.closeProfile
+                onClick={
+                    profileReady
+                        ? actions.closeProfile
+                        : undefined
+                }
 
-                    : undefined
+                disabled={
+                    !profileReady
+                }
 
-            }
+                aria-disabled={
+                    !profileReady
+                }
 
-            disabled={
-                !profileReady
-            }
+            >
 
-        >
+                Exit
 
-            Exit
+            </button>
 
-        </button>
+        </WorkspaceHeaderActions>
 
     );
 
@@ -180,7 +169,88 @@ export default function IdentityWorkspace({
                        WORKSPACE HEADER
                     ================================= */}
 
-<WorkspaceRegionHeader>
+                    <WorkspaceRegionHeader>
+
+    <WorkspaceBanner
+
+        model={banner}
+
+        actions={
+
+            <button
+
+                type="button"
+
+                className={
+                    profileReady
+                        ? "workspace-header-action workspace-header-action-ready"
+                        : "workspace-header-action"
+                }
+
+                onClick={
+                    profileReady
+                        ? actions.closeProfile
+                        : undefined
+                }
+
+                disabled={
+                    !profileReady
+                }
+
+            >
+
+                Exit
+
+            </button>
+
+        }
+
+    >
+
+        <IdentityCapabilitySelector
+
+            values={values}
+
+            setValue={form.setValue}
+
+            readOnly={false}
+
+        />
+
+    </WorkspaceBanner>
+
+
+    <WorkspaceNavigation
+        model={navigation}
+    />
+
+</WorkspaceRegionHeader>
+
+                        <WorkspaceBanner
+
+                            model={banner}
+
+                            actions={
+                                headerAction
+                            }
+
+                        >
+
+                            <IdentityCapabilitySelector
+
+                                values={values}
+
+                                setValue={
+                                    form.setValue
+                                }
+
+                                readOnly={false}
+
+                            />
+
+                        </WorkspaceBanner>
+
+                    <WorkspaceRegionHeader>
 
     <WorkspaceBanner
 
@@ -243,9 +313,7 @@ export default function IdentityWorkspace({
                     ================================= */}
 
                     <WorkspaceNavigation
-
                         model={navigation}
-
                     />
 
 
@@ -258,22 +326,29 @@ export default function IdentityWorkspace({
                         {section && (
 
                             <WorkspaceSection
-
                                 model={section}
-
                                 actions={actions}
-
                             >
 
-                                <div className="workspace-section-content">
+                                <div
+                                    className={
+                                        "workspace-section-content"
+                                    }
+                                >
 
                                     <CapabilityRenderer
 
-                                        section={section}
+                                        section={
+                                            section
+                                        }
 
-                                        form={form}
+                                        form={
+                                            form
+                                        }
 
-                                        editing={editing}
+                                        editing={
+                                            editing
+                                        }
 
                                     />
 
@@ -288,51 +363,52 @@ export default function IdentityWorkspace({
 
                 </WorkspaceContent>
 
+
+                {/* =================================
+                   GUIDE
+                ================================= */}
+
+                <WorkspaceSidebar>
+
+                    <WorkspaceGuide
+                        title="Identity Guide"
+                    >
+
+                        <WorkspacePanel
+                            title="Welcome"
+                        >
+
+                            Manage your trusted identity.
+
+                        </WorkspacePanel>
+
+
+                        <WorkspacePanel
+                            title="Profile Completion"
+                        >
+
+                            {completion}%
+
+                        </WorkspacePanel>
+
+
+                        <WorkspacePanel
+                            title="Current Section"
+                        >
+
+                            {
+                                section?.title
+                                ?? ""
+                            }
+
+                        </WorkspacePanel>
+
+                    </WorkspaceGuide>
+
+                </WorkspaceSidebar>
+
+
             </WorkspaceMain>
-
-
-            {/* =================================
-               GUIDE
-            ================================= */}
-
-            <WorkspaceSidebar>
-
-                <WorkspaceGuide
-                    title="Identity Guide"
-                >
-
-                    <WorkspacePanel
-                        title="Welcome"
-                    >
-
-                        Manage your trusted identity.
-
-                    </WorkspacePanel>
-
-
-                    <WorkspacePanel
-                        title="Profile Completion"
-                    >
-
-                        {profileCompletion}%
-
-                    </WorkspacePanel>
-
-
-                    <WorkspacePanel
-                        title="Current Section"
-                    >
-
-                        {
-                            section?.title
-                            ?? ""
-                        }
-
-                    </WorkspacePanel>
-
-                </WorkspaceGuide>
-
-            </WorkspaceSidebar>
 
 
         </WorkspaceShell>
