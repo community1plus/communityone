@@ -142,78 +142,80 @@ export default function IdentityWorkspace({
        RENDER
     ===================================== */
 
-    return (
+return (
 
-<WorkspaceShell>
-
-    <WorkspaceMain>
+    <WorkspaceShell>
 
         {/* =================================
            PRIMARY CONTENT
         ================================= */}
 
-        <WorkspaceContent>
+        <WorkspaceMain>
 
-            <WorkspaceRegionHeader>
+            <WorkspaceContent>
 
-                <WorkspaceBanner
-                    model={banner}
-                    actions={headerAction}
-                >
+                <WorkspaceRegionHeader>
 
-                    <IdentityCapabilitySelector
-
-                        values={values}
-
-                        setValue={form.setValue}
-
-                        readOnly={false}
-
-                    />
-
-                </WorkspaceBanner>
-
-
-                <WorkspaceNavigation
-                    model={navigation}
-                />
-
-            </WorkspaceRegionHeader>
-
-
-            <WorkspaceBody>
-
-                {section && (
-
-                    <WorkspaceSection
-
-                        model={section}
-
-                        actions={actions}
-
+                    <WorkspaceBanner
+                        model={banner}
+                        actions={headerAction}
                     >
 
-                        <div className="workspace-section-content">
+                        <IdentityCapabilitySelector
 
-                            <CapabilityRenderer
+                            values={values}
 
-                                section={section}
+                            setValue={form.setValue}
 
-                                form={form}
+                            readOnly={false}
 
-                                editing={editing}
+                        />
 
-                            />
+                    </WorkspaceBanner>
 
-                        </div>
 
-                    </WorkspaceSection>
+                    <WorkspaceNavigation
+                        model={navigation}
+                    />
 
-                )}
+                </WorkspaceRegionHeader>
 
-            </WorkspaceBody>
 
-        </WorkspaceContent>
+                <WorkspaceBody>
+
+                    {section && (
+
+                        <WorkspaceSection
+
+                            model={section}
+
+                            actions={actions}
+
+                        >
+
+                            <div className="workspace-section-content">
+
+                                <CapabilityRenderer
+
+                                    section={section}
+
+                                    form={form}
+
+                                    editing={editing}
+
+                                />
+
+                            </div>
+
+                        </WorkspaceSection>
+
+                    )}
+
+                </WorkspaceBody>
+
+            </WorkspaceContent>
+
+        </WorkspaceMain>
 
 
         {/* =================================
@@ -256,10 +258,8 @@ export default function IdentityWorkspace({
 
         </WorkspaceSidebar>
 
-    </WorkspaceMain>
+    </WorkspaceShell>
 
-</WorkspaceShell>
-
-    );
+);
 
 }

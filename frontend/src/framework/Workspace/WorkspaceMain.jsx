@@ -1,5 +1,3 @@
-import "./WorkspaceMain.css";
-
 export default function WorkspaceMain({
 
     children,
