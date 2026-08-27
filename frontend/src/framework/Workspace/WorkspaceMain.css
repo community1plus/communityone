@@ -1,3 +1,7 @@
+/* =========================================
+   WORKSPACE MAIN
+========================================= */
+
 .workspace-main {
 
     display: grid;
@@ -10,8 +14,6 @@
 
     width: 100%;
     min-width: 0;
-
-    align-items: start;
 
     box-sizing: border-box;
 

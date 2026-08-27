@@ -4,15 +4,8 @@
 
 .workspace-sidebar {
 
-    display: flex;
-    flex-direction: column;
-
     width: 100%;
     min-width: 0;
-    height: 100%;
-
-    margin: 0;
-    padding: 0;
 
     box-sizing: border-box;
 
