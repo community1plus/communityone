@@ -1,12 +1,53 @@
 /* =========================================
-   WORKSPACE BANNER TITLE
+   WORKSPACE BANNER
 ========================================= */
 
-.workspace-banner-title {
+.workspace-banner {
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        auto
+        minmax(0, 1fr);
+
+    align-items: center;
+
+    width: 100%;
+    min-width: 0;
+
+    min-height: 92px;
+
+    box-sizing: border-box;
+
+}
+
+
+/* =========================================
+   BANNER SECTIONS
+========================================= */
+
+.workspace-banner
+.workspace-banner-section {
 
     display: flex;
 
     align-items: center;
+
+    min-width: 0;
+
+}
+
+
+/* =========================================
+   LEFT
+========================================= */
+
+.workspace-banner-left {
+
+    display: flex;
+
+    align-items: baseline;
 
     gap: 14px;
 
@@ -16,16 +57,125 @@
 
 
 /* =========================================
-   WORKSPACE HEADER ACTIONS
+   CENTRE
 ========================================= */
 
-.workspace-banner-title
+.workspace-banner
+.workspace-banner-section:nth-child(2) {
+
+    justify-content: center;
+
+}
+
+
+/* =========================================
+   RIGHT
+========================================= */
+
+.workspace-banner
+.workspace-banner-section:nth-child(3) {
+
+    justify-content: flex-end;
+
+}
+
+
+/* =========================================
+   HEADER ACTIONS
+========================================= */
+
 .workspace-header-actions {
 
-    display: flex;
+    display: inline-flex;
 
     align-items: center;
 
+    gap: 8px;
+
     flex-shrink: 0;
+
+}
+
+
+/* =========================================
+   HEADER ACTION
+========================================= */
+
+.workspace-header-action {
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    height: 30px;
+
+    padding: 0 14px;
+
+    border: 1px solid
+        var(--border-color, #dedede);
+
+    border-radius: 999px;
+
+    background: transparent;
+
+    color: var(--text-secondary, #666);
+
+    font-family: inherit;
+
+    font-size: 0.8rem;
+
+    font-weight: 600;
+
+    line-height: 1;
+
+    cursor: not-allowed;
+
+    appearance: none;
+
+    box-sizing: border-box;
+
+}
+
+
+/* =========================================
+   READY
+========================================= */
+
+.workspace-header-action-ready {
+
+    border-color: #2e9b5b;
+
+    background: #2e9b5b;
+
+    color: #fff;
+
+    cursor: pointer;
+
+}
+
+
+/* =========================================
+   READY HOVER
+========================================= */
+
+.workspace-header-action-ready:hover {
+
+    background: #27864f;
+
+    border-color: #27864f;
+
+}
+
+
+/* =========================================
+   DISABLED
+========================================= */
+
+.workspace-header-action:disabled {
+
+    opacity: 0.45;
+
+    cursor: not-allowed;
 
 }

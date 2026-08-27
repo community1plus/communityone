@@ -10,9 +10,6 @@ import WorkspaceMode
 import WorkspaceMetric
     from "../WorkspaceMetric";
 
-import WorkspaceHeaderActions
-    from "../WorkspaceHeaderActions";
-
 import "./WorkspaceBanner.css";
 
 
@@ -22,14 +19,13 @@ export default function WorkspaceBanner({
 
     children,
 
-    actions = null,
+    actions,
 
 }) {
 
     const {
 
         left = {},
-        centre = {},
         right = {},
 
     } = model;
@@ -46,22 +42,13 @@ export default function WorkspaceBanner({
 
             <WorkspaceBannerSection>
 
-                <div className="workspace-banner-title">
+                <div className="workspace-banner-left">
 
                     <WorkspaceTitle
                         title={left.title}
                     />
 
-
-                    {actions && (
-
-                        <WorkspaceHeaderActions>
-
-                            {actions}
-
-                        </WorkspaceHeaderActions>
-
-                    )}
+                    {actions}
 
                 </div>
 

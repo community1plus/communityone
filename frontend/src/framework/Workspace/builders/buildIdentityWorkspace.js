@@ -26,56 +26,29 @@ import {
 const SECTION_ACTION_DEFINITIONS = {
 
     edit: {
-
-        label:
-            "Edit",
-
-        icon:
-            "✎",
-
+        label: "Edit",
+        icon: "✎",
     },
 
     clear: {
-
-        label:
-            "Clear",
-
-        icon:
-            "□",
-
+        label: "Clear",
+        icon: "□",
     },
 
     reset: {
-
-        label:
-            "Reset",
-
-        icon:
-            "↻",
-
+        label: "Reset",
+        icon: "↻",
     },
 
     exit: {
-
-        label:
-            "Exit",
-
-        icon:
-            "×",
-
+        label: "Exit",
+        icon: "×",
     },
 
     save: {
-
-        label:
-            "Save",
-
-        icon:
-            "✓",
-
-        primary:
-            true,
-
+        label: "Save",
+        icon: "✓",
+        primary: true,
     },
 
 };
