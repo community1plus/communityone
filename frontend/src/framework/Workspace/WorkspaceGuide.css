@@ -1,10 +1,7 @@
-/* =========================================
-   WORKSPACE GUIDE
-========================================= */
-
 .workspace-guide {
 
     display: flex;
+
     flex-direction: column;
 
     width: 100%;
@@ -29,13 +26,10 @@
 }
 
 
-/* =========================================
-   GUIDE HEADER
-========================================= */
-
 .workspace-guide-header {
 
     display: flex;
+
     align-items: center;
 
     width: 100%;
@@ -54,10 +48,6 @@
 }
 
 
-/* =========================================
-   GUIDE TITLE
-========================================= */
-
 .workspace-guide-title {
 
     margin: 0;
@@ -74,13 +64,10 @@
 }
 
 
-/* =========================================
-   GUIDE BODY
-========================================= */
-
 .workspace-guide-body {
 
     display: flex;
+
     flex-direction: column;
 
     gap: 24px;

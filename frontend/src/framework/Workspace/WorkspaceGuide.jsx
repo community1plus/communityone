@@ -1,82 +1,36 @@
-.workspace-guide {
+import "./WorkspaceGuide.css";
 
-    display: flex;
+export default function WorkspaceGuide({
 
-    flex-direction: column;
+    title,
 
-    width: 100%;
-    min-width: 0;
+    children,
 
-    margin: 0;
-    padding: 0;
+}) {
 
-    box-sizing: border-box;
+    return (
 
-    background:
-        var(--surface-color, #fff);
+        <section className="workspace-guide">
 
-    border:
-        1px solid
-        var(--border-color, #e8e8e8);
+            <header className="workspace-guide-header">
 
-    border-radius: 24px;
+                <h2 className="workspace-guide-title">
 
-    overflow: hidden;
+                    {title}
 
-}
+                </h2>
+
+            </header>
 
 
-.workspace-guide-header {
+            <div className="workspace-guide-body">
 
-    display: flex;
+                {children}
 
-    align-items: center;
+            </div>
 
-    width: 100%;
+        </section>
 
-    min-height: 72px;
-
-    padding:
-        0 28px;
-
-    box-sizing: border-box;
-
-    border-bottom:
-        1px solid
-        var(--border-color, #e8e8e8);
-
-}
-
-
-.workspace-guide-title {
-
-    margin: 0;
-
-    font-size: 1rem;
-
-    font-weight: 600;
-
-    line-height: 1.3;
-
-    color:
-        var(--text-primary, #111);
-
-}
-
-
-.workspace-guide-body {
-
-    display: flex;
-
-    flex-direction: column;
-
-    gap: 24px;
-
-    width: 100%;
-    min-width: 0;
-
-    padding: 28px;
-
-    box-sizing: border-box;
+    );
 
 }
