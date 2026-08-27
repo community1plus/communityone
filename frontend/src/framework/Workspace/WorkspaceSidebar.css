@@ -1,11 +1,10 @@
+/* =========================================
+   WORKSPACE SIDEBAR
+========================================= */
+
 .workspace-sidebar {
 
-    display: flex;
-
-    flex-direction: column;
-
-    height: 100%;
-
-    align-self: stretch;
+    width: 100%;
+    min-width: 0;
 
 }
