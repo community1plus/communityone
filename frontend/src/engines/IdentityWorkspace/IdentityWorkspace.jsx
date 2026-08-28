@@ -148,25 +148,50 @@ return (
                 <WorkspaceRegionHeader>
 
                     <WorkspaceBanner
-                        model={banner}
-                        actions={headerAction}
-                    >
 
-<div className="identity-capability-selector">
+    model={banner}
 
-    <IdentityCapabilitySelector
+    left={
 
-        values={values}
+        <WorkspaceHeaderActions>
 
-        setValue={form.setValue}
+            <button
+                type="button"
+                className="workspace-header-action"
+                onClick={actions.closeProfile}
+                aria-label="Exit profile"
+            >
 
-        readOnly={false}
+                ×
 
-    />
+            </button>
 
-</div>
+        </WorkspaceHeaderActions>
 
-                    </WorkspaceBanner>
+    }
+
+
+    center={
+
+        <IdentityCapabilitySelector
+
+            values={values}
+
+            setValue={form.setValue}
+
+            readOnly={false}
+
+        />
+
+    }
+
+    right={
+
+        banner?.right
+
+    }
+
+/>
 
 
                     <WorkspaceNavigation

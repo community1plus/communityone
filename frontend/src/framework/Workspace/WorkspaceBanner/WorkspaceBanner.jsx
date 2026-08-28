@@ -1,96 +1,57 @@
-import WorkspaceBannerSection
-    from "../WorkspaceBannerSection/WorkspaceBannerSection";
+/* ==========================================================
+   COMMUNITY ONE PLATFORM FRAMEWORK (CPF)
 
-import WorkspaceTitle
-    from "../WorkspaceTitle";
-
-import WorkspaceMode
-    from "../WorkspaceMode";
-
-import WorkspaceMetric
-    from "../WorkspaceMetric";
-
-import "./WorkspaceBanner.css";
-
+   Workspace Banner
+   ========================================================== */
 
 export default function WorkspaceBanner({
 
-    model,
-
     children,
 
-    actions,
+    left,
+    center,
+    right,
 
 }) {
-
-    const {
-
-        left = {},
-        right = {},
-
-    } = model;
-
 
     return (
 
         <div className="workspace-banner">
 
-
-            {/* =================================
+            {/* =========================================
                LEFT
-            ================================= */}
+            ========================================= */}
 
-            <WorkspaceBannerSection>
+            <div className="workspace-banner-left">
 
-                <div className="workspace-banner-title">
+                {left}
 
-                    <WorkspaceTitle
-                        title={left.title}
-                    />
+            </div>
 
 
-                    {actions && (
+            {/* =========================================
+               CENTER
+            ========================================= */}
 
-                        <div className="workspace-banner-actions">
+            <div className="workspace-banner-center">
 
-                            {actions}
+                {center}
 
-                        </div>
-
-                    )}
-
-                </div>
-
-            </WorkspaceBannerSection>
+            </div>
 
 
-            {/* =================================
-               CENTRE
-            ================================= */}
-
-            <WorkspaceBannerSection>
-
-                <WorkspaceMode>
-
-                    {children}
-
-                </WorkspaceMode>
-
-            </WorkspaceBannerSection>
-
-
-            {/* =================================
+            {/* =========================================
                RIGHT
-            ================================= */}
+            ========================================= */}
 
-            <WorkspaceBannerSection>
+            <div className="workspace-banner-right">
 
-                <WorkspaceMetric
-                    model={right.metric}
-                />
+                {right}
 
-            </WorkspaceBannerSection>
+            </div>
 
+
+            {children}
 
         </div>
 

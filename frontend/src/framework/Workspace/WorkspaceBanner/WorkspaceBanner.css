@@ -1,42 +1,92 @@
-/* =========================================
+/* ==========================================================
+   COMMUNITY ONE PLATFORM FRAMEWORK (CPF)
+
+   Workspace Banner
+   ========================================================== */
+
+
+/* ==========================================================
    WORKSPACE BANNER
-========================================= */
+   ========================================================== */
 
 .workspace-banner {
 
-    position: relative;
+    display: grid;
 
-    display: flex;
+    grid-template-columns:
+        minmax(0, 1fr)
+        auto
+        minmax(0, 1fr);
 
     align-items: center;
+
+    width: 100%;
 
     min-width: 0;
 
-    min-height: 96px;
-
     box-sizing: border-box;
+
+    position: relative;
 
 }
 
 
-/* =========================================
-   TITLE
-========================================= */
+/* ==========================================================
+   LEFT REGION
+   ========================================================== */
 
-.workspace-banner-title {
+.workspace-banner-left {
 
     display: flex;
 
     align-items: center;
 
-    gap: 16px;
+    justify-content: flex-start;
+
+    min-width: 0;
 
 }
 
 
-/* =========================================
-   HEADER ACTIONS
-========================================= */
+/* ==========================================================
+   CENTER REGION
+   ========================================================== */
+
+.workspace-banner-center {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    justify-self: center;
+
+    min-width: 0;
+
+}
+
+
+/* ==========================================================
+   RIGHT REGION
+   ========================================================== */
+
+.workspace-banner-right {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: flex-end;
+
+    min-width: 0;
+
+}
+
+
+/* ==========================================================
+   HEADER ACTION GROUP
+   ========================================================== */
 
 .workspace-header-actions {
 
@@ -44,71 +94,94 @@
 
     align-items: center;
 
-    gap: 8px;
+    gap: 12px;
 
 }
 
 
-/* =========================================
+/* ==========================================================
    HEADER ACTION
-========================================= */
+   ========================================================== */
 
 .workspace-header-action {
+
+    width: 44px;
+    height: 44px;
 
     display: inline-flex;
 
     align-items: center;
     justify-content: center;
 
-    min-height: 38px;
+    flex: 0 0 auto;
 
-    padding:
-        0 16px;
+    padding: 0;
 
-    border:
-        1px solid
-        #d8d8d8;
+    border: none;
 
-    border-radius: 999px;
+    border-radius: 50%;
 
-    background:
-        #f1f1f1;
+    background: #2eae7d;
 
-    color:
-        #777;
+    color: #ffffff;
 
-    font-size: 0.9rem;
+    font-family: inherit;
 
-    font-weight: 600;
+    font-size: 1rem;
+
+    font-weight: 400;
 
     line-height: 1;
 
-    cursor: not-allowed;
+    cursor: pointer;
 
-    opacity: 0.7;
-
-    box-sizing: border-box;
+    transition:
+        background-color .2s ease,
+        transform .15s ease;
 
 }
 
 
-/* =========================================
-   READY
-========================================= */
+.workspace-header-action:hover {
 
-.workspace-header-action-ready {
+    background: #27986d;
 
-    border-color:
-        #2ca66f;
+}
 
-    background:
-        #2ca66f;
 
-    color:
-        #fff;
+.workspace-header-action:active {
 
-    cursor: pointer;
+    transform: translateY(1px);
 
-    opacity: 1;
+}
+
+
+/* ==========================================================
+   IDENTITY CAPABILITY SELECTOR
+   ========================================================== */
+
+.identity-capability-selector {
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-width: 0;
+
+}
+
+
+/* ==========================================================
+   BANNER COMPLETION
+   ========================================================== */
+
+.workspace-banner-completion {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: flex-end;
 
 }
