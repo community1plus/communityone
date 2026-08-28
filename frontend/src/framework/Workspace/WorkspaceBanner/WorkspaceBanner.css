@@ -1,11 +1,4 @@
 /* ==========================================================
-   COMMUNITY ONE PLATFORM FRAMEWORK (CPF)
-
-   Workspace Banner
-   ========================================================== */
-
-
-/* ==========================================================
    WORKSPACE BANNER
    ========================================================== */
 
@@ -26,13 +19,11 @@
 
     box-sizing: border-box;
 
-    position: relative;
-
 }
 
 
 /* ==========================================================
-   LEFT REGION
+   LEFT
    ========================================================== */
 
 .workspace-banner-left {
@@ -49,7 +40,7 @@
 
 
 /* ==========================================================
-   CENTER REGION
+   CENTER
    ========================================================== */
 
 .workspace-banner-center {
@@ -68,7 +59,7 @@
 
 
 /* ==========================================================
-   RIGHT REGION
+   RIGHT
    ========================================================== */
 
 .workspace-banner-right {
@@ -85,7 +76,7 @@
 
 
 /* ==========================================================
-   HEADER ACTION GROUP
+   HEADER ACTION
    ========================================================== */
 
 .workspace-header-actions {
@@ -99,10 +90,6 @@
 }
 
 
-/* ==========================================================
-   HEADER ACTION
-   ========================================================== */
-
 .workspace-header-action {
 
     width: 44px;
@@ -112,8 +99,6 @@
 
     align-items: center;
     justify-content: center;
-
-    flex: 0 0 auto;
 
     padding: 0;
 
@@ -134,54 +119,5 @@
     line-height: 1;
 
     cursor: pointer;
-
-    transition:
-        background-color .2s ease,
-        transform .15s ease;
-
-}
-
-
-.workspace-header-action:hover {
-
-    background: #27986d;
-
-}
-
-
-.workspace-header-action:active {
-
-    transform: translateY(1px);
-
-}
-
-
-/* ==========================================================
-   IDENTITY CAPABILITY SELECTOR
-   ========================================================== */
-
-.identity-capability-selector {
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    min-width: 0;
-
-}
-
-
-/* ==========================================================
-   BANNER COMPLETION
-   ========================================================== */
-
-.workspace-banner-completion {
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: flex-end;
 
 }

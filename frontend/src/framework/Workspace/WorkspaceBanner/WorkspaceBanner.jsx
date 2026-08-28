@@ -6,11 +6,9 @@
 
 export default function WorkspaceBanner({
 
-    children,
-
-    left,
-    center,
-    right,
+    left = null,
+    center = null,
+    right = null,
 
 }) {
 
@@ -18,40 +16,17 @@ export default function WorkspaceBanner({
 
         <div className="workspace-banner">
 
-            {/* =========================================
-               LEFT
-            ========================================= */}
-
             <div className="workspace-banner-left">
-
                 {left}
-
             </div>
-
-
-            {/* =========================================
-               CENTER
-            ========================================= */}
 
             <div className="workspace-banner-center">
-
                 {center}
-
             </div>
-
-
-            {/* =========================================
-               RIGHT
-            ========================================= */}
 
             <div className="workspace-banner-right">
-
                 {right}
-
             </div>
-
-
-            {children}
 
         </div>
 
