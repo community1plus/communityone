@@ -37,6 +37,7 @@ export default function IdentityWorkspace({
 
 }) {
 
+
     /* =====================================
        WORKSPACE
     ===================================== */
@@ -90,7 +91,7 @@ export default function IdentityWorkspace({
 
 
     /* =====================================
-       PROFILE READINESS
+       PROFILE COMPLETION
     ===================================== */
 
     const completion =
@@ -101,65 +102,48 @@ export default function IdentityWorkspace({
         ?? 0;
 
 
+    /* =====================================
+       PROFILE READINESS
+    ===================================== */
+
     const profileReady =
         completion >= 20;
 
 
     /* =====================================
-       WORKSPACE HEADER ACTION
+       HEADER ACTION
     ===================================== */
 
     const headerAction = (
 
-<WorkspaceHeaderActions>
-
-    <button
-        type="button"
-        className="workspace-header-close"
-        onClick={profileReady ? actions.closeProfile : undefined}
-        disabled={!profileReady}
-        aria-disabled={!profileReady}
-        aria-label="Exit profile"
-    >
-        ×
-    </button>
-
-</WorkspaceHeaderActions>
-
-    );
-
-
-    /* =====================================
-       RENDER
-    ===================================== */
-
-return (
-
-    <WorkspaceShell>
-
-        {/* =================================
-           PRIMARY CONTENT
-        ================================= */}
-
-        <WorkspaceMain>
-
-            <WorkspaceContent>
-
-                <WorkspaceRegionHeader>
-
-                    <WorkspaceBanner
-
-    model={banner}
-
-    left={
-
         <WorkspaceHeaderActions>
 
             <button
+
                 type="button"
-                className="workspace-header-action"
-                onClick={actions.closeProfile}
+
+                className={
+                    profileReady
+                        ? "workspace-header-action workspace-header-action-ready"
+                        : "workspace-header-action"
+                }
+
+                onClick={
+                    profileReady
+                        ? actions.closeProfile
+                        : undefined
+                }
+
+                disabled={
+                    !profileReady
+                }
+
+                aria-disabled={
+                    !profileReady
+                }
+
                 aria-label="Exit profile"
+
             >
 
                 ×
@@ -168,118 +152,179 @@ return (
 
         </WorkspaceHeaderActions>
 
-    }
+    );
 
 
-    center={
+    /* =====================================
+       RENDER
+    ===================================== */
 
-        <IdentityCapabilitySelector
+    return (
 
-            values={values}
-
-            setValue={form.setValue}
-
-            readOnly={false}
-
-        />
-
-    }
-
-    right={
-
-        banner?.right
-
-    }
-
-/>
+        <WorkspaceShell>
 
 
-                    <WorkspaceNavigation
-                        model={navigation}
-                    />
+            {/* =================================
+               MAIN
+            ================================= */}
 
-                </WorkspaceRegionHeader>
+            <WorkspaceMain>
 
 
-                <WorkspaceBody>
+                {/* =================================
+                   PRIMARY CONTENT
+                ================================= */}
 
-                    {section && (
+                <WorkspaceContent>
 
-                        <WorkspaceSection
 
-                            model={section}
+                    {/* =================================
+                       WORKSPACE HEADER
+                    ================================= */}
 
-                            actions={actions}
+                    <WorkspaceRegionHeader>
 
-                        >
 
-                            <div className="workspace-section-content">
+                        <WorkspaceBanner
 
-                                <CapabilityRenderer
+                            model={banner}
 
-                                    section={section}
+                            left={
 
-                                    form={form}
+                                headerAction
 
-                                    editing={editing}
+                            }
+
+                            center={
+
+                                <IdentityCapabilitySelector
+
+                                    values={values}
+
+                                    setValue={
+                                        form.setValue
+                                    }
+
+                                    readOnly={false}
 
                                 />
 
-                            </div>
+                            }
 
-                        </WorkspaceSection>
-
-                    )}
-
-                </WorkspaceBody>
-
-            </WorkspaceContent>
-
-        </WorkspaceMain>
+                        />
 
 
-        {/* =================================
-           SIDEBAR
-        ================================= */}
+                        {/* =============================
+                           NAVIGATION
+                        ============================= */}
 
-        <WorkspaceSidebar>
+                        <WorkspaceNavigation
 
-            <WorkspaceGuide
-                title="IDENTITY GUIDE"
-            >
+                            model={navigation}
 
-                <WorkspacePanel
-                    title="Welcome"
-                >
-
-                    Manage your trusted identity.
-
-                </WorkspacePanel>
+                        />
 
 
-                <WorkspacePanel
-                    title="Profile Completion"
-                >
-
-                    {completion}%
-
-                </WorkspacePanel>
+                    </WorkspaceRegionHeader>
 
 
-                <WorkspacePanel
-                    title="Current Section"
-                >
+                    {/* =================================
+                       WORKSPACE BODY
+                    ================================= */}
 
-                    {section?.title ?? ""}
+                    <WorkspaceBody>
 
-                </WorkspacePanel>
+                        {section && (
 
-            </WorkspaceGuide>
+                            <WorkspaceSection
 
-        </WorkspaceSidebar>
+                                model={section}
 
-    </WorkspaceShell>
+                                actions={actions}
 
-);
+                            >
+
+                                <div
+                                    className={
+                                        "workspace-section-content"
+                                    }
+                                >
+
+                                    <CapabilityRenderer
+
+                                        section={section}
+
+                                        form={form}
+
+                                        editing={editing}
+
+                                    />
+
+                                </div>
+
+                            </WorkspaceSection>
+
+                        )}
+
+                    </WorkspaceBody>
+
+
+                </WorkspaceContent>
+
+
+                {/* =================================
+                   SIDEBAR
+                ================================= */}
+
+                <WorkspaceSidebar>
+
+
+                    <WorkspaceGuide
+                        title="IDENTITY GUIDE"
+                    >
+
+
+                        <WorkspacePanel
+                            title="Welcome"
+                        >
+
+                            Manage your trusted identity.
+
+                        </WorkspacePanel>
+
+
+                        <WorkspacePanel
+                            title="Profile Completion"
+                        >
+
+                            {completion}%
+
+                        </WorkspacePanel>
+
+
+                        <WorkspacePanel
+                            title="Current Section"
+                        >
+
+                            {
+                                section?.title
+                                ?? ""
+                            }
+
+                        </WorkspacePanel>
+
+
+                    </WorkspaceGuide>
+
+
+                </WorkspaceSidebar>
+
+
+            </WorkspaceMain>
+
+
+        </WorkspaceShell>
+
+    );
 
 }
