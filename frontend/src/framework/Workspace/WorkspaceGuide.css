@@ -423,6 +423,9 @@
    The guide is a structural workspace region.
    It is NOT a floating card.
 */
+.workspace-guide {
+    border: 1px solid #c8102e;
+}
 
 .workspace-guide {
     position: relative;
