@@ -1,81 +1,192 @@
 /* ==========================================================
-   Identity Workspace
+   IDENTITY WORKSPACE
    Community One Platform
    ========================================================== */
 
+
 /* ==========================================================
-   Header
+   WORKSPACE
+   ========================================================== */
+
+.profile-workspace {
+    width: 100%;
+    height: 100%;
+
+    min-width: 0;
+    min-height: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+
+    background: #f8f6f3;
+}
+
+
+/* ==========================================================
+   HEADER
    ========================================================== */
 
 .profile-card-header {
 
+    position: relative;
+
+    width: 100%;
+    min-height: 88px;
+
     display: flex;
     align-items: center;
 
-    gap: 48px;
+    gap: 0;
 
-    padding-bottom: 12px;
+    padding: 0 0 16px 0;
+
+    border-bottom: 1px solid #e6dfd8;
 
 }
+
+
+/* ==========================================================
+   TITLE
+   ========================================================== */
 
 .profile-card-header h1 {
 
     margin: 0;
 
     font-size: 3rem;
+    line-height: 1;
+
     font-weight: 700;
 
     color: #1f2937;
 
 }
 
+
+/* ==========================================================
+   SUBTITLE
+   ========================================================== */
+
 .profile-subtitle {
 
     flex: 1;
 
-    margin: 0;
+    margin: 0 0 0 32px;
 
     font-size: 1.55rem;
+
     color: #1f2937;
 
 }
 
+
+/* ==========================================================
+   CLOSE BUTTON
+   ========================================================== */
+
 .profile-close-button {
 
+    position: relative;
+
+    width: 54px;
+    height: 54px;
+
+    flex: 0 0 54px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 0;
+
+    padding: 0;
+
     border: none;
-    background: transparent;
+    border-radius: 50%;
+
+    background: #2db27f;
+
+    color: #ffffff;
 
     cursor: pointer;
 
-    font-size: 2rem;
+    font-size: 1.35rem;
+    line-height: 1;
 
-    color: #94a3b8;
+    overflow: visible;
 
-    transition: color .2s;
+    z-index: 2;
+
+    transition:
+        transform 0.18s ease,
+        background 0.18s ease;
+}
+
+
+/* ==========================================================
+   CLOSE BUTTON RADIAL / HALO
+   ========================================================== */
+
+.profile-close-button::before {
+
+    content: "";
+
+    position: absolute;
+
+    inset: -8px;
+
+    border-radius: 50%;
+
+    background: rgba(45, 178, 127, 0.10);
+
+    pointer-events: none;
+
+    z-index: -1;
 
 }
+
+
+/* ==========================================================
+   CLOSE BUTTON HOVER
+   ========================================================== */
 
 .profile-close-button:hover {
 
-    color: #0f172a;
+    background: #27a875;
+
+    transform: scale(1.03);
 
 }
 
+
 /* ==========================================================
-   Form
+   FORM
    ========================================================== */
 
 .profile-form-content {
 
+    flex: 1;
+
+    min-width: 0;
+    min-height: 0;
+
     display: flex;
     flex-direction: column;
+
     margin-top: 0;
+
     gap: 24px;
+
+    overflow-y: auto;
+    overflow-x: hidden;
 
 }
 
+
 /* ==========================================================
-   Cards
+   CARDS
    ========================================================== */
 
 .profile-section-card {
@@ -85,15 +196,15 @@
 
     flex: 1;
 
+    min-width: 0;
+    min-height: 0;
+
 }
 
-/* ==========================================================
-   Sidebar
-   ========================================================== */
 
-/* ==========================================
-   Guide Panel
-   ========================================== */
+/* ==========================================================
+   HELP PANEL
+   ========================================================== */
 
 .profile-help-panel {
 
@@ -110,7 +221,10 @@
 
 }
 
+
 .profile-help-panel h2 {
+
+    margin: 0 0 32px;
 
     font-family:
         Inter,
@@ -120,9 +234,8 @@
 
     font-weight: 700;
 
-    margin-bottom: 32px;
-
 }
+
 
 .profile-help-panel p {
 
@@ -130,8 +243,9 @@
 
 }
 
+
 /* ==========================================================
-   Actions
+   ACTIONS
    ========================================================== */
 
 .profile-edit-actions {
@@ -142,6 +256,11 @@
     gap: 16px;
 
 }
+
+
+/* ==========================================================
+   BUTTONS
+   ========================================================== */
 
 .profile-save-button,
 .profile-cancel-button {
@@ -157,9 +276,18 @@
 
     cursor: pointer;
 
-    transition: .2s ease;
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.15s ease;
 
 }
+
+
+/* ==========================================================
+   SAVE
+   ========================================================== */
 
 .profile-save-button {
 
@@ -167,9 +295,10 @@
 
     background: #9b111e;
 
-    color: white;
+    color: #ffffff;
 
 }
+
 
 .profile-save-button:hover {
 
@@ -177,40 +306,84 @@
 
 }
 
+
+/* ==========================================================
+   CANCEL
+   ========================================================== */
+
 .profile-cancel-button {
 
-    background: white;
+    background: #ffffff;
 
     border: 2px solid #d4d4d8;
 
-    color: #444;
+    color: #444444;
 
 }
+
 
 .profile-cancel-button:hover {
 
-    border-color: #999;
+    border-color: #999999;
 
 }
 
+
 /* ==========================================================
-   Responsive
+   RESPONSIVE
    ========================================================== */
 
 @media (max-width: 1100px) {
 
     .profile-card-header {
 
-        flex-direction: column;
-        align-items: flex-start;
-
-        gap: 16px;
+        min-height: 80px;
 
     }
 
     .profile-subtitle {
 
-        width: 100%;
+        margin-left: 24px;
+
+        font-size: 1.3rem;
+
+    }
+
+}
+
+
+@media (max-width: 768px) {
+
+    .profile-card-header {
+
+        min-height: auto;
+
+        align-items: flex-start;
+
+        padding-bottom: 16px;
+
+    }
+
+    .profile-card-header h1 {
+
+        font-size: 2.4rem;
+
+    }
+
+    .profile-subtitle {
+
+        margin-left: 16px;
+
+        font-size: 1.1rem;
+
+    }
+
+    .profile-close-button {
+
+        width: 48px;
+        height: 48px;
+
+        flex-basis: 48px;
 
     }
 
