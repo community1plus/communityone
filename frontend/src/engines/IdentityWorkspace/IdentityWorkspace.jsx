@@ -12,6 +12,7 @@ import {
     WorkspaceShell,
     WorkspaceMain,
     WorkspaceContent,
+    WorkspaceSidebar,
 
     WorkspaceRegionHeader,
     WorkspaceHeaderActions,
