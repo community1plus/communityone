@@ -1,7 +1,5 @@
 /* ==========================================================
-   COMMUNITY ONE PLATFORM FRAMEWORK (CPF)
-
-   Workspace Metric
+   WORKSPACE METRIC
    ========================================================== */
 
 .workspace-metric {
@@ -13,6 +11,8 @@
 
     width: 72px;
     height: 72px;
+
+    min-width: 72px;
 
     flex: 0 0 72px;
 

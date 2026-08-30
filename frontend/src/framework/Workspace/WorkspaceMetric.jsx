@@ -1,14 +1,5 @@
-/* ==========================================================
-   COMMUNITY ONE PLATFORM FRAMEWORK (CPF)
-
-   Workspace Metric
-   ========================================================== */
-
-import ProgressRing
-    from "./ProgressRing";
-
 import "./WorkspaceMetric.css";
-
+import ProgressRing from "./ProgressRing";
 
 export default function WorkspaceMetric({
 
@@ -16,18 +7,12 @@ export default function WorkspaceMetric({
 
 }) {
 
-    const value =
-        typeof model?.value === "number"
-            ? model.value
-            : 0;
-
-
     return (
 
         <div className="workspace-metric">
 
             <ProgressRing
-                value={value}
+                value={model.value ?? 0}
             />
 
         </div>
