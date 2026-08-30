@@ -1,41 +1,59 @@
-import { createGuideModel } from "../../../framework/Guide/models/GuideModel";
+import { guideContent }
+    from "../../../components/Guide/GuideContent";
 
-import { guideContent } from "../../../components/Guide/GuideContent";
 
 export function createIdentityGuideModel(section) {
 
     const help =
-        guideContent[section] ??
+        guideContent[section]
+        ??
         guideContent.default;
 
-    return createGuideModel({
 
-        progress: {
+    return {
 
-            percentage: 0,
+        title: "IDENTITY GUIDE",
 
-            label: "Complete",
+        panels: [
 
-        },
+            {
+                id: "welcome",
 
-        ai: {
+                title: "Welcome",
 
-            message: "Your assistant will appear here.",
+                content:
+                    "Manage your trusted identity.",
+            },
 
-        },
 
-        help,
+            {
+                id: "progress",
 
-        next: {
+                title: "Profile Completion",
 
-            tasks: [
+                value: "0%",
+            },
 
-                "Verify your email",
 
-            ],
+            {
+                id: "help",
 
-        },
+                title: "Help",
 
-    });
+                content: help,
+            },
+
+
+            {
+                id: "next",
+
+                title: "Next",
+
+                content: "Verify your email",
+            },
+
+        ],
+
+    };
 
 }
