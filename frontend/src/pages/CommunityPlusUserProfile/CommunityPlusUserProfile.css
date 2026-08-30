@@ -78,6 +78,7 @@
      */
     width: 48px;
     height: 48px;
+    
     flex: 0 0 48px;
 
     display: flex;
@@ -328,11 +329,11 @@
 
         padding-bottom: 16px;
     }
-
-    .profile-card-header h1 {
-        font-size: 2.4rem;
-        line-height: 48px;
-    }
+.profile-close-button {
+    width: 52px;
+    height: 52px;
+    flex: 0 0 52px;
+}
 
     .profile-subtitle {
         margin-left: 16px;
