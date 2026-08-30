@@ -7,21 +7,12 @@
 
 /* ==========================================================
    BANNER
-   ----------------------------------------------------------
-   Three-column layout:
-
-   LEFT    |    CENTER    |    RIGHT
-
-   The banner owns horizontal positioning.
    ========================================================== */
 
 .workspace-banner {
 
     --workspace-left-inset: 12px;
     --workspace-right-inset: 32px;
-
-    width: 100%;
-    min-width: 0;
 
     display: grid;
 
@@ -32,6 +23,9 @@
 
     align-items: center;
 
+    width: 100%;
+    min-width: 0;
+
     box-sizing: border-box;
 
     padding-left:
@@ -41,85 +35,62 @@
         var(--workspace-right-inset);
 
     overflow: visible;
-
 }
 
 
 /* ==========================================================
-   LEFT REGION
-   ----------------------------------------------------------
-   Contains:
-
-   close button
-   +
-   PROFILE title
+   LEFT
    ========================================================== */
 
 .workspace-banner-left {
 
-    min-width: 0;
-
     display: flex;
 
     align-items: center;
-
     justify-content: flex-start;
 
-    overflow: visible;
+    min-width: 0;
 
+    overflow: visible;
 }
 
 
 /* ==========================================================
-   CENTER REGION
-   ----------------------------------------------------------
-   Contains:
-
-   Person / Entity selector
+   CENTER
    ========================================================== */
 
 .workspace-banner-center {
 
-    min-width: 0;
-
     display: flex;
 
     align-items: center;
-
     justify-content: center;
 
-    overflow: visible;
+    min-width: 0;
 
+    overflow: visible;
 }
 
 
 /* ==========================================================
-   RIGHT REGION
-   ----------------------------------------------------------
-   Contains:
-
-   completion ring / metric
+   RIGHT
    ========================================================== */
 
 .workspace-banner-right {
 
-    min-width: 0;
-
     display: flex;
 
     align-items: center;
-
     justify-content: flex-end;
 
-    overflow: visible;
+    min-width: 0;
 
+    overflow: visible;
 }
 
 
 /* ==========================================================
    HEADER ACTIONS
-   ----------------------------------------------------------
-   This is the wrapper around the close button.
    ========================================================== */
 
 .workspace-header-actions {
@@ -135,21 +106,11 @@
     margin-right: 12px;
 
     overflow: visible;
-
 }
 
 
 /* ==========================================================
    HEADER ACTION
-   ----------------------------------------------------------
-   PROFILE is 48px high.
-
-   Therefore the close button is deliberately:
-
-       width  = 48px
-       height = 48px
-
-   The halo is allowed to extend outside the button.
    ========================================================== */
 
 .workspace-header-action {
@@ -168,11 +129,9 @@
 
     box-sizing: border-box;
 
-    margin: 0;
     padding: 0;
 
     border: none;
-
     border-radius: 50%;
 
     background: #2eae7d;
@@ -183,7 +142,6 @@
 
     font-size: 1rem;
     font-weight: 400;
-
     line-height: 1;
 
     cursor: pointer;
@@ -201,12 +159,11 @@
     transition:
         background .18s ease,
         transform .18s ease;
-
 }
 
 
 /* ==========================================================
-   HOVER
+   HEADER ACTION — HOVER
    ========================================================== */
 
 .workspace-header-action:hover {
@@ -215,24 +172,22 @@
 
     transform:
         scale(1.02);
-
 }
 
 
 /* ==========================================================
-   ACTIVE
+   HEADER ACTION — ACTIVE
    ========================================================== */
 
 .workspace-header-action:active {
 
     transform:
         scale(.97);
-
 }
 
 
 /* ==========================================================
-   DISABLED
+   HEADER ACTION — DISABLED
    ========================================================== */
 
 .workspace-header-action:disabled {
@@ -244,17 +199,11 @@
     animation: none;
 
     transform: none;
-
 }
 
 
 /* ==========================================================
    CLOSE PULSE
-   ----------------------------------------------------------
-   The shadow creates the halo.
-
-   Because the button and all banner containers use
-   overflow: visible, the halo is not clipped.
    ========================================================== */
 
 @keyframes workspace-close-pulse {
@@ -264,7 +213,6 @@
         box-shadow:
             0 0 0 0
             rgba(46, 174, 125, 0);
-
     }
 
     50% {
@@ -272,7 +220,6 @@
         box-shadow:
             0 0 0 8px
             rgba(46, 174, 125, .10);
-
     }
 
     100% {
@@ -280,27 +227,5 @@
         box-shadow:
             0 0 0 0
             rgba(46, 174, 125, 0);
-
     }
-
-}
-
-
-/* ==========================================================
-   REDUCED MOTION
-   ----------------------------------------------------------
-   Accessibility: disable the breathing halo where the
-   user has requested reduced motion.
-   ========================================================== */
-
-@media (prefers-reduced-motion: reduce) {
-
-    .workspace-header-action {
-
-        animation: none;
-
-        transition: none;
-
-    }
-
 }

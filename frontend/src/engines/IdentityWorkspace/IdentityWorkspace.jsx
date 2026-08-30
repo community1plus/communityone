@@ -21,7 +21,6 @@ import {
     WorkspaceBody,
 
     WorkspaceGuide,
-    WorkspacePanel,
     WorkspaceSection,
 
 } from "../../framework/Workspace";
@@ -111,6 +110,56 @@ export default function IdentityWorkspace({
 
 
     /* =====================================
+       GUIDE
+    ===================================== */
+
+    const guide = {
+
+        title:
+            "IDENTITY GUIDE",
+
+        panels: [
+
+            {
+                id:
+                    "welcome",
+
+                title:
+                    "Welcome",
+
+                content:
+                    "Manage your trusted identity.",
+            },
+
+            {
+                id:
+                    "profile-completion",
+
+                title:
+                    "Profile Completion",
+
+                value:
+                    `${completion}%`,
+            },
+
+            {
+                id:
+                    "current-section",
+
+                title:
+                    "Current Section",
+
+                value:
+                    section?.title
+                    ?? "",
+            },
+
+        ],
+
+    };
+
+
+    /* =====================================
        HEADER ACTION
     ===================================== */
 
@@ -168,191 +217,105 @@ export default function IdentityWorkspace({
                MAIN
             ================================= */}
 
-<WorkspaceMain>
+            <WorkspaceMain>
 
-    <WorkspaceContent>
-
-        {/* =================================
-           WORKSPACE HEADER
-        ================================= */}
-
-        <WorkspaceRegionHeader>
-
-            <WorkspaceBanner
-
-                model={banner}
-
-                left={
-
-                    headerAction
-
-                }
-
-                center={
-
-                    <IdentityCapabilitySelector
-
-                        values={values}
-
-                        setValue={
-                            form.setValue
-                        }
-
-                        readOnly={false}
-
-                    />
-
-                }
-
-            />
-
-            <WorkspaceNavigation
-
-                model={navigation}
-
-            />
-
-        </WorkspaceRegionHeader>
+                <WorkspaceContent>
 
 
-        {/* =================================
-           WORKSPACE BODY
-        ================================= */}
+                    {/* =================================
+                       WORKSPACE HEADER
+                    ================================= */}
 
-        <WorkspaceBody>
+                    <WorkspaceRegionHeader>
 
-            {section && (
+                        <WorkspaceBanner
 
-                <WorkspaceSection
+                            model={banner}
 
-                    model={section}
+                            left={headerAction}
 
-                    actions={actions}
+                            center={
 
-                >
+                                <IdentityCapabilitySelector
 
-                    <div
-                        className="workspace-section-content"
-                    >
+                                    values={values}
 
-                        <CapabilityRenderer
+                                    setValue={
+                                        form.setValue
+                                    }
 
-                            section={section}
+                                    readOnly={false}
 
-                            form={form}
+                                />
 
-                            editing={editing}
+                            }
 
                         />
 
-                    </div>
+                        <WorkspaceNavigation
 
-                </WorkspaceSection>
+                            model={navigation}
 
-            )}
+                        />
 
-        </WorkspaceBody>
-
-
-        {/* =================================
-           WORKSPACE GUIDE
-        ================================= */}
-
-        <WorkspaceGuide
-            title="IDENTITY GUIDE"
-        >
-
-            <WorkspacePanel
-                title="Welcome"
-            >
-
-                Manage your trusted identity.
-
-            </WorkspacePanel>
+                    </WorkspaceRegionHeader>
 
 
-            <WorkspacePanel
-                title="Profile Completion"
-            >
+                    {/* =================================
+                       WORKSPACE BODY
+                    ================================= */}
 
-                {completion}%
+                    <WorkspaceBody>
 
-            </WorkspacePanel>
+                        {section && (
+
+                            <WorkspaceSection
+
+                                model={section}
+
+                                actions={actions}
+
+                            >
+
+                                <div
+                                    className="workspace-section-content"
+                                >
+
+                                    <CapabilityRenderer
+
+                                        section={section}
+
+                                        form={form}
+
+                                        editing={editing}
+
+                                    />
+
+                                </div>
+
+                            </WorkspaceSection>
+
+                        )}
+
+                    </WorkspaceBody>
 
 
-            <WorkspacePanel
-                title="Current Section"
-            >
+                </WorkspaceContent>
 
-                {
-                    section?.title
-                    ?? ""
-                }
-
-            </WorkspacePanel>
-
-        </WorkspaceGuide>
-
-    </WorkspaceContent>
-
-</WorkspaceMain>
+            </WorkspaceMain>
 
 
             {/* =================================
-               SIDEBAR
+               GUIDE SIDEBAR
             ================================= */}
 
             <WorkspaceSidebar>
 
-
                 <WorkspaceGuide
 
-                    title="IDENTITY GUIDE"
+                    model={guide}
 
-                >
-
-
-                    <WorkspacePanel
-
-                        title="Welcome"
-
-                    >
-
-                        Manage your trusted identity.
-
-
-                    </WorkspacePanel>
-
-
-                    <WorkspacePanel
-
-                        title="Profile Completion"
-
-                    >
-
-                        {completion}%
-
-
-                    </WorkspacePanel>
-
-
-                    <WorkspacePanel
-
-                        title="Current Section"
-
-                    >
-
-                        {
-                            section?.title
-                            ?? ""
-                        }
-
-
-                    </WorkspacePanel>
-
-
-                </WorkspaceGuide>
-
+                />
 
             </WorkspaceSidebar>
 
