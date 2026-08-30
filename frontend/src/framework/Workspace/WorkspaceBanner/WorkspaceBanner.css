@@ -1,21 +1,26 @@
 /* ==========================================================
+   COMMUNITY ONE PLATFORM FRAMEWORK (CPF)
+
    WORKSPACE BANNER
+   ========================================================== */
+
+
+/* ==========================================================
+   BANNER
    ========================================================== */
 
 .workspace-banner {
 
-    display: grid;
+    position: relative;
 
-    grid-template-columns:
-        minmax(0, 1fr)
-        auto
-        minmax(0, 1fr);
+    display: flex;
 
     align-items: center;
 
     width: 100%;
 
     min-width: 0;
+    min-height: 64px;
 
     box-sizing: border-box;
 
@@ -31,8 +36,9 @@
     display: flex;
 
     align-items: center;
-
     justify-content: flex-start;
+
+    flex: 0 0 auto;
 
     min-width: 0;
 
@@ -45,13 +51,19 @@
 
 .workspace-banner-center {
 
+    position: absolute;
+
+    left: 50%;
+
+    transform:
+        translateX(-50%);
+
     display: flex;
 
     align-items: center;
-
     justify-content: center;
 
-    justify-self: center;
+    width: auto;
 
     min-width: 0;
 
@@ -67,8 +79,11 @@
     display: flex;
 
     align-items: center;
-
     justify-content: flex-end;
+
+    margin-left: auto;
+
+    flex: 0 0 auto;
 
     min-width: 0;
 
@@ -76,7 +91,7 @@
 
 
 /* ==========================================================
-   HEADER ACTION
+   HEADER ACTIONS
    ========================================================== */
 
 .workspace-header-actions {
@@ -90,15 +105,19 @@
 }
 
 
-.workspace-header-action {
+/* ==========================================================
+   HEADER ACTION
+   ========================================================== */
 
-    width: 44px;
-    height: 44px;
+.workspace-header-action {
 
     display: inline-flex;
 
     align-items: center;
     justify-content: center;
+
+    width: 44px;
+    height: 44px;
 
     padding: 0;
 
@@ -106,9 +125,11 @@
 
     border-radius: 50%;
 
-    background: #2eae7d;
+    background:
+        #2eae7d;
 
-    color: #ffffff;
+    color:
+        #ffffff;
 
     font-family: inherit;
 
@@ -119,5 +140,41 @@
     line-height: 1;
 
     cursor: pointer;
+
+}
+
+
+/* ==========================================================
+   DISABLED HEADER ACTION
+   ========================================================== */
+
+.workspace-header-action:disabled {
+
+    cursor: default;
+
+    opacity: .45;
+
+}
+
+
+/* ==========================================================
+   RESPONSIVE
+   ========================================================== */
+
+@media (max-width: 700px) {
+
+    .workspace-banner {
+
+        min-height: 56px;
+
+    }
+
+
+    .workspace-header-action {
+
+        width: 40px;
+        height: 40px;
+
+    }
 
 }

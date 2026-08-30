@@ -4,10 +4,10 @@
    Workspace Metric
    ========================================================== */
 
-import "./WorkspaceMetric.css";
-
 import ProgressRing
     from "./ProgressRing";
+
+import "./WorkspaceMetric.css";
 
 
 export default function WorkspaceMetric({
@@ -16,20 +16,11 @@ export default function WorkspaceMetric({
 
 }) {
 
-
-    /* ======================================================
-       VALUE
-       ====================================================== */
-
     const value =
         typeof model?.value === "number"
             ? model.value
             : 0;
 
-
-    /* ======================================================
-       RENDER
-       ====================================================== */
 
     return (
 
