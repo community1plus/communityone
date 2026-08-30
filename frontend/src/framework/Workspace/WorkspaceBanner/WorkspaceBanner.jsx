@@ -29,106 +29,91 @@ export default function WorkspaceBanner({
 
     right = null,
 
-    children = null,
-
 }) {
-
 
     /* ======================================================
        MODEL
-       ====================================================== */
+    ====================================================== */
 
-    const {
+    const modelLeft =
+        model?.left ?? {};
 
-        left: modelLeft = {},
+    const modelCentre =
+        model?.centre ?? {};
 
-        center: modelCenter = {},
-
-        right: modelRight = {},
-
-    } = model;
+    const modelRight =
+        model?.right ?? {};
 
 
     /* ======================================================
        LEFT
-       ====================================================== */
+    ====================================================== */
 
     const leftContent =
+        left ?? (
 
-        left !== null
+            <WorkspaceBannerSection>
 
-            ? left
+                <WorkspaceTitle
+                    title={
+                        modelLeft?.title ?? ""
+                    }
+                />
 
-            : (
+            </WorkspaceBannerSection>
 
-                <WorkspaceBannerSection>
-
-                    <WorkspaceTitle
-                        title={
-                            modelLeft.title
-                        }
-                    />
-
-                </WorkspaceBannerSection>
-
-            );
+        );
 
 
     /* ======================================================
        CENTER
-       ====================================================== */
+    ====================================================== */
 
     const centerContent =
+        center ?? (
 
-        center !== null
+            <WorkspaceBannerSection>
 
-            ? center
+                <WorkspaceMode
+                    mode={
+                        modelCentre?.mode
+                    }
+                />
 
-            : (
+            </WorkspaceBannerSection>
 
-                <WorkspaceBannerSection>
-
-                    <WorkspaceMode
-                        model={modelCenter}
-                    >
-
-                        {children}
-
-                    </WorkspaceMode>
-
-                </WorkspaceBannerSection>
-
-            );
+        );
 
 
     /* ======================================================
        RIGHT
-       ====================================================== */
+    ====================================================== */
+
+    const metricModel =
+        modelRight?.metric ?? null;
+
 
     const rightContent =
+        right ?? (
 
-        right !== null
+            <WorkspaceBannerSection>
 
-            ? right
-
-            : (
-
-                <WorkspaceBannerSection>
+                {metricModel && (
 
                     <WorkspaceMetric
-                        model={
-                            modelRight.metric
-                        }
+                        model={metricModel}
                     />
 
-                </WorkspaceBannerSection>
+                )}
 
-            );
+            </WorkspaceBannerSection>
+
+        );
 
 
     /* ======================================================
        RENDER
-       ====================================================== */
+    ====================================================== */
 
     return (
 
