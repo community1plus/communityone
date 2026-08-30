@@ -1,55 +1,31 @@
 /* =====================================================
-   SIDEBAR / WORKSPACE BOUNDARY
-   ===================================================== */
+   COMMUNITY PLUS SIDEBAR
+   Authoritative sidebar presentation
+===================================================== */
 
-.layout-sidebar {
-    width: clamp(var(--sidebar-width-min), 14vw, var(--sidebar-width));
-    min-width: var(--sidebar-width-min);
+.sidebar {
+    width: 236px;
+    min-width: 236px;
     height: 100%;
     min-height: 0;
-    flex: 0 0 auto;
 
-    position: relative;
-
-    /* THE SINGLE WORKSPACE BOUNDARY */
-    border-right: 1px solid #e8e8e8;
-
-    background: #faf8f5;
-
-    overflow: hidden;
-
-    transition:
-        width 0.22s ease,
-        min-width 0.22s ease;
-}
-
-
-/* =====================================================
-   SIDEBAR
-   Visual layer only
-   ===================================================== */
-
-.layout-sidebar .sidebar {
-    width: 100%;
-    min-width: 0;
-    height: 100%;
-    min-height: 0;
+    flex: 0 0 236px;
 
     display: flex;
     flex-direction: column;
 
     position: relative;
-
     box-sizing: border-box;
 
     padding: 14px 10px 18px;
+
     gap: 18px;
 
     overflow: hidden;
 
     background: #faf8f5;
 
-    border: none;
+    border-right: 1px solid #e8e2dc;
 
     font-family:
         -apple-system,
@@ -59,118 +35,32 @@
         sans-serif;
 
     transition:
+        width 0.22s ease,
+        min-width 0.22s ease,
+        flex-basis 0.22s ease,
         background 0.22s ease;
 }
 
 
 /* =====================================================
    COLLAPSED
-   ===================================================== */
+===================================================== */
 
-.layout-sidebar.collapsed {
-    width: var(--sidebar-width-collapsed);
-    min-width: var(--sidebar-width-collapsed);
-}
-
-.layout-sidebar.collapsed .sidebar {
-    width: 100%;
+.sidebar.collapsed {
+    width: 72px;
+    min-width: 72px;
+    flex-basis: 72px;
 }
 
 
 /* =====================================================
-   WORKSPACE
-   ===================================================== */
+   MAIN SCROLL
+===================================================== */
 
-.layout-content {
+.sidebar-main {
     flex: 1 1 auto;
-
-    width: auto;
+    min-height: 0;
     min-width: 0;
-    min-height: 0;
-
-    display: flex;
-    flex-direction: column;
-
-    /* IMPORTANT: no left offset */
-    margin: 0;
-    padding: 0;
-
-    background: var(--content-bg);
-
-    overflow: hidden;
-}
-
-
-/* =====================================================
-   WORKSPACE INNER
-   ===================================================== */
-
-.layout-inner {
-    flex: 1 1 auto;
-
-    width: 100%;
-    max-width: none;
-
-    min-width: 0;
-    min-height: 0;
-
-    margin: 0;
-    padding: 0;
-
-    display: flex;
-    flex-direction: column;
-
-    gap: 0;
-
-    overflow: hidden;
-}
-
-
-/* =====================================================
-   PAGE
-   ===================================================== */
-
-.page-layout {
-    flex: 1 1 auto;
-
-    width: 100%;
-    min-width: 0;
-    min-height: 0;
-
-    display: flex;
-
-    margin: 0;
-    padding: 0;
-
-    gap: 0;
-
-    align-items: stretch;
-
-    overflow: hidden;
-}
-
-
-/* =====================================================
-   CLOSE / WORKSPACE CONTROLS
-
-   Give the close button room to breathe.
-   It must NOT sit on the sidebar boundary.
-   ===================================================== */
-
-.layout-content button {
-    position: relative;
-    z-index: 5;
-}
-
-
-/* =====================================================
-   SIDEBAR SCROLL
-   ===================================================== */
-
-.layout-sidebar .sidebar-main {
-    flex: 1 1 auto;
-
-    min-height: 0;
 
     display: flex;
     flex-direction: column;
@@ -180,18 +70,413 @@
     overflow-y: auto;
     overflow-x: hidden;
 
-    padding-right: 2px;
+    padding: 0;
+    margin: 0;
 }
 
-.layout-sidebar .sidebar-main::-webkit-scrollbar {
+.sidebar-main::-webkit-scrollbar {
     width: 5px;
 }
 
-.layout-sidebar .sidebar-main::-webkit-scrollbar-track {
+.sidebar-main::-webkit-scrollbar-track {
     background: transparent;
 }
 
-.layout-sidebar .sidebar-main::-webkit-scrollbar-thumb {
+.sidebar-main::-webkit-scrollbar-thumb {
     background: rgba(0, 0, 0, 0.08);
     border-radius: 999px;
+}
+
+
+/* =====================================================
+   SECTION
+===================================================== */
+
+.sidebar-section {
+    display: flex;
+    flex-direction: column;
+
+    gap: 6px;
+
+    padding: 0 0 18px;
+    margin: 0;
+
+    border-bottom: 1px solid #f1ebe5;
+}
+
+.sidebar-section:last-child {
+    border-bottom: none;
+}
+
+
+/* =====================================================
+   SECTION TITLE
+===================================================== */
+
+.sidebar-title {
+    display: block;
+
+    padding: 0 10px;
+    margin: 0 0 6px;
+
+    color: #9a8f84;
+
+    font-size: 11px;
+    line-height: 1.2;
+    font-weight: 800;
+
+    letter-spacing: 0.12em;
+
+    text-transform: uppercase;
+
+    white-space: nowrap;
+
+    transition: color 0.18s ease;
+}
+
+.sidebar-section:hover .sidebar-title {
+    color: #746a61;
+}
+
+.sidebar.collapsed .sidebar-title {
+    display: none;
+}
+
+
+/* =====================================================
+   LINK
+===================================================== */
+
+.sidebar-link {
+    appearance: none;
+    -webkit-appearance: none;
+
+    width: 100%;
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    position: relative;
+
+    box-sizing: border-box;
+
+    padding: 11px 12px;
+
+    margin: 0;
+
+    border: none;
+    border-radius: 12px;
+
+    outline: none;
+
+    background: transparent;
+
+    color: #5f564f;
+
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.2;
+    font-weight: 600;
+
+    text-align: left;
+
+    cursor: pointer;
+
+    transition:
+        background 0.18s ease,
+        color 0.18s ease,
+        transform 0.12s ease,
+        box-shadow 0.18s ease;
+}
+
+
+/* =====================================================
+   ICON
+===================================================== */
+
+.sidebar-link .icon {
+    width: 18px;
+    height: 18px;
+
+    flex: 0 0 18px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 16px;
+    line-height: 1;
+
+    opacity: 0.92;
+}
+
+
+/* =====================================================
+   LABEL
+===================================================== */
+
+.sidebar-link .label {
+    min-width: 0;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+}
+
+.sidebar.collapsed .sidebar-link .label {
+    display: none;
+}
+
+
+/* =====================================================
+   LOCK
+===================================================== */
+
+.sidebar-link .lock {
+    margin-left: auto;
+
+    flex: 0 0 auto;
+
+    font-size: 0.8rem;
+    line-height: 1;
+
+    opacity: 0.75;
+}
+
+
+/* =====================================================
+   HOVER
+===================================================== */
+
+.sidebar-link:hover {
+    background: rgba(20, 20, 20, 0.035);
+
+    color: #2f2a27;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+
+/* =====================================================
+   ACTIVE PRESS
+===================================================== */
+
+.sidebar-link:active {
+    transform: scale(0.985);
+}
+
+
+/* =====================================================
+   ACTIVE
+===================================================== */
+
+.sidebar-link.active {
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.9),
+            rgba(255, 255, 255, 0.72)
+        );
+
+    color: #1f1714;
+
+    font-weight: 750;
+
+    box-shadow:
+        0 1px 2px rgba(20, 20, 20, 0.04),
+        0 6px 14px rgba(20, 20, 20, 0.05);
+}
+
+
+/* =====================================================
+   ACTIVE INDICATOR
+
+   Keep this INSIDE the sidebar so it does not
+   interfere with the workspace boundary.
+===================================================== */
+
+.sidebar-link.active::before {
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    top: 10px;
+    bottom: 10px;
+
+    width: 3px;
+
+    border-radius: 999px;
+
+    background: #4a0f0f;
+}
+
+
+/* =====================================================
+   ACTIVE ICON
+===================================================== */
+
+.sidebar-link.active .icon {
+    opacity: 1;
+}
+
+
+/* =====================================================
+   PLATFORM GROUP
+===================================================== */
+
+.sidebar-section.platform .sidebar-link {
+    font-weight: 650;
+}
+
+
+/* =====================================================
+   LOGOUT
+===================================================== */
+
+.sidebar-link.logout {
+    color: #c43c2f;
+}
+
+.sidebar-link.logout:hover {
+    background: rgba(217, 45, 32, 0.08);
+    color: #b42318;
+}
+
+
+/* =====================================================
+   GUEST / PROFILE LOCKED
+===================================================== */
+
+.sidebar-link.guest-locked {
+    opacity: 0.72;
+}
+
+
+/* =====================================================
+   ECHO
+===================================================== */
+
+.echo-brand {
+    flex: 0 0 auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 0;
+
+    padding: 10px 0 4px;
+}
+
+
+/* =====================================================
+   ECHO BUTTON
+===================================================== */
+
+.echo-brand-button {
+    width: 40px;
+    height: 40px;
+
+    flex: 0 0 40px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    box-sizing: border-box;
+
+    padding: 0;
+
+    border: 1px solid rgba(141, 27, 27, 0.08);
+
+    border-radius: 999px;
+
+    overflow: hidden;
+
+    cursor: pointer;
+
+    background:
+        radial-gradient(
+            circle at 30% 30%,
+            #161616,
+            #050505
+        );
+
+    box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.16);
+
+    transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease,
+        filter 0.18s ease;
+}
+
+.echo-brand-button:hover {
+    transform:
+        translateY(-1px)
+        scale(1.03);
+
+    box-shadow:
+        0 8px 18px rgba(141, 27, 27, 0.16);
+
+    filter: saturate(1.05);
+}
+
+
+/* =====================================================
+   ECHO IMAGE
+===================================================== */
+
+.echo-brand-image {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 900px) {
+
+    .sidebar {
+        width: 72px;
+        min-width: 72px;
+        flex-basis: 72px;
+    }
+
+    .sidebar-title,
+    .sidebar-link .label,
+    .sidebar-link .lock {
+        display: none;
+    }
+
+    .sidebar-link {
+        justify-content: center;
+    }
+
+    .sidebar-link.active::before {
+        left: 0;
+    }
+
+    .echo-brand {
+        padding-bottom: 2px;
+    }
+
+    .echo-brand-button {
+        width: 36px;
+        height: 36px;
+        flex-basis: 36px;
+    }
 }
