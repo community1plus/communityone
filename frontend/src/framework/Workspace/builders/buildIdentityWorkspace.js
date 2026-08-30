@@ -19,9 +19,9 @@ import {
 } from "../../../framework/Workspace/runtime/WorkspaceRuntime";
 
 
-/* =========================================
+/* ==========================================================
    SECTION ACTION DEFINITIONS
-========================================= */
+   ========================================================== */
 
 const SECTION_ACTION_DEFINITIONS = {
 
@@ -54,9 +54,9 @@ const SECTION_ACTION_DEFINITIONS = {
 };
 
 
-/* =========================================
+/* ==========================================================
    WORKSPACE BUILDER
-========================================= */
+   ========================================================== */
 
 export function buildIdentityWorkspace(
 
@@ -65,6 +65,11 @@ export function buildIdentityWorkspace(
     actions
 
 ) {
+
+
+    /* ======================================================
+       STATE
+       ====================================================== */
 
     const {
 
@@ -85,6 +90,10 @@ export function buildIdentityWorkspace(
     } = state;
 
 
+    /* ======================================================
+       ACTIONS
+       ====================================================== */
+
     const {
 
         goToSection,
@@ -92,9 +101,9 @@ export function buildIdentityWorkspace(
     } = actions;
 
 
-    /* =====================================
+    /* ======================================================
        RUNTIME
-    ===================================== */
+       ====================================================== */
 
     const runtime =
         createWorkspaceRuntime({
@@ -115,74 +124,82 @@ export function buildIdentityWorkspace(
         });
 
 
-    /* =====================================
+    /* ======================================================
        CURRENT SECTION
-    ===================================== */
+       ====================================================== */
 
     const section =
         runtime.section;
 
 
-    if (!section) {
+    /* ======================================================
+       BANNER
+       ====================================================== */
 
-        console.log(
-    "🧩 IDENTITY WORKSPACE FINAL:",
-    {
-        section: resolvedSection,
-        actions: resolvedSection.actions,
-    }
-);
+    const banner =
+        createWorkspaceBannerModel({
+
+            left: {
+
+                title:
+                    "PROFILE",
+
+            },
+
+            center: {
+
+                mode:
+                    "identity",
+
+            },
+
+            right: {
+
+                metric:
+                    createWorkspaceProgressModel({
+
+                        value:
+                            completion,
+
+                    }),
+
+            },
+
+        });
+
+
+    /* ======================================================
+       NAVIGATION
+       ====================================================== */
+
+    const navigation =
+        createWorkspaceNavigationModel({
+
+            items:
+                runtime.sections,
+
+            current:
+                runtime.current,
+
+            onChange:
+                goToSection,
+
+        });
+
+
+    /* ======================================================
+       NO CURRENT SECTION
+       ====================================================== */
+
+    if (!section) {
 
         return createWorkspace({
 
             runtime,
 
-            banner:
-                createWorkspaceBannerModel({
+            banner,
 
-                    left: {
-
-                        title:
-                            "PROFILE",
-
-                    },
-
-                    centre: {
-
-                        mode:
-                            "identity",
-
-                    },
-
-                    right: {
-
-                        metric:
-
-                            createWorkspaceProgressModel({
-
-                                value:
-                                    completion,
-
-                            }),
-
-                    },
-
-                }),
-
-            navigation:
-
-                createWorkspaceNavigationModel({
-
-                    items:
-                        runtime.sections,
-
-                    current:
-                        runtime.current,
-
-                    onChange:
-                        goToSection,
-
-                }),
+            navigation,
 
             body: {
 
@@ -196,9 +213,9 @@ export function buildIdentityWorkspace(
     }
 
 
-    /* =====================================
+    /* ======================================================
        SECTION STATE
-    ===================================== */
+       ====================================================== */
 
     const editing =
         Boolean(
@@ -216,9 +233,9 @@ export function buildIdentityWorkspace(
         section.id;
 
 
-    /* =====================================
+    /* ======================================================
        SECTION ACTION HANDLERS
-    ===================================== */
+       ====================================================== */
 
     const sectionActionHandlers = {
 
@@ -268,9 +285,9 @@ export function buildIdentityWorkspace(
     };
 
 
-    /* =====================================
+    /* ======================================================
        ACTION VISIBILITY
-    ===================================== */
+       ====================================================== */
 
     const isActionVisible = {
 
@@ -292,9 +309,9 @@ export function buildIdentityWorkspace(
     };
 
 
-    /* =====================================
+    /* ======================================================
        RESOLVE SECTION ACTIONS
-    ===================================== */
+       ====================================================== */
 
     const sectionActions =
 
@@ -365,9 +382,9 @@ export function buildIdentityWorkspace(
             .filter(Boolean);
 
 
-    /* =====================================
+    /* ======================================================
        RESOLVED SECTION
-    ===================================== */
+       ====================================================== */
 
     const resolvedSection = {
 
@@ -378,76 +395,10 @@ export function buildIdentityWorkspace(
 
     };
 
-    console.log(
-    "🔥 BUILD IDENTITY RESOLVED SECTION:",
-    resolvedSection
-);
 
-console.log(
-    "🔥 BUILD IDENTITY RESOLVED ACTIONS:",
-    resolvedSection.actions
-);
-
-
-    /* =====================================
-       BANNER
-    ===================================== */
-
-    const banner =
-        createWorkspaceBannerModel({
-
-            left: {
-
-                title:
-                    "PROFILE",
-
-            },
-
-            centre: {
-
-                mode:
-                    "identity",
-
-            },
-
-            right: {
-
-                metric:
-
-                    createWorkspaceProgressModel({
-
-                        value:
-                            completion,
-
-                    }),
-
-            },
-
-        });
-
-
-    /* =====================================
-       NAVIGATION
-    ===================================== */
-
-    const navigation =
-        createWorkspaceNavigationModel({
-
-            items:
-                runtime.sections,
-
-            current:
-                runtime.current,
-
-            onChange:
-                goToSection,
-
-        });
-
-
-    /* =====================================
+    /* ======================================================
        WORKSPACE
-    ===================================== */
+       ====================================================== */
 
     return createWorkspace({
 
