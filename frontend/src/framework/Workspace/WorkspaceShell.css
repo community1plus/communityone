@@ -1,18 +1,10 @@
 /* ==========================================================
-   COMMUNITY ONE PLATFORM FRAMEWORK (CPF)
-
-   Workspace Shell
-   ========================================================== */
-
-
-/* ==========================================================
    WORKSPACE SHELL
    ========================================================== */
 
 .workspace-shell {
 
     width: 100%;
-    height: 100%;
 
     min-width: 0;
     min-height: 0;
@@ -30,37 +22,106 @@
 
     display: grid;
 
-    width: 100%;
-    height: 100%;
-
-    min-width: 0;
-    min-height: 0;
-
     grid-template-columns:
         minmax(0, 1fr)
-        320px;
+        380px;
 
-    gap: 32px;
+    gap: 0;
 
-    align-items: start;
+    width: 100%;
+
+    min-width: 0;
 
     box-sizing: border-box;
 
 }
+
+
+/* ==========================================================
+   WORKSPACE MAIN
+   ========================================================== */
 
 .workspace-main {
-    display: flex;
-    flex-direction: column;
+
     min-width: 0;
-    min-height: 0;
-    position: relative;
+
+    box-sizing: border-box;
+
 }
 
-.workspace-sidebar {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
+
+/* ==========================================================
+   WORKSPACE CONTENT
+   ========================================================== */
+
+.workspace-content {
+
     min-width: 0;
-    min-height: 0;
+
     box-sizing: border-box;
+
+}
+
+
+/* ==========================================================
+   WORKSPACE SIDEBAR
+   ========================================================== */
+
+.workspace-sidebar {
+
+    min-width: 0;
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+}
+
+
+/* ==========================================================
+   WORKSPACE SIDEBAR INNER
+   ========================================================== */
+
+.workspace-sidebar-inner {
+
+    width: 100%;
+
+    min-width: 0;
+
+    box-sizing: border-box;
+
+}
+
+
+/* ==========================================================
+   RESPONSIVE
+   ========================================================== */
+
+@media (max-width: 1100px) {
+
+    .workspace-layout {
+
+        grid-template-columns:
+            minmax(0, 1fr)
+            320px;
+
+    }
+
+}
+
+
+@media (max-width: 900px) {
+
+    .workspace-layout {
+
+        grid-template-columns: 1fr;
+
+    }
+
+    .workspace-sidebar {
+
+        width: 100%;
+
+    }
+
 }
