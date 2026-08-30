@@ -4,35 +4,31 @@ export default function ProgressRing({
 
     value = 0,
 
-    size = 64,
+    size = 72,
 
-    stroke = 4,
+    stroke = 6,
 
 }) {
 
-    const progress =
-        Math.min(
-            Math.max(
-                Number(value) || 0,
-                0
-            ),
-            100
+    const percentage =
+        Math.max(
+            0,
+            Math.min(
+                100,
+                Number(value) || 0
+            )
         );
-
 
     const radius =
         (size - stroke) / 2;
 
-
     const circumference =
         2 * Math.PI * radius;
 
-
     const offset =
         circumference -
-        (progress / 100) *
+        (percentage / 100) *
         circumference;
-
 
     return (
 
@@ -45,59 +41,42 @@ export default function ProgressRing({
         >
 
             <svg
-                className="progress-ring__svg"
+                className="progress-ring-svg"
                 width={size}
                 height={size}
                 viewBox={`0 0 ${size} ${size}`}
             >
 
-                {/* Track */}
+                {/* Background ring */}
 
                 <circle
-
-                    className="progress-ring__track"
-
+                    className="progress-ring-track"
                     cx={size / 2}
                     cy={size / 2}
-
                     r={radius}
-
-                    fill="none"
-
                     strokeWidth={stroke}
-
+                    fill="none"
                 />
 
-
-                {/* Completion */}
+                {/* Progress */}
 
                 <circle
-
-                    className="progress-ring__progress"
-
+                    className="progress-ring-progress"
                     cx={size / 2}
                     cy={size / 2}
-
                     r={radius}
-
-                    fill="none"
-
                     strokeWidth={stroke}
-
+                    fill="none"
                     strokeDasharray={circumference}
-
                     strokeDashoffset={offset}
-
-                    strokeLinecap="round"
-
                 />
 
             </svg>
 
 
-            <span className="progress-ring__value">
+            <span className="progress-ring-value">
 
-                {progress}%
+                {percentage}%
 
             </span>
 
