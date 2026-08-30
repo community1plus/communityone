@@ -1,28 +1,33 @@
 /* =====================================================
    COMMUNITY PLUS DASHBOARD SHELL
-   Layout / sidebar / content containment
+
+   Layout / sidebar / workspace containment
 ===================================================== */
+
 
 /* =====================================================
    ROOT TOKENS
 ===================================================== */
 
 :root {
-  --sidebar-width: 236px;
-  --sidebar-width-min: 220px;
-  --sidebar-width-collapsed: 72px;
+    --sidebar-width: 236px;
+    --sidebar-width-min: 220px;
+    --sidebar-width-collapsed: 72px;
 
-  --content-max-width: none;
+    --content-bg: #f8f6f3;
+    --sidebar-bg: #fbf9f7;
 
-  --space-x: 0;
-  --space-y: 0;
+    --border-soft: #e6dfd8;
 
-  --content-bg: #f8f6f3;
-  --border-soft: #e6dfd8;
+    --content-max-width: none;
 
-  --gap: 0;
-  --gap-lg: 0;
+    --space-x: 0;
+    --space-y: 0;
+
+    --gap: 0;
+    --gap-lg: 0;
 }
+
 
 /* =====================================================
    RESET
@@ -31,357 +36,732 @@
 *,
 *::before,
 *::after {
-  box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 html,
 body,
 #root {
-  width: 100%;
-  height: 100%;
-  margin: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
 }
 
 body {
-  overflow: hidden;
+    overflow: hidden;
 }
+
 
 /* =====================================================
    APP SHELL
 ===================================================== */
 
 .app-shell {
-  width: 100%;
-  height: 100vh;
-  min-width: 0;
-  min-height: 0;
+    width: 100%;
+    height: 100vh;
 
-  display: flex;
-  flex-direction: column;
+    min-width: 0;
+    min-height: 0;
 
-  background: var(--content-bg);
-  overflow: hidden;
+    display: flex;
+    flex-direction: column;
+
+    background: var(--content-bg);
+
+    overflow: hidden;
 }
+
 
 /* =====================================================
    HEADER
 ===================================================== */
 
 .cp-header {
-  flex: 0 0 auto;
+    flex: 0 0 auto;
 
-  min-height: 76px;
+    min-height: 76px;
 
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 
-  padding: 0 24px;
+    gap: 20px;
 
-  background: #ffffff;
-  border-bottom: 1px solid var(--border-soft);
+    padding: 0 24px;
 
-  z-index: 20;
+    background: #ffffff;
+
+    border-bottom: 1px solid var(--border-soft);
+
+    z-index: 20;
 }
 
 .cp-logo-button {
-  border: none;
-  background: transparent;
+    border: none;
+    background: transparent;
 
-  color: #d61f26;
+    color: #d61f26;
 
-  font-size: 18px;
-  font-weight: 900;
-  letter-spacing: -0.03em;
+    font-size: 18px;
+    font-weight: 900;
+    letter-spacing: -0.03em;
 
-  cursor: pointer;
+    cursor: pointer;
 }
 
 .cp-header-nav {
-  display: flex;
-  align-items: center;
-  gap: 14px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
 }
 
 .cp-header-nav button {
-  border: none;
-  background: transparent;
+    border: none;
+    background: transparent;
 
-  color: #1f1714;
+    color: #1f1714;
 
-  font-size: 14px;
-  font-weight: 750;
+    font-size: 14px;
+    font-weight: 750;
 
-  cursor: pointer;
+    cursor: pointer;
 }
 
 .cp-header-nav button.active {
-  color: #8d1b1b;
+    color: #8d1b1b;
 }
+
 
 /* =====================================================
    MAIN LAYOUT
+
+   Sidebar and workspace are siblings.
+
+   IMPORTANT:
+   The workspace must NOT add another left offset.
 ===================================================== */
 
 .layout-main {
-  flex: 1;
-  min-height: 0;
-  min-width: 0;
+    flex: 1;
 
-  display: flex;
+    min-width: 0;
+    min-height: 0;
 
-  background: var(--content-bg);
-  overflow: hidden;
+    display: flex;
+
+    background: var(--content-bg);
+
+    overflow: hidden;
 }
 
+
 /* =====================================================
-   SIDEBAR
+   MAIN SIDEBAR
+
+   THIS IS THE SINGLE LEFT BOUNDARY
 ===================================================== */
 
 .layout-sidebar,
 .sidebar {
-  width: clamp(var(--sidebar-width-min), 14vw, var(--sidebar-width));
-  min-width: var(--sidebar-width-min);
-  flex: 0 0 auto;
+    position: relative;
 
-  height: 100%;
-  min-height: 0;
+    width: clamp(
+        var(--sidebar-width-min),
+        14vw,
+        var(--sidebar-width)
+    );
 
-  background: #fbf9f7;
-  border-right: 1px solid var(--border-soft);
+    min-width: var(--sidebar-width-min);
 
-  overflow: hidden;
+    flex: 0 0 auto;
 
-  transition:
-    width 0.2s ease,
-    min-width 0.2s ease;
+    height: 100%;
+    min-height: 0;
+
+    background: var(--sidebar-bg);
+
+    /* The visible workspace/sidebar relationship */
+    border-right: 1px solid var(--border-soft);
+
+    overflow: hidden;
+
+    transition:
+        width 0.2s ease,
+        min-width 0.2s ease;
 }
+
+
+/* =====================================================
+   COLLAPSED SIDEBAR
+===================================================== */
 
 .layout-sidebar.collapsed,
 .sidebar.collapsed {
-  width: var(--sidebar-width-collapsed);
-  min-width: var(--sidebar-width-collapsed);
+    width: var(--sidebar-width-collapsed);
+    min-width: var(--sidebar-width-collapsed);
 }
+
 
 /* =====================================================
    CONTENT WRAPPER
+
+   NO LEFT / RIGHT OFFSET
 ===================================================== */
 
 .layout-content {
-  flex: 1;
-  min-width: 0;
-  min-height: 0;
+    flex: 1;
 
-  display: flex;
-  flex-direction: column;
+    min-width: 0;
+    min-height: 0;
 
-  padding: var(--space-y) var(--space-x);
+    display: flex;
+    flex-direction: column;
 
-  background: var(--content-bg);
+    /*
+     * Keep this at zero.
+     * Workspace owns its internal spacing.
+     */
+    padding: 0;
 
-  overflow: hidden;
+    background: var(--content-bg);
+
+    overflow: hidden;
 }
+
 
 /* =====================================================
    CONTENT INNER
+
+   IMPORTANT:
+   No margin.
+   No padding.
+   No artificial left offset.
 ===================================================== */
 
 .layout-inner {
-  flex: 1;
+    flex: 1;
 
-  width: 100%;
-  max-width: var(--content-max-width);
+    width: 100%;
+    max-width: var(--content-max-width);
 
-  min-width: 0;
-  min-height: 0;
+    min-width: 0;
+    min-height: 0;
 
-  margin: 0;
+    margin: 0;
+    padding: 0;
 
-  display: flex;
-  flex-direction: column;
-  gap: var(--gap);
+    display: flex;
+    flex-direction: column;
 
-  overflow: hidden;
+    gap: var(--gap);
+
+    overflow: hidden;
 }
 
-/* Optional scrollable layer for non-map pages */
-.layout-scroll {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-}
 
 /* =====================================================
    PAGE LAYOUT
 ===================================================== */
 
 .page-layout {
-  flex: 1;
-  min-height: 0;
-  min-width: 0;
+    flex: 1;
 
-  display: flex;
-  gap: var(--gap-lg);
+    min-width: 0;
+    min-height: 0;
 
-  align-items: stretch;
+    width: 100%;
 
-  overflow: hidden;
+    display: flex;
+
+    gap: var(--gap-lg);
+
+    align-items: stretch;
+
+    overflow: hidden;
 }
 
 .page-layout > * {
-  flex: 1;
-  min-width: 0;
-  min-height: 0;
+    min-width: 0;
+    min-height: 0;
 }
+
+
+/* =====================================================
+   WORKSPACE CONTAINMENT
+
+   Prevent accidental horizontal offset.
+===================================================== */
+
+.workspace-shell {
+    position: relative;
+
+    width: 100%;
+    max-width: none;
+
+    min-width: 0;
+    min-height: 0;
+
+    margin: 0;
+    padding: 0;
+
+    overflow: visible;
+}
+
+
+/*
+ * If workspace-shell is directly inside page-layout,
+ * it should consume the available width without
+ * introducing another flex offset.
+ */
+
+.page-layout > .workspace-shell {
+    flex: 1 1 auto;
+
+    margin-left: 0;
+    margin-right: 0;
+}
+
+
+/* =====================================================
+   WORKSPACE LAYOUT
+===================================================== */
+
+.workspace-layout {
+    position: relative;
+
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+
+    margin: 0;
+    padding: 0;
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        340px;
+
+    gap: 40px;
+
+    align-items: start;
+
+    overflow: visible;
+}
+
+
+/* =====================================================
+   WORKSPACE MAIN
+===================================================== */
+
+.workspace-main {
+    position: relative;
+
+    min-width: 0;
+    min-height: 0;
+
+    margin: 0;
+    padding: 0;
+
+    overflow: visible;
+}
+
+
+/* =====================================================
+   WORKSPACE SIDEBAR / GUIDE
+
+   The guide is contained within the workspace,
+   not floating over the section.
+===================================================== */
+
+.workspace-sidebar {
+    position: relative;
+
+    width: 100%;
+    min-width: 0;
+
+    margin: 0;
+    padding: 0;
+
+    overflow: visible;
+}
+
+.workspace-sidebar-inner {
+    position: relative;
+
+    width: 100%;
+    min-width: 0;
+
+    margin: 0;
+    padding: 0;
+
+    overflow: visible;
+}
+
+
+/* =====================================================
+   WORKSPACE HEADER
+
+   Gives the close animation room on both sides.
+===================================================== */
+
+.workspace-header {
+    position: relative;
+
+    width: 100%;
+    min-width: 0;
+
+    margin: 0;
+    padding: 0;
+
+    overflow: visible;
+}
+
+
+/* =====================================================
+   WORKSPACE HEADER HEADING
+
+   Close button + PROFILE
+===================================================== */
+
+.workspace-header-heading {
+    display: flex;
+    align-items: center;
+
+    min-width: 0;
+
+    /*
+     * This is the horizontal relationship between
+     * CLOSE and PROFILE.
+     */
+    gap: 14px;
+
+    overflow: visible;
+}
+
+
+/* =====================================================
+   CLOSE BUTTON
+
+   Animation is allowed outside the button bounds.
+===================================================== */
+
+.workspace-header-close {
+    position: relative;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    flex: 0 0 auto;
+
+    width: 54px;
+    height: 54px;
+
+    padding: 0;
+
+    border: none;
+    border-radius: 999px;
+
+    background: #2daa72;
+    color: #ffffff;
+
+    font-family: inherit;
+    font-size: 1.35rem;
+    font-weight: 400;
+
+    line-height: 1;
+
+    cursor: pointer;
+
+    overflow: visible;
+
+    transition:
+        background 0.2s ease,
+        transform 0.15s ease;
+}
+
+
+/* =====================================================
+   CLOSE BUTTON RADIAL PULSE
+
+   Sits outside the button rather than being clipped.
+===================================================== */
+
+.workspace-header-close::after {
+    content: "";
+
+    position: absolute;
+
+    inset: -5px;
+
+    border-radius: 999px;
+
+    border: 2px solid rgba(45, 170, 114, 0.22);
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    animation:
+        workspace-close-pulse 2.4s ease-out infinite;
+}
+
+
+/* =====================================================
+   CLOSE HOVER
+===================================================== */
+
+.workspace-header-close:hover {
+    background: #269b66;
+}
+
+.workspace-header-close:hover::after {
+    animation-duration: 1.8s;
+}
+
+
+/* =====================================================
+   CLOSE ACTIVE
+===================================================== */
+
+.workspace-header-close:active {
+    transform: scale(0.96);
+}
+
+
+/* =====================================================
+   CLOSE DISABLED
+===================================================== */
+
+.workspace-header-close:disabled {
+    opacity: 0.45;
+    cursor: default;
+    transform: none;
+}
+
+.workspace-header-close:disabled::after {
+    display: none;
+}
+
+
+/* =====================================================
+   CLOSE PULSE
+===================================================== */
+
+@keyframes workspace-close-pulse {
+
+    0% {
+        transform: scale(0.92);
+        opacity: 0.45;
+    }
+
+    65% {
+        transform: scale(1.12);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1.12);
+        opacity: 0;
+    }
+}
+
+
+/* =====================================================
+   REDUCED MOTION
+===================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .workspace-header-close,
+    .workspace-header-close::after,
+    .layout-sidebar,
+    .sidebar {
+        animation: none;
+        transition: none;
+    }
+}
+
 
 /* =====================================================
    FULL WIDTH / MAP MODE
 ===================================================== */
 
 .layout-content.full-width {
-  padding: 0;
+    padding: 0;
 }
 
 .layout-content.full-width .layout-inner {
-  max-width: none;
-  height: 100%;
+    width: 100%;
+    max-width: none;
+
+    height: 100%;
+
+    margin: 0;
+    padding: 0;
 }
 
 .full-height {
-  width: 100%;
-  height: 100%;
-  min-height: 0;
+    width: 100%;
+    height: 100%;
+
+    min-height: 0;
 }
+
 
 /* =====================================================
    OVERLAYS
 ===================================================== */
 
 .overlay-layer {
-  position: absolute;
-  inset: 0;
+    position: absolute;
 
-  width: 100%;
-  height: 100%;
+    inset: 0;
 
-  pointer-events: none;
+    width: 100%;
+    height: 100%;
+
+    pointer-events: none;
 }
 
 .overlay-layer > * {
-  pointer-events: auto;
+    pointer-events: auto;
 }
+
 
 /* =====================================================
    BASIC SIDEBAR FALLBACK LINKS
-   Used only if this dashboard renders static links
 ===================================================== */
 
 .sidebar-section {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+    display: flex;
+    flex-direction: column;
 
-  padding: 16px 10px;
+    gap: 6px;
+
+    padding: 16px 10px;
 }
 
 .sidebar-title {
-  padding: 0 6px;
-  margin-bottom: 6px;
+    padding: 0 6px;
+    margin-bottom: 6px;
 
-  color: #8a8178;
+    color: #8a8178;
 
-  font-size: 12px;
-  font-weight: 700;
+    font-size: 12px;
+    font-weight: 700;
 
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
 }
 
 .sidebar-link {
-  width: 100%;
+    width: 100%;
 
-  display: flex;
-  align-items: center;
-  gap: 10px;
+    display: flex;
+    align-items: center;
 
-  padding: 10px;
+    gap: 10px;
 
-  border: none;
-  border-radius: 10px;
+    padding: 10px;
 
-  background: transparent;
-  color: #4f4943;
+    border: none;
+    border-radius: 10px;
 
-  font: inherit;
-  font-size: 14px;
-  font-weight: 700;
+    background: transparent;
 
-  text-align: left;
-  cursor: pointer;
+    color: #4f4943;
+
+    font: inherit;
+    font-size: 14px;
+    font-weight: 700;
+
+    text-align: left;
+
+    cursor: pointer;
 }
 
 .sidebar-link:hover {
-  background: rgba(0, 0, 0, 0.04);
+    background: rgba(0, 0, 0, 0.04);
 }
 
 .sidebar-link span {
-  width: 18px;
-  display: inline-flex;
-  justify-content: center;
+    width: 18px;
+
+    display: inline-flex;
+    justify-content: center;
 }
 
 .sidebar-link strong {
-  min-width: 0;
+    min-width: 0;
 
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
+
 
 /* =====================================================
    RESPONSIVE
 ===================================================== */
 
 @media (max-width: 1100px) {
-  :root {
-    --sidebar-width: 220px;
-    --sidebar-width-min: 200px;
-  }
+
+    :root {
+        --sidebar-width: 220px;
+        --sidebar-width-min: 200px;
+    }
 }
+
 
 @media (max-width: 900px) {
-  .layout-sidebar,
-  .sidebar {
-    width: var(--sidebar-width-collapsed);
-    min-width: var(--sidebar-width-collapsed);
-  }
 
-  .sidebar-title,
-  .sidebar-link strong {
-    display: none;
-  }
+    .layout-sidebar,
+    .sidebar {
+        width: var(--sidebar-width-collapsed);
+        min-width: var(--sidebar-width-collapsed);
+    }
 
-  .sidebar-link {
-    justify-content: center;
-  }
+    .sidebar-title,
+    .sidebar-link strong {
+        display: none;
+    }
+
+    .sidebar-link {
+        justify-content: center;
+    }
+
+    .workspace-layout {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 24px;
+    }
 }
 
+
 @media (max-width: 768px) {
-  .cp-header {
-    min-height: 64px;
-    padding: 0 14px;
-  }
 
-  .cp-header-nav {
-    gap: 8px;
-  }
+    .cp-header {
+        min-height: 64px;
+        padding: 0 14px;
+    }
 
-  .layout-content {
-    padding: 0;
-  }
+    .cp-header-nav {
+        gap: 8px;
+    }
 
-  .page-layout {
-    flex-direction: column;
-  }
+    .layout-content {
+        padding: 0;
+    }
+
+    .page-layout {
+        flex-direction: column;
+    }
+
+    .workspace-layout {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
 }
