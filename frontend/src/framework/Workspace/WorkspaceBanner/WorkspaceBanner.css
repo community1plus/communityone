@@ -6,6 +6,8 @@
 
 .workspace-banner {
 
+    --workspace-right-inset: 32px;
+
     display: grid;
 
     grid-template-columns:
@@ -16,12 +18,11 @@
     align-items: center;
 
     width: 100%;
-
     min-width: 0;
 
     box-sizing: border-box;
 
-    padding-right: 32px;
+    padding-right: var(--workspace-right-inset);
 
 }
 
