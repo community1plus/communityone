@@ -9,9 +9,9 @@
     display: grid;
 
     grid-template-columns:
-        1fr
+        minmax(0, 1fr)
         auto
-        1fr;
+        minmax(0, 1fr);
 
     align-items: center;
 
@@ -20,6 +20,8 @@
     min-width: 0;
 
     box-sizing: border-box;
+
+    padding-right: 32px;
 
 }
 
@@ -65,9 +67,10 @@
     display: flex;
 
     align-items: center;
+
     justify-content: flex-end;
 
-    min-width: 72px;
+    min-width: 0;
 
 }
 
@@ -120,5 +123,39 @@
     line-height: 1;
 
     cursor: pointer;
+
+    animation:
+        workspace-close-pulse
+        3s
+        ease-in-out
+        infinite;
+
+}
+
+@keyframes workspace-close-pulse {
+
+    0% {
+
+        box-shadow:
+            0 0 0 0
+            rgba(46, 174, 125, 0);
+
+    }
+
+    50% {
+
+        box-shadow:
+            0 0 0 8px
+            rgba(46, 174, 125, 0.10);
+
+    }
+
+    100% {
+
+        box-shadow:
+            0 0 0 0
+            rgba(46, 174, 125, 0);
+
+    }
 
 }
