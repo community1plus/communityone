@@ -1,207 +1,506 @@
 /* =====================================================
-   WORKSPACE / SIDEBAR RELATIONSHIP
+   SIDEBAR
+   Community One / Community Plus
 ===================================================== */
 
 .layout-sidebar,
 .sidebar {
-    flex: 0 0 auto;
-    border-right: 1px solid var(--border-soft, #e6dfd8);
-}
-
-
-/* =====================================================
-   WORKSPACE CONTENT
-===================================================== */
-
-.layout-content {
-    position: relative;
-    flex: 1 1 auto;
-    min-width: 0;
+    width: clamp(220px, 14vw, 236px);
+    min-width: 220px;
+    height: 100%;
     min-height: 0;
 
-    padding-left: 24px;
-    padding-right: 0;
+    flex: 0 0 auto;
 
-    background: var(--content-bg, #f8f6f3);
+    display: flex;
+    flex-direction: column;
+
+    position: relative;
+
+    box-sizing: border-box;
+
+    padding: 14px 10px 18px;
+    gap: 18px;
+
+    background: #faf8f5;
 
     /*
-     * Important:
-     * allow the close-button glow/pulse to render
-     * without being clipped by the workspace itself.
+     * THE SIDEBAR OWNS THE WORKSPACE BOUNDARY.
      */
-    overflow: hidden;
+    border-right: 1px solid #e6dfd8;
+
+    /*
+     * Do not clip the outer sidebar boundary/effects.
+     */
+    overflow: visible;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Inter,
+        sans-serif;
+
+    transition:
+        width 0.22s ease,
+        min-width 0.22s ease,
+        background 0.22s ease;
 }
 
 
 /* =====================================================
-   WORKSPACE INNER
+   COLLAPSED
 ===================================================== */
 
-.layout-inner {
-    position: relative;
-    width: 100%;
-    min-width: 0;
+.layout-sidebar.collapsed,
+.sidebar.collapsed {
+    width: 72px;
+    min-width: 72px;
+}
+
+
+/* =====================================================
+   SIDEBAR MAIN
+===================================================== */
+
+.layout-sidebar .sidebar-main,
+.sidebar .sidebar-main {
+    flex: 1 1 auto;
+
     min-height: 0;
 
-    margin: 0;
-    padding: 0;
+    display: flex;
+    flex-direction: column;
 
-    overflow: visible;
+    gap: 18px;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    padding: 0 2px 0 0;
+}
+
+.layout-sidebar .sidebar-main::-webkit-scrollbar,
+.sidebar .sidebar-main::-webkit-scrollbar {
+    width: 5px;
+}
+
+.layout-sidebar .sidebar-main::-webkit-scrollbar-track,
+.sidebar .sidebar-main::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.layout-sidebar .sidebar-main::-webkit-scrollbar-thumb,
+.sidebar .sidebar-main::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.08);
+    border-radius: 999px;
 }
 
 
 /* =====================================================
-   WORKSPACE HEADER
+   SECTION
 ===================================================== */
 
-.workspace-header {
-    position: relative;
+.layout-sidebar .sidebar-section,
+.sidebar .sidebar-section {
+    display: flex;
+    flex-direction: column;
 
+    gap: 6px;
+
+    padding: 0 0 18px;
+
+    border-bottom: 1px solid #f1ebe5;
+}
+
+.layout-sidebar .sidebar-section:last-child,
+.sidebar .sidebar-section:last-child {
+    border-bottom: none;
+}
+
+
+/* =====================================================
+   SECTION TITLE
+===================================================== */
+
+.layout-sidebar .sidebar-title,
+.sidebar .sidebar-title {
+    padding: 0 10px;
+    margin: 0 0 6px;
+
+    color: #9a8f84;
+
+    font-size: 11px;
+    font-weight: 800;
+
+    line-height: 1.2;
+
+    letter-spacing: 0.12em;
+
+    text-transform: uppercase;
+
+    white-space: nowrap;
+
+    transition: color 0.18s ease;
+}
+
+.layout-sidebar .sidebar-section:hover .sidebar-title,
+.sidebar .sidebar-section:hover .sidebar-title {
+    color: #746a61;
+}
+
+.layout-sidebar.collapsed .sidebar-title,
+.sidebar.collapsed .sidebar-title {
+    display: none;
+}
+
+
+/* =====================================================
+   SIDEBAR LINK
+===================================================== */
+
+.layout-sidebar .sidebar-link,
+.sidebar .sidebar-link {
     width: 100%;
-    min-width: 0;
 
-    overflow: visible;
-}
-
-
-/* =====================================================
-   WORKSPACE HEADER HEADING
-===================================================== */
-
-.workspace-header-heading {
-    position: relative;
+    min-height: 40px;
 
     display: flex;
     align-items: center;
 
-    min-width: 0;
+    gap: 12px;
 
-    /*
-     * Creates deliberate visual separation from
-     * the sidebar boundary.
-     */
-    padding-left: 4px;
-
-    overflow: visible;
-}
-
-
-/* =====================================================
-   CLOSE BUTTON
-===================================================== */
-
-.workspace-header-close {
     position: relative;
-    z-index: 5;
 
-    flex: 0 0 auto;
+    box-sizing: border-box;
 
-    width: 56px;
-    height: 56px;
+    margin: 0;
 
-    margin-right: 4px;
-
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    padding: 0;
+    padding: 11px 12px;
 
     border: none;
-    border-radius: 50%;
+    border-radius: 12px;
 
-    background: #2daa72;
-    color: #ffffff;
+    outline: none;
+
+    background: transparent;
+
+    color: #5f564f;
 
     font-family: inherit;
-    font-size: 1.35rem;
-    font-weight: 400;
-    line-height: 1;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.2;
+
+    text-align: left;
 
     cursor: pointer;
 
-    overflow: visible;
+    appearance: none;
+    -webkit-appearance: none;
 
     transition:
-        background 0.2s ease,
-        transform 0.15s ease;
+        background 0.18s ease,
+        color 0.18s ease,
+        transform 0.12s ease,
+        box-shadow 0.18s ease;
 }
 
 
 /* =====================================================
-   CLOSE BUTTON PULSE
+   ICON
 ===================================================== */
 
-.workspace-header-close::before {
+.layout-sidebar .sidebar-link .icon,
+.sidebar .sidebar-link .icon {
+    width: 18px;
+    height: 18px;
+
+    flex: 0 0 18px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 16px;
+
+    line-height: 1;
+
+    opacity: 0.92;
+}
+
+
+/* =====================================================
+   LABEL
+===================================================== */
+
+.layout-sidebar .sidebar-link .label,
+.sidebar .sidebar-link .label {
+    min-width: 0;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+}
+
+.layout-sidebar.collapsed .sidebar-link .label,
+.sidebar.collapsed .sidebar-link .label {
+    display: none;
+}
+
+
+/* =====================================================
+   HOVER
+===================================================== */
+
+.layout-sidebar .sidebar-link:hover,
+.sidebar .sidebar-link:hover {
+    background: rgba(20, 20, 20, 0.035);
+
+    color: #2f2a27;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+
+/* =====================================================
+   ACTIVE
+===================================================== */
+
+.layout-sidebar .sidebar-link.active,
+.sidebar .sidebar-link.active {
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255, 255, 255, 0.9),
+            rgba(255, 255, 255, 0.72)
+        );
+
+    color: #1f1714;
+
+    font-weight: 750;
+
+    box-shadow:
+        0 1px 2px rgba(20, 20, 20, 0.04),
+        0 6px 14px rgba(20, 20, 20, 0.05);
+}
+
+
+/* =====================================================
+   ACTIVE INDICATOR
+===================================================== */
+
+.layout-sidebar .sidebar-link.active::before,
+.sidebar .sidebar-link.active::before {
     content: "";
 
     position: absolute;
-    inset: -7px;
 
-    border-radius: 50%;
+    left: -10px;
 
-    background: rgba(45, 170, 114, 0.10);
+    top: 10px;
+    bottom: 10px;
 
-    opacity: 0;
+    width: 3px;
 
-    transform: scale(0.92);
+    border-radius: 999px;
 
-    pointer-events: none;
-
-    animation: workspace-close-pulse 2.8s ease-out infinite;
-}
-
-
-@keyframes workspace-close-pulse {
-
-    0% {
-        opacity: 0;
-        transform: scale(0.92);
-    }
-
-    20% {
-        opacity: 0.65;
-    }
-
-    60% {
-        opacity: 0;
-        transform: scale(1.16);
-    }
-
-    100% {
-        opacity: 0;
-        transform: scale(1.16);
-    }
+    background: #4a0f0f;
 }
 
 
 /* =====================================================
-   CLOSE BUTTON STATES
+   ACTIVE ICON
 ===================================================== */
 
-.workspace-header-close:hover {
-    background: #269b66;
-}
-
-.workspace-header-close:active {
-    transform: scale(0.96);
-}
-
-.workspace-header-close:disabled {
-    opacity: 0.45;
-    cursor: default;
-    transform: none;
-}
-
-.workspace-header-close:disabled::before {
-    animation: none;
+.layout-sidebar .sidebar-link.active .icon,
+.sidebar .sidebar-link.active .icon {
+    opacity: 1;
 }
 
 
 /* =====================================================
-   PROFILE TITLE
+   PLATFORM
 ===================================================== */
 
-.workspace-header-title {
-    margin-left: 0;
+.layout-sidebar .sidebar-section.platform .sidebar-link,
+.sidebar .sidebar-section.platform .sidebar-link {
+    font-weight: 650;
+}
+
+
+/* =====================================================
+   LOGOUT
+===================================================== */
+
+.layout-sidebar .sidebar-link.logout,
+.sidebar .sidebar-link.logout {
+    color: #c43c2f;
+}
+
+.layout-sidebar .sidebar-link.logout:hover,
+.sidebar .sidebar-link.logout:hover {
+    background: rgba(217, 45, 32, 0.08);
+
+    color: #b42318;
+}
+
+
+/* =====================================================
+   GUEST LOCK
+===================================================== */
+
+.layout-sidebar .sidebar-link.guest-locked,
+.sidebar .sidebar-link.guest-locked {
+    opacity: 0.72;
+}
+
+
+/* =====================================================
+   LOCK
+===================================================== */
+
+.layout-sidebar .sidebar-link .lock,
+.sidebar .sidebar-link .lock {
+    margin-left: auto;
+
+    font-size: 0.8rem;
+
+    flex-shrink: 0;
+}
+
+
+/* =====================================================
+   ECHO BRAND
+===================================================== */
+
+.layout-sidebar .echo-brand,
+.sidebar .echo-brand {
+    display: flex;
+
+    justify-content: center;
+
+    margin-top: auto;
+
+    padding: 10px 0 4px;
+}
+
+
+/* =====================================================
+   ECHO BUTTON
+===================================================== */
+
+.layout-sidebar .echo-brand-button,
+.sidebar .echo-brand-button {
+    width: 40px;
+    height: 40px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    box-sizing: border-box;
+
+    padding: 0;
+
+    border: 1px solid rgba(141, 27, 27, 0.08);
+
+    border-radius: 999px;
+
+    overflow: hidden;
+
+    cursor: pointer;
+
+    background:
+        radial-gradient(
+            circle at 30% 30%,
+            #161616,
+            #050505
+        );
+
+    box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.16);
+
+    transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease,
+        filter 0.18s ease;
+}
+
+.layout-sidebar .echo-brand-button:hover,
+.sidebar .echo-brand-button:hover {
+    transform:
+        translateY(-1px)
+        scale(1.03);
+
+    box-shadow:
+        0 8px 18px rgba(141, 27, 27, 0.16);
+
+    filter: saturate(1.05);
+}
+
+
+/* =====================================================
+   ECHO IMAGE
+===================================================== */
+
+.layout-sidebar .echo-brand-image,
+.sidebar .echo-brand-image {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+}
+
+
+/* =====================================================
+   COLLAPSED LINKS
+===================================================== */
+
+.layout-sidebar.collapsed .sidebar-link,
+.sidebar.collapsed .sidebar-link {
+    justify-content: center;
+}
+
+.layout-sidebar.collapsed .sidebar-link .icon,
+.sidebar.collapsed .sidebar-link .icon {
+    margin: 0;
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 900px) {
+
+    .layout-sidebar,
+    .sidebar {
+        width: 72px;
+        min-width: 72px;
+    }
+
+    .layout-sidebar .sidebar-title,
+    .sidebar .sidebar-title,
+
+    .layout-sidebar .sidebar-link .label,
+    .sidebar .sidebar-link .label {
+        display: none;
+    }
+
+    .layout-sidebar .sidebar-link,
+    .sidebar .sidebar-link {
+        justify-content: center;
+    }
+
+    .layout-sidebar .echo-brand-button,
+    .sidebar .echo-brand-button {
+        width: 36px;
+        height: 36px;
+    }
 }
