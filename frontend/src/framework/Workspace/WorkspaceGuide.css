@@ -1,24 +1,371 @@
 /* ==========================================================
-   WORKSPACE LAYOUT
+   WORKSPACE HEADER CLOSE
    ========================================================== */
 
-.workspace-layout {
+.workspace-header-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 
-    display: grid;
+    width: 54px;
+    height: 54px;
 
-    grid-template-columns:
-        minmax(0, 1fr)
-        340px;
+    flex: 0 0 54px;
 
-    gap: 40px;
+    padding: 0;
+    margin: 0 12px 0 0;
+
+    border: none;
+    border-radius: 999px;
+
+    background: #2daa72;
+    color: #ffffff;
+
+    font-family: inherit;
+    font-size: 1.35rem;
+    font-weight: 400;
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        transform 0.15s ease;
+
+    animation:
+        workspace-close-pulse 3s ease-in-out infinite;
+}
+
+
+/* ==========================================================
+   CLOSE BUTTON PULSE
+   ========================================================== */
+
+@keyframes workspace-close-pulse {
+
+    0%,
+    100% {
+        box-shadow: 0 0 0 0 rgba(45, 170, 114, 0);
+    }
+
+    50% {
+        box-shadow: 0 0 0 5px rgba(45, 170, 114, 0.10);
+    }
+}
+
+
+.workspace-header-close:hover {
+    background: #269b66;
+    animation: none;
+}
+
+
+.workspace-header-close:active {
+    transform: scale(0.96);
+}
+
+
+.workspace-header-close:disabled {
+    opacity: 0.45;
+    cursor: default;
+    transform: none;
+    animation: none;
+}
+
+
+/* ==========================================================
+   WORKSPACE HEADER
+   ========================================================== */
+
+.workspace-header {
+    display: flex;
+    align-items: center;
 
     width: 100%;
     min-width: 0;
 
-    align-items: start;
+    box-sizing: border-box;
+}
+
+
+/* ==========================================================
+   WORKSPACE HEADER HEADING
+   ========================================================== */
+
+.workspace-header-heading {
+    display: flex;
+    align-items: center;
+
+    min-width: 0;
+}
+
+
+/* ==========================================================
+   WORKSPACE HEADER TITLE
+   ========================================================== */
+
+.workspace-header-title {
+    margin: 0;
+
+    font-size: 3.1rem;
+    font-weight: 700;
+    line-height: 1;
+
+    color: var(--text-primary, #111111);
+}
+
+
+/* ==========================================================
+   WORKSPACE SECTION
+   ========================================================== */
+
+.workspace-section {
+    display: block;
+    position: relative;
+
+    width: 100%;
+    min-width: 0;
+
+    margin: 0;
+    padding: 0;
 
     box-sizing: border-box;
 
+    overflow: visible;
+}
+
+
+/* ==========================================================
+   SECTION HEADER
+   ========================================================== */
+
+.workspace-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    width: 100%;
+    min-width: 0;
+    min-height: 68px;
+
+    margin: 0;
+    padding: 0;
+
+    box-sizing: border-box;
+
+    border-bottom:
+        1px solid
+        var(--border-color, #e8e8e8);
+}
+
+
+/* ==========================================================
+   SECTION HEADING
+   ========================================================== */
+
+.workspace-section-heading {
+    display: flex;
+    align-items: center;
+
+    min-width: 0;
+
+    gap: 14px;
+}
+
+
+/* ==========================================================
+   SECTION TITLE
+   ========================================================== */
+
+.workspace-section-title {
+    margin: 0;
+
+    font-size: 1.35rem;
+    font-weight: 600;
+    line-height: 1.2;
+
+    color: var(--text-primary, #111111);
+}
+
+
+/* ==========================================================
+   SECTION COMPLETION
+   ========================================================== */
+
+.workspace-section-completion {
+    display: inline-flex;
+    align-items: center;
+
+    gap: 10px;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+
+    color: #c8102e;
+}
+
+
+/* ==========================================================
+   SECTION ACTIONS
+   ========================================================== */
+
+.workspace-section-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    gap: 16px;
+
+    margin-left: auto;
+    padding: 0;
+
+    flex-shrink: 0;
+}
+
+
+/* ==========================================================
+   SECTION ACTION
+   ========================================================== */
+
+.workspace-section-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 6px;
+
+    border: 0;
+    background: transparent;
+
+    padding: 0;
+    margin: 0;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1;
+
+    color: var(--text-primary, #111111);
+
+    cursor: pointer;
+
+    white-space: nowrap;
+}
+
+
+/* ==========================================================
+   ACTION ICON
+   ========================================================== */
+
+.workspace-section-action-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    font-family: inherit;
+    font-size: 13px;
+    line-height: 1;
+}
+
+
+/* ==========================================================
+   ACTION LABEL
+   ========================================================== */
+
+.workspace-section-action-label {
+    display: inline-block;
+
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+
+    line-height: 1;
+}
+
+
+/* ==========================================================
+   PRIMARY ACTION
+   ========================================================== */
+
+.workspace-section-action.primary {
+    color: #c8102e;
+}
+
+
+/* ==========================================================
+   DISABLED ACTION
+   ========================================================== */
+
+.workspace-section-action:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+
+/* ==========================================================
+   ACTION HOVER
+   ========================================================== */
+
+.workspace-section-action:not(:disabled):hover {
+    opacity: 0.65;
+}
+
+
+/* ==========================================================
+   SECTION BODY
+   ========================================================== */
+
+.workspace-section-body {
+    width: 100%;
+    min-width: 0;
+
+    margin: 0;
+    padding: 0;
+
+    box-sizing: border-box;
+}
+
+
+/* ==========================================================
+   IDENTITY CAPABILITY SELECTOR
+   ========================================================== */
+
+.identity-capability-selector {
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 2;
+
+    pointer-events: auto;
+}
+
+
+/* ==========================================================
+   WORKSPACE LAYOUT
+   ========================================================== */
+
+.workspace-layout {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        460px;
+
+    gap: 0;
+
+    width: 100%;
+    min-width: 0;
+
+    box-sizing: border-box;
 }
 
 
@@ -27,14 +374,11 @@
    ========================================================== */
 
 .workspace-main {
-
-    position: relative;
-
-    width: 100%;
     min-width: 0;
 
-    box-sizing: border-box;
+    overflow: hidden;
 
+    box-sizing: border-box;
 }
 
 
@@ -43,20 +387,14 @@
    ========================================================== */
 
 .workspace-sidebar {
+    position: relative;
 
-    position: sticky;
-
-    top: 32px;
-
-    align-self: start;
-
-    width: 100%;
     min-width: 0;
+    min-height: 0;
+
+    overflow: hidden;
 
     box-sizing: border-box;
-
-    z-index: 1;
-
 }
 
 
@@ -65,12 +403,129 @@
    ========================================================== */
 
 .workspace-sidebar-inner {
+    width: 100%;
+    height: 100%;
 
+    min-width: 0;
+    min-height: 0;
+
+    overflow: hidden;
+
+    box-sizing: border-box;
+}
+
+
+/* ==========================================================
+   WORKSPACE GUIDE
+   ========================================================== */
+
+/*
+   The guide is a structural workspace region.
+   It is NOT a floating card.
+*/
+
+.workspace-guide {
     position: relative;
 
     width: 100%;
     min-width: 0;
 
+    margin: 0;
+    padding: 0;
+
     box-sizing: border-box;
 
+    overflow: hidden;
+
+    border: none;
+    border-radius: 0;
+
+    background: transparent;
+
+    box-shadow: none;
+}
+
+
+/* ==========================================================
+   GUIDE CONTENT
+   ========================================================== */
+
+.workspace-guide-content {
+    width: 100%;
+    min-width: 0;
+
+    margin: 0;
+    padding: 0;
+
+    box-sizing: border-box;
+
+    overflow: hidden;
+}
+
+
+/* ==========================================================
+   GUIDE HEADER
+   ========================================================== */
+
+.workspace-guide-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    width: 100%;
+    min-width: 0;
+
+    margin: 0;
+    padding: 0;
+
+    box-sizing: border-box;
+}
+
+
+/* ==========================================================
+   GUIDE BODY
+   ========================================================== */
+
+.workspace-guide-body {
+    width: 100%;
+    min-width: 0;
+
+    margin: 0;
+    padding: 0;
+
+    box-sizing: border-box;
+
+    overflow: hidden;
+}
+
+
+/* ==========================================================
+   PROGRESS RING ANCHOR
+   ========================================================== */
+
+/*
+   Keep the progress ring on the same horizontal
+   alignment system as the section actions.
+*/
+
+.workspace-header-progress {
+    margin-left: auto;
+
+    flex: 0 0 auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+
+/* ==========================================================
+   REDUCED MOTION
+   ========================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .workspace-header-close {
+        animation: none;
+    }
 }
