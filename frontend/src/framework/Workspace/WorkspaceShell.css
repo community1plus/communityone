@@ -1,110 +1,529 @@
-/* ==========================================================
-   WORKSPACE SHELL
-   ========================================================== */
+/* =========================================================
+   WORKSPACE
+   ========================================================= */
 
 .workspace-shell {
-
     width: 100%;
-
     min-width: 0;
-    min-height: 0;
-
     box-sizing: border-box;
-
 }
 
 
-/* ==========================================================
+/* =========================================================
    WORKSPACE LAYOUT
-   ========================================================== */
+   MAIN CONTENT + GUIDE
+   ========================================================= */
 
 .workspace-layout {
-
     display: grid;
-
-    grid-template-columns:
-        minmax(0, 1fr)
-        380px;
-
-    gap: 0;
-
+    grid-template-columns: minmax(0, 1fr) 400px;
+    column-gap: 0;
     width: 100%;
-
     min-width: 0;
-
     box-sizing: border-box;
-
 }
 
 
-/* ==========================================================
-   WORKSPACE MAIN
-   ========================================================== */
+/* =========================================================
+   MAIN WORKSPACE
+   ========================================================= */
 
 .workspace-main {
-
     min-width: 0;
-
+    width: 100%;
     box-sizing: border-box;
-
+    overflow: visible;
 }
 
 
-/* ==========================================================
-   WORKSPACE CONTENT
-   ========================================================== */
-
-.workspace-content {
-
-    min-width: 0;
-
-    box-sizing: border-box;
-
-}
-
-
-/* ==========================================================
-   WORKSPACE SIDEBAR
-   ========================================================== */
+/* =========================================================
+   WORKSPACE SIDEBAR / GUIDE
+   ========================================================= */
 
 .workspace-sidebar {
-
-    min-width: 0;
-
+    position: relative;
     width: 100%;
-
+    min-width: 0;
+    height: 100%;
     box-sizing: border-box;
-
+    padding: 0;
+    margin: 0;
+    overflow: visible;
 }
 
 
-/* ==========================================================
-   WORKSPACE SIDEBAR INNER
-   ========================================================== */
+/* =========================================================
+   GUIDE INNER
+   ========================================================= */
 
 .workspace-sidebar-inner {
+    position: sticky;
+    top: 24px;
 
     width: 100%;
-
     min-width: 0;
 
     box-sizing: border-box;
 
+    margin: 0;
+    padding: 0;
+
+    overflow: visible;
 }
 
 
-/* ==========================================================
+/* =========================================================
+   GUIDE
+   No rounded container / no floating card
+   ========================================================= */
+
+.workspace-guide {
+    position: relative;
+
+    width: 100%;
+    min-width: 0;
+
+    margin: 0;
+    padding: 0;
+
+    box-sizing: border-box;
+
+    background: transparent;
+
+    border: 0;
+    border-radius: 0;
+
+    box-shadow: none;
+
+    overflow: visible;
+}
+
+
+/* =========================================================
+   GUIDE HEADER
+   ========================================================= */
+
+.workspace-guide-header {
+    width: 100%;
+    min-height: 68px;
+
+    margin: 0;
+    padding: 0;
+
+    box-sizing: border-box;
+
+    border-bottom: 1px solid
+        var(--border-color, #e8e8e8);
+
+    display: flex;
+    align-items: center;
+}
+
+
+/* =========================================================
+   GUIDE BODY
+   ========================================================= */
+
+.workspace-guide-body {
+    width: 100%;
+    min-width: 0;
+
+    margin: 0;
+    padding: 24px 0;
+
+    box-sizing: border-box;
+
+    overflow: visible;
+}
+
+
+/* =========================================================
+   GUIDE ACTIONS
+   ========================================================= */
+
+.workspace-guide-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    width: 100%;
+
+    margin: 0;
+    padding: 0;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   SECTION
+   ========================================================= */
+
+.workspace-section {
+    display: block;
+    position: relative;
+
+    width: 100%;
+    min-width: 0;
+
+    margin: 0;
+    padding: 0;
+
+    box-sizing: border-box;
+
+    overflow: visible;
+}
+
+
+/* =========================================================
+   SECTION HEADER
+   ========================================================= */
+
+.workspace-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    width: 100%;
+    min-width: 0;
+    min-height: 68px;
+
+    margin: 0;
+    padding: 0;
+
+    box-sizing: border-box;
+
+    border-bottom: 1px solid
+        var(--border-color, #e8e8e8);
+}
+
+
+/* =========================================================
+   SECTION HEADING
+   ========================================================= */
+
+.workspace-section-heading {
+    display: flex;
+    align-items: center;
+
+    min-width: 0;
+
+    gap: 20px;
+}
+
+
+/* =========================================================
+   SECTION TITLE
+   ========================================================= */
+
+.workspace-section-title {
+    margin: 0;
+
+    font-size: 1.35rem;
+    font-weight: 600;
+    line-height: 1.2;
+
+    color: var(--text-primary, #111);
+}
+
+
+/* =========================================================
+   SECTION PROGRESS
+   ========================================================= */
+
+.workspace-section-completion {
+    font-weight: 700;
+    color: #c8102e;
+}
+
+
+/* =========================================================
+   SECTION ACTIONS
+   ========================================================= */
+
+.workspace-section-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    gap: 14px;
+
+    flex-shrink: 0;
+
+    margin-left: auto;
+
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+}
+
+
+/* =========================================================
+   SECTION ACTION
+   ========================================================= */
+
+.workspace-section-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 5px;
+
+    border: 0;
+    background: transparent;
+
+    padding: 0;
+    margin: 0;
+
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1;
+
+    color: var(--text-primary, #111);
+
+    cursor: pointer;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   ACTION ICON
+   ========================================================= */
+
+.workspace-section-action-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    line-height: 1;
+}
+
+
+/* =========================================================
+   ACTION LABEL
+   ========================================================= */
+
+.workspace-section-action-label {
+    display: inline-block;
+
+    line-height: 1;
+}
+
+
+/* =========================================================
+   PRIMARY ACTION
+   ========================================================= */
+
+.workspace-section-action.primary {
+    color: #c8102e;
+}
+
+
+/* =========================================================
+   DISABLED ACTION
+   ========================================================= */
+
+.workspace-section-action:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+
+/* =========================================================
+   ACTION HOVER
+   ========================================================= */
+
+.workspace-section-action:not(:disabled):hover {
+    opacity: 0.7;
+}
+
+
+/* =========================================================
+   SECTION BODY
+   ========================================================= */
+
+.workspace-section-body {
+    width: 100%;
+    min-width: 0;
+
+    margin: 0;
+    padding: 0;
+
+    box-sizing: border-box;
+
+    overflow: visible;
+}
+
+
+/* =========================================================
+   WORKSPACE HEADER CLOSE
+   ========================================================= */
+
+.workspace-header-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 54px;
+    height: 54px;
+
+    padding: 0;
+    margin: 0;
+
+    border: none;
+    border-radius: 999px;
+
+    background: #2daa72;
+    color: #ffffff;
+
+    font-family: inherit;
+    font-size: 1.35rem;
+    font-weight: 400;
+    line-height: 1;
+
+    cursor: pointer;
+
+    flex-shrink: 0;
+
+    transition:
+        background .2s ease,
+        transform .15s ease,
+        box-shadow .2s ease;
+
+    animation: workspace-close-pulse 3s ease-in-out infinite;
+}
+
+
+/* =========================================================
+   CLOSE HOVER
+   ========================================================= */
+
+.workspace-header-close:hover {
+    background: #269b66;
+
+    animation-play-state: paused;
+
+    transform: scale(1.03);
+}
+
+
+/* =========================================================
+   CLOSE ACTIVE
+   ========================================================= */
+
+.workspace-header-close:active {
+    transform: scale(.96);
+}
+
+
+/* =========================================================
+   CLOSE DISABLED
+   ========================================================= */
+
+.workspace-header-close:disabled {
+    opacity: .45;
+
+    cursor: default;
+
+    transform: none;
+
+    animation: none;
+}
+
+
+/* =========================================================
+   CLOSE PULSE
+   ========================================================= */
+
+@keyframes workspace-close-pulse {
+
+    0%,
+    100% {
+        box-shadow:
+            0 0 0 0 rgba(45, 170, 114, 0);
+    }
+
+    50% {
+        box-shadow:
+            0 0 0 7px rgba(45, 170, 114, 0.10);
+    }
+}
+
+
+/* =========================================================
+   PROFILE / CAPABILITY SELECTOR
+   ========================================================= */
+
+.identity-capability-selector {
+    position: absolute;
+
+    left: 50%;
+    top: 50%;
+
+    transform: translate(-50%, -50%);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 2;
+}
+
+
+/* =========================================================
+   PROGRESS RING ALIGNMENT
+   ========================================================= */
+
+.workspace-progress {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    width: 100%;
+    min-width: 0;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   GUIDE CONTENT
+   ========================================================= */
+
+.workspace-guide h1,
+.workspace-guide h2,
+.workspace-guide h3,
+.workspace-guide p,
+.workspace-guide span,
+.workspace-guide button {
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+}
+
+
+/* =========================================================
    RESPONSIVE
-   ========================================================== */
+   ========================================================= */
 
 @media (max-width: 1100px) {
 
     .workspace-layout {
-
-        grid-template-columns:
-            minmax(0, 1fr)
-            320px;
-
+        grid-template-columns: minmax(0, 1fr) 340px;
     }
 
 }
@@ -113,15 +532,16 @@
 @media (max-width: 900px) {
 
     .workspace-layout {
-
         grid-template-columns: 1fr;
-
     }
 
     .workspace-sidebar {
+        margin-top: 32px;
+    }
 
-        width: 100%;
-
+    .workspace-sidebar-inner {
+        position: relative;
+        top: auto;
     }
 
 }
