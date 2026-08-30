@@ -29,7 +29,7 @@
      */
     border-radius: 48px;
 
-    overflow: hidden;
+    overflow: visible;
 
 }
 
@@ -241,7 +241,7 @@
      * Allows visual effects to extend beyond the button
      * without affecting the layout.
      */
-    overflow: hidden;
+    overflow: visible;
 
     transition:
         background .2s ease,
