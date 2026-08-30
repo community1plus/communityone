@@ -114,8 +114,8 @@ body {
    sidebar and workspace.
 ===================================================== */
 
-.layout-sidebar,
-.sidebar {
+.layout-sidebar
+{
   width: clamp(
     var(--sidebar-width-min),
     14vw,
