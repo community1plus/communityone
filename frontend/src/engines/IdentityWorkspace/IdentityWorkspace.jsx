@@ -12,7 +12,6 @@ import {
     WorkspaceShell,
     WorkspaceMain,
     WorkspaceContent,
-    WorkspaceSidebar,
 
     WorkspaceRegionHeader,
     WorkspaceHeaderActions,
@@ -168,121 +167,134 @@ export default function IdentityWorkspace({
                MAIN
             ================================= */}
 
-            <WorkspaceMain>
+<WorkspaceMain>
+
+    <WorkspaceContent>
+
+        {/* =================================
+           WORKSPACE HEADER
+        ================================= */}
+
+        <WorkspaceRegionHeader>
+
+            <WorkspaceBanner
+
+                model={banner}
+
+                left={
+
+                    headerAction
+
+                }
+
+                center={
+
+                    <IdentityCapabilitySelector
+
+                        values={values}
+
+                        setValue={
+                            form.setValue
+                        }
+
+                        readOnly={false}
+
+                    />
+
+                }
+
+            />
+
+            <WorkspaceNavigation
+
+                model={navigation}
+
+            />
+
+        </WorkspaceRegionHeader>
 
 
-                {/* =================================
-                   PRIMARY CONTENT
-                ================================= */}
+        {/* =================================
+           WORKSPACE BODY
+        ================================= */}
 
-                <WorkspaceContent>
+        <WorkspaceBody>
 
+            {section && (
 
-                    {/* =================================
-                       WORKSPACE HEADER
-                    ================================= */}
+                <WorkspaceSection
 
-                    <WorkspaceRegionHeader>
+                    model={section}
 
+                    actions={actions}
 
-                        <WorkspaceBanner
+                >
 
-                            model={banner}
+                    <div
+                        className="workspace-section-content"
+                    >
 
-                            left={
+                        <CapabilityRenderer
 
-                                headerAction
+                            section={section}
 
-                            }
+                            form={form}
 
-                            center={
-
-                                <IdentityCapabilitySelector
-
-                                    values={values}
-
-                                    setValue={
-                                        form.setValue
-                                    }
-
-                                    readOnly={false}
-
-                                />
-
-                            }
-
-                            right={
-
-                                banner
-                                    ?.right
-                                    ?.metric
-                                    ?.value
-                                ?? 0
-
-                            }
+                            editing={editing}
 
                         />
 
+                    </div>
 
-                        {/* =================================
-                           NAVIGATION
-                        ================================= */}
+                </WorkspaceSection>
 
-                        <WorkspaceNavigation
+            )}
 
-                            model={navigation}
-
-                        />
+        </WorkspaceBody>
 
 
-                    </WorkspaceRegionHeader>
+        {/* =================================
+           WORKSPACE GUIDE
+        ================================= */}
+
+        <WorkspaceGuide
+            title="IDENTITY GUIDE"
+        >
+
+            <WorkspacePanel
+                title="Welcome"
+            >
+
+                Manage your trusted identity.
+
+            </WorkspacePanel>
 
 
-                    {/* =================================
-                       WORKSPACE BODY
-                    ================================= */}
+            <WorkspacePanel
+                title="Profile Completion"
+            >
 
-                    <WorkspaceBody>
+                {completion}%
 
-                        {section && (
-
-                            <WorkspaceSection
-
-                                model={section}
-
-                                actions={actions}
-
-                            >
-
-                                <div
-                                    className={
-                                        "workspace-section-content"
-                                    }
-                                >
-
-                                    <CapabilityRenderer
-
-                                        section={section}
-
-                                        form={form}
-
-                                        editing={editing}
-
-                                    />
-
-                                </div>
-
-                            </WorkspaceSection>
-
-                        )}
-
-                    </WorkspaceBody>
+            </WorkspacePanel>
 
 
-                </WorkspaceContent>
+            <WorkspacePanel
+                title="Current Section"
+            >
 
+                {
+                    section?.title
+                    ?? ""
+                }
 
-            </WorkspaceMain>
+            </WorkspacePanel>
+
+        </WorkspaceGuide>
+
+    </WorkspaceContent>
+
+</WorkspaceMain>
 
 
             {/* =================================
