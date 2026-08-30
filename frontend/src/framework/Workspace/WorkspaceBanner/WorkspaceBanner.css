@@ -4,9 +4,18 @@
    WORKSPACE BANNER
    ========================================================== */
 
+
+/* ==========================================================
+   BANNER
+   ========================================================== */
+
 .workspace-banner {
 
     --workspace-right-inset: 32px;
+    --workspace-left-inset: 12px;
+
+    width: 100%;
+    min-width: 0;
 
     display: grid;
 
@@ -17,13 +26,15 @@
 
     align-items: center;
 
-    width: 100%;
-    min-width: 0;
-
     box-sizing: border-box;
 
-    padding-right: var(--workspace-right-inset);
+    padding-left:
+        var(--workspace-left-inset);
 
+    padding-right:
+        var(--workspace-right-inset);
+
+    overflow: visible;
 }
 
 
@@ -33,13 +44,13 @@
 
 .workspace-banner-left {
 
-    display: flex;
+    min-width: 0;
 
+    display: flex;
     align-items: center;
     justify-content: flex-start;
 
-    min-width: 0;
-
+    overflow: visible;
 }
 
 
@@ -49,13 +60,13 @@
 
 .workspace-banner-center {
 
-    display: flex;
+    min-width: 0;
 
+    display: flex;
     align-items: center;
     justify-content: center;
 
-    min-width: 0;
-
+    overflow: visible;
 }
 
 
@@ -65,14 +76,13 @@
 
 .workspace-banner-right {
 
-    display: flex;
-
-    align-items: center;
-
-    justify-content: flex-end;
-
     min-width: 0;
 
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    overflow: visible;
 }
 
 
@@ -83,11 +93,15 @@
 .workspace-header-actions {
 
     display: flex;
-
     align-items: center;
+
+    flex: 0 0 auto;
 
     gap: 12px;
 
+    margin-right: 12px;
+
+    overflow: visible;
 }
 
 
@@ -97,33 +111,41 @@
 
 .workspace-header-action {
 
-    width: 44px;
-    height: 44px;
+    position: relative;
+
+    width: 48px;
+    height: 48px;
+
+    flex: 0 0 48px;
 
     display: inline-flex;
 
     align-items: center;
     justify-content: center;
 
+    box-sizing: border-box;
+
     padding: 0;
 
     border: none;
-
     border-radius: 50%;
 
-    background: #2eae7d;
+    background:
+        #2eae7d;
 
-    color: #ffffff;
+    color:
+        #ffffff;
 
     font-family: inherit;
-
     font-size: 1rem;
-
     font-weight: 400;
-
     line-height: 1;
 
     cursor: pointer;
+
+    overflow: visible;
+
+    z-index: 2;
 
     animation:
         workspace-close-pulse
@@ -131,7 +153,56 @@
         ease-in-out
         infinite;
 
+    transition:
+        background .18s ease,
+        transform .18s ease;
 }
+
+
+/* ==========================================================
+   HEADER ACTION HOVER
+   ========================================================== */
+
+.workspace-header-action:hover {
+
+    background:
+        #269f70;
+
+    transform:
+        scale(1.02);
+}
+
+
+/* ==========================================================
+   HEADER ACTION ACTIVE
+   ========================================================== */
+
+.workspace-header-action:active {
+
+    transform:
+        scale(.97);
+}
+
+
+/* ==========================================================
+   HEADER ACTION DISABLED
+   ========================================================== */
+
+.workspace-header-action:disabled {
+
+    opacity: .45;
+
+    cursor: default;
+
+    animation: none;
+
+    transform: none;
+}
+
+
+/* ==========================================================
+   CLOSE PULSE
+   ========================================================== */
 
 @keyframes workspace-close-pulse {
 
@@ -147,7 +218,7 @@
 
         box-shadow:
             0 0 0 8px
-            rgba(46, 174, 125, 0.10);
+            rgba(46, 174, 125, .10);
 
     }
 

@@ -1,477 +1,32 @@
 /* ==========================================================
-   WORKSPACE HEADER CLOSE
-   ========================================================== */
-
-/* ==========================================================
-   WORKSPACE HEADER CLOSE ACTION
-   ========================================================== */
-
-.workspace-header-close {
-
-    width: 48px;
-    height: 48px;
-
-    flex: 0 0 48px;
-
-    display: inline-flex;
-
-    align-items: center;
-    justify-content: center;
-
-    margin: 0 12px 0 0;
-    padding: 0;
-
-    border: none;
-    border-radius: 50%;
-
-    background: #2daa72;
-
-    color: #ffffff;
-
-    font-family: inherit;
-    font-size: 1.2rem;
-    font-weight: 400;
-    line-height: 1;
-
-    cursor: pointer;
-
-    overflow: visible;
-
-    position: relative;
-
-    z-index: 1;
-
-    transition:
-        background .2s ease,
-        transform .15s ease;
-
-}
-
-
-/* ==========================================================
-   CLOSE BUTTON PULSE
-   ========================================================== */
-
-@keyframes workspace-close-pulse {
-
-    0%,
-    100% {
-        box-shadow: 0 0 0 0 rgba(45, 170, 114, 0);
-    }
-
-    50% {
-        box-shadow: 0 0 0 5px rgba(45, 170, 114, 0.10);
-    }
-}
-
-
-.workspace-header-close:hover {
-    background: #269b66;
-    animation: none;
-}
-
-
-.workspace-header-close:active {
-    transform: scale(0.96);
-}
-
-
-.workspace-header-close:disabled {
-    opacity: 0.45;
-    cursor: default;
-    transform: none;
-    animation: none;
-}
-
-
-/* ==========================================================
-   WORKSPACE HEADER
-   ========================================================== */
-
-.workspace-header {
-    display: flex;
-    align-items: center;
-
-    width: 100%;
-    min-width: 0;
-
-    box-sizing: border-box;
-}
-
-
-/* ==========================================================
-   WORKSPACE HEADER HEADING
-   ========================================================== */
-
-.workspace-header-heading {
-    display: flex;
-    align-items: center;
-
-    min-width: 0;
-}
-
-
-/* ==========================================================
-   WORKSPACE HEADER TITLE
-   ========================================================== */
-
-.workspace-header-title {
-    margin: 0;
-
-    font-size: 3.1rem;
-    font-weight: 700;
-    line-height: 1;
-
-    color: var(--text-primary, #111111);
-}
-
-
-/* ==========================================================
-   WORKSPACE SECTION
-   ========================================================== */
-
-.workspace-section {
-    display: block;
-    position: relative;
-
-    width: 100%;
-    min-width: 0;
-
-    margin: 0;
-    padding: 0;
-
-    box-sizing: border-box;
-
-    overflow: visible;
-}
-
-
-/* ==========================================================
-   SECTION HEADER
-   ========================================================== */
-
-.workspace-section-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    width: 100%;
-    min-width: 0;
-    min-height: 68px;
-
-    margin: 0;
-    padding: 0;
-
-    box-sizing: border-box;
-
-    border-bottom:
-        1px solid
-        var(--border-color, #e8e8e8);
-}
-
-
-/* ==========================================================
-   SECTION HEADING
-   ========================================================== */
-
-.workspace-section-heading {
-    display: flex;
-    align-items: center;
-
-    min-width: 0;
-
-    gap: 14px;
-}
-
-
-/* ==========================================================
-   SECTION TITLE
-   ========================================================== */
-
-.workspace-section-title {
-    margin: 0;
-
-    font-size: 1.35rem;
-    font-weight: 600;
-    line-height: 1.2;
-
-    color: var(--text-primary, #111111);
-}
-
-
-/* ==========================================================
-   SECTION COMPLETION
-   ========================================================== */
-
-.workspace-section-completion {
-    display: inline-flex;
-    align-items: center;
-
-    gap: 10px;
-
-    font-family: inherit;
-    font-size: 14px;
-    font-weight: 600;
-
-    color: #c8102e;
-}
-
-
-/* ==========================================================
-   SECTION ACTIONS
-   ========================================================== */
-
-.workspace-section-actions {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-
-    gap: 16px;
-
-    margin-left: auto;
-    padding: 0;
-
-    flex-shrink: 0;
-}
-
-
-/* ==========================================================
-   SECTION ACTION
-   ========================================================== */
-
-.workspace-section-action {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    gap: 6px;
-
-    border: 0;
-    background: transparent;
-
-    padding: 0;
-    margin: 0;
-
-    font-family: inherit;
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 1;
-
-    color: var(--text-primary, #111111);
-
-    cursor: pointer;
-
-    white-space: nowrap;
-}
-
-
-/* ==========================================================
-   ACTION ICON
-   ========================================================== */
-
-.workspace-section-action-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    font-family: inherit;
-    font-size: 13px;
-    line-height: 1;
-}
-
-
-/* ==========================================================
-   ACTION LABEL
-   ========================================================== */
-
-.workspace-section-action-label {
-    display: inline-block;
-
-    font-family: inherit;
-    font-size: inherit;
-    font-weight: inherit;
-
-    line-height: 1;
-}
-
-
-/* ==========================================================
-   PRIMARY ACTION
-   ========================================================== */
-
-.workspace-section-action.primary {
-    color: #c8102e;
-}
-
-
-/* ==========================================================
-   DISABLED ACTION
-   ========================================================== */
-
-.workspace-section-action:disabled {
-    opacity: 0.45;
-    cursor: not-allowed;
-}
-
-
-/* ==========================================================
-   ACTION HOVER
-   ========================================================== */
-
-.workspace-section-action:not(:disabled):hover {
-    opacity: 0.65;
-}
-
-
-/* ==========================================================
-   SECTION BODY
-   ========================================================== */
-
-.workspace-section-body {
-    width: 100%;
-    min-width: 0;
-
-    margin: 0;
-    padding: 0;
-
-    box-sizing: border-box;
-}
-
-
-/* ==========================================================
-   IDENTITY CAPABILITY SELECTOR
-   ========================================================== */
-
-.identity-capability-selector {
-    position: absolute;
-
-    top: 50%;
-    left: 50%;
-
-    transform: translate(-50%, -50%);
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    z-index: 2;
-
-    pointer-events: auto;
-}
-
-
-/* ==========================================================
-   WORKSPACE LAYOUT
-   ========================================================== */
-
-.workspace-layout {
-    display: grid;
-
-    grid-template-columns:
-        minmax(0, 1fr)
-        460px;
-
-    gap: 0;
-
-    width: 100%;
-    min-width: 0;
-
-    box-sizing: border-box;
-}
-
-
-/* ==========================================================
-   WORKSPACE MAIN
-   ========================================================== */
-
-.workspace-main {
-    min-width: 0;
-
-    overflow: hidden;
-
-    box-sizing: border-box;
-}
-
-
-/* ==========================================================
-   WORKSPACE SIDEBAR
-   ========================================================== */
-
-.workspace-sidebar {
-    position: relative;
-
-    min-width: 0;
-    min-height: 0;
-
-    overflow: hidden;
-
-    box-sizing: border-box;
-}
-
-
-/* ==========================================================
-   WORKSPACE SIDEBAR INNER
-   ========================================================== */
-
-.workspace-sidebar-inner {
-    width: 100%;
-    height: 100%;
-
-    min-width: 0;
-    min-height: 0;
-
-    overflow: hidden;
-
-    box-sizing: border-box;
-}
-
-
-/* ==========================================================
+   COMMUNITY ONE PLATFORM FRAMEWORK (CPF)
    WORKSPACE GUIDE
    ========================================================== */
 
-/*
-   The guide is a structural workspace region.
-   It is NOT a floating card.
-*/
-.workspace-guide {
-    border: 1px solid #c8102e;
-}
-
-.workspace-guide {
-    position: relative;
-
-    width: 100%;
-    min-width: 0;
-
-    margin: 0;
-    padding: 0;
-
-    box-sizing: border-box;
-
-    overflow: hidden;
-
-    border: none;
-    border-radius: 0;
-
-    background: transparent;
-
-    box-shadow: none;
-}
-
 
 /* ==========================================================
-   GUIDE CONTENT
+   GUIDE
    ========================================================== */
 
-.workspace-guide-content {
+.workspace-guide {
+
     width: 100%;
     min-width: 0;
+    min-height: 0;
 
-    margin: 0;
-    padding: 0;
+    display: flex;
+    flex-direction: column;
 
     box-sizing: border-box;
+
+    background:
+        var(--panel-solid, #ffffff);
+
+    border:
+        1px solid
+        var(--border, #e8e8e8);
+
+    border-radius: 0;
 
     overflow: hidden;
 }
@@ -482,17 +37,39 @@
    ========================================================== */
 
 .workspace-guide-header {
+
+    width: 100%;
+    min-height: 86px;
+
     display: flex;
     align-items: center;
     justify-content: space-between;
 
-    width: 100%;
-    min-width: 0;
-
-    margin: 0;
-    padding: 0;
+    padding:
+        0 32px;
 
     box-sizing: border-box;
+
+    border-bottom:
+        1px solid
+        var(--border, #e8e8e8);
+}
+
+
+/* ==========================================================
+   GUIDE TITLE
+   ========================================================== */
+
+.workspace-guide-title {
+
+    margin: 0;
+
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.3;
+
+    color:
+        var(--text-primary, #111111);
 }
 
 
@@ -501,45 +78,276 @@
    ========================================================== */
 
 .workspace-guide-body {
+
     width: 100%;
     min-width: 0;
 
-    margin: 0;
-    padding: 0;
+    display: flex;
+    flex-direction: column;
+
+    gap: 28px;
+
+    padding:
+        32px;
 
     box-sizing: border-box;
-
-    overflow: hidden;
 }
 
 
 /* ==========================================================
-   PROGRESS RING ANCHOR
+   WORKSPACE PANEL
    ========================================================== */
 
-/*
-   Keep the progress ring on the same horizontal
-   alignment system as the section actions.
-*/
+.workspace-panel {
 
-.workspace-header-progress {
-    margin-left: auto;
+    width: 100%;
+    min-width: 0;
 
-    flex: 0 0 auto;
+    box-sizing: border-box;
+}
+
+
+/* ==========================================================
+   WORKSPACE HEADER ACTIONS
+   ========================================================== */
+
+.workspace-header-actions {
 
     display: flex;
     align-items: center;
     justify-content: flex-end;
+
+    gap: 18px;
+
+    min-height: 24px;
+
+    white-space: nowrap;
 }
 
 
 /* ==========================================================
-   REDUCED MOTION
+   WORKSPACE HEADER ACTION
    ========================================================== */
 
-@media (prefers-reduced-motion: reduce) {
+.workspace-header-action {
 
-    .workspace-header-close {
-        animation: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border: none;
+
+    background: transparent;
+
+    color:
+        var(--text-secondary, #60738a);
+
+    font-family: inherit;
+    font-size: .82rem;
+    font-weight: 500;
+    line-height: 1.4;
+
+    letter-spacing: .08em;
+    text-transform: uppercase;
+
+    cursor: pointer;
+
+    transition:
+        color .2s ease,
+        opacity .2s ease;
+}
+
+
+/* ==========================================================
+   ACTION HOVER
+   ========================================================== */
+
+.workspace-header-action:hover {
+
+    color:
+        var(--text-primary, #111111);
+}
+
+
+/* ==========================================================
+   ACTION DISABLED
+   ========================================================== */
+
+.workspace-header-action:disabled {
+
+    opacity: .45;
+
+    cursor: default;
+}
+
+
+/* ==========================================================
+   READY ACTION
+   ========================================================== */
+
+.workspace-header-action-ready {
+
+    color:
+        var(--text-primary, #111111);
+}
+
+
+/* ==========================================================
+   SAVE ACTION
+   ========================================================== */
+
+.workspace-header-action-save {
+
+    color:
+        #b00020;
+}
+
+
+.workspace-header-action-save:hover {
+
+    color:
+        #8f0019;
+}
+
+
+/* ==========================================================
+   WORKSPACE HEADER CLOSE
+   ========================================================== */
+
+.workspace-header-close {
+
+    width: 20px;
+    height: 20px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    flex: 0 0 20px;
+
+    margin: 0;
+    padding: 0;
+
+    border: none;
+    border-radius: 50%;
+
+    background:
+        #2daa72;
+
+    color:
+        #ffffff;
+
+    font-family: inherit;
+    font-size: 1.1rem;
+    font-weight: 400;
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition:
+        background .2s ease,
+        transform .15s ease;
+}
+
+
+/* ==========================================================
+   HEADER CLOSE HOVER
+   ========================================================== */
+
+.workspace-header-close:hover {
+
+    background:
+        #269b66;
+}
+
+
+/* ==========================================================
+   HEADER CLOSE ACTIVE
+   ========================================================== */
+
+.workspace-header-close:active {
+
+    transform:
+        scale(.96);
+}
+
+
+/* ==========================================================
+   HEADER CLOSE DISABLED
+   ========================================================== */
+
+.workspace-header-close:disabled {
+
+    opacity: .45;
+
+    cursor: default;
+
+    transform: none;
+}
+
+
+/* ==========================================================
+   SECONDARY TEXT
+   ========================================================== */
+
+.workspace-text-secondary {
+
+    color:
+        var(--text-secondary, #60738a);
+
+    font-family: inherit;
+
+    font-size: .95rem;
+    font-weight: 400;
+    line-height: 1.55;
+}
+
+
+/* ==========================================================
+   SECTION ACTIONS
+   ========================================================== */
+
+.workspace-section-actions {
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    min-height: 24px;
+}
+
+
+/* ==========================================================
+   RESPONSIVE
+   ========================================================== */
+
+@media (max-width: 700px) {
+
+    .workspace-guide-header {
+
+        min-height: 72px;
+
+        padding:
+            0 24px;
     }
+
+
+    .workspace-guide-body {
+
+        padding:
+            24px;
+
+        gap:
+            24px;
+    }
+
+
+    .workspace-header-actions {
+
+        gap:
+            14px;
+    }
+
 }
