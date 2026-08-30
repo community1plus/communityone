@@ -11,7 +11,7 @@ export function buildCapabilityWorkspace({
     actions,
 
 }) {
-
+//
     switch (capability) {
 
         case "wallet":
