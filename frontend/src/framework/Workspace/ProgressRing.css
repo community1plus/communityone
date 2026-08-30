@@ -1,8 +1,12 @@
+/* ==========================================================
+   PROGRESS RING
+   ========================================================== */
+
 .progress-ring {
 
     position: relative;
 
-    display: flex;
+    display: inline-flex;
 
     align-items: center;
 
@@ -13,42 +17,51 @@
 }
 
 
-.progress-ring__svg {
+/* ==========================================================
+   SVG
+   ========================================================== */
+
+.progress-ring-svg {
 
     display: block;
 
-    overflow: visible;
-
     transform: rotate(-90deg);
 
+    overflow: visible;
+
 }
 
 
-/* =====================================
-   RING TRACK
-===================================== */
+/* ==========================================================
+   TRACK
+   ========================================================== */
 
-.progress-ring__track {
+.progress-ring-track {
+
     stroke: #dedede;
+
 }
 
 
-/* =====================================
-   COMPLETION
-===================================== */
-
-.progress-ring__progress {
-    stroke: #b20d1f;
-    stroke-width: 4px;
-    transition: stroke-dashoffset 0.4s ease;
-}
-
-
-/* =====================================
+/* ==========================================================
    VALUE
-===================================== */
+   ========================================================== */
 
-.progress-ring__value {
+.progress-ring-value {
+
+    stroke: #c8102e;
+
+    transition:
+        stroke-dashoffset 300ms ease;
+
+}
+
+
+/* ==========================================================
+   LABEL
+   ========================================================== */
+
+.progress-ring-label {
 
     position: absolute;
 
@@ -60,14 +73,12 @@
 
     justify-content: center;
 
-    color: #b20d1f;
+    color: #c8102e;
 
-    font-size: 13px;
+    font-size: 14px;
 
-    font-weight: 600;
+    font-weight: 500;
 
     line-height: 1;
-
-    pointer-events: none;
 
 }

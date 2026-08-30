@@ -1,5 +1,8 @@
 import "./WorkspaceMetric.css";
-import ProgressRing from "./ProgressRing";
+
+import ProgressRing
+    from "./ProgressRing";
+
 
 export default function WorkspaceMetric({
 
@@ -12,7 +15,11 @@ export default function WorkspaceMetric({
         <div className="workspace-metric">
 
             <ProgressRing
-                value={model.value ?? 0}
+
+                value={
+                    model.value
+                }
+
             />
 
         </div>
