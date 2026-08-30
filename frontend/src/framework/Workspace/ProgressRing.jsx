@@ -10,25 +10,22 @@ export default function ProgressRing({
 
 }) {
 
-    const percentage =
-        Math.max(
-            0,
-            Math.min(
-                100,
-                Number(value) || 0
-            )
-        );
-
     const radius =
         (size - stroke) / 2;
 
     const circumference =
         2 * Math.PI * radius;
 
+    const progress =
+        Math.min(
+            Math.max(value, 0),
+            100
+        );
+
     const offset =
         circumference -
-        (percentage / 100) *
-        circumference;
+        (progress / 100) * circumference;
+
 
     return (
 
@@ -47,38 +44,60 @@ export default function ProgressRing({
                 viewBox={`0 0 ${size} ${size}`}
             >
 
-                {/* Background ring */}
+                {/* BACKGROUND RING */}
 
                 <circle
+
                     className="progress-ring-track"
+
                     cx={size / 2}
                     cy={size / 2}
+
                     r={radius}
-                    strokeWidth={stroke}
+
                     fill="none"
+
+                    strokeWidth={stroke}
+
                 />
 
-                {/* Progress */}
+
+                {/* PROGRESS */}
 
                 <circle
-                    className="progress-ring-progress"
+
+                    className="progress-ring-value"
+
                     cx={size / 2}
                     cy={size / 2}
+
                     r={radius}
-                    strokeWidth={stroke}
+
                     fill="none"
-                    strokeDasharray={circumference}
-                    strokeDashoffset={offset}
+
+                    strokeWidth={stroke}
+
+                    strokeDasharray={
+                        circumference
+                    }
+
+                    strokeDashoffset={
+                        offset
+                    }
+
+                    strokeLinecap="round"
+
                 />
 
             </svg>
 
 
-            <span className="progress-ring-value">
+            <span className="progress-ring-label">
 
-                {percentage}%
+                {progress}%
 
             </span>
+
 
         </div>
 
