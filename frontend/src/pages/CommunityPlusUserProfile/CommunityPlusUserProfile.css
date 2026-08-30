@@ -20,7 +20,10 @@
 
     box-sizing: border-box;
 
-    overflow: hidden;
+    /*
+     * Do not clip the header's decorative halo.
+     */
+    overflow: visible;
 
     background: #f8f6f3;
 }
@@ -39,17 +42,20 @@
     display: flex;
     align-items: center;
 
-    /*
-     * IMPORTANT:
-     * Creates separation from the sidebar boundary.
-     */
     padding: 0 16px 16px 18px;
 
     box-sizing: border-box;
 
     border-bottom: 1px solid #e6dfd8;
-}
 
+    /*
+     * Allow the close-button halo to escape
+     * the header boundary.
+     */
+    overflow: visible;
+
+    z-index: 2;
+}
 
 /* ==========================================================
    CLOSE BUTTON + TITLE GROUP
@@ -93,17 +99,12 @@
 /* ==========================================================
    CLOSE BUTTON HALO
    ========================================================== */
-
 .profile-close-button::before {
     content: "";
 
     position: absolute;
 
-    /*
-     * Keep the halo visually inside the workspace
-     * instead of allowing it to collide with the sidebar.
-     */
-    inset: -6px;
+    inset: -8px;
 
     border-radius: 50%;
 
@@ -130,17 +131,26 @@
    TITLE
    ========================================================== */
 
-.profile-card-header h1 {
-    margin: 0;
+.profile-card-header {
+    position: relative;
 
-    font-size: 3rem;
-    line-height: 1;
+    flex-shrink: 0;
 
-    font-weight: 700;
+    width: 100%;
+    min-height: 88px;
 
-    color: #1f2937;
+    display: flex;
+    align-items: center;
 
-    white-space: nowrap;
+    padding: 0 16px 16px 18px;
+
+    box-sizing: border-box;
+
+    border-bottom: 1px solid #e6dfd8;
+
+    overflow: visible;
+
+    z-index: 2;
 }
 
 
@@ -175,7 +185,6 @@
     flex-direction: column;
 
     margin-top: 0;
-
     gap: 24px;
 
     overflow-y: auto;
