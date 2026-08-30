@@ -29,18 +29,20 @@ export default function WorkspaceBanner({
 
     right = null,
 
-    children,
+    children = null,
 
 }) {
 
 
-    /* =========================================
+    /* ======================================================
        MODEL
-    ========================================= */
+       ====================================================== */
 
     const {
 
         left: modelLeft = {},
+
+        center: modelCenter = {},
 
         centre: modelCentre = {},
 
@@ -49,95 +51,106 @@ export default function WorkspaceBanner({
     } = model;
 
 
-    /* =========================================
+    /*
+     * Support both `center` and the older `centre`
+     * while the framework is being refactored.
+     */
+
+    const modeModel =
+        Object.keys(modelCenter).length
+            ? modelCenter
+            : modelCentre;
+
+
+    /* ======================================================
        LEFT
-    ========================================= */
+       ====================================================== */
 
     const leftContent =
 
-        left
+        left !== null
 
-        ??
+            ? left
 
-        (
+            : (
 
-            <WorkspaceBannerSection>
+                <WorkspaceBannerSection>
 
-                <WorkspaceTitle
-                    title={
-                        modelLeft.title
-                    }
-                />
+                    <WorkspaceTitle
+                        title={
+                            modelLeft.title
+                        }
+                    />
 
-            </WorkspaceBannerSection>
+                </WorkspaceBannerSection>
 
-        );
+            );
 
 
-    /* =========================================
+    /* ======================================================
        CENTER
-    ========================================= */
+       ====================================================== */
 
     const centerContent =
 
-        center
+        center !== null
 
-        ??
+            ? center
 
-        (
+            : (
 
-            <WorkspaceBannerSection>
+                <WorkspaceBannerSection>
 
-                <WorkspaceMode>
+                    <WorkspaceMode
+                        model={modeModel}
+                    >
 
-                    {children}
+                        {children}
 
-                </WorkspaceMode>
+                    </WorkspaceMode>
 
-            </WorkspaceBannerSection>
+                </WorkspaceBannerSection>
 
-        );
+            );
 
 
-    /* =========================================
+    /* ======================================================
        RIGHT
-    ========================================= */
+       ====================================================== */
 
     const rightContent =
 
-        right
+        right !== null
 
-        ??
+            ? right
 
-        (
+            : (
 
-            <WorkspaceBannerSection>
+                <WorkspaceBannerSection>
 
-                <WorkspaceMetric
+                    <WorkspaceMetric
+                        model={
+                            modelRight.metric
+                        }
+                    />
 
-                    model={
-                        modelRight.metric
-                    }
+                </WorkspaceBannerSection>
 
-                />
-
-            </WorkspaceBannerSection>
-
-        );
+            );
 
 
-    /* =========================================
+    /* ======================================================
        RENDER
-    ========================================= */
+       ====================================================== */
 
     return (
 
         <div className="workspace-banner">
 
 
-            {/* =================================
+            {/* ==================================================
                LEFT
-            ================================= */}
+               ================================================== */}
 
             <div className="workspace-banner-left">
 
@@ -146,9 +159,9 @@ export default function WorkspaceBanner({
             </div>
 
 
-            {/* =================================
+            {/* ==================================================
                CENTER
-            ================================= */}
+               ================================================== */}
 
             <div className="workspace-banner-center">
 
@@ -157,9 +170,9 @@ export default function WorkspaceBanner({
             </div>
 
 
-            {/* =================================
+            {/* ==================================================
                RIGHT
-            ================================= */}
+               ================================================== */}
 
             <div className="workspace-banner-right">
 
