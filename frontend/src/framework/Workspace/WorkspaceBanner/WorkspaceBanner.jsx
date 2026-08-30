@@ -1,11 +1,8 @@
 /* ==========================================================
    COMMUNITY ONE PLATFORM FRAMEWORK (CPF)
 
-   Workspace Banner
+   WORKSPACE BANNER
    ========================================================== */
-
-import WorkspaceBannerSection
-    from "../WorkspaceBannerSection/WorkspaceBannerSection";
 
 import WorkspaceTitle
     from "../WorkspaceTitle";
@@ -31,93 +28,84 @@ export default function WorkspaceBanner({
 
 }) {
 
-    /* ======================================================
-       MODEL
-    ====================================================== */
+    const {
 
-    const modelLeft =
-        model?.left ?? {};
+        left: modelLeft = {},
 
-    const modelCentre =
-        model?.centre ?? {};
+        centre: modelCentre = {},
 
-    const modelRight =
-        model?.right ?? {};
+        right: modelRight = {},
+
+    } = model;
 
 
     /* ======================================================
        LEFT
-    ====================================================== */
+       ====================================================== */
 
-    const leftContent =
-        left ?? (
+    const leftContent = (
 
-            <WorkspaceBannerSection>
+        <>
+
+            {left}
+
+            {modelLeft.title && (
 
                 <WorkspaceTitle
-                    title={
-                        modelLeft?.title ?? ""
-                    }
+                    title={modelLeft.title}
                 />
 
-            </WorkspaceBannerSection>
+            )}
 
-        );
+        </>
+
+    );
 
 
     /* ======================================================
        CENTER
-    ====================================================== */
+       ====================================================== */
 
     const centerContent =
+
         center ?? (
 
-            <WorkspaceBannerSection>
+            <WorkspaceMode>
 
-                <WorkspaceMode
-                    mode={
-                        modelCentre?.mode
-                    }
-                />
+                {modelCentre.mode}
 
-            </WorkspaceBannerSection>
+            </WorkspaceMode>
 
         );
 
 
     /* ======================================================
        RIGHT
-    ====================================================== */
-
-    const metricModel =
-        modelRight?.metric ?? null;
-
+       ====================================================== */
 
     const rightContent =
+
         right ?? (
 
-            <WorkspaceBannerSection>
-
-                {metricModel && (
-
-                    <WorkspaceMetric
-                        model={metricModel}
-                    />
-
-                )}
-
-            </WorkspaceBannerSection>
+            <WorkspaceMetric
+                model={modelRight.metric}
+            />
 
         );
 
 
     /* ======================================================
        RENDER
-    ====================================================== */
+       ====================================================== */
 
     return (
 
         <div className="workspace-banner">
+
+
+            {/* =============================================
+               LEFT
+            ============================================= */}
 
             <div className="workspace-banner-left">
 
@@ -126,6 +114,10 @@ export default function WorkspaceBanner({
             </div>
 
 
+            {/* =============================================
+               CENTER
+            ============================================= */}
+
             <div className="workspace-banner-center">
 
                 {centerContent}
@@ -133,11 +125,16 @@ export default function WorkspaceBanner({
             </div>
 
 
+            {/* =============================================
+               RIGHT
+            ============================================= */}
+
             <div className="workspace-banner-right">
 
                 {rightContent}
 
             </div>
+
 
         </div>
 
