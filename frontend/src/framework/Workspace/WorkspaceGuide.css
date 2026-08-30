@@ -2,38 +2,49 @@
    WORKSPACE HEADER CLOSE
    ========================================================== */
 
+/* ==========================================================
+   WORKSPACE HEADER CLOSE ACTION
+   ========================================================== */
+
 .workspace-header-close {
+
+    width: 48px;
+    height: 48px;
+
+    flex: 0 0 48px;
+
     display: inline-flex;
+
     align-items: center;
     justify-content: center;
 
-    width: 54px;
-    height: 54px;
-
-    flex: 0 0 54px;
-
-    padding: 0;
     margin: 0 12px 0 0;
+    padding: 0;
 
     border: none;
-    border-radius: 999px;
+    border-radius: 50%;
 
     background: #2daa72;
+
     color: #ffffff;
 
     font-family: inherit;
-    font-size: 1.35rem;
+    font-size: 1.2rem;
     font-weight: 400;
     line-height: 1;
 
     cursor: pointer;
 
-    transition:
-        background-color 0.2s ease,
-        transform 0.15s ease;
+    overflow: visible;
 
-    animation:
-        workspace-close-pulse 3s ease-in-out infinite;
+    position: relative;
+
+    z-index: 1;
+
+    transition:
+        background .2s ease,
+        transform .15s ease;
+
 }
 
 
