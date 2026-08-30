@@ -241,7 +241,7 @@
      * Allows visual effects to extend beyond the button
      * without affecting the layout.
      */
-    overflow: visible;
+    overflow: hidden;
 
     transition:
         background .2s ease,
