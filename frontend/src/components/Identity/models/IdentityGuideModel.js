@@ -1,59 +1,37 @@
-import { guideContent }
-    from "../../../components/Guide/GuideContent";
+import WorkspaceGuide
+    from "../../../framework/Workspace/WorkspaceGuide";
+
+import {
+    createIdentityGuideModel,
+} from "./models/IdentityGuideModel";
 
 
-export function createIdentityGuideModel(section) {
+export default function IdentityGuide({
 
-    const help =
-        guideContent[section]
-        ??
-        guideContent.default;
+    section,
 
+    completion = 0,
 
-    return {
+}) {
 
-        title: "IDENTITY GUIDE",
+    const model =
+        createIdentityGuideModel(
 
-        panels: [
+            section,
 
-            {
-                id: "welcome",
+            completion
 
-                title: "Welcome",
-
-                content:
-                    "Manage your trusted identity.",
-            },
+        );
 
 
-            {
-                id: "progress",
+    return (
 
-                title: "Profile Completion",
+        <WorkspaceGuide
 
-                value: "0%",
-            },
+            model={model}
 
+        />
 
-            {
-                id: "help",
-
-                title: "Help",
-
-                content: help,
-            },
-
-
-            {
-                id: "next",
-
-                title: "Next",
-
-                content: "Verify your email",
-            },
-
-        ],
-
-    };
+    );
 
 }
