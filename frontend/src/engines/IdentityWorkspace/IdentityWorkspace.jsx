@@ -28,8 +28,6 @@ import {
 
 export default function IdentityWorkspace({
 
-    initialCapability = "identity",
-
     state,
 
     actions,
@@ -53,6 +51,8 @@ export default function IdentityWorkspace({
         banner,
 
         navigation,
+
+        guide,
 
     } = workspace;
 
@@ -90,73 +90,17 @@ export default function IdentityWorkspace({
 
 
     /* =====================================
-       PROFILE COMPLETION
-    ===================================== */
-
-    const completion =
-        banner
-            ?.right
-            ?.metric
-            ?.value
-        ?? 0;
-
-
-    /* =====================================
        PROFILE READINESS
     ===================================== */
 
     const profileReady =
-        completion >= 20;
-
-
-    /* =====================================
-       GUIDE
-    ===================================== */
-
-    const guide = {
-
-        title:
-            "IDENTITY GUIDE",
-
-        panels: [
-
-            {
-                id:
-                    "welcome",
-
-                title:
-                    "Welcome",
-
-                content:
-                    "Manage your trusted identity.",
-            },
-
-            {
-                id:
-                    "profile-completion",
-
-                title:
-                    "Profile Completion",
-
-                value:
-                    `${completion}%`,
-            },
-
-            {
-                id:
-                    "current-section",
-
-                title:
-                    "Current Section",
-
-                value:
-                    section?.title
-                    ?? "",
-            },
-
-        ],
-
-    };
+        (
+            banner
+                ?.right
+                ?.metric
+                ?.value
+            ?? 0
+        ) >= 20;
 
 
     /* =====================================

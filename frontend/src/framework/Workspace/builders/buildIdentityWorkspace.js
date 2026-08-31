@@ -188,6 +188,59 @@ export function buildIdentityWorkspace(
 
 
     /* ======================================================
+       GUIDE
+       ====================================================== */
+
+    const guide = {
+
+        title:
+            "IDENTITY GUIDE",
+
+        panels: [
+
+            {
+                id:
+                    "welcome",
+
+                title:
+                    "Welcome",
+
+                content:
+                    "Manage your trusted identity.",
+
+            },
+
+            {
+                id:
+                    "profile-completion",
+
+                title:
+                    "Profile Completion",
+
+                value:
+                    `${completion}%`,
+
+            },
+
+            {
+                id:
+                    "current-section",
+
+                title:
+                    "Current Section",
+
+                value:
+                    section?.title
+                    ?? "",
+
+            },
+
+        ],
+
+    };
+
+
+    /* ======================================================
        NO CURRENT SECTION
        ====================================================== */
 
@@ -200,6 +253,8 @@ export function buildIdentityWorkspace(
             banner,
 
             navigation,
+
+            guide,
 
             body: {
 
@@ -407,6 +462,8 @@ export function buildIdentityWorkspace(
         banner,
 
         navigation,
+
+        guide,
 
         body: {
 
