@@ -1,7 +1,3 @@
-/* =========================================================
-   WORKSPACE
-   ========================================================= */
-
 .workspace-shell {
 
     width: 100%;
@@ -12,11 +8,6 @@
 }
 
 
-/* =========================================================
-   WORKSPACE LAYOUT
-   MAIN + GUIDE
-   ========================================================= */
-
 .workspace-layout {
 
     display: grid;
@@ -25,35 +16,9 @@
         minmax(0, 1fr)
         400px;
 
+    align-items: stretch;
+
     width: 100%;
-    min-width: 0;
-
-    box-sizing: border-box;
-
-}
-
-
-/* =========================================================
-   MAIN WORKSPACE
-   ========================================================= */
-
-.workspace-main {
-
-    min-width: 0;
-
-    box-sizing: border-box;
-
-    overflow: visible;
-
-}
-
-
-/* =========================================================
-   GUIDE COLUMN
-   ========================================================= */
-
-.workspace-sidebar {
-
     min-width: 0;
     min-height: 0;
 
@@ -62,14 +27,23 @@
 }
 
 
-/* =========================================================
-   GUIDE INNER
-   ========================================================= */
+.workspace-main {
+
+    min-width: 0;
+    min-height: 0;
+
+    box-sizing: border-box;
+
+    overflow: visible;
+
+}
+
 
 .workspace-sidebar-inner {
 
     width: 100%;
     min-width: 0;
+    min-height: 0;
 
     box-sizing: border-box;
 
