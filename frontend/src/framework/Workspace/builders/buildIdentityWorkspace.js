@@ -191,53 +191,28 @@ export function buildIdentityWorkspace(
        GUIDE
        ====================================================== */
 
-    const guide = {
+const guide = {
 
-        title:
-            "IDENTITY GUIDE",
+    title:
+        "IDENTITY GUIDE",
 
-        panels: [
+    panels: [
 
-            {
-                id:
-                    "welcome",
+        {
+            id:
+                "welcome",
 
-                title:
-                    "Welcome",
+            title:
+                "Welcome",
 
-                content:
-                    "Manage your trusted identity.",
+            content:
+                "Manage your trusted identity.",
 
-            },
+        },
 
-            {
-                id:
-                    "profile-completion",
+    ],
 
-                title:
-                    "Profile Completion",
-
-                value:
-                    `${completion}%`,
-
-            },
-
-            {
-                id:
-                    "current-section",
-
-                title:
-                    "Current Section",
-
-                value:
-                    section?.title
-                    ?? "",
-
-            },
-
-        ],
-
-    };
+};
 
 
     /* ======================================================
