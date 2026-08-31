@@ -28,10 +28,6 @@ export default function WorkspaceSection({
     }
 
 
-    if (!model?.runtime?.visible) {
-        return null;
-    }
-
 
     const {
 

@@ -1,3 +1,27 @@
+/* =========================================================
+   WORKSPACE SECTION
+   ========================================================= */
+
+.workspace-section {
+
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+
+    box-sizing: border-box;
+
+    margin: 0;
+    padding: 0;
+
+    overflow: visible;
+
+}
+
+
+/* =========================================================
+   SECTION HEADER
+   ========================================================= */
+
 .workspace-section-header {
 
     display: flex;
@@ -6,10 +30,14 @@
     justify-content: space-between;
 
     width: 100%;
+    min-width: 0;
 
     min-height: 68px;
 
     box-sizing: border-box;
+
+    margin: 0;
+    padding: 0;
 
     border-bottom:
         1px solid
@@ -17,6 +45,10 @@
 
 }
 
+
+/* =========================================================
+   SECTION HEADING
+   ========================================================= */
 
 .workspace-section-heading {
 
@@ -28,12 +60,21 @@
 
     min-width: 0;
 
+    flex: 1 1 auto;
+
 }
 
 
+/* =========================================================
+   SECTION TITLE
+   ========================================================= */
+
 .workspace-section-title {
 
+    min-width: 0;
+
     margin: 0;
+    padding: 0;
 
     font-size: 1.35rem;
 
@@ -43,5 +84,25 @@
 
     color:
         var(--text-primary, #111);
+
+}
+
+
+/* =========================================================
+   SECTION BODY
+   ========================================================= */
+
+.workspace-section-body {
+
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+
+    box-sizing: border-box;
+
+    margin: 0;
+    padding: 0;
+
+    overflow: visible;
 
 }
