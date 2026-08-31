@@ -11,9 +11,7 @@ export default function WorkspaceGuide({
 
         title = "",
         panels = [],
-
     } = model;
-
 
     return (
 
