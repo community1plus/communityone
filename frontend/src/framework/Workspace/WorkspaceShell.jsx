@@ -1,4 +1,4 @@
-
+import "./WorkspaceShell.css";
 
 export default function WorkspaceShell({
 
@@ -9,16 +9,15 @@ export default function WorkspaceShell({
 
     return (
 
-<div className="workspace-shell">
+        <div className="workspace-shell">
 
+            <div className="workspace-layout">
 
-    <div className="workspace-layout">
+                {children}
 
-        {children}
+            </div>
 
-    </div>
-
-</div>
+        </div>
 
     );
 
