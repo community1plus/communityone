@@ -1,11 +1,4 @@
 /* =========================================================
-   COMMUNITY ONE PLATFORM FRAMEWORK (CPF)
-
-   WORKSPACE SHELL
-   ========================================================= */
-
-
-/* =========================================================
    WORKSPACE SHELL
    ========================================================= */
 
@@ -31,7 +24,7 @@
 
     grid-template-columns:
         minmax(0, 1fr)
-        var(--workspace-sidebar-width, 360px);
+        var(--workspace-sidebar-width, 400px);
 
     width: 100%;
     min-width: 0;
@@ -41,13 +34,11 @@
 
     align-items: stretch;
 
-    overflow: visible;
-
 }
 
 
 /* =========================================================
-   MAIN WORKSPACE
+   WORKSPACE MAIN
    ========================================================= */
 
 .workspace-main {
@@ -58,13 +49,11 @@
 
     box-sizing: border-box;
 
-    overflow: visible;
-
 }
 
 
 /* =========================================================
-   GUIDE COLUMN
+   WORKSPACE SIDEBAR
    ========================================================= */
 
 .workspace-sidebar {
@@ -75,9 +64,18 @@
 
     box-sizing: border-box;
 
-    margin: 0;
-    padding: 0;
+}
 
-    overflow: visible;
+
+/* =========================================================
+   WORKSPACE SIDEBAR INNER
+   ========================================================= */
+
+.workspace-sidebar-inner {
+
+    width: 100%;
+    min-width: 0;
+
+    box-sizing: border-box;
 
 }
