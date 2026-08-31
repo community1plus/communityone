@@ -24,7 +24,7 @@
 
     grid-template-columns:
         minmax(0, 1fr)
-        var(--workspace-sidebar-width, 400px);
+        400px;
 
     width: 100%;
     min-width: 0;
