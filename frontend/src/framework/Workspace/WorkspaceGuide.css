@@ -1,5 +1,6 @@
 /* ==========================================================
    COMMUNITY ONE PLATFORM FRAMEWORK (CPF)
+
    WORKSPACE GUIDE
    ========================================================== */
 
@@ -11,24 +12,20 @@
 .workspace-guide {
 
     width: 100%;
+    height: 100%;
+
     min-width: 0;
     min-height: 0;
+
+    box-sizing: border-box;
 
     display: flex;
     flex-direction: column;
 
-    box-sizing: border-box;
+    border-left: 1px solid #e6dfd8;
 
-    background:
-        var(--panel-solid, #ffffff);
+    background: transparent;
 
-    border:
-        1px solid
-        var(--border, #e8e8e8);
-
-    border-radius: 0;
-
-    overflow: hidden;
 }
 
 
@@ -38,21 +35,21 @@
 
 .workspace-guide-header {
 
-    width: 100%;
-    min-height: 86px;
+    height: 82px;
 
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    padding:
-        0 32px;
+    min-height: 82px;
 
     box-sizing: border-box;
 
-    border-bottom:
-        1px solid
-        var(--border, #e8e8e8);
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 0 24px;
+
+    border-bottom: 1px solid #e6dfd8;
+
 }
 
 
@@ -64,12 +61,25 @@
 
     margin: 0;
 
-    font-size: 1rem;
-    font-weight: 600;
-    line-height: 1.3;
+    color: #171717;
 
-    color:
-        var(--text-primary, #111111);
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Inter,
+        sans-serif;
+
+    font-size: 18px;
+
+    font-weight: 500;
+
+    line-height: 1.2;
+
+    letter-spacing: -0.01em;
+
+    text-align: center;
+
 }
 
 
@@ -79,275 +89,156 @@
 
 .workspace-guide-body {
 
-    width: 100%;
+    flex: 1 1 auto;
+
     min-width: 0;
-
-    display: flex;
-    flex-direction: column;
-
-    gap: 28px;
-
-    padding:
-        32px;
+    min-height: 0;
 
     box-sizing: border-box;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    padding: 16px 0 24px;
+
 }
 
 
 /* ==========================================================
-   WORKSPACE PANEL
+   GUIDE PANEL
    ========================================================== */
 
 .workspace-panel {
 
-    width: 100%;
-    min-width: 0;
-
     box-sizing: border-box;
-}
 
+    width: calc(100% - 32px);
 
-/* ==========================================================
-   WORKSPACE HEADER ACTIONS
-   ========================================================== */
+    margin:
+        0 16px 34px;
 
-.workspace-header-actions {
-
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-
-    gap: 18px;
-
-    min-height: 24px;
-
-    white-space: nowrap;
-}
-
-
-/* ==========================================================
-   WORKSPACE HEADER ACTION
-   ========================================================== */
-
-.workspace-header-action {
-
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    padding: 0;
-
-    border: none;
+    padding:
+        26px 34px;
 
     background: transparent;
 
-    color:
-        var(--text-secondary, #60738a);
+    border: none;
 
-    font-family: inherit;
-    font-size: .82rem;
-    font-weight: 500;
-    line-height: 1.4;
+    border-radius: 0;
 
-    letter-spacing: .08em;
-    text-transform: uppercase;
-
-    cursor: pointer;
-
-    transition:
-        color .2s ease,
-        opacity .2s ease;
 }
 
 
 /* ==========================================================
-   ACTION HOVER
+   LAST PANEL
    ========================================================== */
 
-.workspace-header-action:hover {
+.workspace-panel:last-child {
 
-    color:
-        var(--text-primary, #111111);
+    margin-bottom: 0;
+
 }
 
 
 /* ==========================================================
-   ACTION DISABLED
+   PANEL TITLE
    ========================================================== */
 
-.workspace-header-action:disabled {
+.workspace-panel-title {
 
-    opacity: .45;
+    margin:
+        0 0 26px;
 
-    cursor: default;
+    color: #171717;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Inter,
+        sans-serif;
+
+    font-size: 18px;
+
+    font-weight: 700;
+
+    line-height: 1.25;
+
 }
 
 
 /* ==========================================================
-   READY ACTION
+   PANEL CONTENT
    ========================================================== */
 
-.workspace-header-action-ready {
-
-    color:
-        var(--text-primary, #111111);
-}
-
-
-/* ==========================================================
-   SAVE ACTION
-   ========================================================== */
-
-.workspace-header-action-save {
-
-    color:
-        #b00020;
-}
-
-
-.workspace-header-action-save:hover {
-
-    color:
-        #8f0019;
-}
-
-
-/* ==========================================================
-   WORKSPACE HEADER CLOSE
-   ========================================================== */
-
-.workspace-header-close {
-
-    width: 20px;
-    height: 20px;
-
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    flex: 0 0 20px;
+.workspace-panel-content {
 
     margin: 0;
-    padding: 0;
 
-    border: none;
-    border-radius: 50%;
+    color: #171717;
 
-    background:
-        #2daa72;
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Inter,
+        sans-serif;
 
-    color:
-        #ffffff;
+    font-size: 17px;
 
-    font-family: inherit;
-    font-size: 1.1rem;
     font-weight: 400;
-    line-height: 1;
 
-    cursor: pointer;
-
-    transition:
-        background .2s ease,
-        transform .15s ease;
-}
-
-
-/* ==========================================================
-   HEADER CLOSE HOVER
-   ========================================================== */
-
-.workspace-header-close:hover {
-
-    background:
-        #269b66;
-}
-
-
-/* ==========================================================
-   HEADER CLOSE ACTIVE
-   ========================================================== */
-
-.workspace-header-close:active {
-
-    transform:
-        scale(.96);
-}
-
-
-/* ==========================================================
-   HEADER CLOSE DISABLED
-   ========================================================== */
-
-.workspace-header-close:disabled {
-
-    opacity: .45;
-
-    cursor: default;
-
-    transform: none;
-}
-
-
-/* ==========================================================
-   SECONDARY TEXT
-   ========================================================== */
-
-.workspace-text-secondary {
-
-    color:
-        var(--text-secondary, #60738a);
-
-    font-family: inherit;
-
-    font-size: .95rem;
-    font-weight: 400;
     line-height: 1.55;
+
 }
 
 
 /* ==========================================================
-   SECTION ACTIONS
+   PANEL VALUE
    ========================================================== */
 
-.workspace-section-actions {
+.workspace-panel-value {
 
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
+    margin: 0;
 
-    min-height: 24px;
+    color: #171717;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Inter,
+        sans-serif;
+
+    font-size: 17px;
+
+    font-weight: 400;
+
+    line-height: 1.5;
+
 }
 
 
 /* ==========================================================
-   RESPONSIVE
+   SCROLLBAR
    ========================================================== */
 
-@media (max-width: 700px) {
+.workspace-guide-body::-webkit-scrollbar {
 
-    .workspace-guide-header {
+    width: 5px;
 
-        min-height: 72px;
+}
 
-        padding:
-            0 24px;
-    }
+.workspace-guide-body::-webkit-scrollbar-track {
 
+    background: transparent;
 
-    .workspace-guide-body {
+}
 
-        padding:
-            24px;
+.workspace-guide-body::-webkit-scrollbar-thumb {
 
-        gap:
-            24px;
-    }
+    background: rgba(0, 0, 0, 0.08);
 
-
-    .workspace-header-actions {
-
-        gap:
-            14px;
-    }
+    border-radius: 999px;
 
 }
