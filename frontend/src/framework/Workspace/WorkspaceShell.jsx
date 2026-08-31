@@ -3,7 +3,6 @@ import "./WorkspaceShell.css";
 export default function WorkspaceShell({
 
     children,
-    onClose,
 
 }) {
 
