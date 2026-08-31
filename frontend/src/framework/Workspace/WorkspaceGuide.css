@@ -1,12 +1,5 @@
 /* ==========================================================
-   COMMUNITY ONE PLATFORM FRAMEWORK (CPF)
-
    WORKSPACE GUIDE
-   ========================================================== */
-
-
-/* ==========================================================
-   GUIDE
    ========================================================== */
 
 .workspace-guide {
@@ -24,9 +17,7 @@
 
     box-sizing: border-box;
 
-    border-left: 1px solid #e5e2df;
-
-    overflow: hidden;
+    border-left: 1px solid #e5e2de;
 
 }
 
@@ -39,42 +30,34 @@
 
     flex: 0 0 auto;
 
-    height: 102px;
-
     display: flex;
 
     align-items: center;
 
     justify-content: center;
 
+    height: 98px;
+
+    padding: 0 24px;
+
     box-sizing: border-box;
 
-    padding: 0 32px;
-
-    border-bottom: 1px solid #e5e2df;
+    border-bottom: 1px solid #e5e2de;
 
 }
 
-
-/* ==========================================================
-   GUIDE TITLE
-   ========================================================== */
 
 .workspace-guide-title {
 
     margin: 0;
 
-    padding: 0;
+    text-align: center;
 
     font-size: 24px;
 
     font-weight: 500;
 
-    line-height: 1;
-
-    text-align: center;
-
-    color: #111111;
+    line-height: 1.2;
 
 }
 
@@ -87,19 +70,14 @@
 
     flex: 1 1 auto;
 
+    min-width: 0;
     min-height: 0;
-
-    display: flex;
-
-    flex-direction: column;
 
     box-sizing: border-box;
 
-    padding: 30px 0 30px 0;
+    padding: 28px 16px 32px;
 
     overflow-y: auto;
-
-    overflow-x: hidden;
 
 }
 
@@ -110,17 +88,15 @@
 
 .workspace-panel {
 
-    flex: 0 0 auto;
+    width: 100%;
 
-    width: calc(100% - 32px);
-
-    margin-left: 16px;
-
-    margin-right: 16px;
+    min-width: 0;
 
     box-sizing: border-box;
 
-    padding: 34px 32px;
+    margin: 0 0 32px;
+
+    padding: 32px 24px;
 
     border: none;
 
@@ -132,22 +108,29 @@
 
 
 /* ==========================================================
+   LAST PANEL
+   ========================================================== */
+
+.workspace-panel:last-child {
+
+    margin-bottom: 0;
+
+}
+
+
+/* ==========================================================
    PANEL TITLE
    ========================================================== */
 
 .workspace-panel-title {
 
-    margin: 0 0 28px 0;
+    margin: 0 0 32px;
 
-    padding: 0;
-
-    font-size: 23px;
+    font-size: 24px;
 
     font-weight: 600;
 
-    line-height: 1.2;
-
-    color: #111111;
+    line-height: 1.25;
 
 }
 
@@ -160,13 +143,9 @@
 
     margin: 0;
 
-    padding: 0;
-
     font-size: 20px;
 
     line-height: 1.5;
-
-    color: #111111;
 
 }
 
@@ -179,23 +158,8 @@
 
     margin: 0;
 
-    padding: 0;
-
     font-size: 20px;
 
     line-height: 1.5;
-
-    color: #111111;
-
-}
-
-
-/* ==========================================================
-   PANEL SPACING
-   ========================================================== */
-
-.workspace-panel + .workspace-panel {
-
-    margin-top: 26px;
 
 }
