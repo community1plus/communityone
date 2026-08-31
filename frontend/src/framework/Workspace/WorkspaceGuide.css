@@ -9,7 +9,6 @@
     flex-direction: column;
 
     width: 100%;
-
     height: 100%;
 
     min-width: 0;
@@ -28,7 +27,7 @@
 
 .workspace-guide-header {
 
-    flex: 0 0 auto;
+    flex: 0 0 98px;
 
     display: flex;
 
@@ -36,11 +35,11 @@
 
     justify-content: center;
 
-    height: 98px;
-
-    padding: 0 24px;
+    width: 100%;
 
     box-sizing: border-box;
+
+    padding: 0 24px;
 
     border-bottom: 1px solid #e5e2de;
 
@@ -50,6 +49,8 @@
 .workspace-guide-title {
 
     margin: 0;
+
+    padding: 0;
 
     text-align: center;
 
@@ -69,6 +70,12 @@
 .workspace-guide-body {
 
     flex: 1 1 auto;
+
+    display: flex;
+
+    flex-direction: column;
+
+    width: 100%;
 
     min-width: 0;
     min-height: 0;
@@ -96,9 +103,9 @@
 
     margin: 0 0 32px;
 
-    padding: 32px 24px;
+    padding: 32px 20px;
 
-    border: none;
+    border: 0;
 
     border-radius: 0;
 
@@ -126,6 +133,8 @@
 
     margin: 0 0 32px;
 
+    padding: 0;
+
     font-size: 24px;
 
     font-weight: 600;
@@ -143,6 +152,8 @@
 
     margin: 0;
 
+    padding: 0;
+
     font-size: 20px;
 
     line-height: 1.5;
@@ -157,6 +168,8 @@
 .workspace-panel-value {
 
     margin: 0;
+
+    padding: 0;
 
     font-size: 20px;
 
