@@ -1,33 +1,47 @@
 /* =========================================================
-   WORKSPACE GUIDE
+   WORKSPACE
    ========================================================= */
 
-.workspace-guide {
-
-    position: relative;
+.workspace-shell {
 
     width: 100%;
     min-width: 0;
-    min-height: 100%;
 
     box-sizing: border-box;
 
-    margin: 0;
-    padding: 0;
+}
 
-    background: transparent;
 
-    /* Guide boundary */
-    border-left:
-        1px solid
-        var(--border-color, #e8e8e8);
+/* =========================================================
+   WORKSPACE LAYOUT
+   MAIN + GUIDE
+   ========================================================= */
 
-    border-right: none;
-    border-top: none;
-    border-bottom: none;
+.workspace-layout {
 
-    border-radius: 0;
-    box-shadow: none;
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        400px;
+
+    width: 100%;
+    min-width: 0;
+
+    box-sizing: border-box;
+
+}
+
+
+/* =========================================================
+   MAIN WORKSPACE
+   ========================================================= */
+
+.workspace-main {
+
+    min-width: 0;
+
+    box-sizing: border-box;
 
     overflow: visible;
 
@@ -35,163 +49,28 @@
 
 
 /* =========================================================
-   GUIDE HEADER
+   GUIDE COLUMN
    ========================================================= */
 
-.workspace-guide-header {
+.workspace-sidebar {
 
-    width: 100%;
-    height: 96px;
+    min-width: 0;
+    min-height: 0;
 
     box-sizing: border-box;
 
-    margin: 0;
-    padding:
-        0
-        var(--workspace-gap-md);
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    border-bottom:
-        1px solid
-        var(--border-color, #e8e8e8);
-
 }
 
 
 /* =========================================================
-   GUIDE TITLE
+   GUIDE INNER
    ========================================================= */
 
-.workspace-guide-title {
-
-    width: 100%;
-
-    margin: 0;
-    padding: 0;
-
-    text-align: center;
-
-    font-size: 1.35rem;
-    font-weight: 600;
-
-    line-height: 1.2;
-
-    color:
-        var(--text-primary, #111);
-
-}
-
-
-/* =========================================================
-   GUIDE BODY
-   ========================================================= */
-
-.workspace-guide-body {
+.workspace-sidebar-inner {
 
     width: 100%;
     min-width: 0;
 
     box-sizing: border-box;
-
-    margin: 0;
-
-    padding:
-        var(--workspace-gap-md)
-        var(--workspace-gap-sm)
-        var(--workspace-gap-lg);
-
-    display: flex;
-
-    flex-direction: column;
-
-    gap: var(--workspace-gap-lg);
-
-    overflow: visible;
-
-}
-
-
-/* =========================================================
-   GUIDE PANEL
-   ========================================================= */
-
-.workspace-panel {
-
-    width: 100%;
-    min-width: 0;
-
-    box-sizing: border-box;
-
-    margin: 0;
-    padding:
-        0
-        var(--workspace-gap-sm);
-
-    background: transparent;
-
-    border: none;
-    border-radius: 0;
-    box-shadow: none;
-
-    overflow: visible;
-
-}
-
-
-/* =========================================================
-   PANEL TITLE
-   ========================================================= */
-
-.workspace-panel-title {
-
-    margin: 0 0 var(--workspace-gap-md);
-
-    font-size: 1.25rem;
-    font-weight: 600;
-
-    line-height: 1.25;
-
-    color:
-        var(--text-primary, #111);
-
-}
-
-
-/* =========================================================
-   PANEL CONTENT
-   ========================================================= */
-
-.workspace-panel-content {
-
-    margin: 0;
-
-    font-size: 1rem;
-
-    line-height: 1.5;
-
-    color:
-        var(--text-primary, #111);
-
-}
-
-
-/* =========================================================
-   PANEL VALUE
-   ========================================================= */
-
-.workspace-panel-value {
-
-    margin: 0;
-
-    font-size: 1rem;
-
-    line-height: 1.5;
-
-    color:
-        var(--text-primary, #111);
 
 }
