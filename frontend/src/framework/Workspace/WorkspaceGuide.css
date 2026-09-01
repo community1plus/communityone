@@ -1,7 +1,3 @@
-/* ==========================================================
-   WORKSPACE GUIDE
-   ========================================================== */
-
 .workspace-guide {
 
     width: 100%;
@@ -14,6 +10,9 @@
     padding: 0;
 
     background: transparent;
+
+    border: none;
+    border-radius: 0;
 
     border-left:
         1px solid
