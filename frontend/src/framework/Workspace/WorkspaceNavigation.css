@@ -49,6 +49,8 @@
 
     background: transparent;
 
+    flex: 0 0 auto;
+
     margin: 0;
     padding: 0 0 16px 0;
 
@@ -58,6 +60,8 @@
     font-size: 0.95rem;
     font-weight: 500;
     line-height: 1.2;
+
+    text-transform: uppercase;
 
     color:
         var(--text-secondary, #666);
@@ -70,7 +74,6 @@
 
     transition:
         color 160ms ease;
-
 }
 
 
