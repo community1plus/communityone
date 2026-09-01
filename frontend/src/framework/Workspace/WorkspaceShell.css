@@ -18,11 +18,16 @@
    MAIN + GUIDE
    ========================================================= */
 
+/* =========================================
+   WORKSPACE LAYOUT
+========================================= */
+
 .workspace-layout {
 
     display: grid;
 
     grid-template-columns:
+        296px
         minmax(0, 1fr)
         400px;
 
@@ -32,12 +37,11 @@
     min-width: 0;
     min-height: 0;
 
-    box-sizing: border-box;
-
     align-items: stretch;
 
-}
+    box-sizing: border-box;
 
+}
 
 /* =========================================================
    WORKSPACE MAIN
