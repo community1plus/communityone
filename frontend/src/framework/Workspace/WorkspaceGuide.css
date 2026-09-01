@@ -7,13 +7,14 @@
 ========================================= */
 
 .workspace-guide {
+
     display: flex;
     flex-direction: column;
 
+    flex: 1 1 auto;
+
     width: 100%;
     min-width: 0;
-
-    height: 100%;
     min-height: 0;
 
     box-sizing: border-box;
