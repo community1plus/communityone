@@ -61,18 +61,16 @@
 
 .workspace-sidebar {
 
-    width: 100%;
-    height: 100%;
+    display: flex;
+    flex-direction: column;
 
-    min-width: 0;
+    width: 400px;
+    height: 100%;
     min-height: 0;
 
     box-sizing: border-box;
 
-    border-left:
-        1px solid
-        var(--border-color, #e8e8e8);
-
+    border-left: 1px solid var(--border-color, #e8e8e8);
 }
 
 
@@ -83,6 +81,8 @@
 
     display: flex;
     flex-direction: column;
+
+    flex: 1 1 auto;
 
     width: 100%;
     height: 100%;
