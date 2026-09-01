@@ -7,24 +7,24 @@
 ========================================= */
 
 .workspace-guide {
-
     display: flex;
     flex-direction: column;
 
     width: 100%;
     min-width: 0;
 
-    flex: 1 1 auto;
-
-    align-self: stretch;
-
+    height: 100%;
     min-height: 0;
 
     box-sizing: border-box;
 
-    background:
-        var(--surface-primary, #fff);
+    border: 1px solid var(--border-color, #e8e8e8);
 
+    border-radius: 0;
+
+    background: var(--surface-primary, #fff);
+
+    overflow: hidden;
 }
 
 
