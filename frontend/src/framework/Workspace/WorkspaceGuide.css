@@ -2,29 +2,25 @@
    WORKSPACE GUIDE
 ========================================= */
 
-/* =========================================
-   WORKSPACE GUIDE
-========================================= */
-
 .workspace-guide {
 
     display: flex;
     flex-direction: column;
 
-    flex: 1 1 auto;
-
     width: 100%;
+    height: 100%;
     min-width: 0;
     min-height: 0;
 
+    flex: 1 1 auto;
+
     box-sizing: border-box;
 
-    border: 0;
-    border-radius: 0;
-
-    background: var(--surface-primary, #fff);
+    background:
+        var(--surface-primary, #fff);
 
     overflow: hidden;
+
 }
 
 
@@ -36,7 +32,6 @@
 
     display: flex;
     align-items: center;
-    justify-content: center;
 
     width: 100%;
 
@@ -49,6 +44,8 @@
     border-bottom:
         1px solid
         var(--border-color, #e8e8e8);
+
+    flex: 0 0 auto;
 
 }
 
@@ -82,13 +79,18 @@
     display: flex;
     flex-direction: column;
 
-    flex: 1 1 auto;
+    gap: 28px;
 
     width: 100%;
     min-width: 0;
     min-height: 0;
 
+    flex: 1 1 auto;
+
     padding: 32px;
 
     box-sizing: border-box;
+
+    overflow-y: auto;
+
 }
