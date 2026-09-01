@@ -1,3 +1,7 @@
+/* =========================================
+   WORKSPACE NAVIGATION
+========================================= */
+
 .workspace-navigation {
 
     width: 100%;
@@ -23,6 +27,121 @@
     scrollbar-width: none;
 }
 
+
 .workspace-navigation::-webkit-scrollbar {
+
     display: none;
+
+}
+
+
+/* =========================================
+   WORKSPACE TAB
+========================================= */
+
+.workspace-tab {
+
+    appearance: none;
+    -webkit-appearance: none;
+
+    border: 0;
+    outline: 0;
+
+    background: transparent;
+
+    margin: 0;
+    padding: 0 0 16px 0;
+
+    box-sizing: border-box;
+
+    font: inherit;
+    font-size: 0.95rem;
+    font-weight: 500;
+    line-height: 1.2;
+
+    color:
+        var(--text-secondary, #666);
+
+    cursor: pointer;
+
+    white-space: nowrap;
+
+    position: relative;
+
+    transition:
+        color 160ms ease;
+
+}
+
+
+/* =========================================
+   TAB HOVER
+========================================= */
+
+.workspace-tab:hover {
+
+    color:
+        var(--text-primary, #111);
+
+}
+
+
+/* =========================================
+   ACTIVE TAB
+========================================= */
+
+.workspace-tab.active {
+
+    color:
+        var(--text-primary, #111);
+
+}
+
+
+/* =========================================
+   ACTIVE INDICATOR
+========================================= */
+
+.workspace-tab.active::after {
+
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    height: 2px;
+
+    background:
+        var(--accent-color, #b5121b);
+
+}
+
+
+/* =========================================
+   COMPLETED TAB
+========================================= */
+
+.workspace-tab.complete {
+
+    color:
+        var(--text-secondary, #666);
+
+}
+
+
+/* =========================================
+   KEYBOARD FOCUS
+========================================= */
+
+.workspace-tab:focus-visible {
+
+    outline:
+        2px solid
+        var(--accent-color, #b5121b);
+
+    outline-offset: 4px;
+
 }
