@@ -1,12 +1,11 @@
 import "./WorkspacePanel.css";
 
+
 export default function WorkspacePanel({
 
     title,
 
-    content,
-
-    value,
+    children,
 
 }) {
 
@@ -24,25 +23,11 @@ export default function WorkspacePanel({
 
             )}
 
-            {content !== undefined && (
+            <div className="workspace-panel-content">
 
-                <div className="workspace-panel-content">
+                {children}
 
-                    {content}
-
-                </div>
-
-            )}
-
-            {value !== undefined && (
-
-                <div className="workspace-panel-value">
-
-                    {value}
-
-                </div>
-
-            )}
+            </div>
 
         </section>
 
