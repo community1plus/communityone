@@ -39,43 +39,24 @@ export default function WorkspaceGuide({
                GUIDE BODY
             ========================================= */}
 
-            <div className="workspace-guide-body">
+<div className="workspace-guide-body">
 
-{panels.map((panel, index) => (
+    {panels.map((panel, index) => (
 
-    <WorkspacePanel
+        <WorkspacePanel
+            key={
+                panel.id
+                ?? panel.key
+                ?? index
+            }
+            title={panel.title}
+        >
+            {panel.content}
+        </WorkspacePanel>
 
-        key={
-            panel.id
-            ?? panel.key
-            ?? index
-        }
+    ))}
 
-        title={
-            panel.title
-        }
-
-    >
-
-        {panel.content !== undefined &&
-            panel.content
-        }
-
-        {panel.value !== undefined && (
-
-            <div className="workspace-panel-value">
-
-                {panel.value}
-
-            </div>
-
-        )}
-
-    </WorkspacePanel>
-
-))}
-
-            </div>
+</div>
 
         </section>
 

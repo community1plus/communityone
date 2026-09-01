@@ -1,55 +1,100 @@
+/* =========================================
+   WORKSPACE GUIDE
+========================================= */
+
 .workspace-guide {
+
     display: flex;
     flex-direction: column;
 
     width: 100%;
     height: 100%;
+
+    min-width: 0;
     min-height: 0;
 
     box-sizing: border-box;
 
-    background: #ffffff;
-    border: 1px solid #e8e8e8;
+    border:
+        1px solid
+        var(--border-color, #e8e8e8);
+
     border-radius: 28px;
 
+    background:
+        var(--surface-primary, #fff);
+
     overflow: hidden;
+
 }
 
 
-/* ==================================================
+/* =========================================
    GUIDE HEADER
-   ================================================== */
+========================================= */
 
 .workspace-guide-header {
+
     flex: 0 0 auto;
 
-    padding: 32px 36px;
+    display: flex;
+    align-items: center;
 
-    border-bottom: 1px solid #e8e8e8;
+    width: 100%;
+
+    min-height: 86px;
+
+    padding: 0 32px;
+
+    box-sizing: border-box;
+
+    border-bottom:
+        1px solid
+        var(--border-color, #e8e8e8);
+
 }
 
 
-/* ==================================================
+/* =========================================
+   GUIDE TITLE
+========================================= */
+
+.workspace-guide-title {
+
+    margin: 0;
+
+    font-size: 1rem;
+
+    font-weight: 600;
+
+    line-height: 1.3;
+
+    color:
+        var(--text-primary, #111);
+
+}
+
+
+/* =========================================
    GUIDE BODY
-   ================================================== */
+========================================= */
 
 .workspace-guide-body {
-    flex: 1 1 auto;
 
-    min-height: 0;
+    flex: 1 1 auto;
 
     display: flex;
     flex-direction: column;
 
-    padding: 40px 36px;
-}
+    width: 100%;
 
-
-/* ==================================================
-   PANELS
-   ================================================== */
-
-.workspace-guide-body > .workspace-panel {
-    flex: 1 1 auto;
+    min-width: 0;
     min-height: 0;
+
+    box-sizing: border-box;
+
+    padding: 32px;
+
+    overflow: hidden;
+
 }
