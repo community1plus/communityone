@@ -1,4 +1,5 @@
 import "./WorkspaceGuide.css";
+import WorkspacePanel from "./WorkspacePanel";
 
 
 export default function WorkspaceGuide({
@@ -11,7 +12,9 @@ export default function WorkspaceGuide({
 
         title = "",
         panels = [],
+
     } = model;
+
 
     return (
 
@@ -41,7 +44,7 @@ export default function WorkspaceGuide({
 
                 {panels.map((panel, index) => (
 
-                    <section
+                    <WorkspacePanel
 
                         key={
                             panel.id
@@ -49,46 +52,24 @@ export default function WorkspaceGuide({
                             ?? index
                         }
 
-                        className="workspace-panel"
-                    >
+                        title={
+                            panel.title
+                        }
 
-                        {panel.title && (
+                        content={
+                            panel.content
+                        }
 
-                            <h3 className="workspace-panel-title">
+                        value={
+                            panel.value
+                        }
 
-                                {panel.title}
-
-                            </h3>
-
-                        )}
-
-
-                        {panel.content !== undefined && (
-
-                            <div className="workspace-panel-content">
-
-                                {panel.content}
-
-                            </div>
-
-                        )}
-
-
-                        {panel.value !== undefined && (
-
-                            <div className="workspace-panel-value">
-
-                                {panel.value}
-
-                            </div>
-
-                        )}
-
-                    </section>
+                    />
 
                 ))}
 
             </div>
+
 
         </section>
 

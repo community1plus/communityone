@@ -4,7 +4,9 @@ export default function WorkspacePanel({
 
     title,
 
-    children,
+    content,
+
+    value,
 
 }) {
 
@@ -12,17 +14,35 @@ export default function WorkspacePanel({
 
         <section className="workspace-panel">
 
-            <h3 className="workspace-panel-title">
+            {title && (
 
-                {title}
+                <h3 className="workspace-panel-title">
 
-            </h3>
+                    {title}
 
-            <div className="workspace-panel-content">
+                </h3>
 
-                {children}
+            )}
 
-            </div>
+            {content !== undefined && (
+
+                <div className="workspace-panel-content">
+
+                    {content}
+
+                </div>
+
+            )}
+
+            {value !== undefined && (
+
+                <div className="workspace-panel-value">
+
+                    {value}
+
+                </div>
+
+            )}
 
         </section>
 
