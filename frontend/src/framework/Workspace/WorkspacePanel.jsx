@@ -1,42 +1,24 @@
-import "./WorkspaceGuide.css";
-import WorkspacePanel from "./WorkspacePanel";
+import "./WorkspacePanel.css";
 
-export default function WorkspaceGuide({
-    model = {},
+export default function WorkspacePanel({
+    title,
+    children,
 }) {
-    const {
-        title = "",
-        panels = [],
-    } = model;
 
     return (
-        <section className="workspace-guide">
 
-            <header className="workspace-guide-header">
-                <h2 className="workspace-guide-title">
-                    {title}
-                </h2>
-            </header>
+        <section className="workspace-panel">
 
-            <div className="workspace-guide-body">
+            <h3 className="workspace-panel-title">
+                {title}
+            </h3>
 
-                {panels.map((panel, index) => (
-
-                    <WorkspacePanel
-                        key={
-                            panel.id
-                            ?? panel.key
-                            ?? index
-                        }
-                        title={panel.title}
-                    >
-                        {panel.content}
-                    </WorkspacePanel>
-
-                ))}
-
+            <div className="workspace-panel-content">
+                {children}
             </div>
 
         </section>
+
     );
+
 }
