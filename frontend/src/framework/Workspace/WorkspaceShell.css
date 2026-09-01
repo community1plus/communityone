@@ -62,7 +62,13 @@
     min-width: 0;
     min-height: 0;
 
+    height: 100%;
+
     box-sizing: border-box;
+
+    border-left:
+        1px solid
+        var(--border-color, #e8e8e8);
 
 }
 
