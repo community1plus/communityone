@@ -1,5 +1,4 @@
 import "./WorkspaceGuide.css";
-import WorkspacePanel from "./WorkspacePanel";
 
 
 export default function WorkspaceGuide({
