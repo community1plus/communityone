@@ -28,16 +28,17 @@
 
 }
 
+
 /* =========================================
    GUIDE HEADER
 ========================================= */
 
 .workspace-guide-header {
 
-    flex: 0 0 auto;
-
     display: flex;
     align-items: center;
+
+    flex: 0 0 auto;
 
     width: 100%;
 
@@ -80,20 +81,22 @@
 
 .workspace-guide-body {
 
-    flex: 1 1 auto;
-
     display: flex;
     flex-direction: column;
+
+    flex: 1 1 auto;
+
+    gap: 28px;
 
     width: 100%;
 
     min-width: 0;
     min-height: 0;
 
-    box-sizing: border-box;
-
     padding: 32px;
 
-    overflow: hidden;
+    box-sizing: border-box;
+
+    overflow-y: auto;
 
 }
