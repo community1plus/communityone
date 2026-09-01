@@ -15,6 +15,6 @@
         1px solid
         var(--border, #e8e8e8);
 
-    border-radius: 22px;
+    border-radius: none;
 
 }
