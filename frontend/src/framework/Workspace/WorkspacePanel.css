@@ -12,15 +12,6 @@
 
     box-sizing: border-box;
 
-    padding: 32px;
-
-    border:
-        1px solid
-        var(--border-color, #e8e8e8);
-
-    background:
-        var(--surface-primary, #fff);
-
 }
 
 
@@ -30,16 +21,13 @@
 
 .workspace-panel-title {
 
-    margin: 0 0 24px 0;
+    margin: 0 0 16px;
 
-    font-size: 1.5rem;
-
+    font-size: 1.25rem;
     font-weight: 600;
-
     line-height: 1.3;
 
-    color:
-        var(--text-primary, #111);
+    color: var(--text-primary, #111);
 
 }
 
@@ -53,7 +41,6 @@
     width: 100%;
     min-width: 0;
 
-    color:
-        var(--text-primary, #111);
+    box-sizing: border-box;
 
 }
