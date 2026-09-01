@@ -1,6 +1,7 @@
 import "./WorkspaceGuide.css";
 import WorkspacePanel from "./WorkspacePanel";
 
+
 export default function WorkspaceGuide({
 
     model = {},
@@ -19,10 +20,9 @@ export default function WorkspaceGuide({
 
         <section className="workspace-guide">
 
-
-            {/* ==================================================
+            {/* =========================================
                GUIDE HEADER
-               ================================================== */}
+            ========================================= */}
 
             <header className="workspace-guide-header">
 
@@ -35,9 +35,9 @@ export default function WorkspaceGuide({
             </header>
 
 
-            {/* ==================================================
+            {/* =========================================
                GUIDE BODY
-               ================================================== */}
+            ========================================= */}
 
             <div className="workspace-guide-body">
 
@@ -55,20 +55,34 @@ export default function WorkspaceGuide({
                             panel.title
                         }
 
-                        content={
-                            panel.content
-                        }
+                    >
 
-                        value={
-                            panel.value
-                        }
+                        {panel.content !== undefined && (
 
-                    />
+                            <div className="workspace-panel-content">
+
+                                {panel.content}
+
+                            </div>
+
+                        )}
+
+
+                        {panel.value !== undefined && (
+
+                            <div className="workspace-panel-value">
+
+                                {panel.value}
+
+                            </div>
+
+                        )}
+
+                    </WorkspacePanel>
 
                 ))}
 
             </div>
-
 
         </section>
 
