@@ -1,3 +1,4 @@
+import "WorkspaceSidebar.css";
 export default function WorkspaceSidebar({
 
     children,

@@ -1,0 +1,42 @@
+/* =========================================
+   WORKSPACE SIDEBAR
+========================================= */
+
+.workspace-sidebar {
+
+    display: flex;
+    flex-direction: column;
+
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+
+    height: 100%;
+
+    box-sizing: border-box;
+
+    border-left:
+        1px solid
+        var(--border-color, #e8e8e8);
+
+}
+
+
+/* =========================================
+   SIDEBAR INNER
+========================================= */
+
+.workspace-sidebar-inner {
+
+    display: flex;
+    flex-direction: column;
+
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+
+    height: 100%;
+
+    box-sizing: border-box;
+
+}
