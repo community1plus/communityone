@@ -1,7 +1,8 @@
 import PhoneField from "./fields/PhoneField";
 import LocationField from "./fields/LocationField";
 
-import "./FieldRenderer.css";
+import WorkspaceField
+    from "../../framework/Workspace/Form/WorkspaceField";
 
 
 export default function FieldRenderer({
@@ -67,6 +68,10 @@ export default function FieldRenderer({
 
         readOnly = false,
 
+        required = false,
+
+        verificationStatus,
+
     } = field;
 
 
@@ -79,99 +84,56 @@ export default function FieldRenderer({
 
 
     /* =====================================================
-       LABEL ID
-       
-       Used by view mode to associate the displayed
-       value with its label.
+       CONTROL
     ===================================================== */
 
-    const labelId =
-        `${name}-label`;
+    const control = editing ? (
+
+        <input
+            id={name}
+            name={name}
+            type={type}
+            className="workspace-field-input"
+            value={value}
+            readOnly={readOnly}
+            onChange={form.handleChange(name)}
+            onBlur={form.handleBlur(name)}
+        />
+
+    ) : (
+
+        <div
+            id={name}
+            className="workspace-field-value"
+            aria-label={label}
+        >
+            {value || "—"}
+        </div>
+
+    );
 
 
     /* =====================================================
-       RENDER
+       FIELD
     ===================================================== */
 
     return (
 
-        <div className="workspace-field">
+        <WorkspaceField
 
+            label={label}
 
-            {/* =================================================
-               LABEL
-            ================================================= */}
+            hint={helperText}
 
-            {editing ? (
+            required={required}
 
-                <label
-                    id={labelId}
-                    className="workspace-field-label"
-                    htmlFor={name}
-                >
-                    {label}
-                </label>
+            verificationStatus={verificationStatus}
 
-            ) : (
+        >
 
-                <div
-                    id={labelId}
-                    className="workspace-field-label"
-                >
-                    {label}
-                </div>
+            {control}
 
-            )}
-
-
-            {/* =================================================
-               FIELD CONTENT
-            ================================================= */}
-
-            <div className="workspace-field-content">
-
-
-                {editing ? (
-
-                    <input
-                        id={name}
-                        name={name}
-                        type={type}
-                        className="workspace-field-input"
-                        value={value}
-                        readOnly={readOnly}
-                        onChange={form.handleChange(name)}
-                        onBlur={form.handleBlur(name)}
-                    />
-
-                ) : (
-
-                    <div
-                        id={name}
-                        className="workspace-field-value"
-                        aria-labelledby={labelId}
-                    >
-                        {value || "—"}
-                    </div>
-
-                )}
-
-
-                {/* =============================================
-                   HELPER TEXT
-                ============================================= */}
-
-                {helperText && (
-
-                    <div className="workspace-field-helper">
-                        {helperText}
-                    </div>
-
-                )}
-
-            </div>
-
-        </div>
+        </WorkspaceField>
 
     );
 
