@@ -2,7 +2,6 @@
    WORKSPACE FORM
 ========================================= */
 
-
 .workspace-form {
 
     width: 100%;
@@ -24,9 +23,8 @@
 
 .workspace-form .workspace-field {
 
-    width: min(596px, 100%);
+    width: 100%;
 
-    margin-left: auto;
-    margin-right: auto;
+    margin: 0;
 
 }
