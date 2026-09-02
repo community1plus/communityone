@@ -1,8 +1,6 @@
 import PhoneField from "./fields/PhoneField";
 import LocationField from "./fields/LocationField";
-
-import WorkspaceField
-    from "../../framework/Workspace/Form/WorkspaceField";
+import WorkspaceField from "./WorkspaceField";
 
 
 export default function FieldRenderer({
