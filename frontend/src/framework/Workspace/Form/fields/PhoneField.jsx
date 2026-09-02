@@ -3,7 +3,9 @@ import {
     PHONE_COUNTRIES,
 } from "../../../Workspace/profile/profileConstants";
 
-import "../FieldRenderer.css";
+import WorkspaceField
+    from "../../../../framework/Workspace/.../WorkspaceField";
+
 
 export default function PhoneField({
 
@@ -28,9 +30,17 @@ export default function PhoneField({
     } = field;
 
 
+    /* =====================================================
+       VALUE
+    ===================================================== */
+
     const value =
         form.getValue(name) ?? "";
 
+
+    /* =====================================================
+       PHONE COUNTRY
+    ===================================================== */
 
     const phoneCountry =
         form.getValue("phoneCountry");
@@ -49,23 +59,27 @@ export default function PhoneField({
             : DEFAULT_PHONE_COUNTRY;
 
 
+    /* =====================================================
+       READ ONLY
+    ===================================================== */
+
     const isReadOnly =
         readOnly || !editing;
 
 
+    /* =====================================================
+       FIELD
+    ===================================================== */
+
     return (
 
-        <div className="workspace-field">
+        <WorkspaceField
 
-            <label
-                className="workspace-field-label"
-                htmlFor={name}
-            >
+            label={label}
 
-                {label}
+            hint={helperText}
 
-            </label>
-
+        >
 
             <div className="workspace-phone">
 
@@ -80,8 +94,11 @@ export default function PhoneField({
                     onChange={(event) => {
 
                         form.setValue(
+
                             "phoneCountry",
+
                             event.target.value
+
                         );
 
                     }}
@@ -136,18 +153,7 @@ export default function PhoneField({
 
             </div>
 
-
-            {helperText && (
-
-                <div className="workspace-field-helper">
-
-                    {helperText}
-
-                </div>
-
-            )}
-
-        </div>
+        </WorkspaceField>
 
     );
 

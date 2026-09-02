@@ -5,7 +5,8 @@ import { Autocomplete } from "@react-google-maps/api";
 import { useGoogleMaps }
     from "../../../../context/GoogleMapsProvider";
 
-import "../FieldRenderer.css";
+import WorkspaceField
+    from "../../../../framework/Workspace/.../WorkspaceField";
 
 
 export default function LocationField({
@@ -31,6 +32,10 @@ export default function LocationField({
     } = field;
 
 
+    /* =====================================================
+       AUTOCOMPLETE
+    ===================================================== */
+
     const autoRef =
         useRef(null);
 
@@ -40,19 +45,33 @@ export default function LocationField({
     } = useGoogleMaps();
 
 
+    /* =====================================================
+       VALUE
+    ===================================================== */
+
     const value =
         form.getValue(name);
 
+
+    const displayValue =
+        typeof value === "string"
+
+            ? value
+
+            : value?.label ?? "";
+
+
+    /* =====================================================
+       READ ONLY
+    ===================================================== */
 
     const isReadOnly =
         readOnly || !editing;
 
 
-    const displayValue =
-        typeof value === "string"
-            ? value
-            : value?.label ?? "";
-
+    /* =====================================================
+       GOOGLE AUTOCOMPLETE
+    ===================================================== */
 
     const handleLoad =
         (autocomplete) => {
@@ -74,6 +93,10 @@ export default function LocationField({
                 return;
             }
 
+
+            /* =============================================
+               COUNTRY
+            ============================================= */
 
             const countryComponent =
                 place.address_components?.find(
@@ -98,6 +121,10 @@ export default function LocationField({
                     ?.long_name
                 || null;
 
+
+            /* =============================================
+               LOCATION MODEL
+            ============================================= */
 
             const location = {
 
@@ -124,149 +151,142 @@ export default function LocationField({
                     "MANUAL",
 
             };
-console.log(
-    "LOCATION SELECTED",
-    location
-);
 
-console.log(
-    "LOCATION COUNTRY",
-    country,
-    countryCode
-);
+
+            /* =============================================
+               SAVE LOCATION
+            ============================================= */
 
             form.setValue(
+
                 name,
+
                 location
+
             );
 
 
-            /* =====================================
+            /* =============================================
                LOCATION → PHONE COUNTRY
-            ===================================== */
+            ============================================= */
 
-            if (name === "homeLocation") {
+            if (
 
-                if (countryCode) {
+                name === "homeLocation" &&
 
-                    form.setValue(
+                countryCode
 
-                        "phoneCountry",
+            ) {
 
-                        countryCode
+                form.setValue(
 
-                    );
-console.log(
-    "PHONE COUNTRY SET",
-    countryCode
-);
-                }
+                    "phoneCountry",
+
+                    countryCode
+
+                );
 
             }
 
         };
 
 
+    /* =====================================================
+       CONTROL
+    ===================================================== */
+
+    const control = (
+
+        isLoaded && !isReadOnly
+
+    ) ? (
+
+        <Autocomplete
+
+            onLoad={
+                handleLoad
+            }
+
+            onPlaceChanged={
+                handlePlaceChanged
+            }
+
+        >
+
+            <input
+
+                id={name}
+
+                name={name}
+
+                type="text"
+
+                className="workspace-field-input"
+
+                value={displayValue}
+
+                onChange={(event) => {
+
+                    form.setValue(
+
+                        name,
+
+                        event.target.value
+
+                    );
+
+                }}
+
+                onBlur={
+                    form.handleBlur(name)
+                }
+
+                placeholder="Enter your home address"
+
+            />
+
+        </Autocomplete>
+
+    ) : (
+
+        <input
+
+            id={name}
+
+            name={name}
+
+            type="text"
+
+            className="workspace-field-input"
+
+            value={displayValue}
+
+            readOnly={true}
+
+        />
+
+    );
+
+
+    /* =====================================================
+       FIELD
+    ===================================================== */
+
     return (
 
-        <div className="workspace-field">
+        <WorkspaceField
 
-            <label
-                className="workspace-field-label"
-                htmlFor={name}
-            >
+            label={label}
 
-                {label}
+            hint={helperText}
 
-            </label>
+            htmlFor={name}
 
+        >
 
-            {isLoaded && !isReadOnly ? (
+            {control}
 
-                <Autocomplete
-
-                    onLoad={
-                        handleLoad
-                    }
-
-                    onPlaceChanged={
-                        handlePlaceChanged
-                    }
-
-                >
-
-                    <input
-
-                        id={name}
-
-                        name={name}
-
-                        type="text"
-
-                        className="workspace-field-input"
-
-                        value={
-                            displayValue
-                        }
-
-                        onChange={(event) => {
-
-                            form.setValue(
-
-                                name,
-
-                                event.target.value
-
-                            );
-
-                        }}
-
-                        onBlur={
-                            form.handleBlur(name)
-                        }
-
-                        placeholder={
-                            "Enter your home address"
-                        }
-
-                    />
-
-                </Autocomplete>
-
-            ) : (
-
-                <input
-
-                    id={name}
-
-                    name={name}
-
-                    type="text"
-
-                    className="workspace-field-input"
-
-                    value={
-                        displayValue
-                    }
-
-                    readOnly={true}
-
-                />
-
-            )}
-
-
-            {helperText && (
-
-                <div className="workspace-field-helper">
-
-                    {helperText}
-
-                </div>
-
-            )}
-
-        </div>
+        </WorkspaceField>
 
     );
 
