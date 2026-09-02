@@ -1,5 +1,3 @@
-import "./WorkspaceField.css";
-
 export default function WorkspaceField({
 
     label,
@@ -15,6 +13,11 @@ export default function WorkspaceField({
     return (
 
         <div className="workspace-field">
+
+
+            {/* =================================================
+               LABEL
+            ================================================= */}
 
             {label && (
 
@@ -36,6 +39,7 @@ export default function WorkspaceField({
 
                     </span>
 
+
                     {verificationStatus && (
 
                         <span
@@ -54,27 +58,38 @@ export default function WorkspaceField({
 
             )}
 
-            {children}
 
-            {hint && (
+            {/* =================================================
+               CONTENT
+            ================================================= */}
 
-                <div className="workspace-field-hint">
+            <div className="workspace-field-content">
 
-                    {hint}
+                {children}
 
-                </div>
 
-            )}
+                {hint && (
 
-            {error && (
+                    <div className="workspace-field-hint">
 
-                <div className="workspace-field-error">
+                        {hint}
 
-                    {error}
+                    </div>
 
-                </div>
+                )}
 
-            )}
+
+                {error && (
+
+                    <div className="workspace-field-error">
+
+                        {error}
+
+                    </div>
+
+                )}
+
+            </div>
 
         </div>
 
