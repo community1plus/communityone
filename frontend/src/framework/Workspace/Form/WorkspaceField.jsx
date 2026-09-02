@@ -6,6 +6,7 @@ export default function WorkspaceField({
     required = false,
     valid,
     verificationStatus,
+    htmlFor,
     children,
 
 }) {
@@ -21,7 +22,10 @@ export default function WorkspaceField({
 
             {label && (
 
-                <label className="workspace-field-label">
+                <label
+                    className="workspace-field-label"
+                    htmlFor={htmlFor}
+                >
 
                     <span>
 
@@ -47,7 +51,9 @@ export default function WorkspaceField({
                         >
 
                             {verificationStatus.status === "verified"
+
                                 ? "✓ Verified"
+
                                 : "✕ Unverified"}
 
                         </span>
