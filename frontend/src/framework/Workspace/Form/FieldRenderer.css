@@ -8,7 +8,9 @@
 
     display: grid;
 
-    grid-template-columns: max-content minmax(0, 1fr);
+    grid-template-columns:
+        max-content
+        minmax(0, 1fr);
 
     column-gap: 20px;
 
@@ -29,7 +31,7 @@
 
     white-space: nowrap;
 
-    color: #4b4b4b;
+    color: var(--text-primary, #4b4b4b);
 
 }
 
@@ -45,7 +47,7 @@
     display: flex;
     flex-direction: column;
 
-    align-items: flex-start;
+    align-items: stretch;
 
 }
 
@@ -56,7 +58,7 @@
 
 .workspace-field-value {
 
-    color: #4b4b4b;
+    color: var(--text-primary, #4b4b4b);
 
     line-height: 1.5;
 
@@ -71,7 +73,7 @@
 
     margin-top: 4px;
 
-    color: #667085;
+    color: var(--text-secondary, #667085);
 
     line-height: 1.5;
 
@@ -87,11 +89,12 @@
     width: 100%;
 
     margin: 0;
+
     padding: 8px 10px;
 
     box-sizing: border-box;
 
-    color: #4b4b4b;
+    color: var(--text-primary, #4b4b4b);
 
 }
 
@@ -119,6 +122,7 @@
 
     }
 
+
     .workspace-field {
 
         grid-template-columns: 1fr;
@@ -126,6 +130,7 @@
         row-gap: 8px;
 
     }
+
 
     .workspace-field + .workspace-field {
 
