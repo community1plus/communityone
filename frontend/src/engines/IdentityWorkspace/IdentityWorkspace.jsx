@@ -36,7 +36,7 @@ export default function IdentityWorkspace({
 
 
     /* =====================================
-       WORKSPACE
+       BUILD WORKSPACE
     ===================================== */
 
     const workspace =
@@ -46,11 +46,17 @@ export default function IdentityWorkspace({
         );
 
 
+    /* =====================================
+       WORKSPACE MODEL
+    ===================================== */
+
     const {
 
         banner,
 
         navigation,
+
+        body,
 
         guide,
 
@@ -58,7 +64,7 @@ export default function IdentityWorkspace({
 
 
     /* =====================================
-       PROFILE
+       PROFILE STATE
     ===================================== */
 
     const {
@@ -75,7 +81,7 @@ export default function IdentityWorkspace({
     ===================================== */
 
     const section =
-        workspace?.body?.section
+        body?.section
         ?? null;
 
 
@@ -104,7 +110,7 @@ export default function IdentityWorkspace({
 
 
     /* =====================================
-       HEADER ACTION
+       WORKSPACE CLOSE ACTION
     ===================================== */
 
     const headerAction = (
@@ -217,13 +223,9 @@ export default function IdentityWorkspace({
 
                                 model={section}
 
-                                actions={actions}
-
                             >
 
-                                <div
-                                    className="workspace-section-content"
-                                >
+                                <div className="workspace-section-content">
 
                                     <CapabilityRenderer
 
