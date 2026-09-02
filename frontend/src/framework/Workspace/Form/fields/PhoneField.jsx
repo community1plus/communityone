@@ -3,7 +3,8 @@ import {
     PHONE_COUNTRIES,
 } from "../../../Workspace/profile/profileConstants";
 
-import WorkspaceField from "../WorkspaceField";
+import WorkspaceField
+    from "../WorkspaceField";
 
 
 export default function PhoneField({
@@ -58,6 +59,15 @@ export default function PhoneField({
             : DEFAULT_PHONE_COUNTRY;
 
 
+    const country =
+        PHONE_COUNTRIES.find(
+
+            country =>
+                country.code === selectedCountry
+
+        );
+
+
     /* =====================================================
        READ ONLY
     ===================================================== */
@@ -67,7 +77,51 @@ export default function PhoneField({
 
 
     /* =====================================================
-       FIELD
+       DISPLAY VALUE
+    ===================================================== */
+
+    const displayValue =
+        value
+
+            ? `${country?.dialCode ?? ""} ${value}`
+
+            : "—";
+
+
+    /* =====================================================
+       VIEW MODE
+    ===================================================== */
+
+    if (!editing || readOnly) {
+
+        return (
+
+            <WorkspaceField
+
+                label={label}
+
+                hint={helperText}
+
+            >
+
+                <div
+                    className="workspace-field-value"
+                    aria-label={label}
+                >
+
+                    {displayValue}
+
+                </div>
+
+            </WorkspaceField>
+
+        );
+
+    }
+
+
+    /* =====================================================
+       EDIT MODE
     ===================================================== */
 
     return (
@@ -78,9 +132,16 @@ export default function PhoneField({
 
             hint={helperText}
 
+            htmlFor={name}
+
         >
 
             <div className="workspace-phone">
+
+
+                {/* =========================================
+                   COUNTRY
+                ========================================= */}
 
                 <select
 
@@ -123,6 +184,10 @@ export default function PhoneField({
 
                 </select>
 
+
+                {/* =========================================
+                   PHONE NUMBER
+                ========================================= */}
 
                 <input
 
