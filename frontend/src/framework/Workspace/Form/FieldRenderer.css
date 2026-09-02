@@ -1,89 +1,16 @@
 /* =========================================
-   WORKSPACE FIELD
+   WORKSPACE FORM
 ========================================= */
 
-.workspace-field {
+.workspace-form {
 
     width: 100%;
+    max-width: 760px;
 
-    display: grid;
-
-    grid-template-columns: 160px minmax(0, 1fr);
-
-    column-gap: 48px;
-
-    align-items: start;
-
-}
-
-
-/* =========================================
-   LABEL
-========================================= */
-
-.workspace-field-label {
-
-    padding-top: 2px;
-
-    font-weight: 600;
-
-}
-
-
-/* =========================================
-   CONTENT
-========================================= */
-
-.workspace-field-content {
-
-    min-width: 0;
+    margin: 0 auto;
 
     display: flex;
     flex-direction: column;
-
-    align-items: flex-start;
-
-}
-
-
-/* =========================================
-   VALUE
-========================================= */
-
-.workspace-field-value {
-
-    color: #2878d4;
-
-    line-height: 1.5;
-
-}
-
-
-/* =========================================
-   HELPER
-========================================= */
-
-.workspace-field-helper {
-
-    margin-top: 4px;
-
-    color: #667085;
-
-    line-height: 1.5;
-
-}
-
-
-/* =========================================
-   INPUT
-========================================= */
-
-.workspace-field-input {
-
-    width: 100%;
-
-    margin: 0;
-    padding: 8px 10px;
 
     box-sizing: border-box;
 
@@ -91,40 +18,13 @@
 
 
 /* =========================================
-   FIELD SPACING
+   FORM FIELD
 ========================================= */
 
-.workspace-field + .workspace-field {
+.workspace-form .workspace-field {
 
-    margin-top: 42px;
+    width: 100%;
 
-}
-
-
-/* =========================================
-   RESPONSIVE
-========================================= */
-
-@media (max-width: 760px) {
-
-    .workspace-form .workspace-field {
-
-        width: 100%;
-
-    }
-
-    .workspace-field {
-
-        grid-template-columns: 1fr;
-
-        row-gap: 8px;
-
-    }
-
-    .workspace-field + .workspace-field {
-
-        margin-top: 30px;
-
-    }
+    margin: 0;
 
 }
