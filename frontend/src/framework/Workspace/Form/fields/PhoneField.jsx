@@ -3,8 +3,7 @@ import {
     PHONE_COUNTRIES,
 } from "../../../Workspace/profile/profileConstants";
 
-import WorkspaceField
-    from "../../../../framework/Workspace/.../WorkspaceField";
+import WorkspaceField from "../WorkspaceField";
 
 
 export default function PhoneField({
