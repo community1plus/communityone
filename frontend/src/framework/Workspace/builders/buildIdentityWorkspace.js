@@ -191,28 +191,29 @@ export function buildIdentityWorkspace(
        GUIDE
        ====================================================== */
 
-const guide = {
+    const guide = {
 
-    title:
-        "IDENTITY GUIDE",
+        title:
+            "IDENTITY GUIDE",
 
-    panels: [
+        panels: [
 
-        {
-            id:
-                "welcome",
+            {
 
-            title:
-                "Welcome",
+                id:
+                    "welcome",
 
-            content:
-                "Manage your trusted identity.",
+                title:
+                    "Welcome",
 
-        },
+                content:
+                    "Manage your trusted identity.",
 
-    ],
+            },
 
-};
+        ],
+
+    };
 
 
     /* ======================================================
@@ -247,12 +248,6 @@ const guide = {
        SECTION STATE
        ====================================================== */
 
-    const editing =
-        Boolean(
-            section.runtime?.editing
-        );
-
-
     const saving =
         Boolean(
             section.runtime?.saving
@@ -272,8 +267,11 @@ const guide = {
         edit: () => {
 
             actions.setSectionEditing(
+
                 sectionId,
+
                 true
+
             );
 
         },
@@ -282,7 +280,9 @@ const guide = {
         clear: () => {
 
             actions.clearSection(
+
                 sectionId
+
             );
 
         },
@@ -291,7 +291,9 @@ const guide = {
         reset: () => {
 
             actions.resetSection(
+
                 sectionId
+
             );
 
         },
@@ -307,7 +309,9 @@ const guide = {
         save: async () => {
 
             await actions.handleSaveSection(
+
                 sectionId
+
             );
 
         },
@@ -317,24 +321,28 @@ const guide = {
 
     /* ======================================================
        ACTION VISIBILITY
+       
+       All configured section actions are permanently
+       available. Runtime state controls disabled state,
+       not whether the action exists.
        ====================================================== */
 
     const isActionVisible = {
 
         edit:
-            !editing,
+            true,
 
         clear:
-            editing,
+            true,
 
         reset:
-            editing,
+            true,
 
         exit:
             true,
 
         save:
-            editing,
+            true,
 
     };
 
@@ -361,9 +369,16 @@ const guide = {
                     ];
 
 
+                /*
+                 * Ignore unknown or unsupported actions.
+                 */
+
                 if (
+
                     !definition ||
+
                     !handler
+
                 ) {
 
                     return null;
@@ -371,16 +386,27 @@ const guide = {
                 }
 
 
+                /*
+                 * All known actions are visible.
+                 */
+
                 if (
+
                     !isActionVisible[
                         actionId
                     ]
+
                 ) {
 
                     return null;
 
                 }
 
+
+                /*
+                 * Resolve the action ID into the
+                 * renderable WorkspaceSectionAction model.
+                 */
 
                 return {
 
