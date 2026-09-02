@@ -5,8 +5,7 @@ import { Autocomplete } from "@react-google-maps/api";
 import { useGoogleMaps }
     from "../../../../context/GoogleMapsProvider";
 
-import WorkspaceField
-    from "../../../../framework/Workspace/.../WorkspaceField";
+import WorkspaceField from "../WorkspaceField";
 
 
 export default function LocationField({
