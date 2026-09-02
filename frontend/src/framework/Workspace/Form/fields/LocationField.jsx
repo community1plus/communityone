@@ -5,7 +5,8 @@ import { Autocomplete } from "@react-google-maps/api";
 import { useGoogleMaps }
     from "../../../../context/GoogleMapsProvider";
 
-import WorkspaceField from "../WorkspaceField";
+import WorkspaceField
+    from "../WorkspaceField";
 
 
 export default function LocationField({
@@ -153,7 +154,7 @@ export default function LocationField({
 
 
             /* =============================================
-               SAVE LOCATION
+               SAVE LOCATION VALUE
             ============================================= */
 
             form.setValue(
@@ -194,77 +195,99 @@ export default function LocationField({
        CONTROL
     ===================================================== */
 
-    const control = (
+    let control;
 
-        isLoaded && !isReadOnly
 
-    ) ? (
+    if (!editing || readOnly) {
 
-        <Autocomplete
+        control = (
 
-            onLoad={
-                handleLoad
-            }
-
-            onPlaceChanged={
-                handlePlaceChanged
-            }
-
-        >
-
-            <input
-
+            <div
                 id={name}
+                className="workspace-field-value"
+            >
 
-                name={name}
+                {displayValue || "—"}
 
-                type="text"
+            </div>
 
-                className="workspace-field-input"
+        );
 
-                value={displayValue}
+    } else {
 
-                onChange={(event) => {
+        control = (
 
-                    form.setValue(
+            isLoaded ? (
 
-                        name,
+                <Autocomplete
 
-                        event.target.value
+                    onLoad={
+                        handleLoad
+                    }
 
-                    );
+                    onPlaceChanged={
+                        handlePlaceChanged
+                    }
 
-                }}
+                >
 
-                onBlur={
-                    form.handleBlur(name)
-                }
+                    <input
 
-                placeholder="Enter your home address"
+                        id={name}
 
-            />
+                        name={name}
 
-        </Autocomplete>
+                        type="text"
 
-    ) : (
+                        className="workspace-field-input"
 
-        <input
+                        value={displayValue}
 
-            id={name}
+                        onChange={(event) => {
 
-            name={name}
+                            form.setValue(
 
-            type="text"
+                                name,
 
-            className="workspace-field-input"
+                                event.target.value
 
-            value={displayValue}
+                            );
 
-            readOnly={true}
+                        }}
 
-        />
+                        onBlur={
+                            form.handleBlur(name)
+                        }
 
-    );
+                        placeholder="Enter your home address"
+
+                    />
+
+                </Autocomplete>
+
+            ) : (
+
+                <input
+
+                    id={name}
+
+                    name={name}
+
+                    type="text"
+
+                    className="workspace-field-input"
+
+                    value={displayValue}
+
+                    readOnly={true}
+
+                />
+
+            )
+
+        );
+
+    }
 
 
     /* =====================================================
