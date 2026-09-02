@@ -8,9 +8,9 @@
 
     display: grid;
 
-    grid-template-columns: 160px minmax(0, 1fr);
+    grid-template-columns: 120px minmax(0, 1fr);
 
-    column-gap: 48px;
+    column-gap: 24px;
 
     align-items: start;
 
