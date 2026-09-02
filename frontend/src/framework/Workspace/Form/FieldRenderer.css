@@ -8,9 +8,9 @@
 
     display: grid;
 
-    grid-template-columns: 120px minmax(0, 1fr);
+    grid-template-columns: max-content minmax(0, 1fr);
 
-    column-gap: 24px;
+    column-gap: 20px;
 
     align-items: start;
 
@@ -26,6 +26,10 @@
     padding-top: 2px;
 
     font-weight: 600;
+
+    white-space: nowrap;
+
+    color: #4b4b4b;
 
 }
 
@@ -52,7 +56,7 @@
 
 .workspace-field-value {
 
-    color: #2878d4;
+    color: #4b4b4b;
 
     line-height: 1.5;
 
@@ -86,6 +90,8 @@
     padding: 8px 10px;
 
     box-sizing: border-box;
+
+    color: #4b4b4b;
 
 }
 

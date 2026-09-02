@@ -5,9 +5,11 @@ import "./FieldRenderer.css";
 
 
 export default function FieldRenderer({
+
     field,
     form,
     editing,
+
 }) {
 
     if (!field) {
@@ -22,6 +24,7 @@ export default function FieldRenderer({
     switch (field.type) {
 
         case "location":
+
             return (
                 <LocationField
                     field={field}
@@ -30,7 +33,9 @@ export default function FieldRenderer({
                 />
             );
 
+
         case "phone":
+
             return (
                 <PhoneField
                     field={field}
@@ -39,8 +44,10 @@ export default function FieldRenderer({
                 />
             );
 
+
         default:
             break;
+
     }
 
 
@@ -49,44 +56,37 @@ export default function FieldRenderer({
     ===================================================== */
 
     const {
+
         name,
+
         label,
+
         type = "text",
+
         helperText,
+
         readOnly = false,
+
     } = field;
 
 
-    const value = form.getValue(name) ?? "";
+    /* =====================================================
+       VALUE
+    ===================================================== */
+
+    const value =
+        form.getValue(name) ?? "";
 
 
     /* =====================================================
-       FIELD CONTROL
+       LABEL ID
+       
+       Used by view mode to associate the displayed
+       value with its label.
     ===================================================== */
 
-    const control = editing ? (
-
-        <input
-            id={name}
-            name={name}
-            type={type}
-            className="workspace-field-input"
-            value={value}
-            readOnly={readOnly}
-            onChange={form.handleChange(name)}
-            onBlur={form.handleBlur(name)}
-        />
-
-    ) : (
-
-        <div
-            id={name}
-            className="workspace-field-value"
-        >
-            {value || "—"}
-        </div>
-
-    );
+    const labelId =
+        `${name}-label`;
 
 
     /* =====================================================
@@ -97,18 +97,69 @@ export default function FieldRenderer({
 
         <div className="workspace-field">
 
-            <label
-                className="workspace-field-label"
-                htmlFor={name}
-            >
-                {label}
-            </label>
 
+            {/* =================================================
+               LABEL
+            ================================================= */}
+
+            {editing ? (
+
+                <label
+                    id={labelId}
+                    className="workspace-field-label"
+                    htmlFor={name}
+                >
+                    {label}
+                </label>
+
+            ) : (
+
+                <div
+                    id={labelId}
+                    className="workspace-field-label"
+                >
+                    {label}
+                </div>
+
+            )}
+
+
+            {/* =================================================
+               FIELD CONTENT
+            ================================================= */}
 
             <div className="workspace-field-content">
 
-                {control}
 
+                {editing ? (
+
+                    <input
+                        id={name}
+                        name={name}
+                        type={type}
+                        className="workspace-field-input"
+                        value={value}
+                        readOnly={readOnly}
+                        onChange={form.handleChange(name)}
+                        onBlur={form.handleBlur(name)}
+                    />
+
+                ) : (
+
+                    <div
+                        id={name}
+                        className="workspace-field-value"
+                        aria-labelledby={labelId}
+                    >
+                        {value || "—"}
+                    </div>
+
+                )}
+
+
+                {/* =============================================
+                   HELPER TEXT
+                ============================================= */}
 
                 {helperText && (
 
@@ -123,4 +174,5 @@ export default function FieldRenderer({
         </div>
 
     );
+
 }
