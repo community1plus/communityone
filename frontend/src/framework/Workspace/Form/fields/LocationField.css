@@ -6,11 +6,6 @@
 > .pac-target-input {
 
     width: 100%;
-
-}
-
-.workspace-field-content > div {
-
-    width: 100%;
+    max-width: 100%;
 
 }
