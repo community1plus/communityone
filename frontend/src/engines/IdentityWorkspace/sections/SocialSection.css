@@ -19,9 +19,7 @@
 
     width: 100%;
 
-    margin: 0 0 24px;
-
-    box-sizing: border-box;
+    margin: 0 0 12px;
 
 }
 
@@ -30,7 +28,7 @@
 
     margin: 0;
 
-    font-size: 1.35rem;
+    font-size: 1.3rem;
 
     font-weight: 600;
 
@@ -48,6 +46,8 @@
 .social-account-list {
 
     width: 100%;
+
+    max-width: 760px;
 
     display: flex;
 
@@ -73,8 +73,6 @@
     width: 100%;
 
     min-height: 58px;
-
-    padding: 0;
 
     box-sizing: border-box;
 
@@ -110,6 +108,8 @@
     align-items: center;
 
     justify-content: flex-end;
+
+    min-width: 80px;
 
 }
 

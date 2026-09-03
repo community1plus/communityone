@@ -114,10 +114,7 @@ export default function SocialSection({
                                     <button
                                         type="button"
                                         className="social-account-verify"
-                                        disabled={
-                                            !editing ||
-                                            !connected
-                                        }
+                                        disabled={!editing}
                                     >
 
                                         Verify
