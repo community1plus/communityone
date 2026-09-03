@@ -1,20 +1,16 @@
 /* =========================================
-   PHONE FIELD
+   PHONE
 ========================================= */
 
 .workspace-phone {
 
-    display: grid;
+    display: flex;
 
-    grid-template-columns:
-        auto
-        minmax(0, 1fr);
-
-    gap: 8px;
+    align-items: stretch;
 
     width: 100%;
 
-    min-width: 0;
+    max-width: 520px;
 
 }
 
@@ -25,19 +21,15 @@
 
 .workspace-phone-country {
 
-    width: auto;
+    width: 82px;
 
-    min-width: 82px;
+    flex: 0 0 82px;
 
     margin: 0;
 
-    padding: 8px 10px;
+    padding: 8px 6px;
 
     box-sizing: border-box;
-
-    font: inherit;
-
-    color: var(--text-primary, #4b4b4b);
 
 }
 
@@ -46,9 +38,12 @@
    PHONE INPUT
 ========================================= */
 
-.workspace-phone
-.workspace-field-input {
+.workspace-phone .workspace-field-input {
 
-    min-width: 0;
+    flex: 1 1 auto;
+
+    width: auto;
+
+    max-width: none;
 
 }
