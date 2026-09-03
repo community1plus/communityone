@@ -1,32 +1,46 @@
 import "./SocialSection.css";
 
+
 const SOCIAL_PROVIDERS = [
+
     {
         id: "facebook",
         label: "Facebook",
     },
+
     {
         id: "instagram",
         label: "Instagram",
     },
+
     {
         id: "youtube",
         label: "YouTube",
     },
+
     {
         id: "x",
         label: "X",
     },
+
 ];
 
+
 export default function SocialSection({
+
     form,
     editing,
+
 }) {
 
     return (
 
         <div className="social-section">
+
+
+            {/* =================================================
+               SECTION INTRO
+            ================================================= */}
 
             <div className="social-section-header">
 
@@ -34,57 +48,85 @@ export default function SocialSection({
                     Connected Accounts
                 </h2>
 
-                <p>
-                    Connect your social accounts to strengthen
-                    your identity in Community One.
-                </p>
-
             </div>
 
 
-            <div className="social-account-grid">
+            {/* =================================================
+               SOCIAL ACCOUNTS
+            ================================================= */}
+
+            <div className="social-account-list">
 
                 {SOCIAL_PROVIDERS.map((provider) => {
 
+
                     const connected =
-                        form.getValue(
-                            `social.${provider.id}.connected`
+                        Boolean(
+                            form.getValue(
+                                `social.${provider.id}.connected`
+                            )
                         );
+
+
+                    const verified =
+                        Boolean(
+                            form.getValue(
+                                `social.${provider.id}.verified`
+                            )
+                        );
+
 
                     return (
 
                         <div
-                            className="social-account"
+                            className="social-account-row"
                             key={provider.id}
                         >
 
-                            <div className="social-account-info">
 
-                                <strong>
-                                    {provider.label}
-                                </strong>
+                            {/* =================================
+                               SOCIAL MEDIA
+                            ================================= */}
 
-                                <span>
-                                    {connected
-                                        ? "Connected"
-                                        : "Not connected"
-                                    }
-                                </span>
+                            <div className="social-account-name">
+
+                                {provider.label}
 
                             </div>
 
 
-                            <button
-                                type="button"
-                                disabled={!editing}
-                            >
+                            {/* =================================
+                               STATE / ACTION
+                            ================================= */}
 
-                                {connected
-                                    ? "Manage"
-                                    : "Connect"
-                                }
+                            <div className="social-account-action">
 
-                            </button>
+                                {verified ? (
+
+                                    <span className="social-account-verified">
+
+                                        ✓ Verified
+
+                                    </span>
+
+                                ) : (
+
+                                    <button
+                                        type="button"
+                                        className="social-account-verify"
+                                        disabled={
+                                            !editing ||
+                                            !connected
+                                        }
+                                    >
+
+                                        Verify
+
+                                    </button>
+
+                                )}
+
+                            </div>
 
                         </div>
 
@@ -97,4 +139,5 @@ export default function SocialSection({
         </div>
 
     );
+
 }

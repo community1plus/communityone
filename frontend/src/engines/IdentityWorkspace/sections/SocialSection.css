@@ -1,132 +1,202 @@
+/* =========================================
+   SOCIAL SECTION
+========================================= */
+
 .social-section {
+
     width: 100%;
-    max-width: 960px;
-}
-
-.social-section-header {
-    margin-bottom: 28px;
-}
-
-.social-section-header h2 {
-    margin: 0 0 8px;
-
-    font-size: 1.35rem;
-    font-weight: 600;
-
-    color: #222222;
-}
-
-.social-section-header p {
-    margin: 0;
-
-    color: #526b84;
-
-    font-size: 0.95rem;
-}
-
-
-/* =====================================
-   ACCOUNT GRID
-===================================== */
-
-.social-account-grid {
-    display: grid;
-
-    grid-template-columns:
-        repeat(2, minmax(0, 1fr));
-
-    gap: 16px;
-}
-
-
-/* =====================================
-   ACCOUNT CARD
-===================================== */
-
-.social-account {
-    display: flex;
-
-    align-items: center;
-    justify-content: space-between;
-
-    min-height: 110px;
 
     box-sizing: border-box;
 
-    padding: 20px 22px;
-
-    border: 1px solid #d7dde5;
-    border-radius: 14px;
-
-    background: #f8fafc;
 }
 
 
-/* =====================================
-   ACCOUNT INFORMATION
-===================================== */
+/* =========================================
+   SECTION HEADER
+========================================= */
 
-.social-account-info {
+.social-section-header {
+
+    width: 100%;
+
+    margin: 0 0 24px;
+
+    box-sizing: border-box;
+
+}
+
+
+.social-section-header h2 {
+
+    margin: 0;
+
+    font-size: 1.35rem;
+
+    font-weight: 600;
+
+    line-height: 1.3;
+
+    color: var(--text-primary, #4b4b4b);
+
+}
+
+
+/* =========================================
+   ACCOUNT LIST
+========================================= */
+
+.social-account-list {
+
+    width: 100%;
+
     display: flex;
 
     flex-direction: column;
 
-    gap: 6px;
 }
 
-.social-account-info strong {
+
+/* =========================================
+   ACCOUNT ROW
+========================================= */
+
+.social-account-row {
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        auto;
+
+    align-items: center;
+
+    width: 100%;
+
+    min-height: 58px;
+
+    padding: 0;
+
+    box-sizing: border-box;
+
+    border-bottom: 1px solid
+        var(--border-color, #e8e8e8);
+
+}
+
+
+/* =========================================
+   SOCIAL MEDIA NAME
+========================================= */
+
+.social-account-name {
+
     font-size: 1rem;
+
     font-weight: 600;
 
-    color: #222222;
-}
+    color: var(--text-primary, #4b4b4b);
 
-.social-account-info span {
-    font-size: 0.9rem;
-
-    color: #526b84;
 }
 
 
-/* =====================================
+/* =========================================
    ACTION
-===================================== */
+========================================= */
 
-.social-account button {
-    flex-shrink: 0;
+.social-account-action {
 
-    padding: 10px 20px;
+    display: flex;
 
-    border: 1px solid #b51224;
-    border-radius: 20px;
+    align-items: center;
 
-    background: #b51224;
-    color: #ffffff;
+    justify-content: flex-end;
+
+}
+
+
+/* =========================================
+   VERIFY
+========================================= */
+
+.social-account-verify {
+
+    margin: 0;
+
+    padding: 0;
+
+    border: 0;
+
+    background: transparent;
 
     font: inherit;
 
+    font-size: 0.95rem;
+
+    font-weight: 600;
+
+    color: var(--accent-color, #9b111e);
+
     cursor: pointer;
+
 }
 
-.social-account button:hover:not(:disabled) {
-    opacity: 0.9;
+
+.social-account-verify:hover:not(:disabled) {
+
+    text-decoration: underline;
+
 }
 
-.social-account button:disabled {
-    opacity: 0.45;
+
+/* =========================================
+   DISABLED
+========================================= */
+
+.social-account-verify:disabled {
+
+    color: var(--text-secondary, #98a2b3);
 
     cursor: default;
+
 }
 
 
-/* =====================================
+/* =========================================
+   VERIFIED
+========================================= */
+
+.social-account-verified {
+
+    font-size: 0.95rem;
+
+    font-weight: 600;
+
+    color: #2f8f6b;
+
+}
+
+
+/* =========================================
+   LAST ROW
+========================================= */
+
+.social-account-row:last-child {
+
+    border-bottom: 0;
+
+}
+
+
+/* =========================================
    RESPONSIVE
-===================================== */
+========================================= */
 
-@media (max-width: 760px) {
+@media (max-width: 600px) {
 
-    .social-account-grid {
-        grid-template-columns: 1fr;
+    .social-account-row {
+
+        min-height: 54px;
+
     }
 
 }
