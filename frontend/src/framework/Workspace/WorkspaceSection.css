@@ -136,3 +136,19 @@
 .workspace-section-action:not(:disabled):hover {
     color: var(--accent-color, #c8102e);
 }
+
+/* =========================================
+   SECTION CONTENT
+========================================= */
+
+.workspace-section-content {
+
+    width: 100%;
+
+    min-width: 0;
+
+    box-sizing: border-box;
+
+    padding: 32px;
+
+}
