@@ -84,8 +84,6 @@ export default function WorkspaceField({
 
             <div className="workspace-field-content">
 
-                {children}
-
 
                 {hint && (
 
@@ -96,6 +94,7 @@ export default function WorkspaceField({
                     </div>
 
                 )}
+                {children}
 
 
                 {error && (
