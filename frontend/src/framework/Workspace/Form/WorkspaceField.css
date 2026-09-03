@@ -15,9 +15,9 @@
     align-items: start;
 
     width: 100%;
+    min-width: 0;
 
     margin: 0;
-
     padding: 20px 0;
 
     box-sizing: border-box;
@@ -50,15 +50,11 @@
 
     min-width: 0;
 
-    padding-top: 2px;
-
     font-size: 15px;
-
     font-weight: 700;
 
-    line-height: 1.5;
-
-    color: var(--text-primary, #4b4b4b);
+    color:
+        var(--text-primary, #4b4b4b);
 
 }
 
@@ -75,8 +71,6 @@
 
     align-items: flex-start;
 
-    width: 100%;
-
     min-width: 0;
 
 }
@@ -88,9 +82,8 @@
 
 .workspace-field-value {
 
-    width: 100%;
-
-    color: var(--text-primary, #4b4b4b);
+    color:
+        var(--text-primary, #4b4b4b);
 
     line-height: 1.5;
 
@@ -103,29 +96,45 @@
 
 .workspace-field-input {
 
-    width: 100%;
+    display: block;
 
+    width: 100%;
     max-width: 520px;
 
     min-height: 42px;
 
     margin: 0;
-
-    padding: 9px 12px;
+    padding: 8px 10px;
 
     box-sizing: border-box;
 
-    border: 1px solid var(--border-color, #dcdcdc);
+    border:
+        1px solid
+        var(--border-color, #dcdcdc);
 
-    border-radius: 4px;
+    border-radius: 6px;
 
     background: #fff;
 
     font-family: inherit;
-
     font-size: 1rem;
 
-    color: var(--text-primary, #4b4b4b);
+    color:
+        var(--text-primary, #4b4b4b);
+
+}
+
+
+/* =========================================
+   INPUT FOCUS
+========================================= */
+
+.workspace-field-input:focus {
+
+    outline: none;
+
+    border-color:
+        var(--accent-color, #c41230);
 
 }
 
@@ -139,10 +148,10 @@
     margin-top: 4px;
 
     font-size: 0.9rem;
-
     line-height: 1.5;
 
-    color: var(--text-secondary, #667085);
+    color:
+        var(--text-secondary, #667085);
 
 }
 
@@ -156,10 +165,7 @@
     margin-top: 4px;
 
     font-size: 0.875rem;
-
     font-weight: 500;
-
-    line-height: 1.4;
 
     color: #c53030;
 
@@ -174,36 +180,8 @@
 
     margin-left: 4px;
 
-    color: var(--accent-color, #9b111e);
-
-}
-
-
-/* =========================================
-   VERIFICATION
-========================================= */
-
-.workspace-verification-pill {
-
-    white-space: nowrap;
-
-    font-size: 0.8rem;
-
-    font-weight: 600;
-
-}
-
-
-.workspace-verification-pill.verified {
-
-    color: #2f8f6b;
-
-}
-
-
-.workspace-verification-pill.unverified {
-
-    color: var(--text-secondary, #667085);
+    color:
+        var(--accent-color, #9b111e);
 
 }
 
@@ -219,6 +197,8 @@
         grid-template-columns: 1fr;
 
         row-gap: 8px;
+
+        padding: 16px 0;
 
     }
 
