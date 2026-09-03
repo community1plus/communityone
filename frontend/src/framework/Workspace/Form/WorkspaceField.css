@@ -180,7 +180,70 @@
 
 }
 
+/* =========================================
+   PHONE FIELD
+========================================= */
 
+.workspace-phone {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    width: 100%;
+
+    min-width: 0;
+
+}
+
+
+/* =========================================
+   PHONE COUNTRY
+========================================= */
+
+.workspace-phone-country {
+
+    flex: 0 0 auto;
+
+    height: 42px;
+
+    margin: 0;
+    padding: 0 8px;
+
+    box-sizing: border-box;
+
+    border:
+        1px solid
+        var(--border-color, #dcdcdc);
+
+    border-radius: 6px;
+
+    background: #fff;
+
+    font-family: inherit;
+    font-size: 0.95rem;
+
+    color:
+        var(--text-primary, #4b4b4b);
+
+}
+
+
+/* =========================================
+   PHONE INPUT
+========================================= */
+
+.workspace-phone .workspace-field-input {
+
+    flex: 0 1 520px;
+
+    width: 100%;
+
+    max-width: 520px;
+
+}
 /* =========================================
    RESPONSIVE
 ========================================= */
