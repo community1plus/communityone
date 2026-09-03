@@ -1,0 +1,16 @@
+/* =========================================
+   LOCATION FIELD
+========================================= */
+
+.workspace-field-content
+> .pac-target-input {
+
+    width: 100%;
+
+}
+
+.workspace-field-content > div {
+
+    width: 100%;
+
+}

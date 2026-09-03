@@ -1,12 +1,21 @@
+import "./WorkspaceField.css";
+
 export default function WorkspaceField({
 
+    name,
+
     label,
+
     hint,
+
     error,
+
     required = false,
+
     valid,
+
     verificationStatus,
-    htmlFor,
+
     children,
 
 }) {
@@ -16,15 +25,15 @@ export default function WorkspaceField({
         <div className="workspace-field">
 
 
-            {/* =================================================
+            {/* =============================================
                LABEL
-            ================================================= */}
+            ============================================= */}
 
             {label && (
 
                 <label
                     className="workspace-field-label"
-                    htmlFor={htmlFor}
+                    htmlFor={name}
                 >
 
                     <span>
@@ -47,14 +56,18 @@ export default function WorkspaceField({
                     {verificationStatus && (
 
                         <span
-                            className={`workspace-verification-pill ${verificationStatus.status}`}
+                            className={
+                                `workspace-verification-pill ${verificationStatus.status}`
+                            }
                         >
 
                             {verificationStatus.status === "verified"
 
                                 ? "✓ Verified"
 
-                                : "✕ Unverified"}
+                                : "✕ Unverified"
+
+                            }
 
                         </span>
 
@@ -65,9 +78,9 @@ export default function WorkspaceField({
             )}
 
 
-            {/* =================================================
+            {/* =============================================
                CONTENT
-            ================================================= */}
+            ============================================= */}
 
             <div className="workspace-field-content">
 

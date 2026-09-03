@@ -4,46 +4,40 @@
 
 .workspace-phone {
 
-    display: flex;
+    display: grid;
 
-    align-items: stretch;
+    grid-template-columns:
+        auto
+        minmax(0, 1fr);
+
+    gap: 8px;
 
     width: 100%;
 
     min-width: 0;
 
-    gap: 8px;
-
 }
 
 
 /* =========================================
-   COUNTRY SELECTOR
+   COUNTRY
 ========================================= */
 
 .workspace-phone-country {
 
-    flex: 0 0 auto;
+    width: auto;
 
-    width: 92px;
-
-    min-height: 38px;
+    min-width: 82px;
 
     margin: 0;
 
-    padding: 8px 8px;
+    padding: 8px 10px;
 
     box-sizing: border-box;
 
-    border: 1px solid var(--border-color, #d9d9d9);
-
-    border-radius: 6px;
-
-    background: var(--surface-primary, #ffffff);
+    font: inherit;
 
     color: var(--text-primary, #4b4b4b);
-
-    font: inherit;
 
 }
 
@@ -52,49 +46,9 @@
    PHONE INPUT
 ========================================= */
 
-.workspace-phone .workspace-field-input {
-
-    flex: 1 1 auto;
+.workspace-phone
+.workspace-field-input {
 
     min-width: 0;
-
-    width: auto;
-
-}
-
-
-/* =========================================
-   DISABLED COUNTRY SELECTOR
-========================================= */
-
-.workspace-phone-country:disabled {
-
-    opacity: 0.65;
-
-    cursor: default;
-
-}
-
-
-/* =========================================
-   RESPONSIVE
-========================================= */
-
-@media (max-width: 760px) {
-
-    .workspace-phone {
-
-        flex-direction: column;
-
-        align-items: stretch;
-
-    }
-
-
-    .workspace-phone-country {
-
-        width: 100%;
-
-    }
 
 }

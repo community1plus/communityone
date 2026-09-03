@@ -32,10 +32,6 @@ export default function LocationField({
     } = field;
 
 
-    /* =====================================================
-       AUTOCOMPLETE
-    ===================================================== */
-
     const autoRef =
         useRef(null);
 
@@ -54,6 +50,7 @@ export default function LocationField({
 
 
     const displayValue =
+
         typeof value === "string"
 
             ? value
@@ -90,13 +87,11 @@ export default function LocationField({
 
 
             if (!place?.geometry) {
+
                 return;
+
             }
 
-
-            /* =============================================
-               COUNTRY
-            ============================================= */
 
             const countryComponent =
                 place.address_components?.find(
@@ -121,10 +116,6 @@ export default function LocationField({
                     ?.long_name
                 || null;
 
-
-            /* =============================================
-               LOCATION MODEL
-            ============================================= */
 
             const location = {
 
@@ -153,10 +144,6 @@ export default function LocationField({
             };
 
 
-            /* =============================================
-               SAVE LOCATION VALUE
-            ============================================= */
-
             form.setValue(
 
                 name,
@@ -166,16 +153,13 @@ export default function LocationField({
             );
 
 
-            /* =============================================
+            /* =====================================
                LOCATION → PHONE COUNTRY
-            ============================================= */
+            ===================================== */
 
             if (
-
                 name === "homeLocation" &&
-
                 countryCode
-
             ) {
 
                 form.setValue(
@@ -192,32 +176,22 @@ export default function LocationField({
 
 
     /* =====================================================
-       CONTROL
+       RENDER
     ===================================================== */
 
-    let control;
+    return (
 
+        <WorkspaceField
 
-    if (!editing || readOnly) {
+            name={name}
 
-        control = (
+            label={label}
 
-            <div
-                id={name}
-                className="workspace-field-value"
-            >
+            hint={helperText}
 
-                {displayValue || "—"}
+        >
 
-            </div>
-
-        );
-
-    } else {
-
-        control = (
-
-            isLoaded ? (
+            {isLoaded && !isReadOnly ? (
 
                 <Autocomplete
 
@@ -259,7 +233,9 @@ export default function LocationField({
                             form.handleBlur(name)
                         }
 
-                        placeholder="Enter your home address"
+                        placeholder={
+                            "Enter your home address"
+                        }
 
                     />
 
@@ -283,30 +259,7 @@ export default function LocationField({
 
                 />
 
-            )
-
-        );
-
-    }
-
-
-    /* =====================================================
-       FIELD
-    ===================================================== */
-
-    return (
-
-        <WorkspaceField
-
-            label={label}
-
-            hint={helperText}
-
-            htmlFor={name}
-
-        >
-
-            {control}
+            )}
 
         </WorkspaceField>
 

@@ -5,7 +5,6 @@ import {
 
 import WorkspaceField
     from "../WorkspaceField";
-import "./PhoneField.css";
 
 
 export default function PhoneField({
@@ -60,15 +59,6 @@ export default function PhoneField({
             : DEFAULT_PHONE_COUNTRY;
 
 
-    const country =
-        PHONE_COUNTRIES.find(
-
-            country =>
-                country.code === selectedCountry
-
-        );
-
-
     /* =====================================================
        READ ONLY
     ===================================================== */
@@ -78,71 +68,22 @@ export default function PhoneField({
 
 
     /* =====================================================
-       DISPLAY VALUE
-    ===================================================== */
-
-    const displayValue =
-        value
-
-            ? `${country?.dialCode ?? ""} ${value}`
-
-            : "—";
-
-
-    /* =====================================================
-       VIEW MODE
-    ===================================================== */
-
-    if (!editing || readOnly) {
-
-        return (
-
-            <WorkspaceField
-
-                label={label}
-
-                hint={helperText}
-
-            >
-
-                <div
-                    className="workspace-field-value"
-                    aria-label={label}
-                >
-
-                    {displayValue}
-
-                </div>
-
-            </WorkspaceField>
-
-        );
-
-    }
-
-
-    /* =====================================================
-       EDIT MODE
+       RENDER
     ===================================================== */
 
     return (
 
         <WorkspaceField
 
+            name={name}
+
             label={label}
 
             hint={helperText}
 
-            htmlFor={name}
-
         >
 
             <div className="workspace-phone">
-
-
-                {/* =========================================
-                   COUNTRY
-                ========================================= */}
 
                 <select
 
@@ -167,11 +108,15 @@ export default function PhoneField({
                 >
 
                     {PHONE_COUNTRIES.map(
+
                         (country) => (
 
                             <option
+
                                 key={country.code}
+
                                 value={country.code}
+
                             >
 
                                 {country.code}
@@ -181,14 +126,11 @@ export default function PhoneField({
                             </option>
 
                         )
+
                     )}
 
                 </select>
 
-
-                {/* =========================================
-                   PHONE NUMBER
-                ========================================= */}
 
                 <input
 

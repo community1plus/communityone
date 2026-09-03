@@ -50,9 +50,13 @@
 
     min-width: 0;
 
+    padding-top: 2px;
+
     font-size: 15px;
 
     font-weight: 700;
+
+    line-height: 1.5;
 
     color: var(--text-primary, #4b4b4b);
 
@@ -65,13 +69,15 @@
 
 .workspace-field-content {
 
-    min-width: 0;
-
     display: flex;
 
     flex-direction: column;
 
     align-items: flex-start;
+
+    width: 100%;
+
+    min-width: 0;
 
 }
 
@@ -81,6 +87,8 @@
 ========================================= */
 
 .workspace-field-value {
+
+    width: 100%;
 
     color: var(--text-primary, #4b4b4b);
 
@@ -102,6 +110,8 @@
     padding: 8px 10px;
 
     box-sizing: border-box;
+
+    font: inherit;
 
     color: var(--text-primary, #4b4b4b);
 
@@ -137,6 +147,8 @@
 
     font-weight: 500;
 
+    line-height: 1.4;
+
     color: #c53030;
 
 }
@@ -151,5 +163,51 @@
     margin-left: 4px;
 
     color: var(--accent-color, #9b111e);
+
+}
+
+
+/* =========================================
+   VERIFICATION
+========================================= */
+
+.workspace-verification-pill {
+
+    white-space: nowrap;
+
+    font-size: 0.8rem;
+
+    font-weight: 600;
+
+}
+
+
+.workspace-verification-pill.verified {
+
+    color: #2f8f6b;
+
+}
+
+
+.workspace-verification-pill.unverified {
+
+    color: var(--text-secondary, #667085);
+
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 760px) {
+
+    .workspace-field {
+
+        grid-template-columns: 1fr;
+
+        row-gap: 8px;
+
+    }
 
 }
