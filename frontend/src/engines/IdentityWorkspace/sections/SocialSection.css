@@ -25,19 +25,14 @@
 
 }
 
-
 .social-section-header h2 {
-
     margin: 0;
 
-    font-size: 1.3rem;
-
+    font-size: 1.2rem;
     font-weight: 600;
-
     line-height: 1.3;
 
     color: var(--text-primary, #4b4b4b);
-
 }
 
 
