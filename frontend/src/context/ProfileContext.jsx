@@ -378,8 +378,15 @@ const getAuthHeaders = useCallback(
 
         console.log("ABOUT TO NORMALISE", res);
 
-        const nextProfile = payload?.profile || null;
-        const nextProviders = payload?.providers || {};
+const nextProfile = {
+  ...(payload?.profile || {}),
+  username:
+    payload?.profile?.username ||
+    payload?.user?.username ||
+    "",
+};
+
+const nextProviders = payload?.providers || {};
 
         console.log(
   "NEXT PROFILE",
