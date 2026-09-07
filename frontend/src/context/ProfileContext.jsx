@@ -96,13 +96,10 @@ function getValue(obj, path) {
 
 function getCompletedSections(profile, providers = {}) {
   return {
-    organisation:
-      !!(
-        profile?.organisationProfile?.organisation_name ||
-        profile?.organisation?.organisation_name
-      ),
+    identity:
+      !!profile?.username,
 
-    address:
+    location:
       !!(
         profile?.homeLocation?.lat &&
         profile?.homeLocation?.lng
@@ -121,7 +118,33 @@ function getCompletedSections(profile, providers = {}) {
 
     payment:
       !!profile?.paymentVerified,
+
+    entity:
+      !!(
+        profile?.organisationProfile?.organisation_name ||
+        profile?.organisation?.organisation_name
+      ),
   };
+}
+
+function calculateBasicProfileCompletion(profile) {
+  const basicFields = {
+    identity: !!profile?.username,
+
+    location:
+      !!(
+        profile?.homeLocation?.lat &&
+        profile?.homeLocation?.lng
+      ),
+
+    contact:
+      !!profile?.phone,
+  };
+
+  const completed =
+    Object.values(basicFields).filter(Boolean).length;
+
+  return Math.round((completed / 3) * 100);
 }
 
 function calculateCompletion(profile, providers) {
@@ -131,7 +154,12 @@ function calculateCompletion(profile, providers) {
   const completed =
     Object.values(sections).filter(Boolean).length;
 
-  return completed * 20;
+  const total =
+    Object.keys(sections).length;
+
+  return total
+    ? Math.round((completed / total) * 100)
+    : 0;
 }
 
 
@@ -578,6 +606,11 @@ const completionPercent = useMemo(
   [profile, providers]
 );
 
+const basicProfileCompletion = useMemo(
+  () => calculateBasicProfileCompletion(profile),
+  [profile]
+);
+
 console.log({
   organisation:
     !!(
@@ -610,7 +643,7 @@ console.log({
 
 const hasProfile =
   !profileMissing &&
-  profileHasMinimumFields(profile);
+  basicProfileCompletion === 100;
 
 
   const profileReady =
@@ -631,6 +664,7 @@ const hasProfile =
     profileLoading,
     profileReady,
     completionPercent,
+    basicProfileCompletion,
   });
 
   const value = useMemo(
@@ -666,6 +700,7 @@ const hasProfile =
       profileError,
       profileMissing,
       completionPercent,
+      basicProfileCompletion,
       hasProfile,
       loadProfile,
       saveProfile,
