@@ -420,6 +420,13 @@ const nextProviders = payload?.providers || {};
           !nextProfile
         );
 
+        console.log("🔥 PROFILE READY COMMIT", {
+    userKey,
+    username: nextProfile?.username,
+    phoneDisplay: nextProfile?.phoneDisplay,
+    homeLocation: nextProfile?.homeLocation,
+});
+
         return nextProfile;
       } catch (err) {
         if (isNotFoundError(err)) {
@@ -777,7 +784,7 @@ export function useProfile() {
     throw new Error("useProfile must be used within ProfileProvider");
   }
 
-useEffect(() => {
+  useEffect(() => {
     console.log("🔥 PROFILE STATE CHANGED", {
         userKey,
         username: profile?.username,
@@ -789,6 +796,5 @@ useEffect(() => {
     profile,
     userKey,
 ]);
-
   return context;
 }
