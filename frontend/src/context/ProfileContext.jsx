@@ -17,6 +17,12 @@ const ProfileContext = createContext(null);
 const PROFILE_CACHE_PREFIX = "communityone_profile_cache";
 const PROFILE_CACHE_TTL = 1000 * 60 * 10;
 
+const hasHomeLocation =
+  profile?.homeLocation &&
+  typeof profile.homeLocation.lat === "number" &&
+  typeof profile.homeLocation.lng === "number";
+
+
 function getUserKey(user) {
   if (!user) return null;
   if (typeof user === "string") return user;
@@ -127,25 +133,31 @@ function getCompletedSections(profile, providers = {}) {
   };
 }
 
-function calculateBasicProfileCompletion(profile) {
-  const basicFields = {
-    identity: !!profile?.username,
 
-    location:
-      !!(
-        profile?.homeLocation?.lat &&
-        profile?.homeLocation?.lng
-      ),
 
-    contact:
-      !!profile?.phone,
-  };
+const calculateBasicProfileCompletion = (profile) => {
+
+  if (!profile) {
+    return 0;
+  }
+
+  const checks = [
+    Boolean(profile.username?.trim()),
+    Boolean(profile.phone || profile.phoneDisplay),
+    Boolean(
+      profile.homeLocation &&
+      typeof profile.homeLocation.lat === "number" &&
+      typeof profile.homeLocation.lng === "number"
+    ),
+  ];
 
   const completed =
-    Object.values(basicFields).filter(Boolean).length;
+    checks.filter(Boolean).length;
 
-  return Math.round((completed / 3) * 100);
-}
+  return Math.round(
+    (completed / checks.length) * 100
+  );
+};
 
 function calculateCompletion(profile, providers) {
   const sections =
