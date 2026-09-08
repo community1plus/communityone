@@ -35,9 +35,11 @@ function getUserKey(user) {
         return null;
     }
 
+
     if (typeof user === "string") {
         return user;
     }
+
 
     return (
         user?.id ||
@@ -77,20 +79,25 @@ function readProfileCache(userKey) {
                 getProfileCacheKey(userKey)
             );
 
+
         if (!raw) {
             return null;
         }
 
+
         const cached =
             JSON.parse(raw);
+
 
         if (!cached?.cachedAt) {
             return null;
         }
 
+
         const isFresh =
             Date.now() - cached.cachedAt <
             PROFILE_CACHE_TTL;
+
 
         return isFresh
             ? cached
@@ -124,6 +131,7 @@ function writeProfileCache(
             JSON.stringify({
 
                 profile,
+
                 providers,
 
                 cachedAt:
@@ -153,8 +161,8 @@ function clearProfileCache(userKey) {
             );
 
             return;
-
         }
+
 
         Object.keys(localStorage)
             .forEach((key) => {
@@ -279,11 +287,14 @@ function calculateCompletion(
             providers
         );
 
+
     const values =
         Object.values(sections);
 
+
     const completed =
         values.filter(Boolean).length;
+
 
     return values.length
         ? Math.round(
@@ -301,6 +312,7 @@ function calculateBasicProfileCompletion(
     if (!profile) {
         return 0;
     }
+
 
     const checks = [
 
@@ -323,8 +335,10 @@ function calculateBasicProfileCompletion(
 
     ];
 
+
     const completed =
         checks.filter(Boolean).length;
+
 
     return Math.round(
         (completed / checks.length) * 100
@@ -350,8 +364,10 @@ function isNotFoundError(err) {
         err?.response?.status ||
         err?.status;
 
+
     const data =
         err?.response?.data;
+
 
     return (
         status === 404 ||
@@ -434,6 +450,7 @@ export function ProfileProvider({
     const api =
         useAPI();
 
+
     const {
         user,
         isAuthenticated,
@@ -450,15 +467,18 @@ export function ProfileProvider({
     const userKey =
         getUserKey(user);
 
+
     const authSettled =
         !loading &&
         !authLoading;
+
 
     const waitingForUserKey =
         authSettled &&
         isAuthenticated &&
         !isGuest &&
         !userKey;
+
 
     const profileShouldWait =
         !authSettled ||
@@ -482,11 +502,26 @@ export function ProfileProvider({
     const apiRef =
         useRef(api);
 
+
     const loadingRef =
         useRef(false);
 
+
     const currentUserKeyRef =
         useRef(userKey);
+
+
+    /*
+     * Tracks whether the current authenticated user
+     * has already completed profile bootstrap.
+     *
+     * IMPORTANT:
+     * This prevents profile state changes from
+     * re-triggering the bootstrap lifecycle.
+     */
+
+    const profileBootstrapUserRef =
+        useRef(null);
 
 
     useEffect(() => {
@@ -526,6 +561,7 @@ export function ProfileProvider({
 
         Boolean(
             profileShouldWait ||
+
             (
                 isAuthenticated &&
                 !cachedOnRender
@@ -678,27 +714,26 @@ export function ProfileProvider({
                 background = false,
             } = {}) => {
 
+                /*
+                 * Do not attempt API calls until
+                 * authentication has settled.
+                 */
+
                 if (profileShouldWait) {
-
-                    loadingRef.current =
-                        false;
-
-                    clearProfileState({
-                        loading: true,
-                    });
 
                     return null;
 
                 }
 
 
+                /*
+                 * Signed out / guest.
+                 */
+
                 if (
                     !isAuthenticated ||
                     isGuest
                 ) {
-
-                    loadingRef.current =
-                        false;
 
                     clearProfileState({
                         loading: false,
@@ -710,6 +745,10 @@ export function ProfileProvider({
 
                 }
 
+
+                /*
+                 * Prevent overlapping profile requests.
+                 */
 
                 if (loadingRef.current) {
                     return null;
@@ -750,11 +789,12 @@ export function ProfileProvider({
 
                     /*
                      * Preserve the backend profile
-                     * as the authoritative object.
+                     * as authoritative.
                      *
-                     * Only provide the user username
-                     * as a fallback if the profile
-                     * actually lacks the property.
+                     * Only fall back to the user
+                     * username if the profile object
+                     * does not actually contain a
+                     * username property.
                      */
 
                     const rawProfile =
@@ -817,11 +857,13 @@ export function ProfileProvider({
                             userKey
                         );
 
+
                         markProfileReady(
                             null,
                             {},
                             true
                         );
+
 
                         return null;
 
@@ -838,6 +880,7 @@ export function ProfileProvider({
                         err?.message ||
                         "Profile load failed"
                     );
+
 
                     setProfileLoading(
                         false
@@ -872,25 +915,36 @@ export function ProfileProvider({
 
     useEffect(() => {
 
-        loadingRef.current =
-            false;
-
+        /*
+         * -------------------------------------------------
+         * WAIT FOR AUTH
+         * -------------------------------------------------
+         */
 
         if (profileShouldWait) {
 
-            clearProfileState({
-                loading: true,
-            });
+            setProfileLoading(true);
 
             return;
-
         }
 
+
+        /*
+         * -------------------------------------------------
+         * SIGNED OUT / GUEST
+         * -------------------------------------------------
+         */
 
         if (
             !isAuthenticated ||
             isGuest
         ) {
+
+            profileBootstrapUserRef.current =
+                null;
+
+            currentUserKeyRef.current =
+                userKey;
 
             clearProfileState({
                 loading: false,
@@ -899,9 +953,63 @@ export function ProfileProvider({
             clearProfileCache();
 
             return;
-
         }
 
+
+        /*
+         * -------------------------------------------------
+         * AUTHENTICATED BUT NO USER KEY
+         * -------------------------------------------------
+         */
+
+        if (!userKey) {
+            return;
+        }
+
+
+        /*
+         * -------------------------------------------------
+         * BOOTSTRAP GUARD
+         *
+         * This is the key protection against:
+         *
+         * profile change
+         *      ↓
+         * bootstrap
+         *      ↓
+         * loadProfile
+         *      ↓
+         * setProfile
+         *      ↓
+         * bootstrap
+         *
+         * The same authenticated user can only
+         * bootstrap once during this auth lifecycle.
+         * -------------------------------------------------
+         */
+
+        if (
+            profileBootstrapUserRef.current ===
+            userKey
+        ) {
+
+            return;
+        }
+
+
+        /*
+         * Mark BEFORE starting async work.
+         */
+
+        profileBootstrapUserRef.current =
+            userKey;
+
+
+        /*
+         * -------------------------------------------------
+         * USER CHANGE
+         * -------------------------------------------------
+         */
 
         const userChanged =
             currentUserKeyRef.current !==
@@ -912,16 +1020,20 @@ export function ProfileProvider({
             userKey;
 
 
+        /*
+         * -------------------------------------------------
+         * CACHE
+         * -------------------------------------------------
+         */
+
         const cached =
-            userKey
-                ? readProfileCache(userKey)
-                : null;
+            readProfileCache(userKey);
 
 
         /*
-         * If the authenticated user changed,
-         * the previous user's profile must not
-         * remain visible.
+         * -------------------------------------------------
+         * NEW USER
+         * -------------------------------------------------
          */
 
         if (userChanged) {
@@ -946,6 +1058,7 @@ export function ProfileProvider({
                 !cached?.profile
             );
 
+
             if (cached) {
 
                 loadProfile({
@@ -961,15 +1074,16 @@ export function ProfileProvider({
             }
 
             return;
-
         }
 
 
         /*
-         * Existing profile is authoritative while
-         * a reload happens.
+         * -------------------------------------------------
+         * EXISTING USER + CACHE
+         * -------------------------------------------------
          *
-         * Do NOT temporarily replace it with null.
+         * Show cached profile immediately and refresh
+         * from the server in the background.
          */
 
         if (cached) {
@@ -992,20 +1106,23 @@ export function ProfileProvider({
 
             setProfileLoading(false);
 
+
             loadProfile({
                 background: true,
             });
 
-            return;
 
+            return;
         }
 
 
         /*
-         * Initial load.
+         * -------------------------------------------------
+         * EXISTING USER + NO CACHE
+         * -------------------------------------------------
          *
-         * Only clear the profile if there is
-         * actually no current profile.
+         * If a profile is already in React state,
+         * preserve it while refreshing.
          */
 
         if (!profile) {
@@ -1029,6 +1146,7 @@ export function ProfileProvider({
             background: Boolean(profile),
         });
 
+
     }, [
         profileShouldWait,
         isAuthenticated,
@@ -1036,7 +1154,6 @@ export function ProfileProvider({
         userKey,
         loadProfile,
         clearProfileState,
-        profile,
     ]);
 
 
@@ -1061,6 +1178,7 @@ export function ProfileProvider({
 
 
                 setProfileSaving(true);
+
                 setProfileError(null);
 
 
@@ -1245,6 +1363,7 @@ export function ProfileProvider({
 
 
                 setProfileSaving(true);
+
                 setProfileError(null);
 
 
@@ -1386,6 +1505,14 @@ export function ProfileProvider({
         );
 
 
+    /*
+     * Basic account access is based only on:
+     *
+     * username
+     * phone
+     * home location
+     */
+
     const hasProfile =
         !profileMissing &&
         basicProfileCompletion === 100;
@@ -1448,7 +1575,7 @@ export function ProfileProvider({
 
 
     /* =================================================
-       OPTIONAL DEVELOPMENT DIAGNOSTIC
+       DEVELOPMENT DIAGNOSTIC
     ================================================= */
 
     useEffect(() => {
