@@ -149,7 +149,7 @@ const hasHomeLocation =
   profile?.homeLocation &&
   typeof profile.homeLocation.lat === "number" &&
   typeof profile.homeLocation.lng === "number";
-  
+
 
   const completed =
     checks.filter(Boolean).length;
@@ -465,6 +465,15 @@ const nextProviders = payload?.providers || {};
     }
 
     const cached = userKey ? readProfileCache(userKey) : null;
+
+    console.log("🔥 PROFILE BOOTSTRAP", {
+    userKey,
+    cached,
+    currentProfile: profile,
+    profileShouldWait,
+    isAuthenticated,
+    isGuest,
+});
 
     if (cached) {
       setProfile(cached.profile || null);
