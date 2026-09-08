@@ -96,18 +96,22 @@ router.get("/", async (req, res) => {
     =================================================== */
 
     const profileResult =
-      await pool.query(
-        `
-          SELECT *
-          FROM user_profiles
-          WHERE user_id = $1
-          LIMIT 1
-        `,
-        [userId]
-      );
+  await pool.query(
+    `
+      SELECT *
+      FROM user_profiles
+      WHERE user_id = $1
+      LIMIT 1
+    `,
+    [userId]
+  );
 
 
-    console.log(
+const rawProfile =
+  profileResult.rows[0] || null;
+
+
+console.log(
   "[ME] RAW PROFILE FULL:",
   JSON.stringify(
     rawProfile,
@@ -115,21 +119,20 @@ router.get("/", async (req, res) => {
     2
   )
 );
-  
-    const rawProfile =
-      profileResult.rows[0] || null;
 
 
-    console.log(
-      "[ME] PROFILE:",
-      {
-        found: !!rawProfile,
-        profileId: rawProfile?.id || null,
-        userId: rawProfile?.user_id || null,
-        username: rawProfile?.username || null,
-        version: rawProfile?.version || null,
-      }
-    );
+console.log(
+  "[ME] PROFILE:",
+  {
+    found: !!rawProfile,
+    profileId: rawProfile?.id || null,
+    userId: rawProfile?.user_id || null,
+    username: rawProfile?.username || null,
+    version: rawProfile?.version || null,
+  }
+);
+
+   
 
 
     /* ===================================================

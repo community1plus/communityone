@@ -377,34 +377,21 @@ app.use(
 ========================= */
 
 console.log("✅ Routes mounted:");
+console.log("   → /api/me");
+console.log("   → /api/me/providers");
+console.log("   → /api/profile");
+console.log("   → /api/users");
+console.log("   → /api/posts/upload-url");
+console.log("   → /api/posts");
+console.log("   → /api/payments");
+console.log("   → /api/business");
+console.log("   → /api/moderation");
+console.log("   → /api/business-email-verification");
+console.log("   → /api/facebook");
+console.log("   → /api/youtube");
+console.log("   → /api/x");
+console.log("   → /api/instagram");
 
-console.log(
-  "   → /api/posts/upload-url"
-);
-
-console.log(
-  "   → /api/posts"
-);
-
-console.log(
-  "   → /api/users"
-);
-
-console.log(
-  "   → /api/profile"
-);
-
-console.log(
-  "   → /api/youtube"
-);
-
-console.log(
-  "   → /api/x"
-);
-
-console.log(
-  "   → /api/instagram"
-);
 app.get("/", (req, res) => {
   res.status(200).send("Community One backend is running");
 });
