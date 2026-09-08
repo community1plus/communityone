@@ -618,6 +618,17 @@ const basicProfileCompletion = useMemo(
   [profile]
 );
 
+console.log(
+  "🔥 BASIC PROFILE COMPLETION:",
+  {
+    username: profile?.username,
+    phone: profile?.phone,
+    phoneDisplay: profile?.phoneDisplay,
+    homeLocation: profile?.homeLocation,
+    basicProfileCompletion,
+  }
+);
+
 console.log({
   organisation:
     !!(
