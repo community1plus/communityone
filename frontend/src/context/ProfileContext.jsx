@@ -487,6 +487,14 @@ const nextProviders = payload?.providers || {};
       return;
     }
 
+console.log("🚨 PROFILE BEING CLEARED", {
+    currentProfile: profile,
+    userKey,
+    profileShouldWait,
+    isAuthenticated,
+    isGuest,
+});
+
     setProfile(null);
     setProviders(normaliseProviders());
     setProfileMissing(false);
