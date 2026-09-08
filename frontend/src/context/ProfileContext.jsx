@@ -318,6 +318,14 @@ const {
     },
     []
   );
+
+  console.log("🔥 PROFILE READY COMMIT", {
+    userKey,
+    username: nextProfile?.username,
+    phoneDisplay: nextProfile?.phoneDisplay,
+    homeLocation: nextProfile?.homeLocation,
+});
+
 const getAuthHeaders = useCallback(
   async (extraHeaders = {}) => {
 
