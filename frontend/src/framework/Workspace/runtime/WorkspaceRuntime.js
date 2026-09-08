@@ -80,26 +80,16 @@ export function createWorkspaceRuntime({
         );
 
 
-    const runtime = {
-
-        ...(baseSection.runtime ?? {}),
-
-        visible:
-            baseSection.runtime?.visible ?? true,
-
-        enabled:
-            baseSection.runtime?.enabled ?? true,
-
-        valid,
-
-        completion,
-
-        editing,
-
-        saving:
-            Boolean(savingSection),
-
-    };
+const runtime = {
+    ...(baseSection.runtime ?? {}),
+    visible: baseSection.runtime?.visible ?? true,
+    enabled: baseSection.runtime?.enabled ?? true,
+    valid,
+    completion,
+    complete: completion === 100,
+    editing,
+    saving: Boolean(savingSection),
+};
 
 
     const section = {
