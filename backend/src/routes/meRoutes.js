@@ -107,6 +107,15 @@ router.get("/", async (req, res) => {
       );
 
 
+    console.log(
+  "[ME] RAW PROFILE FULL:",
+  JSON.stringify(
+    rawProfile,
+    null,
+    2
+  )
+);
+  
     const rawProfile =
       profileResult.rows[0] || null;
 
