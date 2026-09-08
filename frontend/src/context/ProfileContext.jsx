@@ -777,5 +777,18 @@ export function useProfile() {
     throw new Error("useProfile must be used within ProfileProvider");
   }
 
+useEffect(() => {
+    console.log("🔥 PROFILE STATE CHANGED", {
+        userKey,
+        username: profile?.username,
+        phoneDisplay: profile?.phoneDisplay,
+        homeLocation: profile?.homeLocation,
+        profileIsNull: profile === null,
+    });
+}, [
+    profile,
+    userKey,
+]);
+
   return context;
 }
