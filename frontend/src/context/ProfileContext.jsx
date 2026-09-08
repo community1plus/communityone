@@ -17,12 +17,6 @@ const ProfileContext = createContext(null);
 const PROFILE_CACHE_PREFIX = "communityone_profile_cache";
 const PROFILE_CACHE_TTL = 1000 * 60 * 10;
 
-const hasHomeLocation =
-  profile?.homeLocation &&
-  typeof profile.homeLocation.lat === "number" &&
-  typeof profile.homeLocation.lng === "number";
-
-
 function getUserKey(user) {
   if (!user) return null;
   if (typeof user === "string") return user;
@@ -150,6 +144,12 @@ const calculateBasicProfileCompletion = (profile) => {
       typeof profile.homeLocation.lng === "number"
     ),
   ];
+
+const hasHomeLocation =
+  profile?.homeLocation &&
+  typeof profile.homeLocation.lat === "number" &&
+  typeof profile.homeLocation.lng === "number";
+  
 
   const completed =
     checks.filter(Boolean).length;
