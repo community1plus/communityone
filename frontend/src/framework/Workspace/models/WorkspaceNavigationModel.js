@@ -1,54 +1,23 @@
-import "./WorkspaceNavigation.css";
+export function createWorkspaceNavigationModel({
 
+    items = [],
 
-export default function WorkspaceNavigation({
+    current = 0,
 
-    model,
+    onChange = () => {},
 
 }) {
 
-    if (!model?.visible) {
+    return {
 
-        return null;
+        items,
 
-    }
+        current,
 
+        onChange,
 
-    return (
+        visible: items.length > 1,
 
-        <nav
-            className="workspace-navigation"
-            aria-label="Section navigation"
-        >
-
-            {model.items.map((item, index) => (
-
-                <button
-                    key={item.id}
-                    type="button"
-                    className={[
-                        "workspace-tab",
-                        model.current === index && "active",
-                        item.runtime?.complete && "complete",
-                    ]
-                        .filter(Boolean)
-                        .join(" ")}
-                    onClick={() => model.onChange?.(index)}
-                    aria-current={
-                        model.current === index
-                            ? "page"
-                            : undefined
-                    }
-                >
-
-                    {item.title}
-
-                </button>
-
-            ))}
-
-        </nav>
-
-    );
+    };
 
 }

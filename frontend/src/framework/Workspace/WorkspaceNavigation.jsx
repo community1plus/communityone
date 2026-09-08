@@ -29,11 +29,10 @@ export default function WorkspaceNavigation({
                     className={[
                         "workspace-tab",
                         model.current === index && "active",
-                        index < model.current && "complete",
+                        item.runtime?.complete && "complete",
                     ]
                         .filter(Boolean)
-                        .join(" ")
-                    }
+                        .join(" ")}
                     onClick={() => model.onChange?.(index)}
                     aria-current={
                         model.current === index
