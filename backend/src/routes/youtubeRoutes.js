@@ -80,7 +80,7 @@ console.log("YouTube OAuth session:", {
     email: req.user?.email,
   });
 
-  req.session.userSub = req.user.sub;
+  req.session.userId = req.user.userId;
   req.session.ytOAuthState = crypto.randomUUID();
 
   console.log("Saving YouTube OAuth session:", {
@@ -107,6 +107,13 @@ console.log("YouTube OAuth session:", {
 
 router.get("/callback", async (req, res) => {
   const userSub = req.session.userSub;
+
+if (!userSub) {
+  return redirectFailure(
+    res,
+    "missing_user_session"
+  );
+}
 
 console.log("=== YOUTUBE CALLBACK ===");
 
@@ -217,7 +224,7 @@ const oauthError = req.query.error;
     const publishedAt = channel.snippet?.publishedAt || "";
 
 
-    delete req.session.userSub;
+    delete req.session.userId;
     delete req.session.ytOAuthState;  
 return res.redirect(
   getFrontendRedirect({
