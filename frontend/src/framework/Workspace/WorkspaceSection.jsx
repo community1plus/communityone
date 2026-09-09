@@ -13,16 +13,6 @@ export default function WorkspaceSection({
     children,
 }) {
 
-console.log(
-  "🔥 WorkspaceSection MODEL:",
-  JSON.stringify(model, null, 2)
-);
-
-console.log(
-  "🔥 WorkspaceSection ACTIONS:",
-  JSON.stringify(actions, null, 2)
-);
-
     if (!model?.runtime?.visible) {
         return null;
     }
@@ -39,7 +29,15 @@ console.log(
 
     } = model;
 
+console.log(
+  "🔥 WorkspaceSection MODEL:",
+  JSON.stringify(model, null, 2)
+);
 
+console.log(
+  "🔥 WorkspaceSection ACTIONS:",
+  JSON.stringify(actions, null, 2)
+);
     const completion =
         runtime.completion ?? 0;
 
