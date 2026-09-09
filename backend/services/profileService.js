@@ -1,8 +1,7 @@
 import express from "express";
 import crypto from "crypto";
 
-import authMiddleware from "../../middleware/authMiddleware.js";
-
+import authMiddleware from "../middleware/authMiddleware.js";
 import {
   patchProfileService,
 } from "../../services/profileService.js";
