@@ -3,8 +3,8 @@ import "./SocialSection.css";
 import { useState } from "react";
 
 import useSocialVerification from "../../../hooks/useSocialVerification";
-import useAPI from "../../../../hooks/useAPI";
-import { API_BASE } from "../../../../services/api";
+import useAPI from "../../../hooks/useAPI";
+import { API_BASE } from "../../../services/api";
 
 
 const SOCIAL_PROVIDERS = [
