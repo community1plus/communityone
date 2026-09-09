@@ -3,6 +3,10 @@ import crypto from "crypto";
 
 import authMiddleware from "../../middleware/authMiddleware.js";
 
+import {
+  patchProfileService,
+} from "../../services/profileService.js";
+
 const router = express.Router();
 
 const GOOGLE_AUTH_URL =
@@ -34,7 +38,10 @@ function getFrontendRedirect(params = {}) {
 // FAILURE REDIRECT
 // ============================================================
 
-function redirectFailure(res, reason = "youtube_verification_failed") {
+function redirectFailure(
+  res,
+  reason = "youtube_verification_failed"
+) {
   return res.redirect(
     getFrontendRedirect({
       social: "youtube",
@@ -66,12 +73,26 @@ router.get("/start", async (req, res) => {
   try {
     console.log("=== YOUTUBE START ===");
 
-    console.log("Session ID:", req.sessionID);
+    console.log(
+      "Session ID:",
+      req.sessionID
+    );
 
-    console.log("YouTube OAuth session:", {
-      userId: req.session?.userId,
-      ytOAuthState: req.session?.ytOAuthState,
-    });
+    console.log(
+      "YouTube OAuth session:",
+      {
+        userId:
+          req.session?.userId,
+
+        ytOAuthState:
+          req.session?.ytOAuthState,
+      }
+    );
+
+
+    // --------------------------------------------------------
+    // Validate OAuth configuration
+    // --------------------------------------------------------
 
     if (!isOAuthConfigured()) {
       console.error(
@@ -84,7 +105,13 @@ router.get("/start", async (req, res) => {
       );
     }
 
-    const state = req.session?.ytOAuthState;
+
+    // --------------------------------------------------------
+    // Resolve OAuth state
+    // --------------------------------------------------------
+
+    const state =
+      req.session?.ytOAuthState;
 
     if (!state) {
       console.error(
@@ -97,31 +124,45 @@ router.get("/start", async (req, res) => {
       );
     }
 
+
+    // --------------------------------------------------------
+    // Build Google OAuth URL
+    // --------------------------------------------------------
+
     const params = new URLSearchParams({
-      client_id: process.env.GOOGLE_CLIENT_ID,
+      client_id:
+        process.env.GOOGLE_CLIENT_ID,
 
       redirect_uri:
         process.env.GOOGLE_REDIRECT_URI,
 
-      response_type: "code",
+      response_type:
+        "code",
 
       state,
 
-      access_type: "offline",
+      access_type:
+        "offline",
 
-      prompt: "consent",
+      prompt:
+        "consent",
 
       scope:
         "https://www.googleapis.com/auth/youtube.readonly openid email profile",
     });
 
-    console.log("✅ YOUTUBE OAUTH URL CREATED");
+
+    console.log(
+      "✅ YOUTUBE OAUTH URL CREATED"
+    );
+
 
     return res.redirect(
       `${GOOGLE_AUTH_URL}?${params.toString()}`
     );
 
   } catch (err) {
+
     console.error(
       "❌ YOUTUBE START ERROR:",
       err
@@ -146,20 +187,32 @@ router.post(
 
     console.log("=== YOUTUBE BEGIN ===");
 
-    console.log("Session ID:", req.sessionID);
+    console.log(
+      "Session ID:",
+      req.sessionID
+    );
 
-    console.log("Authenticated user:", {
-      userId: req.user?.userId,
-      cognitoSub: req.user?.cognitoSub,
-      email: req.user?.email,
-    });
+    console.log(
+      "Authenticated user:",
+      {
+        userId:
+          req.user?.userId,
+
+        cognitoSub:
+          req.user?.cognitoSub,
+
+        email:
+          req.user?.email,
+      }
+    );
 
 
     // --------------------------------------------------------
     // Resolve canonical internal user
     // --------------------------------------------------------
 
-    const userId = req.user?.userId;
+    const userId =
+      req.user?.userId;
 
     if (!userId) {
 
@@ -168,7 +221,8 @@ router.post(
       );
 
       return res.status(401).json({
-        error: "Authenticated user ID missing",
+        error:
+          "Authenticated user ID missing",
       });
     }
 
@@ -185,7 +239,8 @@ router.post(
     // Store OAuth transaction in session
     // --------------------------------------------------------
 
-    req.session.userId = userId;
+    req.session.userId =
+      userId;
 
     req.session.ytOAuthState =
       oauthState;
@@ -194,7 +249,8 @@ router.post(
     console.log(
       "Saving YouTube OAuth session:",
       {
-        sessionId: req.sessionID,
+        sessionId:
+          req.sessionID,
 
         userId:
           req.session.userId,
@@ -219,7 +275,8 @@ router.post(
         );
 
         return res.status(500).json({
-          error: "Session save failed",
+          error:
+            "Session save failed",
         });
       }
 
@@ -276,7 +333,6 @@ router.get(
 
     const userId =
       req.session?.userId;
-
 
     if (!userId) {
 
@@ -337,7 +393,8 @@ router.get(
         console.error(
           "❌ YOUTUBE STATE MISMATCH:",
           {
-            receivedState: state,
+            receivedState:
+              state,
 
             sessionState:
               req.session.ytOAuthState,
@@ -397,7 +454,8 @@ router.get(
         await fetch(
           GOOGLE_TOKEN_URL,
           {
-            method: "POST",
+            method:
+              "POST",
 
             headers: {
               "Content-Type":
@@ -457,7 +515,6 @@ router.get(
       console.log(
         "=== YOUTUBE CHANNEL LOOKUP ==="
       );
-
 
       const channelResponse =
         await fetch(
@@ -563,6 +620,62 @@ router.get(
 
 
       // ======================================================
+      // PERSIST YOUTUBE VERIFICATION
+      // ======================================================
+
+      console.log(
+        "=== SAVING YOUTUBE PROFILE ==="
+      );
+
+
+      await patchProfileService({
+        userId,
+
+        body: {
+          profile: {
+            social: {
+              youtube: {
+                verified:
+                  true,
+
+                verifiedAt:
+                  new Date().toISOString(),
+
+                channelId,
+
+                channelTitle,
+
+                channelDescription,
+
+                profilePicture:
+                  thumbnail,
+
+                subscriberCount,
+
+                videoCount,
+
+                viewCount,
+
+                customUrl,
+
+                country,
+
+                publishedAt,
+              },
+            },
+          },
+        },
+
+        req,
+      });
+
+
+      console.log(
+        "✅ YOUTUBE PROFILE SAVED"
+      );
+
+
+      // ======================================================
       // CLEAN UP OAUTH SESSION
       // ======================================================
 
@@ -611,26 +724,11 @@ router.get(
 
         return res.redirect(
           getFrontendRedirect({
-            social: "youtube",
+            social:
+              "youtube",
 
-            verified: "true",
-
-            channelId,
-
-            channelTitle,
-
-            profilePicture:
-              thumbnail,
-
-            subscriberCount,
-
-            videoCount,
-
-            viewCount,
-
-            customUrl,
-
-            country,
+            verified:
+              "true",
           })
         );
 
