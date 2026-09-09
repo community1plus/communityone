@@ -61,9 +61,33 @@ const params = new URLSearchParams({
 });
 
 router.post("/begin", authMiddleware, (req, res) => {
+  console.log("=== YOUTUBE START ===");
+
+console.log("Session ID:", req.sessionID);
+
+console.log("YouTube OAuth session:", {
+  userSub: req.session.userSub,
+  ytOAuthState: req.session.ytOAuthState,
+});
+
+  console.log("=== YOUTUBE BEGIN ===");
+
+  console.log("Session ID:", req.sessionID);
+
+  console.log("Authenticated user:", {
+    userId: req.user?.userId,
+    sub: req.user?.sub,
+    email: req.user?.email,
+  });
 
   req.session.userSub = req.user.sub;
   req.session.ytOAuthState = crypto.randomUUID();
+
+  console.log("Saving YouTube OAuth session:", {
+    sessionId: req.sessionID,
+    userSub: req.session.userSub,
+    ytOAuthState: req.session.ytOAuthState,
+  });
 
   req.session.save((err) => {
 
@@ -84,6 +108,17 @@ router.post("/begin", authMiddleware, (req, res) => {
 router.get("/callback", async (req, res) => {
   const userSub = req.session.userSub;
 
+console.log("=== YOUTUBE CALLBACK ===");
+
+console.log("Session ID:", req.sessionID);
+
+console.log("Callback query:", req.query);
+
+console.log("YouTube OAuth session:", {
+  userSub: req.session.userSub,
+  ytOAuthState: req.session.ytOAuthState,
+});
+
 if (!userSub) {
 
   return redirectFailure(
@@ -93,8 +128,9 @@ if (!userSub) {
 
 }
   try {
-    const code = req.query.code;
-    const oauthError = req.query.error;
+   const code = req.query.code;
+const state = req.query.state;
+const oauthError = req.query.error;
 
     if (oauthError) {
       return redirectFailure(res, String(oauthError));
