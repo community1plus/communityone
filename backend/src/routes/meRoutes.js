@@ -47,8 +47,8 @@ router.get("/", async (req, res) => {
       null;
 
     const cognitoSub =
-      req.user.sub ||
-      null;
+  req.user.cognitoSub ||
+  null;
 
     const tokenEmail =
       req.user.email ||
