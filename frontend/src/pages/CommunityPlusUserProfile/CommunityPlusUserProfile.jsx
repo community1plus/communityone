@@ -126,11 +126,10 @@ export default function CommunityPlusUserProfile({
 
         );
 
-    console.log("🔥 PROFILE FORM HYDRATION", {
-    profile,
-    user,
-    initialValues,
-});
+console.log(
+  "🔥 PROFILE FORM HYDRATION",
+  JSON.stringify({ profile, user, initialValues }, null, 2)
+);
 
     /* =====================================
        FORM
@@ -148,10 +147,10 @@ export default function CommunityPlusUserProfile({
         values,
     } = form;
 
-    console.log("🔥 PROFILE FORM VALUES", {
-    values,
-});
-
+console.log(
+  "🔥 PROFILE FORM VALUES",
+  JSON.stringify({ values }, null, 2)
+);
     /* =====================================
        CURRENT SECTION
        
