@@ -13,15 +13,15 @@ export default function WorkspaceSection({
     children,
 }) {
 
-    console.log(
-        "🔥 WorkspaceSection MODEL:",
-        model
-    );
+console.log(
+  "🔥 WorkspaceSection MODEL:",
+  JSON.stringify(model, null, 2)
+);
 
-    console.log(
-        "🔥 WorkspaceSection ACTIONS:",
-        model?.actions
-    );
+console.log(
+  "🔥 WorkspaceSection ACTIONS:",
+  JSON.stringify(actions, null, 2)
+);
 
     if (!model?.runtime?.visible) {
         return null;
