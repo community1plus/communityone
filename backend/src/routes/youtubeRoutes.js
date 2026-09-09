@@ -749,5 +749,65 @@ router.get(
   }
 );
 
+// ======================================================
+// DISCONNECT YOUTUBE
+// ======================================================
+
+router.delete(
+  "/disconnect",
+  authMiddleware,
+  async (req, res) => {
+    try {
+      const userId = req.user?.userId;
+
+      if (!userId) {
+        return res.status(401).json({
+          error: "Authenticated user not resolved",
+        });
+      }
+
+      console.log(
+        "🔌 DISCONNECTING YOUTUBE:",
+        {
+          userId,
+        }
+      );
+
+      await patchProfileService({
+        userId,
+        body: {
+          profile: {
+            social: {
+              youtube: null,
+            },
+          },
+        },
+        req,
+      });
+
+      console.log(
+        "✅ YOUTUBE DISCONNECTED:",
+        {
+          userId,
+        }
+      );
+
+      return res.status(200).json({
+        success: true,
+        provider: "youtube",
+      });
+
+    } catch (err) {
+      console.error(
+        "❌ YOUTUBE DISCONNECT ERROR:",
+        err
+      );
+
+      return res.status(500).json({
+        error: "Failed to disconnect YouTube",
+      });
+    }
+  }
+);
 
 export default router;
