@@ -46,12 +46,11 @@ console.log(
             />
         ),
 
-        payment: (
-            <IdentityPaymentSection
-                form={form}
-                editing={editing}
-            />
-        ),
+payment: (
+    <div>
+        PAYMENT RENDER TEST
+    </div>
+),
     };
 
 const content =
