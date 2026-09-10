@@ -55,6 +55,7 @@ console.log(
     };
 
 const content =
+    sectionMap[sectionId] ??
     IdentitySections({ form, editing })[sectionId] ??
     defaultContent;
 
