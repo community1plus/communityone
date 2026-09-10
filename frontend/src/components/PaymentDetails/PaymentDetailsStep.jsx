@@ -1,74 +1,64 @@
 import {
-  PaymentElement,
-  useStripe,
-  useElements,
+    PaymentElement,
+    useStripe,
+    useElements,
 } from "@stripe/react-stripe-js";
 
-import { useState, useEffect } from "react";
-import api from "../../lib/api";
+import { useState } from "react";
+
 
 export default function PaymentDetailsStep() {
-  const stripe = useStripe();
-  const elements = useElements();
 
-  const [clientSecret, setClientSecret] =
-    useState("");
+    const stripe = useStripe();
+    const elements = useElements();
 
-  const [loading, setLoading] =
-    useState(false);
+    const [loading, setLoading] =
+        useState(false);
 
-  useEffect(() => {
-    loadIntent();
-  }, []);
 
-  async function loadIntent() {
-    const res = await api.post(
-      "/payments/create-setup-intent"
-    );
+    async function handleSubmit() {
 
-    setClientSecret(res.data.clientSecret);
-  }
+        if (!stripe || !elements) {
+            return;
+        }
 
-  async function handleSubmit() {
-    if (!stripe || !elements) return;
+        setLoading(true);
 
-    setLoading(true);
+        const { error, setupIntent } =
+            await stripe.confirmSetup({
+                elements,
+                confirmParams: {},
+                redirect: "if_required",
+            });
 
-    const { error, setupIntent } =
-      await stripe.confirmSetup({
-        elements,
-        confirmParams: {},
-        redirect: "if_required",
-      });
+        setLoading(false);
 
-    setLoading(false);
+        if (error) {
+            alert(error.message);
+            return;
+        }
 
-    if (error) {
-      alert(error.message);
-      return;
+        console.log("Stripe SetupIntent:", setupIntent);
+
+        alert("Card verified successfully");
     }
 
-    console.log(setupIntent);
 
-    alert("Card verified successfully");
-  }
+    return (
+        <div className="space-y-6">
 
-  if (!clientSecret) {
-    return <div>Loading...</div>;
-  }
+            <PaymentElement />
 
-  return (
-    <div className="space-y-6">
-      <PaymentElement />
+            <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={loading || !stripe || !elements}
+            >
+                {loading
+                    ? "Verifying..."
+                    : "Verify Card"}
+            </button>
 
-      <button
-        onClick={handleSubmit}
-        disabled={loading}
-      >
-        {loading
-          ? "Verifying..."
-          : "Verify Card"}
-      </button>
-    </div>
-  );
+        </div>
+    );
 }
