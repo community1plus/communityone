@@ -4,6 +4,9 @@ import WorkspaceFormView
 import SocialSection
     from "../../engines/IdentityWorkspace/sections/SocialSection";
 
+import StripePaymentWrapper
+    from "..."; // use the existing StripePaymentWrapper path
+
 
 export default function CapabilityRenderer({
 
@@ -14,19 +17,9 @@ export default function CapabilityRenderer({
 
 }) {
 
-   if (!section) {
-    return null;
-}
-
-console.log(
-    "[CAPABILITY RENDERER]",
-    {
-        id: section.id,
-        view: section.view,
-        title: section.title,
-        section,
+    if (!section) {
+        return null;
     }
-);
 
 
     switch (section.view) {
@@ -54,6 +47,19 @@ console.log(
                     form={form}
                     editing={editing}
                     sectionCompletion={sectionCompletion}
+                />
+
+            );
+
+
+        case "payment":
+
+            return (
+
+                <StripePaymentWrapper
+                    form={form}
+                    editing={editing}
+                    section={section}
                 />
 
             );

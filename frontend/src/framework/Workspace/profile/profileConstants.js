@@ -353,25 +353,25 @@ export const COMMON_STEPS = [
     }),
 
 
-    createWorkspaceSectionModel({
+createWorkspaceSectionModel({
 
-        id: "payment",
+    id: "payment",
 
-        title: "Payment",
+    title: "Payment",
 
-        view: "form",
+    view: "payment",
 
-        actions: [
-            "edit",
-            "clear",
-            "reset",
-            "exit",
-            "save",
-        ],
+    actions: [
+        "edit",
+        "clear",
+        "reset",
+        "exit",
+        "save",
+    ],
 
-        fields: [],
+    fields: [],
 
-    }),
+}),
 
 ];
 
