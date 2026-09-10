@@ -5,29 +5,34 @@ import {
   useSearchParams,
 } from "react-router-dom";
 
-
 import {
   useProfile,
 } from "../context/ProfileContext";
 
 
+// ============================================================
+// SOCIAL VERIFICATION CALLBACK
+// ============================================================
 
 export default function useSocialVerification() {
 
-  
   const processedRef = useRef(false);
 
-    const [searchParams] =
+  const [searchParams] =
     useSearchParams();
 
   const navigate =
     useNavigate();
 
-
-
   const {
     loadProfile,
+    patchProfile,
   } = useProfile();
+
+
+  // ==========================================================
+  // CALLBACK PARAMETERS
+  // ==========================================================
 
   const social =
     searchParams.get("social");
@@ -35,61 +40,136 @@ export default function useSocialVerification() {
   const verified =
     searchParams.get("verified");
 
+  const reason =
+    searchParams.get("reason");
+
+
+  // ==========================================================
+  // VERIFICATION CALLBACK
+  // ==========================================================
+
   useEffect(() => {
+
+    // --------------------------------------------------------
+    // Ignore normal profile loads
+    // --------------------------------------------------------
+
+    if (!social || !verified) {
+      return;
+    }
+
+
+    // --------------------------------------------------------
+    // Only process successful verification here
+    // --------------------------------------------------------
+
+    if (verified !== "true") {
+
+      console.warn(
+        "⚠️ Social verification failed:",
+        {
+          social,
+          reason,
+        }
+      );
+
+      return;
+    }
+
+
+    // --------------------------------------------------------
+    // Prevent duplicate processing
+    // --------------------------------------------------------
+
+    if (processedRef.current) {
+      return;
+    }
+
+    processedRef.current = true;
+
+
+    // --------------------------------------------------------
+    // Complete verification
+    // --------------------------------------------------------
 
     async function completeVerification() {
 
-if (
-  verified !== "true" ||
-  !social
-) {
-  return;
-}
+      try {
 
-if (processedRef.current) {
-  return;
-}
+        console.log(
+          "=== SOCIAL VERIFICATION CALLBACK ==="
+        );
 
-processedRef.current = true;
-   
+        console.log(
+          "Provider:",
+          social
+        );
 
-try {
+        console.log(
+          "Verified:",
+          verified
+        );
 
-  console.log(
-    `Refreshing profile after ${social} verification...`
-  );
 
-  await loadProfile({
-    background: false,
-  });
+        // ====================================================
+        // LOAD FRESH PROFILE
+        // ====================================================
 
-processedRef.current = false;
+        console.log(
+          `Refreshing profile after ${social} verification...`
+        );
 
-navigate(
-  "/communityplus/profile",
-  {
-    replace: true,
-  }
-);
+        const refreshedProfile =
+          await loadProfile({
+            background: false,
+          });
 
-} catch (err) {
 
-  console.error(
-    "❌ Verification refresh failed",
-    err
-  );
+        console.log(
+          "✅ Profile refreshed after social verification:",
+          refreshedProfile
+        );
 
-}
+
+        // ====================================================
+        // REMOVE CALLBACK PARAMETERS
+        // ====================================================
+
+        navigate(
+          "/communityplus/profile",
+          {
+            replace: true,
+          }
+        );
+
+
+        console.log(
+          "✅ Social verification callback completed"
+        );
+
+      } catch (err) {
+
+        console.error(
+          "❌ Social verification callback failed:",
+          err
+        );
+
+        // Allow a future callback to be processed
+        // if the current attempt failed.
+        processedRef.current = false;
+      }
 
     }
+
 
     completeVerification();
 
   }, [
-  social,
-  verified,
-  loadProfile,
-  navigate,
-]);
+    social,
+    verified,
+    reason,
+    loadProfile,
+    navigate,
+  ]);
 
 }

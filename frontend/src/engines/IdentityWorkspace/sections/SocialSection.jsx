@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import useSocialVerification from "../../../hooks/useSocialVerification";
 import useAPI from "../../../hooks/useAPI";
+import { useProfile } from "../../../context/ProfileContext";
 import { API_BASE } from "../../../services/api";
 
 
@@ -48,11 +49,22 @@ export default function SocialSection({
 }) {
 
     /*
-     * Mount the existing OAuth callback handler.
+     * OAuth callback completion.
      *
-     * This is the legacy verification engine.
+     * The hook is responsible for detecting the
+     * verification callback and rehydrating the
+     * profile after OAuth succeeds.
      */
     useSocialVerification();
+
+
+    /*
+     * ProfileContext is the authoritative source
+     * for persisted profile state.
+     */
+    const {
+        loadProfile,
+    } = useProfile();
 
 
     const {
@@ -67,6 +79,16 @@ export default function SocialSection({
     ] = useState(null);
 
 
+    /*
+     * ---------------------------------------------------------
+     * VERIFY
+     * ---------------------------------------------------------
+     *
+     * 1. Establish authenticated backend session.
+     * 2. Redirect to OAuth provider.
+     * 3. OAuth callback persists verification.
+     * 4. useSocialVerification() reloads the profile.
+     */
     const handleVerify = async (provider) => {
 
         if (!editing) {
@@ -123,7 +145,41 @@ export default function SocialSection({
     };
 
 
+    /*
+     * ---------------------------------------------------------
+     * DISCONNECT
+     * ---------------------------------------------------------
+     *
+     * Backend is authoritative.
+     *
+     * DELETE removes the provider from the persisted
+     * profile. Once that succeeds, reload ProfileContext.
+     *
+     * Do NOT manually modify:
+     *
+     *     social.youtube
+     *
+     * in the form.
+     *
+     * The profile reload will flow back through:
+     *
+     * ProfileContext
+     *      ↓
+     * profile
+     *      ↓
+     * getInitialProfileValues()
+     *      ↓
+     * useForm()
+     *      ↓
+     * SocialSection
+     *
+     */
     const handleDisconnect = async (provider) => {
+
+        if (!editing) {
+            return;
+        }
+
 
         const confirmed =
             window.confirm(
@@ -143,20 +199,24 @@ export default function SocialSection({
             );
 
 
+            /*
+             * Persist the disconnect on the backend.
+             */
             await deleteRequest(
                 `/${provider.id}/disconnect`
             );
 
 
             /*
-             * Do not manually manufacture the
-             * social state here.
+             * Rehydrate the authoritative profile.
              *
-             * ProfileContext remains authoritative.
-             *
-             * If the existing useAPI/profile architecture
-             * refreshes the profile, the form will rehydrate.
+             * The backend has now removed the
+             * provider from persisted social state.
              */
+            await loadProfile({
+                background: false,
+            });
+
 
         } catch (err) {
 
@@ -204,13 +264,10 @@ export default function SocialSection({
                 {SOCIAL_PROVIDERS.map(
                     (provider) => {
 
-                        const connected =
-                            Boolean(
-                                form.getValue(
-                                    `social.${provider.id}.connected`
-                                )
-                            );
-
+                        /*
+                         * Read persisted state through the
+                         * form/workspace model.
+                         */
 
                         const verified =
                             Boolean(
