@@ -1,51 +1,55 @@
 import { useEffect, useState } from "react";
 
-import {
-  Elements,
-} from "@stripe/react-stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
 
-import {
-  loadStripe,
-} from "@stripe/stripe-js";
-
-import api from "../../src/lib/api";
+import useAPI from "../hooks/useAPI";
 
 import PaymentDetailsStep
-  from "../components/PaymentDetails/PaymentDetailsStep";
+    from "../components/PaymentDetails/PaymentDetailsStep";
+
 
 const stripePromise = loadStripe(
-  import.meta.env
-    .VITE_STRIPE_PUBLISHABLE_KEY
+    import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
 );
 
+
 export default function StripePaymentWrapper() {
-  const [clientSecret, setClientSecret] =
-    useState("");
 
-  useEffect(() => {
-    loadIntent();
-  }, []);
+    const api = useAPI();
 
-  async function loadIntent() {
-    const res = await api.post(
-      "/payments/create-setup-intent"
+    const [clientSecret, setClientSecret] =
+        useState("");
+
+    useEffect(() => {
+        loadIntent();
+    }, []);
+
+    async function loadIntent() {
+
+        const res = await api.post(
+            "/payments/create-setup-intent"
+        );
+
+        setClientSecret(
+            res.clientSecret
+        );
+    }
+
+    if (!clientSecret) {
+        return (
+            <div>
+                Loading...
+            </div>
+        );
+    }
+
+    return (
+        <Elements
+            stripe={stripePromise}
+            options={{ clientSecret }}
+        >
+            <PaymentDetailsStep />
+        </Elements>
     );
-
-    setClientSecret(
-      res.data.clientSecret
-    );
-  }
-
-  if (!clientSecret) {
-    return <div>Loading...</div>;
-  }
-
-  return (
-    <Elements
-      stripe={stripePromise}
-      options={{ clientSecret }}
-    >
-      <PaymentDetailsStep />
-    </Elements>
-  );
 }
