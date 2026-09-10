@@ -6,6 +6,7 @@ const router = express.Router();
 
 router.post(
   "/create-setup-intent",
+  authMiddleware,
   async (req, res) => {
     try {
       const setupIntent =
