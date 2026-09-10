@@ -69,13 +69,16 @@ const content = (
     </div>
 );
 
-    return (
-        <WorkspaceSection>
-            <WorkspaceCard>
-                <WorkspaceCardBody>
-                    {content}
-                </WorkspaceCardBody>
-            </WorkspaceCard>
-        </WorkspaceSection>
-    );
+return (
+    <div
+        style={{
+            padding: "40px",
+            fontSize: "24px",
+            background: "yellow",
+            color: "black",
+        }}
+    >
+        IDENTITY SECTION RENDERER IS ALIVE
+    </div>
+);
 }
