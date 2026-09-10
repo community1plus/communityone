@@ -4,8 +4,7 @@ import WorkspaceFormView
 import SocialSection
     from "../../engines/IdentityWorkspace/sections/SocialSection";
 
-import StripePaymentWrapper
-    from "..."; // use the existing StripePaymentWrapper path
+import StripePaymentWrapper from "../../pages/StripePaymentWrapper";
 
 
 export default function CapabilityRenderer({
