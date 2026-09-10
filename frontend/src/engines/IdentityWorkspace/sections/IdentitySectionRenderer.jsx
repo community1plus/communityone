@@ -21,16 +21,6 @@ export default function IdentitySectionRenderer({
     sectionCompletion,
 }) {
 
-    console.log(
-        "[IDENTITY SECTION RENDER]",
-        {
-            sectionId,
-            activeSteps,
-            currentStep,
-            editing,
-        }
-    );
-
     const defaultContent = (
         <WorkspaceForm>
             <FormBuilder
@@ -56,29 +46,26 @@ console.log(
             />
         ),
 
-payment: (
-    <div>
-        PAYMENT RENDER TEST
-    </div>
-),
+        payment: (
+            <IdentityPaymentSection
+                form={form}
+                editing={editing}
+            />
+        ),
     };
 
-const content = (
-    <div style={{ padding: "40px", fontSize: "24px" }}>
-        SECTION ID: {String(sectionId)}
-    </div>
-);
+const content =
+    sectionMap[sectionId] ??
+    IdentitySections({ form, editing })[sectionId] ??
+    defaultContent;
 
-return (
-    <div
-        style={{
-            padding: "40px",
-            fontSize: "24px",
-            background: "yellow",
-            color: "black",
-        }}
-    >
-        IDENTITY SECTION RENDERER IS ALIVE
-    </div>
-);
+    return (
+        <WorkspaceSection>
+            <WorkspaceCard>
+                <WorkspaceCardBody>
+                    {content}
+                </WorkspaceCardBody>
+            </WorkspaceCard>
+        </WorkspaceSection>
+    );
 }

@@ -14,9 +14,19 @@ export default function CapabilityRenderer({
 
 }) {
 
-    if (!section) {
-        return null;
+   if (!section) {
+    return null;
+}
+
+console.log(
+    "[CAPABILITY RENDERER]",
+    {
+        id: section.id,
+        view: section.view,
+        title: section.title,
+        section,
     }
+);
 
 
     switch (section.view) {
