@@ -121,6 +121,11 @@ router.post(
             }
         );
 
+        console.log("[FACEBOOK] BEGIN SESSION:", {
+  sessionId: req.sessionID,
+  userId: req.session.userId,
+  state: req.session.fbOAuthState,
+});
 
         req.session.save((err) => {
 
@@ -165,7 +170,12 @@ router.get(
             "[FACEBOOK] START"
         );
 
-
+console.log("[FACEBOOK] START SESSION:", {
+  sessionId: req.sessionID,
+  userId: req.session.userId,
+  state: req.session.fbOAuthState,
+  cookie: req.headers.cookie || null,
+});
         const userId =
             req.session?.userId;
 
@@ -312,6 +322,13 @@ router.get(
         console.log(
             "[FACEBOOK] CALLBACK"
         );
+
+console.log("[FACEBOOK] CALLBACK SESSION:", {
+  sessionId: req.sessionID,
+  userId: req.session.userId,
+  state: req.session.fbOAuthState,
+  cookie: req.headers.cookie || null,
+});
 
         const userId =
             req.session?.userId;
