@@ -1,5 +1,4 @@
 import "./config/env.js";
-
 import express from "express";
 import cors from "cors";
 import pkg from "pg";
@@ -37,9 +36,11 @@ import businessRoutes from "./routes/businessRoutes.js";
 import moderationRoutes from "./routes/moderation/moderation.js";
 import businessEmailVerificationRoutes from "./routes/businessEmailVerificationRoutes.js";
 
-
-
 // import identityRoutes from "./routes/identityRoutes.js";
+
+
+
+const app = express();
 
 /* =========================
    APP
@@ -55,9 +56,6 @@ app.use((req, res, next) => {
 
   next();
 });
-
-const app = express();
-
 app.use(
   session({
 
