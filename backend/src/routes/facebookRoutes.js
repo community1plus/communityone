@@ -2,246 +2,308 @@ import express from "express";
 import crypto from "crypto";
 
 import authMiddleware
-  from "../../middleware/authMiddleware.js";
+    from "../../middleware/authMiddleware.js";
 
 import {
-  patchProfileService,
+    patchProfileService,
 } from "../../services/profileService.js";
 
 const router = express.Router();
 
 const FB_AUTH_URL =
-  "https://www.facebook.com/v25.0/dialog/oauth";
+    "https://www.facebook.com/v25.0/dialog/oauth";
 
 const FB_TOKEN_URL =
-  "https://graph.facebook.com/v25.0/oauth/access_token";
+    "https://graph.facebook.com/v25.0/oauth/access_token";
 
 const FB_GRAPH_URL =
-  "https://graph.facebook.com/v25.0";
+    "https://graph.facebook.com/v25.0";
 
-function getFrontendRedirect(params = {}) {
-  const baseUrl =
+const FRONTEND_URL =
     process.env.FRONTEND_URL ||
     "https://develop.d1ss8rtrtimogr.amplifyapp.com";
 
-  const query =
-    new URLSearchParams(params);
 
-  return `${baseUrl}/communityplus/profile?${query.toString()}`;
+// ============================================================
+// HELPERS
+// ============================================================
+
+function getFrontendRedirect(params = {}) {
+
+    const query =
+        new URLSearchParams(params);
+
+    return (
+        `${FRONTEND_URL}` +
+        `/communityplus/profile?` +
+        `${query.toString()}`
+    );
 }
+
 
 function redirectFailure(
-  res,
-  reason = "facebook_verification_failed"
+    res,
+    reason = "facebook_verification_failed"
 ) {
-  console.error(
-    "❌ FACEBOOK FAILURE:",
-    reason
-  );
 
-  return res.redirect(
-    getFrontendRedirect({
-      social: "facebook",
-      verified: "false",
-      reason,
-    })
-  );
+    console.error(
+        "[FACEBOOK] FAILURE:",
+        reason
+    );
+
+    return res.redirect(
+        getFrontendRedirect({
+            social: "facebook",
+            verified: "false",
+            reason,
+        })
+    );
 }
+
 
 // ============================================================
 // BEGIN FACEBOOK VERIFICATION
 // ============================================================
 
 router.post(
-  "/begin",
-  authMiddleware,
-  (req, res) => {
+    "/begin",
+    authMiddleware,
+    (req, res) => {
 
-    console.log("=== FACEBOOK BEGIN ===");
-
-    console.log(
-      "Session ID:",
-      req.sessionID
-    );
-
-    console.log(
-      "Authenticated user:",
-      {
-        userId:
-          req.user?.userId,
-
-        cognitoSub:
-          req.user?.cognitoSub,
-
-        email:
-          req.user?.email,
-      }
-    );
-
-    const userId =
-      req.user?.userId;
-
-    if (!userId) {
-
-      console.error(
-        "❌ FACEBOOK BEGIN: Missing internal userId"
-      );
-
-      return res.status(401).json({
-        error:
-          "Authenticated user ID missing",
-      });
-    }
-
-    const oauthState =
-      crypto.randomUUID();
-
-    req.session.userId =
-      userId;
-
-    req.session.fbOAuthState =
-      oauthState;
-
-    console.log(
-      "Saving Facebook OAuth session:",
-      {
-        sessionId:
-          req.sessionID,
-
-        userId:
-          req.session.userId,
-
-        fbOAuthState:
-          req.session.fbOAuthState,
-      }
-    );
-
-    req.session.save((err) => {
-
-      if (err) {
-
-        console.error(
-          "❌ FACEBOOK SESSION SAVE ERROR:",
-          err
+        console.log(
+            "[FACEBOOK] BEGIN"
         );
 
-        return res.status(500).json({
-          error:
-            "Session save failed",
+        const userId =
+            req.user?.userId;
+
+        if (!userId) {
+
+            console.error(
+                "[FACEBOOK] BEGIN: " +
+                "missing internal userId"
+            );
+
+            return res.status(401).json({
+                error:
+                    "Authenticated user ID missing",
+            });
+        }
+
+
+        const oauthState =
+            crypto.randomUUID();
+
+
+        /*
+         * Bind the OAuth transaction to the
+         * authenticated application user.
+         *
+         * Do NOT store the Cognito subject here.
+         */
+        req.session.userId =
+            userId;
+
+        req.session.fbOAuthState =
+            oauthState;
+
+
+        console.log(
+            "[FACEBOOK] Saving OAuth session:",
+            {
+                sessionId:
+                    req.sessionID,
+
+                userId,
+
+                hasState:
+                    Boolean(oauthState),
+            }
+        );
+
+
+        req.session.save((err) => {
+
+            if (err) {
+
+                console.error(
+                    "[FACEBOOK] " +
+                    "SESSION SAVE ERROR:",
+                    err
+                );
+
+                return res.status(500).json({
+                    error:
+                        "Session save failed",
+                });
+            }
+
+
+            console.log(
+                "[FACEBOOK] " +
+                "SESSION SAVED"
+            );
+
+
+            return res.status(200).json({
+                ok: true,
+            });
         });
-      }
-
-      console.log(
-        "✅ FACEBOOK SESSION SAVED"
-      );
-
-      return res.json({
-        ok: true,
-      });
-    });
-  }
+    }
 );
+
 
 // ============================================================
 // START FACEBOOK OAUTH
 // ============================================================
 
 router.get(
-  "/start",
-  async (req, res) => {
+    "/start",
+    (req, res) => {
 
-    console.log("=== FACEBOOK START ===");
-
-    console.log(
-      "Session ID:",
-      req.sessionID
-    );
-
-    console.log(
-      "Facebook OAuth session:",
-      {
-        userId:
-          req.session?.userId,
-
-        fbOAuthState:
-          req.session?.fbOAuthState,
-      }
-    );
-
-    const userId =
-      req.session?.userId;
-
-    if (!userId) {
-
-      return redirectFailure(
-        res,
-        "missing_user_session"
-      );
-    }
-
-    try {
-
-      if (
-        !process.env.FACEBOOK_APP_ID ||
-        !process.env.FACEBOOK_REDIRECT_URI
-      ) {
-
-        return redirectFailure(
-          res,
-          "facebook_oauth_not_configured"
+        console.log(
+            "[FACEBOOK] START"
         );
-      }
 
-      const state =
-        req.session?.fbOAuthState;
 
-      if (!state) {
+        const userId =
+            req.session?.userId;
 
-        return redirectFailure(
-          res,
-          "missing_oauth_state"
+        const state =
+            req.session?.fbOAuthState;
+
+
+        console.log(
+            "[FACEBOOK] OAuth session:",
+            {
+                sessionId:
+                    req.sessionID,
+
+                userId,
+
+                hasState:
+                    Boolean(state),
+            }
         );
-      }
 
-      const params =
-        new URLSearchParams({
-          client_id:
-            process.env.FACEBOOK_APP_ID,
 
-          redirect_uri:
-            process.env.FACEBOOK_REDIRECT_URI,
+        // ----------------------------------------------------
+        // SESSION VALIDATION
+        // ----------------------------------------------------
 
-          response_type:
-            "code",
+        if (!userId) {
 
-          state,
+            return redirectFailure(
+                res,
+                "missing_user_session"
+            );
+        }
 
-          scope: [
-            "public_profile",
-            "email",
-          ].join(","),
-        });
 
-      const authUrl =
-        `${FB_AUTH_URL}?${params.toString()}`;
+        if (!state) {
 
-      console.log(
-        "Facebook auth URL generated."
-      );
+            return redirectFailure(
+                res,
+                "missing_oauth_state"
+            );
+        }
 
-      return res.redirect(authUrl);
 
-    } catch (err) {
+        // ----------------------------------------------------
+        // CONFIGURATION VALIDATION
+        // ----------------------------------------------------
 
-      console.error(
-        "❌ FACEBOOK START ERROR:",
-        err
-      );
+        const appId =
+            process.env.FACEBOOK_APP_ID;
 
-      return redirectFailure(
-        res,
-        "facebook_start_failed"
-      );
+        const redirectUri =
+            process.env.FACEBOOK_REDIRECT_URI;
+
+
+        if (!appId || !redirectUri) {
+
+            console.error(
+                "[FACEBOOK] " +
+                "OAuth configuration missing"
+            );
+
+            return redirectFailure(
+                res,
+                "facebook_oauth_not_configured"
+            );
+        }
+
+
+        // ----------------------------------------------------
+        // BUILD FACEBOOK AUTHORIZATION URL
+        // ----------------------------------------------------
+
+        try {
+
+            const params =
+                new URLSearchParams({
+                    client_id:
+                        appId,
+
+                    redirect_uri:
+                        redirectUri,
+
+                    response_type:
+                        "code",
+
+                    state,
+
+                    scope:
+                        "public_profile,email",
+                });
+
+
+            const authUrl =
+                `${FB_AUTH_URL}?${params.toString()}`;
+
+
+            console.log(
+                "[FACEBOOK] " +
+                "Authorization URL generated"
+            );
+
+
+            return res.redirect(
+                authUrl
+            );
+
+        } catch (err) {
+
+            console.error(
+                "[FACEBOOK] " +
+                "START ERROR:",
+                err
+            );
+
+            return redirectFailure(
+                res,
+                "facebook_start_failed"
+            );
+        }
     }
-  }
 );
+
+
+// ============================================================
+// FACEBOOK CALLBACK
+// ============================================================
+//
+// We will add this next.
+// Do not add the legacy callback yet.
+// ============================================================
+
+
+// ============================================================
+// FACEBOOK DISCONNECT
+// ============================================================
+//
+// We will add this after the callback.
+// ============================================================
+
+
+export default router;
