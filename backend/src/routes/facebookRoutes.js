@@ -810,4 +810,126 @@ console.log("[FACEBOOK] CALLBACK SESSION:", {
     }
 );
 
+// ======================================================
+// DISCONNECT FACEBOOK
+// ======================================================
+
+router.delete(
+  "/disconnect",
+  authMiddleware,
+  async (req, res) => {
+    try {
+      const userId = req.user?.userId;
+
+      if (!userId) {
+        return res.status(401).json({
+          error: "Authenticated user not resolved",
+        });
+      }
+
+      console.log(
+        "🔌 DISCONNECTING FACEBOOK:",
+        {
+          userId,
+        }
+      );
+
+      await patchProfileService({
+        userId,
+        body: {
+          profile: {
+            social: {
+              facebook: null,
+            },
+          },
+        },
+        req,
+      });
+
+      console.log(
+        "✅ FACEBOOK DISCONNECTED:",
+        {
+          userId,
+        }
+      );
+
+      return res.status(200).json({
+        success: true,
+        provider: "facebook",
+      });
+
+    } catch (err) {
+      console.error(
+        "❌ FACEBOOK DISCONNECT ERROR:",
+        err
+      );
+
+      return res.status(500).json({
+        error: "Failed to disconnect Facebook",
+      });
+    }
+  }
+);
+
+// ======================================================
+// DISCONNECT FACEBOOK
+// ======================================================
+
+router.delete(
+  "/disconnect",
+  authMiddleware,
+  async (req, res) => {
+    try {
+      const userId = req.user?.userId;
+
+      if (!userId) {
+        return res.status(401).json({
+          error: "Authenticated user not resolved",
+        });
+      }
+
+      console.log(
+        "🔌 DISCONNECTING FACEBOOK:",
+        {
+          userId,
+        }
+      );
+
+      await patchProfileService({
+        userId,
+        body: {
+          profile: {
+            social: {
+              facebook: null,
+            },
+          },
+        },
+        req,
+      });
+
+      console.log(
+        "✅ FACEBOOK DISCONNECTED:",
+        {
+          userId,
+        }
+      );
+
+      return res.status(200).json({
+        success: true,
+        provider: "facebook",
+      });
+
+    } catch (err) {
+      console.error(
+        "❌ FACEBOOK DISCONNECT ERROR:",
+        err
+      );
+
+      return res.status(500).json({
+        error: "Failed to disconnect Facebook",
+      });
+    }
+  }
+);
+
 export default router;
