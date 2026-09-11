@@ -5,7 +5,7 @@ import authMiddleware from "../../middleware/authMiddleware.js";
 
 import {
     patchProfileService,
-} from "../services/profileService.js";
+} from "../../services/profileService.js";
 
 
 const router = express.Router();
