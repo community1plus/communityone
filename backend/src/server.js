@@ -44,6 +44,17 @@ import businessEmailVerificationRoutes from "./routes/businessEmailVerificationR
 /* =========================
    APP
 ========================= */
+app.use((req, res, next) => {
+  console.log("🍪 COOKIE DEBUG:", {
+    method: req.method,
+    url: req.originalUrl,
+    cookie: req.headers.cookie || null,
+    origin: req.headers.origin || null,
+    referer: req.headers.referer || null,
+  });
+
+  next();
+});
 
 const app = express();
 
