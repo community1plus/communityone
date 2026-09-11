@@ -8,12 +8,10 @@ import StripePaymentWrapper from "../../pages/StripePaymentWrapper";
 
 
 export default function CapabilityRenderer({
-
     section,
     form,
     editing,
     sectionCompletion,
-
 }) {
 
     if (!section) {
@@ -26,41 +24,48 @@ export default function CapabilityRenderer({
         case "form":
 
             return (
-
                 <WorkspaceFormView
                     section={section}
                     form={form}
                     editing={editing}
-                    sectionCompletion={sectionCompletion}
+                    sectionCompletion={
+                        sectionCompletion
+                    }
                 />
-
             );
 
 
         case "social":
 
             return (
-
                 <SocialSection
                     section={section}
                     form={form}
                     editing={editing}
-                    sectionCompletion={sectionCompletion}
+                    sectionCompletion={
+                        sectionCompletion
+                    }
                 />
-
             );
 
 
         case "payment":
 
             return (
-
                 <StripePaymentWrapper
-                    form={form}
-                    editing={editing}
-                    section={section}
-                />
+                    payment={
+                        form.getValue("payment")
+                    }
 
+                    onVerified={(payment) => {
+
+                        form.setValue(
+                            "payment",
+                            payment
+                        );
+
+                    }}
+                />
             );
 
 
