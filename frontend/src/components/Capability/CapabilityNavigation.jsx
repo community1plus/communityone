@@ -1,3 +1,4 @@
+import IdentityCapabilitySelector from "../../components/Identity/IdentityCapabilitySelector";
 switch (capability) {
     case "wallet":
         return <WalletNavigation />;
