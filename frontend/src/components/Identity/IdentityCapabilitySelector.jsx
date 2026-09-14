@@ -1,10 +1,19 @@
 import { WorkspaceSegmentedControl } from "../../framework/Workspace";
 
 export default function IdentityCapabilitySelector({
-    value = "PERSONAL",
-    onChange,
+
+    values = {},
+
+    setValue,
+
     readOnly = false,
+
 }) {
+
+    const identityType =
+        values?.identityType ||
+        values?.activeIdentityType ||
+        "PERSONAL";
 
     return (
 
@@ -13,14 +22,15 @@ export default function IdentityCapabilitySelector({
             <WorkspaceSegmentedControl
 
                 value={
-                    value === "ENTITY"
+                    identityType === "ENTITY"
                         ? "entity"
                         : "person"
                 }
 
                 onChange={(value) => {
 
-                    onChange(
+                    setValue(
+                        "identityType",
                         value === "entity"
                             ? "ENTITY"
                             : "PERSONAL"
