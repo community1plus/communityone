@@ -1,5 +1,4 @@
 import { WorkspaceSegmentedControl } from "../../framework/Workspace";
-import IdentityCapabilitySelector from "../../components/Identity/IdentityCapabilitySelector";
 
 export default function IdentityCapabilitySelector({
 
