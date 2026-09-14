@@ -35,6 +35,8 @@ import useForm
 import IdentityWorkspace
     from "../../engines/IdentityWorkspace/IdentityWorkspace";
 
+import EntityWorkspace
+    from "../../engines/IdentityWorkspace/EntityWorkspace";
 
 import {
     PERSONAL_STEPS,
@@ -105,7 +107,6 @@ export default function CommunityPlusUserProfile({
         setEditingSections,
     ] = useState({});
 
-
     /* =====================================
        PROFILE VALUES
     ===================================== */
@@ -146,6 +147,10 @@ console.log(
     const {
         values,
     } = form;
+
+    const isEntity =
+        values.identityType === "ENTITY" ||
+        values.capabilities?.entity;
 
 console.log(
   "🔥 PROFILE FORM VALUES",
@@ -201,11 +206,9 @@ console.log(
        Workspace section runtime contract.
     ===================================== */
 
-const sections = useMemo(() => {
+    
 
-    const isEntity =
-        values.identityType === "ENTITY" ||
-        values.capabilities?.entity;
+const sections = useMemo(() => {
 
     if (isEntity) {
 
@@ -223,8 +226,7 @@ const sections = useMemo(() => {
     ];
 
 }, [
-    values.identityType,
-    values.capabilities,
+    isEntity,
 ]);
 
 
@@ -591,7 +593,23 @@ const sections = useMemo(() => {
        RENDER
     ===================================== */
 
-    return (
+    return isEntity ? (
+
+        <EntityWorkspace
+
+            initialCapability="entity"
+
+            state={
+                workspaceState
+            }
+
+            actions={
+                workspaceActions
+            }
+
+        />
+
+    ) : (
 
         <IdentityWorkspace
 
