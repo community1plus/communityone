@@ -33,7 +33,8 @@ import {
     Save,
 } from "lucide-react";
 
-import "../../../src/components/Identity/IdentityCapabilitySelector.css";
+import "../../../src/components/Identity/IdentityCapabilitySelector";
+
 export default function EntityWorkspace({
 
     initialCapability = "entity",
