@@ -33,7 +33,7 @@ import {
     Save,
 } from "lucide-react";
 
-import "../../../src/components/Identity/IdentityCapabilitySelector";
+import "../../components/Identity/IdentityCapabilitySelector";
 
 export default function EntityWorkspace({
 
