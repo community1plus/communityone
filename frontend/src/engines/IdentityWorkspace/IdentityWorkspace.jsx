@@ -27,11 +27,11 @@ import {
 
 
 export default function IdentityWorkspace({
-
+    initialCapability = "identity",
     state,
-
     actions,
-
+    activeIdentityType,
+    onIdentityTypeChange,
 }) {
 
 
