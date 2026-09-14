@@ -211,9 +211,23 @@ export default function EntityWorkspace({
 
                     <WorkspaceRegionHeader>
 
-                        <WorkspaceBanner
-                            model={banner}
-                        />
+<WorkspaceBanner
+    model={banner}
+>
+    <IdentityCapabilitySelector
+        values={
+            values
+        }
+
+        setValue={
+            form.setValue
+        }
+
+        readOnly={
+            false
+        }
+    />
+</WorkspaceBanner>
 
                     </WorkspaceRegionHeader>
 
