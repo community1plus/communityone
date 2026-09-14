@@ -2,7 +2,12 @@ import express from "express";
 import crypto from "crypto";
 import pkceChallenge from "pkce-challenge";
 
-import authMiddleware from "../../middleware/authMiddleware.js";
+import authMiddleware
+  from "../../middleware/authMiddleware.js";
+
+import {
+  patchProfileService,
+} from "../../services/profileService.js";
 
 const router = express.Router();
 
@@ -11,13 +16,13 @@ const router = express.Router();
 ========================= */
 
 const X_AUTH_URL =
-  "https://twitter.com/i/oauth2/authorize";
+  "https://x.com/i/oauth2/authorize";
 
 const X_TOKEN_URL =
   "https://api.x.com/2/oauth2/token";
 
 const X_ME_URL =
-  "https://api.x.com/2/users/me?user.fields=id,name,username,profile_image_url,verified,description,public_metrics";
+  "https://api.x.com/2/users/me";
 
 /* =========================
    FRONTEND REDIRECT
@@ -47,19 +52,12 @@ function redirectFailure(
   );
 
   return res.redirect(
-
     getFrontendRedirect({
-
       social: "x",
-
       verified: "false",
-
       reason,
-
     })
-
   );
-
 }
 
 /* =========================
@@ -86,48 +84,38 @@ function validateEnv(res) {
 }
 
 /* =========================
-   SESSION VALIDATION
+   SESSION SAVE
 ========================= */
 
-function validateSession(req, res) {
+function saveSession(req) {
 
-  const valid =
+  return new Promise(
+    (resolve, reject) => {
 
-    req.session.userSub &&
-    req.session.xOAuthState &&
-    req.session.xCodeVerifier &&
-    req.session.xCodeChallenge;
+      req.session.save(
+        (err) => {
 
-  if (!valid) {
+          if (err) {
+            reject(err);
+            return;
+          }
 
-    console.error(
-      "❌ Missing OAuth session",
-      {
-        id: req.sessionID,
-        session: req.session,
-      }
-    );
+          resolve();
 
-    redirectFailure(
-      res,
-      "missing_user_session"
-    );
+        }
+      );
 
-    return false;
-
-  }
-
-  return true;
-
+    }
+  );
 }
 
 /* =========================
-   CLEAN SESSION
+   CLEAN OAUTH SESSION
 ========================= */
 
-function destroyOAuthSession(req) {
+async function destroyOAuthSession(req) {
 
-  delete req.session.userSub;
+  delete req.session.userId;
 
   delete req.session.xOAuthState;
 
@@ -135,7 +123,9 @@ function destroyOAuthSession(req) {
 
   delete req.session.xCodeChallenge;
 
+  await saveSession(req);
 }
+
 /* =========================
    BEGIN OAUTH
 ========================= */
@@ -147,22 +137,50 @@ router.post(
 
     try {
 
-      console.log("=== X BEGIN ===");
+      console.log(
+        "=== X BEGIN ==="
+      );
 
       if (!validateEnv(res)) {
         return;
       }
+
+      const userId =
+        req.user?.userId;
+
+      if (!userId) {
+
+        return res.status(401).json({
+          error: "unauthorized",
+        });
+
+      }
+
+      /* =========================
+         GENERATE PKCE
+      ========================= */
 
       const {
         code_verifier,
         code_challenge,
       } = await pkceChallenge();
 
-      req.session.userSub =
-        req.user.sub;
+      /* =========================
+         GENERATE STATE
+      ========================= */
+
+      const state =
+        crypto.randomUUID();
+
+      /* =========================
+         SAVE SESSION
+      ========================= */
+
+      req.session.userId =
+        userId;
 
       req.session.xOAuthState =
-        crypto.randomUUID();
+        state;
 
       req.session.xCodeVerifier =
         code_verifier;
@@ -170,45 +188,19 @@ router.post(
       req.session.xCodeChallenge =
         code_challenge;
 
+      await saveSession(req);
+
       console.log(
-        "Saving X session",
+        "📘 X OAUTH BEGIN:",
         {
+          userId,
           sessionId:
             req.sessionID,
-
-          userSub:
-            req.session.userSub,
         }
       );
 
-      req.session.save((err) => {
-
-        if (err) {
-
-          console.error(
-            "Session save failed",
-            err
-          );
-
-          return res.status(500).json({
-
-            error:
-              "Session save failed",
-
-          });
-
-        }
-
-        console.log(
-          "✔ X session saved"
-        );
-
-        return res.json({
-
-          ok: true,
-
-        });
-
+      return res.status(200).json({
+        success: true,
       });
 
     } catch (err) {
@@ -219,10 +211,8 @@ router.post(
       );
 
       return res.status(500).json({
-
         error:
           "x_begin_failed",
-
       });
 
     }
@@ -236,24 +226,64 @@ router.post(
 
 router.get(
   "/start",
-  (req, res) => {
+  async (req, res) => {
 
     try {
 
-      console.log("=== X START ===");
-
       console.log(
-        "Session ID:",
-        req.sessionID
+        "=== X START ==="
       );
 
       if (!validateEnv(res)) {
         return;
       }
 
-      if (!validateSession(req, res)) {
-        return;
+      const userId =
+        req.session?.userId;
+
+      const state =
+        req.session?.xOAuthState;
+
+      const codeChallenge =
+        req.session?.xCodeChallenge;
+
+      /* =========================
+         SESSION VALIDATION
+      ========================= */
+
+      if (
+        !userId ||
+        !state ||
+        !codeChallenge
+      ) {
+
+        console.error(
+          "❌ X SESSION MISSING:",
+          {
+            sessionId:
+              req.sessionID,
+
+            hasUserId:
+              Boolean(userId),
+
+            hasState:
+              Boolean(state),
+
+            hasCodeChallenge:
+              Boolean(codeChallenge),
+          }
+        );
+
+        return redirectFailure(
+          res,
+          "x_session_missing"
+        );
+
       }
+
+      /* =========================
+         AUTHORIZE URL
+      ========================= */
 
       const params =
         new URLSearchParams({
@@ -270,11 +300,10 @@ router.get(
           scope:
             "users.read tweet.read offline.access",
 
-          state:
-            req.session.xOAuthState,
+          state,
 
           code_challenge:
-            req.session.xCodeChallenge,
+            codeChallenge,
 
           code_challenge_method:
             "S256",
@@ -285,7 +314,12 @@ router.get(
         `${X_AUTH_URL}?${params.toString()}`;
 
       console.log(
-        "Redirecting to X..."
+        "📘 X OAUTH START:",
+        {
+          userId,
+          sessionId:
+            req.sessionID,
+        }
       );
 
       return res.redirect(
@@ -308,6 +342,7 @@ router.get(
 
   }
 );
+
 /* =========================
    CALLBACK
 ========================= */
@@ -318,30 +353,78 @@ router.get(
 
     try {
 
-      console.log("=== X CALLBACK ===");
+      console.log(
+        "=== X CALLBACK ==="
+      );
 
       if (!validateEnv(res)) {
-        return;
-      }
-
-      if (!validateSession(req, res)) {
         return;
       }
 
       const {
         code,
         error,
+        error_description,
         state,
       } = req.query;
+
+      const userId =
+        req.session?.userId;
+
+      const sessionState =
+        req.session?.xOAuthState;
+
+      const codeVerifier =
+        req.session?.xCodeVerifier;
+
+      /* =========================
+         SESSION VALIDATION
+      ========================= */
+
+      if (!userId) {
+
+        return redirectFailure(
+          res,
+          "x_session_user_missing"
+        );
+
+      }
+
+      if (!sessionState) {
+
+        return redirectFailure(
+          res,
+          "x_session_state_missing"
+        );
+
+      }
+
+      if (!codeVerifier) {
+
+        return redirectFailure(
+          res,
+          "x_code_verifier_missing"
+        );
+
+      }
+
+      /* =========================
+         OAUTH ERROR
+      ========================= */
 
       if (error) {
 
         console.error(
           "❌ X OAUTH ERROR:",
-          error
+          {
+            error,
+            error_description,
+          }
         );
 
-        destroyOAuthSession(req);
+        await destroyOAuthSession(
+          req
+        );
 
         return redirectFailure(
           res,
@@ -350,27 +433,21 @@ router.get(
 
       }
 
-      if (!code) {
-
-        destroyOAuthSession(req);
-
-        return redirectFailure(
-          res,
-          "missing_x_code"
-        );
-
-      }
+      /* =========================
+         STATE VALIDATION
+      ========================= */
 
       if (
-        state !==
-        req.session.xOAuthState
+        state !== sessionState
       ) {
 
         console.error(
           "❌ X STATE MISMATCH"
         );
 
-        destroyOAuthSession(req);
+        await destroyOAuthSession(
+          req
+        );
 
         return redirectFailure(
           res,
@@ -380,8 +457,54 @@ router.get(
       }
 
       /* =========================
+         AUTHORIZATION CODE
+      ========================= */
+
+      if (!code) {
+
+        await destroyOAuthSession(
+          req
+        );
+
+        return redirectFailure(
+          res,
+          "missing_x_code"
+        );
+
+      }
+
+      /* =========================
          TOKEN EXCHANGE
       ========================= */
+
+      const tokenBody =
+        new URLSearchParams({
+
+          grant_type:
+            "authorization_code",
+
+          code,
+
+          redirect_uri:
+            process.env.X_REDIRECT_URI,
+
+          code_verifier:
+            codeVerifier,
+
+        });
+
+      /*
+       * X confidential clients use
+       * HTTP Basic authentication
+       * with client_id:client_secret.
+       */
+
+      const basicCredentials =
+        Buffer
+          .from(
+            `${process.env.X_CLIENT_ID}:${process.env.X_CLIENT_SECRET}`
+          )
+          .toString("base64");
 
       const tokenResponse =
         await fetch(
@@ -395,26 +518,13 @@ router.get(
               "Content-Type":
                 "application/x-www-form-urlencoded",
 
+              Authorization:
+                `Basic ${basicCredentials}`,
+
             },
 
             body:
-              new URLSearchParams({
-
-                grant_type:
-                  "authorization_code",
-
-                code,
-
-                redirect_uri:
-                  process.env.X_REDIRECT_URI,
-
-                client_id:
-                  process.env.X_CLIENT_ID,
-
-                code_verifier:
-                  req.session.xCodeVerifier,
-
-              }),
+              tokenBody,
 
           }
         );
@@ -422,17 +532,32 @@ router.get(
       const tokenData =
         await tokenResponse.json();
 
-      console.log(
-        "X TOKEN:",
-        tokenData
-      );
+      /*
+       * NEVER log access_token or refresh_token.
+       */
 
       if (
         !tokenResponse.ok ||
-        !tokenData.access_token
+        !tokenData?.access_token
       ) {
 
-        destroyOAuthSession(req);
+        console.error(
+          "❌ X TOKEN EXCHANGE FAILED:",
+          {
+            status:
+              tokenResponse.status,
+
+            error:
+              tokenData?.error,
+
+            error_description:
+              tokenData?.error_description,
+          }
+        );
+
+        await destroyOAuthSession(
+          req
+        );
 
         return redirectFailure(
           res,
@@ -441,19 +566,40 @@ router.get(
 
       }
 
+      const accessToken =
+        tokenData.access_token;
+
       /* =========================
-         GET USER PROFILE
+         GET AUTHENTICATED X USER
       ========================= */
+
+      const profileUrl =
+        new URL(
+          X_ME_URL
+        );
+
+      profileUrl.searchParams.set(
+        "user.fields",
+        [
+          "id",
+          "name",
+          "username",
+          "profile_image_url",
+          "verified",
+          "description",
+          "public_metrics",
+        ].join(",")
+      );
 
       const meResponse =
         await fetch(
-          X_ME_URL,
+          profileUrl,
           {
 
             headers: {
 
               Authorization:
-                `Bearer ${tokenData.access_token}`,
+                `Bearer ${accessToken}`,
 
             },
 
@@ -463,17 +609,25 @@ router.get(
       const meData =
         await meResponse.json();
 
-      console.log(
-        "X PROFILE:",
-        meData
-      );
-
       if (
         !meResponse.ok ||
-        !meData.data
+        !meData?.data?.id
       ) {
 
-        destroyOAuthSession(req);
+        console.error(
+          "❌ X PROFILE LOOKUP FAILED:",
+          {
+            status:
+              meResponse.status,
+
+            errors:
+              meData?.errors,
+          }
+        );
+
+        await destroyOAuthSession(
+          req
+        );
 
         return redirectFailure(
           res,
@@ -486,53 +640,119 @@ router.get(
         meData.data;
 
       /* =========================
+         BUILD X PROFILE
+      ========================= */
+
+      const xProfile = {
+
+        verified:
+          true,
+
+        verifiedAt:
+          new Date().toISOString(),
+
+        providerId:
+          user.id || "",
+
+        username:
+          user.username || "",
+
+        displayName:
+          user.name || "",
+
+        profileImage:
+          user.profile_image_url || "",
+
+        verifiedBadge:
+          Boolean(
+            user.verified
+          ),
+
+        description:
+          user.description || "",
+
+        followersCount:
+          user.public_metrics
+            ?.followers_count ?? 0,
+
+        followingCount:
+          user.public_metrics
+            ?.following_count ?? 0,
+
+        tweetCount:
+          user.public_metrics
+            ?.tweet_count ?? 0,
+
+      };
+
+      /* =========================
+         PERSIST PROFILE
+      ========================= */
+
+      await patchProfileService({
+
+        userId,
+
+        body: {
+
+          profile: {
+
+            social: {
+
+              x:
+                xProfile,
+
+            },
+
+          },
+
+        },
+
+        req,
+
+      });
+
+      console.log(
+        "✅ X VERIFIED:",
+        {
+          userId,
+
+          providerId:
+            xProfile.providerId,
+
+          username:
+            xProfile.username,
+        }
+      );
+
+      /* =========================
          CLEAN SESSION
       ========================= */
 
-      destroyOAuthSession(req);
+      await destroyOAuthSession(
+        req
+      );
 
-      req.session.save(() => {
+      /* =========================
+         SUCCESS
+      ========================= */
 
-        return res.redirect(
+      return res.redirect(
 
-          getFrontendRedirect({
+        getFrontendRedirect({
 
-            social: "x",
+          social:
+            "x",
 
-            verified: "true",
+          verified:
+            "true",
 
-            providerId:
-              user.id || "",
+          username:
+            xProfile.username,
 
-            username:
-              user.username || "",
+        })
 
-            displayName:
-              user.name || "",
-
-            profileImage:
-              user.profile_image_url || "",
-
-            verifiedBadge:
-              user.verified || false,
-
-            description:
-              user.description || "",
-
-            followers:
-              user.public_metrics?.followers_count || 0,
-
-            following:
-              user.public_metrics?.following_count || 0,
-
-            tweets:
-              user.public_metrics?.tweet_count || 0,
-
-          })
-
-        );
-
-      });
+      );
 
     } catch (err) {
 
@@ -541,12 +761,96 @@ router.get(
         err
       );
 
-      destroyOAuthSession(req);
+      try {
+
+        await destroyOAuthSession(
+          req
+        );
+
+      } catch {
+        // Ignore cleanup failure.
+      }
 
       return redirectFailure(
         res,
         "x_callback_failed"
       );
+
+    }
+
+  }
+);
+
+/* =========================
+   DISCONNECT
+========================= */
+
+router.delete(
+  "/disconnect",
+  authMiddleware,
+  async (req, res) => {
+
+    try {
+
+      const userId =
+        req.user?.userId;
+
+      if (!userId) {
+
+        return res.status(401).json({
+          error: "unauthorized",
+        });
+
+      }
+
+      await patchProfileService({
+
+        userId,
+
+        body: {
+
+          profile: {
+
+            social: {
+
+              x:
+                null,
+
+            },
+
+          },
+
+        },
+
+        req,
+
+      });
+
+      console.log(
+        "✅ X DISCONNECTED:",
+        userId
+      );
+
+      return res.status(200).json({
+
+        success:
+          true,
+
+      });
+
+    } catch (err) {
+
+      console.error(
+        "❌ X DISCONNECT ERROR:",
+        err
+      );
+
+      return res.status(500).json({
+
+        error:
+          "x_disconnect_failed",
+
+      });
 
     }
 
