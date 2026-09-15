@@ -414,30 +414,40 @@ export default function CommunityPlusUserProfile({
        EDIT SECTION
     ===================================== */
 
-    const setSectionEditing =
-        useCallback(
+const setSectionEditing =
+    useCallback(
+        (
+            sectionId,
+            editing
+        ) => {
 
-            (
+            console.log(
+                "🔥 SET SECTION EDITING:",
                 sectionId,
                 editing
-            ) => {
+            );
 
-                setEditingSections(
-                    previous => ({
+            setEditingSections(
+                previous => {
 
+                    const next = {
                         ...previous,
+                        [sectionId]: editing,
+                    };
 
-                        [sectionId]:
-                            editing,
+                    console.log(
+                        "🔥 EDITING SECTIONS NEXT:",
+                        next
+                    );
 
-                    })
-                );
+                    return next;
 
-            },
+                }
+            );
 
-            []
-
-        );
+        },
+        []
+    );
 
 
     /* =====================================
