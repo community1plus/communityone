@@ -15,7 +15,6 @@ import {
     useNavigate,
 } from "react-router-dom";
 
-
 import {
     useAuth,
 } from "../../context/AuthContext";
@@ -24,13 +23,11 @@ import {
     useProfile,
 } from "../../context/ProfileContext";
 
-
 import useAPI
     from "../../hooks/useAPI";
 
 import useForm
     from "../../hooks/useForm";
-
 
 import IdentityWorkspace
     from "../../engines/IdentityWorkspace/IdentityWorkspace";
@@ -44,16 +41,13 @@ import {
     COMMON_STEPS,
 } from "../../framework/Workspace/profile/profileConstants";
 
-
 import {
     buildProfilePayload,
 } from "./profilePayload";
 
-
 import {
     createWorkspaceSectionController,
 } from "../../framework/Workspace/controllers/WorkspaceSectionController";
-
 
 import "./CommunityPlusUserProfile.css";
 
@@ -67,6 +61,10 @@ export default function CommunityPlusUserProfile({
     initialCapability = "identity",
 
 }) {
+
+    /* =====================================
+       NAVIGATION
+    ===================================== */
 
     const navigate =
         useNavigate();
@@ -107,40 +105,28 @@ export default function CommunityPlusUserProfile({
         setEditingSections,
     ] = useState({});
 
+
     /* =====================================
        PROFILE VALUES
     ===================================== */
 
     const initialValues =
         useMemo(
-
             () =>
                 getInitialProfileValues(
                     profile,
                     user
                 ),
-
             [
                 profile,
                 user,
             ]
-
         );
 
-console.log(
-  "🔥 PROFILE FORM HYDRATION",
-  JSON.stringify({ profile, user, initialValues }, null, 2)
-);
-
-    /* =====================================
-       FORM
-    ===================================== */
 
     const form =
         useForm({
-
             initialValues,
-
         });
 
 
@@ -148,22 +134,78 @@ console.log(
         values,
     } = form;
 
+
+    /* =====================================
+       IDENTITY TYPE
+    ===================================== */
+
     const isEntity =
         values.identityType === "ENTITY" ||
         values.capabilities?.entity;
 
-console.log(
-  "🔥 PROFILE FORM VALUES",
-  JSON.stringify({ values }, null, 2)
-);
+
+    /* =====================================
+       PROFILE SECTIONS
+    ===================================== */
+
+    const sections =
+        useMemo(() => {
+
+            if (isEntity) {
+
+                return [
+
+                    ...PERSONAL_STEPS.slice(0, 1),
+
+                    ...ENTITY_STEPS,
+
+                    ...COMMON_STEPS,
+
+                ];
+
+            }
+
+            return [
+
+                ...PERSONAL_STEPS,
+
+                ...COMMON_STEPS,
+
+            ];
+
+        }, [
+            isEntity,
+        ]);
+
+
     /* =====================================
        CURRENT SECTION
        
-       NOTE:
-       The underlying Workspace runtime is
-       still section-based. The profile
-       configuration is now step-based.
+       Person and Entity maintain
+       independent workspace positions.
     ===================================== */
+
+    const storageKey =
+        isEntity
+            ? "profileCurrentSection:entity"
+            : "profileCurrentSection:person";
+
+
+    const defaultSection =
+        isEntity
+            ? (
+                sections.findIndex(
+                    section =>
+                        section.id === "entity"
+                )
+            )
+            : (
+                sections.findIndex(
+                    section =>
+                        section.id === "identity"
+                )
+            );
+
 
     const [
         currentSection,
@@ -172,15 +214,103 @@ console.log(
 
         const saved =
             sessionStorage.getItem(
-                "profileCurrentSection"
+                storageKey
             );
 
+        if (saved !== null) {
 
-        return saved
-            ? Number(saved)
+            const savedIndex =
+                Number(saved);
+
+            if (
+                Number.isInteger(
+                    savedIndex
+                ) &&
+                savedIndex >= 0
+            ) {
+
+                return savedIndex;
+
+            }
+
+        }
+
+        return defaultSection >= 0
+            ? defaultSection
             : 0;
 
     });
+
+
+    /* =====================================
+       CAPABILITY SWITCH
+       
+       When Person / Entity changes,
+       move to that capability's
+       appropriate starting section.
+    ===================================== */
+
+    useEffect(() => {
+
+        const nextStorageKey =
+            isEntity
+                ? "profileCurrentSection:entity"
+                : "profileCurrentSection:person";
+
+
+        const saved =
+            sessionStorage.getItem(
+                nextStorageKey
+            );
+
+
+        if (saved !== null) {
+
+            const savedIndex =
+                Number(saved);
+
+
+            if (
+                Number.isInteger(
+                    savedIndex
+                ) &&
+                savedIndex >= 0 &&
+                savedIndex < sections.length
+            ) {
+
+                setCurrentSection(
+                    savedIndex
+                );
+
+                return;
+
+            }
+
+        }
+
+
+        const nextSection =
+            isEntity
+                ? sections.findIndex(
+                    section =>
+                        section.id === "entity"
+                )
+                : sections.findIndex(
+                    section =>
+                        section.id === "identity"
+                );
+
+
+        setCurrentSection(
+            nextSection >= 0
+                ? nextSection
+                : 0
+        );
+
+    }, [
+        isEntity,
+        sections,
+    ]);
 
 
     /* =====================================
@@ -190,52 +320,18 @@ console.log(
     useEffect(() => {
 
         sessionStorage.setItem(
-            "profileCurrentSection",
-            currentSection
+            storageKey,
+            String(currentSection)
         );
 
     }, [
+        storageKey,
         currentSection,
     ]);
 
 
     /* =====================================
-       PROFILE STEPS
-       
-       These are converted into the existing
-       Workspace section runtime contract.
-    ===================================== */
-
-    
-
-const sections = useMemo(() => {
-
-    if (isEntity) {
-
-        return [
-            ...PERSONAL_STEPS.slice(0, 1),
-            ...ENTITY_STEPS,
-            ...COMMON_STEPS,
-        ];
-
-    }
-
-    return [
-        ...PERSONAL_STEPS,
-        ...COMMON_STEPS,
-    ];
-
-}, [
-    isEntity,
-]);
-
-
-    /* =====================================
        SECTION CONTROLLER
-       
-       Existing runtime controller retained
-       until Workspace section → step
-       migration is completed.
     ===================================== */
 
     const sectionController =
@@ -282,14 +378,13 @@ const sections = useMemo(() => {
 
 
     /* =====================================
-       STEP / SECTION COMPLETION
+       SECTION COMPLETION
     ===================================== */
 
     const sectionCompletion =
         useMemo(
 
             () =>
-
                 Object.fromEntries(
 
                     sections.map(
@@ -435,7 +530,9 @@ const sections = useMemo(() => {
 
                 try {
 
-                    setSavingSection(true);
+                    setSavingSection(
+                        true
+                    );
 
 
                     const payload =
@@ -483,12 +580,13 @@ const sections = useMemo(() => {
 
 
                     /*
-                     * Notify parent when
-                     * supplied.
+                     * Notify parent.
                      */
 
                     if (onComplete) {
+
                         onComplete();
+
                     }
 
                 } catch (error) {
@@ -500,7 +598,9 @@ const sections = useMemo(() => {
 
                 } finally {
 
-                    setSavingSection(false);
+                    setSavingSection(
+                        false
+                    );
 
                 }
 
@@ -593,23 +693,30 @@ const sections = useMemo(() => {
        RENDER
     ===================================== */
 
-    return isEntity ? (
+    if (isEntity) {
 
-        <EntityWorkspace
+        return (
 
-            initialCapability="entity"
+            <EntityWorkspace
 
-            state={
-                workspaceState
-            }
+                initialCapability="entity"
 
-            actions={
-                workspaceActions
-            }
+                state={
+                    workspaceState
+                }
 
-        />
+                actions={
+                    workspaceActions
+                }
 
-    ) : (
+            />
+
+        );
+
+    }
+
+
+    return (
 
         <IdentityWorkspace
 
