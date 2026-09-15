@@ -20,8 +20,13 @@ const stripePromise = loadStripe(
 
 
 export default function StripePaymentWrapper({
+
     payment = null,
+
+    editing = false,
+
     onVerified = null,
+
 }) {
 
     const api = useAPI();
@@ -36,9 +41,11 @@ export default function StripePaymentWrapper({
 
 
     /*
-     * The profile is already verified.
+     * A verified payment is locked during normal
+     * workspace viewing.
      *
-     * Do NOT create another SetupIntent.
+     * When editing begins, a new SetupIntent is required
+     * so the user can replace the payment method.
      */
 
     const isVerified =
@@ -47,21 +54,44 @@ export default function StripePaymentWrapper({
         );
 
 
+    const showVerified =
+        isVerified &&
+        !editing;
+
+
     useEffect(() => {
 
         /*
-         * Nothing to initialise when the payment
-         * method has already been verified.
+         * Existing verified payment and normal view.
+         *
+         * No Stripe initialisation required.
          */
 
-        if (isVerified) {
+        if (showVerified) {
+
+            setClientSecret("");
+
+            setError("");
+
             return;
+
         }
 
 
+        /*
+         * We are either:
+
+         * 1. verifying an initial payment method, or
+         * 2. replacing an existing payment method.
+         */
+
         loadIntent();
 
-    }, [isVerified]);
+
+    }, [
+        showVerified,
+        editing,
+    ]);
 
 
     async function loadIntent() {
@@ -69,6 +99,8 @@ export default function StripePaymentWrapper({
         try {
 
             setError("");
+
+            setClientSecret("");
 
 
             const res =
@@ -90,6 +122,7 @@ export default function StripePaymentWrapper({
                 res.clientSecret
             );
 
+
         } catch (error) {
 
             console.error(
@@ -110,23 +143,49 @@ export default function StripePaymentWrapper({
 
     /*
      |--------------------------------------------------------------------------
-     | Already verified
+     | Existing verified payment
      |--------------------------------------------------------------------------
      */
 
-    if (isVerified) {
+    if (showVerified) {
 
         return (
-            <Elements
-                stripe={stripePromise}
-            >
+            <div className="payment-verification-success">
 
-                <PaymentDetailsStep
-                    payment={payment}
-                    onVerified={onVerified}
-                />
+                <div className="payment-verification-header">
 
-            </Elements>
+                    <strong>
+                        Payment method verified
+                    </strong>
+
+                </div>
+
+
+                <div className="payment-verification-details">
+
+                    {payment?.brand && (
+                        <span>
+                            {payment.brand}
+                        </span>
+                    )}
+
+
+                    {payment?.last4 && (
+                        <span>
+                            •••• {payment.last4}
+                        </span>
+                    )}
+
+                </div>
+
+
+                <div className="payment-verification-status">
+
+                    ✓ Verified
+
+                </div>
+
+            </div>
         );
 
     }
@@ -170,7 +229,7 @@ export default function StripePaymentWrapper({
 
     /*
      |--------------------------------------------------------------------------
-     | Stripe PaymentElement
+     | Payment replacement / initial verification
      |--------------------------------------------------------------------------
      */
 
@@ -183,8 +242,19 @@ export default function StripePaymentWrapper({
         >
 
             <PaymentDetailsStep
-                payment={payment}
-                onVerified={onVerified}
+
+                payment={
+                    payment
+                }
+
+                editing={
+                    editing
+                }
+
+                onVerified={
+                    onVerified
+                }
+
             />
 
         </Elements>

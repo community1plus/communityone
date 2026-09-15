@@ -121,29 +121,17 @@ export default function FieldRenderer({
 
             {editing ? (
 
-                <input
-
-                    id={name}
-
-                    name={name}
-
-                    type={type}
-
-                    className="workspace-field-input"
-
-                    value={value}
-
-                    readOnly={readOnly}
-
-                    onChange={
-                        form.handleChange(name)
-                    }
-
-                    onBlur={
-                        form.handleBlur(name)
-                    }
-
-                />
+<input
+    id={name}
+    name={name}
+    type={type}
+    className="workspace-field-input"
+    value={value}
+    readOnly={readOnly}
+    onChange={form.handleChange(name)}
+    onBlur={form.handleBlur(name)}
+    data-editing={editing}
+/>
 
             ) : (
 

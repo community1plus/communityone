@@ -4,39 +4,50 @@ import {
     useElements,
 } from "@stripe/react-stripe-js";
 
-import { useEffect, useState } from "react";
+import {
+    useEffect,
+    useState,
+} from "react";
 
-import useAPI from "../../hooks/useAPI";
+import useAPI
+    from "../../hooks/useAPI";
 
 
 export default function PaymentDetailsStep({
+
     payment = null,
+
+    editing = false,
+
     onVerified = null,
+
 }) {
 
     const stripe = useStripe();
+
     const elements = useElements();
+
     const api = useAPI();
 
 
     /*
      * Local verification state.
-     *
-     * This immediately locks the UI after a successful
-     * verification without waiting for the profile to
-     * rehydrate.
      */
 
-    const [verifiedPayment, setVerifiedPayment] =
-        useState(
-            payment?.verified
-                ? payment
-                : null
-        );
+    const [
+        verifiedPayment,
+        setVerifiedPayment,
+    ] = useState(
+        payment?.verified
+            ? payment
+            : null
+    );
 
 
-    const [loading, setLoading] =
-        useState(false);
+    const [
+        loading,
+        setLoading,
+    ] = useState(false);
 
 
     /*
@@ -48,18 +59,22 @@ export default function PaymentDetailsStep({
 
         if (payment?.verified) {
 
-            setVerifiedPayment(payment);
+            setVerifiedPayment(
+                payment
+            );
 
         }
 
-    }, [payment]);
+    }, [
+        payment,
+    ]);
 
 
     /*
-     * Payment has already been verified.
+     * A verified payment is displayed only when the
+     * workspace is NOT in edit mode.
      *
-     * Do not render PaymentElement again.
-     * Do not allow another confirmSetup().
+     * Edit means replace the existing payment method.
      */
 
     const isVerified =
@@ -68,22 +83,30 @@ export default function PaymentDetailsStep({
         );
 
 
+    const showVerified =
+        isVerified &&
+        !editing;
+
+
     async function handleSubmit() {
 
         /*
-         * Defensive guard.
-         *
-         * Even if the button somehow gets triggered while
-         * the component is already verified, never attempt
-         * to confirm the SetupIntent again.
+         * Never submit while already verified unless
+         * the workspace explicitly entered edit mode.
          */
 
-        if (isVerified) {
+        if (
+            isVerified &&
+            !editing
+        ) {
             return;
         }
 
 
-        if (!stripe || !elements) {
+        if (
+            !stripe ||
+            !elements
+        ) {
             return;
         }
 
@@ -121,10 +144,13 @@ export default function PaymentDetailsStep({
                         code: error.code,
                         decline_code:
                             error.decline_code,
-                        message: error.message,
-                        param: error.param,
+                        message:
+                            error.message,
+                        param:
+                            error.param,
                     }
                 );
+
 
                 throw new Error(
                     error.message ||
@@ -178,8 +204,7 @@ export default function PaymentDetailsStep({
 
 
             /*
-             * Build the local verified state from the
-             * backend response.
+             * Build local verified state.
              */
 
             const savedPayment =
@@ -193,10 +218,8 @@ export default function PaymentDetailsStep({
 
 
             /*
-             * Lock the component immediately.
-             *
-             * This prevents another confirmSetup() call
-             * against the already-succeeded SetupIntent.
+             * Immediately lock this newly verified
+             * payment method.
              */
 
             setVerifiedPayment(
@@ -205,11 +228,13 @@ export default function PaymentDetailsStep({
 
 
             /*
-             * Allow the parent/wrapper to refresh the
-             * broader profile state if required.
+             * Refresh the parent profile state.
              */
 
-            if (typeof onVerified === "function") {
+            if (
+                typeof onVerified ===
+                "function"
+            ) {
 
                 onVerified(
                     savedPayment
@@ -225,10 +250,12 @@ export default function PaymentDetailsStep({
                 error
             );
 
+
             alert(
                 error?.message ||
                 "Unable to verify card"
             );
+
 
         } finally {
 
@@ -245,7 +272,7 @@ export default function PaymentDetailsStep({
      |--------------------------------------------------------------------------
      */
 
-    if (isVerified) {
+    if (showVerified) {
 
         return (
             <div className="payment-verification-success">
@@ -291,7 +318,7 @@ export default function PaymentDetailsStep({
 
     /*
      |--------------------------------------------------------------------------
-     | Verification state
+     | Stripe PaymentElement
      |--------------------------------------------------------------------------
      */
 
@@ -303,7 +330,9 @@ export default function PaymentDetailsStep({
 
             <button
                 type="button"
-                onClick={handleSubmit}
+                onClick={
+                    handleSubmit
+                }
                 disabled={
                     loading ||
                     !stripe ||

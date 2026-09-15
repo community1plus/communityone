@@ -4,7 +4,8 @@ import WorkspaceFormView
 import SocialSection
     from "../../engines/IdentityWorkspace/sections/SocialSection";
 
-import StripePaymentWrapper from "../../pages/StripePaymentWrapper";
+import StripePaymentWrapper
+    from "../../pages/StripePaymentWrapper";
 
 
 export default function CapabilityRenderer({
@@ -55,6 +56,10 @@ export default function CapabilityRenderer({
                 <StripePaymentWrapper
                     payment={
                         form.getValue("payment")
+                    }
+
+                    editing={
+                        editing
                     }
 
                     onVerified={(payment) => {
