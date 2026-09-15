@@ -119,7 +119,6 @@ from "./WorkspaceToolbar";
 
 export { default as WorkspaceHeaderControls} from "./WorkspaceHeaderControls";
 
-export { default as WorkspaceClose } from "./WorkspaceClose";
 
 export * from "./Form";
 
