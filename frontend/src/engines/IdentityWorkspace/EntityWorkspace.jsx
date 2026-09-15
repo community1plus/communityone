@@ -25,13 +25,6 @@ import {
 } from "../../framework/Workspace";
 
 
-import {
-    Pencil,
-    Eraser,
-    RotateCcw,
-    Save,
-} from "lucide-react";
-
 import IdentityCapabilitySelector
     from "../../components/Identity/IdentityCapabilitySelector";
 
@@ -147,66 +140,6 @@ export default function EntityWorkspace({
         sectionId;
 
 
-    /* =====================================
-       ACTIONS
-    ===================================== */
-
-    const handleEdit =
-        () => {
-
-            if (!sectionId) {
-                return;
-            }
-
-            actions.setSectionEditing(
-                sectionId,
-                true
-            );
-
-        };
-
-
-    const handleClear =
-        () => {
-
-            if (!sectionId) {
-                return;
-            }
-
-            actions.clearSection(
-                sectionId
-            );
-
-        };
-
-
-    const handleReset =
-        () => {
-
-            if (!sectionId) {
-                return;
-            }
-
-            actions.resetSection(
-                sectionId
-            );
-
-        };
-
-
-    const handleSave =
-        async () => {
-
-            if (!sectionId) {
-                return;
-            }
-
-            await actions.handleSaveSection(
-                sectionId
-            );
-
-        };
-
     const headerAction = (
 
     <WorkspaceHeaderActions>
@@ -289,183 +222,25 @@ export default function EntityWorkspace({
 
                     <WorkspaceBody>
 
-                        <div
-                            className="
-                                workspace-section
-                            "
-                        >
+                        {section && (
 
-
-                            <div
-                                className="
-                                    workspace-section-header
-                                "
+                            <WorkspaceSection
+                                model={section}
                             >
 
+                                <CapabilityRenderer
 
-                                <div
-                                    className="
-                                        workspace-section-title
-                                    "
-                                >
+                                    section={section}
 
-                                    {
-                                        section?.title
-                                        ?? ""
-                                    }
+                                    form={form}
 
-                                </div>
+                                    editing={editing}
 
+                                />
 
-                                <div
-                                    className="
-                                        workspace-section-actions
-                                    "
-                                >
+                            </WorkspaceSection>
 
-
-                                    {!editing ? (
-
-                                        <button
-                                            type="button"
-
-                                            onClick={
-                                                handleEdit
-                                            }
-
-                                            className="
-                                                workspace-action
-                                                workspace-action-edit
-                                            "
-                                        >
-
-                                            <Pencil
-                                                size={16}
-                                            />
-
-                                            <span>
-                                                Edit
-                                            </span>
-
-                                        </button>
-
-                                    ) : (
-
-                                        <>
-
-                                            <button
-                                                type="button"
-
-                                                onClick={
-                                                    handleClear
-                                                }
-
-                                                className="
-                                                    workspace-action
-                                                "
-
-                                                disabled={
-                                                    saving
-                                                }
-                                            >
-
-                                                <Eraser
-                                                    size={16}
-                                                />
-
-                                                <span>
-                                                    Clear
-                                                </span>
-
-                                            </button>
-
-
-                                            <button
-                                                type="button"
-
-                                                onClick={
-                                                    handleReset
-                                                }
-
-                                                className="
-                                                    workspace-action
-                                                "
-
-                                                disabled={
-                                                    saving
-                                                }
-                                            >
-
-                                                <RotateCcw
-                                                    size={16}
-                                                />
-
-                                                <span>
-                                                    Reset
-                                                </span>
-
-                                            </button>
-
-
-                                            <button
-                                                type="button"
-
-                                                onClick={
-                                                    handleSave
-                                                }
-
-                                                className="
-                                                    workspace-action
-                                                    workspace-action-save
-                                                "
-
-                                                disabled={
-                                                    savingSection
-                                                }
-                                            >
-
-                                                <Save
-                                                    size={16}
-                                                />
-
-                                                <span>
-
-                                                    {
-                                                        saving
-                                                            ? "Saving..."
-                                                            : "Save"
-                                                    }
-
-                                                </span>
-
-                                            </button>
-
-                                        </>
-
-                                    )}
-
-                                </div>
-
-                            </div>
-
-
-                            <CapabilityRenderer
-
-                                section={
-                                    section
-                                }
-
-                                form={
-                                    form
-                                }
-
-                                editing={
-                                    editing
-                                }
-
-                            />
-
-                        </div>
+                        )}
 
                     </WorkspaceBody>
 
