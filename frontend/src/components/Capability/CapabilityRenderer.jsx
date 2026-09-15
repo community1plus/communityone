@@ -13,6 +13,7 @@ export default function CapabilityRenderer({
     form,
     editing,
     sectionCompletion,
+    onPaymentVerified,
 }) {
 
     if (!section) {
@@ -50,7 +51,37 @@ export default function CapabilityRenderer({
             );
 
 
-        case "payment":
+case "payment":
+
+    return (
+        <StripePaymentWrapper
+            payment={
+                form.getValue("payment")
+            }
+
+            editing={
+                editing
+            }
+
+            onVerified={(payment) => {
+
+                form.setValue(
+                    "payment",
+                    payment
+                );
+
+                if (
+                    typeof onPaymentVerified ===
+                    "function"
+                ) {
+
+                    onPaymentVerified();
+
+                }
+
+            }}
+        />
+    );
 
             return (
                 <StripePaymentWrapper

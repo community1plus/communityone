@@ -180,22 +180,25 @@ export default function EntityWorkspace({
                                 }
 
                             >
+<CapabilityRenderer
+    section={
+        section
+    }
+    form={
+        form
+    }
+    editing={
+        editing
+    }
+    onPaymentVerified={() => {
 
-                                <CapabilityRenderer
+        actions.setSectionEditing(
+            sectionId,
+            false
+        );
 
-                                    section={
-                                        section
-                                    }
-
-                                    form={
-                                        form
-                                    }
-
-                                    editing={
-                                        editing
-                                    }
-
-                                />
+    }}
+/>
 
                             </WorkspaceSection>
 
