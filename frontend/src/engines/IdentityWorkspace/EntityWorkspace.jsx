@@ -14,14 +14,13 @@ import {
     WorkspaceSidebar,
 
     WorkspaceRegionHeader,
+    WorkspaceHeaderActions,
     WorkspaceBanner,
     WorkspaceNavigation,
     WorkspaceBody,
 
     WorkspaceGuide,
-    WorkspacePanel,
-
-    WorkspaceClose,
+    WorkspaceSection,
 
 } from "../../framework/Workspace";
 
@@ -183,6 +182,22 @@ export default function EntityWorkspace({
 
         };
 
+    const headerAction = (
+
+    <WorkspaceHeaderActions>
+
+        <button
+            type="button"
+            className="workspace-header-action workspace-header-action-ready"
+            onClick={actions.closeProfile}
+            aria-label="Exit profile"
+        >
+            ×
+        </button>
+
+    </WorkspaceHeaderActions>
+
+);
 
     /* =====================================
        RENDER
@@ -193,13 +208,7 @@ export default function EntityWorkspace({
         <WorkspaceShell>
 
 
-            <WorkspaceClose
 
-                onClick={
-                    actions.closeProfile
-                }
-
-            />
 
 
             <WorkspaceMain>
@@ -214,23 +223,27 @@ export default function EntityWorkspace({
                     <WorkspaceRegionHeader>
 
 <WorkspaceBanner
-                            model={banner}
 
-                            center={
-                                <IdentityCapabilitySelector
-                                    values={
-                                        values
-                                    }
+    model={banner}
 
-                                    setValue={
-                                        form.setValue
-                                    }
+    left={headerAction}
 
-                                    readOnly={
-                                        false
-                                    }
-                                />
-                            }
+    center={
+
+        <IdentityCapabilitySelector
+
+            values={values}
+
+            setValue={
+                form.setValue
+            }
+
+            readOnly={false}
+
+        />
+
+    }
+
 />
 
                     </WorkspaceRegionHeader>
