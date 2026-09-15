@@ -1,9 +1,6 @@
 import CapabilityRenderer
     from "../../components/Capability/CapabilityRenderer";
 
-    import WorkspaceClose
-    from "../../framework/Workspace/WorkspaceClose";
-
 import {
     buildCapabilityWorkspace,
 } from "../../framework/Workspace/builders/buildCapabilityWorkspace";
