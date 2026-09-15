@@ -441,53 +441,32 @@ export default function EntityWorkspace({
                GUIDE
             ============================== */}
 
-            <WorkspaceSidebar>
+<WorkspaceSidebar>
 
-                <WorkspaceGuide
-                    title="ENTITY GUIDE"
-                >
+    <WorkspaceGuide
+        model={{
+            title: "ENTITY GUIDE",
+            panels: [
+                {
+                    id: "welcome",
+                    title: "Welcome",
+                    content: "Manage your trusted entity.",
+                },
+                {
+                    id: "completion",
+                    title: "Profile Completion",
+                    content: `${banner?.right?.metric?.value ?? 0}%`,
+                },
+                {
+                    id: "section",
+                    title: "Current Section",
+                    content: section?.title ?? "",
+                },
+            ],
+        }}
+    />
 
-
-                    <WorkspacePanel
-                        title="Welcome"
-                    >
-
-                        Manage your trusted
-                        entity.
-
-                    </WorkspacePanel>
-
-
-                    <WorkspacePanel
-                        title="Profile Completion"
-                    >
-
-                        {
-                            banner
-                                ?.right
-                                ?.metric
-                                ?.value
-                            ?? 0
-                        }%
-
-                    </WorkspacePanel>
-
-
-                    <WorkspacePanel
-                        title="Current Section"
-                    >
-
-                        {
-                            section?.title
-                            ?? ""
-                        }
-
-                    </WorkspacePanel>
-
-
-                </WorkspaceGuide>
-
-            </WorkspaceSidebar>
+</WorkspaceSidebar>
 
 
         </WorkspaceShell>
