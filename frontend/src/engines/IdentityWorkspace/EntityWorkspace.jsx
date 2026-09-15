@@ -1,6 +1,7 @@
 import CapabilityRenderer
     from "../../components/Capability/CapabilityRenderer";
 
+
 import {
     buildCapabilityWorkspace,
 } from "../../framework/Workspace/builders/buildCapabilityWorkspace";
@@ -34,8 +35,8 @@ import {
 
 import IdentityCapabilitySelector
     from "../../components/Identity/IdentityCapabilitySelector";
-    
-    export default function EntityWorkspace({
+
+export default function EntityWorkspace({
 
     initialCapability = "entity",
 
@@ -189,15 +190,19 @@ import IdentityCapabilitySelector
 
     return (
 
-<WorkspaceShell>
+        <WorkspaceShell>
 
-    <WorkspaceClose
-        onClick={
-            actions.closeProfile
-        }
-    />
 
-    <WorkspaceMain>
+            <WorkspaceClose
+
+                onClick={
+                    actions.closeProfile
+                }
+
+            />
+
+
+            <WorkspaceMain>
 
                 <WorkspaceContent>
 
@@ -209,16 +214,25 @@ import IdentityCapabilitySelector
                     <WorkspaceRegionHeader>
 
 <WorkspaceBanner
-    model={banner}
+                            model={banner}
 
-    center={
-        <IdentityCapabilitySelector
-            values={values}
-            setValue={form.setValue}
-            readOnly={false}
-        />
-    }
+                            center={
+                                <IdentityCapabilitySelector
+                                    values={
+                                        values
+                                    }
+
+                                    setValue={
+                                        form.setValue
+                                    }
+
+                                    readOnly={
+                                        false
+                                    }
+                                />
+                            }
 />
+
                     </WorkspaceRegionHeader>
 
 
