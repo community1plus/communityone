@@ -89,6 +89,15 @@ console.log(
     const section =
         runtime.section;
 
+    console.log(
+    "🔥 ENTITY RUNTIME SECTION:",
+    section
+);
+
+console.log(
+    "🔥 ENTITY SECTION ACTION IDS:",
+    section?.actions
+);    
 
     const banner =
         createWorkspaceBannerModel({
