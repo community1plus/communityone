@@ -317,6 +317,10 @@ console.log(
 
             .filter(Boolean);
 
+    console.log(
+    "🔥 ENTITY RESOLVED ACTIONS:",
+    sectionActions
+);        
 
     const resolvedSection = {
 
@@ -327,6 +331,10 @@ console.log(
 
     };
 
+console.log(
+    "🔥 ENTITY RESOLVED SECTION:",
+    resolvedSection
+);
 
     return createWorkspace({
 
