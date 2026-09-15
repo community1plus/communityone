@@ -60,6 +60,20 @@ export function buildEntityWorkspace(
         goToSection,
     } = actions;
 
+    console.log(
+    "🔥 ENTITY WORKSPACE sections:",
+    sections
+);
+
+console.log(
+    "🔥 ENTITY WORKSPACE currentSection:",
+    currentSection
+);
+
+console.log(
+    "🔥 ENTITY WORKSPACE current section id:",
+    sections?.[currentSection]?.id
+);
 
     const runtime =
         createWorkspaceRuntime({
