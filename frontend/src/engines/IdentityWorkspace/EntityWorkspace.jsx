@@ -101,6 +101,31 @@ export default function EntityWorkspace({
     } = runtime ?? {};
 
 
+    /* =====================================
+       GUIDE MODEL
+    ===================================== */
+
+    const guide = {
+
+        title: "ENTITY GUIDE",
+
+        panels: [
+
+            {
+                id: "welcome",
+
+                title: "Welcome",
+
+                content:
+                    "Manage your trusted entity.",
+
+            },
+
+        ],
+
+    };
+
+
     const sectionId =
         section?.id;
 
@@ -456,30 +481,11 @@ export default function EntityWorkspace({
 
 <WorkspaceSidebar>
 
-    <WorkspaceGuide
-        model={{
-            title: "ENTITY GUIDE",
-            panels: [
-                {
-                    id: "welcome",
-                    title: "Welcome",
-                    content: "Manage your trusted entity.",
-                },
-                {
-                    id: "completion",
-                    title: "Profile Completion",
-                    content: `${banner?.right?.metric?.value ?? 0}%`,
-                },
-                {
-                    id: "section",
-                    title: "Current Section",
-                    content: section?.title ?? "",
-                },
-            ],
-        }}
-    />
+                <WorkspaceGuide
+                    model={guide}
+                />
 
-</WorkspaceSidebar>
+            </WorkspaceSidebar>
 
 
         </WorkspaceShell>
