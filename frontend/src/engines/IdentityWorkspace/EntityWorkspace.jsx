@@ -1,6 +1,8 @@
 import CapabilityRenderer
     from "../../components/Capability/CapabilityRenderer";
 
+    import WorkspaceClose
+    from "../../framework/Workspace/WorkspaceClose";
 
 import {
     buildCapabilityWorkspace,
@@ -190,19 +192,15 @@ import IdentityCapabilitySelector
 
     return (
 
-        <WorkspaceShell>
+<WorkspaceShell>
 
+    <WorkspaceClose
+        onClick={
+            actions.closeProfile
+        }
+    />
 
-            <WorkspaceClose
-
-                onClick={
-                    actions.closeProfile
-                }
-
-            />
-
-
-            <WorkspaceMain>
+    <WorkspaceMain>
 
                 <WorkspaceContent>
 
