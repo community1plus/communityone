@@ -19,6 +19,15 @@ export default function FieldRenderer({
         return null;
     }
 
+    console.log(
+    "🔥 FIELD RENDERER:",
+    field.name,
+    "editing:",
+    editing,
+    "readOnly:",
+    field.readOnly
+);
+
 
     /* =====================================================
        SPECIAL FIELD TYPES
