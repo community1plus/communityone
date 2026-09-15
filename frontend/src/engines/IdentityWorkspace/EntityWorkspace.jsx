@@ -245,39 +245,33 @@ export default function EntityWorkspace({
                        BANNER
                     ========================== */}
 
-<WorkspaceRegionHeader>
+                    <WorkspaceRegionHeader>
 
-    <WorkspaceBanner
+<WorkspaceBanner
 
-        model={banner}
+    model={banner}
 
-        left={headerAction}
+    left={headerAction}
 
-        center={
+    center={
 
-            <IdentityCapabilitySelector
+        <IdentityCapabilitySelector
 
-                values={values}
+            values={values}
 
-                setValue={
-                    form.setValue
-                }
+            setValue={
+                form.setValue
+            }
 
-                readOnly={false}
+            readOnly={false}
 
-            />
+        />
 
-        }
+    }
 
-    />
+/>
 
-    <WorkspaceNavigation
-
-        model={navigation}
-
-    />
-
-</WorkspaceRegionHeader>
+                    </WorkspaceRegionHeader>
 
 
                     {/* ==========================
