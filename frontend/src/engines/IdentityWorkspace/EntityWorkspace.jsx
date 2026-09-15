@@ -215,22 +215,15 @@ import IdentityCapabilitySelector
 
 <WorkspaceBanner
     model={banner}
->
-    <IdentityCapabilitySelector
-        values={
-            values
-        }
 
-        setValue={
-            form.setValue
-        }
-
-        readOnly={
-            false
-        }
-    />
-</WorkspaceBanner>
-
+    center={
+        <IdentityCapabilitySelector
+            values={values}
+            setValue={form.setValue}
+            readOnly={false}
+        />
+    }
+/>
                     </WorkspaceRegionHeader>
 
 
