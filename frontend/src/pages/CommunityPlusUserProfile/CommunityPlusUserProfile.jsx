@@ -9,7 +9,6 @@ import {
     useEffect,
     useMemo,
     useCallback,
-    useRef,
 } from "react";
 
 import {
@@ -108,35 +107,41 @@ export default function CommunityPlusUserProfile({
 
     /* =====================================
        PROFILE INITIAL VALUES
+
+       Convert the canonical profile from
+       ProfileContext into the workspace
+       form structure.
     ===================================== */
 
     const profileInitialValues =
         useMemo(
-
             () =>
                 getInitialProfileValues({
                     profile,
-                    user
+                    user,
                 }),
-
             [
                 profile,
                 user,
             ]
-
         );
 
 
     /* =====================================
        FORM
+
+       useForm owns the active workspace
+       editing state.
+
+       initialValues establishes the initial
+       form state. Hydration below handles
+       subsequent ProfileContext updates.
     ===================================== */
 
     const form =
         useForm({
-
             initialValues:
                 profileInitialValues,
-
         });
 
 
@@ -148,46 +153,46 @@ export default function CommunityPlusUserProfile({
 
     /* =====================================
        PROFILE HYDRATION
-       
+
+       ProfileContext may provide profile
+       data in stages.
+
+       Example:
+
+           render
+             ↓
+           cached profile
+             ↓
+           background /me request
+             ↓
+           canonical profile
+             ↓
+           ProfileContext update
+
+       The previous implementation used
+       hydratedProfileRef to hydrate only
+       once.
+
+       That meant the cached profile could
+       become the "hydrated" state before
+       the canonical API profile arrived.
+
+       The workspace now hydrates whenever
+       ProfileContext supplies a profile.
+
        IMPORTANT:
-       
-       Hydrate the workspace from the
-       canonical profile once.
-       
-       After that, the workspace owns its
-       current editing state.
-       
-       This prevents a profile refresh after
-       save from replacing the Entity values
-       currently held by the form.
+
+       handleSaveSection does NOT call
+       loadProfile() after PATCH.
+
+       Therefore a successful local save
+       remains authoritative for the active
+       workspace session.
     ===================================== */
-
-    const hydratedProfileRef =
-        useRef(false);
-
 
     useEffect(() => {
 
-        /*
-         * There is nothing to hydrate until
-         * ProfileContext has a profile.
-         */
-
         if (!profile) {
-            return;
-        }
-
-
-        /*
-         * Do not continuously rehydrate.
-         *
-         * Once the workspace has received
-         * its canonical starting state,
-         * local form state becomes authoritative
-         * for this workspace session.
-         */
-
-        if (hydratedProfileRef.current) {
             return;
         }
 
@@ -195,12 +200,12 @@ export default function CommunityPlusUserProfile({
         const hydratedValues =
             getInitialProfileValues({
                 profile,
-                user
+                user,
             });
 
 
         console.log(
-            "🔥 PROFILE INITIAL HYDRATION:",
+            "🔥 PROFILE HYDRATION:",
             JSON.stringify(
                 hydratedValues,
                 null,
@@ -213,19 +218,10 @@ export default function CommunityPlusUserProfile({
             hydratedValues
         );
 
-
-        hydratedProfileRef.current =
-            true;
-
-
     }, [
-
         profile,
-
         user,
-
         setValues,
-
     ]);
 
 
@@ -240,6 +236,18 @@ export default function CommunityPlusUserProfile({
 
     /* =====================================
        PROFILE SECTIONS
+
+       PERSON
+           Personal sections
+           +
+           Common capabilities
+
+       ENTITY
+           Person identity
+           +
+           Entity sections
+           +
+           Common capabilities
     ===================================== */
 
     const sections =
@@ -257,11 +265,13 @@ export default function CommunityPlusUserProfile({
 
                     ...PERSONAL_STEPS.slice(0, 1),
 
+
                     /*
                      * Entity-owned workspace.
                      */
 
                     ...ENTITY_STEPS,
+
 
                     /*
                      * Shared capabilities.
@@ -283,15 +293,13 @@ export default function CommunityPlusUserProfile({
             ];
 
         }, [
-
             isEntity,
-
         ]);
 
 
     /* =====================================
        CURRENT SECTION
-       
+
        Person and Entity maintain
        independent workspace positions.
     ===================================== */
@@ -304,12 +312,10 @@ export default function CommunityPlusUserProfile({
 
     const defaultSection =
         isEntity
-
             ? sections.findIndex(
                 section =>
                     section.id === "entity"
             )
-
             : sections.findIndex(
                 section =>
                     section.id === "identity"
@@ -334,15 +340,11 @@ export default function CommunityPlusUserProfile({
 
 
             if (
-
                 Number.isInteger(
                     savedIndex
                 )
-
                 &&
-
                 savedIndex >= 0
-
             ) {
 
                 return savedIndex;
@@ -353,9 +355,7 @@ export default function CommunityPlusUserProfile({
 
 
         return defaultSection >= 0
-
             ? defaultSection
-
             : 0;
 
     });
@@ -363,10 +363,13 @@ export default function CommunityPlusUserProfile({
 
     /* =====================================
        CAPABILITY SWITCH
-       
+
        When Person / Entity changes,
-       move to that capability's
-       appropriate starting section.
+       restore that capability's last
+       section where possible.
+
+       Otherwise move to the capability's
+       default starting section.
     ===================================== */
 
     useEffect(() => {
@@ -390,19 +393,13 @@ export default function CommunityPlusUserProfile({
 
 
             if (
-
                 Number.isInteger(
                     savedIndex
                 )
-
                 &&
-
                 savedIndex >= 0
-
                 &&
-
                 savedIndex < sections.length
-
             ) {
 
                 setCurrentSection(
@@ -418,12 +415,10 @@ export default function CommunityPlusUserProfile({
 
         const nextSection =
             isEntity
-
                 ? sections.findIndex(
                     section =>
                         section.id === "entity"
                 )
-
                 : sections.findIndex(
                     section =>
                         section.id === "identity"
@@ -431,22 +426,14 @@ export default function CommunityPlusUserProfile({
 
 
         setCurrentSection(
-
             nextSection >= 0
-
                 ? nextSection
-
                 : 0
-
         );
 
-
     }, [
-
         isEntity,
-
         sections,
-
     ]);
 
 
@@ -457,21 +444,15 @@ export default function CommunityPlusUserProfile({
     useEffect(() => {
 
         sessionStorage.setItem(
-
             storageKey,
-
             String(
                 currentSection
             )
-
         );
 
     }, [
-
         storageKey,
-
         currentSection,
-
     ]);
 
 
@@ -481,11 +462,8 @@ export default function CommunityPlusUserProfile({
 
     const sectionController =
         useMemo(
-
             () =>
-
                 createWorkspaceSectionController({
-
                     sections,
 
                     current:
@@ -493,17 +471,12 @@ export default function CommunityPlusUserProfile({
 
                     setCurrent:
                         setCurrentSection,
-
                 }),
 
             [
-
                 sections,
-
                 currentSection,
-
             ]
-
         );
 
 
@@ -513,19 +486,14 @@ export default function CommunityPlusUserProfile({
 
     const completion =
         useMemo(
-
             () =>
-
                 calculateProfileCompletion(
                     values
                 ),
 
             [
-
                 values,
-
             ]
-
         );
 
 
@@ -535,11 +503,8 @@ export default function CommunityPlusUserProfile({
 
     const sectionCompletion =
         useMemo(
-
             () =>
-
                 Object.fromEntries(
-
                     sections.map(
                         section => [
 
@@ -552,17 +517,12 @@ export default function CommunityPlusUserProfile({
 
                         ]
                     )
-
                 ),
 
             [
-
                 sections,
-
                 values,
-
             ]
-
         );
 
 
@@ -572,7 +532,6 @@ export default function CommunityPlusUserProfile({
 
     const setSectionEditing =
         useCallback(
-
             (
                 sectionId,
                 editing
@@ -589,12 +548,10 @@ export default function CommunityPlusUserProfile({
                     previous => {
 
                         const next = {
-
                             ...previous,
 
                             [sectionId]:
                                 editing,
-
                         };
 
 
@@ -612,7 +569,6 @@ export default function CommunityPlusUserProfile({
             },
 
             []
-
         );
 
 
@@ -622,7 +578,6 @@ export default function CommunityPlusUserProfile({
 
     const clearSection =
         useCallback(
-
             (sectionId) => {
 
                 const section =
@@ -651,33 +606,24 @@ export default function CommunityPlusUserProfile({
             },
 
             [
-
                 sections,
-
                 form,
-
             ]
-
         );
 
 
     /* =====================================
        RESET SECTION
-       
-       NOTE:
-       
-       For now this uses the form's
-       canonical reset behaviour.
-       
-       We are deliberately not changing
-       nested Entity reset semantics here
-       until useForm's path handling is
-       inspected.
+
+       Current behaviour deliberately uses
+       useForm's canonical reset behaviour.
+
+       Nested Entity reset semantics remain
+       unchanged.
     ===================================== */
 
     const resetSection =
         useCallback(
-
             (sectionId) => {
 
                 if (!sectionId) {
@@ -702,34 +648,30 @@ export default function CommunityPlusUserProfile({
             },
 
             [
-
                 form,
-
             ]
-
         );
 
 
     /* =====================================
        SAVE SECTION
-       
+
        IMPORTANT:
-       
+
        Do NOT call loadProfile() here.
-       
-       PATCH success means the local workspace
-       values have successfully been persisted.
-       
-       Calling loadProfile() immediately after
-       PATCH can rehydrate the form from an
-       incomplete/legacy canonical profile
-       representation and wipe the new Entity
-       state from the workspace.
+
+       PATCH success means the local
+       workspace values have successfully
+       been persisted.
+
+       Reloading the profile immediately
+       after PATCH can cause an incomplete
+       or legacy canonical representation
+       to replace the active Entity state.
     ===================================== */
 
     const handleSaveSection =
         useCallback(
-
             async (sectionId) => {
 
                 if (!sectionId) {
@@ -759,14 +701,27 @@ export default function CommunityPlusUserProfile({
                         )
                     );
 
-console.log("🔥 PROFILE SAVE VALUES:", values);
-console.log("🔥 PROFILE SAVE IDENTITY TYPE:", values.identityType);
-console.log("🔥 PROFILE SAVE USER TYPE:", values.userType);
-console.log("🔥 PROFILE SAVE ENTITY:", values.entity);
+
+                    console.log(
+                        "🔥 PROFILE SAVE IDENTITY TYPE:",
+                        values.identityType
+                    );
+
+
+                    console.log(
+                        "🔥 PROFILE SAVE USER TYPE:",
+                        values.userType
+                    );
+
+
+                    console.log(
+                        "🔥 PROFILE SAVE ENTITY:",
+                        values.entity
+                    );
+
 
                     const payload =
                         buildProfilePayload({
-
                             values,
 
                             userEmail:
@@ -774,7 +729,6 @@ console.log("🔥 PROFILE SAVE ENTITY:", values.entity);
 
                             homeLocation:
                                 values.homeLocation,
-
                         });
 
 
@@ -789,7 +743,7 @@ console.log("🔥 PROFILE SAVE ENTITY:", values.entity);
 
 
                     /*
-                     * Persist to the API.
+                     * Persist to API.
                      */
 
                     await patchProfile(
@@ -806,13 +760,13 @@ console.log("🔥 PROFILE SAVE ENTITY:", values.entity);
                      *
                      * here.
                      *
-                     * The workspace already has the
-                     * successfully saved values.
+                     * The workspace already has
+                     * the successfully saved values.
                      */
 
 
                     /*
-                     * Exit edit mode only after the
+                     * Exit edit mode only after
                      * API confirms success.
                      */
 
@@ -844,14 +798,12 @@ console.log("🔥 PROFILE SAVE ENTITY:", values.entity);
 
                     }
 
-
                 } catch (error) {
 
                     console.error(
                         "[PROFILE SAVE] FAILED:",
                         error
                     );
-
 
                 } finally {
 
@@ -864,17 +816,11 @@ console.log("🔥 PROFILE SAVE ENTITY:", values.entity);
             },
 
             [
-
                 values,
-
                 user?.email,
-
                 patchProfile,
-
                 onComplete,
-
             ]
-
         );
 
 
@@ -884,27 +830,20 @@ console.log("🔥 PROFILE SAVE ENTITY:", values.entity);
 
     const closeProfile =
         useCallback(
-
             () => {
 
                 navigate(
-
                     "/communityplus",
-
                     {
                         replace: true,
                     }
-
                 );
 
             },
 
             [
-
                 navigate,
-
             ]
-
         );
 
 
