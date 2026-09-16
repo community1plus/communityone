@@ -1,4 +1,7 @@
-import { toE164Phone } from "../../../src/framework/Workspace/profile/profileHelpers";
+import {
+  toE164Phone
+} from "../../../src/framework/Workspace/profile/profileHelpers";
+
 
 export function buildProfilePayload({
   values,
@@ -6,13 +9,23 @@ export function buildProfilePayload({
   homeLocation,
 }) {
 
+  /* =========================================
+     USER TYPE
+  ========================================= */
+
   const userType =
     values.userType ||
     values.identityType ||
     "PERSONAL";
 
+
   const isOrg =
     userType === "ORG";
+
+
+  /* =========================================
+     PERSONAL PHONE
+  ========================================= */
 
   const phoneE164 =
     toE164Phone(
@@ -20,7 +33,28 @@ export function buildProfilePayload({
       values.phoneCountry
     );
 
+
+  /* =========================================
+     ENTITY
+  ========================================= */
+
+  const entity =
+    values.entity
+      ? {
+          ...values.entity,
+        }
+      : null;
+
+
+  /* =========================================
+     PAYLOAD
+  ========================================= */
+
   return {
+
+    /* =======================================
+       PROFILE
+    ======================================= */
 
     profile: {
 
@@ -64,9 +98,29 @@ export function buildProfilePayload({
 
     },
 
+
+    /* =======================================
+       ENTITY
+       
+       New Entity domain payload.
+    ======================================= */
+
+    entity,
+
+
+    /* =======================================
+       LEGACY ORGANISATION PROFILE
+       
+       Leave this intact for existing
+       ORG functionality.
+    ======================================= */
+
     organisationProfile:
+
       isOrg
+
         ? {
+
             ...values.organisation,
 
             location:
@@ -83,7 +137,9 @@ export function buildProfilePayload({
 
             source:
               "manual",
+
           }
+
         : null,
 
   };
