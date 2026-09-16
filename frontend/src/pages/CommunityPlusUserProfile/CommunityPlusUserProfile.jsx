@@ -9,6 +9,7 @@ import {
     useEffect,
     useMemo,
     useCallback,
+    useRef,
 } from "react";
 
 import {
@@ -81,7 +82,6 @@ export default function CommunityPlusUserProfile({
 
     const {
         profile,
-        loadProfile,
     } = useProfile();
 
 
@@ -107,68 +107,128 @@ export default function CommunityPlusUserProfile({
 
 
     /* =====================================
-       PROFILE VALUES
+       PROFILE INITIAL VALUES
     ===================================== */
 
-    const initialValues =
+    const profileInitialValues =
         useMemo(
+
             () =>
                 getInitialProfileValues(
                     profile,
                     user
                 ),
+
             [
                 profile,
                 user,
             ]
+
         );
 
+
+    /* =====================================
+       FORM
+    ===================================== */
 
     const form =
         useForm({
-            initialValues,
+
+            initialValues:
+                profileInitialValues,
+
         });
 
 
-const {
-    values,
-    setValues,
-} = form;
+    const {
+        values,
+        setValues,
+    } = form;
 
-/* =====================================
-   PROFILE HYDRATION
-===================================== */
 
-useEffect(() => {
+    /* =====================================
+       PROFILE HYDRATION
+       
+       IMPORTANT:
+       
+       Hydrate the workspace from the
+       canonical profile once.
+       
+       After that, the workspace owns its
+       current editing state.
+       
+       This prevents a profile refresh after
+       save from replacing the Entity values
+       currently held by the form.
+    ===================================== */
 
-    if (!profile) {
-        return;
-    }
+    const hydratedProfileRef =
+        useRef(false);
 
-    const hydratedValues =
-        getInitialProfileValues(
-            profile,
-            user
+
+    useEffect(() => {
+
+        /*
+         * There is nothing to hydrate until
+         * ProfileContext has a profile.
+         */
+
+        if (!profile) {
+            return;
+        }
+
+
+        /*
+         * Do not continuously rehydrate.
+         *
+         * Once the workspace has received
+         * its canonical starting state,
+         * local form state becomes authoritative
+         * for this workspace session.
+         */
+
+        if (hydratedProfileRef.current) {
+            return;
+        }
+
+
+        const hydratedValues =
+            getInitialProfileValues(
+                profile,
+                user
+            );
+
+
+        console.log(
+            "🔥 PROFILE INITIAL HYDRATION:",
+            JSON.stringify(
+                hydratedValues,
+                null,
+                2
+            )
         );
 
-    console.log(
-        "🔥 PROFILE HYDRATION:",
-        JSON.stringify(
-            hydratedValues,
-            null,
-            2
-        )
-    );
 
-    setValues(
-        hydratedValues
-    );
+        setValues(
+            hydratedValues
+        );
 
-}, [
-    profile,
-    user,
-    setValues,
-]);
+
+        hydratedProfileRef.current =
+            true;
+
+
+    }, [
+
+        profile,
+
+        user,
+
+        setValues,
+
+    ]);
+
+
     /* =====================================
        IDENTITY TYPE
     ===================================== */
@@ -189,15 +249,30 @@ useEffect(() => {
 
                 return [
 
+                    /*
+                     * Person identity remains the
+                     * identity of the authenticated
+                     * user operating the Entity.
+                     */
+
                     ...PERSONAL_STEPS.slice(0, 1),
 
+                    /*
+                     * Entity-owned workspace.
+                     */
+
                     ...ENTITY_STEPS,
+
+                    /*
+                     * Shared capabilities.
+                     */
 
                     ...COMMON_STEPS,
 
                 ];
 
             }
+
 
             return [
 
@@ -208,7 +283,9 @@ useEffect(() => {
             ];
 
         }, [
+
             isEntity,
+
         ]);
 
 
@@ -227,17 +304,15 @@ useEffect(() => {
 
     const defaultSection =
         isEntity
-            ? (
-                sections.findIndex(
-                    section =>
-                        section.id === "entity"
-                )
+
+            ? sections.findIndex(
+                section =>
+                    section.id === "entity"
             )
-            : (
-                sections.findIndex(
-                    section =>
-                        section.id === "identity"
-                )
+
+            : sections.findIndex(
+                section =>
+                    section.id === "identity"
             );
 
 
@@ -251,16 +326,23 @@ useEffect(() => {
                 storageKey
             );
 
+
         if (saved !== null) {
 
             const savedIndex =
                 Number(saved);
 
+
             if (
+
                 Number.isInteger(
                     savedIndex
-                ) &&
+                )
+
+                &&
+
                 savedIndex >= 0
+
             ) {
 
                 return savedIndex;
@@ -269,8 +351,11 @@ useEffect(() => {
 
         }
 
+
         return defaultSection >= 0
+
             ? defaultSection
+
             : 0;
 
     });
@@ -305,11 +390,19 @@ useEffect(() => {
 
 
             if (
+
                 Number.isInteger(
                     savedIndex
-                ) &&
-                savedIndex >= 0 &&
+                )
+
+                &&
+
+                savedIndex >= 0
+
+                &&
+
                 savedIndex < sections.length
+
             ) {
 
                 setCurrentSection(
@@ -325,10 +418,12 @@ useEffect(() => {
 
         const nextSection =
             isEntity
+
                 ? sections.findIndex(
                     section =>
                         section.id === "entity"
                 )
+
                 : sections.findIndex(
                     section =>
                         section.id === "identity"
@@ -336,14 +431,22 @@ useEffect(() => {
 
 
         setCurrentSection(
+
             nextSection >= 0
+
                 ? nextSection
+
                 : 0
+
         );
 
+
     }, [
+
         isEntity,
+
         sections,
+
     ]);
 
 
@@ -354,13 +457,21 @@ useEffect(() => {
     useEffect(() => {
 
         sessionStorage.setItem(
+
             storageKey,
-            String(currentSection)
+
+            String(
+                currentSection
+            )
+
         );
 
     }, [
+
         storageKey,
+
         currentSection,
+
     ]);
 
 
@@ -372,6 +483,7 @@ useEffect(() => {
         useMemo(
 
             () =>
+
                 createWorkspaceSectionController({
 
                     sections,
@@ -385,8 +497,11 @@ useEffect(() => {
                 }),
 
             [
+
                 sections,
+
                 currentSection,
+
             ]
 
         );
@@ -400,12 +515,15 @@ useEffect(() => {
         useMemo(
 
             () =>
+
                 calculateProfileCompletion(
                     values
                 ),
 
             [
+
                 values,
+
             ]
 
         );
@@ -419,6 +537,7 @@ useEffect(() => {
         useMemo(
 
             () =>
+
                 Object.fromEntries(
 
                     sections.map(
@@ -437,8 +556,11 @@ useEffect(() => {
                 ),
 
             [
+
                 sections,
+
                 values,
+
             ]
 
         );
@@ -448,40 +570,50 @@ useEffect(() => {
        EDIT SECTION
     ===================================== */
 
-const setSectionEditing =
-    useCallback(
-        (
-            sectionId,
-            editing
-        ) => {
+    const setSectionEditing =
+        useCallback(
 
-            console.log(
-                "🔥 SET SECTION EDITING:",
+            (
                 sectionId,
                 editing
-            );
+            ) => {
 
-            setEditingSections(
-                previous => {
+                console.log(
+                    "🔥 SET SECTION EDITING:",
+                    sectionId,
+                    editing
+                );
 
-                    const next = {
-                        ...previous,
-                        [sectionId]: editing,
-                    };
 
-                    console.log(
-                        "🔥 EDITING SECTIONS NEXT:",
-                        next
-                    );
+                setEditingSections(
+                    previous => {
 
-                    return next;
+                        const next = {
 
-                }
-            );
+                            ...previous,
 
-        },
-        []
-    );
+                            [sectionId]:
+                                editing,
+
+                        };
+
+
+                        console.log(
+                            "🔥 EDITING SECTIONS NEXT:",
+                            next
+                        );
+
+
+                        return next;
+
+                    }
+                );
+
+            },
+
+            []
+
+        );
 
 
     /* =====================================
@@ -519,8 +651,11 @@ const setSectionEditing =
             },
 
             [
+
                 sections,
+
                 form,
+
             ]
 
         );
@@ -528,12 +663,27 @@ const setSectionEditing =
 
     /* =====================================
        RESET SECTION
+       
+       NOTE:
+       
+       For now this uses the form's
+       canonical reset behaviour.
+       
+       We are deliberately not changing
+       nested Entity reset semantics here
+       until useForm's path handling is
+       inspected.
     ===================================== */
 
     const resetSection =
         useCallback(
 
             (sectionId) => {
+
+                if (!sectionId) {
+                    return;
+                }
+
 
                 form.reset();
 
@@ -552,7 +702,9 @@ const setSectionEditing =
             },
 
             [
+
                 form,
+
             ]
 
         );
@@ -560,6 +712,19 @@ const setSectionEditing =
 
     /* =====================================
        SAVE SECTION
+       
+       IMPORTANT:
+       
+       Do NOT call loadProfile() here.
+       
+       PATCH success means the local workspace
+       values have successfully been persisted.
+       
+       Calling loadProfile() immediately after
+       PATCH can rehydrate the form from an
+       incomplete/legacy canonical profile
+       representation and wipe the new Entity
+       state from the workspace.
     ===================================== */
 
     const handleSaveSection =
@@ -579,6 +744,22 @@ const setSectionEditing =
                     );
 
 
+                    console.log(
+                        "🔥 PROFILE SAVE SECTION:",
+                        sectionId
+                    );
+
+
+                    console.log(
+                        "🔥 PROFILE SAVE VALUES:",
+                        JSON.stringify(
+                            values,
+                            null,
+                            2
+                        )
+                    );
+
+
                     const payload =
                         buildProfilePayload({
 
@@ -593,22 +774,42 @@ const setSectionEditing =
                         });
 
 
+                    console.log(
+                        "🔥 PROFILE SAVE PAYLOAD:",
+                        JSON.stringify(
+                            payload,
+                            null,
+                            2
+                        )
+                    );
+
+
+                    /*
+                     * Persist to the API.
+                     */
+
                     await patchProfile(
                         payload
                     );
 
 
                     /*
-                     * Refresh canonical
-                     * profile state.
+                     * IMPORTANT:
+                     *
+                     * Do NOT call:
+                     *
+                     * await loadProfile();
+                     *
+                     * here.
+                     *
+                     * The workspace already has the
+                     * successfully saved values.
                      */
-
-                    await loadProfile();
 
 
                     /*
-                     * Exit edit mode for
-                     * the saved section.
+                     * Exit edit mode only after the
+                     * API confirms success.
                      */
 
                     setEditingSections(
@@ -623,6 +824,12 @@ const setSectionEditing =
                     );
 
 
+                    console.log(
+                        "✅ PROFILE SAVE SUCCESS:",
+                        sectionId
+                    );
+
+
                     /*
                      * Notify parent.
                      */
@@ -633,12 +840,14 @@ const setSectionEditing =
 
                     }
 
+
                 } catch (error) {
 
                     console.error(
-                        "[PROFILE SAVE] FAILED",
+                        "[PROFILE SAVE] FAILED:",
                         error
                     );
+
 
                 } finally {
 
@@ -651,11 +860,15 @@ const setSectionEditing =
             },
 
             [
+
                 values,
+
                 user?.email,
+
                 patchProfile,
-                loadProfile,
+
                 onComplete,
+
             ]
 
         );
@@ -671,16 +884,21 @@ const setSectionEditing =
             () => {
 
                 navigate(
+
                     "/communityplus",
+
                     {
                         replace: true,
                     }
+
                 );
 
             },
 
             [
+
                 navigate,
+
             ]
 
         );

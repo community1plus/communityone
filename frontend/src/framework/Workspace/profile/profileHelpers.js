@@ -269,123 +269,157 @@ export function getInitialProfileValues({
     const email =
         getUserEmail(user);
 
-    const emailPrefix =
-        email.split("@")[0] || "";
+
+    const profileData =
+        profile || {};
 
 
-    const entity =
-        profile?.entity || {};
+    /* =========================================
+       ENTITY SOURCE
+    ========================================= */
 
+    const persistedEntity =
+        profileData.entity ||
+        profileData.entityProfile ||
+        profileData.organisationProfile ||
+        {};
+
+
+    const entity = {
+
+        name:
+            persistedEntity.name ||
+            persistedEntity.organisation_name ||
+            "",
+
+        classification:
+            persistedEntity.classification ||
+            "",
+
+        website:
+            persistedEntity.website ||
+            "",
+
+        streetAddress:
+            persistedEntity.streetAddress ||
+            persistedEntity.street_address ||
+            "",
+
+        suburb:
+            persistedEntity.suburb ||
+            "",
+
+        postcode:
+            persistedEntity.postcode ||
+            "",
+
+        phone:
+            persistedEntity.phone ||
+            persistedEntity.organisation_phone ||
+            "",
+
+        email:
+            persistedEntity.email ||
+            persistedEntity.organisation_email ||
+            "",
+
+        location:
+            persistedEntity.location ||
+            null,
+
+        emailVerified:
+            Boolean(
+                persistedEntity.emailVerified ??
+                persistedEntity.email_verified
+            ),
+
+        ownershipVerified:
+            Boolean(
+                persistedEntity.ownershipVerified ??
+                persistedEntity.ownership_verified
+            ),
+
+        source:
+            persistedEntity.source ||
+            "manual",
+
+    };
+
+
+    /* =========================================
+       RETURN
+    ========================================= */
 
     return {
 
         username:
-            profile?.username ||
-            emailPrefix,
+            profileData.username ||
+            email.split("@")[0] ||
+            "",
 
-        display_name:
-            profile?.display_name ||
-            profile?.displayName ||
-            emailPrefix,
+        displayName:
+            profileData.displayName ||
+            profileData.display_name ||
+            "",
 
         email:
-            profile?.email ||
+            profileData.email ||
             email,
 
         userType:
-            profile?.userType ||
-            profile?.user_type ||
+            profileData.userType ||
+            profileData.user_type ||
             "PERSONAL",
 
+        identityType:
+            profileData.identityType ||
+            (
+                profileData.userType === "ENTITY" ||
+                profileData.user_type === "ENTITY"
+                    ? "ENTITY"
+                    : "PERSONAL"
+            ),
 
         phoneCountry:
-            profile?.phoneCountry ||
+            profileData.phoneCountry ||
             "AU",
 
         phoneDisplay:
-            profile?.phoneDisplay ||
+            profileData.phoneDisplay ||
             "",
 
         phoneE164:
-            profile?.phoneE164 ||
-            profile?.phone ||
+            profileData.phoneE164 ||
+            profileData.phone ||
             "",
 
-
         homeLocation:
-            profile?.homeLocation ||
+            profileData.homeLocation ||
             null,
 
-
-        /* =====================================
-           ENTITY
-        ===================================== */
-
-        entity: {
-
-            name:
-                entity.name ||
-                "",
-
-            classification:
-                entity.classification ||
-                "",
-
-            website:
-                entity.website ||
-                "",
-
-            streetAddress:
-                entity.streetAddress ||
-                "",
-
-            suburb:
-                entity.suburb ||
-                "",
-
-            postcode:
-                entity.postcode ||
-                "",
-
-            phone:
-                entity.phone ||
-                "",
-
-            phoneE164:
-                entity.phoneE164 ||
-                "",
-
-            email:
-                entity.email ||
-                "",
-
-            location:
-                entity.location ||
-                null,
-
-            emailVerified:
-                Boolean(
-                    entity.emailVerified
-                ),
-
-            ownershipVerified:
-                Boolean(
-                    entity.ownershipVerified
-                ),
-
-            source:
-                entity.source ||
-                "manual",
-
-        },
-
+        entity,
 
         policies:
-            profile?.policies || {},
+            profileData.policies || {
 
+                communityStandards: false,
+
+                creatorGuidelines: false,
+
+                marketplacePolicies: false,
+
+                participationFramework: false,
+
+            },
 
         payment:
-            profile?.payment || {},
+            profileData.payment || {
+
+                cardName: "",
+
+                last4: "",
+
+            },
 
     };
 

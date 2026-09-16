@@ -17,18 +17,18 @@ export function buildProfilePayload({
        IDENTITY TYPE
     ========================================= */
 
-    const identityType =
-        values.identityType ||
+    const userType =
         values.userType ||
+        values.identityType ||
         "PERSONAL";
 
 
     const isEntity =
-        identityType === "ENTITY";
+        userType === "ENTITY";
 
 
     /* =========================================
-       PHONE
+       PERSONAL PHONE
     ========================================= */
 
     const phoneE164 =
@@ -39,11 +39,17 @@ export function buildProfilePayload({
 
 
     /* =========================================
-       ENTITY
+       ENTITY PHONE
     ========================================= */
 
-    const entity =
-        values.entity || {};
+    const entityPhone =
+        values.entity?.phone || "";
+
+    const entityPhoneE164 =
+        toE164Phone(
+            entityPhone,
+            values.phoneCountry
+        );
 
 
     /* =========================================
@@ -60,44 +66,47 @@ export function buildProfilePayload({
             values.display_name ||
             "",
 
-        display_name:
-            values.display_name ||
-            values.displayName ||
-            "",
-
         email:
             values.email ||
             userEmail ||
             "",
 
-        userType:
-            identityType,
+        userType,
 
-        user_type:
-            identityType,
-
-        identityType,
+        identityType:
+            isEntity
+                ? "ENTITY"
+                : "PERSONAL",
 
         profileLevel:
             1,
 
-        profile_level:
-            1,
-
         phone:
-            phoneE164,
+            isEntity
+                ? entityPhoneE164
+                : phoneE164,
 
-        phoneE164,
+        phoneE164:
+            isEntity
+                ? entityPhoneE164
+                : phoneE164,
 
         phoneDisplay:
-            values.phoneDisplay || "",
+            isEntity
+                ? entityPhone
+                : values.phoneDisplay || "",
 
         phoneCountry:
             values.phoneCountry || "AU",
 
         homeLocation:
             isEntity
-                ? null
+                ? (
+                    values.entity?.location ||
+                    values.homeLocation ||
+                    homeLocation ||
+                    null
+                )
                 : (
                     values.homeLocation ||
                     homeLocation ||
@@ -117,46 +126,120 @@ export function buildProfilePayload({
        ENTITY
     ========================================= */
 
-    if (isEntity) {
+    const entity =
+        isEntity
+            ? {
 
-        profile.entity = {
+                name:
+                    values.entity?.name ||
+                    "",
 
-            name:
-                entity.name || "",
+                classification:
+                    values.entity?.classification ||
+                    "",
 
-            classification:
-                entity.classification || "",
+                website:
+                    values.entity?.website ||
+                    "",
 
-            website:
-                entity.website || "",
+                streetAddress:
+                    values.entity?.streetAddress ||
+                    "",
 
-            streetAddress:
-                entity.streetAddress || "",
+                suburb:
+                    values.entity?.suburb ||
+                    "",
 
-            suburb:
-                entity.suburb || "",
+                postcode:
+                    values.entity?.postcode ||
+                    "",
 
-            postcode:
-                entity.postcode || "",
+                phone:
+                    entityPhoneE164,
 
-            phone:
-                entity.phone || "",
+                email:
+                    values.entity?.email ||
+                    "",
 
-            email:
-                entity.email || "",
+                location:
+                    values.entity?.location ||
+                    values.homeLocation ||
+                    null,
 
-        };
+                source:
+                    values.entity?.source ||
+                    "manual",
 
-    }
+            }
+            : null;
 
 
     /* =========================================
-       RETURN
+       LEGACY API COMPATIBILITY
+    ========================================= */
+
+    const organisationProfile =
+        isEntity
+            ? {
+
+                organisation_name:
+                    entity.name,
+
+                organisation_email:
+                    entity.email,
+
+                organisation_phone:
+                    entity.phone,
+
+                website:
+                    entity.website,
+
+                location:
+                    entity.location,
+
+                classification:
+                    entity.classification,
+
+                streetAddress:
+                    entity.streetAddress,
+
+                suburb:
+                    entity.suburb,
+
+                postcode:
+                    entity.postcode,
+
+                email_verified:
+                    Boolean(
+                        values.entity?.emailVerified
+                    ),
+
+                ownership_verified:
+                    Boolean(
+                        values.entity?.ownershipVerified
+                    ),
+
+                business_level:
+                    1,
+
+                source:
+                    entity.source,
+
+            }
+            : null;
+
+
+    /* =========================================
+       PAYLOAD
     ========================================= */
 
     return {
 
         profile,
+
+        entity,
+
+        organisationProfile,
 
     };
 
