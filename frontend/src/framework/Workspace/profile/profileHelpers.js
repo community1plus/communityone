@@ -246,6 +246,16 @@ export function calculateProfileCompletion(
 
 }
 
+function getUserEmail(user) {
+
+    return (
+        user?.email ||
+        user?.attributes?.email ||
+        user?.signInDetails?.loginId ||
+        ""
+    );
+
+}
 
 /* =====================================
    INITIAL PROFILE VALUES
