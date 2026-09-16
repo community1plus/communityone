@@ -409,21 +409,33 @@ export function getInitialProfileValues({
     user,
 }) {
 
-    /* =====================================
-       USER
-    ===================================== */
-
-    const email =
-        getUserEmail(user);
-
-
     const profileData =
         profile || {};
 
+    const accountEmail =
+        getUserEmail(user);
 
-    /* =====================================
-       ENTITY
-    ===================================== */
+    const profileEmail =
+        cleanString(
+            profileData.email
+        );
+
+    const username =
+        cleanString(
+            profileData.username
+        ) ||
+        accountEmail
+            .split("@")[0];
+
+    const email =
+        profileEmail ||
+        accountEmail;
+
+    const displayName =
+        cleanString(
+            profileData.displayName ||
+            profileData.display_name
+        );
 
     const persistedEntity =
         profileData.entity ||
@@ -431,67 +443,7 @@ export function getInitialProfileValues({
         profileData.organisationProfile ||
         {};
 
-
-    const hasPersistedEntity =
-        Object.keys(
-            persistedEntity
-        ).length > 0;
-
-
-    /* =====================================
-       IDENTITY TYPE
-
-       Explicit identityType wins.
-
-       If an Entity exists but identityType
-       is absent, Entity becomes active.
-
-       userType remains the legacy fallback.
-    ===================================== */
-
-    const explicitIdentityType =
-        String(
-            profileData.identityType ||
-            profileData.identity_type ||
-            ""
-        ).toUpperCase();
-
-
-    const legacyUserType =
-        String(
-            profileData.userType ||
-            profileData.user_type ||
-            ""
-        ).toUpperCase();
-
-
-    const identityType =
-
-        explicitIdentityType === "ENTITY"
-
-            ? "ENTITY"
-
-            : explicitIdentityType === "PERSONAL"
-
-                ? "PERSONAL"
-
-                : hasPersistedEntity
-
-                    ? "ENTITY"
-
-                    : legacyUserType === "ENTITY"
-
-                        ? "ENTITY"
-
-                        : "PERSONAL";
-
-
-    /* =====================================
-       ENTITY MODEL
-    ===================================== */
-
     const entity = {
-
         name:
             persistedEntity.name ||
             persistedEntity.organisation_name ||
@@ -547,156 +499,58 @@ export function getInitialProfileValues({
         source:
             persistedEntity.source ||
             "manual",
-
     };
-
-
-    /* =====================================
-       SOCIAL
-    ===================================== */
-
-    const social =
-        normaliseSocialState(
-            profileData.social
-        );
-
-
-    /* =====================================
-       PAYMENT
-    ===================================== */
-
-    const payment =
-        profileData.payment ||
-        {
-
-            cardName:
-                "",
-
-            last4:
-                "",
-
-            brand:
-                "",
-
-            provider:
-                "",
-
-            verified:
-                false,
-
-            verifiedAt:
-                null,
-
-        };
-
-
-    /* =====================================
-       RETURN
-    ===================================== */
 
     return {
 
-        /* ---------------------------------
-           IDENTITY
-        --------------------------------- */
+        username,
 
-        username:
-            profileData.username ??
-            (
-                email
-                    .split("@")[0]
-            ),
+        displayName,
 
-        displayName:
-            profileData.displayName ||
-            profileData.display_name ||
-            getUserDisplayName(user),
-
-        email:
-            profileData.email ||
-            email,
-
-
-        /* ---------------------------------
-           TYPES
-        --------------------------------- */
+        email,
 
         userType:
             profileData.userType ||
             profileData.user_type ||
             "PERSONAL",
 
-        identityType,
-
-
-        /* ---------------------------------
-           PERSONAL CONTACT
-        --------------------------------- */
+        identityType:
+            profileData.identityType ||
+            (
+                profileData.userType === "ENTITY" ||
+                profileData.user_type === "ENTITY"
+                    ? "ENTITY"
+                    : "PERSONAL"
+            ),
 
         phoneCountry:
             profileData.phoneCountry ||
-            profileData.phone_country ||
             "AU",
 
         phoneDisplay:
             profileData.phoneDisplay ||
-            profileData.phone_display ||
             "",
 
         phoneE164:
             profileData.phoneE164 ||
-            profileData.phone_e164 ||
             profileData.phone ||
             "",
 
-        phoneVerified:
-            Boolean(
-                profileData.phoneVerified ??
-                profileData.phone_verified
-            ),
-
-
-        /* ---------------------------------
-           PERSONAL LOCATION
-        --------------------------------- */
-
         homeLocation:
             profileData.homeLocation ||
-            profileData.home_location ||
             null,
 
-
-        /* ---------------------------------
-           SOCIAL
-        --------------------------------- */
-
-        social,
-
-
-        /* ---------------------------------
-           ENTITY
-        --------------------------------- */
-
         entity,
-
-
-        /* ---------------------------------
-           POLICIES
-        --------------------------------- */
 
         policies:
             profileData.policies ||
             {},
 
-
-        /* ---------------------------------
-           PAYMENT
-        --------------------------------- */
-
-        payment,
+        payment:
+            profileData.payment ||
+            null,
 
     };
-
 }
 
 
