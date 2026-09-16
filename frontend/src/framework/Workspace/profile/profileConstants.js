@@ -4,7 +4,7 @@ import {
 
 import {
     ENTITY_CLASSIFICATIONS,
-} from "../entity/entityClassifications";
+} from "../../Workspace/entity/entityClassifications";
 
 
 /* =========================================
