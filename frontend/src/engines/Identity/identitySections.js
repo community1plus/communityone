@@ -146,43 +146,19 @@ export const ENTITY_SECTIONS = [
     }),
 
 
-    createWorkspaceSectionModel({
-
-        id: "entity-address",
-
-        title: "Address",
-
-        view: "form",
-
-        fields: [
-
-            {
-                name: "entity.streetAddress",
-
-                label: "Street Address",
-
-                type: "text",
-            },
-
-            {
-                name: "entity.suburb",
-
-                label: "Suburb",
-
-                type: "text",
-            },
-
-            {
-                name: "entity.postcode",
-
-                label: "Postcode",
-
-                type: "text",
-            },
-
-        ],
-
-    }),
+createWorkspaceSectionModel({
+    id: "entity-address",
+    title: "Address",
+    view: "form",
+    actions: ["edit", "clear", "reset", "exit", "save"],
+    fields: [
+        {
+            name: "entity.location",
+            label: "Entity Address",
+            type: "location",
+        },
+    ],
+}),
 
 
     createWorkspaceSectionModel({
