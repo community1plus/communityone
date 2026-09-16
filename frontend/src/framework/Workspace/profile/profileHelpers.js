@@ -6,6 +6,19 @@ import {
 
 
 /* =====================================
+   STRING
+===================================== */
+
+function cleanString(value = "") {
+
+    return String(
+        value ?? ""
+    ).trim();
+
+}
+
+
+/* =====================================
    PROFILE SECTION COMPLETION
 ===================================== */
 
@@ -19,110 +32,82 @@ export function calculateProfileSectionCompletion(
 
     switch (sectionId) {
 
-        /* =====================================
-           IDENTITY
-        ===================================== */
-
         case "identity":
 
             checks = [
-
                 Boolean(
-                    values.username
+                    cleanString(
+                        values.username
+                    )
                 ),
-
             ];
 
             break;
 
-
-        /* =====================================
-           LOCATION
-        ===================================== */
 
         case "location":
 
             checks = [
-
                 Boolean(
                     values.homeLocation
                 ),
-
             ];
 
             break;
 
-
-        /* =====================================
-           CONTACT
-        ===================================== */
 
         case "contact":
 
             checks = [
-
                 Boolean(
-                    values.phoneDisplay
+                    cleanString(
+                        values.phoneDisplay
+                    )
                 ),
-
             ];
 
             break;
 
 
-        /* =====================================
-           SOCIAL
-        ===================================== */
-
         case "social":
 
             checks = [
-
                 Object.values(
                     values.social || {}
                 ).some(
                     account =>
                         account?.verified === true
                 ),
-
             ];
 
             break;
 
-
-        /* =====================================
-           PAYMENT
-        ===================================== */
 
         case "payment":
 
             checks = [
-
                 Boolean(
                     values.payment?.verified
                 ),
-
             ];
 
             break;
 
 
-        /* =====================================
-           ENTITY
-        ===================================== */
-
         case "entity":
 
             checks = [
-
                 Boolean(
-                    values.entity?.name
+                    cleanString(
+                        values.entity?.name
+                    )
                 ),
 
                 Boolean(
-                    values.entity?.website
+                    cleanString(
+                        values.entity?.website
+                    )
                 ),
-
             ];
 
             break;
@@ -131,19 +116,23 @@ export function calculateProfileSectionCompletion(
         case "entity-address":
 
             checks = [
-
                 Boolean(
-                    values.entity?.streetAddress
+                    cleanString(
+                        values.entity?.streetAddress
+                    )
                 ),
 
                 Boolean(
-                    values.entity?.suburb
+                    cleanString(
+                        values.entity?.suburb
+                    )
                 ),
 
                 Boolean(
-                    values.entity?.postcode
+                    cleanString(
+                        values.entity?.postcode
+                    )
                 ),
-
             ];
 
             break;
@@ -152,23 +141,21 @@ export function calculateProfileSectionCompletion(
         case "entity-contact":
 
             checks = [
-
                 Boolean(
-                    values.entity?.phone
+                    cleanString(
+                        values.entity?.phone
+                    )
                 ),
 
                 Boolean(
-                    values.entity?.email
+                    cleanString(
+                        values.entity?.email
+                    )
                 ),
-
             ];
 
             break;
 
-
-        /* =====================================
-           DEFAULT
-        ===================================== */
 
         default:
 
@@ -206,13 +193,9 @@ export function calculateProfileCompletion(
     const sectionIds = [
 
         "identity",
-
         "location",
-
         "contact",
-
         "social",
-
         "payment",
 
     ];
@@ -236,249 +219,102 @@ export function calculateProfileCompletion(
 
 
     return Math.round(
-
         (
             completedSections /
             sectionIds.length
         ) * 100
-
     );
 
 }
+
+
+/* =====================================
+   USER EMAIL
+===================================== */
 
 function getUserEmail(user) {
 
-    return (
+    return cleanString(
+
         user?.email ||
+
         user?.attributes?.email ||
+
         user?.signInDetails?.loginId ||
+
         ""
+
     );
 
 }
 
+
 /* =====================================
-   SOCIAL NORMALISATION
+   ENTITY
 ===================================== */
 
-function normaliseSocialState(
-    social = {}
+function buildInitialEntity(
+    profile = {}
 ) {
+
+    const persistedEntity =
+
+        profile.entity ||
+
+        profile.entityProfile ||
+
+        profile.organisationProfile ||
+
+        profile.organisation ||
+
+        {};
+
 
     return {
 
-        facebook:
-            social?.facebook &&
-            typeof social.facebook === "object"
-                ? {
-                    ...social.facebook,
-
-                    connected:
-                        social.facebook.connected ??
-                        Boolean(
-                            social.facebook.verified
-                        ),
-
-                    username:
-                        social.facebook.username ||
-                        social.facebook.accountName ||
-                        "",
-
-                }
-                : {
-                    connected: false,
-                    username: "",
-                    verified: false,
-                },
-
-
-        instagram:
-            social?.instagram &&
-            typeof social.instagram === "object"
-                ? {
-                    ...social.instagram,
-
-                    connected:
-                        social.instagram.connected ??
-                        Boolean(
-                            social.instagram.verified
-                        ),
-
-                    username:
-                        social.instagram.username ||
-                        social.instagram.handle ||
-                        social.instagram.pageName ||
-                        "",
-
-                }
-                : {
-                    connected: false,
-                    username: "",
-                    verified: false,
-                },
-
-
-        youtube:
-            social?.youtube &&
-            typeof social.youtube === "object"
-                ? {
-                    ...social.youtube,
-
-                    connected:
-                        social.youtube.connected ??
-                        Boolean(
-                            social.youtube.verified
-                        ),
-
-                    username:
-                        social.youtube.username ||
-                        social.youtube.customUrl ||
-                        social.youtube.channelTitle ||
-                        "",
-
-                }
-                : {
-                    connected: false,
-                    username: "",
-                    verified: false,
-                },
-
-
-        x:
-            social?.x &&
-            typeof social.x === "object"
-                ? {
-                    ...social.x,
-
-                    connected:
-                        social.x.connected ??
-                        Boolean(
-                            social.x.verified
-                        ),
-
-                    username:
-                        social.x.username ||
-                        social.x.handle ||
-                        "",
-
-                }
-                : {
-                    connected: false,
-                    username: "",
-                    verified: false,
-                },
-
-    };
-
-}
-/* =====================================
-   USER DISPLAY NAME
-===================================== */
-
-function getUserDisplayName(user) {
-
-    return (
-
-        user?.displayName ||
-
-        user?.name ||
-
-        user?.attributes?.name ||
-
-        user?.attributes?.given_name ||
-
-        getUserEmail(user)
-            .split("@")[0] ||
-
-        ""
-
-    );
-
-}
-
-/* =====================================
-   INITIAL PROFILE VALUES
-===================================== */
-
-/* =====================================
-   INITIAL PROFILE VALUES
-===================================== */
-
-export function getInitialProfileValues({
-    profile,
-    user,
-}) {
-
-    const profileData =
-        profile || {};
-
-    const accountEmail =
-        getUserEmail(user);
-
-    const profileEmail =
-        cleanString(
-            profileData.email
-        );
-
-    const username =
-        cleanString(
-            profileData.username
-        ) ||
-        accountEmail
-            .split("@")[0];
-
-    const email =
-        profileEmail ||
-        accountEmail;
-
-    const displayName =
-        cleanString(
-            profileData.displayName ||
-            profileData.display_name
-        );
-
-    const persistedEntity =
-        profileData.entity ||
-        profileData.entityProfile ||
-        profileData.organisationProfile ||
-        {};
-
-    const entity = {
         name:
-            persistedEntity.name ||
-            persistedEntity.organisation_name ||
-            "",
+            cleanString(
+                persistedEntity.name ||
+                persistedEntity.organisation_name
+            ),
 
         classification:
-            persistedEntity.classification ||
-            "",
+            cleanString(
+                persistedEntity.classification
+            ),
 
         website:
-            persistedEntity.website ||
-            "",
+            cleanString(
+                persistedEntity.website
+            ),
 
         streetAddress:
-            persistedEntity.streetAddress ||
-            persistedEntity.street_address ||
-            "",
+            cleanString(
+                persistedEntity.streetAddress ||
+                persistedEntity.street_address
+            ),
 
         suburb:
-            persistedEntity.suburb ||
-            "",
+            cleanString(
+                persistedEntity.suburb
+            ),
 
         postcode:
-            persistedEntity.postcode ||
-            "",
+            cleanString(
+                persistedEntity.postcode
+            ),
 
         phone:
-            persistedEntity.phone ||
-            persistedEntity.organisation_phone ||
-            "",
+            cleanString(
+                persistedEntity.phone ||
+                persistedEntity.organisation_phone
+            ),
 
         email:
-            persistedEntity.email ||
-            persistedEntity.organisation_email ||
-            "",
+            cleanString(
+                persistedEntity.email ||
+                persistedEntity.organisation_email
+            ),
 
         location:
             persistedEntity.location ||
@@ -497,11 +333,153 @@ export function getInitialProfileValues({
             ),
 
         source:
-            persistedEntity.source ||
+            cleanString(
+                persistedEntity.source
+            ) ||
             "manual",
+
     };
 
+}
+
+
+/* =====================================
+   IDENTITY TYPE
+===================================== */
+
+function resolveIdentityType(
+    profile
+) {
+
+    if (
+        profile?.identityType
+    ) {
+
+        return profile.identityType;
+
+    }
+
+
+    if (
+        profile?.identity_type
+    ) {
+
+        return profile.identity_type;
+
+    }
+
+
+    if (
+        profile?.userType ===
+            IDENTITY_TYPES.ENTITY ||
+
+        profile?.user_type ===
+            IDENTITY_TYPES.ENTITY
+    ) {
+
+        return IDENTITY_TYPES.ENTITY;
+
+    }
+
+
+    return IDENTITY_TYPES.PERSONAL;
+
+}
+
+
+/* =====================================
+   USER TYPE
+===================================== */
+
+function resolveUserType(
+    profile
+) {
+
+    return (
+
+        profile?.userType ||
+
+        profile?.user_type ||
+
+        "PERSONAL"
+
+    );
+
+}
+
+
+/* =====================================
+   INITIAL PROFILE VALUES
+===================================== */
+
+export function getInitialProfileValues({
+    profile,
+    user,
+} = {}) {
+
+    const profileData =
+        profile || {};
+
+
+    /* -------------------------------------
+       ACCOUNT IDENTITY
+    ------------------------------------- */
+
+    const accountEmail =
+        getUserEmail(
+            user
+        );
+
+
+    const profileEmail =
+        cleanString(
+            profileData.email
+        );
+
+
+    const email =
+        profileEmail ||
+        accountEmail;
+
+
+    const username =
+        cleanString(
+            profileData.username
+        ) ||
+
+        (
+            email.includes("@")
+                ? email.split("@")[0]
+                : ""
+        );
+
+
+    const displayName =
+        cleanString(
+            profileData.displayName ||
+            profileData.display_name
+        );
+
+
+    /* -------------------------------------
+       ENTITY
+    ------------------------------------- */
+
+    const entity =
+        buildInitialEntity(
+            profileData
+        );
+
+
+    /* -------------------------------------
+       PROFILE VALUES
+    ------------------------------------- */
+
     return {
+
+        /* =================================
+           IDENTITY
+        ================================= */
 
         username,
 
@@ -509,48 +487,98 @@ export function getInitialProfileValues({
 
         email,
 
+
+        /* =================================
+           ACCOUNT TYPE
+        ================================= */
+
         userType:
-            profileData.userType ||
-            profileData.user_type ||
-            "PERSONAL",
+            resolveUserType(
+                profileData
+            ),
 
         identityType:
-            profileData.identityType ||
-            (
-                profileData.userType === "ENTITY" ||
-                profileData.user_type === "ENTITY"
-                    ? "ENTITY"
-                    : "PERSONAL"
+            resolveIdentityType(
+                profileData
             ),
+
+
+        /* =================================
+           PHONE
+        ================================= */
 
         phoneCountry:
             profileData.phoneCountry ||
-            "AU",
+            profileData.phone_country ||
+            DEFAULT_PHONE_COUNTRY,
 
         phoneDisplay:
-            profileData.phoneDisplay ||
-            "",
+            cleanString(
+                profileData.phoneDisplay ||
+                profileData.phone_display
+            ),
 
         phoneE164:
-            profileData.phoneE164 ||
-            profileData.phone ||
-            "",
+            cleanString(
+                profileData.phoneE164 ||
+                profileData.phone_e164 ||
+                profileData.phone
+            ),
+
+
+        /* =================================
+           LOCATION
+        ================================= */
 
         homeLocation:
             profileData.homeLocation ||
+            profileData.home_location ||
             null,
+
+
+        /* =================================
+           ENTITY
+        ================================= */
 
         entity,
 
-        policies:
-            profileData.policies ||
+
+        /* =================================
+           SOCIAL
+        ================================= */
+
+        social:
+            profileData.social ||
             {},
+
+
+        /* =================================
+           PAYMENT
+        ================================= */
 
         payment:
             profileData.payment ||
-            null,
+            {
+                cardName: "",
+                last4: "",
+            },
+
+
+        /* =================================
+           POLICIES
+        ================================= */
+
+        policies:
+            profileData.policies ||
+            {
+                communityStandards: false,
+                creatorGuidelines: false,
+                marketplacePolicies: false,
+                participationFramework: false,
+            },
 
     };
+
 }
 
 
@@ -563,15 +591,11 @@ export function getEmailDomain(
 ) {
 
     return (
-
-        email
+        cleanString(email)
             .split("@")[1]
             ?.toLowerCase()
-
         ||
-
         ""
-
     );
 
 }
@@ -606,7 +630,7 @@ export function getPhoneCountry(
 
 
 /* =====================================
-   PHONE
+   PHONE → E.164
 ===================================== */
 
 export function toE164Phone(
@@ -621,22 +645,26 @@ export function toE164Phone(
 
 
     if (!country) {
-
         return "";
-
     }
 
 
     const digits =
-        value
-            .replace(/\D/g, "")
-            .replace(/^0+/, "");
+        cleanString(
+            value
+        )
+            .replace(
+                /\D/g,
+                ""
+            )
+            .replace(
+                /^0+/,
+                ""
+            );
 
 
     if (!digits) {
-
         return "";
-
     }
 
 
@@ -663,14 +691,14 @@ export function validatePhone(
 
 
     if (!country) {
-
         return false;
-
     }
 
 
     const digits =
-        phone
+        cleanString(
+            phone
+        )
             .replace(
                 country.dialCode,
                 ""

@@ -52,6 +52,21 @@ import {
 import "./CommunityPlusUserProfile.css";
 
 
+/* =====================================================
+   STORAGE
+===================================================== */
+
+const PERSON_SECTION_STORAGE_KEY =
+    "profileCurrentSection:person";
+
+const ENTITY_SECTION_STORAGE_KEY =
+    "profileCurrentSection:entity";
+
+
+/* =====================================================
+   COMPONENT
+===================================================== */
+
 export default function CommunityPlusUserProfile({
 
     onComplete,
@@ -62,17 +77,17 @@ export default function CommunityPlusUserProfile({
 
 }) {
 
-    /* =====================================
+    /* =================================================
        NAVIGATION
-    ===================================== */
+    ================================================= */
 
     const navigate =
         useNavigate();
 
 
-    /* =====================================
+    /* =================================================
        CONTEXT
-    ===================================== */
+    ================================================= */
 
     const {
         user,
@@ -89,9 +104,9 @@ export default function CommunityPlusUserProfile({
     } = useAPI();
 
 
-    /* =====================================
+    /* =================================================
        LOCAL STATE
-    ===================================== */
+    ================================================= */
 
     const [
         savingSection,
@@ -105,13 +120,17 @@ export default function CommunityPlusUserProfile({
     ] = useState({});
 
 
-    /* =====================================
-       PROFILE INITIAL VALUES
+    /* =================================================
+       PROFILE → FORM
+    =================================================
 
-       Convert the canonical profile from
-       ProfileContext into the workspace
-       form structure.
-    ===================================== */
+       ProfileContext owns the canonical profile.
+
+       getInitialProfileValues converts the
+       backend representation into the form
+       representation expected by CPF.
+
+    ================================================= */
 
     const profileInitialValues =
         useMemo(
@@ -127,16 +146,9 @@ export default function CommunityPlusUserProfile({
         );
 
 
-    /* =====================================
+    /* =================================================
        FORM
-
-       useForm owns the active workspace
-       editing state.
-
-       initialValues establishes the initial
-       form state. Hydration below handles
-       subsequent ProfileContext updates.
-    ===================================== */
+    ================================================= */
 
     const form =
         useForm({
@@ -151,44 +163,30 @@ export default function CommunityPlusUserProfile({
     } = form;
 
 
-    /* =====================================
+    /* =================================================
        PROFILE HYDRATION
+    =================================================
 
-       ProfileContext may provide profile
-       data in stages.
+       ProfileContext can update in stages:
 
-       Example:
-
-           render
-             ↓
+           initial render
+                ↓
            cached profile
-             ↓
-           background /me request
-             ↓
+                ↓
+           /me
+                ↓
            canonical profile
-             ↓
-           ProfileContext update
+                ↓
+           ProfileContext
+                ↓
+           form hydration
 
-       The previous implementation used
-       hydratedProfileRef to hydrate only
-       once.
+       Do not use a one-time hydration ref.
 
-       That meant the cached profile could
-       become the "hydrated" state before
-       the canonical API profile arrived.
+       The canonical ProfileContext value must be
+       allowed to replace an earlier cached value.
 
-       The workspace now hydrates whenever
-       ProfileContext supplies a profile.
-
-       IMPORTANT:
-
-       handleSaveSection does NOT call
-       loadProfile() after PATCH.
-
-       Therefore a successful local save
-       remains authoritative for the active
-       workspace session.
-    ===================================== */
+    ================================================= */
 
     useEffect(() => {
 
@@ -225,30 +223,40 @@ export default function CommunityPlusUserProfile({
     ]);
 
 
-    /* =====================================
+    /* =================================================
        IDENTITY TYPE
-    ===================================== */
+    ================================================= */
 
     const isEntity =
         values.identityType === "ENTITY" ||
         values.capabilities?.entity;
 
 
-    /* =====================================
+    /* =================================================
        PROFILE SECTIONS
+    =================================================
 
-       PERSON
-           Personal sections
-           +
-           Common capabilities
+       PERSONAL:
 
-       ENTITY
-           Person identity
-           +
-           Entity sections
-           +
-           Common capabilities
-    ===================================== */
+           Personal Identity
+           Location
+           Contact
+           Social
+           Payment
+
+       ENTITY:
+
+           Person Identity
+           Entity
+           Entity Address
+           Entity Contact
+           Social
+           Payment
+
+       The authenticated person remains the identity
+       operating the Entity.
+
+    ================================================= */
 
     const sections =
         useMemo(() => {
@@ -257,25 +265,23 @@ export default function CommunityPlusUserProfile({
 
                 return [
 
-                    /*
-                     * Person identity remains the
-                     * identity of the authenticated
-                     * user operating the Entity.
-                     */
+                    /* -----------------------------
+                       PERSON IDENTITY
+                    ----------------------------- */
 
                     ...PERSONAL_STEPS.slice(0, 1),
 
 
-                    /*
-                     * Entity-owned workspace.
-                     */
+                    /* -----------------------------
+                       ENTITY
+                    ----------------------------- */
 
                     ...ENTITY_STEPS,
 
 
-                    /*
-                     * Shared capabilities.
-                     */
+                    /* -----------------------------
+                       COMMON CAPABILITIES
+                    ----------------------------- */
 
                     ...COMMON_STEPS,
 
@@ -286,7 +292,16 @@ export default function CommunityPlusUserProfile({
 
             return [
 
+                /* -----------------------------
+                   PERSONAL PROFILE
+                ----------------------------- */
+
                 ...PERSONAL_STEPS,
+
+
+                /* -----------------------------
+                   COMMON CAPABILITIES
+                ----------------------------- */
 
                 ...COMMON_STEPS,
 
@@ -297,30 +312,44 @@ export default function CommunityPlusUserProfile({
         ]);
 
 
-    /* =====================================
-       CURRENT SECTION
-
-       Person and Entity maintain
-       independent workspace positions.
-    ===================================== */
+    /* =================================================
+       SECTION STORAGE
+    ================================================= */
 
     const storageKey =
         isEntity
-            ? "profileCurrentSection:entity"
-            : "profileCurrentSection:person";
+            ? ENTITY_SECTION_STORAGE_KEY
+            : PERSON_SECTION_STORAGE_KEY;
 
+
+    /* =================================================
+       DEFAULT SECTION
+    ================================================= */
 
     const defaultSection =
-        isEntity
-            ? sections.findIndex(
+        useMemo(() => {
+
+            const defaultSectionId =
+                isEntity
+                    ? "entity"
+                    : "identity";
+
+
+            return sections.findIndex(
                 section =>
-                    section.id === "entity"
-            )
-            : sections.findIndex(
-                section =>
-                    section.id === "identity"
+                    section.id ===
+                    defaultSectionId
             );
 
+        }, [
+            isEntity,
+            sections,
+        ]);
+
+
+    /* =================================================
+       CURRENT SECTION
+    ================================================= */
 
     const [
         currentSection,
@@ -361,28 +390,23 @@ export default function CommunityPlusUserProfile({
     });
 
 
-    /* =====================================
+    /* =================================================
        CAPABILITY SWITCH
+    =================================================
 
-       When Person / Entity changes,
-       restore that capability's last
-       section where possible.
+       Person and Entity maintain independent
+       navigation positions.
 
-       Otherwise move to the capability's
-       default starting section.
-    ===================================== */
+       If the saved position is no longer valid,
+       move to the capability's default section.
+
+    ================================================= */
 
     useEffect(() => {
 
-        const nextStorageKey =
-            isEntity
-                ? "profileCurrentSection:entity"
-                : "profileCurrentSection:person";
-
-
         const saved =
             sessionStorage.getItem(
-                nextStorageKey
+                storageKey
             );
 
 
@@ -413,33 +437,22 @@ export default function CommunityPlusUserProfile({
         }
 
 
-        const nextSection =
-            isEntity
-                ? sections.findIndex(
-                    section =>
-                        section.id === "entity"
-                )
-                : sections.findIndex(
-                    section =>
-                        section.id === "identity"
-                );
-
-
         setCurrentSection(
-            nextSection >= 0
-                ? nextSection
+            defaultSection >= 0
+                ? defaultSection
                 : 0
         );
 
     }, [
-        isEntity,
+        storageKey,
         sections,
+        defaultSection,
     ]);
 
 
-    /* =====================================
+    /* =================================================
        CURRENT SECTION STORAGE
-    ===================================== */
+    ================================================= */
 
     useEffect(() => {
 
@@ -456,9 +469,9 @@ export default function CommunityPlusUserProfile({
     ]);
 
 
-    /* =====================================
+    /* =================================================
        SECTION CONTROLLER
-    ===================================== */
+    ================================================= */
 
     const sectionController =
         useMemo(
@@ -480,9 +493,9 @@ export default function CommunityPlusUserProfile({
         );
 
 
-    /* =====================================
+    /* =================================================
        PROFILE COMPLETION
-    ===================================== */
+    ================================================= */
 
     const completion =
         useMemo(
@@ -497,14 +510,15 @@ export default function CommunityPlusUserProfile({
         );
 
 
-    /* =====================================
+    /* =================================================
        SECTION COMPLETION
-    ===================================== */
+    ================================================= */
 
     const sectionCompletion =
         useMemo(
             () =>
                 Object.fromEntries(
+
                     sections.map(
                         section => [
 
@@ -517,6 +531,7 @@ export default function CommunityPlusUserProfile({
 
                         ]
                     )
+
                 ),
 
             [
@@ -526,9 +541,9 @@ export default function CommunityPlusUserProfile({
         );
 
 
-    /* =====================================
+    /* =================================================
        EDIT SECTION
-    ===================================== */
+    ================================================= */
 
     const setSectionEditing =
         useCallback(
@@ -537,33 +552,22 @@ export default function CommunityPlusUserProfile({
                 editing
             ) => {
 
-                console.log(
-                    "🔥 SET SECTION EDITING:",
-                    sectionId,
-                    editing
-                );
+                if (!sectionId) {
+                    return;
+                }
 
 
                 setEditingSections(
-                    previous => {
+                    previous => ({
 
-                        const next = {
-                            ...previous,
+                        ...previous,
 
-                            [sectionId]:
-                                editing,
-                        };
+                        [sectionId]:
+                            Boolean(
+                                editing
+                            ),
 
-
-                        console.log(
-                            "🔥 EDITING SECTIONS NEXT:",
-                            next
-                        );
-
-
-                        return next;
-
-                    }
+                    })
                 );
 
             },
@@ -572,18 +576,24 @@ export default function CommunityPlusUserProfile({
         );
 
 
-    /* =====================================
+    /* =================================================
        CLEAR SECTION
-    ===================================== */
+    ================================================= */
 
     const clearSection =
         useCallback(
             (sectionId) => {
 
+                if (!sectionId) {
+                    return;
+                }
+
+
                 const section =
                     sections.find(
                         item =>
-                            item.id === sectionId
+                            item.id ===
+                            sectionId
                     );
 
 
@@ -594,6 +604,11 @@ export default function CommunityPlusUserProfile({
 
                 section.fields?.forEach(
                     field => {
+
+                        if (!field?.name) {
+                            return;
+                        }
+
 
                         form.setValue(
                             field.name,
@@ -612,15 +627,17 @@ export default function CommunityPlusUserProfile({
         );
 
 
-    /* =====================================
+    /* =================================================
        RESET SECTION
+    =================================================
 
-       Current behaviour deliberately uses
-       useForm's canonical reset behaviour.
+       useForm remains the authority for reset
+       semantics.
 
-       Nested Entity reset semantics remain
-       unchanged.
-    ===================================== */
+       This deliberately resets the entire form,
+       matching the existing behaviour.
+
+    ================================================= */
 
     const resetSection =
         useCallback(
@@ -653,22 +670,29 @@ export default function CommunityPlusUserProfile({
         );
 
 
-    /* =====================================
+    /* =================================================
        SAVE SECTION
+    =================================================
 
-       IMPORTANT:
+       Flow:
 
-       Do NOT call loadProfile() here.
+           CPF form values
+                  ↓
+           buildProfilePayload()
+                  ↓
+           PATCH /profile
+                  ↓
+           success
+                  ↓
+           exit edit mode
 
-       PATCH success means the local
-       workspace values have successfully
-       been persisted.
+       We intentionally do NOT call loadProfile()
+       after PATCH here.
 
-       Reloading the profile immediately
-       after PATCH can cause an incomplete
-       or legacy canonical representation
-       to replace the active Entity state.
-    ===================================== */
+       The active workspace already contains the
+       values confirmed by the successful PATCH.
+
+    ================================================= */
 
     const handleSaveSection =
         useCallback(
@@ -702,24 +726,6 @@ export default function CommunityPlusUserProfile({
                     );
 
 
-                    console.log(
-                        "🔥 PROFILE SAVE IDENTITY TYPE:",
-                        values.identityType
-                    );
-
-
-                    console.log(
-                        "🔥 PROFILE SAVE USER TYPE:",
-                        values.userType
-                    );
-
-
-                    console.log(
-                        "🔥 PROFILE SAVE ENTITY:",
-                        values.entity
-                    );
-
-
                     const payload =
                         buildProfilePayload({
                             values,
@@ -742,33 +748,10 @@ export default function CommunityPlusUserProfile({
                     );
 
 
-                    /*
-                     * Persist to API.
-                     */
-
                     await patchProfile(
                         payload
                     );
 
-
-                    /*
-                     * IMPORTANT:
-                     *
-                     * Do NOT call:
-                     *
-                     * await loadProfile();
-                     *
-                     * here.
-                     *
-                     * The workspace already has
-                     * the successfully saved values.
-                     */
-
-
-                    /*
-                     * Exit edit mode only after
-                     * API confirms success.
-                     */
 
                     setEditingSections(
                         previous => ({
@@ -788,14 +771,8 @@ export default function CommunityPlusUserProfile({
                     );
 
 
-                    /*
-                     * Notify parent.
-                     */
-
                     if (onComplete) {
-
                         onComplete();
-
                     }
 
                 } catch (error) {
@@ -824,9 +801,9 @@ export default function CommunityPlusUserProfile({
         );
 
 
-    /* =====================================
+    /* =================================================
        CLOSE PROFILE
-    ===================================== */
+    ================================================= */
 
     const closeProfile =
         useCallback(
@@ -847,9 +824,9 @@ export default function CommunityPlusUserProfile({
         );
 
 
-    /* =====================================
+    /* =================================================
        WORKSPACE STATE
-    ===================================== */
+    ================================================= */
 
     const workspaceState = {
 
@@ -872,9 +849,9 @@ export default function CommunityPlusUserProfile({
     };
 
 
-    /* =====================================
+    /* =================================================
        WORKSPACE ACTIONS
-    ===================================== */
+    ================================================= */
 
     const workspaceActions = {
 
@@ -894,9 +871,9 @@ export default function CommunityPlusUserProfile({
     };
 
 
-    /* =====================================
-       RENDER
-    ===================================== */
+    /* =================================================
+       WORKSPACE
+    ================================================= */
 
     if (isEntity) {
 
