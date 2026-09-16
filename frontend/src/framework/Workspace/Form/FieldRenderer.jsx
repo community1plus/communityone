@@ -1,5 +1,6 @@
 import PhoneField from "./fields/PhoneField";
 import LocationField from "./fields/LocationField";
+import SelectField from "./fields/SelectField";
 
 import WorkspaceField
     from "./WorkspaceField";
@@ -57,6 +58,23 @@ export default function FieldRenderer({
             return (
 
                 <PhoneField
+
+                    field={field}
+
+                    form={form}
+
+                    editing={editing}
+
+                />
+
+            );
+
+
+        case "select":
+
+            return (
+
+                <SelectField
 
                     field={field}
 
