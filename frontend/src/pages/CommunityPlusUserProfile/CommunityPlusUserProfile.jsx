@@ -114,10 +114,10 @@ export default function CommunityPlusUserProfile({
         useMemo(
 
             () =>
-                getInitialProfileValues(
+                getInitialProfileValues({
                     profile,
                     user
-                ),
+                }),
 
             [
                 profile,
@@ -193,10 +193,10 @@ export default function CommunityPlusUserProfile({
 
 
         const hydratedValues =
-            getInitialProfileValues(
+            getInitialProfileValues({
                 profile,
                 user
-            );
+            });
 
 
         console.log(
