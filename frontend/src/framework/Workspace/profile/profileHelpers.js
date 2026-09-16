@@ -251,7 +251,7 @@ export function calculateProfileCompletion(
    INITIAL PROFILE VALUES
 ===================================== */
 
-function getInitialProfileValues({
+export function getInitialProfileValues({
     profile,
     user,
 }) {
