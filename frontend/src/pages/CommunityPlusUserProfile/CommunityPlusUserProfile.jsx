@@ -759,6 +759,10 @@ export default function CommunityPlusUserProfile({
                         )
                     );
 
+console.log("🔥 PROFILE SAVE VALUES:", values);
+console.log("🔥 PROFILE SAVE IDENTITY TYPE:", values.identityType);
+console.log("🔥 PROFILE SAVE USER TYPE:", values.userType);
+console.log("🔥 PROFILE SAVE ENTITY:", values.entity);
 
                     const payload =
                         buildProfilePayload({
