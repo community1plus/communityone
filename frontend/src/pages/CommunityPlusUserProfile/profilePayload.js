@@ -17,41 +17,18 @@ export function buildProfilePayload({
        IDENTITY TYPE
     ========================================= */
 
-    const userType =
-        values.userType ||
+    const identityType =
         values.identityType ||
+        values.userType ||
         "PERSONAL";
 
 
     const isEntity =
-        userType === "ENTITY";
+        identityType === "ENTITY";
 
 
     /* =========================================
-       ENTITY
-    ========================================= */
-
-    const entity =
-        values.entity || {};
-
-
-    /* =========================================
-       ENTITY PHONE
-    ========================================= */
-
-    const entityPhoneDisplay =
-        entity.phone || "";
-
-
-    const entityPhoneE164 =
-        toE164Phone(
-            entityPhoneDisplay,
-            values.phoneCountry
-        );
-
-
-    /* =========================================
-       PERSON PHONE
+       PHONE
     ========================================= */
 
     const phoneE164 =
@@ -62,14 +39,11 @@ export function buildProfilePayload({
 
 
     /* =========================================
-       ENTITY LOCATION
+       ENTITY
     ========================================= */
 
-    const entityLocation =
-        entity.location ||
-        values.homeLocation ||
-        homeLocation ||
-        null;
+    const entity =
+        values.entity || {};
 
 
     /* =========================================
@@ -86,37 +60,44 @@ export function buildProfilePayload({
             values.display_name ||
             "",
 
+        display_name:
+            values.display_name ||
+            values.displayName ||
+            "",
+
         email:
             values.email ||
             userEmail ||
             "",
 
-        userType,
+        userType:
+            identityType,
+
+        user_type:
+            identityType,
+
+        identityType,
 
         profileLevel:
             1,
 
-        phone:
-            isEntity
-                ? entityPhoneE164
-                : phoneE164,
+        profile_level:
+            1,
 
-        phoneE164:
-            isEntity
-                ? entityPhoneE164
-                : phoneE164,
+        phone:
+            phoneE164,
+
+        phoneE164,
 
         phoneDisplay:
-            isEntity
-                ? entityPhoneDisplay
-                : values.phoneDisplay || "",
+            values.phoneDisplay || "",
 
         phoneCountry:
             values.phoneCountry || "AU",
 
         homeLocation:
             isEntity
-                ? entityLocation
+                ? null
                 : (
                     values.homeLocation ||
                     homeLocation ||
@@ -133,75 +114,49 @@ export function buildProfilePayload({
 
 
     /* =========================================
-       ENTITY PROFILE
+       ENTITY
     ========================================= */
 
-    const entityProfile =
-        isEntity
-            ? {
+    if (isEntity) {
 
-                name:
-                    entity.name || "",
+        profile.entity = {
 
-                classification:
-                    entity.classification || "",
+            name:
+                entity.name || "",
 
-                website:
-                    entity.website || "",
+            classification:
+                entity.classification || "",
 
-                streetAddress:
-                    entity.streetAddress || "",
+            website:
+                entity.website || "",
 
-                suburb:
-                    entity.suburb || "",
+            streetAddress:
+                entity.streetAddress || "",
 
-                postcode:
-                    entity.postcode || "",
+            suburb:
+                entity.suburb || "",
 
-                phone:
-                    entityPhoneDisplay,
+            postcode:
+                entity.postcode || "",
 
-                phoneE164:
-                    entityPhoneE164,
+            phone:
+                entity.phone || "",
 
-                email:
-                    entity.email ||
-                    values.email ||
-                    userEmail ||
-                    "",
+            email:
+                entity.email || "",
 
-                location:
-                    entity.location ||
-                    null,
+        };
 
-                emailVerified:
-                    Boolean(
-                        entity.emailVerified
-                    ),
-
-                ownershipVerified:
-                    Boolean(
-                        entity.ownershipVerified
-                    ),
-
-                source:
-                    entity.source ||
-                    "manual",
-
-            }
-            : null;
+    }
 
 
     /* =========================================
-       PAYLOAD
+       RETURN
     ========================================= */
 
     return {
 
         profile,
-
-        entity:
-            entityProfile,
 
     };
 

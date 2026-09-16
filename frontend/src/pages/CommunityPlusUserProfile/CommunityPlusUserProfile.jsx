@@ -130,11 +130,45 @@ export default function CommunityPlusUserProfile({
         });
 
 
-    const {
-        values,
-    } = form;
+const {
+    values,
+    setValues,
+} = form;
 
+/* =====================================
+   PROFILE HYDRATION
+===================================== */
 
+useEffect(() => {
+
+    if (!profile) {
+        return;
+    }
+
+    const hydratedValues =
+        getInitialProfileValues(
+            profile,
+            user
+        );
+
+    console.log(
+        "🔥 PROFILE HYDRATION:",
+        JSON.stringify(
+            hydratedValues,
+            null,
+            2
+        )
+    );
+
+    setValues(
+        hydratedValues
+    );
+
+}, [
+    profile,
+    user,
+    setValues,
+]);
     /* =====================================
        IDENTITY TYPE
     ===================================== */
