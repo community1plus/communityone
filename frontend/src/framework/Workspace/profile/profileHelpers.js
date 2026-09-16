@@ -251,245 +251,60 @@ export function calculateProfileCompletion(
    INITIAL PROFILE VALUES
 ===================================== */
 
-export function getInitialProfileValues(
+function getInitialProfileValues({
     profile,
-    user
-) {
-
-    profile =
-        profile && typeof profile === "object"
-            ? profile
-            : {};
-
-    user =
-        user && typeof user === "object"
-            ? user
-            : {};
+    user,
+}) {
 
     const email =
-        user?.email || "";
+        getUserEmail(user);
+
+    const emailPrefix =
+        email.split("@")[0] || "";
 
 
-    const emailUsername =
-        email
-            .split("@")[0]
-            .toLowerCase();
-
-
-    /*
-     * -------------------------------------
-     * PROFILE USERNAME
-     *
-     * An empty username is a valid saved
-     * profile state.
-     *
-     * Only use the email username when the
-     * profile has never contained a username.
-     * -------------------------------------
-     */
-
-    const hasProfileUsername =
-        Object.prototype.hasOwnProperty.call(
-            profile,
-            "username"
-        );
-
-
-    const profileUsername =
-        hasProfileUsername
-            ? profile.username
-            : emailUsername;
-
-
-    /*
-     * -------------------------------------
-     * IDENTITY TYPE
-     *
-     * PERSONAL
-     * ENTITY
-     *
-     * Legacy ORG is temporarily mapped to
-     * ENTITY for backward compatibility.
-     * -------------------------------------
-     */
-
-    const identityType =
-        profile?.identityType
-        ||
-        (
-            profile?.userType === "ORG"
-                ? IDENTITY_TYPES.ENTITY
-                : IDENTITY_TYPES.PERSONAL
-        );
+    const entity =
+        profile?.entity || {};
 
 
     return {
 
-        /* =====================================
-           ACTIVE IDENTITY
-        ===================================== */
+        username:
+            profile?.username ||
+            emailPrefix,
 
-        activeIdentityType:
-            identityType,
+        display_name:
+            profile?.display_name ||
+            profile?.displayName ||
+            emailPrefix,
 
-
-        identityType,
-
-
-        /* =====================================
-           PERSONAL IDENTITY
-        ===================================== */
-
-        personalIdentity: {
-
-            username:
-                profileUsername,
-
+        email:
+            profile?.email ||
             email,
 
-            phoneCountry:
-                profile?.phoneCountry ||
-                DEFAULT_PHONE_COUNTRY,
+        userType:
+            profile?.userType ||
+            profile?.user_type ||
+            "PERSONAL",
 
-            phoneDisplay:
-                profile?.phoneDisplay ||
-                "",
-
-            homeLocation:
-                profile?.homeLocation ||
-                null,
-
-        },
-
-
-        /* =====================================
-           FORMAL ENTITIES
-        ===================================== */
-
-        entities:
-            profile?.entities ||
-            [],
-
-
-        /* =====================================
-           IDENTITY
-        ===================================== */
-
-        username:
-            profileUsername,
-
-        email,
-
-
-        /* =====================================
-           CONTACT
-        ===================================== */
 
         phoneCountry:
             profile?.phoneCountry ||
-            DEFAULT_PHONE_COUNTRY,
+            "AU",
 
         phoneDisplay:
             profile?.phoneDisplay ||
             "",
 
+        phoneE164:
+            profile?.phoneE164 ||
+            profile?.phone ||
+            "",
 
-        /* =====================================
-           LOCATION
-        ===================================== */
 
         homeLocation:
             profile?.homeLocation ||
             null,
-
-
-        /* =====================================
-           SOCIAL
-        ===================================== */
-
-        social: {
-
-            facebook: {
-
-                connected:
-                    profile?.social?.facebook?.connected ||
-                    false,
-
-                username:
-                    profile?.social?.facebook?.username ||
-                    "",
-
-                verified:
-                    profile?.social?.facebook?.verified ||
-                    false,
-
-            },
-
-
-            instagram: {
-
-                connected:
-                    profile?.social?.instagram?.connected ||
-                    false,
-
-                username:
-                    profile?.social?.instagram?.username ||
-                    "",
-
-                verified:
-                    profile?.social?.instagram?.verified ||
-                    false,
-
-            },
-
-
-            youtube: {
-
-                connected:
-                    profile?.social?.youtube?.connected ||
-                    false,
-
-                username:
-                    profile?.social?.youtube?.username ||
-                    "",
-
-                verified:
-                    profile?.social?.youtube?.verified ||
-                    false,
-
-            },
-
-
-            x: {
-
-                connected:
-                    profile?.social?.x?.connected ||
-                    false,
-
-                username:
-                    profile?.social?.x?.username ||
-                    "",
-
-                verified:
-                    profile?.social?.x?.verified ||
-                    false,
-
-            },
-
-        },
-
-
-        /* =====================================
-           PAYMENT
-        ===================================== */
-
-        payment: {
-
-            verified:
-                profile?.payment?.verified ||
-                false,
-
-        },
 
 
         /* =====================================
@@ -499,41 +314,68 @@ export function getInitialProfileValues(
         entity: {
 
             name:
-                profile?.entity?.name ||
-                profile?.organisation?.name ||
+                entity.name ||
+                "",
+
+            classification:
+                entity.classification ||
                 "",
 
             website:
-                profile?.entity?.website ||
-                profile?.organisation?.website ||
+                entity.website ||
                 "",
 
             streetAddress:
-                profile?.entity?.streetAddress ||
-                profile?.organisation?.streetAddress ||
+                entity.streetAddress ||
                 "",
 
             suburb:
-                profile?.entity?.suburb ||
-                profile?.organisation?.suburb ||
+                entity.suburb ||
                 "",
 
             postcode:
-                profile?.entity?.postcode ||
-                profile?.organisation?.postcode ||
+                entity.postcode ||
                 "",
 
             phone:
-                profile?.entity?.phone ||
-                profile?.organisation?.phone ||
+                entity.phone ||
+                "",
+
+            phoneE164:
+                entity.phoneE164 ||
                 "",
 
             email:
-                profile?.entity?.email ||
-                profile?.organisation?.email ||
+                entity.email ||
                 "",
 
+            location:
+                entity.location ||
+                null,
+
+            emailVerified:
+                Boolean(
+                    entity.emailVerified
+                ),
+
+            ownershipVerified:
+                Boolean(
+                    entity.ownershipVerified
+                ),
+
+            source:
+                entity.source ||
+                "manual",
+
         },
+
+
+        policies:
+            profile?.policies || {},
+
+
+        payment:
+            profile?.payment || {},
 
     };
 
