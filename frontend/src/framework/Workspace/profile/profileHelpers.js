@@ -258,6 +258,149 @@ function getUserEmail(user) {
 }
 
 /* =====================================
+   SOCIAL NORMALISATION
+===================================== */
+
+function normaliseSocialState(
+    social = {}
+) {
+
+    return {
+
+        facebook:
+            social?.facebook &&
+            typeof social.facebook === "object"
+                ? {
+                    ...social.facebook,
+
+                    connected:
+                        social.facebook.connected ??
+                        Boolean(
+                            social.facebook.verified
+                        ),
+
+                    username:
+                        social.facebook.username ||
+                        social.facebook.accountName ||
+                        "",
+
+                }
+                : {
+                    connected: false,
+                    username: "",
+                    verified: false,
+                },
+
+
+        instagram:
+            social?.instagram &&
+            typeof social.instagram === "object"
+                ? {
+                    ...social.instagram,
+
+                    connected:
+                        social.instagram.connected ??
+                        Boolean(
+                            social.instagram.verified
+                        ),
+
+                    username:
+                        social.instagram.username ||
+                        social.instagram.handle ||
+                        social.instagram.pageName ||
+                        "",
+
+                }
+                : {
+                    connected: false,
+                    username: "",
+                    verified: false,
+                },
+
+
+        youtube:
+            social?.youtube &&
+            typeof social.youtube === "object"
+                ? {
+                    ...social.youtube,
+
+                    connected:
+                        social.youtube.connected ??
+                        Boolean(
+                            social.youtube.verified
+                        ),
+
+                    username:
+                        social.youtube.username ||
+                        social.youtube.customUrl ||
+                        social.youtube.channelTitle ||
+                        "",
+
+                }
+                : {
+                    connected: false,
+                    username: "",
+                    verified: false,
+                },
+
+
+        x:
+            social?.x &&
+            typeof social.x === "object"
+                ? {
+                    ...social.x,
+
+                    connected:
+                        social.x.connected ??
+                        Boolean(
+                            social.x.verified
+                        ),
+
+                    username:
+                        social.x.username ||
+                        social.x.handle ||
+                        "",
+
+                }
+                : {
+                    connected: false,
+                    username: "",
+                    verified: false,
+                },
+
+    };
+
+}
+/* =====================================
+   USER DISPLAY NAME
+===================================== */
+
+function getUserDisplayName(user) {
+
+    return (
+
+        user?.displayName ||
+
+        user?.name ||
+
+        user?.attributes?.name ||
+
+        user?.attributes?.given_name ||
+
+        getUserEmail(user)
+            .split("@")[0] ||
+
+        ""
+
+    );
+
+}
+
+/* =====================================
+   INITIAL PROFILE VALUES
+===================================== */
+
+/* =====================================
    INITIAL PROFILE VALUES
 ===================================== */
 
@@ -265,6 +408,10 @@ export function getInitialProfileValues({
     profile,
     user,
 }) {
+
+    /* =====================================
+       USER
+    ===================================== */
 
     const email =
         getUserEmail(user);
@@ -274,9 +421,9 @@ export function getInitialProfileValues({
         profile || {};
 
 
-    /* =========================================
-       ENTITY SOURCE
-    ========================================= */
+    /* =====================================
+       ENTITY
+    ===================================== */
 
     const persistedEntity =
         profileData.entity ||
@@ -284,6 +431,64 @@ export function getInitialProfileValues({
         profileData.organisationProfile ||
         {};
 
+
+    const hasPersistedEntity =
+        Object.keys(
+            persistedEntity
+        ).length > 0;
+
+
+    /* =====================================
+       IDENTITY TYPE
+
+       Explicit identityType wins.
+
+       If an Entity exists but identityType
+       is absent, Entity becomes active.
+
+       userType remains the legacy fallback.
+    ===================================== */
+
+    const explicitIdentityType =
+        String(
+            profileData.identityType ||
+            profileData.identity_type ||
+            ""
+        ).toUpperCase();
+
+
+    const legacyUserType =
+        String(
+            profileData.userType ||
+            profileData.user_type ||
+            ""
+        ).toUpperCase();
+
+
+    const identityType =
+
+        explicitIdentityType === "ENTITY"
+
+            ? "ENTITY"
+
+            : explicitIdentityType === "PERSONAL"
+
+                ? "PERSONAL"
+
+                : hasPersistedEntity
+
+                    ? "ENTITY"
+
+                    : legacyUserType === "ENTITY"
+
+                        ? "ENTITY"
+
+                        : "PERSONAL";
+
+
+    /* =====================================
+       ENTITY MODEL
+    ===================================== */
 
     const entity = {
 
@@ -346,80 +551,149 @@ export function getInitialProfileValues({
     };
 
 
-    /* =========================================
+    /* =====================================
+       SOCIAL
+    ===================================== */
+
+    const social =
+        normaliseSocialState(
+            profileData.social
+        );
+
+
+    /* =====================================
+       PAYMENT
+    ===================================== */
+
+    const payment =
+        profileData.payment ||
+        {
+
+            cardName:
+                "",
+
+            last4:
+                "",
+
+            brand:
+                "",
+
+            provider:
+                "",
+
+            verified:
+                false,
+
+            verifiedAt:
+                null,
+
+        };
+
+
+    /* =====================================
        RETURN
-    ========================================= */
+    ===================================== */
 
     return {
 
+        /* ---------------------------------
+           IDENTITY
+        --------------------------------- */
+
         username:
-            profileData.username ||
-            email.split("@")[0] ||
-            "",
+            profileData.username ??
+            (
+                email
+                    .split("@")[0]
+            ),
 
         displayName:
             profileData.displayName ||
             profileData.display_name ||
-            "",
+            getUserDisplayName(user),
 
         email:
             profileData.email ||
             email,
+
+
+        /* ---------------------------------
+           TYPES
+        --------------------------------- */
 
         userType:
             profileData.userType ||
             profileData.user_type ||
             "PERSONAL",
 
-        identityType:
-            profileData.identityType ||
-            (
-                profileData.userType === "ENTITY" ||
-                profileData.user_type === "ENTITY"
-                    ? "ENTITY"
-                    : "PERSONAL"
-            ),
+        identityType,
+
+
+        /* ---------------------------------
+           PERSONAL CONTACT
+        --------------------------------- */
 
         phoneCountry:
             profileData.phoneCountry ||
+            profileData.phone_country ||
             "AU",
 
         phoneDisplay:
             profileData.phoneDisplay ||
+            profileData.phone_display ||
             "",
 
         phoneE164:
             profileData.phoneE164 ||
+            profileData.phone_e164 ||
             profileData.phone ||
             "",
 
+        phoneVerified:
+            Boolean(
+                profileData.phoneVerified ??
+                profileData.phone_verified
+            ),
+
+
+        /* ---------------------------------
+           PERSONAL LOCATION
+        --------------------------------- */
+
         homeLocation:
             profileData.homeLocation ||
+            profileData.home_location ||
             null,
+
+
+        /* ---------------------------------
+           SOCIAL
+        --------------------------------- */
+
+        social,
+
+
+        /* ---------------------------------
+           ENTITY
+        --------------------------------- */
 
         entity,
 
+
+        /* ---------------------------------
+           POLICIES
+        --------------------------------- */
+
         policies:
-            profileData.policies || {
+            profileData.policies ||
+            {},
 
-                communityStandards: false,
 
-                creatorGuidelines: false,
+        /* ---------------------------------
+           PAYMENT
+        --------------------------------- */
 
-                marketplacePolicies: false,
-
-                participationFramework: false,
-
-            },
-
-        payment:
-            profileData.payment || {
-
-                cardName: "",
-
-                last4: "",
-
-            },
+        payment,
 
     };
 
