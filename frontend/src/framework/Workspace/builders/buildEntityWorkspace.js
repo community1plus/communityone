@@ -75,6 +75,22 @@ console.log(
     sections?.[currentSection]?.id
 );
 
+console.log(
+    "🔥 ENTITY SOURCE SECTION:",
+    sections?.find(
+        section =>
+            section.id === "entity"
+    )
+);
+
+console.log(
+    "🔥 ENTITY SOURCE FIELDS:",
+    sections?.find(
+        section =>
+            section.id === "entity"
+    )?.fields
+);
+
     const runtime =
         createWorkspaceRuntime({
             sections,
