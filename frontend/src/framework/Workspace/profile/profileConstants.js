@@ -2,6 +2,10 @@ import {
     createWorkspaceSectionModel,
 } from "../models/WorkspaceSectionModel";
 
+import {
+    ENTITY_CLASSIFICATIONS,
+} from "../entity/entityClassifications";
+
 
 /* =========================================
    PHONE
@@ -224,6 +228,20 @@ export const ENTITY_STEPS = [
             },
 
             {
+                name: "entity.classification",
+
+                label: "Classification",
+
+                type: "select",
+
+                options:
+                    ENTITY_CLASSIFICATIONS,
+
+                helperText:
+                    "Choose the primary classification for this entity.",
+            },
+
+            {
                 name: "entity.website",
 
                 label: "Website",
@@ -353,25 +371,25 @@ export const COMMON_STEPS = [
     }),
 
 
-createWorkspaceSectionModel({
+    createWorkspaceSectionModel({
 
-    id: "payment",
+        id: "payment",
 
-    title: "Payment",
+        title: "Payment",
 
-    view: "payment",
+        view: "payment",
 
-    actions: [
-        "edit",
-        "clear",
-        "reset",
-        "exit",
-        "save",
-    ],
+        actions: [
+            "edit",
+            "clear",
+            "reset",
+            "exit",
+            "save",
+        ],
 
-    fields: [],
+        fields: [],
 
-}),
+    }),
 
 ];
 
