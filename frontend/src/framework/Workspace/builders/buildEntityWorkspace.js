@@ -119,7 +119,7 @@ console.log(
         createWorkspaceBannerModel({
 
             left: {
-                title: "ENTITY",
+                title: "PROFILE",
             },
 
             center: {
