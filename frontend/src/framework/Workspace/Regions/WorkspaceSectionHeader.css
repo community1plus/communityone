@@ -1,0 +1,205 @@
+/* =========================================
+   WORKSPACE SECTION HEADER
+========================================= */
+
+.workspace-section-header {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    width: 100%;
+
+    margin: 0;
+
+    padding:
+        18px 0;
+
+    box-sizing: border-box;
+
+    border-bottom:
+        1px solid
+        var(--border-color, #e8e8e8);
+
+}
+
+
+/* =========================================
+   SECTION HEADING
+========================================= */
+
+.workspace-section-heading {
+
+    display: flex;
+
+    align-items: center;
+
+    min-width: 0;
+
+    margin: 0;
+    padding: 0;
+
+}
+
+
+/* =========================================
+   SECTION TITLE
+========================================= */
+
+.workspace-section-title {
+
+    margin: 0;
+
+    font-size: 1.25rem;
+
+    font-weight: 500;
+
+    line-height: 1.2;
+
+    color:
+        var(--text-primary, #111);
+
+}
+
+
+/* =========================================
+   SECTION TOOLS
+========================================= */
+
+.workspace-section-tools {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: flex-end;
+
+    gap: 18px;
+
+    flex: 0 0 auto;
+
+    margin: 0;
+    padding: 0;
+
+}
+
+
+/* =========================================
+   SECTION COMPLETION
+========================================= */
+
+.workspace-section-completion {
+
+    font-size: 0.85rem;
+
+    font-weight: 700;
+
+    color:
+        var(--accent-color, #c41230);
+
+}
+
+
+/* =========================================
+   SECTION ACTIONS
+========================================= */
+
+.workspace-section-actions {
+
+    position: relative;
+
+    display: flex;
+
+    align-items: center;
+
+    margin: 0;
+    padding: 0;
+
+}
+
+
+/* =========================================
+   ACTION BUTTON
+========================================= */
+
+.workspace-section-action {
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    appearance: none;
+
+    background: transparent;
+
+    border: none;
+
+    margin: 0;
+    padding: 0;
+
+    cursor: pointer;
+
+    font-family: inherit;
+
+    font-size: 0.9rem;
+
+    font-weight: 400;
+
+    color:
+        var(--text-primary, #111);
+
+}
+
+
+.workspace-section-action:hover {
+
+    color:
+        var(--accent-color, #c41230);
+
+}
+
+
+.workspace-section-action:disabled {
+
+    opacity: 0.5;
+
+    cursor: default;
+
+}
+
+
+/* =========================================
+   PRIMARY ACTION
+========================================= */
+
+.workspace-section-action-primary {
+
+    color:
+        var(--accent-color, #c41230);
+
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 760px) {
+
+    .workspace-section-header {
+
+        padding:
+            16px 0;
+
+    }
+
+    .workspace-section-tools {
+
+        gap: 12px;
+
+    }
+
+}
