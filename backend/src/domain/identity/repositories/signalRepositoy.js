@@ -1,7 +1,0 @@
-createSignal()
-
-findSignalById()
-
-findSignalsByLocationId()
-
-archiveSignal()

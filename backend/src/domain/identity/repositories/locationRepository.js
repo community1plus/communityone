@@ -1,7 +1,0 @@
-createLocation()
-
-findLocationById()
-
-updateLocation()
-
-archiveLocation()
