@@ -34,7 +34,8 @@ export async function fetchParticipationByPersonId(
 ===================================================== */
 
 export async function createDefaultParticipation(
-  personId
+  personId,
+  db = pool
 ) {
   if (!personId) {
     throw new Error(
