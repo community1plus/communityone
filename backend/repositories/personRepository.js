@@ -1,4 +1,3 @@
-javascript
 import { pool } from "../src/db/pool.js";
 
 const TABLE = "persons";
@@ -7,12 +6,15 @@ const TABLE = "persons";
    FETCH PERSON BY USER ID
 ===================================================== */
 
-export async function fetchPersonByUserId(userId) {
+export async function fetchPersonByUserId(
+  userId,
+  db = pool
+) {
   if (!userId) {
     throw new Error("Missing userId");
   }
 
-  const { rows } = await pool.query(
+  const { rows } = await db.query(
     `
       SELECT *
       FROM ${TABLE}
@@ -31,14 +33,17 @@ export async function fetchPersonByUserId(userId) {
    CREATE PERSON FOR USER
 ===================================================== */
 
-export async function createPersonForUser(userId) {
+export async function createPersonForUser(
+  userId,
+  db = pool
+) {
   if (!userId) {
     throw new Error(
       "Cannot create PERSON without userId"
     );
   }
 
-  const { rows } = await pool.query(
+  const { rows } = await db.query(
     `
       INSERT INTO ${TABLE} (
         user_id
@@ -57,7 +62,7 @@ export async function createPersonForUser(userId) {
     return rowToPerson(rows[0]);
   }
 
-  return fetchPersonByUserId(userId);
+  return fetchPersonByUserId(userId, db);
 }
 
 /* =====================================================

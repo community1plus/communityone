@@ -1,4 +1,3 @@
-javascript
 import { pool } from "../src/db/pool.js";
 
 const TABLE = "person_participation";
@@ -8,13 +7,14 @@ const TABLE = "person_participation";
 ===================================================== */
 
 export async function fetchParticipationByPersonId(
-  personId
+  personId,
+  db = pool
 ) {
   if (!personId) {
     throw new Error("Missing personId");
   }
 
-  const { rows } = await pool.query(
+  const { rows } = await db.query(
     `
       SELECT *
       FROM ${TABLE}
@@ -42,7 +42,7 @@ export async function createDefaultParticipation(
     );
   }
 
-  const { rows } = await pool.query(
+  const { rows } = await db.query(
     `
       INSERT INTO ${TABLE} (
         person_id,
@@ -67,7 +67,7 @@ export async function createDefaultParticipation(
     return rowToParticipation(rows[0]);
   }
 
-  return fetchParticipationByPersonId(personId);
+  return fetchParticipationByPersonId(personId, db);
 }
 
 /* =====================================================
