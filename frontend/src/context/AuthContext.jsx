@@ -15,73 +15,51 @@ import {
   signOut,
 } from "aws-amplify/auth";
 
+import { apiFetch } from "../services/api";
 
-const AuthContext =
-  createContext(null);
+const AuthContext = createContext(null);
 
-
-const GUEST_KEY =
-  "community_guest";
-
+const GUEST_KEY = "community_guest";
 
 /* =========================================
    NORMALISE USER
 ========================================= */
 
-function normaliseUser(
-  amplifyUser,
-  tokens
-) {
-
+function normaliseUser(amplifyUser, tokens) {
   if (!amplifyUser) {
     return null;
   }
 
-
-  const idPayload =
-    tokens?.idToken?.payload || {};
-
+  const idPayload = tokens?.idToken?.payload || {};
 
   const email =
     idPayload.email ||
     amplifyUser.signInDetails?.loginId ||
     "";
 
-
-  const name =
-    idPayload.name || "";
-
+  const name = idPayload.name || "";
 
   const username =
     amplifyUser.username ||
     email ||
     "";
 
-
   const fallback =
     email?.split("@")[0] ||
     username ||
     "User";
 
+  const displayName = name || fallback;
 
-  const displayName =
-    name || fallback;
-
-
-  const initials =
-    displayName
-      .split(/[\s._-]+/)
-      .filter(Boolean)
-      .map(
-        part => part[0]
-      )
-      .join("")
-      .slice(0, 2)
-      .toUpperCase();
-
+  const initials = displayName
+    .split(/[\s._-]+/)
+    .filter(Boolean)
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 
   return {
-
     id:
       amplifyUser.userId ||
       idPayload.sub ||
@@ -94,526 +72,382 @@ function normaliseUser(
       null,
 
     username,
-
     email,
-
     name,
-
     displayName,
-
     initials,
-
-    raw:
-      amplifyUser,
-
+    raw: amplifyUser,
   };
-
 }
-
 
 /* =========================================
    AUTH PROVIDER
 ========================================= */
 
-export function AuthProvider({
-  children,
-}) {
+export function AuthProvider({ children }) {
+  const mountedRef = useRef(true);
 
-  const mountedRef =
-    useRef(true);
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
+  const [tokens, setTokens] = useState(null);
 
+  // Backend participation state from GET /api/me.
+  const [participation, setParticipation] = useState(null);
 
-  const [
-    user,
-    setUser,
-  ] = useState(null);
+  // True while participation is being loaded.
+  const [participationLoading, setParticipationLoading] =
+    useState(false);
 
+  // Records whether the latest participation request failed.
+  const [participationError, setParticipationError] =
+    useState(null);
 
-  const [
-    token,
-    setToken,
-  ] = useState(null);
-
-
-  const [
-    tokens,
-    setTokens,
-  ] = useState(null);
-
-
-  const [
-    isGuest,
-    setIsGuest,
-  ] = useState(() => {
-
-    return (
-      localStorage.getItem(
-        GUEST_KEY
-      ) === "true"
-    );
-
+  const [isGuest, setIsGuest] = useState(() => {
+    return localStorage.getItem(GUEST_KEY) === "true";
   });
 
-
-  const [
-    loading,
-    setLoading,
-  ] = useState(true);
-
-
-  const [
-    hydrating,
-    setHydrating,
-  ] = useState(false);
-
+  const [loading, setLoading] = useState(true);
+  const [hydrating, setHydrating] = useState(false);
 
   /* =========================================
      MOUNT
   ========================================= */
 
   useEffect(() => {
-
     mountedRef.current = true;
 
-
     return () => {
-
       mountedRef.current = false;
-
     };
-
   }, []);
-
 
   /* =========================================
      CLEAR AUTH
   ========================================= */
 
-  const clearAuth =
-    useCallback(() => {
+  const clearAuth = useCallback(() => {
+    if (!mountedRef.current) {
+      return;
+    }
 
-      if (!mountedRef.current) {
-        return;
+    setUser(null);
+    setToken(null);
+    setTokens(null);
+
+    setParticipation(null);
+    setParticipationLoading(false);
+    setParticipationError(null);
+  }, []);
+
+  /* =========================================
+     LOAD PARTICIPATION
+  ========================================= */
+
+  const loadParticipation = useCallback(
+    async (accessToken) => {
+      if (!accessToken) {
+        if (mountedRef.current) {
+          setParticipation(null);
+          setParticipationError(
+            "An access token is required to load participation."
+          );
+        }
+
+        return null;
       }
 
+      if (mountedRef.current) {
+        setParticipationLoading(true);
+        setParticipationError(null);
+      }
 
-      setUser(null);
+      try {
+        const response = await apiFetch("/me", {
+          method: "GET",
+          token: accessToken,
+        });
 
-      setToken(null);
+        if (response?.authenticated !== true) {
+          throw new Error(
+            "The backend did not confirm authentication."
+          );
+        }
 
-      setTokens(null);
+        const nextParticipation =
+          response?.participation ?? null;
 
-    }, []);
+        if (mountedRef.current) {
+          setParticipation(nextParticipation);
+        }
 
+        return nextParticipation;
+      } catch (error) {
+        console.error(
+          "[AUTH] Participation hydration failed:",
+          error?.message || error
+        );
+
+        if (mountedRef.current) {
+          setParticipation(null);
+          setParticipationError(
+            error?.message ||
+              "Unable to load participation."
+          );
+        }
+
+        // Do not sign the user out just because
+        // the participation endpoint is unavailable.
+        return null;
+      } finally {
+        if (mountedRef.current) {
+          setParticipationLoading(false);
+        }
+      }
+    },
+    []
+  );
 
   /* =========================================
      REFRESH AUTH
   ========================================= */
 
-  const refreshAuth =
-    useCallback(
-      async ({
-        forceRefresh = false,
-      } = {}) => {
+  const refreshAuth = useCallback(
+    async ({ forceRefresh = false } = {}) => {
+      if (mountedRef.current) {
+        setHydrating(true);
+      }
+
+      try {
+        const amplifyUser = await getCurrentUser();
+
+        const session = await fetchAuthSession({
+          forceRefresh,
+        });
+
+        const accessToken =
+          session.tokens?.idToken?.toString();
+
+        if (!accessToken) {
+          clearAuth();
+          return null;
+        }
+
+        const normalisedUser = normaliseUser(
+          amplifyUser,
+          session.tokens
+        );
 
         if (mountedRef.current) {
+          setUser(normalisedUser);
+          setToken(accessToken);
+          setTokens(session.tokens);
 
-          setHydrating(true);
-
+          localStorage.removeItem(GUEST_KEY);
+          setIsGuest(false);
         }
 
+        /*
+         * Load backend participation using the newly
+         * obtained token. A participation failure does
+         * not invalidate successful Amplify auth.
+         */
+        await loadParticipation(accessToken);
 
-        try {
-
-          const amplifyUser =
-            await getCurrentUser();
-
-
-          const session =
-            await fetchAuthSession({
-              forceRefresh,
-            });
-
-
-          const accessToken =
-            session.tokens?.idToken?.toString();
-
-
-          if (!accessToken) {
-
-            clearAuth();
-
-            return null;
-
-          }
-
-
-          const normalisedUser =
-            normaliseUser(
-              amplifyUser,
-              session.tokens
-            );
-
-
-          if (mountedRef.current) {
-
-            setUser(
-              normalisedUser
-            );
-
-            setToken(
-              accessToken
-            );
-
-            setTokens(
-              session.tokens
-            );
-
-
-            localStorage.removeItem(
-              GUEST_KEY
-            );
-
-            setIsGuest(false);
-
-          }
-
-
-          /*
-          =====================================
-          IMPORTANT
-
-          Return the NEW token as well as the
-          normalised user.
-
-          useAPI needs this immediately when
-          retrying a request after a 401.
-          =====================================
-          */
-
-          return {
-
-            user:
-              normalisedUser,
-
-            token:
-              accessToken,
-
-          };
-
-        } catch (err) {
-
-          if (
-            err?.name !==
-              "UserUnAuthenticatedException" &&
-            err?.name !==
-              "NotAuthorizedException"
-          ) {
-
-            console.warn(
-              "Auth refresh failed:",
-              err?.name ||
+        /*
+         * Preserve the existing return contract for
+         * callers that need the refreshed token.
+         */
+        return {
+          user: normalisedUser,
+          token: accessToken,
+        };
+      } catch (err) {
+        if (
+          err?.name !== "UserUnAuthenticatedException" &&
+          err?.name !== "NotAuthorizedException"
+        ) {
+          console.warn(
+            "Auth refresh failed:",
+            err?.name ||
               err?.message ||
               err
-            );
-
-          }
-
-
-          clearAuth();
-
-          return null;
-
-        } finally {
-
-          if (mountedRef.current) {
-
-            setHydrating(false);
-
-          }
-
+          );
         }
 
-      },
-      [
-        clearAuth,
-      ]
-    );
-
+        clearAuth();
+        return null;
+      } finally {
+        if (mountedRef.current) {
+          setHydrating(false);
+        }
+      }
+    },
+    [clearAuth, loadParticipation]
+  );
 
   /* =========================================
      INITIAL AUTH
   ========================================= */
 
   useEffect(() => {
-
     async function initAuth() {
-
       try {
-
         await refreshAuth();
-
       } finally {
-
         if (mountedRef.current) {
-
           setLoading(false);
-
         }
-
       }
-
     }
 
-
     initAuth();
-
-  }, [
-    refreshAuth,
-  ]);
-
+  }, [refreshAuth]);
 
   /* =========================================
      LOGIN
   ========================================= */
 
-  const login =
-    useCallback(
-      async () => {
+  const login = useCallback(async () => {
+    localStorage.removeItem(GUEST_KEY);
+    setIsGuest(false);
 
-        localStorage.removeItem(
-          GUEST_KEY
-        );
-
-        setIsGuest(false);
-
-
-        await signInWithRedirect();
-
-      },
-      []
-    );
-
+    await signInWithRedirect();
+  }, []);
 
   /* =========================================
-     GUEST
+     GUEST MODE
   ========================================= */
 
-  const continueAsGuest =
-    useCallback(
-      async () => {
+  const continueAsGuest = useCallback(async () => {
+    try {
+      await signOut({
+        global: false,
+      });
+    } catch (err) {
+      console.warn(
+        "Guest mode signOut warning:",
+        err?.message || err
+      );
+    }
 
-        try {
+    clearAuth();
 
-          await signOut({
-            global: false,
-          });
+    localStorage.setItem(GUEST_KEY, "true");
 
-        } catch (err) {
-
-          console.warn(
-            "Guest mode signOut warning:",
-            err?.message || err
-          );
-
-        }
-
-
-        clearAuth();
-
-
-        localStorage.setItem(
-          GUEST_KEY,
-          "true"
-        );
-
-
-        setIsGuest(true);
-
-        setLoading(false);
-
-        setHydrating(false);
-
-      },
-      [
-        clearAuth,
-      ]
-    );
-
+    setIsGuest(true);
+    setLoading(false);
+    setHydrating(false);
+  }, [clearAuth]);
 
   /* =========================================
      LOGOUT
   ========================================= */
 
-  const logout =
-    useCallback(
-      async () => {
+  const logout = useCallback(async () => {
+    try {
+      await signOut({
+        global: true,
+      });
+    } catch (err) {
+      console.warn(
+        "Logout warning:",
+        err?.message || err
+      );
+    } finally {
+      clearAuth();
 
-        try {
+      localStorage.removeItem(GUEST_KEY);
+      setIsGuest(false);
 
-          await signOut({
-            global: true,
-          });
-
-        } catch (err) {
-
-          console.warn(
-            "Logout warning:",
-            err?.message || err
-          );
-
-        } finally {
-
-          clearAuth();
-
-          localStorage.removeItem(
-            GUEST_KEY
-          );
-
-          setIsGuest(false);
-
-          window.location.assign("/");
-
-        }
-
-      },
-      [
-        clearAuth,
-      ]
-    );
-
+      window.location.assign("/");
+    }
+  }, [clearAuth]);
 
   /* =========================================
      AUTH STATE
   ========================================= */
 
-  const isAuthenticated =
-    Boolean(
-      user &&
-      token
-    );
+  const isAuthenticated = Boolean(user && token);
 
+  const authLoading = loading || hydrating;
 
-  const authLoading =
-    loading ||
-    hydrating;
-
-
-  const role =
-    isAuthenticated
-      ? "member"
-      : isGuest
+  const role = isAuthenticated
+    ? "member"
+    : isGuest
       ? "guest"
       : "anonymous";
-
 
   /* =========================================
      CONTEXT VALUE
   ========================================= */
 
-  const value =
-    useMemo(
-      () => ({
+  const value = useMemo(
+    () => ({
+      user,
+      token,
+      tokens,
 
-        user,
+      // Backend participation state.
+      participation,
+      participationLoading,
+      participationError,
+      loadParticipation,
 
-        token,
+      loading,
+      hydrating,
+      authLoading,
 
-        tokens,
+      isAuthenticated,
+      isGuest,
+      role,
 
-        loading,
-
-        hydrating,
-
-        authLoading,
-
-        isAuthenticated,
-
-        isGuest,
-
-        role,
-
-        login,
-
-        logout,
-
-        continueAsGuest,
-
-        refreshAuth,
-
-        clearAuth,
-
-      }),
-      [
-
-        user,
-
-        token,
-
-        tokens,
-
-        loading,
-
-        hydrating,
-
-        authLoading,
-
-        isAuthenticated,
-
-        isGuest,
-
-        role,
-
-        login,
-
-        logout,
-
-        continueAsGuest,
-
-        refreshAuth,
-
-        clearAuth,
-
-      ]
-    );
-
-
-  return (
-
-    <AuthContext.Provider
-      value={value}
-    >
-
-      {children}
-
-    </AuthContext.Provider>
-
+      login,
+      logout,
+      continueAsGuest,
+      refreshAuth,
+      clearAuth,
+    }),
+    [
+      user,
+      token,
+      tokens,
+      participation,
+      participationLoading,
+      participationError,
+      loadParticipation,
+      loading,
+      hydrating,
+      authLoading,
+      isAuthenticated,
+      isGuest,
+      role,
+      login,
+      logout,
+      continueAsGuest,
+      refreshAuth,
+      clearAuth,
+    ]
   );
 
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
-
 
 /* =========================================
    USE AUTH
 ========================================= */
 
 export function useAuth() {
-
-  const context =
-    useContext(
-      AuthContext
-    );
-
+  const context = useContext(AuthContext);
 
   if (!context) {
-
     throw new Error(
       "useAuth must be used within AuthProvider"
     );
-
   }
 
-
   return context;
-
 }
