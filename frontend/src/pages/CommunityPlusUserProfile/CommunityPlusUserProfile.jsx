@@ -89,9 +89,18 @@ export default function CommunityPlusUserProfile({
        CONTEXT
     ================================================= */
 
-    const {
-        user, participation
-    } = useAuth();
+const {
+  user,
+  participation,
+  participationLoading,
+  participationError
+} = useAuth();
+
+console.log("[PARTICIPATION STATE]", {
+  participation,
+  participationLoading,
+  participationError
+});
 
 
     const {
