@@ -96,13 +96,9 @@ const POST_WITH_MEDIA_SELECT = `
 `;
 
 /* =====================================================
-   IVIEW FEED
-   MVP behaviour:
-   - published posts only
-   - hides posts requiring review
-   - scope LOCAL by default
-   - no lat/lng radius filtering yet
+   ROUTE TEST
 ===================================================== */
+
 router.get("/route-test", (req, res) => {
   res.json({
     ok: true,
@@ -111,6 +107,14 @@ router.get("/route-test", (req, res) => {
   });
 });
 
+/* =====================================================
+   IVIEW FEED
+   - Published posts only
+   - Hides posts requiring review
+   - Scope LOCAL by default
+   - Filters posts by geographic radius
+===================================================== */
+
 router.get("/iview", async (req, res) => {
   try {
     const {
@@ -118,34 +122,43 @@ router.get("/iview", async (req, res) => {
       scope = "LOCAL",
     } = req.query;
 
-const safeScope = normalizeScope(scope);
-const safeFeedLimit = safeLimit(limit, 20, 100);
-const latitude = Number(req.query.lat);
-const longitude = Number(req.query.lng);
-const safeRadiusKm = Math.min(Math.max(Number(req.query.radiusKm) || 5, 1), 50);
+    const safeScope = normalizeScope(scope);
+    const safeFeedLimit = safeLimit(limit, 20, 100);
+    const latitude = Number(req.query.lat);
+    const longitude = Number(req.query.lng);
+    const safeRadiusKm = Math.min(
+      Math.max(Number(req.query.radiusKm) || 5, 1),
+      50
+    );
 
     const result = await pool.query(
       `
       ${POST_WITH_MEDIA_SELECT}
-where
-  p.status = 'published'
-  and coalesce(p.requires_review, false) = false
-  and upper(coalesce(p.scope, 'LOCAL')) = $1
-  and p.lat is not null
-  and p.lng is not null
-  and (
-    6371 * acos(
-      cos(radians($2)) *
-      cos(radians(p.lat)) *
-      cos(radians(p.lng) - radians($3)) +
-      sin(radians($2)) *
-      sin(radians(p.lat))
-    )
-  ) <= $4
-order by p.created_at desc
-limit $5
+      where
+        p.status = 'published'
+        and coalesce(p.requires_review, false) = false
+        and upper(coalesce(p.scope, 'LOCAL')) = $1
+        and p.lat is not null
+        and p.lng is not null
+        and (
+          6371 * acos(
+            cos(radians($2)) *
+            cos(radians(p.lat)) *
+            cos(radians(p.lng) - radians($3)) +
+            sin(radians($2)) *
+            sin(radians(p.lat))
+          )
+        ) <= $4
+      order by p.created_at desc
+      limit $5
       `,
-      [ safeScope, latitude, longitude, safeRadiusKm, safeFeedLimit,]
+      [
+        safeScope,
+        latitude,
+        longitude,
+        safeRadiusKm,
+        safeFeedLimit,
+      ]
     );
 
     const posts = await hydrateMediaWithSignedUrls(result.rows);
@@ -170,6 +183,15 @@ limit $5
 
 /* =====================================================
    GET POSTS
+
+   Supported views:
+   - now: posts that have not expired
+   - blob: posts that have expired
+   - no view: preserves the previous query behaviour
+
+   Expiry is compared against PostgreSQL NOW().
+   expires_at should represent the correct expiry instant,
+   calculated using the relevant community's local timezone.
 ===================================================== */
 
 router.get("/", async (req, res) => {
@@ -179,13 +201,43 @@ router.get("/", async (req, res) => {
       type,
       limit = 30,
       scope,
+      view,
     } = req.query;
 
+    const normalizedView = String(view || "")
+      .trim()
+      .toLowerCase();
+
+    if (
+      normalizedView &&
+      !["now", "blob"].includes(normalizedView)
+    ) {
+      return res.status(400).json({
+        error: "Invalid view. Use 'now' or 'blob'.",
+      });
+    }
+
     const values = [];
+
     const where = [
       "p.status = 'published'",
       "coalesce(p.requires_review, false) = false",
     ];
+
+    // NOW: include posts whose expiry is in the future,
+    // plus posts without an expiry timestamp.
+    if (normalizedView === "now") {
+      where.push(
+        "(p.expires_at IS NULL OR p.expires_at > NOW())"
+      );
+    }
+
+    // BLOB: include posts whose expiry timestamp has passed.
+    if (normalizedView === "blob") {
+      where.push(
+        "p.expires_at IS NOT NULL AND p.expires_at <= NOW()"
+      );
+    }
 
     if (mode) {
       values.push(mode);
@@ -220,9 +272,7 @@ router.get("/", async (req, res) => {
 
     const posts = await hydrateMediaWithSignedUrls(result.rows);
 
-    return res.json({
-      posts,
-    });
+    return res.json({ posts });
   } catch (error) {
     console.error("Fetch posts failed:", error);
 
@@ -237,6 +287,7 @@ router.get("/", async (req, res) => {
    COMMENTS
 ===================================================== */
 
+// Retrieve published comments for a post.
 router.get("/:postId/comments", async (req, res) => {
   try {
     const { postId } = req.params;
@@ -271,6 +322,7 @@ router.get("/:postId/comments", async (req, res) => {
   }
 });
 
+// Create a comment.
 router.post("/:postId/comments", requireAuth, async (req, res) => {
   try {
     const { postId } = req.params;
@@ -357,7 +409,9 @@ router.post("/", requireAuth, async (req, res) => {
 
     const normalizedDistribution = {
       ...distribution,
-      scope: normalizeScope(distribution?.scope || normalizedScope),
+      scope: normalizeScope(
+        distribution?.scope || normalizedScope
+      ),
       feeds: safeArray(distribution?.feeds).length
         ? safeArray(distribution.feeds).map((feed) =>
             normalizeScope(feed)
@@ -472,7 +526,8 @@ router.post("/", requireAuth, async (req, res) => {
           moderation_labels
         )
         values (
-          $1,$2,$3,$4,$5,$6,$7,$8,$9,'uploaded','pending',null,'[]'::jsonb
+          $1,$2,$3,$4,$5,$6,$7,$8,$9,
+          'uploaded','pending',null,'[]'::jsonb
         )
         returning *
         `,
