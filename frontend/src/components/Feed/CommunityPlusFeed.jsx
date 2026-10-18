@@ -31,9 +31,11 @@ export default function Feed({ activeFilter = "all" }) {
         setLoading(true);
         setError("");
 
-        const response = await fetch(
-          `${import.meta.env.VITE_API_BASE}/posts`
-        );
+const view = activeFilter === "blob" ? "blob" : "now";
+
+const response = await fetch(
+  `${import.meta.env.VITE_API_BASE}/posts?view=${view}`
+);
 
         const data = await response.json();
 
