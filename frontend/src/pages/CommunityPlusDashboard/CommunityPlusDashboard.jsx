@@ -1,16 +1,22 @@
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import "./CommunityPlusDashboardHome.css";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
+import "./CommunityPlusDashboardHome.css";
 import { useMap } from "../../context/MapContext";
 import CommunityMap from "../../components/Map/CommunityMap";
 import FeedCard from "../../components/FeedCard/CommunityPlusFeedCard";
 
-const API_BASE =
+const API_BASE = (
   import.meta.env.VITE_API_BASE ||
   (import.meta.env.VITE_API_URL
     ? `${import.meta.env.VITE_API_URL}/api`
-    : "");
+    : "")
+).replace(/\/$/, "");
 
 const FILTERS = [
   { id: "all", label: "All" },
@@ -21,10 +27,18 @@ const FILTERS = [
   { id: "beacon", label: "Beacons" },
 ];
 
+const CURRENT_TYPES = [
+  "now",
+  "incident",
+  "event",
+  "beacon",
+];
+
 function formatRelativeTime(value) {
   if (!value) return "Just now";
 
   const timestamp = new Date(value).getTime();
+
   if (Number.isNaN(timestamp)) return "Just now";
 
   const diffMinutes = Math.floor(
@@ -35,63 +49,84 @@ function formatRelativeTime(value) {
   if (diffMinutes < 60) return `${diffMinutes}m ago`;
 
   const diffHours = Math.floor(diffMinutes / 60);
+
   if (diffHours < 24) return `${diffHours}h ago`;
 
   return `${Math.floor(diffHours / 24)}d ago`;
 }
 
-function filterFeedItems(items, activeFilter) {
+function getPostText(item) {
+  return item.content || item.title || "";
+}
+
+function filterPosts(posts, activeFilter) {
   if (activeFilter === "all" || activeFilter === "blob") {
-    return items;
+    return posts;
   }
 
   if (activeFilter === "now") {
-    return items.filter((item) =>
-      ["now", "incident", "event", "beacon"].includes(
+    return posts.filter((item) =>
+      CURRENT_TYPES.includes(
         String(item.type || "").toLowerCase()
       )
     );
   }
 
-  return items.filter(
+  return posts.filter(
     (item) =>
-      String(item.type || "").toLowerCase() ===
-      activeFilter.toLowerCase()
+      String(item.type || "").toLowerCase() === activeFilter
   );
 }
 
-function Feed({ activeFilter, onItemsLoaded }) {
+function matchesSearch(item, query) {
+  if (!query.trim()) return true;
+
+  const searchableText = [
+    item.title,
+    item.content,
+    item.type,
+    item.author,
+    item.user_id,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+
+  return searchableText.includes(query.trim().toLowerCase());
+}
+
+export default function CommunityPlusDashboardHome() {
   const {
-    addMarkers,
-    visibleMarkers,
-    selectedMarkerId,
+    setMarkers,
     focusOnMarker,
-    clearSelection,
   } = useMap();
 
-  const [items, setItems] = useState([]);
+  const [activeFilter, setActiveFilter] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchMode, setSearchMode] = useState("local");
+
+  const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // All/current categories use NOW.
-  // Blobs uses expired posts.
+  const [selectedPostId, setSelectedPostId] = useState(null);
+
+  // The backend determines whether a post belongs to NOW or BLOB.
   const view = activeFilter === "blob" ? "blob" : "now";
 
   useEffect(() => {
     const controller = new AbortController();
 
     async function loadPosts() {
-      if (!API_BASE) {
-        setItems([]);
-        onItemsLoaded([]);
-        setError("Backend API is not configured.");
-        setLoading(false);
-        return;
-      }
-
       try {
         setLoading(true);
         setError("");
+
+        if (!API_BASE) {
+          throw new Error(
+            "API base URL is not configured."
+          );
+        }
 
         const params = new URLSearchParams({ view });
 
@@ -111,19 +146,21 @@ function Feed({ activeFilter, onItemsLoaded }) {
           );
         }
 
-        const nextItems = Array.isArray(data.posts)
-          ? data.posts
-          : [];
-
-        setItems(nextItems);
-        onItemsLoaded(nextItems);
+        setPosts(
+          Array.isArray(data.posts) ? data.posts : []
+        );
       } catch (err) {
         if (err.name === "AbortError") return;
 
-        console.error("Dashboard feed fetch failed:", err);
-        setItems([]);
-        onItemsLoaded([]);
-        setError(err?.message || "Could not load posts.");
+        console.error(
+          "Dashboard posts failed to load:",
+          err
+        );
+
+        setPosts([]);
+        setError(
+          err?.message || "Could not load community posts."
+        );
       } finally {
         if (!controller.signal.aborted) {
           setLoading(false);
@@ -134,147 +171,82 @@ function Feed({ activeFilter, onItemsLoaded }) {
     loadPosts();
 
     return () => controller.abort();
-  }, [view, onItemsLoaded]);
+  }, [view]);
 
-  const feedItems = useMemo(
-    () => filterFeedItems(items, activeFilter),
-    [items, activeFilter]
+  const filteredPosts = useMemo(
+    () => filterPosts(posts, activeFilter),
+    [posts, activeFilter]
   );
 
+  const visiblePosts = useMemo(
+    () =>
+      filteredPosts.filter((item) =>
+        matchesSearch(item, searchQuery)
+      ),
+    [filteredPosts, searchQuery]
+  );
+
+  // Keep map markers synchronised with the displayed feed.
+  // Preserve markers owned by other parts of the application.
   useEffect(() => {
-    addMarkers(
-      feedItems.filter((item) => item.location),
-      "feed"
-    );
-  }, [feedItems, addMarkers]);
+    const feedMarkers = visiblePosts
+      .filter((item) => item.location)
+      .map((item) => ({
+        ...item,
+        __source: "feed",
+      }));
 
-  const itemsToRender = useMemo(() => {
-    if (!visibleMarkers.length) return feedItems;
+    setMarkers((previousMarkers) => [
+      ...previousMarkers.filter(
+        (marker) => marker.__source !== "feed"
+      ),
+      ...feedMarkers,
+    ]);
 
-    return feedItems.filter((item) =>
-      visibleMarkers.some((marker) => marker.id === item.id)
-    );
-  }, [visibleMarkers, feedItems]);
+    return () => {
+      setMarkers((previousMarkers) =>
+        previousMarkers.filter(
+          (marker) => marker.__source !== "feed"
+        )
+      );
+    };
+  }, [visiblePosts, setMarkers]);
 
-  const handleSelect = useCallback(
-    ({ id, location }) => {
-      if (location) {
-        focusOnMarker(location, id);
-      }
-    },
-    [focusOnMarker]
-  );
-
-  const handleMouseLeave = useCallback(
-    (item) => {
-      if (selectedMarkerId !== item.id) {
-        clearSelection();
-      }
-    },
-    [selectedMarkerId, clearSelection]
-  );
-
-  if (loading) {
-    return <div className="feed-empty">Loading posts...</div>;
-  }
-
-  if (error) {
-    return <div className="feed-empty">{error}</div>;
-  }
-
-  if (!itemsToRender.length) {
-    return (
-      <div className="feed-empty">
-        {activeFilter === "blob"
-          ? "No expired posts to display."
-          : "No current community activity."}
-      </div>
-    );
-  }
-
-  return (
-    <>
-      {itemsToRender.map((item) => (
-        <div
-          key={item.id}
-          onMouseLeave={() => handleMouseLeave(item)}
-        >
-          <FeedCard
-            id={item.id}
-            type={item.type}
-            title={item.title || ""}
-            text={item.content || item.title || ""}
-            time={formatRelativeTime(item.created_at)}
-            image={
-              item.media?.[0]?.signedUrl ||
-              item.media?.[0]?.publicUrl ||
-              item.image ||
-              null
-            }
-            location={item.location}
-            active={selectedMarkerId === item.id}
-            onSelect={handleSelect}
-          />
-        </div>
-      ))}
-    </>
-  );
-}
-
-export default function CommunityPlusDashboardHome() {
-  const [activeFilter, setActiveFilter] = useState("all");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchMode, setSearchMode] = useState("local");
-  const [searchResults, setSearchResults] = useState([]);
-  const [loadedPosts, setLoadedPosts] = useState([]);
-
-  const { focusOnMarker } = useMap();
-
-  const handleItemsLoaded = useCallback((items) => {
-    setLoadedPosts(items);
+  const handleSearch = useCallback((event) => {
+    setSearchQuery(event.target.value);
   }, []);
 
-  const handleSearch = useCallback(
-    (event) => {
-      const value = event.target.value;
-      setSearchQuery(value);
+  const handleSelectPost = useCallback(
+    (item) => {
+      setSelectedPostId(item.id);
 
-      if (!value.trim()) {
-        setSearchResults([]);
-        return;
+      if (item.location) {
+        focusOnMarker(item.location, item.id);
       }
-
-      const query = value.toLowerCase();
-
-      const results = loadedPosts.filter((item) => {
-        const haystack = [
-          item.title,
-          item.content,
-          item.type,
-          item.author,
-        ]
-          .filter(Boolean)
-          .join(" ")
-          .toLowerCase();
-
-        return haystack.includes(query);
-      });
-
-      setSearchResults(results);
-    },
-    [loadedPosts]
-  );
-
-  const handleSearchSelect = useCallback(
-    (result) => {
-      if (!result?.location) return;
-
-      focusOnMarker(result.location, result.id);
-      setSearchQuery(result.title || result.content || "");
-      setSearchResults([]);
     },
     [focusOnMarker]
   );
+
+  const handleSearchResultSelect = useCallback(
+    (item) => {
+      handleSelectPost(item);
+      setSearchQuery(item.title || getPostText(item));
+    },
+    [handleSelectPost]
+  );
+
+  const searchResults = useMemo(() => {
+    if (!searchQuery.trim()) return [];
+
+    return visiblePosts.slice(0, 5);
+  }, [visiblePosts, searchQuery]);
+
+  const emptyMessage =
+    activeFilter === "blob"
+      ? "No expired posts to display."
+      : searchQuery.trim()
+        ? "No matching community posts."
+        : "No current community activity.";
 
   return (
     <div className="dashboard-home-page">
@@ -291,6 +263,7 @@ export default function CommunityPlusDashboardHome() {
                 className={`feed-filter ${
                   activeFilter === filter.id ? "active" : ""
                 }`}
+                aria-pressed={activeFilter === filter.id}
                 onClick={() => setActiveFilter(filter.id)}
               >
                 {filter.label}
@@ -299,10 +272,43 @@ export default function CommunityPlusDashboardHome() {
           </div>
 
           <div className="feed-list">
-            <Feed
-              activeFilter={activeFilter}
-              onItemsLoaded={handleItemsLoaded}
-            />
+            {loading ? (
+              <div className="feed-empty">
+                Loading posts...
+              </div>
+            ) : error ? (
+              <div className="feed-empty" role="alert">
+                {error}
+              </div>
+            ) : visiblePosts.length === 0 ? (
+              <div className="feed-empty">
+                {emptyMessage}
+              </div>
+            ) : (
+              <div className="feed">
+                {visiblePosts.map((item) => (
+                  <FeedCard
+                    key={item.id}
+                    id={item.id}
+                    title={item.title || ""}
+                    type={item.type}
+                    text={getPostText(item)}
+                    time={formatRelativeTime(
+                      item.created_at
+                    )}
+                    image={
+                      item.media?.[0]?.signedUrl ||
+                      item.media?.[0]?.publicUrl ||
+                      item.image ||
+                      null
+                    }
+                    location={item.location}
+                    active={selectedPostId === item.id}
+                    onSelect={() => handleSelectPost(item)}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </section>
 
@@ -311,23 +317,35 @@ export default function CommunityPlusDashboardHome() {
             <div className="dashboard-search-controls">
               <div className="dashboard-search-box">
                 <input
-                  type="text"
+                  type="search"
                   value={searchQuery}
                   onChange={handleSearch}
-                  placeholder={`Search ${
+                  placeholder={
                     searchMode === "local"
-                      ? "your community"
-                      : "the world"
-                  }...`}
+                      ? "Search your Community ..."
+                      : "Search the World ..."
+                  }
+                  aria-label="Search community posts"
                 />
 
-                <span className="dashboard-search-icon">⌕</span>
+                <span
+                  className="dashboard-search-icon"
+                  aria-hidden="true"
+                >
+                  ⌕
+                </span>
               </div>
 
-              <div className="dashboard-search-mode">
+              <div
+                className="dashboard-search-mode"
+                aria-label="Search scope"
+              >
                 <button
                   type="button"
-                  className={searchMode === "local" ? "active" : ""}
+                  className={
+                    searchMode === "local" ? "active" : ""
+                  }
+                  aria-pressed={searchMode === "local"}
                   onClick={() => setSearchMode("local")}
                 >
                   Local
@@ -335,7 +353,10 @@ export default function CommunityPlusDashboardHome() {
 
                 <button
                   type="button"
-                  className={searchMode === "global" ? "active" : ""}
+                  className={
+                    searchMode === "global" ? "active" : ""
+                  }
+                  aria-pressed={searchMode === "global"}
                   onClick={() => setSearchMode("global")}
                 >
                   Global
@@ -343,23 +364,27 @@ export default function CommunityPlusDashboardHome() {
               </div>
             </div>
 
-            {!!searchResults.length && (
+            {searchResults.length > 0 && (
               <div className="dashboard-search-results">
-                {searchResults.map((result) => (
+                {searchResults.map((item) => (
                   <button
-                    key={result.id}
+                    key={item.id}
                     type="button"
                     className="dashboard-search-result"
-                    onClick={() => handleSearchSelect(result)}
+                    onClick={() =>
+                      handleSearchResultSelect(item)
+                    }
                   >
                     <div className="dashboard-search-result-meta">
-                      <span>{result.type}</span>
+                      <span>{item.type || "Post"}</span>
                       <strong>
-                        {result.title || result.content}
+                        {item.title || getPostText(item)}
                       </strong>
                     </div>
 
-                    <p>{result.content}</p>
+                    {item.title && item.content && (
+                      <p>{item.content}</p>
+                    )}
                   </button>
                 ))}
               </div>
