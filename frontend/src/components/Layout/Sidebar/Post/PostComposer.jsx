@@ -426,7 +426,7 @@ function sanitizeFileName(fileName = "") {
 
   return String(fileName)
 
-    .replace(/[^\w.\\-()\s]/g, "")
+    .replace(/[^\w.\\()\s-]/g, "")
 
     .replace(/\s+/g, "_")
 
