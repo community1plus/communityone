@@ -144,23 +144,28 @@ export default function Feed({ activeFilter = "all" }) {
   return (
     <div className="feed">
       {filteredItems.map((item) => (
-        <FeedCard
-          key={item.id}
-          id={item.id}
-          type={item.type}
-          name={item.author || item.user_id || "Community Member"}
-          time={formatRelativeTime(item.created_at)}
-          text={item.content || item.title}
-          image={item.media?.[0]?.signedUrl || null}
-          media={item.media || []}
-          location={item.location}
-          onSelect={() => {
-            if (item.location) {
-              focusOnMarker(item.location, item.id);
-            }
-          }}
-        />
-      ))}
+  <FeedCard
+    key={item.id}
+    id={item.id}
+    title={item.title || ""}
+    type={item.type}
+    text={item.content || item.title || ""}
+    time={formatRelativeTime(item.created_at)}
+    image={
+      item.media?.[0]?.signedUrl ||
+      item.media?.[0]?.publicUrl ||
+      item.image ||
+      null
+    }
+    location={item.location}
+    active={false}
+    onSelect={() => {
+      if (item.location) {
+        focusOnMarker(item.location, item.id);
+      }
+    }}
+  />
+))}
     </div>
   );
 }
