@@ -608,21 +608,13 @@ export default function CommunityPlusIViewPage() {
 
         setError("");
 
-const params = new URLSearchParams({
-  limit: String(FEED_LIMIT),
-  scope: "LOCAL",
-  lat: String(lat),
-  lng: String(lng),
-  radiusKm: "5",
-  view: "blob",
-});
-
-const response = await fetch(
-  `${API_BASE}/posts/iview?${params.toString()}`,
-  {
-    cache: "no-store",
-  }
-);
+        const params = new URLSearchParams({
+          limit: String(FEED_LIMIT),
+          scope: "LOCAL",
+          lat: String(lat),
+          lng: String(lng),
+          radiusKm: "5",
+        });
 
         const response = await fetch(
           `${API_BASE}/posts/iview?${params.toString()}`,
