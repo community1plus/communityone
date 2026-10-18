@@ -25,19 +25,7 @@ const FILTERS = [
   { id: "beacon", label: "Beacons" },
 ];
 
-const DEFAULT_FEED_CARD = {
-  id: "default-feed-card",
-  type: "welcome",
-  title: "👋 Welcome to Community One",
-  content:
-    "No community activity has been posted yet. Be the first to share news, events, alerts or updates with your local area.",
-  author: "Community One",
-  created_at: new Date().toISOString(),
-  expires_at: null,
-  system: true,
-  location: null,
-  media: [],
-};
+
 
 /* =========================================================
    HELPERS
@@ -74,46 +62,46 @@ function sortByMostRecent(items = []) {
 }
 
 function applyFeedFilter(items = [], activeFilter = "all") {
-  if (activeFilter === "all") {
-    return items;
-  }
+  // Blobs is a lifecycle view, not a post type.
+  if (["all", "now", "blob"].includes(activeFilter)) return items;
 
-  if (activeFilter === "now") {
-    return items.filter((item) =>
-      ["now", "incident", "event", "beacon"].includes(item.type)
-    );
-  }
-
+  // Category filters show posts of that category; expiry is handled below.
   return items.filter((item) => item.type === activeFilter);
 }
 
 function resolveDashboardFeed(items = [], activeFilter = "all") {
-  const isCurrent = (item) =>
-    !item.expires_at ||
-    new Date(item.expires_at).getTime() > Date.now();
+  const currentItems = items.filter(isCurrentActivity);
+  const expiredItems = items.filter(
+    (item) => Boolean(item.expires_at) && !isCurrentActivity(item)
+  );
 
   if (activeFilter === "blob") {
-    const expiredItems = items.filter(
-      (item) => item.expires_at && !isCurrent(item)
-    );
-
     return {
-      items: expiredItems,
+      items: sortByMostRecent(expiredItems),
       mode: expiredItems.length ? "blob" : "empty",
     };
   }
 
   if (activeFilter === "now") {
-    const currentItems = items.filter(isCurrent);
-
     return {
-      items: currentItems,
+      items: sortByMostRecent(currentItems),
       mode: currentItems.length ? "current" : "empty",
     };
   }
 
+  if (["incident", "event", "beacon"].includes(activeFilter)) {
+    const matchingCurrentItems = currentItems.filter(
+      (item) => item.type === activeFilter
+    );
+    return {
+      items: sortByMostRecent(matchingCurrentItems),
+      mode: matchingCurrentItems.length ? "current" : "empty",
+    };
+  }
+
+  // All is inclusive. Expired posts are rendered as Blobs, never as NOW.
   return {
-    items,
+    items: sortByMostRecent(items),
     mode: items.length ? "all" : "empty",
   };
 }
@@ -166,9 +154,24 @@ export default function CommunityPlusDashboardHome() {
       setPostsLoading(true);
       setPostsError("");
 
-      const response = await fetch(
-        `${import.meta.env.VITE_API_BASE}/posts`
-      );
+      const apiBase =
+        import.meta.env.VITE_API_BASE ||
+        `${import.meta.env.VITE_API_URL || ""}/api`;
+
+      // Ask the API for lifecycle-filtered results when a view requires it.
+      const view =
+        activeFilter === "now" ||
+        ["incident", "event", "beacon"].includes(activeFilter)
+          ? "now"
+          : activeFilter === "blob"
+            ? "blob"
+            : null;
+
+      const baseUrl = `${apiBase.replace(/\/$/, "")}/posts`;
+      const url = new URL(baseUrl, window.location.origin);
+      if (view) url.searchParams.set("view", view);
+
+      const response = await fetch(url.toString());
 
       const data = await response.json();
 
@@ -183,7 +186,7 @@ export default function CommunityPlusDashboardHome() {
     } finally {
       setPostsLoading(false);
     }
-  }, []);
+  }, [activeFilter]);
 
   useEffect(() => {
     loadPosts();
@@ -195,8 +198,7 @@ export default function CommunityPlusDashboardHome() {
 
   const resolvedFeed = useMemo(() => {
     const filteredItems = applyFeedFilter(posts, activeFilter);
-
-    return resolveDashboardFeed(filteredItems);
+    return resolveDashboardFeed(filteredItems, activeFilter);
   }, [posts, activeFilter]);
 
   const feedItems = resolvedFeed.items;
@@ -394,9 +396,15 @@ export default function CommunityPlusDashboardHome() {
 
             {!postsLoading &&
               !postsError &&
-              resolvedFeed.mode === "fallback" && (
+              resolvedFeed.mode === "empty" && (
                 <div className="feed-empty">
-                  No current activity. Showing the most recent update.
+                  {activeFilter === "blob"
+                    ? "No expired posts to show."
+                    : activeFilter === "now"
+                      ? "No current activity yet. Be the first to post an update."
+                      : activeFilter === "all"
+                        ? "No community posts yet. Be the first to share an update."
+                        : `No current ${FILTERS.find((filter) => filter.id === activeFilter)?.label.toLowerCase() || "activity"} to show.`}
                 </div>
               )}
 
@@ -415,7 +423,11 @@ export default function CommunityPlusDashboardHome() {
                 >
                   <FeedCard
                     id={item.id}
-                    type={item.type}
+                    type={
+                      item.expires_at && !isCurrentActivity(item)
+                        ? "blob"
+                        : item.type
+                    }
                     name={
                       item.author ||
                       item.user_id ||
