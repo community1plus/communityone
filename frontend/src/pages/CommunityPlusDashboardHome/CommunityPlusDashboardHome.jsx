@@ -87,28 +87,34 @@ function applyFeedFilter(items = [], activeFilter = "all") {
   return items.filter((item) => item.type === activeFilter);
 }
 
-function resolveDashboardFeed(items = []) {
-  if (!items.length) {
+function resolveDashboardFeed(items = [], activeFilter = "all") {
+  const isCurrent = (item) =>
+    !item.expires_at ||
+    new Date(item.expires_at).getTime() > Date.now();
+
+  if (activeFilter === "blob") {
+    const expiredItems = items.filter(
+      (item) => item.expires_at && !isCurrent(item)
+    );
+
     return {
-      mode: "empty",
-      items: [DEFAULT_FEED_CARD],
+      items: expiredItems,
+      mode: expiredItems.length ? "blob" : "empty",
     };
   }
 
-  const currentItems = items.filter(isCurrentActivity);
+  if (activeFilter === "now") {
+    const currentItems = items.filter(isCurrent);
 
-  if (currentItems.length) {
     return {
-      mode: "active",
-      items: sortByMostRecent(currentItems),
+      items: currentItems,
+      mode: currentItems.length ? "current" : "empty",
     };
   }
-
-  const latestItem = sortByMostRecent(items)[0];
 
   return {
-    mode: "fallback",
-    items: latestItem ? [latestItem] : [DEFAULT_FEED_CARD],
+    items,
+    mode: items.length ? "all" : "empty",
   };
 }
 
