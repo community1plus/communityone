@@ -7,10 +7,11 @@ function formatRelativeTime(value) {
   if (!value) return "Just now";
 
   const timestamp = new Date(value).getTime();
-
   if (Number.isNaN(timestamp)) return "Just now";
 
-  const diffMinutes = Math.floor((Date.now() - timestamp) / 60000);
+  const diffMinutes = Math.floor(
+    (Date.now() - timestamp) / 60000
+  );
 
   if (diffMinutes < 1) return "Just now";
   if (diffMinutes < 60) return `${diffMinutes}m ago`;
@@ -28,8 +29,7 @@ export default function Feed({ activeFilter = "all" }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // "all" and "now" both display the current NOW feed.
-  // "blob" displays expired posts.
+  // NOW contains current posts; BLOB contains expired posts.
   const view = activeFilter === "blob" ? "blob" : "now";
 
   useEffect(() => {
@@ -59,10 +59,14 @@ export default function Feed({ activeFilter = "all" }) {
         const data = await response.json().catch(() => ({}));
 
         if (!response.ok) {
-          throw new Error(data?.error || "Could not load posts.");
+          throw new Error(
+            data?.error || "Could not load posts."
+          );
         }
 
-        setItems(Array.isArray(data.posts) ? data.posts : []);
+        setItems(
+          Array.isArray(data.posts) ? data.posts : []
+        );
       } catch (err) {
         if (err.name === "AbortError") return;
 
@@ -97,10 +101,11 @@ export default function Feed({ activeFilter = "all" }) {
     return items.filter(
       (item) =>
         String(item.type || "").toLowerCase() ===
-        String(activeFilter).toLowerCase()
+        activeFilter.toLowerCase()
     );
   }, [items, activeFilter]);
 
+  // Replace this feed's markers while preserving other sources.
   useEffect(() => {
     const markerItems = filteredItems
       .filter((item) => item.location)
@@ -109,22 +114,26 @@ export default function Feed({ activeFilter = "all" }) {
         __source: "feed",
       }));
 
-    setMarkers((prev) => {
-      // Replace markers previously supplied by this feed,
-      // while preserving markers from other sources.
-      const otherMarkers = prev.filter(
+    setMarkers((prev) => [
+      ...prev.filter(
         (marker) => marker.__source !== "feed"
-      );
+      ),
+      ...markerItems,
+    ]);
 
-      return [
-        ...otherMarkers,
-        ...markerItems,
-      ];
-    });
+    return () => {
+      setMarkers((prev) =>
+        prev.filter(
+          (marker) => marker.__source !== "feed"
+        )
+      );
+    };
   }, [filteredItems, setMarkers]);
 
   if (loading) {
-    return <div className="feed-empty">Loading posts...</div>;
+    return (
+      <div className="feed-empty">Loading posts...</div>
+    );
   }
 
   if (error) {
@@ -144,28 +153,28 @@ export default function Feed({ activeFilter = "all" }) {
   return (
     <div className="feed">
       {filteredItems.map((item) => (
-  <FeedCard
-    key={item.id}
-    id={item.id}
-    title={item.title || ""}
-    type={item.type}
-    text={item.content || item.title || ""}
-    time={formatRelativeTime(item.created_at)}
-    image={
-      item.media?.[0]?.signedUrl ||
-      item.media?.[0]?.publicUrl ||
-      item.image ||
-      null
-    }
-    location={item.location}
-    active={false}
-    onSelect={() => {
-      if (item.location) {
-        focusOnMarker(item.location, item.id);
-      }
-    }}
-  />
-))}
+        <FeedCard
+          key={item.id}
+          id={item.id}
+          title={item.title || ""}
+          type={item.type}
+          text={item.content || item.title || ""}
+          time={formatRelativeTime(item.created_at)}
+          image={
+            item.media?.[0]?.signedUrl ||
+            item.media?.[0]?.publicUrl ||
+            item.image ||
+            null
+          }
+          location={item.location}
+          active={false}
+          onSelect={() => {
+            if (item.location) {
+              focusOnMarker(item.location, item.id);
+            }
+          }}
+        />
+      ))}
     </div>
   );
 }
