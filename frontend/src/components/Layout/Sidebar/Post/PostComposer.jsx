@@ -2766,33 +2766,33 @@ export default function PostComposer({
 
           >
 
-            {preview\.kind === "image" && (
+            {preview.kind === "image" && (
 
-              <img src={preview\.url} alt={preview\.metadata.name} />
-
-            )}
-
-
-
-            {preview\.kind === "video" && (
-
-              <video src={preview\.url} controls autoPlay />
+              <img src={preview.url} alt={preview.metadata.name} />
 
             )}
 
 
 
-            {preview\.kind === "audio" && <audio src={preview\.url} controls />}
+            {preview.kind === "video" && (
+
+              <video src={preview.url} controls autoPlay />
+
+            )}
 
 
 
-            {preview\.kind === "document" && (
+            {preview.kind === "audio" && <audio src={preview.url} controls />}
+
+
+
+            {preview.kind === "document" && (
 
               <div className="file-preview-box">
 
-                <strong>{preview\.metadata.name}</strong>
+                <strong>{preview.metadata.name}</strong>
 
-                <span>{preview\.metadata.sizeLabel}</span>
+                <span>{preview.metadata.sizeLabel}</span>
 
               </div>
 
