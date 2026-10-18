@@ -107,12 +107,16 @@ router.get("/route-test", (req, res) => {
   });
 });
 
+
 /* =====================================================
    IVIEW FEED
+   - BLOB is the default view
+   - NOW returns posts that have not expired
+   - BLOB returns expired posts
+   - No geographic radius or coordinate filtering
    - Published posts only
    - Hides posts requiring review
    - Scope LOCAL by default
-   - Filters posts by geographic radius
 ===================================================== */
 
 router.get("/iview", async (req, res) => {
@@ -120,43 +124,40 @@ router.get("/iview", async (req, res) => {
     const {
       limit = 20,
       scope = "LOCAL",
+      view = "blob",
     } = req.query;
+
+    const normalizedView = String(view || "blob")
+      .trim()
+      .toLowerCase();
+
+    if (!["now", "blob"].includes(normalizedView)) {
+      return res.status(400).json({
+        error: "Invalid view. Use 'now' or 'blob'.",
+      });
+    }
 
     const safeScope = normalizeScope(scope);
     const safeFeedLimit = safeLimit(limit, 20, 100);
-    const latitude = Number(req.query.lat);
-    const longitude = Number(req.query.lng);
-    const safeRadiusKm = Math.min(
-      Math.max(Number(req.query.radiusKm) || 5, 1),
-      50
-    );
+
+    const expiryCondition =
+      normalizedView === "blob"
+        ? "p.expires_at IS NOT NULL AND p.expires_at <= NOW()"
+        : "(p.expires_at IS NULL OR p.expires_at > NOW())";
 
     const result = await pool.query(
       `
-      ${POST_WITH_MEDIA_SELECT}
-      where
-        p.status = 'published'
-        and coalesce(p.requires_review, false) = false
-        and upper(coalesce(p.scope, 'LOCAL')) = $1
-        and p.lat is not null
-        and p.lng is not null
-        and (
-          6371 * acos(
-            cos(radians($2)) *
-            cos(radians(p.lat)) *
-            cos(radians(p.lng) - radians($3)) +
-            sin(radians($2)) *
-            sin(radians(p.lat))
-          )
-        ) <= $4
-      order by p.created_at desc
-      limit $5
+        ${POST_WITH_MEDIA_SELECT}
+        where
+          p.status = 'published'
+          and coalesce(p.requires_review, false) = false
+          and upper(coalesce(p.scope, 'LOCAL')) = $1
+          and ${expiryCondition}
+        order by p.created_at desc
+        limit $2
       `,
       [
         safeScope,
-        latitude,
-        longitude,
-        safeRadiusKm,
         safeFeedLimit,
       ]
     );
@@ -166,6 +167,7 @@ router.get("/iview", async (req, res) => {
     return res.json({
       posts,
       filters: {
+        view: normalizedView,
         scope: safeScope,
         limit: safeFeedLimit,
         locationFiltering: false,
@@ -180,6 +182,7 @@ router.get("/iview", async (req, res) => {
     });
   }
 });
+
 
 /* =====================================================
    GET POSTS
