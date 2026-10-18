@@ -1,3 +1,4 @@
+
 import { useEffect, useMemo, useState } from "react";
 import { useMap } from "../../context/MapContext";
 import FeedCard from "../FeedCard/CommunityPlusFeedCard";
@@ -5,9 +6,11 @@ import FeedCard from "../FeedCard/CommunityPlusFeedCard";
 function formatRelativeTime(value) {
   if (!value) return "Just now";
 
-  const diffMinutes = Math.floor(
-    (Date.now() - new Date(value).getTime()) / 60000
-  );
+  const timestamp = new Date(value).getTime();
+
+  if (Number.isNaN(timestamp)) return "Just now";
+
+  const diffMinutes = Math.floor((Date.now() - timestamp) / 60000);
 
   if (diffMinutes < 1) return "Just now";
   if (diffMinutes < 60) return `${diffMinutes}m ago`;
@@ -25,46 +28,77 @@ export default function Feed({ activeFilter = "all" }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // "all" and "now" both display the current NOW feed.
+  // "blob" displays expired posts.
+  const view = activeFilter === "blob" ? "blob" : "now";
+
   useEffect(() => {
+    const controller = new AbortController();
+
     async function loadPosts() {
       try {
         setLoading(true);
         setError("");
 
-const view = activeFilter === "blob" ? "blob" : "now";
+        const apiBase = import.meta.env.VITE_API_BASE;
 
-const response = await fetch(
-  `${import.meta.env.VITE_API_BASE}/posts?view=${view}`
-);
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data?.error || "Could not load posts");
+        if (!apiBase) {
+          throw new Error("API base URL is not configured.");
         }
 
-        setItems(data.posts || []);
+        const params = new URLSearchParams({ view });
+
+        const response = await fetch(
+          `${apiBase}/posts?${params.toString()}`,
+          {
+            signal: controller.signal,
+            cache: "no-store",
+          }
+        );
+
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+          throw new Error(data?.error || "Could not load posts.");
+        }
+
+        setItems(Array.isArray(data.posts) ? data.posts : []);
       } catch (err) {
+        if (err.name === "AbortError") return;
+
         console.error("Load posts failed:", err);
-        setError(err?.message || "Could not load posts");
+        setError(err?.message || "Could not load posts.");
+        setItems([]);
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
       }
     }
 
     loadPosts();
-  }, []);
+
+    return () => controller.abort();
+  }, [view]);
 
   const filteredItems = useMemo(() => {
-    if (activeFilter === "all") return items;
+    if (activeFilter === "all" || activeFilter === "blob") {
+      return items;
+    }
 
     if (activeFilter === "now") {
       return items.filter((item) =>
-        ["now", "incident", "event", "beacon"].includes(item.type)
+        ["now", "incident", "event", "beacon"].includes(
+          String(item.type || "").toLowerCase()
+        )
       );
     }
 
-    return items.filter((item) => item.type === activeFilter);
+    return items.filter(
+      (item) =>
+        String(item.type || "").toLowerCase() ===
+        String(activeFilter).toLowerCase()
+    );
   }, [items, activeFilter]);
 
   useEffect(() => {
@@ -76,13 +110,16 @@ const response = await fetch(
       }));
 
     setMarkers((prev) => {
-      const existingIds = new Set(prev.map((m) => m.id));
-
-      const nextMarkers = markerItems.filter(
-        (item) => !existingIds.has(item.id)
+      // Replace markers previously supplied by this feed,
+      // while preserving markers from other sources.
+      const otherMarkers = prev.filter(
+        (marker) => marker.__source !== "feed"
       );
 
-      return [...prev, ...nextMarkers];
+      return [
+        ...otherMarkers,
+        ...markerItems,
+      ];
     });
   }, [filteredItems, setMarkers]);
 
@@ -95,7 +132,13 @@ const response = await fetch(
   }
 
   if (!filteredItems.length) {
-    return <div className="feed-empty">No posts yet.</div>;
+    return (
+      <div className="feed-empty">
+        {activeFilter === "blob"
+          ? "No expired posts to display."
+          : "No posts yet."}
+      </div>
+    );
   }
 
   return (
