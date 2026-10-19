@@ -1,6 +1,7 @@
+
 import {
     toE164Phone,
-} from "../../../src/framework/Workspace/profile/profileHelpers";
+} from "../../framework/Workspace/profile/profileHelpers";
 
 
 /* =========================================================
@@ -11,16 +12,14 @@ function buildPhone({
     phone,
     country,
 }) {
-    const display =
-        phone || "";
+    const display = phone || "";
 
     return {
         display,
-        e164:
-            toE164Phone(
-                display,
-                country
-            ),
+        e164: toE164Phone(
+            display,
+            country
+        ),
     };
 }
 
@@ -32,19 +31,13 @@ function buildEntity({
         return null;
     }
 
-    const phone =
-        buildPhone({
-            phone:
-                entity.phone,
-            country:
-                entity.phoneCountry ||
-                "AU",
-        });
+    const phone = buildPhone({
+        phone: entity.phone,
+        country: entity.phoneCountry || "AU",
+    });
 
     return {
-
-        name:
-            entity.name || "",
+        name: entity.name || "",
 
         classification:
             entity.classification || "",
@@ -61,20 +54,16 @@ function buildEntity({
         postcode:
             entity.postcode || "",
 
-        phone:
-            phone.e164,
+        phone: phone.e164,
 
         email:
             entity.email || "",
 
         location:
-            entity.location ||
-            null,
+            entity.location || null,
 
         source:
-            entity.source ||
-            "manual",
-
+            entity.source || "manual",
     };
 }
 
@@ -88,7 +77,6 @@ function buildOrganisationProfile({
     }
 
     return {
-
         organisation_name:
             entity.name,
 
@@ -116,119 +104,40 @@ function buildOrganisationProfile({
         postcode:
             entity.postcode,
 
-        email_verified:
-            Boolean(
-                sourceValues
-                    ?.entity
-                    ?.emailVerified
-            ),
+        email_verified: Boolean(
+            sourceValues?.entity?.emailVerified
+        ),
 
-        ownership_verified:
-            Boolean(
-                sourceValues
-                    ?.entity
-                    ?.ownershipVerified
-            ),
+        ownership_verified: Boolean(
+            sourceValues?.entity?.ownershipVerified
+        ),
 
-        business_level:
-            1,
+        business_level: 1,
 
         source:
             entity.source,
-
     };
 }
 
 
 /* =========================================================
    PROFILE PAYLOAD
-                : personalPhone.e164,
-
-        phoneDisplay:
-            isEntity
-                ? entity?.phone || ""
-                : values.phoneDisplay ||
-                  "",
-
-        phoneCountry:
-            values.phoneCountry ||
-            "AU",
-
-        homeLocation:
-            isEntity
-                ? (
-                    entity?.location ||
-                    values.homeLocation ||
-                    homeLocation ||
-                    null
-                )
-                : (
-                    values.homeLocation ||
-                    homeLocation ||
-                    null
-                ),
-
-        policies:
-            values.policies,
-
-        payment:
-            values.payment,
-
-    };
-
-
-    /* =====================================================
-       LEGACY API COMPATIBILITY
-    ===================================================== */
-
-    const organisationProfile =
-        buildOrganisationProfile({
-            entity,
-            sourceValues:
-                values,
-        });
-
-
-    /* =====================================================
-       PAYLOAD
-    ===================================================== */
-
-    return {
-
-        profile,
-
-        entity,
-
-        organisationProfile,
-
-    };
-
-}
 ========================================================= */
 
 export function buildProfilePayload({
-
     values,
-
     userEmail,
-
     homeLocation,
-
 }) {
-
     /* =====================================================
        IDENTITY
     ===================================================== */
 
     const userType =
-        values.userType ||
-        "PERSONAL";
-
+        values.userType || "PERSONAL";
 
     const identityType =
-        values.identityType ||
-        "PERSONAL";
-
+        values.identityType || "PERSONAL";
 
     const isEntity =
         identityType === "ENTITY";
@@ -238,27 +147,19 @@ export function buildProfilePayload({
        PHONE
     ===================================================== */
 
-    const personalPhone =
-        buildPhone({
-            phone:
-                values.phoneDisplay,
-            country:
-                values.phoneCountry ||
-                "AU",
-        });
-
+    const personalPhone = buildPhone({
+        phone: values.phoneDisplay,
+        country: values.phoneCountry || "AU",
+    });
 
     const entitySource =
         values.entity || null;
 
-
-    const entity =
-        isEntity
-            ? buildEntity({
-                entity:
-                    entitySource,
-            })
-            : null;
+    const entity = isEntity
+        ? buildEntity({
+            entity: entitySource,
+        })
+        : null;
 
 
     /* =====================================================
@@ -266,10 +167,8 @@ export function buildProfilePayload({
     ===================================================== */
 
     const profile = {
-
         username:
-            values.username ||
-            "",
+            values.username || "",
 
         displayName:
             values.displayName ||
@@ -285,14 +184,62 @@ export function buildProfilePayload({
 
         identityType,
 
-        profileLevel:
-            1,
+        profileLevel: 1,
 
-        phone:
-            isEntity
-                ? entity?.phone || ""
-                : personalPhone.e164,
+        phone: isEntity
+            ? entity?.phone || ""
+            : personalPhone.e164,
 
-        phoneE164:
-            isEntity
-                ? entity?.phone || ""
+        phoneE164: isEntity
+            ? entity?.phone || ""
+            : personalPhone.e164,
+
+        phoneDisplay: isEntity
+            ? entity?.phone || ""
+            : values.phoneDisplay || "",
+
+        phoneCountry:
+            values.phoneCountry || "AU",
+
+        homeLocation: isEntity
+            ? (
+                entity?.location ||
+                values.homeLocation ||
+                homeLocation ||
+                null
+            )
+            : (
+                values.homeLocation ||
+                homeLocation ||
+                null
+            ),
+
+        policies:
+            values.policies,
+
+        payment:
+            values.payment,
+    };
+
+
+    /* =====================================================
+       LEGACY API COMPATIBILITY
+    ===================================================== */
+
+    const organisationProfile =
+        buildOrganisationProfile({
+            entity,
+            sourceValues: values,
+        });
+
+
+    /* =====================================================
+       PAYLOAD
+    ===================================================== */
+
+    return {
+        profile,
+        entity,
+        organisationProfile,
+    };
+}
