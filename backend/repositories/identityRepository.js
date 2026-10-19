@@ -5,38 +5,38 @@ import { pool } from "../db/pool.js";
    FIND BY COGNITO SUB
 ===================================================== */
 
-export async function findUserByCognitoSub(
-  cognitoSub
-) {
+export async function findUserByCognitoSub(cognitoSub) {
+  if (!cognitoSub) {
+    return null;
+  }
 
-  const { rows } =
-    await pool.query(
-      `
-        SELECT *
-        FROM users
-        WHERE cognito_sub = $1
-        LIMIT 1
-      `,
-      [cognitoSub]
-    );
+  const { rows } = await pool.query(
+    `
+      SELECT *
+      FROM ${TABLE}
+      WHERE cognito_sub = $1
+      LIMIT 1
+    `,
+    [cognitoSub]
+  );
 
-  if (!rows[0]) {
-  const { rows: dbRows } = await pool.query(`
-    SELECT
-      current_database() AS database_name,
-      current_schema() AS schema_name,
-      inet_server_addr()::text AS server_address
-  `);
+  if (rows.length === 0) {
+    const { rows: metadata } = await pool.query(`
+      SELECT
+        current_database() AS database_name,
+        current_schema() AS schema_name,
+        inet_server_addr()::text AS server_address
+    `);
 
-  console.warn("[IDENTITY LOOKUP MISS]", {
-    cognitoSubSuffix: cognitoSub.slice(-8),
-    database: dbRows[0]?.database_name,
-    schema: dbRows[0]?.schema_name,
-    server: dbRows[0]?.server_address,
-  });
-}
+    console.warn("[IDENTITY LOOKUP MISS]", {
+      cognitoSubSuffix: cognitoSub.slice(-12),
+      database: metadata[0]?.database_name,
+      schema: metadata[0]?.schema_name,
+      server: metadata[0]?.server_address,
+    });
+  }
 
-return rows[0] || null;
+  return rows[0] || null;
 }
 
 
