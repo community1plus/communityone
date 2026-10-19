@@ -58,6 +58,7 @@ function ProtectedRoute({ children }) {
   return children;
 }
 
+
 function ProfileGate({ children }) {
   const location = useLocation();
 
@@ -69,22 +70,21 @@ function ProfileGate({ children }) {
   } = useAuth();
 
   const {
-    profile,
     profileReady,
     basicProfileCompletion,
   } = useProfile();
-
-  console.log("PROFILE GATE", {
-    profileReady,
-    basicProfileCompletion,
-    profile,
-  });
 
   if (loading || authLoading) {
     return <div style={{ padding: 40 }}>Loading...</div>;
   }
 
   if (!isAuthenticated || isGuest) {
+    return children;
+  }
+
+  // Allow the profile workspace to render while onboarding.
+  // Otherwise, the gate would redirect to this route repeatedly.
+  if (location.pathname === "/communityplus/profile") {
     return children;
   }
 
@@ -95,7 +95,7 @@ function ProfileGate({ children }) {
   if (basicProfileCompletion < 100) {
     return (
       <Navigate
-        to="/profile"
+        to="/communityplus/profile"
         replace
         state={{
           profileRequired: true,
@@ -107,6 +107,7 @@ function ProfileGate({ children }) {
 
   return children;
 }
+
 
 function AppProviders() {
   return (
