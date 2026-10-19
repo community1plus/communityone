@@ -20,7 +20,23 @@ export async function findUserByCognitoSub(
       [cognitoSub]
     );
 
-  return rows[0] || null;
+  if (!rows[0]) {
+  const { rows: dbRows } = await pool.query(`
+    SELECT
+      current_database() AS database_name,
+      current_schema() AS schema_name,
+      inet_server_addr()::text AS server_address
+  `);
+
+  console.warn("[IDENTITY LOOKUP MISS]", {
+    cognitoSubSuffix: cognitoSub.slice(-8),
+    database: dbRows[0]?.database_name,
+    schema: dbRows[0]?.schema_name,
+    server: dbRows[0]?.server_address,
+  });
+}
+
+return rows[0] || null;
 }
 
 
