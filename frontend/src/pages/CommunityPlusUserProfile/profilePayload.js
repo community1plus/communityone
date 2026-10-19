@@ -142,6 +142,68 @@ function buildOrganisationProfile({
 
 /* =========================================================
    PROFILE PAYLOAD
+                : personalPhone.e164,
+
+        phoneDisplay:
+            isEntity
+                ? entity?.phone || ""
+                : values.phoneDisplay ||
+                  "",
+
+        phoneCountry:
+            values.phoneCountry ||
+            "AU",
+
+        homeLocation:
+            isEntity
+                ? (
+                    entity?.location ||
+                    values.homeLocation ||
+                    homeLocation ||
+                    null
+                )
+                : (
+                    values.homeLocation ||
+                    homeLocation ||
+                    null
+                ),
+
+        policies:
+            values.policies,
+
+        payment:
+            values.payment,
+
+    };
+
+
+    /* =====================================================
+       LEGACY API COMPATIBILITY
+    ===================================================== */
+
+    const organisationProfile =
+        buildOrganisationProfile({
+            entity,
+            sourceValues:
+                values,
+        });
+
+
+    /* =====================================================
+       PAYLOAD
+    ===================================================== */
+
+    return {
+
+        profile,
+
+        entity,
+
+        organisationProfile,
+
+    };
+
+}
 ========================================================= */
 
 export function buildProfilePayload({
@@ -234,65 +296,3 @@ export function buildProfilePayload({
         phoneE164:
             isEntity
                 ? entity?.phone || ""
-                : personalPhone.e164,
-
-        phoneDisplay:
-            isEntity
-                ? entity?.phone || ""
-                : values.phoneDisplay ||
-                  "",
-
-        phoneCountry:
-            values.phoneCountry ||
-            "AU",
-
-        homeLocation:
-            isEntity
-                ? (
-                    entity?.location ||
-                    values.homeLocation ||
-                    homeLocation ||
-                    null
-                )
-                : (
-                    values.homeLocation ||
-                    homeLocation ||
-                    null
-                ),
-
-        policies:
-            values.policies,
-
-        payment:
-            values.payment,
-
-    };
-
-
-    /* =====================================================
-       LEGACY API COMPATIBILITY
-    ===================================================== */
-
-    const organisationProfile =
-        buildOrganisationProfile({
-            entity,
-            sourceValues:
-                values,
-        });
-
-
-    /* =====================================================
-       PAYLOAD
-    ===================================================== */
-
-    return {
-
-        profile,
-
-        entity,
-
-        organisationProfile,
-
-    };
-
-}

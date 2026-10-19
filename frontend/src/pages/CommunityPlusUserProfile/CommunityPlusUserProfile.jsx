@@ -23,9 +23,6 @@ import {
     useProfile,
 } from "../../context/ProfileContext";
 
-import useAPI
-    from "../../hooks/useAPI";
-
 import useForm
     from "../../hooks/useForm";
 
@@ -103,14 +100,11 @@ console.log("[PARTICIPATION STATE]", {
 });
 
 
-    const {
-        profile,
-    } = useProfile();
+const {
+    profile,
+    patchProfile,
+} = useProfile();
 
-
-    const {
-        patchProfile,
-    } = useAPI();
 
 
     /* =================================================
