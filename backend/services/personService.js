@@ -1,3 +1,4 @@
+
 import { pool } from "../src/db/pool.js";
 
 import {
@@ -9,11 +10,6 @@ import {
   fetchParticipationByPersonId,
   createDefaultParticipation,
 } from "../repositories/personParticipationRepository.js";
-
-
-/* =====================================================
-   ENSURE PERSON AND PARTICIPATION
-===================================================== */
 
 /**
  * Ensures an authenticated application user has:
@@ -33,9 +29,11 @@ export async function ensurePersonParticipation(userId) {
   }
 
   const client = await pool.connect();
+  let transactionStarted = false;
 
   try {
     await client.query("BEGIN");
+    transactionStarted = true;
 
     // 1. Find or create the PERSON.
     let person = await fetchPersonByUserId(
@@ -78,6 +76,7 @@ export async function ensurePersonParticipation(userId) {
     }
 
     await client.query("COMMIT");
+    transactionStarted = false;
 
     return {
       userId,
@@ -85,9 +84,21 @@ export async function ensurePersonParticipation(userId) {
       participation,
     };
   } catch (error) {
-    await client.query("ROLLBACK");
+    if (transactionStarted) {
+      try {
+        await client.query("ROLLBACK");
+      } catch (rollbackError) {
+        // Preserve the original failure.
+        console.error(
+          "Failed to roll back PERSON participation transaction:",
+          rollbackError
+        );
+      }
+    }
+
     throw error;
   } finally {
     client.release();
   }
 }
+
