@@ -1,10 +1,94 @@
+
 import { pool } from "../db/pool.js";
+
+const TABLE = "users";
+
+
+/* =====================================================
+   FIND BY COGNITO SUBJECT
+===================================================== */
+
+export async function findUserByCognitoSub(cognitoSub) {
+  if (!cognitoSub) {
+    return null;
+  }
+
+  const { rows } = await pool.query(
+    `
+      SELECT *
+      FROM ${TABLE}
+      WHERE cognito_sub = $1
+      LIMIT 1
+    `,
+    [cognitoSub]
+  );
+
+  return rows[0] || null;
+}
+
+
+/* =====================================================
+   FIND BY USER ID
+===================================================== */
+
+export async function findUserById(userId) {
+  if (!userId) {
+    return null;
+  }
+
+  const { rows } = await pool.query(
+    `
+      SELECT *
+      FROM ${TABLE}
+      WHERE id = $1
+      LIMIT 1
+    `,
+    [userId]
+  );
+
+  return rows[0] || null;
+}
+
+
+/* =====================================================
+   FIND BY EMAIL
+===================================================== */
+
+export async function findUserByEmail(email) {
+  const normalizedEmail = String(email || "")
+    .trim()
+    .toLowerCase();
+
+  if (!normalizedEmail) {
+    return null;
+  }
+
+  const { rows } = await pool.query(
+    `
+      SELECT *
+      FROM ${TABLE}
+      WHERE LOWER(BTRIM(email)) = $1
+      LIMIT 1
+    `,
+    [normalizedEmail]
+  );
+
+  return rows[0] || null;
+}
 
 
 /* =====================================================
    CREATE USER FOR A NEW COGNITO IDENTITY
 ===================================================== */
 
+/**
+ * Creates a Community One user when the Cognito subject
+ * is not already linked to an application account.
+ *
+ * Existing email ownership conflicts are rejected.
+ * This function does not automatically link identities
+ * based on email alone.
+ */
 export async function createUserForCognitoIdentity({
   cognitoSub,
   email,
@@ -30,11 +114,13 @@ export async function createUserForCognitoIdentity({
     await client.query("BEGIN");
     transactionStarted = true;
 
-    // Serialize first-login provisioning for this email.
+    // Serialize provisioning attempts for this email.
     await client.query(
-      `SELECT pg_advisory_xact_lock(
-        hashtextextended($1::text, 0)
-      )`,
+      `
+        SELECT pg_advisory_xact_lock(
+          hashtextextended($1::text, 0)
+        )
+      `,
       [normalizedEmail]
     );
 
@@ -51,13 +137,15 @@ export async function createUserForCognitoIdentity({
     const emailMatches = emailResult.rows;
 
     if (emailMatches.length > 0) {
-      const sameIdentity =
+      // Idempotent recovery if another request has already
+      // created this exact subject/email combination.
+      if (
         emailMatches.length === 1 &&
-        emailMatches[0].cognito_sub === cognitoSub;
-
-      if (sameIdentity) {
+        emailMatches[0].cognito_sub === cognitoSub
+      ) {
         await client.query("COMMIT");
         transactionStarted = false;
+
         return emailMatches[0];
       }
 
@@ -83,10 +171,10 @@ export async function createUserForCognitoIdentity({
       [cognitoSub, normalizedEmail]
     );
 
-    let user = insertResult.rows[0];
+    let user = insertResult.rows[0] || null;
 
-    // Another concurrent request might have created this
-    // Cognito identity while this transaction was running.
+    // Another request might have created this subject
+    // concurrently. Reuse that account rather than duplicate it.
     if (!user) {
       const existingResult = await client.query(
         `
@@ -94,6 +182,7 @@ export async function createUserForCognitoIdentity({
           FROM ${TABLE}
           WHERE cognito_sub = $1
           LIMIT 1
+          FOR UPDATE
         `,
         [cognitoSub]
       );
@@ -131,114 +220,85 @@ export async function createUserForCognitoIdentity({
 
 
 /* =====================================================
-   FIND BY COGNITO SUB
+   LINK COGNITO IDENTITY
 ===================================================== */
 
-export async function findUserByCognitoSub(cognitoSub) {
+/**
+ * Links a Cognito subject only when the target user
+ * has no subject or already has this same subject.
+ *
+ * Existing subjects are never silently overwritten.
+ */
+export async function linkCognitoIdentity(
+  userId,
+  cognitoSub
+) {
+  if (!userId) {
+    throw new Error("Missing Community One userId");
+  }
+
   if (!cognitoSub) {
-    return null;
+    throw new Error("Missing Cognito subject");
   }
 
   const { rows } = await pool.query(
     `
-      SELECT *
-      FROM ${TABLE}
-      WHERE cognito_sub = $1
-      LIMIT 1
+      UPDATE ${TABLE} AS target
+      SET
+        cognito_sub = $2,
+        updated_at = NOW()
+      WHERE target.id = $1
+        AND (
+          target.cognito_sub IS NULL
+          OR target.cognito_sub = $2
+        )
+        AND NOT EXISTS (
+          SELECT 1
+          FROM ${TABLE} AS existing
+          WHERE existing.cognito_sub = $2
+            AND existing.id <> $1
+        )
+      RETURNING target.*
     `,
-    [cognitoSub]
+    [userId, cognitoSub]
   );
 
-  if (rows.length === 0) {
-    const { rows: metadata } = await pool.query(`
-      SELECT
-        current_database() AS database_name,
-        current_schema() AS schema_name,
-        inet_server_addr()::text AS server_address
-    `);
-
-    console.warn("[IDENTITY LOOKUP MISS]", {
-      cognitoSubSuffix: cognitoSub.slice(-12),
-      database: metadata[0]?.database_name,
-      schema: metadata[0]?.schema_name,
-      server: metadata[0]?.server_address,
-    });
-  }
-
   return rows[0] || null;
 }
 
 
 /* =====================================================
-   FIND BY EMAIL
-===================================================== */
-
-export async function findUserByEmail(
-  email
-) {
-
-  const { rows } =
-    await pool.query(
-      `
-        SELECT *
-        FROM users
-        WHERE LOWER(email) = LOWER($1)
-        LIMIT 1
-      `,
-      [email]
-    );
-
-  return rows[0] || null;
-}
-
-
-/* =====================================================
-   UPDATE COGNITO SUB
+   LEGACY COMPATIBILITY
 ===================================================== */
 
 export async function updateUserCognitoSub(
   userId,
   cognitoSub
 ) {
-
-  const { rows } =
-    await pool.query(
-      `
-        UPDATE users
-        SET
-          cognito_sub = $2,
-          updated_at = NOW()
-        WHERE id = $1
-        RETURNING *
-      `,
-      [
-        userId,
-        cognitoSub,
-      ]
-    );
-
-  return rows[0] || null;
+  return linkCognitoIdentity(userId, cognitoSub);
 }
 
 
 /* =====================================================
-   FIND BY COMMUNITY ONE USER ID
+   UPDATE LAST LOGIN
 ===================================================== */
 
-export async function findUserById(
-  userId
-) {
+export async function updateLastLogin(userId) {
+  if (!userId) {
+    throw new Error("Missing Community One userId");
+  }
 
-  const { rows } =
-    await pool.query(
-      `
-        SELECT *
-        FROM users
-        WHERE id = $1
-        LIMIT 1
-      `,
-      [userId]
-    );
+  const { rows } = await pool.query(
+    `
+      UPDATE ${TABLE}
+      SET
+        last_login = NOW(),
+        updated_at = NOW()
+      WHERE id = $1
+      RETURNING *
+    `,
+    [userId]
+  );
 
   return rows[0] || null;
 }
