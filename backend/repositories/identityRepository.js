@@ -2,6 +2,135 @@ import { pool } from "../db/pool.js";
 
 
 /* =====================================================
+   CREATE USER FOR A NEW COGNITO IDENTITY
+===================================================== */
+
+export async function createUserForCognitoIdentity({
+  cognitoSub,
+  email,
+}) {
+  if (!cognitoSub) {
+    throw new Error("Missing Cognito subject");
+  }
+
+  const normalizedEmail = String(email || "")
+    .trim()
+    .toLowerCase();
+
+  if (!normalizedEmail) {
+    throw new Error(
+      "A Cognito email is required to provision a Community One user"
+    );
+  }
+
+  const client = await pool.connect();
+  let transactionStarted = false;
+
+  try {
+    await client.query("BEGIN");
+    transactionStarted = true;
+
+    // Serialize first-login provisioning for this email.
+    await client.query(
+      `SELECT pg_advisory_xact_lock(
+        hashtextextended($1::text, 0)
+      )`,
+      [normalizedEmail]
+    );
+
+    const emailResult = await client.query(
+      `
+        SELECT *
+        FROM ${TABLE}
+        WHERE LOWER(BTRIM(email)) = $1
+        FOR UPDATE
+      `,
+      [normalizedEmail]
+    );
+
+    const emailMatches = emailResult.rows;
+
+    if (emailMatches.length > 0) {
+      const sameIdentity =
+        emailMatches.length === 1 &&
+        emailMatches[0].cognito_sub === cognitoSub;
+
+      if (sameIdentity) {
+        await client.query("COMMIT");
+        transactionStarted = false;
+        return emailMatches[0];
+      }
+
+      const error = new Error(
+        "This email is already associated with another Community One identity. Explicit account linking is required."
+      );
+
+      error.code = "ACCOUNT_LINK_REQUIRED";
+
+      throw error;
+    }
+
+    const insertResult = await client.query(
+      `
+        INSERT INTO ${TABLE} (
+          cognito_sub,
+          email
+        )
+        VALUES ($1, $2)
+        ON CONFLICT (cognito_sub) DO NOTHING
+        RETURNING *
+      `,
+      [cognitoSub, normalizedEmail]
+    );
+
+    let user = insertResult.rows[0];
+
+    // Another concurrent request might have created this
+    // Cognito identity while this transaction was running.
+    if (!user) {
+      const existingResult = await client.query(
+        `
+          SELECT *
+          FROM ${TABLE}
+          WHERE cognito_sub = $1
+          LIMIT 1
+        `,
+        [cognitoSub]
+      );
+
+      user = existingResult.rows[0] || null;
+    }
+
+    if (!user) {
+      throw new Error(
+        "Unable to create or resolve the Community One user"
+      );
+    }
+
+    await client.query("COMMIT");
+    transactionStarted = false;
+
+    return user;
+  } catch (error) {
+    if (transactionStarted) {
+      try {
+        await client.query("ROLLBACK");
+      } catch (rollbackError) {
+        console.error(
+          "User provisioning rollback failed:",
+          rollbackError.message
+        );
+      }
+    }
+
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
+
+/* =====================================================
    FIND BY COGNITO SUB
 ===================================================== */
 

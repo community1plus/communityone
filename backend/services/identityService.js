@@ -1,8 +1,7 @@
 import {
   findUserByCognitoSub,
-  findUserByEmail,
   findUserById,
-  linkCognitoIdentity,
+  createUserForCognitoIdentity,
   updateLastLogin,
 } from "../src/repositories/identityRepository.js";
 
@@ -96,61 +95,30 @@ return buildResolvedIdentity(
   }
 
 
+
   /* ===================================================
-     2. NO SUB MATCH
-     Try existing Community One account
+     2. NO SUBJECT MATCH: PROVISION OR RECOVER ACCOUNT
   =================================================== */
 
   if (!email) {
-
     throw new Error(
-      "Cognito identity is not linked to a Community One user"
+      "Cannot provision a Community One user without an email"
     );
-
   }
 
+  const user = await createUserForCognitoIdentity({
+    cognitoSub,
+    email,
+  });
 
-  const existingByEmail =
-    await findUserByEmail(
-      email
-    );
+  await updateLastLogin(user.id);
 
-
-  if (!existingByEmail) {
-
-    throw new Error(
-      "Cognito identity is not linked to a Community One user"
-    );
-
-  }
-
-
-  /* ===================================================
-     3. IDENTITY LINKING
-  =================================================== */
-
-  /*
-   * IMPORTANT:
-   *
-   * For production we should require a trusted
-   * identity linking flow.
-   *
-   * During the POC, this can be used to recover
-   * the existing Community One account.
-   */
-
-  if (!emailVerified) {
-
-    console.warn(
-      "⚠️ Cognito email is not verified; linking existing account:",
-      {
-        userId: existingByEmail.id,
-        email,
-        cognitoSub,
-      }
-    );
-
-  }
+  return buildResolvedIdentity(
+    user,
+    cognitoSub,
+    email,
+    cognitoUsername
+  );
 
 
   const linkedUser =
