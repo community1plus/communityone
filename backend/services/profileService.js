@@ -618,81 +618,96 @@ export async function putProfileService({
    PATCH PROFILE
 ===================================================== */
 
+
+/* =====================================================
+   PATCH PROFILE
+===================================================== */
+
 export async function patchProfileService({
   userId,
   body,
   req,
 }) {
-
   if (!userId) {
-    throw new Error(
-      "Missing userId"
-    );
+    throw new Error("Missing userId");
   }
 
-  const existing =
-    await fetchProfileByUserId(
-      userId
-    );
+  const incoming = pickProfileFields(
+    body?.profile || {}
+  );
+
+  const existing = await fetchProfileByUserId(
+    userId
+  );
+
+  let saved;
 
   if (!existing) {
-    throw new Error(
-      "Profile not found"
-    );
-  }
+    /*
+     * FIRST PROFILE SAVE
+     *
+     * A newly provisioned Community One user may
+     * not have a profile record yet. Initialise
+     * the default profile and merge the submitted
+     * values before creating the record.
+     */
 
-  const incoming =
-    pickProfileFields(
-      body?.profile || {}
+    const base = createDefaultProfile(userId);
+
+    const merged = buildMergedProfile(
+      base,
+      incoming,
+      req
     );
 
-  const merged =
-    buildMergedProfile(
+    saved = await createProfile(merged);
+
+    console.log(
+      "[PROFILE SERVICE] INITIAL PATCH CREATED",
+      {
+        userId,
+        profileId: saved?.profileId ?? null,
+        version: saved?.version ?? null,
+      }
+    );
+  } else {
+    /*
+     * EXISTING PROFILE
+     *
+     * Preserve the normal patch/update behaviour.
+     */
+
+    const merged = buildMergedProfile(
       existing,
       incoming,
       req
     );
 
-
-  console.log(
-    "[PROFILE SERVICE] PATCH",
-    {
-      userId,
-
-      existingUserId:
-        existing.userId,
-
-      mergedUserId:
-        merged.userId,
-
-      existingVersion:
-        existing.version,
-
-      nextVersion:
-        merged.version,
-
-      mode:
-        merged.mode,
-
-      userType:
-        merged.userType,
-    }
-  );
-
-
-  const saved =
-    await updateProfile(
-      merged
+    console.log(
+      "[PROFILE SERVICE] PATCH",
+      {
+        userId,
+        existingUserId: existing.userId,
+        mergedUserId: merged.userId,
+        existingVersion: existing.version,
+        nextVersion: merged.version,
+        mode: merged.mode,
+        userType: merged.userType,
+      }
     );
 
+    saved = await updateProfile(merged);
+  }
+
+  if (!saved) {
+    throw new Error(
+      "Profile save did not return a saved profile"
+    );
+  }
 
   return {
     profile: saved,
-
-    organisationProfile:
-      null,
-
-    version:
-      saved.version,
+    organisationProfile: null,
+    version: saved.version,
   };
 }
