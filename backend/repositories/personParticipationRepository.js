@@ -29,6 +29,47 @@ export async function fetchParticipationByPersonId(
     : null;
 }
 
+
+/* =====================================================
+   UPDATE ONBOARDING STATUS
+===================================================== */
+
+export async function updateParticipationStatus(
+  personId,
+  onboardingStatus,
+  db = pool
+) {
+  if (!personId) {
+    throw new Error("Missing personId");
+  }
+
+  const allowedStatuses = new Set([
+    "GUEST",
+    "IN_PROGRESS",
+    "COMPLETED",
+  ]);
+
+  if (!allowedStatuses.has(onboardingStatus)) {
+    throw new Error("Invalid onboarding status");
+  }
+
+  const { rows } = await db.query(
+    `
+      UPDATE ${TABLE}
+      SET
+        onboarding_status = $2,
+        updated_at = NOW()
+      WHERE person_id = $1
+        AND onboarding_status <> 'COMPLETED'
+      RETURNING *
+    `,
+    [personId, onboardingStatus]
+  );
+
+  return rows[0] ? rowToParticipation(rows[0]) : null;
+}
+
+
 /* =====================================================
    CREATE DEFAULT PARTICIPATION
 ===================================================== */
@@ -43,24 +84,24 @@ export async function createDefaultParticipation(
     );
   }
 
-  const { rows } = await db.query(
-    `
-      INSERT INTO ${TABLE} (
-        person_id,
-        onboarding_status,
-        participation_scope
-      )
-      VALUES ($1, $2, $3)
-      ON CONFLICT (person_id)
-      DO NOTHING
-      RETURNING *
-    `,
-    [
-      personId,
-      "GUEST",
-      "PERSON",
-    ]
-  );
+const { rows } = await db.query(
+  `
+    INSERT INTO ${TABLE} (
+      person_id,
+      onboarding_status,
+      participation_scope
+    )
+    VALUES ($1, $2, $3)
+    ON CONFLICT (person_id)
+    DO NOTHING
+    RETURNING *
+  `,
+  [
+    personId,
+    "CHOICE_REQUIRED",
+    "PERSON",
+  ]
+);
 
   // Return the newly created record, or fetch the
   // existing record if another request created it.

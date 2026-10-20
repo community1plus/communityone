@@ -239,4 +239,129 @@ router.get("/", async (req, res) => {
   }
 });
 
+
+/* =====================================================
+   UPDATE CURRENT USER ONBOARDING STATUS
+===================================================== */
+
+router.patch("/participation", async (req, res) => {
+  const personId = req.user?.personId;
+  const userId = req.user?.userId || req.user?.id;
+
+  const onboardingStatus = String(
+    req.body?.onboardingStatus || ""
+  )
+    .trim()
+    .toUpperCase();
+
+  const allowedStatuses = new Set([
+    "GUEST",
+    "IN_PROGRESS",
+    "COMPLETED",
+  ]);
+
+  if (!personId || !userId) {
+    return res.status(409).json({
+      error: "The authenticated user has no participation record.",
+    });
+  }
+
+  if (!allowedStatuses.has(onboardingStatus)) {
+    return res.status(400).json({
+      error: "Invalid onboarding status.",
+    });
+  }
+
+  try {
+    // Only mark onboarding complete after verifying the
+    // same minimum-profile criteria used by the frontend.
+    if (onboardingStatus === "COMPLETED") {
+      const result = await getProfileService({ userId });
+      const profile = result?.profile;
+
+      const location =
+        profile?.homeLocation ||
+        profile?.home_location ||
+        null;
+
+      const hasUsername =
+        typeof profile?.username === "string" &&
+        Boolean(profile.username.trim());
+
+      const hasPhone = Boolean(
+        String(
+          profile?.phone ||
+          profile?.phoneDisplay ||
+          profile?.phoneE164 ||
+          ""
+        ).trim()
+      );
+
+      const hasLocation =
+        typeof location?.lat === "number" &&
+        Number.isFinite(location.lat) &&
+        typeof location?.lng === "number" &&
+        Number.isFinite(location.lng);
+
+      if (!hasUsername || !hasPhone || !hasLocation) {
+        return res.status(400).json({
+          error:
+            "The minimum profile is incomplete. Username, phone and a valid home location are required.",
+        });
+      }
+    }
+
+    const updated = await updateParticipationStatus(
+      personId,
+      onboardingStatus
+    );
+
+    if (updated) {
+      return res.status(200).json({
+        participation: updated,
+      });
+    }
+
+    // Distinguish a missing record from an already completed
+    // record, or an attempt to change completed participation.
+    const current = await fetchParticipationByPersonId(
+      personId
+    );
+
+    if (!current) {
+      return res.status(404).json({
+        error: "Participation record not found.",
+      });
+    }
+
+    if (current.onboardingStatus === onboardingStatus) {
+      return res.status(200).json({
+        participation: current,
+      });
+    }
+
+    if (current.onboardingStatus === "COMPLETED") {
+      return res.status(409).json({
+        error: "Completed onboarding cannot be downgraded.",
+      });
+    }
+
+    return res.status(409).json({
+      error: "Unable to update onboarding status.",
+    });
+  } catch (error) {
+    console.error(
+      "[ME] PARTICIPATION UPDATE FAILED",
+      {
+        message: error?.message,
+      }
+    );
+
+    return res.status(500).json({
+      error: "Failed to update onboarding status.",
+    });
+  }
+});
+
+
 export default router;
