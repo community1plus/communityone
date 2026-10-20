@@ -30,14 +30,35 @@ export default function CommunityPlusAuthModal({ onClose, onSuccess }) {
     setMode(nextMode);
   };
 
+
   const handleGoogleLogin = async () => {
     try {
-      await signInWithRedirect({ provider: "Google" });
+      await signInWithRedirect({
+        provider: "Google",
+        options: {
+          prompt: "select_account",
+        },
+      });
     } catch (err) {
       console.error("Google sign-in failed:", err);
       setError(err?.message || "Google sign-in failed.");
     }
   };
+
+  const handleFacebookLogin = async () => {
+    try {
+      await signInWithRedirect({
+        provider: "Facebook",
+        options: {
+          prompt: "select_account",
+        },
+      });
+    } catch (err) {
+      console.error("Facebook sign-in failed:", err);
+      setError(err?.message || "Facebook sign-in failed.");
+    }
+  };
+
 
   const handleFacebookLogin = async () => {
     try {

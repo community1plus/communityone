@@ -317,12 +317,18 @@ console.log("[AUTH ID TOKEN CLAIMS]", {
      LOGIN
   ========================================= */
 
-  const login = useCallback(async () => {
-    localStorage.removeItem(GUEST_KEY);
-    setIsGuest(false);
 
-    await signInWithRedirect();
-  }, []);
+const login = useCallback(async () => {
+  localStorage.removeItem(GUEST_KEY);
+  setIsGuest(false);
+
+  await signInWithRedirect({
+    options: {
+      prompt: "select_account",
+    },
+  });
+}, []);
+
 
   /* =========================================
      GUEST MODE
