@@ -55,115 +55,77 @@ async function buildResolvedIdentity(
    RESOLVE COGNITO IDENTITY
 ===================================================== */
 
+
 export async function resolveIdentity({
   cognitoSub,
   email,
   cognitoUsername,
   emailVerified = false,
 }) {
-
   if (!cognitoSub) {
-    throw new Error(
-      "Missing Cognito subject"
-    );
+    throw new Error("Missing Cognito subject");
   }
 
-
-  /* ===================================================
-     1. PRIMARY IDENTITY LOOKUP
-  =================================================== */
-
+  // 1. Resolve the canonical Community One account.
   const existingBySub =
-    await findUserByCognitoSub(
-      cognitoSub
-    );
-
+    await findUserByCognitoSub(cognitoSub);
 
   if (existingBySub) {
+    await updateLastLogin(existingBySub.id);
 
-    await updateLastLogin(
-      existingBySub.id
+    return buildResolvedIdentity(
+      existingBySub,
+      cognitoSub,
+      email,
+      cognitoUsername
     );
-
-return buildResolvedIdentity(
-  existingBySub,
-  cognitoSub,
-  email,
-  cognitoUsername
-);
-
   }
 
+  // 2. A new account requires a verified email.
+  const normalizedEmail = String(email || "")
+    .trim()
+    .toLowerCase();
 
-
-  /* ===================================================
-     2. NO SUBJECT MATCH: PROVISION OR RECOVER ACCOUNT
-  =================================================== */
-
-  if (!email) {
+  if (!normalizedEmail) {
     throw new Error(
       "Cannot provision a Community One user without an email"
     );
   }
 
+  if (emailVerified !== true) {
+    const error = new Error(
+      "A verified email is required to provision a Community One user"
+    );
+
+    error.code = "EMAIL_NOT_VERIFIED";
+    throw error;
+  }
+
+  // 3. Provision or recover the account.
+  // Existing email conflicts must be handled through
+  // explicit account linking, never automatic reassignment.
   const user = await createUserForCognitoIdentity({
     cognitoSub,
-    email,
+    email: normalizedEmail,
   });
+
+  if (!user?.id) {
+    throw new Error(
+      "Community One user provisioning returned no user ID"
+    );
+  }
 
   await updateLastLogin(user.id);
 
+  // 4. Ensure the domain participation records exist.
   return buildResolvedIdentity(
     user,
     cognitoSub,
-    email,
+    normalizedEmail,
     cognitoUsername
   );
-
-
-  const linkedUser =
-    await linkCognitoIdentity(
-      existingByEmail.id,
-      cognitoSub
-    );
-
-
-  if (!linkedUser) {
-
-    throw new Error(
-      "Failed to link Cognito identity"
-    );
-
-  }
-
-
-  await updateLastLogin(
-    linkedUser.id
-  );
-
-
-  console.log(
-    "🔗 Cognito identity linked:",
-    {
-      userId:
-        linkedUser.id,
-
-      cognitoSub,
-
-      email:
-        linkedUser.email,
-    }
-  );
-
-
-return buildResolvedIdentity(
-  linkedUser,
-  cognitoSub,
-  email,
-  cognitoUsername
-);
-
 }
+
 
 
 /* =====================================================

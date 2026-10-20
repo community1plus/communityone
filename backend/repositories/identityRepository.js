@@ -76,7 +76,6 @@ export async function findUserByEmail(email) {
   return rows[0] || null;
 }
 
-
 /* =====================================================
    CREATE USER FOR A NEW COGNITO IDENTITY
 ===================================================== */
@@ -217,6 +216,7 @@ export async function createUserForCognitoIdentity({
     client.release();
   }
 }
+
 
 
 /* =====================================================
