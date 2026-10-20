@@ -60,15 +60,6 @@ export default function CommunityPlusAuthModal({ onClose, onSuccess }) {
   };
 
 
-  const handleFacebookLogin = async () => {
-    try {
-      await signInWithRedirect({ provider: "Facebook" });
-    } catch (err) {
-      console.error("Facebook sign-in failed:", err);
-      setError(err?.message || "Facebook sign-in failed.");
-    }
-  };
-
   const handleJoin = async (event) => {
     event.preventDefault();
     clearStatus();
