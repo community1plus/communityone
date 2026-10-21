@@ -207,6 +207,40 @@ export function AuthProvider({ children }) {
     []
   );
 
+
+const updateOnboardingStatus = useCallback(
+  async (onboardingStatus) => {
+    if (!token) {
+      throw new Error(
+        "Authentication is required to update onboarding."
+      );
+    }
+
+    const response = await apiFetch("/me/participation", {
+      method: "PATCH",
+      token,
+      body: { onboardingStatus },
+    });
+
+    const payload = response?.data || response || {};
+    const nextParticipation = payload.participation;
+
+    if (!nextParticipation) {
+      throw new Error(
+        "The backend did not return updated participation."
+      );
+    }
+
+    if (mountedRef.current) {
+      setParticipation(nextParticipation);
+    }
+
+    return nextParticipation;
+  },
+  [token]
+);
+
+
   /* =========================================
      REFRESH AUTH
   ========================================= */
@@ -408,7 +442,7 @@ const login = useCallback(async () => {
       participationLoading,
       participationError,
       loadParticipation,
-
+      updateOnboardingStatus,
       loading,
       hydrating,
       authLoading,
@@ -440,6 +474,7 @@ const login = useCallback(async () => {
       login,
       logout,
       continueAsGuest,
+      updateOnboardingStatus,
       refreshAuth,
       clearAuth,
     ]

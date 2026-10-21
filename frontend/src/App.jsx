@@ -59,6 +59,7 @@ function ProtectedRoute({ children }) {
 }
 
 
+
 function ProfileGate({ children }) {
   const location = useLocation();
 
@@ -67,38 +68,90 @@ function ProfileGate({ children }) {
     isGuest,
     loading,
     authLoading,
+    participation,
+    participationLoading,
+    participationError,
   } = useAuth();
 
   const {
     profileReady,
-    basicProfileCompletion,
   } = useProfile();
 
   if (loading || authLoading) {
     return <div style={{ padding: 40 }}>Loading...</div>;
   }
 
+  // Preserve anonymous guest preview behaviour.
   if (!isAuthenticated || isGuest) {
     return children;
   }
 
-  // Allow the profile workspace to render while onboarding.
-  // Otherwise, the gate would redirect to this route repeatedly.
+  // Wait until the persisted onboarding status is available.
+  if (participationLoading) {
+    return <div style={{ padding: 40 }}>Loading participation...</div>;
+  }
+
+  // Do not redirect on a failed participation request.
+  // Show the error instead of guessing the user's status.
+  if (participationError) {
+    return (
+      <div style={{ padding: 40 }}>
+        Unable to load your onboarding status. Please refresh and try again.
+      </div>
+    );
+  }
+
+  const onboardingStatus = participation?.onboardingStatus;
+
+  // Keep the profile workspace accessible so users can resume setup.
   if (location.pathname === "/communityplus/profile") {
     return children;
   }
 
-  if (!profileReady) {
-    return <div style={{ padding: 40 }}>Loading profile...</div>;
-  }
-
-  if (basicProfileCompletion < 100) {
+  // Missing or unrecognised state must not silently bypass onboarding.
+  if (
+    !["CHOICE_REQUIRED", "GUEST", "IN_PROGRESS", "COMPLETED"].includes(
+      onboardingStatus
+    )
+  ) {
     return (
       <Navigate
-        to="/communityplus/profile"
+        to="/"
+        replace
+        state={{ onboardingStatusUnavailable: true }}
+      />
+    );
+  }
+
+  // Authenticated users who chose guest access can enter the community.
+  if (
+    onboardingStatus === "GUEST" ||
+    onboardingStatus === "COMPLETED"
+  ) {
+    return children;
+  }
+
+  // These states require the onboarding choice or profile setup.
+  if (
+    onboardingStatus === "CHOICE_REQUIRED" ||
+    onboardingStatus === "IN_PROGRESS"
+  ) {
+    if (!profileReady) {
+      return <div style={{ padding: 40 }}>Loading profile...</div>;
+    }
+
+    return (
+      <Navigate
+        to={
+          onboardingStatus === "IN_PROGRESS"
+            ? "/communityplus/profile"
+            : "/"
+        }
         replace
         state={{
-          profileRequired: true,
+          profileRequired: onboardingStatus === "IN_PROGRESS",
+          onboardingChoiceRequired:
+            onboardingStatus === "CHOICE_REQUIRED",
           returnTo: location.pathname + location.search,
         }}
       />
@@ -107,6 +160,7 @@ function ProfileGate({ children }) {
 
   return children;
 }
+
 
 
 function AppProviders() {

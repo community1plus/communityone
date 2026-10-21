@@ -90,7 +90,8 @@ const {
   user,
   participation,
   participationLoading,
-  participationError
+  participationError,
+  updateOnboardingStatus,
 } = useAuth();
 
 console.log("[PARTICIPATION STATE]", {
@@ -751,32 +752,32 @@ const {
                     );
 
 
-                    await patchProfile(
-                        payload
-                    );
+await patchProfile(payload);
 
+setEditingSections(previous => ({
+    ...previous,
+    [sectionId]: false,
+}));
 
-                    setEditingSections(
-                        previous => ({
+console.log("✅ PROFILE SAVE SUCCESS:", sectionId);
 
-                            ...previous,
+if (
+    !isEntity &&
+    participation?.onboardingStatus === "IN_PROGRESS"
+) {
+    try {
+        await updateOnboardingStatus("COMPLETED");
+    } catch (error) {
+        console.error(
+            "[ONBOARDING] Profile saved, but completion failed:",
+            error
+        );
+    }
+}
 
-                            [sectionId]:
-                                false,
-
-                        })
-                    );
-
-
-                    console.log(
-                        "✅ PROFILE SAVE SUCCESS:",
-                        sectionId
-                    );
-
-
-                    if (onComplete) {
-                        onComplete();
-                    }
+if (onComplete) {
+    onComplete();
+}
 
                 } catch (error) {
 
@@ -800,6 +801,9 @@ const {
                 user?.email,
                 patchProfile,
                 onComplete,
+                participation,
+                updateOnboardingStatus,
+                isEntity,
             ]
         );
 
