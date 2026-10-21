@@ -39,7 +39,17 @@ export default function CommunityPlusSidebar({
   const location = useLocation();
   const { pathname } = location;
 
-  const { isAuthenticated, isGuest } = useAuth();
+  
+const {
+  isAuthenticated,
+  isGuest,
+  participation,
+  participationLoading,
+  participationError,
+} = useAuth();
+
+const onboardingStatus = participation?.onboardingStatus;
+
 
   const {
     profileReady,
@@ -140,26 +150,74 @@ export default function CommunityPlusSidebar({
         return;
       }
 
-      if (protectedItem) {
-        if (!isAuthenticated || isGuest) {
-          redirectToLogin(item.path);
-          return;
-        }
 
-        if (profileIsStillResolving) {
-          return;
-        }
+if (protectedItem) {
+  if (!isAuthenticated || isGuest) {
+    redirectToLogin(item.path);
+    return;
+  }
 
-        if (!hasMinimumProfile) {
-          navigate("/communityplus/welcome", {
-            state: {
-              returnTo: item.path,
-              profileRequired: true,
-            },
-          });
-          return;
-        }
-      }
+  // Wait until participation and profile state have resolved.
+  if (
+    profileIsStillResolving ||
+    participationLoading
+  ) {
+    return;
+  }
+
+  // Do not make an onboarding decision if the backend
+  // could not provide participation state.
+  if (participationError || !participation) {
+    console.error(
+      "[SIDEBAR] Cannot determine onboarding status:",
+      participationError || "Participation is unavailable."
+    );
+    return;
+  }
+
+  if (onboardingStatus === "CHOICE_REQUIRED") {
+    navigate("/", {
+      state: {
+        onboardingChoiceRequired: true,
+        returnTo: item.path,
+      },
+    });
+    return;
+  }
+
+  if (onboardingStatus === "IN_PROGRESS") {
+    navigate("/communityplus/profile", {
+      state: {
+        returnTo: item.path,
+        profileRequired: true,
+      },
+    });
+    return;
+  }
+
+  if (onboardingStatus === "GUEST") {
+    return;
+  }
+
+  if (onboardingStatus !== "COMPLETED") {
+    console.error(
+      "[SIDEBAR] Unexpected onboarding status:",
+      onboardingStatus
+    );
+    return;
+  }
+
+  if (!hasMinimumProfile) {
+    navigate("/communityplus/profile", {
+      state: {
+        returnTo: item.path,
+        profileRequired: true,
+      },
+    });
+    return;
+  }
+}
+
 
       if (item.path) {
         navigate(item.path, {
@@ -185,6 +243,10 @@ export default function CommunityPlusSidebar({
       hasMinimumProfile,
       redirectToLogin,
       handleLogout,
+      participation,
+      participationLoading,
+      participationError,
+      onboardingStatus,
     ]
   );
 
