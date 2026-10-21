@@ -17,7 +17,7 @@ import {
  * - One participation record
  *
  * Existing records are preserved.
- * New participation defaults to GUEST / PERSON.
+ * New participation defaults to CHOICE_REQUIRED / PERSON.
  *
  * userId is users.id, not Cognito's sub.
  */

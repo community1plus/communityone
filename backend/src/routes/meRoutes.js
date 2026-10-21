@@ -1,9 +1,208 @@
+
 import express from "express";
 
 import { pool } from "../db/pool.js";
 import { normalizeProfile } from "../utils/normalizeProfile.js";
+import { getProfileService } from "../../services/profileService.js";
+import {
+  fetchParticipationByPersonId,
+  updateParticipationStatus,
+} from "../../repositories/personParticipationRepository.js";
 
 const router = express.Router();
+
+const ALLOWED_ONBOARDING_STATUSES = new Set([
+  "GUEST",
+  "IN_PROGRESS",
+  "COMPLETED",
+]);
+
+function getEmailLocalPart(email = "") {
+  return email.includes("@") ? email.split("@")[0] : "";
+}
+
+function hasMinimumProfile(profile) {
+  const location =
+    profile?.homeLocation ??
+    profile?.home_location ??
+    null;
+
+  const hasUsername =
+    typeof profile?.username === "string" &&
+    Boolean(profile.username.trim());
+
+  const hasPhone = [
+    profile?.phone,
+    profile?.phoneDisplay,
+    profile?.phoneE164,
+  ].some(
+    (value) =>
+      value != null &&
+      Boolean(String(value).trim())
+  );
+
+  const hasValidLocation =
+    typeof location?.lat === "number" &&
+    Number.isFinite(location.lat) &&
+    typeof location?.lng === "number" &&
+    Number.isFinite(location.lng);
+
+  return hasUsername && hasPhone && hasValidLocation;
+}
+
+function sendParticipationError(res, status, error) {
+  return res.status(status).json({ error });
+}
+
+
+
+export function createParticipationHandler({
+  fetchParticipationByPersonId,
+  updateParticipationStatus,
+  getProfileService,
+}) {
+  return async function participationHandler(req, res) {
+    const personId = req.user?.personId;
+    const userId = req.user?.userId || req.user?.id;
+
+    const requestedStatus = String(
+      req.body?.onboardingStatus ?? ""
+    )
+      .trim()
+      .toUpperCase();
+
+    if (!personId || !userId) {
+      return sendParticipationError(
+        res,
+        409,
+        "The authenticated user has no participation record."
+      );
+    }
+
+    if (!ALLOWED_ONBOARDING_STATUSES.has(requestedStatus)) {
+      return sendParticipationError(
+        res,
+        400,
+        "Invalid onboarding status."
+      );
+    }
+
+    try {
+      const current =
+        await fetchParticipationByPersonId(personId);
+
+      if (!current) {
+        return sendParticipationError(
+          res,
+          404,
+          "Participation record not found."
+        );
+      }
+
+      const currentStatus = String(
+        current.onboardingStatus ?? ""
+      ).toUpperCase();
+
+      // Repeated requests for the existing status are no-ops.
+      if (currentStatus === requestedStatus) {
+        return res.status(200).json({
+          participation: current,
+        });
+      }
+
+      // Completed onboarding is immutable.
+      if (currentStatus === "COMPLETED") {
+        return sendParticipationError(
+          res,
+          409,
+          "Completed onboarding cannot be downgraded."
+        );
+      }
+
+      // Completion is only valid from IN_PROGRESS.
+      if (requestedStatus === "COMPLETED") {
+        if (currentStatus !== "IN_PROGRESS") {
+          return sendParticipationError(
+            res,
+            409,
+            "Onboarding must be in progress before it can be completed."
+          );
+        }
+
+        const result = await getProfileService({ userId });
+
+        if (!hasMinimumProfile(result?.profile)) {
+          return sendParticipationError(
+            res,
+            400,
+            "The minimum profile is incomplete. Username, phone and a valid home location are required."
+          );
+        }
+      }
+
+      const updated = await updateParticipationStatus(
+        personId,
+        requestedStatus
+      );
+
+      if (updated) {
+        return res.status(200).json({
+          participation: updated,
+        });
+      }
+
+      // The database may reject a transition if another request
+      // changed the participation after our initial read.
+      const latest =
+        await fetchParticipationByPersonId(personId);
+
+      if (!latest) {
+        return sendParticipationError(
+          res,
+          404,
+          "Participation record not found."
+        );
+      }
+
+      const latestStatus = String(
+        latest.onboardingStatus ?? ""
+      ).toUpperCase();
+
+      // Another request may already have completed this transition.
+      if (latestStatus === requestedStatus) {
+        return res.status(200).json({
+          participation: latest,
+        });
+      }
+
+      if (latestStatus === "COMPLETED") {
+        return sendParticipationError(
+          res,
+          409,
+          "Completed onboarding cannot be downgraded."
+        );
+      }
+
+      return sendParticipationError(
+        res,
+        409,
+        "Unable to update onboarding status."
+      );
+    } catch (error) {
+      console.error("[ME] PARTICIPATION UPDATE FAILED", {
+        message: error?.message,
+      });
+
+      return sendParticipationError(
+        res,
+        500,
+        "Failed to update onboarding status."
+      );
+    }
+  };
+}
+
+
 
 /* =====================================================
    GET CURRENT USER
@@ -13,10 +212,6 @@ router.get("/", async (req, res) => {
   try {
     console.log("========================================");
     console.log("📡 GET /api/me");
-
-    /* =============================================
-       1. AUTHENTICATION
-    ============================================= */
 
     if (!req.user) {
       console.warn("[ME] No authenticated user");
@@ -59,10 +254,7 @@ router.get("/", async (req, res) => {
       participationScope,
     });
 
-    /* =============================================
-       2. FETCH LEGACY USER PROFILE
-    ============================================= */
-
+    // Fetch the legacy profile associated with the account.
     const profileResult = await pool.query(
       `
         SELECT *
@@ -83,10 +275,7 @@ router.get("/", async (req, res) => {
       version: rawProfile?.version ?? null,
     });
 
-    /* =============================================
-       3. FETCH LEGACY ORGANISATION PROFILE
-    ============================================= */
-
+    // Preserve the legacy organisation-profile relationship.
     let organisationProfile = null;
 
     if (rawProfile?.id) {
@@ -100,7 +289,8 @@ router.get("/", async (req, res) => {
         [rawProfile.id]
       );
 
-      organisationProfile = organisationResult.rows[0] || null;
+      organisationProfile =
+        organisationResult.rows[0] || null;
 
       console.log("[ME] ORGANISATION PROFILE", {
         found: Boolean(organisationProfile),
@@ -108,23 +298,16 @@ router.get("/", async (req, res) => {
       });
     }
 
-    /* =============================================
-       4. NORMALIZE PROFILE
-    ============================================= */
-
     const normalizedProfile = normalizeProfile(rawProfile);
 
     const canonicalEmail =
       normalizedProfile?.email || tokenEmail || "";
 
-    const emailLocalPart =
-      tokenEmail && tokenEmail.includes("@")
-        ? tokenEmail.split("@")[0]
-        : "";
+    const emailLocalPart = getEmailLocalPart(tokenEmail);
 
     const canonicalUsername =
       normalizedProfile?.username ||
-      (tokenEmail.includes("@") ? emailLocalPart : "") ||
+      emailLocalPart ||
       tokenUsername ||
       "";
 
@@ -144,10 +327,6 @@ router.get("/", async (req, res) => {
       userType: profile?.userType ?? null,
     });
 
-    /* =============================================
-       5. SOCIAL PROVIDER STATUS
-    ============================================= */
-
     const social = profile?.social || {};
 
     const providers = {
@@ -157,52 +336,38 @@ router.get("/", async (req, res) => {
       x: Boolean(social.x?.verified),
     };
 
-    /* =============================================
-       6. USER RESPONSE
-    ============================================= */
-
     const user = {
-      // Community One account identity
+      // Community One account identity.
       id: userId,
       cognitoSub,
 
-      // Authenticated account information
+      // Authenticated account information.
       email: tokenEmail,
 
-      // Community One profile presentation
+      // Profile presentation.
       username:
         profile?.username ||
         emailLocalPart ||
         tokenUsername ||
         "",
-
       displayName:
         profile?.displayName ||
         emailLocalPart ||
         tokenUsername ||
         "",
 
-      // Legacy profile state
+      // Legacy profile state; not the onboarding status.
       profileCompleted: Boolean(profile),
     };
 
-    /* =============================================
-       7. PERSON PARTICIPATION CONTEXT
-
-       Supplied by authentication/identity resolution.
-       No PERSON creation or authorization occurs here.
-    ============================================= */
-
+    // Participation context is supplied by identity resolution.
+    // This handler does not create or authorize participation.
     const participation = {
       personId,
       personStatus,
       onboardingStatus,
       participationScope,
     };
-
-    /* =============================================
-       8. RESPONSE
-    ============================================= */
 
     const response = {
       authenticated: true,
@@ -224,12 +389,12 @@ router.get("/", async (req, res) => {
     console.log("========================================");
 
     return res.status(200).json(response);
-  } catch (err) {
+  } catch (error) {
     console.error("[ME] GET /api/me ERROR", {
-      message: err.message,
+      message: error.message,
       stack:
         process.env.NODE_ENV === "development"
-          ? err.stack
+          ? error.stack
           : undefined,
     });
 
@@ -239,129 +404,18 @@ router.get("/", async (req, res) => {
   }
 });
 
-
 /* =====================================================
    UPDATE CURRENT USER ONBOARDING STATUS
 ===================================================== */
+router.patch(
+  "/participation",
+  createParticipationHandler({
+    fetchParticipationByPersonId,
+    updateParticipationStatus,
+    getProfileService,
+  })
+);
 
-router.patch("/participation", async (req, res) => {
-  const personId = req.user?.personId;
-  const userId = req.user?.userId || req.user?.id;
-
-  const onboardingStatus = String(
-    req.body?.onboardingStatus || ""
-  )
-    .trim()
-    .toUpperCase();
-
-  const allowedStatuses = new Set([
-    "GUEST",
-    "IN_PROGRESS",
-    "COMPLETED",
-  ]);
-
-  if (!personId || !userId) {
-    return res.status(409).json({
-      error: "The authenticated user has no participation record.",
-    });
-  }
-
-  if (!allowedStatuses.has(onboardingStatus)) {
-    return res.status(400).json({
-      error: "Invalid onboarding status.",
-    });
-  }
-
-  try {
-    // Only mark onboarding complete after verifying the
-    // same minimum-profile criteria used by the frontend.
-    if (onboardingStatus === "COMPLETED") {
-      const result = await getProfileService({ userId });
-      const profile = result?.profile;
-
-      const location =
-        profile?.homeLocation ||
-        profile?.home_location ||
-        null;
-
-      const hasUsername =
-        typeof profile?.username === "string" &&
-        Boolean(profile.username.trim());
-
-      const hasPhone = Boolean(
-        String(
-          profile?.phone ||
-          profile?.phoneDisplay ||
-          profile?.phoneE164 ||
-          ""
-        ).trim()
-      );
-
-      const hasLocation =
-        typeof location?.lat === "number" &&
-        Number.isFinite(location.lat) &&
-        typeof location?.lng === "number" &&
-        Number.isFinite(location.lng);
-
-      if (!hasUsername || !hasPhone || !hasLocation) {
-        return res.status(400).json({
-          error:
-            "The minimum profile is incomplete. Username, phone and a valid home location are required.",
-        });
-      }
-    }
-
-    const updated = await updateParticipationStatus(
-      personId,
-      onboardingStatus
-    );
-
-    if (updated) {
-      return res.status(200).json({
-        participation: updated,
-      });
-    }
-
-    // Distinguish a missing record from an already completed
-    // record, or an attempt to change completed participation.
-    const current = await fetchParticipationByPersonId(
-      personId
-    );
-
-    if (!current) {
-      return res.status(404).json({
-        error: "Participation record not found.",
-      });
-    }
-
-    if (current.onboardingStatus === onboardingStatus) {
-      return res.status(200).json({
-        participation: current,
-      });
-    }
-
-    if (current.onboardingStatus === "COMPLETED") {
-      return res.status(409).json({
-        error: "Completed onboarding cannot be downgraded.",
-      });
-    }
-
-    return res.status(409).json({
-      error: "Unable to update onboarding status.",
-    });
-  } catch (error) {
-    console.error(
-      "[ME] PARTICIPATION UPDATE FAILED",
-      {
-        message: error?.message,
-      }
-    );
-
-    return res.status(500).json({
-      error: "Failed to update onboarding status.",
-    });
-  }
-});
 
 
 export default router;

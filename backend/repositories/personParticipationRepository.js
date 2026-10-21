@@ -60,7 +60,21 @@ export async function updateParticipationStatus(
         onboarding_status = $2,
         updated_at = NOW()
       WHERE person_id = $1
-        AND onboarding_status <> 'COMPLETED'
+        AND (
+          onboarding_status = $2
+          OR (
+            onboarding_status = 'CHOICE_REQUIRED'
+            AND $2 IN ('GUEST', 'IN_PROGRESS')
+          )
+          OR (
+            onboarding_status = 'GUEST'
+            AND $2 = 'IN_PROGRESS'
+          )
+          OR (
+            onboarding_status = 'IN_PROGRESS'
+            AND $2 = 'COMPLETED'
+          )
+        )
       RETURNING *
     `,
     [personId, onboardingStatus]
@@ -84,24 +98,24 @@ export async function createDefaultParticipation(
     );
   }
 
-const { rows } = await db.query(
-  `
-    INSERT INTO ${TABLE} (
-      person_id,
-      onboarding_status,
-      participation_scope
-    )
-    VALUES ($1, $2, $3)
-    ON CONFLICT (person_id)
-    DO NOTHING
-    RETURNING *
-  `,
-  [
-    personId,
-    "CHOICE_REQUIRED",
-    "PERSON",
-  ]
-);
+  const { rows } = await db.query(
+    `
+      INSERT INTO ${TABLE} (
+        person_id,
+        onboarding_status,
+        participation_scope
+      )
+      VALUES ($1, $2, $3)
+      ON CONFLICT (person_id)
+      DO NOTHING
+      RETURNING *
+    `,
+    [
+      personId,
+      "CHOICE_REQUIRED",
+      "PERSON"
+    ]
+  );
 
   // Return the newly created record, or fetch the
   // existing record if another request created it.
