@@ -9,8 +9,15 @@ const AUTH_PROVIDER = "cognito";
    FIND BY COGNITO SUBJECT
 ===================================================== */
 
+
+/* =====================================================
+   FIND BY COGNITO SUB
+===================================================== */
+
 export async function findUserByCognitoSub(cognitoSub) {
-  if (!cognitoSub) return null;
+  if (!cognitoSub) {
+    return null;
+  }
 
   const { rows } = await pool.query(
     `
@@ -24,6 +31,7 @@ export async function findUserByCognitoSub(cognitoSub) {
 
   return rows[0] || null;
 }
+
 
 /* =====================================================
    FIND BY AUTHENTICATION IDENTITY
@@ -289,7 +297,17 @@ export async function createUserForCognitoIdentity({
  *
  * Do not use this function to link an additional provider.
  */
-export async function linkCognitoIdentity(userId, cognitoSub) {
+
+/* =====================================================
+   LEGACY COGNITO IDENTITY LINK
+   Additional identities must be linked through an
+   explicit, verified account-linking flow.
+===================================================== */
+
+export async function linkCognitoIdentity(
+  userId,
+  cognitoSub
+) {
   if (!userId) {
     throw new Error("Missing Community One userId");
   }
@@ -298,30 +316,15 @@ export async function linkCognitoIdentity(userId, cognitoSub) {
     throw new Error("Missing Cognito subject");
   }
 
-  const { rows } = await pool.query(
-    `
-      UPDATE ${TABLE} AS target
-      SET
-        cognito_sub = $2,
-        updated_at = NOW()
-      WHERE target.id = $1
-        AND (
-          target.cognito_sub IS NULL
-          OR target.cognito_sub = $2
-        )
-        AND NOT EXISTS (
-          SELECT 1
-          FROM ${TABLE} AS existing
-          WHERE existing.cognito_sub = $2
-            AND existing.id <> $1
-        )
-      RETURNING target.*
-    `,
-    [userId, cognitoSub]
+  const error = new Error(
+    "Legacy Cognito identity linking is disabled. Use the explicit authentication identity linking flow."
   );
 
-  return rows[0] || null;
+  error.code = "EXPLICIT_LINK_REQUIRED";
+
+  throw error;
 }
+
 
 /* =====================================================
    LEGACY COMPATIBILITY
@@ -330,6 +333,158 @@ export async function linkCognitoIdentity(userId, cognitoSub) {
 export async function updateUserCognitoSub(userId, cognitoSub) {
   return linkCognitoIdentity(userId, cognitoSub);
 }
+
+
+/* =====================================================
+   LINK VERIFIED AUTH IDENTITY TO EXISTING USER
+
+   The caller must independently verify ownership of
+   the second Cognito identity before calling this.
+   Never updates users.cognito_sub.
+===================================================== */
+
+export async function linkAuthIdentityToUser(
+  userId,
+  cognitoSub
+) {
+  if (!userId) {
+    throw new Error("Missing Community One userId");
+  }
+
+  if (!cognitoSub) {
+    throw new Error("Missing Cognito subject");
+  }
+
+  const client = await pool.connect();
+  let transactionStarted = false;
+
+  try {
+    await client.query("BEGIN");
+    transactionStarted = true;
+
+    // Lock the canonical Community One user.
+    const userResult = await client.query(
+      `
+        SELECT id
+        FROM ${TABLE}
+        WHERE id = $1
+        FOR UPDATE
+      `,
+      [userId]
+    );
+
+    if (!userResult.rows.length) {
+      const error = new Error(
+        "Community One user not found"
+      );
+      error.code = "USER_NOT_FOUND";
+      throw error;
+    }
+
+    // If this subject already exists, it must belong
+    // to this same canonical user.
+    const existingResult = await client.query(
+      `
+        SELECT user_id
+        FROM user_auth_identities
+        WHERE provider = $1
+          AND provider_subject = $2
+        FOR UPDATE
+      `,
+      ["cognito", cognitoSub]
+    );
+
+    if (existingResult.rows.length) {
+      if (
+        String(existingResult.rows[0].user_id) !==
+        String(userId)
+      ) {
+        const error = new Error(
+          "This authentication identity is linked to another Community One user"
+        );
+        error.code = "IDENTITY_LINK_CONFLICT";
+        throw error;
+      }
+
+      await client.query("COMMIT");
+      transactionStarted = false;
+
+      return {
+        userId,
+        cognitoSub,
+        alreadyLinked: true,
+      };
+    }
+
+    // The unique constraint on (provider, provider_subject)
+    // remains the final safeguard against concurrent linking.
+    const insertResult = await client.query(
+      `
+        INSERT INTO user_auth_identities (
+          user_id,
+          provider,
+          provider_subject
+        )
+        VALUES ($1, $2, $3)
+        ON CONFLICT (provider, provider_subject)
+        DO NOTHING
+        RETURNING user_id
+      `,
+      [userId, "cognito", cognitoSub]
+    );
+
+    if (!insertResult.rows.length) {
+      // Another request may have linked the subject first.
+      const retryResult = await client.query(
+        `
+          SELECT user_id
+          FROM user_auth_identities
+          WHERE provider = $1
+            AND provider_subject = $2
+          FOR UPDATE
+        `,
+        ["cognito", cognitoSub]
+      );
+
+      if (
+        !retryResult.rows.length ||
+        String(retryResult.rows[0].user_id) !==
+          String(userId)
+      ) {
+        const error = new Error(
+          "This authentication identity is linked to another Community One user"
+        );
+        error.code = "IDENTITY_LINK_CONFLICT";
+        throw error;
+      }
+    }
+
+    await client.query("COMMIT");
+    transactionStarted = false;
+
+    return {
+      userId,
+      cognitoSub,
+      alreadyLinked: false,
+    };
+  } catch (error) {
+    if (transactionStarted) {
+      try {
+        await client.query("ROLLBACK");
+      } catch (rollbackError) {
+        console.error(
+          "Authentication identity link rollback failed:",
+          rollbackError.message
+        );
+      }
+    }
+
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
 
 /* =====================================================
    UPDATE LAST LOGIN

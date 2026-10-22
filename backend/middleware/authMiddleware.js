@@ -13,6 +13,14 @@ const REGION =
 const USER_POOL_ID =
   process.env.COGNITO_USER_POOL_ID || "ap-southeast-2_2TGqghCuO";
 
+const COGNITO_CLIENT_ID = process.env.COGNITO_CLIENT_ID;
+
+if (!COGNITO_CLIENT_ID) {
+  throw new Error(
+    "Missing required environment variable: COGNITO_CLIENT_ID"
+  );
+}
+
 const COGNITO_ISSUER =
   `https://cognito-idp.${REGION}.amazonaws.com/${USER_POOL_ID}`;
 
@@ -87,6 +95,7 @@ function verifyWithPem(token, pem) {
   return jwt.verify(token, pem, {
     algorithms: ["RS256"],
     issuer: COGNITO_ISSUER,
+    audience: COGNITO_CLIENT_ID,
   });
 }
 

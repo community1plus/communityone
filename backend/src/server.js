@@ -358,12 +358,6 @@ app.use(
   userRoutes
 );
 
-
-app.use(
-  "/api/facebook",
-  facebookRoutes
-);
-
 app.use(
   "/api/youtube",
   youtubeRoutes
