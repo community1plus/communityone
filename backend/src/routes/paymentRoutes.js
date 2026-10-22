@@ -1,6 +1,6 @@
 import express from "express";
 
-import { stripe } from "../lib/stripe.js";
+import { stripe, isStripeConfigured } from "../lib/stripe.js";
 import authMiddleware from "../../middleware/authMiddleware.js";
 
 import {
@@ -22,11 +22,17 @@ const router = express.Router();
 |
 */
 
+
+
 router.post(
     "/create-setup-intent",
     authMiddleware,
     async (req, res) => {
-
+if (!isStripeConfigured || !stripe) {
+    return res.status(503).json({
+        error: "Payment service is not configured in this environment.",
+    });
+}
         try {
 
             const userId =

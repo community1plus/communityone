@@ -1,4 +1,5 @@
 import {
+  findUserByAuthIdentity,
   findUserByCognitoSub,
   findUserById,
   createUserForCognitoIdentity,
@@ -67,8 +68,9 @@ export async function resolveIdentity({
   }
 
   // 1. Resolve the canonical Community One account.
-  const existingBySub =
-    await findUserByCognitoSub(cognitoSub);
+const existingBySub =
+  await findUserByAuthIdentity(cognitoSub)
+  || await findUserByCognitoSub(cognitoSub);
 
   if (existingBySub) {
     await updateLastLogin(existingBySub.id);

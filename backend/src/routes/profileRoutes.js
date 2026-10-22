@@ -22,33 +22,19 @@ const router = express.Router();
    GET /api/profile
 ------------------------------------- */
 
-router.get(
-    "/",
-    requireAuth,
-    getProfile
-);
+router.get("/", getProfile);
 
 
 /* -------------------------------------
    PUT /api/profile
 ------------------------------------- */
 
-router.put(
-    "/",
-    requireAuth,
-    putProfile
-);
-
+router.put("/", putProfile);
 
 /* -------------------------------------
    PATCH /api/profile
 ------------------------------------- */
-
-router.patch(
-    "/",
-    requireAuth,
-    patchProfile
-);
+router.patch("/", patchProfile);
 
 
 export default router;

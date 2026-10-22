@@ -108,7 +108,7 @@ process.on("unhandledRejection", (err) => {
 app.use(
   cors({
     origin: [
-  "http://localhost:5173/",
+  "http://localhost:5173",
   "https://main.d1ss8rtrtimogr.amplifyapp.com/",
   "https://develop.d1ss8rtrtimogr.amplifyapp.com/",
   "https://main.d1ss8rtrtimogr.amplifyapp.com",

@@ -1,5 +1,5 @@
 import express from "express";
-import { stripe } from "../lib/stripe.js";
+import { stripe, isStripeConfigured } from "../lib/stripe.js";
 import { requireAuth } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
@@ -8,6 +8,13 @@ router.post(
   "/create-setup-intent",
   requireAuth,
   async (req, res) => {
+
+    if (!isStripeConfigured || !stripe) {
+  return res.status(503).json({
+    error: "Payment service is not configured in this environment.",
+  });
+}
+
     try {
       const setupIntent =
         await stripe.setupIntents.create({

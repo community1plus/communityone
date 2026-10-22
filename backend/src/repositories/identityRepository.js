@@ -20,6 +20,7 @@ export async function findUserByCognitoSub(
       FROM ${TABLE}
       WHERE cognito_sub = $1
       LIMIT 1
+      FOR UPDATE
     `,
     [cognitoSub]
   );
@@ -27,6 +28,31 @@ export async function findUserByCognitoSub(
   return rows[0] || null;
 }
 
+
+/* =====================================================
+   FIND BY AUTH IDENTITY
+===================================================== */
+
+export async function findUserByAuthIdentity(cognitoSub) {
+  if (!cognitoSub) {
+    return null;
+  }
+
+  const { rows } = await pool.query(
+    `
+      SELECT u.*
+      FROM user_auth_identities AS a
+      JOIN ${TABLE} AS u
+        ON u.id = a.user_id
+      WHERE a.provider = $1
+        AND a.provider_subject = $2
+      LIMIT 1
+    `,
+    ["cognito", cognitoSub]
+  );
+
+  return rows[0] || null;
+}
 
 
 /* =====================================================
@@ -82,14 +108,49 @@ export async function createUserForCognitoIdentity({
 
     if (emailMatches.length > 0) {
       // Allow an idempotent retry for the same identity.
-      if (
-        emailMatches.length === 1 &&
-        emailMatches[0].cognito_sub === cognitoSub
-      ) {
-        await client.query("COMMIT");
-        transactionStarted = false;
-        return emailMatches[0];
-      }
+if (
+  emailMatches.length === 1 &&
+  emailMatches[0].cognito_sub === cognitoSub
+  ) {
+      await client.query(
+        `
+          INSERT INTO user_auth_identities (
+            user_id,
+            provider,
+            provider_subject
+          )
+          VALUES ($1, $2, $3)
+          ON CONFLICT (provider, provider_subject) DO NOTHING
+        `,
+        [emailMatches[0].id, "cognito", cognitoSub]
+      );
+      const mappingResult = await client.query(
+  `
+    SELECT user_id
+    FROM user_auth_identities
+    WHERE provider = $1
+      AND provider_subject = $2
+    LIMIT 1
+  `,
+  ["cognito", cognitoSub]
+);
+
+if (
+  !mappingResult.rows[0] ||
+  mappingResult.rows[0].user_id !== emailMatches[0].id
+) {
+  const error = new Error(
+    "Cognito identity is already linked to a different Community One user"
+  );
+
+  error.code = "IDENTITY_LINK_CONFLICT";
+  throw error;
+}
+      await client.query("COMMIT");
+      transactionStarted = false;
+
+      return emailMatches[0];
+  }
 
       const error = new Error(
         "This email belongs to another Community One identity. Explicit account linking is required."
@@ -122,6 +183,7 @@ export async function createUserForCognitoIdentity({
           FROM ${TABLE}
           WHERE cognito_sub = $1
           LIMIT 1
+          FOR UPDATE
         `,
         [cognitoSub]
       );
@@ -135,10 +197,47 @@ export async function createUserForCognitoIdentity({
       );
     }
 
-    await client.query("COMMIT");
-    transactionStarted = false;
+// Ensure this Cognito identity maps to the canonical user.
+await client.query(
+  `
+    INSERT INTO user_auth_identities (
+      user_id,
+      provider,
+      provider_subject
+    )
+    VALUES ($1, $2, $3)
+    ON CONFLICT (provider, provider_subject) DO NOTHING
+  `,
+  [user.id, "cognito", cognitoSub]
+);
 
-    return user;
+const mappingResult = await client.query(
+  `
+    SELECT user_id
+    FROM user_auth_identities
+    WHERE provider = $1
+      AND provider_subject = $2
+    LIMIT 1
+  `,
+  ["cognito", cognitoSub]
+);
+
+if (
+  !mappingResult.rows[0] ||
+  mappingResult.rows[0].user_id !== user.id
+) {
+  const error = new Error(
+    "Cognito identity is already linked to a different Community One user"
+  );
+
+  error.code = "IDENTITY_LINK_CONFLICT";
+  throw error;
+}
+
+await client.query("COMMIT");
+transactionStarted = false;
+
+return user;
   } catch (error) {
     if (transactionStarted) {
       try {
