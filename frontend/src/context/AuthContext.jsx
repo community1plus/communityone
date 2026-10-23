@@ -263,13 +263,6 @@ const updateOnboardingStatus = useCallback(
 
         const idPayload = session.tokens?.idToken?.payload || {};
 
-console.log("[AUTH ID TOKEN CLAIMS]", {
-  sub: idPayload.sub,
-  email: idPayload.email,
-  emailVerified: idPayload.email_verified,
-  cognitoUsername: idPayload["cognito:username"],
-  issuer: idPayload.iss,
-});  
 
         if (!accessToken) {
           clearAuth();
