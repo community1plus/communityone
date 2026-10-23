@@ -1,5 +1,5 @@
 
-import { pool } from "../db/pool.js";
+import { pool } from "../src/db/pool.js";
 
 const TABLE = "users";
 const AUTH_IDENTITY_TABLE = "user_auth_identities";
@@ -343,9 +343,11 @@ export async function updateUserCognitoSub(userId, cognitoSub) {
    Never updates users.cognito_sub.
 ===================================================== */
 
+
 export async function linkAuthIdentityToUser(
   userId,
-  cognitoSub
+  cognitoSub,
+  authMethod
 ) {
   if (!userId) {
     throw new Error("Missing Community One userId");
@@ -353,6 +355,24 @@ export async function linkAuthIdentityToUser(
 
   if (!cognitoSub) {
     throw new Error("Missing Cognito subject");
+  }
+
+  const normalizedAuthMethod = String(authMethod || "")
+    .trim()
+    .toLowerCase();
+
+  const allowedAuthMethods = new Set([
+    "google",
+    "facebook",
+    "email",
+  ]);
+
+  if (!allowedAuthMethods.has(normalizedAuthMethod)) {
+    const error = new Error(
+      "Unsupported authentication method"
+    );
+    error.code = "INVALID_AUTH_METHOD";
+    throw error;
   }
 
   const client = await pool.connect();
@@ -381,8 +401,7 @@ export async function linkAuthIdentityToUser(
       throw error;
     }
 
-    // If this subject already exists, it must belong
-    // to this same canonical user.
+    // An identity must never be reassigned to another user.
     const existingResult = await client.query(
       `
         SELECT user_id
@@ -406,35 +425,53 @@ export async function linkAuthIdentityToUser(
         throw error;
       }
 
+      // Same user: refresh the originating-method metadata.
+      await client.query(
+        `
+          UPDATE user_auth_identities
+          SET
+            auth_method = $3,
+            updated_at = NOW()
+          WHERE provider = $1
+            AND provider_subject = $2
+        `,
+        ["cognito", cognitoSub, normalizedAuthMethod]
+      );
+
       await client.query("COMMIT");
       transactionStarted = false;
 
       return {
         userId,
         cognitoSub,
+        authMethod: normalizedAuthMethod,
         alreadyLinked: true,
       };
     }
 
-    // The unique constraint on (provider, provider_subject)
-    // remains the final safeguard against concurrent linking.
     const insertResult = await client.query(
       `
         INSERT INTO user_auth_identities (
           user_id,
           provider,
-          provider_subject
+          provider_subject,
+          auth_method
         )
-        VALUES ($1, $2, $3)
+        VALUES ($1, $2, $3, $4)
         ON CONFLICT (provider, provider_subject)
         DO NOTHING
         RETURNING user_id
       `,
-      [userId, "cognito", cognitoSub]
+      [
+        userId,
+        "cognito",
+        cognitoSub,
+        normalizedAuthMethod,
+      ]
     );
 
     if (!insertResult.rows.length) {
-      // Another request may have linked the subject first.
+      // A concurrent request may have inserted this subject.
       const retryResult = await client.query(
         `
           SELECT user_id
@@ -457,6 +494,19 @@ export async function linkAuthIdentityToUser(
         error.code = "IDENTITY_LINK_CONFLICT";
         throw error;
       }
+
+      // The concurrent insert belongs to this user.
+      await client.query(
+        `
+          UPDATE user_auth_identities
+          SET
+            auth_method = $3,
+            updated_at = NOW()
+          WHERE provider = $1
+            AND provider_subject = $2
+        `,
+        ["cognito", cognitoSub, normalizedAuthMethod]
+      );
     }
 
     await client.query("COMMIT");
@@ -465,6 +515,7 @@ export async function linkAuthIdentityToUser(
     return {
       userId,
       cognitoSub,
+      authMethod: normalizedAuthMethod,
       alreadyLinked: false,
     };
   } catch (error) {
@@ -483,6 +534,41 @@ export async function linkAuthIdentityToUser(
   } finally {
     client.release();
   }
+}
+
+
+/* =====================================================
+   MARK COMMUNITY ONE EMAIL AS VERIFIED
+===================================================== */
+
+export async function markUserEmailVerified(userId) {
+  if (!userId) {
+    throw new Error("Missing Community One userId");
+  }
+
+  const { rows } = await pool.query(
+    `
+      UPDATE ${TABLE}
+      SET
+        email_verified = TRUE,
+        email_verified_at = COALESCE(
+          email_verified_at,
+          NOW()
+        ),
+        updated_at = NOW()
+      WHERE id = $1
+      RETURNING *
+    `,
+    [userId]
+  );
+
+  if (!rows.length) {
+    const error = new Error("Community One user not found");
+    error.code = "USER_NOT_FOUND";
+    throw error;
+  }
+
+  return rows[0];
 }
 
 

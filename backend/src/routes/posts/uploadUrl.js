@@ -1,8 +1,8 @@
 import express from "express";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { s3 } from "../../lib/s3.js";
-import { buildS3Key } from "../../utils/buildS3Key.js";
+import { s3 } from "../../../lib/s3.js";
+import { buildS3Key } from "../../../utils/buildS3Key.js";
 import authMiddleware from "../../../middleware/authMiddleware.js";
 import requireCompletedOnboarding from "../../../middleware/requireCompletedOnboarding.js";
 

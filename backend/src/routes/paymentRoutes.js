@@ -1,6 +1,6 @@
 import express from "express";
 
-import { stripe, isStripeConfigured } from "../lib/stripe.js";
+import { stripe, isStripeConfigured } from "../../lib/stripe.js";
 import authMiddleware from "../../middleware/authMiddleware.js";
 
 import {

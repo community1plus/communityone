@@ -5,6 +5,7 @@ import pkg from "pg";
 import session from "express-session";
 import { pool } from "./db/pool.js";
 import { connectDB } from "../src/db/db.js";
+import authIdentityRoutes from "../routes/authIdentityRoutes.js";
 
 
 await connectDB();
@@ -33,7 +34,7 @@ import meRoutes from "./routes/meRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import businessRoutes from "./routes/businessRoutes.js";
 
-import moderationRoutes from "./routes/moderation/moderation.js";
+import moderationRoutes from "./services/moderation/moderation.js";
 import businessEmailVerificationRoutes from "./routes/businessEmailVerificationRoutes.js";
 
 // import identityRoutes from "./routes/identityRoutes.js";
@@ -82,6 +83,13 @@ app.use(
       httpOnly: true,
     },
   })
+);
+
+
+app.use(
+  "/api/me/auth-identities",
+  authMiddleware,
+  authIdentityRoutes
 );
 
 app.set("trust proxy", 1);

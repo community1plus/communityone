@@ -4,10 +4,10 @@
   "type": "module",
   "description": "CommunityOne backend API",
   "main": "src/server.js",
-  "scripts": {
-    "start": "node src/server.js",
-    "dev": "node src/server.js"
-  },
+"scripts": {
+  "start": "node --env-file=.env src/server.js",
+  "dev": "node --env-file=.env src/server.js"
+},
   "keywords": [],
   "author": "",
   "license": "ISC",

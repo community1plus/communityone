@@ -2,7 +2,7 @@
 import express from "express";
 
 import { pool } from "../db/pool.js";
-import { normalizeProfile } from "../utils/normalizeProfile.js";
+import { normalizeProfile } from "../../utils/normalizeProfile.js";
 import { getProfileService } from "../../services/profileService.js";
 import {
   fetchParticipationByPersonId,
