@@ -15,6 +15,35 @@ import {
 } from "./personService.js";
 
 
+async function buildResolvedIdentity(
+  user,
+  cognitoSub,
+  email,
+  cognitoUsername
+) {
+  const identity = buildIdentity(
+    user,
+    cognitoSub,
+    email,
+    cognitoUsername
+  );
+
+  const domainContext = await ensurePersonParticipation(
+    identity.userId
+  );
+
+  return {
+    ...identity,
+    personId: domainContext.person.personId,
+    personStatus: domainContext.person.status,
+    onboardingStatus:
+      domainContext.participation.onboardingStatus,
+    participationScope:
+      domainContext.participation.participationScope,
+  };
+}
+
+
 export async function resolveIdentity({
   cognitoSub,
   email,
