@@ -15,6 +15,24 @@ import {
 } from "./personService.js";
 
 
+function buildIdentity(
+  user,
+  cognitoSub,
+  email,
+  cognitoUsername
+) {
+  return {
+    userId: user.id,
+    cognitoSub: cognitoSub || user.cognito_sub,
+    email: user.email || email || "",
+    username: cognitoUsername || "",
+    createdAt: user.created_at,
+    updatedAt: user.updated_at,
+    lastLogin: user.last_login,
+  };
+}
+
+
 async function buildResolvedIdentity(
   user,
   cognitoSub,
@@ -42,6 +60,7 @@ async function buildResolvedIdentity(
       domainContext.participation.participationScope,
   };
 }
+
 
 
 export async function resolveIdentity({
@@ -80,6 +99,18 @@ export async function resolveIdentity({
       "Cannot resolve a Community One user without an email"
     );
   }
+
+  console.log("[IDENTITY RESOLUTION DEBUG]", {
+  cognitoSub,
+  normalizedEmail,
+  emailVerified,
+  foundByAuthIdentity: Boolean(
+    await findUserByAuthIdentity(cognitoSub)
+  ),
+  foundByPrimarySub: Boolean(
+    await findUserByCognitoSub(cognitoSub)
+  ),
+});
 
   // 2. A new identity must have a verified email.
   if (emailVerified !== true) {

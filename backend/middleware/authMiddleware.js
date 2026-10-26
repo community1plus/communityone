@@ -129,6 +129,32 @@ async function verifyCognitoToken(token) {
 /* =====================================================
    PLATFORM AUTHENTICATION CONTEXT
 ===================================================== */
+export async function verifyCognitoIdTokenFromRequest(req) {
+  const authorization = req.headers.authorization || "";
+  const match = authorization.match(/^Bearer\s+(\S+)$/i);
+
+  if (!match) {
+    const error = new Error("Missing authorization token");
+    error.code = "AUTH_TOKEN_MISSING";
+    throw error;
+  }
+
+  const verified = await verifyCognitoToken(match[1]);
+
+  if (verified.token_use !== "id") {
+    const error = new Error("Invalid token type");
+    error.code = "INVALID_TOKEN_TYPE";
+    throw error;
+  }
+
+  if (!verified.sub || !verified.email) {
+    const error = new Error("Cognito token must contain subject and email");
+    error.code = "TOKEN_CLAIMS_MISSING";
+    throw error;
+  }
+
+  return verified;
+}
 
 async function buildAuthContext(verified) {
   const cognitoSub = verified.sub;
@@ -142,12 +168,12 @@ async function buildAuthContext(verified) {
     throw new Error("Cognito token is missing subject");
   }
 
-  const identity = await resolveIdentity({
-    cognitoSub,
-    email,
-    cognitoUsername,
-    emailVerified: verified.email_verified === true,
-  });
+const identity = await resolveIdentity({
+  cognitoSub,
+  email,
+  cognitoUsername,
+  emailVerified: false,
+});
 
   if (!identity?.userId) {
     throw new Error("Platform identity could not be resolved");
@@ -215,17 +241,19 @@ export default async function authMiddleware(req, res, next) {
     });
 
     return next();
-  } catch (err) {
-    console.error("Authentication middleware failed", {
-      name: err.name,
-      message: err.message,
-      stack:
-        process.env.NODE_ENV === "development"
-          ? err.stack
-          : undefined,
-    });
 
-    // Token validation errors are authentication failures.
+  } catch (err) {
+    // Email verification is a known application state.
+    if (err.code === "EMAIL_NOT_VERIFIED") {
+      return res.status(403).json({
+        code: "EMAIL_NOT_VERIFIED",
+        error: "Email verification required",
+        message:
+          "Please verify your email address before continuing.",
+      });
+    }
+
+    // Invalid or expired JWTs are authentication failures.
     if (
       err.name === "JsonWebTokenError" ||
       err.name === "TokenExpiredError" ||
@@ -236,10 +264,19 @@ export default async function authMiddleware(req, res, next) {
       });
     }
 
-    // Identity lookup/bootstrap or infrastructure errors
-    // should not be misreported as invalid credentials.
+    // Log unexpected failures before returning.
+    console.error("Authentication middleware failed", {
+      name: err.name,
+      message: err.message,
+      stack:
+        process.env.NODE_ENV === "development"
+          ? err.stack
+          : undefined,
+    });
+
     return res.status(500).json({
       error: "Unable to establish authentication context",
     });
   }
+
 }
