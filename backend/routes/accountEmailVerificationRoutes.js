@@ -2,7 +2,7 @@
 import express from "express";
 import crypto from "node:crypto";
 
-import { pool } from "../db/pool.js";
+import { pool } from "../src/db/pool.js";
 import { sendEmail } from "../../services/emailService.js";
 import {
   verifyCognitoIdTokenFromRequest,
