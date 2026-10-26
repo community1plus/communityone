@@ -9,7 +9,7 @@ import {
 } from "../middleware/authMiddleware.js";
 import {
   resolveIdentity,
-} from "../../services/identityService.js";
+} from "../services/identityService.js";
 
 const router = express.Router();
 
