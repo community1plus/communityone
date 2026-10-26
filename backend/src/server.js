@@ -6,7 +6,7 @@ import session from "express-session";
 import { pool } from "./db/pool.js";
 import { connectDB } from "../src/db/db.js";
 import authIdentityRoutes from "../routes/authIdentityRoutes.js";
-import accountEmailVerificationRoutes from "./routes/accountEmailVerificationRoutes.js";
+import accountEmailVerificationRoutes from "../routes/accountEmailVerificationRoutes.js";
 
 await connectDB();
 
@@ -326,6 +326,11 @@ console.log("Mounting Facebook routes...");
 app.use("/api/facebook", facebookRoutes);
 
 app.use("/api/business-email-verification",  businessEmailVerificationRoutes);
+
+app.use(
+  "/api/account-email-verification",
+  accountEmailVerificationRoutes
+);
 
 app.use("/api/moderation", moderationRoutes);
 
