@@ -6,7 +6,7 @@ import { pool } from "../src/db/pool.js";
 import { sendEmail } from "../services/emailService.js";
 import {
   verifyCognitoIdTokenFromRequest,
-} from "../../middleware/authMiddleware.js";
+} from "../middleware/authMiddleware.js";
 import {
   resolveIdentity,
 } from "../../services/identityService.js";
