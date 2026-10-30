@@ -546,18 +546,15 @@ export async function markUserEmailVerified(userId) {
     throw new Error("Missing Community One userId");
   }
 
+
   const { rows } = await pool.query(
     `
-      UPDATE ${TABLE}
-      SET
-        email_verified = TRUE,
-        email_verified_at = COALESCE(
-          email_verified_at,
-          NOW()
-        ),
-        updated_at = NOW()
+      UPDATE users
+      SET email_verified = TRUE,
+          email_verified_at = COALESCE(email_verified_at, NOW()),
+          updated_at = NOW()
       WHERE id = $1
-      RETURNING *
+      RETURNING id, email, email_verified, email_verified_at
     `,
     [userId]
   );

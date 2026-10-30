@@ -9,6 +9,10 @@ import {
   updateParticipationStatus,
 } from "../../repositories/personParticipationRepository.js";
 
+import {
+  findUserById,
+} from "../../repositories/identityRepository.js";
+
 const router = express.Router();
 
 const ALLOWED_ONBOARDING_STATUSES = new Set([
@@ -244,6 +248,20 @@ router.get("/", async (req, res) => {
       });
     }
 
+
+const canonicalUserStartedAt = Date.now();
+
+const canonicalUser = await findUserById(userId);
+
+console.log("[ME TIMING] findUserById", {
+  durationMs: Date.now() - canonicalUserStartedAt,
+});
+
+if (!canonicalUser) {
+  return res.status(404).json({
+    error: "Community One user not found.",
+  });
+}
     console.log("[ME] AUTH IDENTITY", {
       userId,
       cognitoSub,
@@ -255,15 +273,21 @@ router.get("/", async (req, res) => {
     });
 
     // Fetch the legacy profile associated with the account.
-    const profileResult = await pool.query(
-      `
-        SELECT *
-        FROM user_profiles
-        WHERE user_id = $1
-        LIMIT 1
-      `,
-      [userId]
-    );
+const profileQueryStartedAt = Date.now();
+
+const profileResult = await pool.query(
+  `
+    SELECT *
+    FROM user_profiles
+    WHERE user_id = $1
+    LIMIT 1
+  `,
+  [userId]
+);
+
+console.log("[ME TIMING] user_profiles query", {
+  durationMs: Date.now() - profileQueryStartedAt,
+});
 
     const rawProfile = profileResult.rows[0] || null;
 
@@ -279,15 +303,21 @@ router.get("/", async (req, res) => {
     let organisationProfile = null;
 
     if (rawProfile?.id) {
-      const organisationResult = await pool.query(
-        `
-          SELECT *
-          FROM organisation_profiles
-          WHERE user_profile_id = $1
-          LIMIT 1
-        `,
-        [rawProfile.id]
-      );
+const organisationQueryStartedAt = Date.now();
+
+const organisationResult = await pool.query(
+  `
+    SELECT *
+    FROM organisation_profiles
+    WHERE user_profile_id = $1
+    LIMIT 1
+  `,
+  [rawProfile.id]
+);
+
+console.log("[ME TIMING] organisation_profiles query", {
+  durationMs: Date.now() - organisationQueryStartedAt,
+});
 
       organisationProfile =
         organisationResult.rows[0] || null;
@@ -355,6 +385,8 @@ router.get("/", async (req, res) => {
         emailLocalPart ||
         tokenUsername ||
         "",
+        emailVerified: canonicalUser.email_verified === true,
+        emailVerifiedAt: canonicalUser.email_verified_at ?? null,
 
       // Legacy profile state; not the onboarding status.
       profileCompleted: Boolean(profile),

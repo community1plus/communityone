@@ -113,26 +113,28 @@ router.post("/start", async (req, res) => {
     const sub = claims.sub;
     const email = normaliseEmail(claims.email);
 
-    const existing = await pool.query(
-      `SELECT last_sent_at
-       FROM account_email_verification_challenges
-       WHERE cognito_sub = $1
-         AND email_normalized = $2`,
-      [sub, email]
-    );
+const existing = await pool.query(
+  `SELECT
+     last_sent_at,
+     EXTRACT(EPOCH FROM (NOW() - last_sent_at)) AS elapsed_seconds
+   FROM account_email_verification_challenges
+   WHERE cognito_sub = $1
+     AND email_normalized = $2`,
+  [sub, email]
+);
 
-    if (existing.rows.length) {
-      const lastSent = new Date(existing.rows[0].last_sent_at);
-      const elapsedSeconds =
-        (Date.now() - lastSent.getTime()) / 1000;
+if (existing.rows.length) {
+  const elapsedSeconds = Number(
+    existing.rows[0].elapsed_seconds
+  );
 
-      if (elapsedSeconds < RESEND_COOLDOWN_SECONDS) {
-        return res.status(429).json({
-          code: "VERIFICATION_RATE_LIMITED",
-          error: "Please wait before requesting another code.",
-        });
-      }
-    }
+  if (elapsedSeconds < RESEND_COOLDOWN_SECONDS) {
+    return res.status(429).json({
+      code: "VERIFICATION_RATE_LIMITED",
+      error: "Please wait before requesting another code.",
+    });
+  }
+}
 
     const code = crypto.randomInt(100000, 1000000).toString();
     const codeHash = hashCode({ sub, email, code });

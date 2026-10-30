@@ -17,3 +17,16 @@ export const pool = new Pool({
     rejectUnauthorized: false,
   },
 });
+
+
+pool.on("connect", () => {
+  console.log("[DB POOL] New database connection established");
+});
+
+pool.on("acquire", () => {
+  console.log("[DB POOL] Existing connection acquired");
+});
+
+pool.on("remove", () => {
+  console.log("[DB POOL] Connection removed from pool");
+});

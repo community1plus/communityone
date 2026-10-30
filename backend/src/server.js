@@ -332,6 +332,8 @@ app.use(
   accountEmailVerificationRoutes
 );
 
+console.log("   → /api/account-email-verification");
+
 app.use("/api/moderation", moderationRoutes);
 
 app.use(

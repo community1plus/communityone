@@ -83,34 +83,38 @@ export async function resolveIdentity({
     await findUserByAuthIdentity(cognitoSub) ||
     await findUserByCognitoSub(cognitoSub);
 
-  if (existingBySub) {
-    await updateLastLogin(existingBySub.id);
+if (existingBySub) {
+  const existingEmail = String(existingBySub.email || "")
+    .trim()
+    .toLowerCase();
 
-    return buildResolvedIdentity(
-      existingBySub,
-      cognitoSub,
-      normalizedEmail,
-      cognitoUsername
+  if (existingEmail !== normalizedEmail) {
+    const error = new Error(
+      "The verified email does not match the existing account email"
     );
+    error.code = "EMAIL_MISMATCH";
+    throw error;
   }
+
+  await markUserEmailVerified(existingBySub.id);
+
+  await updateLastLogin(existingBySub.id);
+
+  const updatedUser = await findUserById(existingBySub.id);
+
+  return buildResolvedIdentity(
+    updatedUser || existingBySub,
+    cognitoSub,
+    normalizedEmail,
+    cognitoUsername
+  );
+}
 
   if (!normalizedEmail) {
     throw new Error(
       "Cannot resolve a Community One user without an email"
     );
   }
-
-  console.log("[IDENTITY RESOLUTION DEBUG]", {
-  cognitoSub,
-  normalizedEmail,
-  emailVerified,
-  foundByAuthIdentity: Boolean(
-    await findUserByAuthIdentity(cognitoSub)
-  ),
-  foundByPrimarySub: Boolean(
-    await findUserByCognitoSub(cognitoSub)
-  ),
-});
 
   // 2. A new identity must have a verified email.
   if (emailVerified !== true) {
@@ -133,7 +137,7 @@ export async function resolveIdentity({
       cognitoSub,
       authMethod
     );
-
+    
     await markUserEmailVerified(existingByEmail.id);
 
     const updatedUser =
@@ -160,9 +164,9 @@ export async function resolveIdentity({
       "Community One user provisioning returned no user ID"
     );
   }
+const verifiedUser = await markUserEmailVerified(user.id);
 
-  await markUserEmailVerified(user.id);
-  await updateLastLogin(user.id);
+await updateLastLogin(user.id);
 
   const updatedUser = await findUserById(user.id);
 
