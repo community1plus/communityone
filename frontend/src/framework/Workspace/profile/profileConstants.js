@@ -121,7 +121,7 @@ export const PERSONAL_STEPS = [
 
                 label: "Email",
 
-                type: "email",
+                type: "verified-email",
 
                 readOnly: true,
             },

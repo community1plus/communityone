@@ -102,6 +102,9 @@ export function AuthProvider({ children }) {
   const [participationError, setParticipationError] =
     useState(null);
 
+  const [emailVerificationRequired, setEmailVerificationRequired] =
+    useState(false);  
+
   const [isGuest, setIsGuest] = useState(() => {
     return localStorage.getItem(GUEST_KEY) === "true";
   });
@@ -125,87 +128,100 @@ export function AuthProvider({ children }) {
      CLEAR AUTH
   ========================================= */
 
-  const clearAuth = useCallback(() => {
-    if (!mountedRef.current) {
-      return;
-    }
 
-    setUser(null);
-    setToken(null);
-    setTokens(null);
+const clearAuth = useCallback(() => {
+  if (!mountedRef.current) {
+    return;
+  }
 
-    setParticipation(null);
-    setParticipationLoading(false);
-    setParticipationError(null);
-  }, []);
+  setUser(null);
+  setToken(null);
+  setTokens(null);
+
+  setParticipation(null);
+  setParticipationLoading(false);
+  setParticipationError(null);
+  setEmailVerificationRequired(false);
+}, []);
+
 
   /* =========================================
      LOAD PARTICIPATION
   ========================================= */
 
-  const loadParticipation = useCallback(
-    async (accessToken) => {
-      if (!accessToken) {
-        if (mountedRef.current) {
-          setParticipation(null);
-          setParticipationError(
-            "An access token is required to load participation."
-          );
-        }
 
-        return null;
-      }
+const loadParticipation = useCallback(async (accessToken) => {
+  if (!accessToken) {
+    if (mountedRef.current) {
+      setParticipation(null);
+      setEmailVerificationRequired(false);
+      setParticipationError(
+        "An access token is required to load participation."
+      );
+      setParticipationLoading(false);
+    }
 
-      if (mountedRef.current) {
-        setParticipationLoading(true);
-        setParticipationError(null);
-      }
+    return null;
+  }
 
-      try {
-        const response = await apiFetch("/me", {
-          method: "GET",
-          token: accessToken,
-        });
+  if (mountedRef.current) {
+    setParticipationLoading(true);
+    setParticipationError(null);
+  }
 
-        if (response?.authenticated !== true) {
-          throw new Error(
-            "The backend did not confirm authentication."
-          );
-        }
+  try {
+    const response = await apiFetch("/me", {
+      method: "GET",
+      token: accessToken,
+    });
 
-        const nextParticipation =
-          response?.participation ?? null;
+    if (response?.authenticated !== true) {
+      throw new Error(
+        "The backend did not confirm authentication."
+      );
+    }
 
-        if (mountedRef.current) {
-          setParticipation(nextParticipation);
-        }
+    const nextParticipation = response?.participation ?? null;
 
-        return nextParticipation;
-      } catch (error) {
-        console.error(
-          "[AUTH] Participation hydration failed:",
-          error?.message || error
-        );
+    if (mountedRef.current) {
+      setParticipation(nextParticipation);
+      setEmailVerificationRequired(false);
+      setParticipationError(null);
+    }
 
-        if (mountedRef.current) {
-          setParticipation(null);
-          setParticipationError(
-            error?.message ||
-              "Unable to load participation."
-          );
-        }
+    return nextParticipation;
+  } catch (error) {
+    const errorCode =
+      error?.code ??
+      error?.data?.code ??
+      error?.response?.data?.code;
 
-        // Do not sign the user out just because
-        // the participation endpoint is unavailable.
-        return null;
-      } finally {
-        if (mountedRef.current) {
-          setParticipationLoading(false);
-        }
-      }
-    },
-    []
-  );
+    const requiresEmailVerification =
+      errorCode === "EMAIL_NOT_VERIFIED";
+
+    console.error(
+      "[AUTH] Participation hydration failed:",
+      error?.message || error
+    );
+
+    if (mountedRef.current) {
+      setParticipation(null);
+      setEmailVerificationRequired(requiresEmailVerification);
+      setParticipationError(
+        error?.message || "Unable to load participation."
+      );
+    }
+
+    // A backend participation failure does not, by itself,
+    // invalidate a successful Cognito authentication session.
+    return null;
+  } finally {
+    if (mountedRef.current) {
+      setParticipationLoading(false);
+    }
+  }
+}, []);
+
 
 
 const updateOnboardingStatus = useCallback(
@@ -288,7 +304,9 @@ const updateOnboardingStatus = useCallback(
          * obtained token. A participation failure does
          * not invalidate successful Amplify auth.
          */
-        await loadParticipation(accessToken);
+        console.time("[AUTH] loadParticipation");
+await loadParticipation(accessToken);
+console.timeEnd("[AUTH] loadParticipation");
 
         /*
          * Preserve the existing return contract for
@@ -434,6 +452,7 @@ const login = useCallback(async () => {
       participation,
       participationLoading,
       participationError,
+      emailVerificationRequired,
       loadParticipation,
       updateOnboardingStatus,
       loading,
@@ -457,6 +476,7 @@ const login = useCallback(async () => {
       participation,
       participationLoading,
       participationError,
+      emailVerificationRequired,
       loadParticipation,
       loading,
       hydrating,

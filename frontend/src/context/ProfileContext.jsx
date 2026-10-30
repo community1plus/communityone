@@ -12,7 +12,7 @@ import { fetchAuthSession } from "aws-amplify/auth";
 
 import { useAuth } from "./AuthContext";
 import useAPI from "../hooks/useAPI";
-
+import { buildUrl } from "../services/api";
 
 const ProfileContext =
     createContext(null);
@@ -543,6 +543,12 @@ export function ProfileProvider({
         cachedOnRender?.profile || null
     );
 
+    
+const [
+    accountUser,
+    setAccountUser,
+] = useState(null);
+
 
     const [
         providers,
@@ -601,6 +607,7 @@ export function ProfileProvider({
             } = {}) => {
 
                 setProfile(null);
+                setAccountUser(null);
 
                 setProviders(
                     normaliseProviders()
@@ -660,50 +667,115 @@ export function ProfileProvider({
        AUTH HEADERS
     ================================================= */
 
-    const getAuthHeaders =
-        useCallback(
-            async (
-                extraHeaders = {}
-            ) => {
-
-                const session =
-                    await fetchAuthSession({
-                        forceRefresh: true,
-                    });
 
 
-                const authToken =
-                    session.tokens
-                        ?.idToken
-                        ?.toString();
+const getAuthHeaders = useCallback(
+  async (extraHeaders = {}) => {
+    const session = await fetchAuthSession({
+      forceRefresh: true,
+    });
+
+    const idToken = session.tokens?.idToken;
+    const accessToken = session.tokens?.accessToken;
+    const idTokenString = idToken?.toString();
+
+    if (import.meta.env.DEV) {
+      console.log("[AMPLIFY AUTH DIAGNOSTIC]", {
+        hasTokensObject: Boolean(session.tokens),
+        hasIdToken: Boolean(idToken),
+        idTokenType: typeof idToken,
+        idTokenStringLength: idTokenString?.length ?? 0,
+        hasAccessToken: Boolean(accessToken),
+        isAuthenticated,
+        isGuest,
+      });
+    }
+
+    if (!idTokenString || idTokenString === "undefined") {
+      throw new Error(
+        "No ID token available in the Amplify session"
+      );
+    }
+
+    return {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${idTokenString}`,
+      ...extraHeaders,
+    };
+  },
+  [isAuthenticated, isGuest]
+);
 
 
-                if (!authToken) {
+const testAccountEmailVerification = useCallback(async () => {
+    try {
+        const headers = await getAuthHeaders();
 
-                    throw new Error(
-                        "No authenticated session"
-                    );
+        const response = await fetch(
+    buildUrl("/account-email-verification/start"),
+    {
+        method: "POST",
+        headers,
+    }
+);
 
-                }
+        const result = await response.json();
+
+        if (!response.ok || result.success !== true) {
+    throw new Error(
+        result.error ||
+        result.message ||
+        `Unable to send verification code (HTTP ${response.status}).`
+    );
+}
+        console.log("Account verification test:", {
+            status: response.status,
+            result,
+        });
+
+        return result;
+    } catch (error) {
+        console.error("Account verification test failed:", error);
+        throw error;
+    }
+}, [getAuthHeaders]);
 
 
-                return {
+const confirmAccountEmailVerification = useCallback(
+    async (code) => {
+        const normalizedCode = String(code || "").trim();
 
-                    "Content-Type":
-                        "application/json",
+        if (!/^\d{6}$/.test(normalizedCode)) {
+            throw new Error("Enter the six-digit verification code.");
+        }
 
-                    Authorization:
-                        `Bearer ${authToken}`,
+        const headers = await getAuthHeaders();
 
-                    ...extraHeaders,
+        const response = await fetch(
+    buildUrl("/account-email-verification/confirm"),
+    {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+            code: normalizedCode,
+        }),
+    }
+);
 
-                };
+        const result = await response.json().catch(() => ({}));
 
-            },
-            []
-        );
+        if (!response.ok || result.success !== true || result.verified !== true) {
+            throw new Error(
+                result.error ||
+                result.message ||
+                `Email verification failed (HTTP ${response.status}).`
+            );
+        }
 
-
+        return result;
+    },
+    [getAuthHeaders]
+);
     /* =================================================
        LOAD PROFILE
     ================================================= */
@@ -774,11 +846,16 @@ export function ProfileProvider({
                         await getAuthHeaders();
 
 
-                    const res =
-                        await apiRef.current.get(
-                            "/me",
-                            { headers }
-                        );
+const res =
+    await apiRef.current.get(
+        "/me",
+        {
+            headers,
+            params: {
+                _refresh: Date.now(),
+            },
+        }
+    );
 
 
                     const payload =
@@ -786,7 +863,12 @@ export function ProfileProvider({
                             res
                         );
 
+                    setAccountUser(payload?.user || null);
 
+                    console.log("[PROFILE EMAIL STATUS RECEIVED]", {
+    email: payload?.user?.email,
+    emailVerified: payload?.user?.emailVerified,
+});    
                     /*
                      * Preserve the backend profile
                      * as authoritative.
@@ -856,6 +938,8 @@ export function ProfileProvider({
                         clearProfileCache(
                             userKey
                         );
+
+                        setAccountUser(null);
 
 
                         markProfileReady(
@@ -1037,6 +1121,7 @@ export function ProfileProvider({
          */
 
         if (userChanged) {
+            setAccountUser(null);
 
             setProfile(
                 cached?.profile || null
@@ -1128,7 +1213,7 @@ export function ProfileProvider({
         if (!profile) {
 
             setProfile(null);
-
+            setAccountUser(null);
             setProviders(
                 normaliseProviders()
             );
@@ -1528,51 +1613,51 @@ export function ProfileProvider({
        CONTEXT VALUE
     ================================================= */
 
-    const value =
-        useMemo(
-            () => ({
+const value = useMemo(
+    () => ({
+        profile,
+        setProfile,
 
-                profile,
-                setProfile,
+        accountUser,
 
-                providers,
-                setProviders,
+        providers,
+        setProviders,
 
-                profileLoading,
-                profileReady,
+        profileLoading,
+        profileReady,
+        profileSaving,
+        profileError,
+        profileMissing,
 
-                profileSaving,
+        completionPercent,
+        basicProfileCompletion,
+        hasProfile,
 
-                profileError,
-                profileMissing,
-
-                completionPercent,
-                basicProfileCompletion,
-
-                hasProfile,
-
-                loadProfile,
-                saveProfile,
-                patchProfile,
-
-            }),
-            [
-                profile,
-                providers,
-                profileLoading,
-                profileReady,
-                profileSaving,
-                profileError,
-                profileMissing,
-                completionPercent,
-                basicProfileCompletion,
-                hasProfile,
-                loadProfile,
-                saveProfile,
-                patchProfile,
-            ]
-        );
-
+        loadProfile,
+        saveProfile,
+        patchProfile,
+        testAccountEmailVerification,
+        confirmAccountEmailVerification,
+    }),
+    [
+        profile,
+        accountUser,
+        providers,
+        profileLoading,
+        profileReady,
+        profileSaving,
+        profileError,
+        profileMissing,
+        completionPercent,
+        basicProfileCompletion,
+        hasProfile,
+        loadProfile,
+        saveProfile,
+        patchProfile,
+        testAccountEmailVerification,
+        confirmAccountEmailVerification,
+    ]
+);
 
     /* =================================================
        DEVELOPMENT DIAGNOSTIC

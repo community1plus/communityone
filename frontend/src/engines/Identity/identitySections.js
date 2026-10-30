@@ -39,7 +39,7 @@ export const PERSONAL_SECTIONS = [
 
                 label: "Email",
 
-                type: "email",
+                type: "verified-email",
 
                 readOnly: true,
             },

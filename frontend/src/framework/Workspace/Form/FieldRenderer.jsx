@@ -5,6 +5,7 @@ import SelectField from "./fields/SelectField";
 import WorkspaceField
     from "./WorkspaceField";
 
+import VerifiedEmailField from "./VerifiedEmailField";
 
 export default function FieldRenderer({
 
@@ -85,7 +86,21 @@ export default function FieldRenderer({
                 />
 
             );
+        case "verified-email":
 
+    return (
+
+        <VerifiedEmailField
+
+            field={field}
+
+            form={form}
+
+            editing={editing}
+
+        />
+
+    );
 
         default:
 

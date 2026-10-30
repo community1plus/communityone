@@ -11,6 +11,8 @@ import {
     useCallback,
 } from "react";
 
+
+
 import {
     useNavigate,
 } from "react-router-dom";
@@ -87,11 +89,13 @@ export default function CommunityPlusUserProfile({
     ================================================= */
 
 const {
-  user,
-  participation,
-  participationLoading,
-  participationError,
-  updateOnboardingStatus,
+    user,
+    participation,
+    participationLoading,
+    participationError,
+    updateOnboardingStatus,
+    isAuthenticated,
+    isGuest,
 } = useAuth();
 
 console.log("[PARTICIPATION STATE]", {
@@ -104,6 +108,8 @@ console.log("[PARTICIPATION STATE]", {
 const {
     profile,
     patchProfile,
+    testAccountEmailVerification,
+    confirmAccountEmailVerification,
 } = useProfile();
 
 
@@ -123,7 +129,12 @@ const {
         setEditingSections,
     ] = useState({});
 
-
+const [verificationCode, setVerificationCode] = useState("");
+const [verificationBusy, setVerificationBusy] = useState(false);
+const [verificationCodeSent, setVerificationCodeSent] = useState(false);
+const [verificationComplete, setVerificationComplete] = useState(false);
+const [verificationMessage, setVerificationMessage] = useState("");
+const [verificationError, setVerificationError] = useState("");
     /* =================================================
        PROFILE → FORM
     =================================================
@@ -878,51 +889,68 @@ if (onComplete) {
     };
 
 
-    /* =================================================
+        /* =====================================================
+       EMAIL VERIFICATION TEST — DEVELOPMENT ONLY
+    ===================================================== */
+
+const handleSendVerificationCode = async () => {
+    setVerificationBusy(true);
+    setVerificationError("");
+    setVerificationMessage("");
+
+    try {
+        const result = await testAccountEmailVerification();
+
+        setVerificationCodeSent(true);
+        setVerificationCode("");
+        setVerificationMessage(
+            result.message || "Verification code sent."
+        );
+    } catch (error) {
+        setVerificationError(error.message);
+    } finally {
+        setVerificationBusy(false);
+    }
+};
+
+const handleConfirmVerificationCode = async () => {
+    setVerificationBusy(true);
+    setVerificationError("");
+    setVerificationMessage("");
+
+    try {
+        await confirmAccountEmailVerification(verificationCode);
+
+        setVerificationComplete(true);
+        setVerificationMessage("Email verification completed.");
+    } catch (error) {
+        setVerificationError(error.message);
+    } finally {
+        setVerificationBusy(false);
+    }
+};
+
+    /* =====================================================
        WORKSPACE
-    ================================================= */
+    ===================================================== */
 
     if (isEntity) {
-
         return (
-
-            <EntityWorkspace
-
-                initialCapability="entity"
-
-                state={
-                    workspaceState
-                }
-
-                actions={
-                    workspaceActions
-                }
-
-            />
-
-        );
-
+    <IdentityWorkspace
+        initialCapability={initialCapability}
+        state={workspaceState}
+        actions={workspaceActions}
+    />
+);
     }
 
-
     return (
+    <IdentityWorkspace
+        initialCapability={initialCapability}
+        state={workspaceState}
+        actions={workspaceActions}
+    />
+);
 
-        <IdentityWorkspace
-
-            initialCapability={
-                initialCapability
-            }
-
-            state={
-                workspaceState
-            }
-
-            actions={
-                workspaceActions
-            }
-
-        />
-
-    );
 
 }

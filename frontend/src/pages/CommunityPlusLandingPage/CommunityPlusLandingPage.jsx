@@ -6,6 +6,7 @@ import { useAuth } from "../../context/AuthContext";
 import CommunityPlusAuthModal from "../../components/Auth/CommunityPlusAuthModal";
 
 import "./CommunityPlusLandingPage.css";
+import { useProfile } from "../../context/ProfileContext";
 
 const RETURN_TO_KEY = "communityone_return_to";
 const SWITCH_ACCOUNT_KEY = "communityone_open_auth_after_logout";
@@ -17,18 +18,21 @@ const ONBOARDING = {
   COMPLETED: "COMPLETED",
 };
 
+
 export default function CommunityPlusLandingPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
   const {
     loading,
+    user,
     authLoading,
     isAuthenticated,
     isGuest,
     participation,
     participationLoading,
     participationError,
+    emailVerificationRequired,
     updateOnboardingStatus,
     continueAsGuest,
     logout,
@@ -37,9 +41,21 @@ export default function CommunityPlusLandingPage() {
   const onboardingStatus =
     participation?.onboardingStatus ?? null;
 
-  const [showAuth, setShowAuth] = useState(false);
-  const [choiceBusy, setChoiceBusy] = useState(false);
-  const [choiceError, setChoiceError] = useState("");
+ 
+const [showAuth, setShowAuth] = useState(false);
+const [choiceBusy, setChoiceBusy] = useState(false);
+const [choiceError, setChoiceError] = useState("");
+
+const {
+  testAccountEmailVerification,
+  confirmAccountEmailVerification,
+} = useProfile();
+
+const [verificationCode, setVerificationCode] = useState("");
+const [verificationBusy, setVerificationBusy] = useState(false);
+const [verificationMessage, setVerificationMessage] = useState("");
+const [verificationError, setVerificationError] = useState("");
+
 
   const returnTo = useMemo(
     () =>
@@ -177,6 +193,50 @@ export default function CommunityPlusLandingPage() {
     setShowAuth(false);
     setChoiceError("");
   };
+
+
+  
+const handleSendVerificationCode = async () => {
+  setVerificationBusy(true);
+  setVerificationMessage("");
+  setVerificationError("");
+
+  try {
+    await testAccountEmailVerification();
+    setVerificationMessage(
+      "Verification code sent. Check your email."
+    );
+  } catch (error) {
+    setVerificationError(
+      error?.message || "Unable to send the verification code."
+    );
+  } finally {
+    setVerificationBusy(false);
+  }
+};
+
+const handleConfirmVerificationCode = async () => {
+  setVerificationBusy(true);
+  setVerificationMessage("");
+  setVerificationError("");
+
+  try {
+    await confirmAccountEmailVerification(verificationCode);
+    setVerificationCode("");
+    setVerificationMessage(
+      "Email verified successfully. Refreshing your account status..."
+    );
+
+    window.location.reload();
+  } catch (error) {
+    setVerificationError(
+      error?.message || "Unable to verify this email address."
+    );
+  } finally {
+    setVerificationBusy(false);
+  }
+};
+
 
   const openAuth = () => {
     if (hasAuthenticatedIdentity) {
@@ -342,11 +402,20 @@ export default function CommunityPlusLandingPage() {
     return null;
   }
 
-  const participationUnavailable =
-    hasAuthenticatedIdentity &&
-    !onboardingStatus &&
-    Boolean(participationError);
 
+const participationUnavailable =
+  hasAuthenticatedIdentity &&
+  !emailVerificationRequired &&
+  !onboardingStatus &&
+  Boolean(participationError);
+
+
+
+    console.log("[EMAIL TEST AUTH STATE]", {
+  isAuthenticated,
+  isGuest,
+  hasUser: Boolean(user),
+});
   /* =====================================================
      RENDER
   ===================================================== */
@@ -379,7 +448,7 @@ export default function CommunityPlusLandingPage() {
             </h2>
 
             <p className="landing-sub">
-              A Community platform for local news, events, and services.
+              KEEP BUILDING.
             </p>
           </div>
 
@@ -394,7 +463,7 @@ export default function CommunityPlusLandingPage() {
                 onClick={handleGuestEntry}
                 disabled={choiceBusy}
               >
-                Continue as Guest
+                Explore as Guest
               </button>
             ) : needsOnboardingChoice ? (
               <>
@@ -425,6 +494,73 @@ export default function CommunityPlusLandingPage() {
                   Set up minimum profile
                 </button>
               </>
+            
+
+) : emailVerificationRequired ? (
+  <>
+    <p className="guest-mode-copy">
+      Please verify your email address before continuing.
+    </p>
+
+    <button
+      type="button"
+      className="btn primary hero-cta"
+      onClick={handleSendVerificationCode}
+      disabled={verificationBusy}
+    >
+      {verificationBusy
+        ? "Please wait..."
+        : "Send verification code"}
+    </button>
+
+    <input
+      type="text"
+      inputMode="numeric"
+      autoComplete="one-time-code"
+      maxLength={6}
+      value={verificationCode}
+      onChange={(event) =>
+        setVerificationCode(
+          event.target.value.replace(/\D/g, "").slice(0, 6)
+        )
+      }
+      placeholder="Enter 6-digit code"
+      aria-label="Email verification code"
+      disabled={verificationBusy}
+    />
+
+    <button
+      type="button"
+      className="btn secondary"
+      onClick={handleConfirmVerificationCode}
+      disabled={
+        verificationBusy ||
+        !/^\d{6}$/.test(verificationCode)
+      }
+    >
+      Verify email
+    </button>
+
+    {verificationMessage && (
+      <p role="status">{verificationMessage}</p>
+    )}
+
+    {verificationError && (
+      <p role="alert" className="error">
+        {verificationError}
+      </p>
+    )}
+
+    <button
+      type="button"
+      className="btn secondary"
+      onClick={handleSwitchAccount}
+      disabled={verificationBusy}
+    >
+      Switch account
+    </button>
+  </>
+
             ) : participationUnavailable ? (
               <>
                 <p role="alert" className="error">
@@ -474,15 +610,7 @@ export default function CommunityPlusLandingPage() {
               </p>
             )}
 
-            <div className="guest-pill">
-              READ ONLY ACCESS
-            </div>
-
-            <p className="guest-mode-copy">
-              Explore your local community in read-only mode.
-              Set up your minimum profile when you're ready
-              to participate.
-            </p>
+            
           </div>
         </section>
       </main>
@@ -503,6 +631,59 @@ export default function CommunityPlusLandingPage() {
           onSuccess={handleAuthSuccess}
         />
       )}
+
+{import.meta.env.DEV && (
+  <>
+    <button
+      type="button"
+      style={{
+        position: "fixed",
+        right: "20px",
+        bottom: "20px",
+        zIndex: 99999,
+        padding: "12px 18px",
+        background: "#c62828",
+        color: "#ffffff",
+        border: "3px solid yellow",
+        borderRadius: "6px",
+        cursor: "pointer",
+      }}
+      disabled={!isAuthenticated || isGuest}
+      onClick={async () => {
+        console.log("[EMAIL TEST] Starting verification request");
+
+        try {
+          const result = await testAccountEmailVerification();
+          console.log("[EMAIL TEST] API result:", result);
+          alert(
+            "Verification request completed. Check the console and backend logs."
+          );
+        } catch (error) {
+          console.error(
+            "[EMAIL TEST] Verification request failed:",
+            error
+          );
+          alert(`Verification request failed: ${error.message}`);
+        }
+      }}
+    >
+      Test email verification
+    </button>
+
+    {(!isAuthenticated || isGuest) && (
+      <p
+        style={{
+          position: "fixed",
+          right: "20px",
+          bottom: "70px",
+          zIndex: 99999,
+        }}
+      >
+        Sign in to run the email verification test.
+      </p>
+    )}
+  </>
+)}
     </div>
   );
 }
