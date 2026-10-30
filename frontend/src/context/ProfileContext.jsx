@@ -14,32 +14,21 @@ import { useAuth } from "./AuthContext";
 import useAPI from "../hooks/useAPI";
 import { buildUrl } from "../services/api";
 
-const ProfileContext =
-    createContext(null);
+const ProfileContext = createContext(null);
 
-
-const PROFILE_CACHE_PREFIX =
-    "communityone_profile_cache";
-
-const PROFILE_CACHE_TTL =
-    1000 * 60 * 10;
-
+const PROFILE_CACHE_PREFIX = "communityone_profile_cache";
+const PROFILE_CACHE_TTL = 1000 * 60 * 10;
 
 /* =====================================================
    USER KEY
 ===================================================== */
 
 function getUserKey(user) {
-
-    if (!user) {
-        return null;
-    }
-
+    if (!user) return null;
 
     if (typeof user === "string") {
         return user;
     }
-
 
     return (
         user?.id ||
@@ -54,152 +43,86 @@ function getUserKey(user) {
     );
 }
 
-
 /* =====================================================
    CACHE
 ===================================================== */
 
 function getProfileCacheKey(userKey) {
-
     return `${PROFILE_CACHE_PREFIX}:${userKey}`;
-
 }
 
-
 function readProfileCache(userKey) {
-
-    if (!userKey) {
-        return null;
-    }
+    if (!userKey) return null;
 
     try {
+        const raw = localStorage.getItem(
+            getProfileCacheKey(userKey)
+        );
 
-        const raw =
-            localStorage.getItem(
-                getProfileCacheKey(userKey)
-            );
+        if (!raw) return null;
 
+        const cached = JSON.parse(raw);
 
-        if (!raw) {
-            return null;
-        }
-
-
-        const cached =
-            JSON.parse(raw);
-
-
-        if (!cached?.cachedAt) {
-            return null;
-        }
-
+        if (!cached?.cachedAt) return null;
 
         const isFresh =
             Date.now() - cached.cachedAt <
             PROFILE_CACHE_TTL;
 
-
-        return isFresh
-            ? cached
-            : null;
+        return isFresh ? cached : null;
 
     } catch {
-
         return null;
-
     }
-
 }
-
 
 function writeProfileCache(
     userKey,
     profile,
     providers
 ) {
-
-    if (!userKey) {
-        return;
-    }
+    if (!userKey) return;
 
     try {
-
         localStorage.setItem(
-
             getProfileCacheKey(userKey),
-
             JSON.stringify({
-
                 profile,
-
                 providers,
-
-                cachedAt:
-                    Date.now(),
-
+                cachedAt: Date.now(),
             })
-
         );
-
     } catch {
-
         // Ignore cache failures.
-
     }
-
 }
 
-
 function clearProfileCache(userKey) {
-
     try {
-
         if (userKey) {
-
             localStorage.removeItem(
                 getProfileCacheKey(userKey)
             );
-
             return;
         }
 
-
-        Object.keys(localStorage)
-            .forEach((key) => {
-
-                if (
-                    key.startsWith(
-                        PROFILE_CACHE_PREFIX
-                    )
-                ) {
-
-                    localStorage.removeItem(
-                        key
-                    );
-
-                }
-
-            });
+        Object.keys(localStorage).forEach((key) => {
+            if (key.startsWith(PROFILE_CACHE_PREFIX)) {
+                localStorage.removeItem(key);
+            }
+        });
 
     } catch {
-
         // Ignore cache failures.
-
     }
-
 }
-
 
 /* =====================================================
    PROVIDERS
 ===================================================== */
 
-function normaliseProviders(
-    providers = {}
-) {
-
+function normaliseProviders(providers = {}) {
     return {
-
         facebook:
             typeof providers.facebook === "object"
                 ? !!providers.facebook?.verified
@@ -219,11 +142,8 @@ function normaliseProviders(
             typeof providers.x === "object"
                 ? !!providers.x?.verified
                 : !!providers.x,
-
     };
-
 }
-
 
 /* =====================================================
    COMPLETION
@@ -233,92 +153,58 @@ function getCompletedSections(
     profile,
     providers = {}
 ) {
-
     return {
+        identity: !!profile?.username,
 
-        identity:
-            !!profile?.username,
+        location: !!(
+            profile?.homeLocation?.lat &&
+            profile?.homeLocation?.lng
+        ),
 
-        location:
-            !!(
-                profile?.homeLocation?.lat &&
-                profile?.homeLocation?.lng
-            ),
+        contact: !!(
+            profile?.phone ||
+            profile?.phoneDisplay
+        ),
 
-        contact:
-            !!(
-                profile?.phone ||
-                profile?.phoneDisplay
-            ),
+        social: !!(
+            providers.facebook ||
+            providers.instagram ||
+            providers.youtube ||
+            providers.x
+        ),
 
-        social:
-            !!(
-                providers.facebook ||
-                providers.instagram ||
-                providers.youtube ||
-                providers.x
-            ),
+        payment: !!profile?.paymentVerified,
 
-        payment:
-            !!profile?.paymentVerified,
-
-        entity:
-            !!(
-                profile?.organisationProfile
-                    ?.organisation_name ||
-
-                profile?.organisation
-                    ?.organisation_name
-            ),
-
+        entity: !!(
+            profile?.organisationProfile
+                ?.organisation_name ||
+            profile?.organisation
+                ?.organisation_name
+        ),
     };
-
 }
 
+function calculateCompletion(profile, providers) {
+    const sections = getCompletedSections(
+        profile,
+        providers
+    );
 
-function calculateCompletion(
-    profile,
-    providers
-) {
-
-    const sections =
-        getCompletedSections(
-            profile,
-            providers
-        );
-
-
-    const values =
-        Object.values(sections);
-
-
-    const completed =
-        values.filter(Boolean).length;
-
+    const values = Object.values(sections);
+    const completed = values.filter(Boolean).length;
 
     return values.length
         ? Math.round(
             (completed / values.length) * 100
         )
         : 0;
-
 }
 
-
-function calculateBasicProfileCompletion(
-    profile
-) {
-
-    if (!profile) {
-        return 0;
-    }
-
+function calculateBasicProfileCompletion(profile) {
+    if (!profile) return 0;
 
     const checks = [
-
-        Boolean(
-            profile.username?.trim()
-        ),
+        Boolean(profile.username?.trim()),
 
         Boolean(
             profile.phone ||
@@ -327,68 +213,47 @@ function calculateBasicProfileCompletion(
 
         Boolean(
             profile.homeLocation &&
-            typeof profile.homeLocation.lat ===
-                "number" &&
-            typeof profile.homeLocation.lng ===
-                "number"
+            typeof profile.homeLocation.lat === "number" &&
+            typeof profile.homeLocation.lng === "number"
         ),
-
     ];
 
-
-    const completed =
-        checks.filter(Boolean).length;
-
+    const completed = checks.filter(Boolean).length;
 
     return Math.round(
         (completed / checks.length) * 100
     );
-
 }
-
 
 /* =====================================================
    API
 ===================================================== */
 
 function normaliseApiResponse(res) {
-
     return res?.data || res || {};
-
 }
 
-
 function isNotFoundError(err) {
-
     const status =
         err?.response?.status ||
         err?.status;
 
-
-    const data =
-        err?.response?.data;
-
+    const data = err?.response?.data;
 
     return (
         status === 404 ||
-        data?.error ===
-            "Profile not found" ||
+        data?.error === "Profile not found" ||
         data?.profile === null
     );
-
 }
-
 
 /* =====================================================
    CLIENT ENDPOINT
 ===================================================== */
 
 function getClientEndpointDetails() {
-
     return {
-
-        deviceName:
-            navigator.platform || "",
+        deviceName: navigator.platform || "",
 
         deviceType:
             /Mobi|Android|iPhone|iPad/i.test(
@@ -397,14 +262,9 @@ function getClientEndpointDetails() {
                 ? "mobile"
                 : "desktop",
 
-        userAgent:
-            navigator.userAgent || "",
-
-        platform:
-            navigator.platform || "",
-
-        language:
-            navigator.language || "",
+        userAgent: navigator.userAgent || "",
+        platform: navigator.platform || "",
+        language: navigator.language || "",
 
         timezone:
             Intl.DateTimeFormat()
@@ -412,68 +272,45 @@ function getClientEndpointDetails() {
                 .timeZone || "",
 
         screen: {
-
-            width:
-                window.screen?.width || null,
-
-            height:
-                window.screen?.height || null,
-
+            width: window.screen?.width || null,
+            height: window.screen?.height || null,
         },
 
         viewport: {
-
-            width:
-                window.innerWidth || null,
-
-            height:
-                window.innerHeight || null,
-
+            width: window.innerWidth || null,
+            height: window.innerHeight || null,
         },
 
-        capturedAt:
-            new Date().toISOString(),
-
+        capturedAt: new Date().toISOString(),
     };
-
 }
-
 
 /* =====================================================
    PROVIDER
 ===================================================== */
 
-export function ProfileProvider({
-    children,
-}) {
-
-    const api =
-        useAPI();
-
+export function ProfileProvider({ children }) {
+    const api = useAPI();
 
     const {
-    user,
-    meData,
-    participationError,
-    isAuthenticated,
-    loading,
-    authLoading,
-    isGuest,
-} = useAuth();
-
+        user,
+        meData,
+        participationError,
+        isAuthenticated,
+        loading,
+        authLoading,
+        isGuest,
+    } = useAuth();
 
     /* =================================================
        AUTH STATE
     ================================================= */
 
-    const userKey =
-        getUserKey(user);
-
+    const userKey = getUserKey(user);
 
     const authSettled =
         !loading &&
         !authLoading;
-
 
     const waitingForUserKey =
         authSettled &&
@@ -481,11 +318,9 @@ export function ProfileProvider({
         !isGuest &&
         !userKey;
 
-
     const profileShouldWait =
         !authSettled ||
         waitingForUserKey;
-
 
     /* =================================================
        CACHE
@@ -496,117 +331,17 @@ export function ProfileProvider({
             ? readProfileCache(userKey)
             : null;
 
-
     /* =================================================
        REFS
     ================================================= */
 
-    const apiRef =
-        useRef(api);
+    const apiRef = useRef(api);
 
+    const loadingRef = useRef(false);
 
-    const loadingRef =
-        useRef(false);
+    const currentUserKeyRef = useRef(userKey);
 
-
-    const currentUserKeyRef =
-        useRef(userKey);
-
-
-    /*
-     * Tracks whether the current authenticated user
-     * has already completed profile bootstrap.
-     *
-     * IMPORTANT:
-     * This prevents profile state changes from
-     * re-triggering the bootstrap lifecycle.
-     */
-
-    const profileBootstrapUserRef =
-        useRef(null);
-
-
-
-useEffect(() => {
-    if (profileShouldWait) {
-        setProfileLoading(true);
-        return;
-    }
-
-    if (!isAuthenticated || isGuest) {
-        profileBootstrapUserRef.current = null;
-        currentUserKeyRef.current = userKey;
-
-        clearProfileState({ loading: false });
-        clearProfileCache();
-
-        return;
-    }
-
-    if (!userKey || !meData) {
-        if (!userKey) return;
-
-        // The shared request failed or returned no data.
-        setProfileError(
-            participationError || "Unable to load account profile."
-        );
-        setProfileLoading(false);
-        return;
-    }
-
-    if (profileBootstrapUserRef.current === userKey) {
-        return;
-    }
-
-    profileBootstrapUserRef.current = userKey;
-
-    currentUserKeyRef.current = userKey;
-
-    const rawProfile = meData.profile || {};
-
-    const hasUsername = Object.prototype.hasOwnProperty.call(
-        rawProfile,
-        "username"
-    );
-
-    const nextProfile = {
-        ...rawProfile,
-        username: hasUsername
-            ? rawProfile.username
-            : (meData.user?.username || ""),
-    };
-
-    const nextProviders = meData.providers || {};
-
-    setAccountUser(meData.user || null);
-
-    setProfile(nextProfile);
-
-    setProviders(normaliseProviders(nextProviders));
-
-    setProfileMissing(!meData.profile);
-
-    setProfileError(null);
-
-    setProfileLoading(false);
-
-    writeProfileCache(
-        userKey,
-        nextProfile,
-        nextProviders
-    );
-
-}, [
-    profileShouldWait,
-    isAuthenticated,
-    isGuest,
-    userKey,
-    meData,
-    participationError,
-    clearProfileState,
-]);
-
-
+    const profileBootstrapUserRef = useRef(null);
 
     /* =================================================
        STATE
@@ -619,12 +354,10 @@ useEffect(() => {
         cachedOnRender?.profile || null
     );
 
-    
-const [
-    accountUser,
-    setAccountUser,
-] = useState(null);
-
+    const [
+        accountUser,
+        setAccountUser,
+    ] = useState(null);
 
     const [
         providers,
@@ -635,438 +368,302 @@ const [
         )
     );
 
-
     const [
         profileLoading,
         setProfileLoading,
     ] = useState(
-
         Boolean(
             profileShouldWait ||
-
             (
                 isAuthenticated &&
                 !cachedOnRender
             )
         )
-
     );
-
 
     const [
         profileSaving,
         setProfileSaving,
     ] = useState(false);
 
-
     const [
         profileError,
         setProfileError,
     ] = useState(null);
-
 
     const [
         profileMissing,
         setProfileMissing,
     ] = useState(false);
 
-
     /* =================================================
        STATE HELPERS
     ================================================= */
 
-    const clearProfileState =
-        useCallback(
-            ({
-                loading = true,
-                missing = false,
-            } = {}) => {
+    const clearProfileState = useCallback(
+        ({
+            loading = true,
+            missing = false,
+        } = {}) => {
+            setProfile(null);
+            setAccountUser(null);
 
-                setProfile(null);
-                setAccountUser(null);
+            setProviders(
+                normaliseProviders()
+            );
 
-                setProviders(
-                    normaliseProviders()
-                );
+            setProfileMissing(missing);
+            setProfileError(null);
+            setProfileLoading(loading);
+        },
+        []
+    );
 
-                setProfileMissing(
-                    missing
-                );
+    const markProfileReady = useCallback(
+        (
+            nextProfile = null,
+            nextProviders = {},
+            missing = false
+        ) => {
+            setProfile(nextProfile);
 
-                setProfileError(null);
+            setProviders(
+                normaliseProviders(nextProviders)
+            );
 
-                setProfileLoading(
-                    loading
-                );
-
-            },
-            []
-        );
-
-
-    const markProfileReady =
-        useCallback(
-            (
-                nextProfile = null,
-                nextProviders = {},
-                missing = false
-            ) => {
-
-                setProfile(
-                    nextProfile
-                );
-
-                setProviders(
-                    normaliseProviders(
-                        nextProviders
-                    )
-                );
-
-                setProfileMissing(
-                    missing
-                );
-
-                setProfileError(
-                    null
-                );
-
-                setProfileLoading(
-                    false
-                );
-
-            },
-            []
-        );
-
+            setProfileMissing(missing);
+            setProfileError(null);
+            setProfileLoading(false);
+        },
+        []
+    );
 
     /* =================================================
        AUTH HEADERS
     ================================================= */
 
+    const getAuthHeaders = useCallback(
+        async (extraHeaders = {}) => {
+            const session = await fetchAuthSession({
+                forceRefresh: true,
+            });
 
+            const idToken = session.tokens?.idToken;
+            const accessToken = session.tokens?.accessToken;
+            const idTokenString = idToken?.toString();
 
-const getAuthHeaders = useCallback(
-  async (extraHeaders = {}) => {
-    const session = await fetchAuthSession({
-      forceRefresh: true,
-    });
+            if (import.meta.env.DEV) {
+                console.log(
+                    "[AMPLIFY AUTH DIAGNOSTIC]",
+                    {
+                        hasTokensObject: Boolean(session.tokens),
+                        hasIdToken: Boolean(idToken),
+                        idTokenType: typeof idToken,
+                        idTokenStringLength:
+                            idTokenString?.length ?? 0,
+                        hasAccessToken: Boolean(accessToken),
+                        isAuthenticated,
+                        isGuest,
+                    }
+                );
+            }
 
-    const idToken = session.tokens?.idToken;
-    const accessToken = session.tokens?.accessToken;
-    const idTokenString = idToken?.toString();
+            if (
+                !idTokenString ||
+                idTokenString === "undefined"
+            ) {
+                throw new Error(
+                    "No ID token available in the Amplify session"
+                );
+            }
 
-    if (import.meta.env.DEV) {
-      console.log("[AMPLIFY AUTH DIAGNOSTIC]", {
-        hasTokensObject: Boolean(session.tokens),
-        hasIdToken: Boolean(idToken),
-        idTokenType: typeof idToken,
-        idTokenStringLength: idTokenString?.length ?? 0,
-        hasAccessToken: Boolean(accessToken),
-        isAuthenticated,
-        isGuest,
-      });
-    }
-
-    if (!idTokenString || idTokenString === "undefined") {
-      throw new Error(
-        "No ID token available in the Amplify session"
-      );
-    }
-
-    return {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${idTokenString}`,
-      ...extraHeaders,
-    };
-  },
-  [isAuthenticated, isGuest]
-);
-
-
-const testAccountEmailVerification = useCallback(async () => {
-    try {
-        const headers = await getAuthHeaders();
-
-        const response = await fetch(
-    buildUrl("/account-email-verification/start"),
-    {
-        method: "POST",
-        headers,
-    }
-);
-
-        const result = await response.json();
-
-        if (!response.ok || result.success !== true) {
-    throw new Error(
-        result.error ||
-        result.message ||
-        `Unable to send verification code (HTTP ${response.status}).`
+            return {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${idTokenString}`,
+                ...extraHeaders,
+            };
+        },
+        [isAuthenticated, isGuest]
     );
-}
-        console.log("Account verification test:", {
-            status: response.status,
-            result,
-        });
 
-        return result;
-    } catch (error) {
-        console.error("Account verification test failed:", error);
-        throw error;
-    }
-}, [getAuthHeaders]);
-
-
-const confirmAccountEmailVerification = useCallback(
-    async (code) => {
-        const normalizedCode = String(code || "").trim();
-
-        if (!/^\d{6}$/.test(normalizedCode)) {
-            throw new Error("Enter the six-digit verification code.");
-        }
-
-        const headers = await getAuthHeaders();
-
-        const response = await fetch(
-    buildUrl("/account-email-verification/confirm"),
-    {
-        method: "POST",
-        headers,
-        body: JSON.stringify({
-            code: normalizedCode,
-        }),
-    }
-);
-
-        const result = await response.json().catch(() => ({}));
-
-        if (!response.ok || result.success !== true || result.verified !== true) {
-            throw new Error(
-                result.error ||
-                result.message ||
-                `Email verification failed (HTTP ${response.status}).`
-            );
-        }
-
-        return result;
-    },
-    [getAuthHeaders]
-);
     /* =================================================
+       EMAIL VERIFICATION
+    ================================================= */
+
+    const testAccountEmailVerification =
+        useCallback(async () => {
+            try {
+                const headers = await getAuthHeaders();
+
+                const response = await fetch(
+                    buildUrl(
+                        "/account-email-verification/start"
+                    ),
+                    {
+                        method: "POST",
+                        headers,
+                    }
+                );
+
+                const result = await response.json();
+
+                if (
+                    !response.ok ||
+                    result.success !== true
+                ) {
+                    throw new Error(
+                        result.error ||
+                        result.message ||
+                        `Unable to send verification code (HTTP ${response.status}).`
+                    );
+                }
+
+                console.log(
+                    "Account verification test:",
+                    {
+                        status: response.status,
+                        result,
+                    }
+                );
+
+                return result;
+
+            } catch (error) {
+                console.error(
+                    "Account verification test failed:",
+                    error
+                );
+                throw error;
+            }
+        }, [getAuthHeaders]);
+
+            /* =================================================
        LOAD PROFILE
     ================================================= */
 
-    const loadProfile =
-        useCallback(
-            async ({
-                background = false,
-            } = {}) => {
+    const loadProfile = useCallback(
+        async ({
+            background = false,
+        } = {}) => {
 
-                /*
-                 * Do not attempt API calls until
-                 * authentication has settled.
-                 */
+            if (profileShouldWait) {
+                return null;
+            }
 
-                if (profileShouldWait) {
+            if (!isAuthenticated || isGuest) {
+                clearProfileState({
+                    loading: false,
+                });
 
-                    return null;
+                clearProfileCache();
 
-                }
+                return null;
+            }
 
+            if (loadingRef.current) {
+                return null;
+            }
 
-                /*
-                 * Signed out / guest.
-                 */
+            loadingRef.current = true;
 
-                if (
-                    !isAuthenticated ||
-                    isGuest
-                ) {
+            if (!background) {
+                setProfileLoading(true);
+            }
 
-                    clearProfileState({
-                        loading: false,
-                    });
+            try {
+                const headers = await getAuthHeaders();
 
-                    clearProfileCache();
+                const res = await apiRef.current.get(
+                    "/me",
+                    {
+                        headers,
+                        params: {
+                            _refresh: Date.now(),
+                        },
+                    }
+                );
 
-                    return null;
+                const payload =
+                    normaliseApiResponse(res);
 
-                }
+                setAccountUser(payload?.user || null);
 
+                const rawProfile =
+                    payload?.profile || {};
 
-                /*
-                 * Prevent overlapping profile requests.
-                 */
+                const hasUsername =
+                    Object.prototype.hasOwnProperty.call(
+                        rawProfile,
+                        "username"
+                    );
 
-                if (loadingRef.current) {
-                    return null;
-                }
+                const nextProfile = {
+                    ...rawProfile,
+                    username: hasUsername
+                        ? rawProfile.username
+                        : (payload?.user?.username || ""),
+                };
 
+                const nextProviders =
+                    payload?.providers || {};
 
-                loadingRef.current =
-                    true;
+                writeProfileCache(
+                    userKey,
+                    nextProfile,
+                    nextProviders
+                );
 
+                markProfileReady(
+                    nextProfile,
+                    nextProviders,
+                    !payload?.profile
+                );
 
-                if (!background) {
+                return nextProfile;
 
-                    setProfileLoading(
+            } catch (err) {
+
+                if (isNotFoundError(err)) {
+                    clearProfileCache(userKey);
+                    setAccountUser(null);
+
+                    markProfileReady(
+                        null,
+                        {},
                         true
                     );
 
-                }
-
-
-                try {
-
-                    const headers =
-                        await getAuthHeaders();
-
-
-const res =
-    await apiRef.current.get(
-        "/me",
-        {
-            headers,
-            params: {
-                _refresh: Date.now(),
-            },
-        }
-    );
-
-
-                    const payload =
-                        normaliseApiResponse(
-                            res
-                        );
-
-                    setAccountUser(payload?.user || null);
-
-                    console.log("[PROFILE EMAIL STATUS RECEIVED]", {
-    email: payload?.user?.email,
-    emailVerified: payload?.user?.emailVerified,
-});    
-                    /*
-                     * Preserve the backend profile
-                     * as authoritative.
-                     *
-                     * Only fall back to the user
-                     * username if the profile object
-                     * does not actually contain a
-                     * username property.
-                     */
-
-                    const rawProfile =
-                        payload?.profile || {};
-
-
-                    const hasUsername =
-                        Object.prototype
-                            .hasOwnProperty
-                            .call(
-                                rawProfile,
-                                "username"
-                            );
-
-
-                    const nextProfile = {
-
-                        ...rawProfile,
-
-                        username:
-                            hasUsername
-                                ? rawProfile.username
-                                : (
-                                    payload
-                                        ?.user
-                                        ?.username ||
-                                    ""
-                                ),
-
-                    };
-
-
-                    const nextProviders =
-                        payload?.providers || {};
-
-
-                    writeProfileCache(
-                        userKey,
-                        nextProfile,
-                        nextProviders
-                    );
-
-
-                    markProfileReady(
-                        nextProfile,
-                        nextProviders,
-                        !payload?.profile
-                    );
-
-
-                    return nextProfile;
-
-                } catch (err) {
-
-                    if (
-                        isNotFoundError(err)
-                    ) {
-
-                        clearProfileCache(
-                            userKey
-                        );
-
-                        setAccountUser(null);
-
-
-                        markProfileReady(
-                            null,
-                            {},
-                            true
-                        );
-
-
-                        return null;
-
-                    }
-
-
-                    console.error(
-                        "Profile load failed:",
-                        err
-                    );
-
-
-                    setProfileError(
-                        err?.message ||
-                        "Profile load failed"
-                    );
-
-
-                    setProfileLoading(
-                        false
-                    );
-
-
                     return null;
-
-                } finally {
-
-                    loadingRef.current =
-                        false;
-
                 }
 
-            },
-            [
-                profileShouldWait,
-                isAuthenticated,
-                isGuest,
-                userKey,
-                getAuthHeaders,
-                markProfileReady,
-                clearProfileState,
-            ]
-        );
+                console.error(
+                    "Profile load failed:",
+                    err
+                );
+
+                setProfileError(
+                    err?.message ||
+                    "Profile load failed"
+                );
+
+                setProfileLoading(false);
+
+                return null;
+
+            } finally {
+                loadingRef.current = false;
+            }
+        },
+        [
+            profileShouldWait,
+            isAuthenticated,
+            isGuest,
+            userKey,
+            getAuthHeaders,
+            markProfileReady,
+            clearProfileState,
+        ]
+    );
 
 
     /* =================================================
@@ -1075,36 +672,14 @@ const res =
 
     useEffect(() => {
 
-        /*
-         * -------------------------------------------------
-         * WAIT FOR AUTH
-         * -------------------------------------------------
-         */
-
         if (profileShouldWait) {
-
             setProfileLoading(true);
-
             return;
         }
 
-
-        /*
-         * -------------------------------------------------
-         * SIGNED OUT / GUEST
-         * -------------------------------------------------
-         */
-
-        if (
-            !isAuthenticated ||
-            isGuest
-        ) {
-
-            profileBootstrapUserRef.current =
-                null;
-
-            currentUserKeyRef.current =
-                userKey;
+        if (!isAuthenticated || isGuest) {
+            profileBootstrapUserRef.current = null;
+            currentUserKeyRef.current = userKey;
 
             clearProfileState({
                 loading: false,
@@ -1115,556 +690,364 @@ const res =
             return;
         }
 
-
-        /*
-         * -------------------------------------------------
-         * AUTHENTICATED BUT NO USER KEY
-         * -------------------------------------------------
-         */
-
         if (!userKey) {
             return;
         }
 
-
-        /*
-         * -------------------------------------------------
-         * BOOTSTRAP GUARD
-         *
-         * This is the key protection against:
-         *
-         * profile change
-         *      ↓
-         * bootstrap
-         *      ↓
-         * loadProfile
-         *      ↓
-         * setProfile
-         *      ↓
-         * bootstrap
-         *
-         * The same authenticated user can only
-         * bootstrap once during this auth lifecycle.
-         * -------------------------------------------------
-         */
-
-        if (
-            profileBootstrapUserRef.current ===
-            userKey
-        ) {
-
-            return;
-        }
-
-
-        /*
-         * Mark BEFORE starting async work.
-         */
-
-        profileBootstrapUserRef.current =
-            userKey;
-
-
-        /*
-         * -------------------------------------------------
-         * USER CHANGE
-         * -------------------------------------------------
-         */
-
-        const userChanged =
-            currentUserKeyRef.current !==
-            userKey;
-
-
-        currentUserKeyRef.current =
-            userKey;
-
-
-        /*
-         * -------------------------------------------------
-         * CACHE
-         * -------------------------------------------------
-         */
-
-        const cached =
-            readProfileCache(userKey);
-
-
-        /*
-         * -------------------------------------------------
-         * NEW USER
-         * -------------------------------------------------
-         */
-
-        if (userChanged) {
-            setAccountUser(null);
-
-            setProfile(
-                cached?.profile || null
+        if (!meData) {
+            setProfileError(
+                participationError ||
+                "Unable to load account profile."
             );
-
-            setProviders(
-                normaliseProviders(
-                    cached?.providers || {}
-                )
-            );
-
-            setProfileMissing(
-                !cached?.profile
-            );
-
-            setProfileError(null);
-
-            setProfileLoading(
-                !cached?.profile
-            );
-
-
-            if (cached) {
-
-                loadProfile({
-                    background: true,
-                });
-
-            } else {
-
-                loadProfile({
-                    background: false,
-                });
-
-            }
-
-            return;
-        }
-
-
-        /*
-         * -------------------------------------------------
-         * EXISTING USER + CACHE
-         * -------------------------------------------------
-         *
-         * Show cached profile immediately and refresh
-         * from the server in the background.
-         */
-
-        if (cached) {
-
-            setProfile(
-                cached.profile || null
-            );
-
-            setProviders(
-                normaliseProviders(
-                    cached.providers || {}
-                )
-            );
-
-            setProfileMissing(
-                !cached.profile
-            );
-
-            setProfileError(null);
 
             setProfileLoading(false);
 
-
-            loadProfile({
-                background: true,
-            });
-
-
             return;
         }
 
-
-        /*
-         * -------------------------------------------------
-         * EXISTING USER + NO CACHE
-         * -------------------------------------------------
-         *
-         * If a profile is already in React state,
-         * preserve it while refreshing.
-         */
-
-        if (!profile) {
-
-            setProfile(null);
-            setAccountUser(null);
-            setProviders(
-                normaliseProviders()
-            );
-
-            setProfileMissing(false);
-
-            setProfileError(null);
-
-            setProfileLoading(true);
-
+        if (
+            profileBootstrapUserRef.current === userKey
+        ) {
+            return;
         }
 
+        profileBootstrapUserRef.current = userKey;
+        currentUserKeyRef.current = userKey;
 
-        loadProfile({
-            background: Boolean(profile),
-        });
+        const rawProfile =
+            meData.profile || {};
 
+        const hasUsername =
+            Object.prototype.hasOwnProperty.call(
+                rawProfile,
+                "username"
+            );
+
+        const nextProfile = {
+            ...rawProfile,
+            username: hasUsername
+                ? rawProfile.username
+                : (meData.user?.username || ""),
+        };
+
+        const nextProviders =
+            meData.providers || {};
+
+        setAccountUser(meData.user || null);
+
+        setProfile(nextProfile);
+
+        setProviders(
+            normaliseProviders(nextProviders)
+        );
+
+        setProfileMissing(!meData.profile);
+
+        setProfileError(null);
+
+        setProfileLoading(false);
+
+        writeProfileCache(
+            userKey,
+            nextProfile,
+            nextProviders
+        );
 
     }, [
         profileShouldWait,
         isAuthenticated,
         isGuest,
         userKey,
-        loadProfile,
+        meData,
+        participationError,
         clearProfileState,
     ]);
 
+    const confirmAccountEmailVerification =
+        useCallback(
+            async (code) => {
+                const normalizedCode =
+                    String(code || "").trim();
 
-    /* =================================================
+                if (!/^\d{6}$/.test(normalizedCode)) {
+                    throw new Error(
+                        "Enter the six-digit verification code."
+                    );
+                }
+
+                const headers = await getAuthHeaders();
+
+                const response = await fetch(
+                    buildUrl(
+                        "/account-email-verification/confirm"
+                    ),
+                    {
+                        method: "POST",
+                        headers,
+                        body: JSON.stringify({
+                            code: normalizedCode,
+                        }),
+                    }
+                );
+
+                const result = await response
+                    .json()
+                    .catch(() => ({}));
+
+                if (
+                    !response.ok ||
+                    result.success !== true ||
+                    result.verified !== true
+                ) {
+                    throw new Error(
+                        result.error ||
+                        result.message ||
+                        `Email verification failed (HTTP ${response.status}).`
+                    );
+                }
+
+                return result;
+            },
+            [getAuthHeaders]
+        );
+            /* =================================================
        SAVE PROFILE
     ================================================= */
 
-    const saveProfile =
-        useCallback(
-            async (nextProfile) => {
+    const saveProfile = useCallback(
+        async (nextProfile) => {
 
-                if (
-                    !isAuthenticated ||
-                    isGuest
-                ) {
+            if (
+                !isAuthenticated ||
+                isGuest
+            ) {
+                throw new Error(
+                    "User is not authenticated"
+                );
+            }
 
-                    throw new Error(
-                        "User is not authenticated"
-                    );
+            setProfileSaving(true);
+            setProfileError(null);
 
-                }
+            const previousProfile = profile;
 
+            try {
+                const headers = await getAuthHeaders({
+                    "x-version":
+                        previousProfile?.version
+                            ? String(previousProfile.version)
+                            : "",
+                });
 
-                setProfileSaving(true);
+                const payloadToSave = {
+                    ...nextProfile,
+                    endpoint: getClientEndpointDetails(),
+                };
 
-                setProfileError(null);
+                const res = await apiRef.current.put(
+                    "/profile",
+                    payloadToSave,
+                    { headers }
+                );
 
+                const payload =
+                    normaliseApiResponse(res);
 
-                const previousProfile =
-                    profile;
-
-
-                try {
-
-                    const headers =
-                        await getAuthHeaders({
-
-                            "x-version":
-                                previousProfile?.version
-                                    ? String(
-                                        previousProfile.version
-                                    )
-                                    : "",
-
-                        });
-
-
-                    const payloadToSave = {
-
+                const savedProfile =
+                    payload?.profile ||
+                    {
+                        ...profile,
                         ...nextProfile,
-
-                        endpoint:
-                            getClientEndpointDetails(),
-
                     };
 
+                const nextProviders =
+                    savedProfile?.social || {};
 
-                    const res =
-                        await apiRef.current.put(
-                            "/profile",
-                            payloadToSave,
-                            { headers }
+                setProfile(savedProfile);
+
+                setProviders(
+                    normaliseProviders(nextProviders)
+                );
+
+                setProfileMissing(false);
+                setProfileLoading(false);
+
+                writeProfileCache(
+                    userKey,
+                    savedProfile,
+                    nextProviders
+                );
+
+                return savedProfile;
+
+            } catch (err) {
+
+                const status =
+                    err?.response?.status ||
+                    err?.status;
+
+                if (status === 409) {
+                    const serverProfile =
+                        err?.response?.data
+                            ?.serverProfile;
+
+                    if (serverProfile) {
+                        setProfile(serverProfile);
+                        setProfileMissing(false);
+                        setProfileLoading(false);
+
+                        writeProfileCache(
+                            userKey,
+                            serverProfile,
+                            providers
                         );
 
-
-                    const payload =
-                        normaliseApiResponse(
-                            res
-                        );
-
-
-                    const savedProfile =
-                        payload?.profile ||
-                        {
-                            ...profile,
-                            ...nextProfile,
-                        };
-
-
-                    const nextProviders =
-                        savedProfile?.social || {};
-
-
-                    setProfile(
-                        savedProfile
-                    );
-
-                    setProviders(
-                        normaliseProviders(
-                            nextProviders
-                        )
-                    );
-
-                    setProfileMissing(
-                        false
-                    );
-
-                    setProfileLoading(
-                        false
-                    );
-
-
-                    writeProfileCache(
-                        userKey,
-                        savedProfile,
-                        nextProviders
-                    );
-
-
-                    return savedProfile;
-
-                } catch (err) {
-
-                    const status =
-                        err?.response?.status ||
-                        err?.status;
-
-
-                    if (status === 409) {
-
-                        const serverProfile =
-                            err?.response?.data
-                                ?.serverProfile;
-
-
-                        if (serverProfile) {
-
-                            setProfile(
-                                serverProfile
-                            );
-
-                            setProfileMissing(
-                                false
-                            );
-
-                            setProfileLoading(
-                                false
-                            );
-
-
-                            writeProfileCache(
-                                userKey,
-                                serverProfile,
-                                providers
-                            );
-
-
-                            return serverProfile;
-
-                        }
-
+                        return serverProfile;
                     }
-
-
-                    console.error(
-                        "Profile save failed:",
-                        err
-                    );
-
-
-                    setProfileError(
-                        err?.message ||
-                        "Profile save failed"
-                    );
-
-
-                    throw err;
-
-                } finally {
-
-                    setProfileSaving(
-                        false
-                    );
-
                 }
 
-            },
-            [
-                isAuthenticated,
-                isGuest,
-                userKey,
-                profile,
-                providers,
-                getAuthHeaders,
-            ]
-        );
+                console.error(
+                    "Profile save failed:",
+                    err
+                );
+
+                setProfileError(
+                    err?.message ||
+                    "Profile save failed"
+                );
+
+                throw err;
+
+            } finally {
+                setProfileSaving(false);
+            }
+        },
+        [
+            isAuthenticated,
+            isGuest,
+            userKey,
+            profile,
+            providers,
+            getAuthHeaders,
+        ]
+    );
 
 
     /* =================================================
        PATCH PROFILE
     ================================================= */
 
-    const patchProfile =
-        useCallback(
-            async (patch) => {
+    const patchProfile = useCallback(
+        async (patch) => {
 
-                if (
-                    !isAuthenticated ||
-                    isGuest
-                ) {
+            if (
+                !isAuthenticated ||
+                isGuest
+            ) {
+                throw new Error(
+                    "User is not authenticated"
+                );
+            }
 
-                    throw new Error(
-                        "User is not authenticated"
-                    );
+            setProfileSaving(true);
+            setProfileError(null);
 
-                }
+            try {
+                const headers = await getAuthHeaders({
+                    "x-version":
+                        profile?.version
+                            ? String(profile.version)
+                            : "",
+                });
 
+                const payloadToPatch = {
+                    ...patch,
+                    endpoint: getClientEndpointDetails(),
+                };
 
-                setProfileSaving(true);
+                const res = await apiRef.current.patch(
+                    "/profile",
+                    payloadToPatch,
+                    { headers }
+                );
 
-                setProfileError(null);
+                const payload =
+                    normaliseApiResponse(res);
 
+                const savedProfile =
+                    payload?.profile;
 
-                try {
+                const nextProviders =
+                    savedProfile?.social || {};
 
-                    const headers =
-                        await getAuthHeaders({
+                setProfile(savedProfile);
 
-                            "x-version":
-                                profile?.version
-                                    ? String(
-                                        profile.version
-                                    )
-                                    : "",
+                setProviders(
+                    normaliseProviders(nextProviders)
+                );
 
-                        });
+                setProfileMissing(false);
+                setProfileLoading(false);
 
+                writeProfileCache(
+                    userKey,
+                    savedProfile,
+                    nextProviders
+                );
 
-                    const payloadToPatch = {
+                return savedProfile;
 
-                        ...patch,
+            } catch (err) {
 
-                        endpoint:
-                            getClientEndpointDetails(),
+                console.error(
+                    "Profile patch failed:",
+                    err
+                );
 
-                    };
+                setProfileError(
+                    err?.message ||
+                    "Profile patch failed"
+                );
 
+                throw err;
 
-                    const res =
-                        await apiRef.current.patch(
-                            "/profile",
-                            payloadToPatch,
-                            { headers }
-                        );
-
-
-                    const payload =
-                        normaliseApiResponse(
-                            res
-                        );
-
-
-                    const savedProfile =
-                        payload?.profile;
-
-
-                    const nextProviders =
-                        savedProfile?.social || {};
-
-
-                    setProfile(
-                        savedProfile
-                    );
-
-                    setProviders(
-                        normaliseProviders(
-                            nextProviders
-                        )
-                    );
-
-                    setProfileMissing(
-                        false
-                    );
-
-                    setProfileLoading(
-                        false
-                    );
-
-
-                    writeProfileCache(
-                        userKey,
-                        savedProfile,
-                        nextProviders
-                    );
-
-
-                    return savedProfile;
-
-                } catch (err) {
-
-                    console.error(
-                        "Profile patch failed:",
-                        err
-                    );
-
-
-                    setProfileError(
-                        err?.message ||
-                        "Profile patch failed"
-                    );
-
-
-                    throw err;
-
-                } finally {
-
-                    setProfileSaving(
-                        false
-                    );
-
-                }
-
-            },
-            [
-                isAuthenticated,
-                isGuest,
-                userKey,
-                profile,
-                getAuthHeaders,
-            ]
-        );
+            } finally {
+                setProfileSaving(false);
+            }
+        },
+        [
+            isAuthenticated,
+            isGuest,
+            userKey,
+            profile,
+            getAuthHeaders,
+        ]
+    );
 
 
     /* =================================================
        DERIVED STATE
     ================================================= */
 
-    const completionPercent =
-        useMemo(
-            () =>
-                calculateCompletion(
-                    profile,
-                    providers
-                ),
-            [
+    const completionPercent = useMemo(
+        () =>
+            calculateCompletion(
                 profile,
-                providers,
-            ]
-        );
+                providers
+            ),
+        [
+            profile,
+            providers,
+        ]
+    );
 
-
-    const basicProfileCompletion =
-        useMemo(
-            () =>
-                calculateBasicProfileCompletion(
-                    profile
-                ),
-            [profile]
-        );
-
+    const basicProfileCompletion = useMemo(
+        () =>
+            calculateBasicProfileCompletion(
+                profile
+            ),
+        [profile]
+    );
 
     /*
      * Basic account access is based only on:
@@ -1678,7 +1061,6 @@ const res =
         !profileMissing &&
         basicProfileCompletion === 100;
 
-
     const profileReady =
         authSettled &&
         !waitingForUserKey &&
@@ -1689,51 +1071,53 @@ const res =
        CONTEXT VALUE
     ================================================= */
 
-const value = useMemo(
-    () => ({
-        profile,
-        setProfile,
+    const value = useMemo(
+        () => ({
+            profile,
+            setProfile,
 
-        accountUser,
+            accountUser,
 
-        providers,
-        setProviders,
+            providers,
+            setProviders,
 
-        profileLoading,
-        profileReady,
-        profileSaving,
-        profileError,
-        profileMissing,
+            profileLoading,
+            profileReady,
+            profileSaving,
+            profileError,
+            profileMissing,
 
-        completionPercent,
-        basicProfileCompletion,
-        hasProfile,
+            completionPercent,
+            basicProfileCompletion,
+            hasProfile,
 
-        loadProfile,
-        saveProfile,
-        patchProfile,
-        testAccountEmailVerification,
-        confirmAccountEmailVerification,
-    }),
-    [
-        profile,
-        accountUser,
-        providers,
-        profileLoading,
-        profileReady,
-        profileSaving,
-        profileError,
-        profileMissing,
-        completionPercent,
-        basicProfileCompletion,
-        hasProfile,
-        loadProfile,
-        saveProfile,
-        patchProfile,
-        testAccountEmailVerification,
-        confirmAccountEmailVerification,
-    ]
-);
+            loadProfile,
+            saveProfile,
+            patchProfile,
+
+            testAccountEmailVerification,
+            confirmAccountEmailVerification,
+        }),
+        [
+            profile,
+            accountUser,
+            providers,
+            profileLoading,
+            profileReady,
+            profileSaving,
+            profileError,
+            profileMissing,
+            completionPercent,
+            basicProfileCompletion,
+            hasProfile,
+            loadProfile,
+            saveProfile,
+            patchProfile,
+            testAccountEmailVerification,
+            confirmAccountEmailVerification,
+        ]
+    );
+
 
     /* =================================================
        DEVELOPMENT DIAGNOSTIC
@@ -1741,10 +1125,7 @@ const value = useMemo(
 
     useEffect(() => {
 
-        if (
-            import.meta.env?.DEV
-        ) {
-
+        if (import.meta.env?.DEV) {
             console.log(
                 "PROFILE CONTEXT STATE",
                 {
@@ -1758,7 +1139,6 @@ const value = useMemo(
                     basicProfileCompletion,
                 }
             );
-
         }
 
     }, [
@@ -1774,17 +1154,10 @@ const value = useMemo(
 
 
     return (
-
-        <ProfileContext.Provider
-            value={value}
-        >
-
+        <ProfileContext.Provider value={value}>
             {children}
-
         </ProfileContext.Provider>
-
     );
-
 }
 
 
@@ -1793,22 +1166,13 @@ const value = useMemo(
 ===================================================== */
 
 export function useProfile() {
-
-    const context =
-        useContext(
-            ProfileContext
-        );
-
+    const context = useContext(ProfileContext);
 
     if (!context) {
-
         throw new Error(
             "useProfile must be used within ProfileProvider"
         );
-
     }
 
-
     return context;
-
 }
