@@ -93,6 +93,8 @@ export function AuthProvider({ children }) {
 
   // Backend participation state from GET /api/me.
   const [participation, setParticipation] = useState(null);
+  // Complete response from GET /api/me, shared with ProfileContext.
+const [meData, setMeData] = useState(null);
 
   // True while participation is being loaded.
   const [participationLoading, setParticipationLoading] =
@@ -139,6 +141,7 @@ const clearAuth = useCallback(() => {
   setTokens(null);
 
   setParticipation(null);
+  setMeData(null);
   setParticipationLoading(false);
   setParticipationError(null);
   setEmailVerificationRequired(false);
@@ -184,6 +187,9 @@ const loadParticipation = useCallback(async (accessToken) => {
     const nextParticipation = response?.participation ?? null;
 
     if (mountedRef.current) {
+  setMeData(response);
+}
+    if (mountedRef.current) {
       setParticipation(nextParticipation);
       setEmailVerificationRequired(false);
       setParticipationError(null);
@@ -206,6 +212,7 @@ const loadParticipation = useCallback(async (accessToken) => {
 
     if (mountedRef.current) {
       setParticipation(null);
+      setMeData(null);
       setEmailVerificationRequired(requiresEmailVerification);
       setParticipationError(
         error?.message || "Unable to load participation."
@@ -240,7 +247,9 @@ const updateOnboardingStatus = useCallback(
 
     const payload = response?.data || response || {};
     const nextParticipation = payload.participation;
-
+    if (mountedRef.current) {
+  setMeData(response);
+}
     if (!nextParticipation) {
       throw new Error(
         "The backend did not return updated participation."
@@ -450,6 +459,7 @@ const login = useCallback(async () => {
 
       // Backend participation state.
       participation,
+      meData,
       participationLoading,
       participationError,
       emailVerificationRequired,
@@ -474,6 +484,7 @@ const login = useCallback(async () => {
       token,
       tokens,
       participation,
+      meData,
       participationLoading,
       participationError,
       emailVerificationRequired,

@@ -452,12 +452,14 @@ export function ProfileProvider({
 
 
     const {
-        user,
-        isAuthenticated,
-        loading,
-        authLoading,
-        isGuest,
-    } = useAuth();
+    user,
+    meData,
+    participationError,
+    isAuthenticated,
+    loading,
+    authLoading,
+    isGuest,
+} = useAuth();
 
 
     /* =================================================
@@ -524,12 +526,86 @@ export function ProfileProvider({
         useRef(null);
 
 
-    useEffect(() => {
 
-        apiRef.current =
-            api;
+useEffect(() => {
+    if (profileShouldWait) {
+        setProfileLoading(true);
+        return;
+    }
 
-    }, [api]);
+    if (!isAuthenticated || isGuest) {
+        profileBootstrapUserRef.current = null;
+        currentUserKeyRef.current = userKey;
+
+        clearProfileState({ loading: false });
+        clearProfileCache();
+
+        return;
+    }
+
+    if (!userKey || !meData) {
+        if (!userKey) return;
+
+        // The shared request failed or returned no data.
+        setProfileError(
+            participationError || "Unable to load account profile."
+        );
+        setProfileLoading(false);
+        return;
+    }
+
+    if (profileBootstrapUserRef.current === userKey) {
+        return;
+    }
+
+    profileBootstrapUserRef.current = userKey;
+
+    currentUserKeyRef.current = userKey;
+
+    const rawProfile = meData.profile || {};
+
+    const hasUsername = Object.prototype.hasOwnProperty.call(
+        rawProfile,
+        "username"
+    );
+
+    const nextProfile = {
+        ...rawProfile,
+        username: hasUsername
+            ? rawProfile.username
+            : (meData.user?.username || ""),
+    };
+
+    const nextProviders = meData.providers || {};
+
+    setAccountUser(meData.user || null);
+
+    setProfile(nextProfile);
+
+    setProviders(normaliseProviders(nextProviders));
+
+    setProfileMissing(!meData.profile);
+
+    setProfileError(null);
+
+    setProfileLoading(false);
+
+    writeProfileCache(
+        userKey,
+        nextProfile,
+        nextProviders
+    );
+
+}, [
+    profileShouldWait,
+    isAuthenticated,
+    isGuest,
+    userKey,
+    meData,
+    participationError,
+    clearProfileState,
+]);
+
 
 
     /* =================================================
