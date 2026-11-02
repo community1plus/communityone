@@ -705,11 +705,12 @@ export function ProfileProvider({ children }) {
             return;
         }
 
-        if (
-            profileBootstrapUserRef.current === userKey
-        ) {
-            return;
-        }
+if (
+    profileBootstrapUserRef.current === userKey
+) {
+    setProfileLoading(false);
+    return;
+}
 
         profileBootstrapUserRef.current = userKey;
         currentUserKeyRef.current = userKey;

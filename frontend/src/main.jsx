@@ -16,6 +16,10 @@ import { LocationProvider } from "./context/LocationProvider.jsx";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 import { ProfileProvider } from "./context/ProfileContext";
+
+import { fetchAuthSession } from "aws-amplify/auth";
+import { apiFetch } from "./services/api";
+
 const stripePromise = loadStripe(
   import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
 );
@@ -51,6 +55,12 @@ Amplify.configure({
   },
 });
 
+console.log("[AUTH HUB] main.jsx listener registered");
+
+Hub.listen("auth", ({ payload }) => {
+  console.log("[AUTH HUB] event received:", payload.event);
+});
+
 Hub.listen("auth", ({ payload }) => {
   switch (payload.event) {
     case "signInWithRedirect":
@@ -58,6 +68,33 @@ Hub.listen("auth", ({ payload }) => {
       break;
 
     case "signedIn":
+  console.log("Signed in");
+
+  void (async () => {
+    try {
+      const session = await fetchAuthSession();
+
+      const idToken = session.tokens?.idToken?.toString();
+
+      if (!idToken) {
+        throw new Error("Cognito ID token unavailable");
+      }
+
+      await apiFetch("/auth/session-established", {
+        method: "POST",
+        token: idToken,
+      });
+
+      console.log("Backend session established");
+    } catch (error) {
+      console.error(
+        "Failed to establish backend session:",
+        error
+      );
+    }
+  })();
+
+  break;
       console.log("✅ Signed in via redirect");
       break;
 

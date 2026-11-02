@@ -77,6 +77,7 @@ export default function CommunityPlusEmailForm({ onSuccess }) {
         );
       }
 
+      console.log("[AUTH] Email form signIn completed");
       const currentUser = await getCurrentUser();
 
       const session = await fetchAuthSession({
@@ -91,11 +92,11 @@ export default function CommunityPlusEmailForm({ onSuccess }) {
           "Signed in, but no access token was found."
         );
       }
-
+      console.log("[AUTH] Email form starting forced refresh");
       await refreshAuth({
         forceRefresh: true,
       });
-
+console.log("[AUTH] Email form refresh completed");
       if (typeof onSuccess === "function") {
         onSuccess();
       }

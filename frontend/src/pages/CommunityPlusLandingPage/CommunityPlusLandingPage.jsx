@@ -631,59 +631,6 @@ const participationUnavailable =
           onSuccess={handleAuthSuccess}
         />
       )}
-
-{import.meta.env.DEV && (
-  <>
-    <button
-      type="button"
-      style={{
-        position: "fixed",
-        right: "20px",
-        bottom: "20px",
-        zIndex: 99999,
-        padding: "12px 18px",
-        background: "#c62828",
-        color: "#ffffff",
-        border: "3px solid yellow",
-        borderRadius: "6px",
-        cursor: "pointer",
-      }}
-      disabled={!isAuthenticated || isGuest}
-      onClick={async () => {
-        console.log("[EMAIL TEST] Starting verification request");
-
-        try {
-          const result = await testAccountEmailVerification();
-          console.log("[EMAIL TEST] API result:", result);
-          alert(
-            "Verification request completed. Check the console and backend logs."
-          );
-        } catch (error) {
-          console.error(
-            "[EMAIL TEST] Verification request failed:",
-            error
-          );
-          alert(`Verification request failed: ${error.message}`);
-        }
-      }}
-    >
-      Test email verification
-    </button>
-
-    {(!isAuthenticated || isGuest) && (
-      <p
-        style={{
-          position: "fixed",
-          right: "20px",
-          bottom: "70px",
-          zIndex: 99999,
-        }}
-      >
-        Sign in to run the email verification test.
-      </p>
-    )}
-  </>
-)}
     </div>
   );
 }

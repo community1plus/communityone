@@ -46,7 +46,7 @@ function getInitials(name = "") {
 export default function HeaderTopRow({ onOpenAuthModal }) {
   const navigate = useNavigate();
 
-  const { user, isAuthenticated, isGuest } = useAuth();
+  const { user, isAuthenticated, isGuest, exitGuest } = useAuth();
 
   const displayName = useMemo(() => getDisplayName(user), [user]);
 
@@ -88,13 +88,13 @@ export default function HeaderTopRow({ onOpenAuthModal }) {
         {isGuest ? (
           <>
             <div className="guest-inline">
-              <div className="guest-pill">Guest Access</div>
-
-              <span className="guest-readonly">Read Only</span>
 
               <button
                 className="guest-exit"
-                onClick={() => navigate("/")}
+                onClick={() => {
+  exitGuest();
+  navigate("/");
+}}
               >
                 Exit Guest
               </button>

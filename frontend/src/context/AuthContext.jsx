@@ -17,6 +17,17 @@ import {
 
 import { apiFetch } from "../services/api";
 
+import {
+  isGuest as checkIsGuest,
+  canBrowse,
+  canCreate,
+  canUpload,
+  canComment,
+  canSave,
+} from "../auth/permissions";
+
+import { Hub } from "aws-amplify/utils";
+
 const AuthContext = createContext(null);
 
 const GUEST_KEY = "community_guest";
@@ -86,6 +97,7 @@ function normaliseUser(amplifyUser, tokens) {
 
 export function AuthProvider({ children }) {
   const mountedRef = useRef(true);
+  const refreshAuthPromiseRef = useRef(null);
 
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
@@ -270,8 +282,14 @@ const updateOnboardingStatus = useCallback(
      REFRESH AUTH
   ========================================= */
 
-  const refreshAuth = useCallback(
-    async ({ forceRefresh = false } = {}) => {
+const refreshAuth = useCallback(
+  async ({ forceRefresh = false } = {}) => {
+    // Reuse an existing authentication refresh if one is running.
+    if (refreshAuthPromiseRef.current) {
+      return refreshAuthPromiseRef.current;
+    }
+
+    const refreshPromise = (async () => {
       if (mountedRef.current) {
         setHydrating(true);
       }
@@ -285,9 +303,6 @@ const updateOnboardingStatus = useCallback(
 
         const accessToken =
           session.tokens?.idToken?.toString();
-
-        const idPayload = session.tokens?.idToken?.payload || {};
-
 
         if (!accessToken) {
           clearAuth();
@@ -308,19 +323,10 @@ const updateOnboardingStatus = useCallback(
           setIsGuest(false);
         }
 
-        /*
-         * Load backend participation using the newly
-         * obtained token. A participation failure does
-         * not invalidate successful Amplify auth.
-         */
         console.time("[AUTH] loadParticipation");
-await loadParticipation(accessToken);
-console.timeEnd("[AUTH] loadParticipation");
+        await loadParticipation(accessToken);
+        console.timeEnd("[AUTH] loadParticipation");
 
-        /*
-         * Preserve the existing return contract for
-         * callers that need the refreshed token.
-         */
         return {
           user: normalisedUser,
           token: accessToken,
@@ -345,9 +351,20 @@ console.timeEnd("[AUTH] loadParticipation");
           setHydrating(false);
         }
       }
-    },
-    [clearAuth, loadParticipation]
-  );
+    })();
+
+    refreshAuthPromiseRef.current = refreshPromise;
+
+    try {
+      return await refreshPromise;
+    } finally {
+      if (refreshAuthPromiseRef.current === refreshPromise) {
+        refreshAuthPromiseRef.current = null;
+      }
+    }
+  },
+  [clearAuth, loadParticipation]
+);
 
   /* =========================================
      INITIAL AUTH
@@ -366,6 +383,24 @@ console.timeEnd("[AUTH] loadParticipation");
 
     initAuth();
   }, [refreshAuth]);
+
+  /* =========================================
+     COGNITO SIGN-IN EVENT
+  ========================================= */
+
+  useEffect(() => {
+    const cancelListener = Hub.listen("auth", ({ payload }) => {
+      if (payload.event === "signedIn") {
+        console.log("[AUTH] Cognito sign-in detected");
+
+        console.log("[AUTH] Hub listener starting refresh");
+        void refreshAuth();
+      }
+    });
+
+    return cancelListener;
+  }, [refreshAuth]);
+
 
   /* =========================================
      LOGIN
@@ -409,6 +444,16 @@ const login = useCallback(async () => {
     setHydrating(false);
   }, [clearAuth]);
 
+  const exitGuest = useCallback(() => {
+  localStorage.removeItem(GUEST_KEY);
+
+  setIsGuest(false);
+  clearAuth();
+
+  setLoading(false);
+  setHydrating(false);
+}, [clearAuth]);
+
   /* =========================================
      LOGOUT
   ========================================= */
@@ -437,15 +482,46 @@ const login = useCallback(async () => {
      AUTH STATE
   ========================================= */
 
-  const isAuthenticated = Boolean(user && token);
+const isAuthenticated = Boolean(user && token);
 
-  const authLoading = loading || hydrating;
+const authLoading = loading || hydrating;
 
-  const role = isAuthenticated
+const guestAccess = checkIsGuest(
+  user,
+  isGuest,
+  participation
+);
+
+const can = useCallback(
+  (capability) => {
+    switch (capability) {
+      case "browse":
+        return canBrowse();
+
+      case "create":
+        return canCreate(user, isGuest, participation);
+
+      case "upload":
+        return canUpload(user, isGuest, participation);
+
+      case "comment":
+        return canComment(user, isGuest, participation);
+
+      case "save":
+        return canSave(user, isGuest, participation);
+
+      default:
+        return false;
+    }
+  },
+  [user, isGuest, participation]
+);
+
+const role = guestAccess
+  ? "guest"
+  : isAuthenticated
     ? "member"
-    : isGuest
-      ? "guest"
-      : "anonymous";
+    : "anonymous";
 
   /* =========================================
      CONTEXT VALUE
@@ -468,14 +544,15 @@ const login = useCallback(async () => {
       loading,
       hydrating,
       authLoading,
-
-      isAuthenticated,
-      isGuest,
-      role,
+isAuthenticated,
+isGuest,
+role,
+can,
 
       login,
       logout,
       continueAsGuest,
+      exitGuest,
       refreshAuth,
       clearAuth,
     }),
@@ -495,9 +572,11 @@ const login = useCallback(async () => {
       isAuthenticated,
       isGuest,
       role,
+      can,
       login,
       logout,
       continueAsGuest,
+      exitGuest,
       updateOnboardingStatus,
       refreshAuth,
       clearAuth,

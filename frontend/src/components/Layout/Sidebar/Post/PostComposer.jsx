@@ -4,6 +4,8 @@ import { useParams, useLocation } from "react-router-dom";
 
 import { fetchAuthSession } from "aws-amplify/auth";
 
+import { useAuth } from "../../../../context/AuthContext";
+
 
 
 import "./PostComposer.css";
@@ -786,6 +788,8 @@ async function apiFetch(path, options = {}) {
 
 export default function PostComposer({
 
+  
+
   mode: propMode,
 
   onSubmit,
@@ -802,7 +806,12 @@ export default function PostComposer({
 
   const location = useLocation();
 
-
+  const {
+    user: authUser,
+    isGuest,
+    participation,
+    can,
+  } = useAuth();
 
   const routeMode = params.mode || location.state?.mode;
 
@@ -868,29 +877,28 @@ export default function PostComposer({
 
 
 
-  const requireSignedIn = () => {
-
-    if (user) return true;
-
-
-
+const requireSignedIn = () => {
+  // Anonymous visitor: request authentication.
+  if (!authUser) {
     setError("Please sign in to create posts, upload media, or submit content.");
-
     setSubmitSuccess("");
 
-
-
     if (typeof onRequireAuth === "function") {
-
       onRequireAuth();
-
     }
 
-
-
     return false;
+  }
 
-  };
+  // Authenticated guest: browsing is allowed, creation is not.
+  if (!can("create")) {
+    setError("Guest access is read-only. Complete onboarding to create content.");
+    setSubmitSuccess("");
+    return false;
+  }
+
+  return true;
+};
 
 
 
@@ -1478,9 +1486,12 @@ export default function PostComposer({
 
 
 
-  const uploadSingleFile = async (item, index, total) => {
+const uploadSingleFile = async (item, index, total) => {
+  if (!requireSignedIn()) {
+    throw new Error("You do not have permission to upload files.");
+  }
 
-    const headers = await getAuthHeaders();
+  const headers = await getAuthHeaders();
 
     const safeName = item.safeName || sanitizeFileName(item.file.name);
 
@@ -1582,9 +1593,10 @@ export default function PostComposer({
 
 
 
-  const uploadFilesToS3 = async () => {
+const uploadFilesToS3 = async () => {
+  if (!requireSignedIn()) return [];
 
-    if (!files.length) return [];
+  if (!files.length) return [];
 
 
 
@@ -1856,7 +1868,7 @@ export default function PostComposer({
                   placeholder={config.titlePlaceholder}
 
                   value={title}
-
+                  disabled={submitting || !can("create")}
                   onChange={(event) => {
 
                     setTitle(event.target.value);
@@ -1876,7 +1888,7 @@ export default function PostComposer({
                   placeholder={config.bodyPlaceholder}
 
                   value={content}
-
+                  disabled={submitting || !can("create")}
                   onChange={(event) => {
 
                     setContent(event.target.value);
@@ -1933,7 +1945,7 @@ export default function PostComposer({
 
                     }}
 
-                    disabled={submitting}
+                    disabled={submitting || !can("upload")}
 
                   >
 

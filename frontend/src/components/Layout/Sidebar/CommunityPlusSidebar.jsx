@@ -195,27 +195,25 @@ if (protectedItem) {
     return;
   }
 
-  if (onboardingStatus === "GUEST") {
-    return;
-  }
+// GUEST can enter the interface, but permissions remain read-only.
+if (onboardingStatus === "GUEST") {
+  // Continue to navigation below.
+} else if (onboardingStatus !== "COMPLETED") {
+  console.error(
+    "[SIDEBAR] Unexpected onboarding status:",
+    onboardingStatus
+  );
+  return;
+} else if (!hasMinimumProfile) {
+  navigate("/communityplus/profile", {
+    state: {
+      returnTo: item.path,
+      profileRequired: true,
+    },
+  });
+  return;
+}
 
-  if (onboardingStatus !== "COMPLETED") {
-    console.error(
-      "[SIDEBAR] Unexpected onboarding status:",
-      onboardingStatus
-    );
-    return;
-  }
-
-  if (!hasMinimumProfile) {
-    navigate("/communityplus/profile", {
-      state: {
-        returnTo: item.path,
-        profileRequired: true,
-      },
-    });
-    return;
-  }
 }
 
 
@@ -282,11 +280,12 @@ if (protectedItem) {
                   (!isAuthenticated || isGuest);
 
                 const profileLocked =
-                  protectedItem &&
-                  isAuthenticated &&
-                  !isGuest &&
-                  !profileIsStillResolving &&
-                  !hasMinimumProfile;
+  protectedItem &&
+  isAuthenticated &&
+  !isGuest &&
+  onboardingStatus !== "GUEST" &&
+  !profileIsStillResolving &&
+  !hasMinimumProfile;
 
                 const locked =
                   guestLocked ||

@@ -5,14 +5,13 @@ import { useAuth } from "../../context/AuthContext";
 import { useProfile } from "../../context/ProfileContext";
 
 export default function CommunityPlusAuthResolve() {
-  const [checkedAuth, setCheckedAuth] = useState(false);
+ 
 
   const {
     loading,
     isAuthenticated,
     isGuest,
     user,
-    refreshAuth,
   } = useAuth();
 
   const {
@@ -20,26 +19,9 @@ export default function CommunityPlusAuthResolve() {
     hasProfile,
   } = useProfile();
 
-  useEffect(() => {
-    let active = true;
 
-    async function checkAuth() {
-      try {
-        await refreshAuth?.();
-      } finally {
-        if (active) setCheckedAuth(true);
-      }
-    }
-
-    checkAuth();
-
-    return () => {
-      active = false;
-    };
-  }, [refreshAuth]);
 
   console.log("AUTH RESOLVE:", {
-    checkedAuth,
     loading,
     isAuthenticated,
     isGuest,
@@ -48,7 +30,7 @@ export default function CommunityPlusAuthResolve() {
     hasProfile,
   });
 
-  if (loading || !checkedAuth) {
+  if (loading) {
     return <div style={{ padding: 40 }}>Checking session...</div>;
   }
 
