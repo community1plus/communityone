@@ -1,6 +1,7 @@
 import PhoneField from "./fields/PhoneField";
 import LocationField from "./fields/LocationField";
 import SelectField from "./fields/SelectField";
+import VerifiedPhoneField from "./VerifiedPhoneField";
 
 import WorkspaceField
     from "./WorkspaceField";
@@ -54,7 +55,43 @@ export default function FieldRenderer({
             );
 
 
-        case "phone":
+                case "phone":
+
+            if (field.verification === "person") {
+                return (
+                    <VerifiedPhoneField
+                        field={field}
+                        form={form}
+                        editing={editing}
+                    />
+                );
+            }
+
+            return (
+                <PhoneField
+                    field={field}
+                    form={form}
+                    editing={editing}
+                />
+            );
+
+            if (field.verification === "person") {
+                return (
+                    <VerifiedPhoneField
+                        field={field}
+                        form={form}
+                        editing={editing}
+                    />
+                );
+            }
+
+            return (
+                <PhoneField
+                    field={field}
+                    form={form}
+                    editing={editing}
+                />
+            );
 
             return (
 

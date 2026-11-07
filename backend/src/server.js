@@ -7,7 +7,7 @@ import { pool } from "./db/pool.js";
 import { connectDB } from "../src/db/db.js";
 import authIdentityRoutes from "../routes/authIdentityRoutes.js";
 import accountEmailVerificationRoutes from "../routes/accountEmailVerificationRoutes.js";
-
+import accountPhoneVerificationRoutes from "../routes/accountPhoneVerificationRoutes.js";
 await connectDB();
 
 /* =========================
@@ -333,6 +333,8 @@ app.use(
 );
 
 console.log("   → /api/account-email-verification");
+
+app.use("/api/account-phone-verification", accountPhoneVerificationRoutes);
 
 app.use("/api/moderation", moderationRoutes);
 

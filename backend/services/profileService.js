@@ -294,13 +294,6 @@ function pickProfileFields(
   }
 
   if (
-    profile.phoneVerified !== undefined
-  ) {
-    incoming.phoneVerified =
-      profile.phoneVerified;
-  }
-
-  if (
     profile.homeLocation !== undefined
   ) {
     incoming.homeLocation =
@@ -473,6 +466,21 @@ function buildMergedProfile(
         )
       ),
   };
+
+
+  const existingPhone =
+    existing.phoneE164 ||
+    existing.phone ||
+    "";
+
+  const incomingPhone =
+    incoming.phoneE164 ??
+    incoming.phone ??
+    existingPhone;
+
+  if (incomingPhone !== existingPhone) {
+    merged.phoneVerified = false;
+  }
 
 
   /*

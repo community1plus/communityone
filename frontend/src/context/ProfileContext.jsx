@@ -811,7 +811,92 @@ if (
             },
             [getAuthHeaders]
         );
-            /* =================================================
+
+    /* =================================================
+       PHONE VERIFICATION
+    ================================================= */
+
+    const startAccountPhoneVerification =
+        useCallback(async () => {
+            const headers = await getAuthHeaders();
+
+            const response = await fetch(
+                buildUrl(
+                    "/account-phone-verification/start"
+                ),
+                {
+                    method: "POST",
+                    headers,
+                }
+            );
+
+            const result = await response
+                .json()
+                .catch(() => ({}));
+
+            if (
+                !response.ok ||
+                result.success !== true
+            ) {
+                throw new Error(
+                    result.error ||
+                    result.message ||
+                    `Unable to send phone verification code (HTTP ${response.status}).`
+                );
+            }
+
+            return result;
+        }, [getAuthHeaders]);
+
+    const confirmAccountPhoneVerification =
+        useCallback(
+            async (code) => {
+                const normalizedCode =
+                    String(code || "").trim();
+
+                if (!/^\d{6}$/.test(normalizedCode)) {
+                    throw new Error(
+                        "Enter the six-digit verification code."
+                    );
+                }
+
+                const headers = await getAuthHeaders();
+
+                const response = await fetch(
+                    buildUrl(
+                        "/account-phone-verification/confirm"
+                    ),
+                    {
+                        method: "POST",
+                        headers,
+                        body: JSON.stringify({
+                            code: normalizedCode,
+                        }),
+                    }
+                );
+
+                const result = await response
+                    .json()
+                    .catch(() => ({}));
+
+                if (
+                    !response.ok ||
+                    result.success !== true ||
+                    result.verified !== true
+                ) {
+                    throw new Error(
+                        result.error ||
+                        result.message ||
+                        `Phone verification failed (HTTP ${response.status}).`
+                    );
+                }
+
+                return result;
+            },
+            [getAuthHeaders]
+        );
+
+    /* =================================================
        SAVE PROFILE
     ================================================= */
 
@@ -1098,6 +1183,8 @@ if (
 
             testAccountEmailVerification,
             confirmAccountEmailVerification,
+            startAccountPhoneVerification,
+            confirmAccountPhoneVerification,
         }),
         [
             profile,
@@ -1116,6 +1203,8 @@ if (
             patchProfile,
             testAccountEmailVerification,
             confirmAccountEmailVerification,
+            startAccountPhoneVerification,
+            confirmAccountPhoneVerification,
         ]
     );
 

@@ -343,3 +343,38 @@ export async function updateProfile(
     rows[0]
   );
 }
+
+/* =====================================================
+   MARK PHONE VERIFIED
+===================================================== */
+
+export async function markPhoneVerified({
+  userId,
+  phoneE164,
+  db = pool,
+}) {
+  if (!userId || !phoneE164) {
+    throw new Error("Missing userId or phoneE164");
+  }
+
+  const { rows } = await db.query(
+    `
+      UPDATE ${TABLE}
+      SET
+        phone_verified = TRUE,
+        version = version + 1,
+        updated_at = NOW()
+      WHERE user_id = $1
+        AND COALESCE(
+          NULLIF(phone_e164, ''),
+          phone
+        ) = $2
+      RETURNING *
+    `,
+    [userId, phoneE164]
+  );
+
+  return rows[0]
+    ? rowToProfile(rows[0])
+    : null;
+}
